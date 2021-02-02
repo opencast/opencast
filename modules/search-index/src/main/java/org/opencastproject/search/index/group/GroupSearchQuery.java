@@ -64,8 +64,9 @@ public class GroupSearchQuery extends AbstractSearchQuery {
     this.organization = organization;
     this.user = user;
     this.actions.add(Permissions.Action.READ.toString());
-    if (!user.getOrganization().getId().equals(organization))
+    if (!user.getOrganization().getId().equals(organization)) {
       throw new IllegalStateException("User's organization must match search organization");
+    }
   }
 
   /**
@@ -78,8 +79,9 @@ public class GroupSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public GroupSearchQuery withIdentifier(String id) {
-    if (StringUtils.isBlank(id))
+    if (StringUtils.isBlank(id)) {
       throw new IllegalArgumentException("Identifier cannot be null");
+    }
     this.identifiers.add(id);
     return this;
   }
@@ -155,8 +157,9 @@ public class GroupSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public GroupSearchQuery withAction(Action action) {
-    if (action == null)
+    if (action == null) {
       throw new IllegalArgumentException("Action cannot be null");
+    }
     this.actions.add(action.toString());
     return this;
   }
@@ -219,8 +222,9 @@ public class GroupSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public GroupSearchQuery withRole(JpaRole role) {
-    if (role == null)
+    if (role == null) {
       throw new IllegalArgumentException("Role cannot be null");
+    }
     this.roles.add(role);
     return this;
   }

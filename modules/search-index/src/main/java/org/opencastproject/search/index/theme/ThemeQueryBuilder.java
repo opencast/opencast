@@ -55,8 +55,9 @@ public class ThemeQueryBuilder extends AbstractElasticsearchQueryBuilder<ThemeSe
   @Override
   public void buildQuery(ThemeSearchQuery query) {
     // Organization
-    if (query.getOrganization() == null)
+    if (query.getOrganization() == null) {
       throw new IllegalStateException("No organization set on the theme search query!");
+    }
 
     and(ThemeIndexSchema.ORGANIZATION, query.getOrganization());
 
@@ -142,17 +143,20 @@ public class ThemeQueryBuilder extends AbstractElasticsearchQueryBuilder<ThemeSe
       for (SearchTerms<String> terms : query.getTerms()) {
         StringBuilder queryText = new StringBuilder();
         for (String term : terms.getTerms()) {
-          if (queryText.length() > 0)
+          if (queryText.length() > 0) {
             queryText.append(" ");
+          }
           queryText.append(term);
         }
-        if (query.isFuzzySearch())
+        if (query.isFuzzySearch()) {
           fuzzyText = queryText.toString();
-        else
+        } else {
           this.text = queryText.toString();
+        }
         if (Quantifier.All.equals(terms.getQuantifier())) {
-          if (groups == null)
+          if (groups == null) {
             groups = new ArrayList<ValueGroup>();
+          }
           if (query.isFuzzySearch()) {
             logger.warn("All quantifier not supported in conjunction with wildcard text");
           }

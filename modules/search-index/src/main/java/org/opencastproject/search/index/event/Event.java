@@ -65,13 +65,19 @@ import javax.xml.transform.stream.StreamSource;
 /**
  * Object wrapper for a recording event.
  */
-@XmlType(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE, propOrder = { "identifier", "organization",
-        "title", "description", "subject", "location", "presenters", "contributors", "seriesId", "seriesName",
-        "language", "source", "created", "creator", "publisher", "license", "rights", "accessPolicy", "managedAcl", "workflowState",
+@XmlType(
+    name = "event",
+    namespace = IndexObject.INDEX_XML_NAMESPACE,
+    propOrder = {
+        "identifier", "organization", "title", "description", "subject", "location", "presenters",
+        "contributors", "seriesId", "seriesName", "language", "source", "created", "creator",
+        "publisher", "license", "rights", "accessPolicy", "managedAcl", "workflowState",
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration",
         "hasComments", "hasOpenComments", "hasPreview", "needsCutting", "publications",
         "archiveVersion", "recordingStatus", "eventStatus", "agentId", "agentConfigurations",
-        "technicalStartTime", "technicalEndTime", "technicalPresenters" })
+        "technicalStartTime", "technicalEndTime", "technicalPresenters"
+    }
+)
 @XmlRootElement(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Event implements IndexObject {
@@ -1085,8 +1091,9 @@ public class Event implements IndexObject {
     BufferedReader streamReader = new BufferedReader(new InputStreamReader(json, "UTF-8"));
     StringBuilder jsonStringBuilder = new StringBuilder();
     String inputStr;
-    while ((inputStr = streamReader.readLine()) != null)
+    while ((inputStr = streamReader.readLine()) != null) {
       jsonStringBuilder.append(inputStr);
+    }
 
     JSONObject obj = new JSONObject(jsonStringBuilder.toString());
     Configuration config = new Configuration();

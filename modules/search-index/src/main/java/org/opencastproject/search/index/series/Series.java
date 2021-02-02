@@ -196,8 +196,9 @@ public class Series implements IndexObject {
    *          the title
    */
   public void setTitle(String title) {
-    if (EqualsUtil.eq(this.title, title))
+    if (EqualsUtil.eq(this.title, title)) {
       return;
+    }
 
     this.title = title;
     seriesTitleUpdated = true;
@@ -553,8 +554,9 @@ public class Series implements IndexObject {
     BufferedReader streamReader = new BufferedReader(new InputStreamReader(json, "UTF-8"));
     StringBuilder jsonStringBuilder = new StringBuilder();
     String inputStr;
-    while ((inputStr = streamReader.readLine()) != null)
+    while ((inputStr = streamReader.readLine()) != null) {
       jsonStringBuilder.append(inputStr);
+    }
 
     JSONObject obj = new JSONObject(jsonStringBuilder.toString());
     Configuration config = new Configuration();

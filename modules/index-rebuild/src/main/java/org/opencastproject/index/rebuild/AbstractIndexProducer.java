@@ -78,7 +78,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
     singleThreadExecutor.shutdown();
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* --------------------------------------------------------------------------------------------------------------- */
 
   private class MessageWatcher implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(MessageWatcher.class);
@@ -97,8 +97,8 @@ public abstract class AbstractIndexProducer implements IndexProducer {
     @Override
     public void run() {
       if (getMessageReceiver() == null) {
-        logger.warn("The message receiver for " + getClassName()
-                + " was null so unable to listen for repopulate index messages. Ignore this warning if this is a test.");
+        logger.warn("The message receiver for {} was null so unable to listen for repopulate index "
+            + "messages. Ignore this warning if this is a test.", getClassName());
         listening = false;
         return;
       }
@@ -109,13 +109,15 @@ public abstract class AbstractIndexProducer implements IndexProducer {
                   MessageSender.DestinationType.Queue);
           executor.execute(future);
           BaseMessage message = (BaseMessage) future.get();
-          if (message == null || !(message.getObject() instanceof IndexRecreateObject))
+          if (message == null || !(message.getObject() instanceof IndexRecreateObject)) {
             continue;
+          }
 
           IndexRecreateObject indexObject = (IndexRecreateObject) message.getObject();
           if (!indexObject.getService().equals(getService())
-                  || !indexObject.getStatus().equals(IndexRecreateObject.Status.Start))
+                  || !indexObject.getStatus().equals(IndexRecreateObject.Status.Start)) {
             continue;
+          }
           logger.info("Index '{}' has received a start repopulating command for service '{}'.",
                   indexObject.getIndexName(), getService());
           repopulate(indexObject.getIndexName());

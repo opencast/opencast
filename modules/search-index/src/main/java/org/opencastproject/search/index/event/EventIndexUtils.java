@@ -93,7 +93,8 @@ public final class EventIndexUtils {
    * @throws IOException
    *           if unmarshalling fails
    */
-  public static Event toRecordingEvent(SearchMetadataCollection metadata, Unmarshaller unmarshaller) throws IOException {
+  public static Event toRecordingEvent(SearchMetadataCollection metadata, Unmarshaller unmarshaller)
+          throws IOException {
     Map<String, SearchMetadata<?>> metadataMap = metadata.toMap();
     String eventJson = (String) metadataMap.get(EventIndexSchema.OBJECT).getValue();
     return Event.valueOf(IOUtils.toInputStream(eventJson, Charset.defaultCharset()), unmarshaller);
@@ -112,50 +113,72 @@ public final class EventIndexUtils {
     metadata.addField(EventIndexSchema.UID, event.getIdentifier(), true);
     metadata.addField(EventIndexSchema.ORGANIZATION, event.getOrganization(), false);
     metadata.addField(EventIndexSchema.OBJECT, event.toXML(), false);
-    if (StringUtils.isNotBlank(event.getTitle()))
+    if (StringUtils.isNotBlank(event.getTitle())) {
       metadata.addField(EventIndexSchema.TITLE, event.getTitle(), true);
-    if (StringUtils.isNotBlank(event.getDescription()))
+    }
+    if (StringUtils.isNotBlank(event.getDescription())) {
       metadata.addField(EventIndexSchema.DESCRIPTION, event.getDescription(), true);
-    if (StringUtils.isNotBlank(event.getLocation()))
+    }
+    if (StringUtils.isNotBlank(event.getLocation())) {
       metadata.addField(EventIndexSchema.LOCATION, event.getLocation(), true);
-    if (StringUtils.isNotBlank(event.getSeriesId()))
+    }
+    if (StringUtils.isNotBlank(event.getSeriesId())) {
       metadata.addField(EventIndexSchema.SERIES_ID, event.getSeriesId(), true);
-    if (StringUtils.isNotBlank(event.getSeriesName()))
+    }
+    if (StringUtils.isNotBlank(event.getSeriesName())) {
       metadata.addField(EventIndexSchema.SERIES_NAME, event.getSeriesName(), true);
-    if (StringUtils.isNotBlank(event.getLanguage()))
+    }
+    if (StringUtils.isNotBlank(event.getLanguage())) {
       metadata.addField(EventIndexSchema.LANGUAGE, event.getLanguage(), true);
-    if (StringUtils.isNotBlank(event.getSubject()))
+    }
+    if (StringUtils.isNotBlank(event.getSubject())) {
       metadata.addField(EventIndexSchema.SUBJECT, event.getSubject(), true);
-    if (StringUtils.isNotBlank(event.getSource()))
+    }
+    if (StringUtils.isNotBlank(event.getSource())) {
       metadata.addField(EventIndexSchema.SOURCE, event.getSource(), true);
-    if (StringUtils.isNotBlank(event.getCreated()))
+    }
+    if (StringUtils.isNotBlank(event.getCreated())) {
       metadata.addField(EventIndexSchema.CREATED, event.getCreated(), true);
-    if (StringUtils.isNotBlank(event.getCreator()))
+    }
+    if (StringUtils.isNotBlank(event.getCreator())) {
       metadata.addField(EventIndexSchema.CREATOR, event.getCreator(), true);
-    if (StringUtils.isNotBlank(event.getPublisher()))
+    }
+    if (StringUtils.isNotBlank(event.getPublisher())) {
       metadata.addField(EventIndexSchema.PUBLISHER, event.getPublisher(), true);
-    if (StringUtils.isNotBlank(event.getLicense()))
+    }
+    if (StringUtils.isNotBlank(event.getLicense())) {
       metadata.addField(EventIndexSchema.LICENSE, event.getLicense(), true);
-    if (StringUtils.isNotBlank(event.getRights()))
+    }
+    if (StringUtils.isNotBlank(event.getRights())) {
       metadata.addField(EventIndexSchema.RIGHTS, event.getRights(), true);
-    if (StringUtils.isNotBlank(event.getManagedAcl()))
+    }
+    if (StringUtils.isNotBlank(event.getManagedAcl())) {
       metadata.addField(EventIndexSchema.MANAGED_ACL, event.getManagedAcl(), true);
-    if (StringUtils.isNotBlank(event.getWorkflowState()))
+    }
+    if (StringUtils.isNotBlank(event.getWorkflowState())) {
       metadata.addField(EventIndexSchema.WORKFLOW_STATE, event.getWorkflowState(), true);
-    if (event.getWorkflowId() != null)
+    }
+    if (event.getWorkflowId() != null) {
       metadata.addField(EventIndexSchema.WORKFLOW_ID, event.getWorkflowId(), true);
-    if (StringUtils.isNotBlank(event.getWorkflowDefinitionId()))
+    }
+    if (StringUtils.isNotBlank(event.getWorkflowDefinitionId())) {
       metadata.addField(EventIndexSchema.WORKFLOW_DEFINITION_ID, event.getWorkflowDefinitionId(), true);
-    if (StringUtils.isNotBlank(event.getRecordingStartDate()))
+    }
+    if (StringUtils.isNotBlank(event.getRecordingStartDate())) {
       metadata.addField(EventIndexSchema.START_DATE, event.getRecordingStartDate(), true);
-    if (StringUtils.isNotBlank(event.getRecordingEndDate()))
+    }
+    if (StringUtils.isNotBlank(event.getRecordingEndDate())) {
       metadata.addField(EventIndexSchema.END_DATE, event.getRecordingEndDate(), true);
-    if (event.getDuration() != null)
+    }
+    if (event.getDuration() != null) {
       metadata.addField(EventIndexSchema.DURATION, event.getDuration(), true);
-    if (event.getArchiveVersion() != null)
+    }
+    if (event.getArchiveVersion() != null) {
       metadata.addField(EventIndexSchema.ARCHIVE_VERSION, event.getArchiveVersion(), true);
-    if (event.getRecordingStatus() != null)
+    }
+    if (event.getRecordingStatus() != null) {
       metadata.addField(EventIndexSchema.RECORDING_STATUS, event.getRecordingStatus(), true);
+    }
 
     metadata.addField(EventIndexSchema.EVENT_STATUS, event.getEventStatus(), true);
 
@@ -166,8 +189,9 @@ public final class EventIndexUtils {
     if (event.getPublications() != null) {
       List<Publication> publications = event.getPublications();
       HashMap<String, Object>[] publicationsArray = new HashMap[publications.size()];
-      for (int i = 0; i < publications.size(); i++)
+      for (int i = 0; i < publications.size(); i++) {
         publicationsArray[i] = generatePublicationDoc(publications.get(i));
+      }
 
       metadata.addField(EventIndexSchema.PUBLICATION, publicationsArray, true);
     }
@@ -438,10 +462,12 @@ public final class EventIndexUtils {
       event.setTechnicalEndTime(event.getRecordingEndDate());
     } else {
       // If this is an upload where the start time is not set, set the start time to same as dublin core
-      if (StringUtils.isBlank(event.getTechnicalStartTime()))
+      if (StringUtils.isBlank(event.getTechnicalStartTime())) {
         event.setTechnicalStartTime(event.getRecordingStartDate());
-      if (StringUtils.isBlank(event.getTechnicalEndTime()))
+      }
+      if (StringUtils.isBlank(event.getTechnicalEndTime())) {
         event.setTechnicalEndTime(event.getRecordingEndDate());
+      }
     }
     return event;
   }
@@ -540,16 +566,20 @@ public final class EventIndexUtils {
    *           if event has not been found
    */
   public static void updateComments(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting,
-          String organization, User user, AbstractSearchIndex searchIndex) throws SearchIndexException, NotFoundException {
-    if (!hasComments && hasOpenComments)
+      String organization, User user, AbstractSearchIndex searchIndex)
+          throws SearchIndexException, NotFoundException {
+    if (!hasComments && hasOpenComments) {
       throw new IllegalStateException(
               "Invalid comment update request: You can't have open comments without having any comments!");
-    if (!hasOpenComments && needsCutting)
+    }
+    if (!hasOpenComments && needsCutting) {
       throw new IllegalStateException(
-              "Invalid comment update request: You can't have an needs cutting comment without having any open comments!");
+          "Invalid comment update request: You can't have an needs cutting comment without having any open comments!");
+    }
     Event event = getEvent(eventId, organization, user, searchIndex);
-    if (event == null)
+    if (event == null) {
       throw new NotFoundException("No event with id " + eventId + " found.");
+    }
 
     event.setHasComments(hasComments);
     event.setHasOpenComments(hasOpenComments);
@@ -646,16 +676,19 @@ public final class EventIndexUtils {
     Set<String> allPublicationFlavors = new TreeSet<String>();
     for (Publication p : publications) {
       for (Attachment attachment : p.getAttachments()) {
-        if (attachment.getFlavor() != null)
+        if (attachment.getFlavor() != null) {
           allPublicationFlavors.add(attachment.getFlavor().toString());
+        }
       }
       for (Catalog catalog : p.getCatalogs()) {
-        if (catalog.getFlavor() != null)
+        if (catalog.getFlavor() != null) {
           allPublicationFlavors.add(catalog.getFlavor().toString());
+        }
       }
       for (Track track : p.getTracks()) {
-        if (track.getFlavor() != null)
+        if (track.getFlavor() != null) {
           allPublicationFlavors.add(track.getFlavor().toString());
+        }
       }
     }
     return allPublicationFlavors.toArray(new String[allPublicationFlavors.size()]);

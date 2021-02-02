@@ -59,8 +59,9 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
   @Override
   public void buildQuery(EventSearchQuery query) {
     // Organization
-    if (query.getOrganization() == null)
+    if (query.getOrganization() == null) {
       throw new IllegalStateException("No organization set on the event search query!");
+    }
 
     and(EventIndexSchema.ORGANIZATION, query.getOrganization());
 
@@ -93,8 +94,9 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
 
     // Presenter
     if (query.getPresenters() != null) {
-      for (String presenter : query.getPresenters())
+      for (String presenter : query.getPresenters()) {
         and(EventIndexSchema.PRESENTER, presenter);
+      }
     }
 
     // Contributors
@@ -214,8 +216,9 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
 
     // Publications
     if (query.getPublications() != null) {
-      for (String publication : query.getPublications())
+      for (String publication : query.getPublications()) {
         and(EventIndexSchema.PUBLICATION, publication);
+      }
     }
 
     // Archive version
@@ -253,17 +256,20 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       for (SearchTerms<String> terms : query.getTerms()) {
         StringBuilder queryText = new StringBuilder();
         for (String term : terms.getTerms()) {
-          if (queryText.length() > 0)
+          if (queryText.length() > 0) {
             queryText.append(" ");
+          }
           queryText.append(term);
         }
-        if (query.isFuzzySearch())
+        if (query.isFuzzySearch()) {
           fuzzyText = queryText.toString();
-        else
+        } else {
           this.text = queryText.toString();
+        }
         if (Quantifier.All.equals(terms.getQuantifier())) {
-          if (groups == null)
+          if (groups == null) {
             groups = new ArrayList<>();
+          }
           if (query.isFuzzySearch()) {
             logger.warn("All quantifier not supported in conjunction with wildcard text");
           }

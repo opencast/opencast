@@ -127,8 +127,12 @@ public class IndexRebuildService {
         IndexRecreateObject indexRecreateObject = (IndexRecreateObject) message.getObject();
         switch (indexRecreateObject.getStatus()) {
           case Update:
-            logger.info("Updating service: '{}' with {}/{} finished, {}% complete.", indexRecreateObject.getService(),
-                    indexRecreateObject.getCurrent(), indexRecreateObject.getTotal(), (int) (indexRecreateObject.getCurrent() * 100 / indexRecreateObject.getTotal()));
+            logger.info("Updating service: '{}' with {}/{} finished, {}% complete.",
+                indexRecreateObject.getService(),
+                indexRecreateObject.getCurrent(),
+                indexRecreateObject.getTotal(),
+                (int) (indexRecreateObject.getCurrent() * 100 / indexRecreateObject.getTotal())
+            );
             if (indexRecreateObject.getCurrent() == indexRecreateObject.getTotal()) {
               logger.info("Waiting for service '{}' indexing to complete", indexRecreateObject.getService());
             }
@@ -171,23 +175,31 @@ public class IndexRebuildService {
    */
   public synchronized void recreateIndex(AbstractSearchIndex index, String service)
           throws IllegalArgumentException, InterruptedException, ExecutionException, IndexRebuildException {
-    if (StringUtils.equalsIgnoreCase("Groups", StringUtils.trim(service)))
+    if (StringUtils.equalsIgnoreCase("Groups", StringUtils.trim(service))) {
       recreateService(index, IndexRecreateObject.Service.Groups);
-    else if (StringUtils.equalsIgnoreCase("Acl", StringUtils.trim(service)))
+    }
+    else if (StringUtils.equalsIgnoreCase("Acl", StringUtils.trim(service))) {
       recreateService(index, IndexRecreateObject.Service.Acl);
-    else if (StringUtils.equalsIgnoreCase("Themes", StringUtils.trim(service)))
+    }
+    else if (StringUtils.equalsIgnoreCase("Themes", StringUtils.trim(service))) {
       recreateService(index, IndexRecreateObject.Service.Themes);
-    else if (StringUtils.equalsIgnoreCase("Series", StringUtils.trim(service)))
+    }
+    else if (StringUtils.equalsIgnoreCase("Series", StringUtils.trim(service))) {
       recreateService(index, IndexRecreateObject.Service.Series);
-    else if (StringUtils.equalsIgnoreCase("Scheduler", StringUtils.trim(service)))
+    }
+    else if (StringUtils.equalsIgnoreCase("Scheduler", StringUtils.trim(service))) {
       recreateService(index, IndexRecreateObject.Service.Scheduler);
-    else if (StringUtils.equalsIgnoreCase("Workflow", StringUtils.trim(service)))
+    }
+    else if (StringUtils.equalsIgnoreCase("Workflow", StringUtils.trim(service))) {
       recreateService(index, IndexRecreateObject.Service.Workflow);
-    else if (StringUtils.equalsIgnoreCase("AssetManager", StringUtils.trim(service)))
+    }
+    else if (StringUtils.equalsIgnoreCase("AssetManager", StringUtils.trim(service))) {
       recreateService(index, IndexRecreateObject.Service.AssetManager);
-    else      if (StringUtils.equalsIgnoreCase("Comments", StringUtils.trim(service)))
+    }
+    else if (StringUtils.equalsIgnoreCase("Comments", StringUtils.trim(service))) {
       recreateService(index, IndexRecreateObject.Service.Comments);
-    else
+    } else {
       throw new IllegalArgumentException("Unknown service " + service);
+    }
   }
 }

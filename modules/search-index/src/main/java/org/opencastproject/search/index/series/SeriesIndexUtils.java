@@ -238,8 +238,9 @@ public final class SeriesIndexUtils {
 
   public static void updateEventSeriesTitles(Series series, String organization, User user,
           AbstractSearchIndex searchIndex) throws SearchIndexException {
-    if (!series.isSeriesTitleUpdated())
+    if (!series.isSeriesTitleUpdated()) {
       return;
+    }
 
     SearchResult<Event> events = searchIndex
             .getByQuery(new EventSearchQuery(organization, user).withoutActions().withSeriesId(series.getIdentifier()));

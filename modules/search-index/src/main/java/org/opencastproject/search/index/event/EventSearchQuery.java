@@ -92,8 +92,9 @@ public class EventSearchQuery extends AbstractSearchQuery {
     this.organization = organization;
     this.user = user;
     this.actions.add(Permissions.Action.READ.toString());
-    if (!user.getOrganization().getId().equals(organization))
+    if (!user.getOrganization().getId().equals(organization)) {
       throw new IllegalStateException("User's organization must match search organization");
+    }
   }
 
   /**
@@ -106,8 +107,9 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withIdentifier(String id) {
-    if (StringUtils.isBlank(id))
+    if (StringUtils.isBlank(id)) {
       throw new IllegalArgumentException("Identifier cannot be null");
+    }
     this.identifiers.add(id);
     return this;
   }
@@ -180,8 +182,9 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withAction(Action action) {
-    if (action == null)
+    if (action == null) {
       throw new IllegalArgumentException("Action cannot be null");
+    }
     this.actions.add(action.toString());
     return this;
   }
@@ -205,8 +208,9 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withPresenter(String presenter) {
-    if (StringUtils.isBlank(presenter))
+    if (StringUtils.isBlank(presenter)) {
       throw new IllegalArgumentException("Presenter cannot be null");
+    }
     this.presenters.add(presenter);
     return this;
   }
@@ -230,8 +234,9 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withContributor(String contributor) {
-    if (StringUtils.isBlank(contributor))
+    if (StringUtils.isBlank(contributor)) {
       throw new IllegalArgumentException("Contributor cannot be null");
+    }
     this.contributors.add(contributor);
     return this;
   }
@@ -814,8 +819,9 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withPublications(String publication) {
-    if (StringUtils.isBlank(publication))
+    if (StringUtils.isBlank(publication)) {
       throw new IllegalArgumentException("Publication cannot be null");
+    }
     this.publications.add(publication);
     return this;
   }
@@ -924,8 +930,9 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withTechnicalPresenters(String presenter) {
-    if (StringUtils.isBlank(presenter))
+    if (StringUtils.isBlank(presenter)) {
       throw new IllegalArgumentException("Presenter cannot be null");
+    }
     this.technicalPresenters.add(presenter);
     return this;
   }

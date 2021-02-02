@@ -222,8 +222,9 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    */
   public void deleteAssets(String organization, User user, String uid) throws SearchIndexException, NotFoundException {
     Event event = EventIndexUtils.getEvent(uid, organization, user, this);
-    if (event == null)
+    if (event == null) {
       throw new NotFoundException("No event with id " + uid + " found.");
+    }
 
     event.setArchiveVersion(null);
 
@@ -251,8 +252,9 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   public void deleteScheduling(String organization, User user, String uid)
           throws SearchIndexException, NotFoundException {
     Event event = EventIndexUtils.getEvent(uid, organization, user, this);
-    if (event == null)
+    if (event == null) {
       throw new NotFoundException("No event with id " + uid + " found.");
+    }
 
     event.setAgentId(null);
 
@@ -282,8 +284,9 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   public void deleteWorkflow(String organization, User user, String uid, Long workflowId)
           throws SearchIndexException, NotFoundException {
     Event event = EventIndexUtils.getEvent(uid, organization, user, this);
-    if (event == null)
+    if (event == null) {
       throw new NotFoundException("No event with id " + uid + " found.");
+    }
 
     if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowId)) {
       logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", uid, workflowId);

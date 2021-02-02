@@ -78,16 +78,19 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
   public ThemeSearchQuery(String organization, User user) {
     super(Theme.DOCUMENT_TYPE);
 
-    if (organization == null)
+    if (organization == null) {
       throw new IllegalStateException("The organization for this query was null.");
+    }
 
-    if (user == null)
+    if (user == null) {
       throw new IllegalStateException("The user for this query was null.");
+    }
 
     this.organization = organization;
     this.user = user;
-    if (!user.getOrganization().getId().equals(organization))
+    if (!user.getOrganization().getId().equals(organization)) {
       throw new IllegalStateException("User's organization must match search organization");
+    }
   }
 
   /**

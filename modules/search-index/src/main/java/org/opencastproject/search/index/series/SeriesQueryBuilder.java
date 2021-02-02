@@ -60,8 +60,9 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
   @Override
   public void buildQuery(SeriesSearchQuery query) {
     // Organization
-    if (query.getOrganization() == null)
+    if (query.getOrganization() == null) {
       throw new IllegalStateException("No organization set on the series search query!");
+    }
 
     and(SeriesIndexSchema.ORGANIZATION, query.getOrganization());
 
@@ -148,17 +149,20 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
       for (SearchTerms<String> terms : query.getTerms()) {
         StringBuffer queryText = new StringBuffer();
         for (String term : terms.getTerms()) {
-          if (queryText.length() > 0)
+          if (queryText.length() > 0) {
             queryText.append(" ");
+          }
           queryText.append(term);
         }
-        if (query.isFuzzySearch())
+        if (query.isFuzzySearch()) {
           fuzzyText = queryText.toString();
-        else
+        } else {
           this.text = queryText.toString();
+        }
         if (Quantifier.All.equals(terms.getQuantifier())) {
-          if (groups == null)
+          if (groups == null) {
             groups = new ArrayList<ValueGroup>();
+          }
           if (query.isFuzzySearch()) {
             logger.warn("All quantifier not supported in conjunction with wildcard text");
           }
