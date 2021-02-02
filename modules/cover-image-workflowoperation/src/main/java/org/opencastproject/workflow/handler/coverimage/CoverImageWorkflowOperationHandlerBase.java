@@ -327,7 +327,9 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     for (Map.Entry<EName, List<DublinCoreValue>> entry : data.entrySet()) {
       String currentKey = entry.getKey().getLocalName();
       switch(currentKey) {
-        case "creator": appendXml(xml, "creators", entry.getValue().get(0).getValue()); break;
+        case "creator":
+          appendXml(xml, "creators", getValuesAsString(entry));
+          break;
         case "isPartOf":
           xml.append("<series>");
           //get series catalog
@@ -343,8 +345,11 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
                 String[] date = seriesEntry.getValue().get(0).getValue().split("\\.");
                 appendXml(xml, "date", date[0]);
                 break;
+              case "contributor":
+                appendXml(xml, "contributors", getValuesAsString(seriesEntry));
+                break;
               default: String key = seriesEntry.getKey().getLocalName();
-                appendXml(xml, key, seriesEntry.getValue().get(0).getValue());
+                appendXml(xml, key, getValuesAsString(seriesEntry));
             }
           }
           xml.append("</series>");
@@ -364,14 +369,28 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
           String[] date = entry.getValue().get(0).getValue().split("\\.");
           appendXml(xml, "date", date[0]);
           break;
-        case "contributer":
-          appendXml(xml, "contributers",  entry.getValue().get(0).getValue());
+        case "contributor":
+          appendXml(xml, "contributors", getValuesAsString(entry));
           break;
-        default: appendXml(xml, entry.getKey().getLocalName(), entry.getValue().get(0).getValue());
+        default: appendXml(xml, entry.getKey().getLocalName(), getValuesAsString(entry));
       }
     }
     xml.append("</metadata>");
     return xml.toString();
+  }
+
+  protected String getValuesAsString(Map.Entry<EName, List<DublinCoreValue>> entry) {
+    List<DublinCoreValue> values = entry.getValue();
+    String stringValues = "";
+    try {
+      stringValues += values.get(0).getValue();
+      for (int i = 1; i < values.size(); i++) {
+        stringValues += ", " + values.get(i).getValue();
+      }
+    } catch (IndexOutOfBoundsException e) {
+      logger.warn("Given Key '{}' has no Entries : {}", entry.getKey(), e.getMessage());
+    }
+    return stringValues;
   }
 
   protected void appendXml(StringBuilder xml, String name, String body) {
