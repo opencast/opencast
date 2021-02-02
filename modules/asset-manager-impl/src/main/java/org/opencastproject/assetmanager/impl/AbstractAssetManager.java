@@ -172,6 +172,11 @@ public abstract class AbstractAssetManager implements AssetManager {
   }
 
   @Override
+  public long countEvents(final String organization) {
+    return getDb().countEvents(organization);
+  }
+
+  @Override
   public boolean snapshotExists(final String mediaPackageId) {
     return getDb().snapshotExists(mediaPackageId);
   }

@@ -235,6 +235,11 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   }
 
   @Override
+  public long countEvents(String organization) {
+    return delegate.countEvents(organization);
+  }
+
+  @Override
   public boolean snapshotExists(final String mediaPackageId) {
     return delegate.snapshotExists(mediaPackageId);
   }

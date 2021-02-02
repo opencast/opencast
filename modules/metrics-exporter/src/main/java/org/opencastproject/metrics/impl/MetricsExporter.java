@@ -21,6 +21,7 @@
 
 package org.opencastproject.metrics.impl;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -117,10 +118,16 @@ public class MetricsExporter {
       .help("Version of Opencast (based on metrics module)")
       .labelNames("part")
       .register();
+  private final Gauge eventsInAssetManager = Gauge.build()
+      .name("opencast_asset_manager_events")
+      .help("Events in Asset Manager")
+      .labelNames("organization")
+      .register();
 
-  /** The service */
+  /** OSGi services */
   private ServiceRegistry serviceRegistry;
   private OrganizationDirectoryService organizationDirectoryService;
+  private AssetManager assetManager;
 
   @Activate
   public void activate(BundleContext bundleContext) {
@@ -192,6 +199,13 @@ public class MetricsExporter {
       }
     }
 
+    // Get numbers from asset manager
+    for (Organization organization: organizationDirectoryService.getOrganizations()) {
+      eventsInAssetManager
+          .labels(organization.getId())
+          .set(assetManager.countEvents(organization.getId()));
+    }
+
     // collect metrics
     final StringWriter writer = new StringWriter();
     TextFormat.write004(writer, registry.metricFamilySamples());
@@ -206,5 +220,10 @@ public class MetricsExporter {
   @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  @Reference
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 }
