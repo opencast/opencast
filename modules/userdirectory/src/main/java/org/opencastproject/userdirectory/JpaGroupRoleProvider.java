@@ -23,10 +23,10 @@ package org.opencastproject.userdirectory;
 
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.group.GroupItem;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.GroupProvider;
 import org.opencastproject.security.api.JaxbGroup;
@@ -631,7 +631,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   }
 
   @Override
-  public Service getService() {
-    return Service.Groups;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Groups;
   }
 }

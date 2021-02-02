@@ -22,10 +22,9 @@
 package org.opencastproject.themes.persistence;
 
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.theme.SerializableTheme;
 import org.opencastproject.message.broker.api.theme.ThemeItem;
 import org.opencastproject.security.api.Organization;
@@ -350,7 +349,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   @Override
-  public Service getService() {
-    return IndexRecreateObject.Service.Themes;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Themes;
   }
 }

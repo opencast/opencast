@@ -24,7 +24,6 @@ package org.opencastproject.index.rebuild;
 import static java.lang.String.format;
 
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -43,9 +42,17 @@ import java.util.concurrent.ExecutionException;
 
 public class IndexRebuildService implements BundleActivator {
 
+  /**
+   * The Services whose data is indexed by ElasticSearch
+   * Attention: The order is relevant for the index rebuild and should not be changed!
+   */
+  public enum Service {
+    Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager, Comments
+  }
+
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);
 
-  private Map<IndexRecreateObject.Service, IndexProducer> indexProducers = new HashMap<>();
+  private Map<IndexRebuildService.Service, IndexProducer> indexProducers = new HashMap<>();
 
   private ServiceRegistration serviceRegistration = null;
 
@@ -71,7 +78,7 @@ public class IndexRebuildService implements BundleActivator {
     }
 
     // all available?
-    if (indexProducers.size() == IndexRecreateObject.Service.values().length) {
+    if (indexProducers.size() == IndexRebuildService.Service.values().length) {
       registerIndexRebuildService(bundleContext);
     } else {  // wait for the rest
       bundleContext.addServiceListener(new ServiceListener() {
@@ -82,7 +89,7 @@ public class IndexRebuildService implements BundleActivator {
             ServiceReference serviceReference = serviceEvent.getServiceReference();
             addIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
 
-            if (indexProducers.size() == IndexRecreateObject.Service.values().length) {
+            if (indexProducers.size() == IndexRebuildService.Service.values().length) {
               registerIndexRebuildService(bundleContext);
               bundleContext.removeServiceListener(this);
             }
@@ -114,7 +121,7 @@ public class IndexRebuildService implements BundleActivator {
   public synchronized void recreateIndex(AbstractSearchIndex index)
           throws InterruptedException, CancellationException, ExecutionException, IOException, IndexRebuildException {
     index.clear();
-    for (IndexRecreateObject.Service service: IndexRecreateObject.Service.values()) {
+    for (IndexRebuildService.Service service: IndexRebuildService.Service.values()) {
       recreateService(index, service);
     }
   }
@@ -123,7 +130,7 @@ public class IndexRebuildService implements BundleActivator {
    * Ask for data to be rebuilt from a service.
    *
    * @param service
-   *          The {@link IndexRecreateObject.Service} representing the service to start re-sending the data from.
+   *          The {@link IndexRebuildService.Service} representing the service to start re-sending the data from.
    * @throws InterruptedException
    *           Thrown if the process of re-sending the data is interupted.
    * @throws CancellationException
@@ -131,7 +138,7 @@ public class IndexRebuildService implements BundleActivator {
    * @throws ExecutionException
    *           Thrown if the process of re-sending the data has an error.
    */
-  private void recreateService(AbstractSearchIndex index, IndexRecreateObject.Service service)
+  private void recreateService(AbstractSearchIndex index, IndexRebuildService.Service service)
           throws InterruptedException, CancellationException, ExecutionException, IndexRebuildException {
 
     IndexProducer indexProducer = indexProducers.get(service);
@@ -163,7 +170,7 @@ public class IndexRebuildService implements BundleActivator {
   public synchronized void recreateIndex(AbstractSearchIndex index, String serviceName)
           throws IllegalArgumentException, InterruptedException, ExecutionException, IndexRebuildException {
 
-    IndexRecreateObject.Service service = IndexRecreateObject.Service.valueOf(serviceName);
+    IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
     recreateService(index, service);
   }
 }

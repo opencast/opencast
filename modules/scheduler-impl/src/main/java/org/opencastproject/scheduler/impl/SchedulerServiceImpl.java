@@ -46,6 +46,7 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -57,7 +58,6 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -1585,8 +1585,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public Service getService() {
-    return Service.Scheduler;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Scheduler;
   }
 
   public MessageSender getMessageSender() {

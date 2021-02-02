@@ -35,6 +35,7 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;
@@ -46,7 +47,6 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.workflow.WorkflowItem;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
@@ -2410,7 +2410,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   @Override
-  public Service getService() {
-    return Service.Workflow;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Workflow;
   }
 }

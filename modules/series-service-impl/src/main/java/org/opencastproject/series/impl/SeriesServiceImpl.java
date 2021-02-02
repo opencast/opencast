@@ -29,10 +29,10 @@ import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -604,7 +604,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public Service getService() {
-    return Service.Series;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Series;
   }
 }

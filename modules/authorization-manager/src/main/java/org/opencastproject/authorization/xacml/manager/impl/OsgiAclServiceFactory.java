@@ -26,10 +26,10 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.acl.AclItem;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -138,7 +138,7 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   }
 
   @Override
-  public Service getService() {
-    return Service.Acl;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Acl;
   }
 }

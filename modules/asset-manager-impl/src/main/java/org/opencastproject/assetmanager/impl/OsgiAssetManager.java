@@ -37,11 +37,11 @@ import org.opencastproject.assetmanager.impl.storage.AssetStore;
 import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -430,8 +430,8 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
    */
 
   @Override
-  public IndexRecreateObject.Service getService() {
-    return IndexRecreateObject.Service.AssetManager;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.AssetManager;
   }
 
   @Override

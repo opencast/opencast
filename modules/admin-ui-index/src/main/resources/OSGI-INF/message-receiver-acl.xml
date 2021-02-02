@@ -10,12 +10,6 @@
     <provide interface="org.opencastproject.index.service.message.AclMessageReceiverImpl"/>
   </service>
 
-  <reference name="message-broker-sender"
-             cardinality="1..1"
-             interface="org.opencastproject.message.broker.api.MessageSender"
-             policy="static"
-             bind="setMessageSender"/>
-
   <reference name="message-broker-receiver"
              cardinality="1..1"
              interface="org.opencastproject.message.broker.api.MessageReceiver"

@@ -24,10 +24,10 @@ import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.comments.CommentItem;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -436,7 +436,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   @Override
-  public Service getService() {
-    return Service.Comments;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Comments;
   }
 }
