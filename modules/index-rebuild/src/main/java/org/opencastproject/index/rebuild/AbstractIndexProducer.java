@@ -45,8 +45,6 @@ public abstract class AbstractIndexProducer implements IndexProducer {
 
   public abstract MessageReceiver getMessageReceiver();
 
-  public abstract IndexRecreateObject.Service getService();
-
   /** The message watcher */
   private MessageWatcher messageWatcher;
 

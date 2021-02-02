@@ -21,6 +21,8 @@
 
 package org.opencastproject.index.rebuild;
 
+import org.opencastproject.message.broker.api.index.IndexRecreateObject;
+
 /**
  * This service produces messages for an elastic search index
  */
@@ -34,4 +36,6 @@ public interface IndexProducer {
    * Re-send all data of this service to the index
    */
   void repopulate(String indexName) throws Exception;
+
+  IndexRecreateObject.Service getService();
 }

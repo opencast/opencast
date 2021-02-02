@@ -29,6 +29,12 @@ import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -36,6 +42,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -49,7 +57,7 @@ import java.util.concurrent.FutureTask;
         immediate = true,
         service = { IndexRebuildService.class }
 )
-public class IndexRebuildService {
+public class IndexRebuildService implements BundleActivator {
 
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);
 
@@ -62,6 +70,10 @@ public class IndexRebuildService {
   /** An Executor to get messages */
   private ExecutorService executor = Executors.newSingleThreadExecutor();
 
+  private Map<IndexRecreateObject.Service, IndexProducer> indexProducers = new HashMap<>();
+
+  private ServiceRegistration serviceRegistration = null;
+
   @Reference(name = "messageSender")
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
@@ -70,6 +82,56 @@ public class IndexRebuildService {
   @Reference(name = "messageReceiver")
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
+  }
+
+  private void addIndexProducer(IndexProducer indexProducer) {
+    indexProducers.put(indexProducer.getService(), indexProducer);
+    logger.info("Service {} registered.", indexProducer.getService());
+  }
+
+  private void registerIndexRebuildService(BundleContext bundleContext) {
+    logger.info("All Services registered.");
+    serviceRegistration = bundleContext.registerService(this.getClass().getName(), IndexRebuildService.this, null);
+  }
+
+  @Override
+  public void start(BundleContext bundleContext) throws Exception {
+
+    // check if there are already indexProducers available
+    ServiceReference<?>[] serviceReferences = bundleContext.getAllServiceReferences(IndexProducer.class.getName(), null);
+    if (serviceReferences != null) {
+      for (ServiceReference serviceReference : serviceReferences) {
+        addIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
+      }
+    }
+
+    // all available?
+    if (indexProducers.size() == IndexRecreateObject.Service.values().length) {
+      registerIndexRebuildService(bundleContext);
+    } else {  // wait for the rest
+      bundleContext.addServiceListener(new ServiceListener() {
+
+        @Override
+        public void serviceChanged(ServiceEvent serviceEvent) {
+          if (serviceEvent.getType() == ServiceEvent.REGISTERED) {
+            ServiceReference serviceReference = serviceEvent.getServiceReference();
+            addIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
+
+            if (indexProducers.size() == IndexRecreateObject.Service.values().length) {
+              registerIndexRebuildService(bundleContext);
+              bundleContext.removeServiceListener(this);
+            }
+          }
+        }
+      }, "(objectClass=" + IndexProducer.class.getName() + ")");
+    }
+  }
+
+  @Override
+  public void stop(BundleContext bundleContext) throws Exception {
+    if (serviceRegistration != null)  {
+      serviceRegistration.unregister();
+    }
   }
 
   /**

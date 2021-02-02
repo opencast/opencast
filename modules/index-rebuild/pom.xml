@@ -36,6 +36,11 @@
       <artifactId>slf4j-api</artifactId>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -56,6 +61,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
+            <Bundle-Activator>org.opencastproject.index.rebuild.IndexRebuildService</Bundle-Activator>
             <Export-Package>
               org.opencastproject.index.rebuild
             </Export-Package>
