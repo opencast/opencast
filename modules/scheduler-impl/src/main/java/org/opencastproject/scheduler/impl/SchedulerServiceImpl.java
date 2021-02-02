@@ -1619,19 +1619,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return SchedulerServiceImpl.class.getName();
   }
 
-  @Override
   public MessageSender getMessageSender() {
     return messageSender;
   }
 
-  @Override
   public SecurityService getSecurityService() {
     return securityService;
   }
-
-  @Override
-  public String getSystemUserName() {
-    return systemUserName;
-  }
-
 }

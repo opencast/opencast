@@ -2438,20 +2438,4 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public String getClassName() {
     return WorkflowServiceImpl.class.getName();
   }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return SecurityUtil.getSystemUserName(componentContext);
-  }
-
 }

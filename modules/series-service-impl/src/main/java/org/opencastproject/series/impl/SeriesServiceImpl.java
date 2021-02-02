@@ -632,20 +632,4 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   public String getClassName() {
     return SeriesServiceImpl.class.getName();
   }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return systemUserName;
-  }
-
 }

@@ -25,7 +25,6 @@ import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.security.api.SecurityService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +45,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
 
   public abstract MessageReceiver getMessageReceiver();
 
-  public abstract MessageSender getMessageSender();
-
-  public abstract SecurityService getSecurityService();
-
   public abstract IndexRecreateObject.Service getService();
-
-  public abstract String getSystemUserName();
 
   /** The message watcher */
   private MessageWatcher messageWatcher;

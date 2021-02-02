@@ -381,20 +381,4 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   public String getClassName() {
     return ThemesServiceDatabaseImpl.class.getName();
   }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return SecurityUtil.getSystemUserName(cc);
-  }
-
 }

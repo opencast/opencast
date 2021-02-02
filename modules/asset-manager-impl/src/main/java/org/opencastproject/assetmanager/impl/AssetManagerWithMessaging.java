@@ -102,17 +102,14 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
         return Service.AssetManager;
       }
 
-      @Override
       public MessageSender getMessageSender() {
         return AssetManagerWithMessaging.this.messageSender;
       }
 
-      @Override
       public SecurityService getSecurityService() {
         return AssetManagerWithMessaging.this.secSvc;
       }
 
-      @Override
       public String getSystemUserName() {
         return systemUserName;
       }

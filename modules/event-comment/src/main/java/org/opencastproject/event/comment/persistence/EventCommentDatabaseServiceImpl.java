@@ -465,20 +465,4 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   public String getClassName() {
     return EventCommentDatabaseServiceImpl.class.getName();
   }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return SecurityUtil.getSystemUserName(cc);
-  }
-
 }
