@@ -32,10 +32,11 @@ public final class IndexRecreateObject implements Serializable {
   }
 
   /**
-   * New services may be added in arbitrary order since the elements are identified by name, not their ordinal.
+   * The Services whose data is indexed by ElasticSearch
+   * Attention: The order is relevant for the index rebuild and should not be changed!
    */
   public enum Service {
-    Acl, AssetManager, Comments, Groups, Scheduler, Series, Themes, Workflow
+    Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager, Comments
   }
 
   private String indexName;

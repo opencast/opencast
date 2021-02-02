@@ -29,7 +29,6 @@ import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -87,16 +86,10 @@ public class IndexRebuildService {
    */
   public synchronized void recreateIndex(AbstractSearchIndex index)
           throws InterruptedException, CancellationException, ExecutionException, IOException, IndexRebuildException {
-    // Clear index first
     index.clear();
-    recreateService(index, IndexRecreateObject.Service.Groups);
-    recreateService(index, IndexRecreateObject.Service.Acl);
-    recreateService(index, IndexRecreateObject.Service.Themes);
-    recreateService(index, IndexRecreateObject.Service.Series);
-    recreateService(index, IndexRecreateObject.Service.Scheduler);
-    recreateService(index, IndexRecreateObject.Service.Workflow);
-    recreateService(index, IndexRecreateObject.Service.AssetManager);
-    recreateService(index, IndexRecreateObject.Service.Comments);
+    for (IndexRecreateObject.Service service: IndexRecreateObject.Service.values()) {
+      recreateService(index, service);
+    }
   }
 
   /**
@@ -162,7 +155,7 @@ public class IndexRebuildService {
   /**
    * Recreate the index from a specific service that provide data.
    *
-   * @param service
+   * @param serviceName
    *           The service name. The available services are:
    *           Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager, Comments
    *
@@ -173,33 +166,10 @@ public class IndexRebuildService {
    * @throws ExecutionException
    *           Thrown if there is a problem executing the process.
    */
-  public synchronized void recreateIndex(AbstractSearchIndex index, String service)
+  public synchronized void recreateIndex(AbstractSearchIndex index, String serviceName)
           throws IllegalArgumentException, InterruptedException, ExecutionException, IndexRebuildException {
-    if (StringUtils.equalsIgnoreCase("Groups", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Groups);
-    }
-    else if (StringUtils.equalsIgnoreCase("Acl", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Acl);
-    }
-    else if (StringUtils.equalsIgnoreCase("Themes", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Themes);
-    }
-    else if (StringUtils.equalsIgnoreCase("Series", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Series);
-    }
-    else if (StringUtils.equalsIgnoreCase("Scheduler", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Scheduler);
-    }
-    else if (StringUtils.equalsIgnoreCase("Workflow", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Workflow);
-    }
-    else if (StringUtils.equalsIgnoreCase("AssetManager", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.AssetManager);
-    }
-    else if (StringUtils.equalsIgnoreCase("Comments", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Comments);
-    } else {
-      throw new IllegalArgumentException("Unknown service " + service);
-    }
+
+    IndexRecreateObject.Service service = IndexRecreateObject.Service.valueOf(serviceName);
+    recreateService(index, service);
   }
 }
