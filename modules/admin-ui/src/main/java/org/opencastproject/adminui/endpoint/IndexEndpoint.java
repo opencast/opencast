@@ -35,8 +35,6 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -134,12 +132,6 @@ public class IndexEndpoint {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
         indexRebuildService.recreateIndex(adminUISearchIndex, service);
-      } catch (InterruptedException e) {
-        logger.error("Repopulating the index was interrupted", e);
-      } catch (CancellationException e) {
-        logger.trace("Listening for index messages has been cancelled.");
-      } catch (ExecutionException e) {
-        logger.error("Repopulating the index failed to execute", e);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -159,12 +151,6 @@ public class IndexEndpoint {
       try {
         logger.info("Starting to repopulate the index");
         indexRebuildService.recreateIndex(adminUISearchIndex);
-      } catch (InterruptedException e) {
-        logger.error("Repopulating the index was interrupted", e);
-      } catch (CancellationException e) {
-        logger.trace("Listening for index messages has been cancelled.");
-      } catch (ExecutionException e) {
-        logger.error("Repopulating the index failed to execute", e);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }

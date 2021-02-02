@@ -37,8 +37,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
 public class IndexRebuildService implements BundleActivator {
 
@@ -52,9 +50,9 @@ public class IndexRebuildService implements BundleActivator {
 
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);
 
-  private Map<IndexRebuildService.Service, IndexProducer> indexProducers = new HashMap<>();
+  private final Map<IndexRebuildService.Service, IndexProducer> indexProducers = new HashMap<>();
 
-  private ServiceRegistration serviceRegistration = null;
+  private ServiceRegistration<?> serviceRegistration = null;
 
   private void addIndexProducer(IndexProducer indexProducer) {
     indexProducers.put(indexProducer.getService(), indexProducer);
@@ -72,7 +70,7 @@ public class IndexRebuildService implements BundleActivator {
     // check if there are already indexProducers available
     ServiceReference<?>[] serviceReferences = bundleContext.getAllServiceReferences(IndexProducer.class.getName(), null);
     if (serviceReferences != null) {
-      for (ServiceReference serviceReference : serviceReferences) {
+      for (ServiceReference<?> serviceReference : serviceReferences) {
         addIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
       }
     }
@@ -86,7 +84,7 @@ public class IndexRebuildService implements BundleActivator {
         @Override
         public void serviceChanged(ServiceEvent serviceEvent) {
           if (serviceEvent.getType() == ServiceEvent.REGISTERED) {
-            ServiceReference serviceReference = serviceEvent.getServiceReference();
+            ServiceReference<?> serviceReference = serviceEvent.getServiceReference();
             addIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
 
             if (indexProducers.size() == IndexRebuildService.Service.values().length) {
@@ -109,17 +107,13 @@ public class IndexRebuildService implements BundleActivator {
   /**
    * Recreate the index from all of the services that provide data.
    *
-   * @throws InterruptedException
-   *           Thrown if the process is interupted.
-   * @throws CancellationException
-   *           Thrown if listeing to messages has been canceled.
-   * @throws ExecutionException
-   *           Thrown if there is a problem executing the process.
    * @throws IOException
    *           Thrown if the index cannot be cleared.
+   * @throws IndexRebuildException
+   *           Thrown if the index-rebuild failed.
    */
   public synchronized void recreateIndex(AbstractSearchIndex index)
-          throws InterruptedException, CancellationException, ExecutionException, IOException, IndexRebuildException {
+          throws IOException, IndexRebuildException {
     index.clear();
     for (IndexRebuildService.Service service: IndexRebuildService.Service.values()) {
       recreateService(index, service);
@@ -131,16 +125,11 @@ public class IndexRebuildService implements BundleActivator {
    *
    * @param service
    *          The {@link IndexRebuildService.Service} representing the service to start re-sending the data from.
-   * @throws InterruptedException
-   *           Thrown if the process of re-sending the data is interupted.
-   * @throws CancellationException
-   *           Thrown if listening to messages has been canceled.
-   * @throws ExecutionException
-   *           Thrown if the process of re-sending the data has an error.
+   * @throws IndexRebuildException
+   *           Thrown if the index-rebuild failed.
    */
   private void recreateService(AbstractSearchIndex index, IndexRebuildService.Service service)
-          throws InterruptedException, CancellationException, ExecutionException, IndexRebuildException {
-
+          throws IndexRebuildException {
     IndexProducer indexProducer = indexProducers.get(service);
     logger.info("Starting to recreate index {} for service '{}'", index.getIndexName(), service);
     try {
@@ -160,16 +149,11 @@ public class IndexRebuildService implements BundleActivator {
    *           The service name. The available services are:
    *           Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager, Comments
    *
-   * @throws IllegalArgumentException
-   *           Thrown if the service name is invalid
-   * @throws InterruptedException
-   *           Thrown if the process is interupted.
-   * @throws ExecutionException
-   *           Thrown if there is a problem executing the process.
+   * @throws IndexRebuildException
+   *           Thrown if the index-rebuild failed.
    */
   public synchronized void recreateIndex(AbstractSearchIndex index, String serviceName)
-          throws IllegalArgumentException, InterruptedException, ExecutionException, IndexRebuildException {
-
+          throws IllegalArgumentException, IndexRebuildException {
     IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
     recreateService(index, service);
   }

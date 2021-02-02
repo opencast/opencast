@@ -61,8 +61,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -288,12 +286,6 @@ public class BaseEndpoint {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
         indexRebuildService.recreateIndex(externalIndex, service);
-      } catch (InterruptedException e) {
-        logger.error("Repopulating the index was interrupted", e);
-      } catch (CancellationException e) {
-        logger.trace("Listening for index messages has been cancelled.");
-      } catch (ExecutionException e) {
-        logger.error("Repopulating the index failed to execute", e);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -313,12 +305,6 @@ public class BaseEndpoint {
         logger.info("Starting to repopulate the external index");
         indexRebuildService.recreateIndex(externalIndex);
         logger.info("Finished repopulating the external index");
-      } catch (InterruptedException e) {
-        logger.error("Repopulating the external index was interrupted", e);
-      } catch (CancellationException e) {
-        logger.trace("Listening for external index messages has been cancelled.");
-      } catch (ExecutionException e) {
-        logger.error("Repopulating the external index failed to execute", e);
       } catch (Throwable t) {
         logger.error("Repopulating the external index failed", t);
       }
