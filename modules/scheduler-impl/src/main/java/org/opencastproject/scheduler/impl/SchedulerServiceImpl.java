@@ -340,16 +340,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @throws Exception
    */
   public void activate(ComponentContext cc) throws Exception {
-    super.activate();
     this.componentContext = cc;
     systemUserName = SecurityUtil.getSystemUserName(cc);
     logger.info("Activating Scheduler Service");
-  }
-
-  /** Callback from OSGi on service deactivation. */
-  @Override
-  public void deactivate() {
-    super.deactivate();
   }
 
   @Override
@@ -1605,18 +1598,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
-  }
-
-  @Override
   public Service getService() {
     return Service.Scheduler;
-  }
-
-  @Override
-  public String getClassName() {
-    return SchedulerServiceImpl.class.getName();
   }
 
   public MessageSender getMessageSender() {

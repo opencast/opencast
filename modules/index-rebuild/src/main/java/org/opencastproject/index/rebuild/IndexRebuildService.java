@@ -61,9 +61,6 @@ public class IndexRebuildService implements BundleActivator {
 
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);
 
-  /** The message sender */
-  private MessageSender messageSender;
-
   /** The message receiver */
   private MessageReceiver messageReceiver;
 
@@ -73,12 +70,7 @@ public class IndexRebuildService implements BundleActivator {
   private Map<IndexRecreateObject.Service, IndexProducer> indexProducers = new HashMap<>();
 
   private ServiceRegistration serviceRegistration = null;
-
-  @Reference(name = "messageSender")
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
+  
   @Reference(name = "messageReceiver")
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
@@ -168,11 +160,18 @@ public class IndexRebuildService implements BundleActivator {
    */
   private void recreateService(AbstractSearchIndex index, IndexRecreateObject.Service service)
           throws InterruptedException, CancellationException, ExecutionException, IndexRebuildException {
+
+
+    IndexProducer indexProducer = indexProducers.get(service);
     logger.info("Starting to recreate index for service '{}'", service);
-    messageSender.sendObjectMessage(IndexProducer.RECEIVER_QUEUE + "." + service, MessageSender.DestinationType.Queue,
-            IndexRecreateObject.start(index.getIndexName(), service));
+    try {
+      indexProducer.repopulate(index.getIndexName());
+    } catch (Exception e) {
+      throw new IndexRebuildException(format("Index Rebuild of Index %s for Service %s failed.", index.getIndexName(),
+              service.name()), e);
+    }
+
     boolean done = false;
-    // TODO Add a timeout for services that are not going to respond.
     while (!done) {
       FutureTask<Serializable> future = messageReceiver.receiveSerializable(IndexProducer.RESPONSE_QUEUE,
               MessageSender.DestinationType.Queue);

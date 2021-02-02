@@ -176,9 +176,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   public void activate(ComponentContext cc) {
     logger.debug("Activate group role provider");
     this.cc = cc;
-
-    // Set up persistence
-    super.activate();
   }
 
   /**
@@ -645,17 +642,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
-  }
-
-  @Override
   public Service getService() {
     return Service.Groups;
-  }
-
-  @Override
-  public String getClassName() {
-    return JpaGroupRoleProvider.class.getName();
   }
 }

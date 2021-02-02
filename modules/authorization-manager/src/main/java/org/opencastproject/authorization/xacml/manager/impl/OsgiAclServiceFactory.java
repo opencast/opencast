@@ -137,11 +137,6 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
     });
   }
 
-  @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
-  }
-
   /**
    * Callback for activation of this component.
    *
@@ -150,16 +145,10 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
    */
   public void activate(ComponentContext cc) {
     this.cc = cc;
-    super.activate();
   }
 
   @Override
   public Service getService() {
     return Service.Acl;
-  }
-
-  @Override
-  public String getClassName() {
-    return OsgiAclServiceFactory.class.getName();
   }
 }

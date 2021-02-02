@@ -94,16 +94,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for themes");
     this.cc = cc;
-    super.activate();
-  }
-
-  /**
-   * Closes entity manager factory.
-   *
-   * @param cc
-   */
-  public void deactivate(ComponentContext cc) {
-    super.deactivate();
   }
 
   /** OSGi DI */
@@ -368,17 +358,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
-  }
-
-  @Override
   public Service getService() {
     return IndexRecreateObject.Service.Themes;
-  }
-
-  @Override
-  public String getClassName() {
-    return ThemesServiceDatabaseImpl.class.getName();
   }
 }

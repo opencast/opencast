@@ -101,7 +101,6 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for event comments");
     this.cc = cc;
-    super.activate();
   }
 
   /** OSGi DI */
@@ -452,17 +451,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
-  }
-
-  @Override
   public Service getService() {
     return Service.Comments;
-  }
-
-  @Override
-  public String getClassName() {
-    return EventCommentDatabaseServiceImpl.class.getName();
   }
 }

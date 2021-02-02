@@ -430,16 +430,6 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
    */
 
   @Override
-  public String getClassName() {
-    return OsgiAssetManager.class.getName();
-  }
-
-  @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
-  }
-
-  @Override
   public IndexRecreateObject.Service getService() {
     return IndexRecreateObject.Service.AssetManager;
   }

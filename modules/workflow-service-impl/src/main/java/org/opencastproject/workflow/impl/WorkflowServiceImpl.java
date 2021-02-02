@@ -292,17 +292,14 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     } catch (WorkflowDatabaseException e) {
       logger.error("Error registering JMX statistic beans", e);
     }
-    super.activate();
     logger.info("Activate Workflow service");
   }
 
-  @Override
   @Deactivate
   public void deactivate() {
     for (ObjectInstance mxbean : jmxBeans) {
       JmxUtil.unregisterMXBean(mxbean);
     }
-    super.deactivate();
   }
 
   /**
@@ -2425,17 +2422,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
-  }
-
-  @Override
   public Service getService() {
     return Service.Workflow;
-  }
-
-  @Override
-  public String getClassName() {
-    return WorkflowServiceImpl.class.getName();
   }
 }

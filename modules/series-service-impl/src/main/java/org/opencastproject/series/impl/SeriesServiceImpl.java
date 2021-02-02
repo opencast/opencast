@@ -64,7 +64,6 @@ import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,12 +162,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     logger.info("Activating Series Service");
     systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
     populateSolr(systemUserName);
-    super.activate();
-  }
-
-  @Deactivate
-  public void deactivate() {
-    super.deactivate();
   }
 
   /** If the solr index is empty, but there are series in the database, populate the solr index. */
@@ -619,17 +612,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
-  }
-
-  @Override
   public Service getService() {
     return Service.Series;
-  }
-
-  @Override
-  public String getClassName() {
-    return SeriesServiceImpl.class.getName();
   }
 }
