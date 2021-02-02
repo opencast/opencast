@@ -46,7 +46,6 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -58,7 +57,6 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
@@ -84,7 +82,6 @@ import org.opencastproject.scheduler.impl.persistence.ExtendedEventDto;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -1539,7 +1536,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     final int[] current = {0};
     final int total = persistence.countEvents();
     logger.info("Re-populating {} index with {} scheduled events", indexName, total);
-    final int responseInterval = (total < 100) ? 1 : (total / 100);
 
     for (Organization organization: orgDirectoryService.getOrganizations()) {
       final User user = SecurityUtil.createSystemUser(systemUserName, organization);
@@ -1579,22 +1575,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             }
             final Serializable message = new SchedulerItemList(event.getMediaPackageId(), schedulerItems);
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue, message);
-            if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
-              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                      IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Scheduler, total, current[0]));
-            }
+            logIndexRebuildProgress(indexName, total, current[0]);
           } catch (Exception e) {
             logger.error("Failed to send scheduler update for event {}. Skipping.", event.getMediaPackageId());
           }
         }
       });
     }
-
-    final Serializable message = IndexRecreateObject.end(indexName, Service.Scheduler);
-    final Organization organization = new DefaultOrganization();
-    final User user = SecurityUtil.createSystemUser(componentContext, organization);
-    SecurityUtil.runAs(securityService, organization, user,
-            () -> messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue, message));
   }
 
   @Override

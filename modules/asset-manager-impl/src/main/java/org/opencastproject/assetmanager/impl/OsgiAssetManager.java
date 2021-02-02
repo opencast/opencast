@@ -449,7 +449,6 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
       final int total = r.countSnapshots();
       logger.info("Populating index '{}' with {} snapshots | start", indexName, total);
-      final int responseInterval = (total < 100) ? 1 : (total / 100);
       int current = 0;
 
       final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
@@ -470,10 +469,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
               logger.error("Unable to recreate event {} from organization {}",
                       snapshot.getMediaPackage().getIdentifier().toString(), orgId, t);
             }
-            if (((current % responseInterval) == 0) || (current == total)) {
-              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                      IndexRecreateObject.update(indexName, getService(), total, current));
-            }
+            logIndexRebuildProgress(indexName, total, current);
           }
         } catch (Throwable t) {
           logger.error("Unable to recreate event index for organization {}", orgId, t);
@@ -482,9 +478,6 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
           secSvc.setUser(systemUser);
         }
       }
-      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-              IndexRecreateObject.end(indexName, getService()));
-
     } finally {
       secSvc.setOrganization(org);
       secSvc.setUser(user);

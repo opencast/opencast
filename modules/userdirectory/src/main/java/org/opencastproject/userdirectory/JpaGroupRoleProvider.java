@@ -26,9 +26,7 @@ import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.group.GroupItem;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.GroupProvider;
 import org.opencastproject.security.api.JaxbGroup;
@@ -618,7 +616,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
       SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
         final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
         int total = groups.size();
-        final int responseInterval = (total < 100) ? 1 : (total / 100);
         int current = 1;
         logger.info(
                 "Re-populating index '{}' with groups of organization {}. There are {} group(s) to add to the index.",
@@ -626,19 +623,11 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
         for (JpaGroup group : groups) {
           messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                   GroupItem.update(JaxbGroup.fromGroup(group)));
-          if (((current % responseInterval) == 0) || (current == total)) {
-            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                  IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Groups, total, current));
-          }
+          logIndexRebuildProgress(indexName, total, current);
           current++;
         }
       });
     }
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Groups));
-    });
   }
 
   @Override

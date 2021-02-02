@@ -46,7 +46,6 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.workflow.WorkflowItem;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
@@ -57,7 +56,6 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
@@ -2393,20 +2391,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                     messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                             WorkflowItem.updateInstance(instance, dcXml, accessControlList));
                   });
-          if ((current % responseInterval == 0) || (current == total)) {
-            logger.info("Updating {} workflow index {}/{}: {} percent complete.", indexName, current, total,
-                    current * 100 / total);
-          }
+          logIndexRebuildProgress(indexName, total, current);
         }
       } while (current < total);
     }
-    logger.info("Finished populating {} index with workflows", indexName);
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(componentContext, organization),
-            () -> {
-              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                      IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Workflow));
-            });
   }
 
   private String getEpisodeDublinCoreXml(MediaPackage mediaPackage) {

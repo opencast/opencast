@@ -24,13 +24,10 @@ import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.comments.CommentItem;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -409,7 +406,6 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       current[0] = 0;
       logger.info("Re-populating index '{}' with comments for events. There are {} events with comments to add",
               indexName, total);
-      final int responseInterval = (total < 100) ? 1 : (total / 100);
       final Map<String, List<String>> eventsWithComments = getEventsWithComments();
       for (String orgId : eventsWithComments.keySet()) {
         Organization organization = organizationDirectoryService.getOrganization(orgId);
@@ -424,12 +420,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                               CommentItem.update(eventId, !comments.isEmpty(), hasOpenComments, needsCutting));
 
                       current[0] += comments.size();
-                      if (responseInterval == 1 || comments.size() > responseInterval || current[0] == total
-                              || current[0] % responseInterval < comments.size()) {
-                        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
-                                MessageSender.DestinationType.Queue, IndexRecreateObject
-                                        .update(indexName, IndexRecreateObject.Service.Comments, total, current[0]));
-                      }
+                      logIndexRebuildProgress(indexName, total, current[0]);
                     } catch (EventCommentDatabaseException e) {
                       logger.error("Unable to retrieve event comments for organization {}", orgId, e);
                     } catch (Throwable t) {
@@ -442,12 +433,6 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logger.warn("Unable to index event comments", e);
       throw new ServiceException(e.getMessage());
     }
-
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Comments));
-    });
   }
 
   @Override

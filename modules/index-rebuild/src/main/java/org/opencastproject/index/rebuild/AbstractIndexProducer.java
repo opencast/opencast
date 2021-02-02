@@ -21,9 +21,37 @@
 
 package org.opencastproject.index.rebuild;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This service produces messages for an elastic search index
  */
 public abstract class AbstractIndexProducer implements IndexProducer {
 
+  private static final Logger logger = LoggerFactory.getLogger(AbstractIndexProducer.class);
+
+  protected void logIndexRebuildProgress(String indexName, int total, int current) {
+    logIndexRebuildProgress(indexName, total, current, 1);
+  }
+
+  protected void logIndexRebuildProgress(String indexName, int total, int current, int batchSize) {
+    final int responseInterval = (total < 100) ? 1 : (total / 100);
+    if (responseInterval == 1 || batchSize > responseInterval || current == total
+            || current % responseInterval < batchSize) {
+      logger.info("Updating index {} for service '{}': {}/{} finished, {}% complete.", indexName, getService(), current,
+              total, (current * 100 / total));
+    }
+    if (current == total) {
+      logger.info("Waiting for service '{}' indexing to complete", getService().name());
+    }
+  }
+  protected void logIndexRebuildError(String indexName, Exception e) {
+    logger.error("Error updating index {} for service '{}'.", indexName, getService(), e);
+  }
+
+  protected void logIndexRebuildError(String indexName, int total, int current, Exception e) {
+    logger.error("Error updating index {} for service '{}' with {}/{} finished.", indexName, getService(), current,
+            total, e);
+  }
 }

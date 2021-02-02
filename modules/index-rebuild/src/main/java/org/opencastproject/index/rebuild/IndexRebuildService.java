@@ -24,9 +24,6 @@ package org.opencastproject.index.rebuild;
 import static java.lang.String.format;
 
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.message.broker.api.BaseMessage;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 
 import org.osgi.framework.BundleActivator;
@@ -35,46 +32,22 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 
-@Component(
-        property = {
-                "service.description=Index Rebuild Service"
-        },
-        immediate = true,
-        service = { IndexRebuildService.class }
-)
 public class IndexRebuildService implements BundleActivator {
 
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);
 
-  /** The message receiver */
-  private MessageReceiver messageReceiver;
-
-  /** An Executor to get messages */
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
-
   private Map<IndexRecreateObject.Service, IndexProducer> indexProducers = new HashMap<>();
 
   private ServiceRegistration serviceRegistration = null;
-
-  @Reference(name = "messageReceiver")
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
-  }
 
   private void addIndexProducer(IndexProducer indexProducer) {
     indexProducers.put(indexProducer.getService(), indexProducer);
@@ -161,56 +134,16 @@ public class IndexRebuildService implements BundleActivator {
   private void recreateService(AbstractSearchIndex index, IndexRecreateObject.Service service)
           throws InterruptedException, CancellationException, ExecutionException, IndexRebuildException {
 
-
     IndexProducer indexProducer = indexProducers.get(service);
-    logger.info("Starting to recreate index for service '{}'", service);
+    logger.info("Starting to recreate index {} for service '{}'", index.getIndexName(), service);
     try {
       indexProducer.repopulate(index.getIndexName());
     } catch (Exception e) {
+      logger.error("Error recreating index {} for service '{}' ", index.getIndexName(), service);
       throw new IndexRebuildException(format("Index Rebuild of Index %s for Service %s failed.", index.getIndexName(),
               service.name()), e);
     }
-
-    boolean done = false;
-    while (!done) {
-      FutureTask<Serializable> future = messageReceiver.receiveSerializable(IndexProducer.RESPONSE_QUEUE,
-              MessageSender.DestinationType.Queue);
-      executor.execute(future);
-      BaseMessage message = (BaseMessage) future.get();
-      if (message.getObject() instanceof IndexRecreateObject) {
-        IndexRecreateObject indexRecreateObject = (IndexRecreateObject) message.getObject();
-        switch (indexRecreateObject.getStatus()) {
-          case Update:
-            logger.info("Updating service: '{}' with {}/{} finished, {}% complete.",
-                indexRecreateObject.getService(),
-                indexRecreateObject.getCurrent(),
-                indexRecreateObject.getTotal(),
-                (int) (indexRecreateObject.getCurrent() * 100 / indexRecreateObject.getTotal())
-            );
-            if (indexRecreateObject.getCurrent() == indexRecreateObject.getTotal()) {
-              logger.info("Waiting for service '{}' indexing to complete", indexRecreateObject.getService());
-            }
-            break;
-          case End:
-            done = true;
-            logger.info("Finished re-creating data for service '{}'", indexRecreateObject.getService());
-            break;
-          case Error:
-            logger.error("Error updating service '{}' with {}/{} finished.",
-                    indexRecreateObject.getService(), indexRecreateObject.getCurrent(),
-                    indexRecreateObject.getTotal());
-            throw new IndexRebuildException(
-                    format("Error updating service '%s' with %s/%s finished.", indexRecreateObject.getService(),
-                            indexRecreateObject.getCurrent(), indexRecreateObject.getTotal()));
-          default:
-            logger.error("Unable to handle the status '{}' for service '{}'", indexRecreateObject.getStatus(),
-                    indexRecreateObject.getService());
-            throw new IllegalArgumentException(format("Unable to handle the status '%s' for service '%s'",
-                    indexRecreateObject.getStatus(), indexRecreateObject.getService()));
-
-        }
-      }
-    }
+    logger.info("Finished to recreate index {} for service '{}'", index.getIndexName(), service);
   }
 
   /**

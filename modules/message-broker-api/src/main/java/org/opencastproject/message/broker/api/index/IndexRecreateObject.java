@@ -25,100 +25,11 @@ import java.io.Serializable;
 
 public final class IndexRecreateObject implements Serializable {
 
-  private static final long serialVersionUID = 6076737478411640536L;
-
-  public enum Status {
-    Start, Update, End, Error
-  }
-
   /**
    * The Services whose data is indexed by ElasticSearch
    * Attention: The order is relevant for the index rebuild and should not be changed!
    */
   public enum Service {
     Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager, Comments
-  }
-
-  private String indexName;
-  private String message;
-  private int total;
-  private int current;
-  private Status status;
-  private Service service;
-
-  /**
-   * Constructor for a start or stop message.
-   *
-   * @param indexName
-   *          The index name
-   * @param service
-   *          The service this message relates to.
-   * @param status
-   *          The status of the message.
-   */
-  private IndexRecreateObject(String indexName, Service service, Status status) {
-    this.indexName = indexName;
-    this.service = service;
-    this.status = status;
-  }
-
-  /**
-   * Constructor for an update message.
-   *
-   * @param indexName
-   *          The index name
-   * @param service
-   *          The service that has been updated.
-   * @param total
-   *          The total number of objects that will be re-added.
-   * @param current
-   *          The current number that have been re-added.
-   */
-  private IndexRecreateObject(String indexName, Service service, int total, int current) {
-    this.indexName = indexName;
-    this.service = service;
-    this.status = Status.Update;
-    this.total = total;
-    this.current = current;
-  }
-
-  public static IndexRecreateObject start(String indexName, Service service) {
-    return new IndexRecreateObject(indexName, service, Status.Start);
-  }
-
-  public static IndexRecreateObject update(String indexName, Service service, int total, int current) {
-    return new IndexRecreateObject(indexName, service, total, current);
-  }
-
-  public static IndexRecreateObject end(String indexName, Service service) {
-    return new IndexRecreateObject(indexName, service, Status.End);
-  }
-
-  public static IndexRecreateObject error(String indexName, Service service, int total, int current, String message) {
-    return new IndexRecreateObject(indexName, service, total, current);
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public String getIndexName() {
-    return indexName;
-  }
-
-  public int getTotal() {
-    return total;
-  }
-
-  public int getCurrent() {
-    return current;
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public Service getService() {
-    return service;
   }
 }

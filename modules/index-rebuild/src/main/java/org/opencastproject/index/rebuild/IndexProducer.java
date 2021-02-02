@@ -28,10 +28,6 @@ import org.opencastproject.message.broker.api.index.IndexRecreateObject;
  */
 public interface IndexProducer {
 
-  String RECEIVER_QUEUE = "INDEX_RECEIVER.QUEUE";
-
-  String RESPONSE_QUEUE = "INDEX_RESPONSE.QUEUE";
-
   /**
    * Re-send all data of this service to the index
    */
