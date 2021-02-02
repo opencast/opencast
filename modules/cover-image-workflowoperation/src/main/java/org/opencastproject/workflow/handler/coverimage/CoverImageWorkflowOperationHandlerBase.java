@@ -307,14 +307,20 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
 
   protected String getMetadataXml(MediaPackage mp, WorkflowOperationInstance operation) {
     //get specified episode/series flavor
-    final String configuredEpisodeFlavor = Objects.toString(StringUtils.trimToNull(operation.getConfiguration(EPISODE_FLAVOR)), "dublincore/episode");
-    final String configuredSeriesFlavor = Objects.toString(StringUtils.trimToNull(operation.getConfiguration(SERIES_FLAVOR)), "dublincore/series");
+    final String configuredEpisodeFlavor =
+            Objects.toString(StringUtils.trimToNull(operation.getConfiguration(EPISODE_FLAVOR)),
+                    "dublincore/episode");
+    final String configuredSeriesFlavor =
+            Objects.toString(StringUtils.trimToNull(operation.getConfiguration(SERIES_FLAVOR)),
+                    "dublincore/series");
 
     MediaPackageElementFlavor episodeFlavor = MediaPackageElementFlavor.parseFlavor(configuredEpisodeFlavor);
     MediaPackageElementFlavor seriesFlavor = MediaPackageElementFlavor.parseFlavor(configuredSeriesFlavor);
 
     //Get episode metadata-catalog
-    Catalog[] catalogs = mp.getCatalogs(new MediaPackageElementFlavor(episodeFlavor.getType(), StringUtils.lowerCase(episodeFlavor.getSubtype())));
+    Catalog[] catalogs =
+            mp.getCatalogs(new MediaPackageElementFlavor(episodeFlavor.getType(),
+                    StringUtils.lowerCase(episodeFlavor.getSubtype())));
 
     //load metadata-catalog
     DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(getWorkspace(), catalogs[0]);
@@ -333,7 +339,8 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
         case "isPartOf":
           xml.append("<series>");
           //get series catalog
-          Catalog[] seriesCatalogs = mp.getCatalogs(new MediaPackageElementFlavor(seriesFlavor.getType(), seriesFlavor.getSubtype()));
+          Catalog[] seriesCatalogs =
+                  mp.getCatalogs(new MediaPackageElementFlavor(seriesFlavor.getType(), seriesFlavor.getSubtype()));
           //get Series metadata
           DublinCoreCatalog dcSeries = DublinCoreUtil.loadDublinCore(getWorkspace(), seriesCatalogs[0]);
           Map<EName, List<DublinCoreValue>> seriesMetadata = dcSeries.getValues();
