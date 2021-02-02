@@ -168,7 +168,7 @@ import javax.management.ObjectInstance;
     "service.pid=org.opencastproject.workflow.impl.WorkflowServiceImpl"
   },
   immediate = true,
-  service = { WorkflowService.class, WorkflowServiceImpl.class }
+  service = { WorkflowService.class, WorkflowServiceImpl.class, IndexProducer.class }
 )
 public class WorkflowServiceImpl extends AbstractIndexProducer implements WorkflowService, JobProducer, ManagedService {
 

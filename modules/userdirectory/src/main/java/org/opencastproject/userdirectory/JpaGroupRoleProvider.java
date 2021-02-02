@@ -81,7 +81,7 @@ import javax.persistence.EntityTransaction;
     "service.description=Provides a group role directory"
   },
   immediate = true,
-  service = { RoleProvider.class, JpaGroupRoleProvider.class }
+  service = { RoleProvider.class, JpaGroupRoleProvider.class, IndexProducer.class }
 )
 public class JpaGroupRoleProvider extends AbstractIndexProducer
         implements AAIRoleProvider, GroupProvider, GroupRoleProvider {

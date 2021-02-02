@@ -88,7 +88,7 @@ import javax.persistence.EntityManagerFactory;
     "service.description=Opencast Asset Manager"
   },
   immediate = true,
-  service = { AssetManager.class, TieredStorageAssetManager.class }
+  service = { AssetManager.class, TieredStorageAssetManager.class, IndexProducer.class }
 )
 public class OsgiAssetManager extends AbstractIndexProducer implements AssetManager, TieredStorageAssetManager {
   /**

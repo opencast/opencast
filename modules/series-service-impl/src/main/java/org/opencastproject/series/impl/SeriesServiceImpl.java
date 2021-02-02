@@ -89,7 +89,7 @@ import javax.xml.parsers.ParserConfigurationException;
     "service.description=Series Service"
   },
   immediate = true,
-  service = { SeriesService.class }
+  service = { SeriesService.class, IndexProducer.class }
 )
 public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesService {
 
