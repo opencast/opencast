@@ -20,23 +20,34 @@
  */
 package org.opencastproject.assetmanager.impl;
 
+import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
+import static org.opencastproject.util.RequireUtil.notEmpty;
+
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
+import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.storage.AssetStore;
 import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
+import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
+import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
@@ -44,6 +55,7 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -59,6 +71,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -77,8 +90,10 @@ import javax.persistence.EntityManagerFactory;
   immediate = true,
   service = { AssetManager.class, TieredStorageAssetManager.class }
 )
-public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager {
-  /** Log facility */
+public class OsgiAssetManager extends AbstractIndexProducer implements AssetManager, TieredStorageAssetManager {
+  /**
+   * Log facility
+   */
   private static final Logger logger = LoggerFactory.getLogger(OsgiAssetManager.class);
 
   private SecurityService secSvc;
@@ -91,18 +106,22 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   private MessageReceiver messageReceiver;
   private EntityManagerFactory emf;
   private List<RemoteAssetStore> remotes = new LinkedList<>();
+  private String systemUserName;
+  private AssetManagerWithMessaging withMessaging;
 
   // collect all objects that need to be closed on service deactivation
   private AutoCloseable toClose;
 
   private TieredStorageAssetManager delegate;
 
-  /** OSGi callback. */
+  /**
+   * OSGi callback.
+   */
   @Activate
   public synchronized void activate(ComponentContext cc) {
     logger.info("Activating AssetManager");
     final Database db = new Database(emf);
-    final String systemUserName = SecurityUtil.getSystemUserName(cc);
+    systemUserName = SecurityUtil.getSystemUserName(cc);
     // create the core asset manager
     final AbstractAssetManagerWithTieredStorage core = new AbstractAssetManagerWithTieredStorage() {
       private HashMap<String, RemoteAssetStore> remoteStores = new LinkedHashMap<>();
@@ -157,20 +176,14 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
       }
     };
     // compose with ActiveMQ messaging
-    final AssetManagerWithMessaging withMessaging = new AssetManagerWithMessaging(
-            core,
-            messageSender,
-            messageReceiver,
-            authSvc,
-            orgDir,
-            secSvc,
-            workspace,
-            systemUserName);
+    withMessaging = new AssetManagerWithMessaging(core, messageSender, messageReceiver,
+            authSvc, orgDir, secSvc, workspace, systemUserName);
     // compose with security
     boolean includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
     boolean includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     boolean includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
-    delegate = new AssetManagerWithSecurity(withMessaging, authSvc, secSvc, includeAPIRoles, includeCARoles, includeUIRoles);
+    delegate = new AssetManagerWithSecurity(withMessaging, authSvc, secSvc, includeAPIRoles, includeCARoles,
+            includeUIRoles);
     for (RemoteAssetStore ras : remotes) {
       delegate.addRemoteAssetStore(ras);
     }
@@ -184,7 +197,9 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
     };
   }
 
-  /** OSGi callback. Close the database. */
+  /**
+   * OSGi callback. Close the database.
+   */
   @Deactivate
   public void deactivate(ComponentContext cc) throws Exception {
     toClose.close();
@@ -408,5 +423,81 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   @Override
   public Opt<String> getSnapshotRetrievalCost(Version version, String mpId) {
     return delegate.getSnapshotRetrievalCost(version, mpId);
+  }
+
+  /**
+   * AbstractIndexProducer Implementation
+   */
+
+  @Override
+  public String getClassName() {
+    return OsgiAssetManager.class.getName();
+  }
+
+  @Override
+  public MessageReceiver getMessageReceiver() {
+    return messageReceiver;
+  }
+
+  @Override
+  public IndexRecreateObject.Service getService() {
+    return IndexRecreateObject.Service.AssetManager;
+  }
+
+  @Override
+  public void repopulate(final String indexName) {
+    notEmpty(indexName, "indexName");
+    final Organization org = secSvc.getOrganization();
+    final User user = (org != null ? secSvc.getUser() : null);
+    try {
+      final Organization defaultOrg = new DefaultOrganization();
+      final User systemUser = SecurityUtil.createSystemUser(systemUserName, defaultOrg);
+      secSvc.setOrganization(defaultOrg);
+      secSvc.setUser(systemUser);
+
+      final AQueryBuilder q = delegate.createQuery();
+      final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
+      final int total = r.countSnapshots();
+      logger.info("Populating index '{}' with {} snapshots | start", indexName, total);
+      final int responseInterval = (total < 100) ? 1 : (total / 100);
+      int current = 0;
+
+      final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
+      for (String orgId : byOrg.keySet()) {
+        final Organization snapshotOrg;
+        try {
+          snapshotOrg = orgDir.getOrganization(orgId);
+          secSvc.setOrganization(snapshotOrg);
+          secSvc.setUser(SecurityUtil.createSystemUser(systemUserName, snapshotOrg));
+
+          for (Snapshot snapshot : byOrg.get(orgId)) {
+            current += 1;
+            try {
+              AssetManagerItem.TakeSnapshot takeSnapshot = withMessaging.mkTakeSnapshotMessage(snapshot, null);
+              messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName),
+                      MessageSender.DestinationType.Queue, takeSnapshot);
+            } catch (Throwable t) {
+              logger.error("Unable to recreate event {} from organization {}",
+                      snapshot.getMediaPackage().getIdentifier().toString(), orgId, t);
+            }
+            if (((current % responseInterval) == 0) || (current == total)) {
+              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                      IndexRecreateObject.update(indexName, getService(), total, current));
+            }
+          }
+        } catch (Throwable t) {
+          logger.error("Unable to recreate event index for organization {}", orgId, t);
+        } finally {
+          secSvc.setOrganization(defaultOrg);
+          secSvc.setUser(systemUser);
+        }
+      }
+      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+              IndexRecreateObject.end(indexName, getService()));
+
+    } finally {
+      secSvc.setOrganization(org);
+      secSvc.setUser(user);
+    }
   }
 }
