@@ -42,7 +42,6 @@ import org.opencastproject.util.data.Collections;
 
 import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -84,11 +83,6 @@ public class GroupRoleEndpointTest {
     endpoint = new GroupRoleEndpoint();
     endpoint.setJpaGroupRoleProvider(provider);
 
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    provider.deactivate();
   }
 
   @Test

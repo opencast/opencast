@@ -70,7 +70,7 @@ public class IndexRebuildService implements BundleActivator {
   private Map<IndexRecreateObject.Service, IndexProducer> indexProducers = new HashMap<>();
 
   private ServiceRegistration serviceRegistration = null;
-  
+
   @Reference(name = "messageReceiver")
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
