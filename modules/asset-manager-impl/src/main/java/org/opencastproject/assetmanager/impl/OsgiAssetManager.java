@@ -176,8 +176,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
       }
     };
     // compose with ActiveMQ messaging
-    withMessaging = new AssetManagerWithMessaging(core, messageSender, messageReceiver,
-            authSvc, orgDir, secSvc, workspace, systemUserName);
+    withMessaging = new AssetManagerWithMessaging(core, messageSender, authSvc, workspace);
     // compose with security
     boolean includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
     boolean includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));

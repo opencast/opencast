@@ -26,14 +26,11 @@ import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery.DeleteSnapshotHandler;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.slf4j.Logger;
@@ -52,21 +49,14 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerWithMessaging.class);
 
   private final MessageSender messageSender;
-  private final MessageReceiver messageReceiver;
   private final AuthorizationService authSvc;
-  private final OrganizationDirectoryService orgDir;
-  private final SecurityService secSvc;
   private final Workspace workspace;
 
   public AssetManagerWithMessaging(final TieredStorageAssetManager delegate, final MessageSender messageSender,
-          MessageReceiver messageReceiver, AuthorizationService authSvc, OrganizationDirectoryService orgDir,
-          SecurityService secSvc, Workspace workspace, final String systemUserName) {
+          AuthorizationService authSvc, Workspace workspace) {
     super(delegate);
     this.messageSender = messageSender;
-    this.messageReceiver = messageReceiver;
     this.authSvc = authSvc;
-    this.orgDir = orgDir;
-    this.secSvc = secSvc;
     this.workspace = workspace;
   }
 
