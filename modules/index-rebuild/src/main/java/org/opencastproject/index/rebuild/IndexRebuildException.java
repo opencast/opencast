@@ -22,16 +22,18 @@
 package org.opencastproject.index.rebuild;
 
 /**
- * An exception which indicates an error when creating a response.
+ * An exception which indicates an error when rebuilding an ElasticSearch index.
  */
 public class IndexRebuildException extends Exception {
 
   private static final long serialVersionUID = -3312895786363366343L;
 
   /**
-   * Constructor without cause.
+   * Constructor without Cause.
    *
    * @param message
+   *           The error message.
+   *
    */
   public IndexRebuildException(String message) {
     super(message);
@@ -41,10 +43,11 @@ public class IndexRebuildException extends Exception {
    * Full fledged constructor.
    *
    * @param message
+   *           The error message.
    * @param cause
+   *           The cause.
    */
   public IndexRebuildException(String message, Throwable cause) {
     super(message, cause);
   }
-
 }

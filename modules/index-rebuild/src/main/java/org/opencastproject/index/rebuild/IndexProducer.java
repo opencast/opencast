@@ -22,14 +22,23 @@
 package org.opencastproject.index.rebuild;
 
 /**
- * This service produces messages for an elastic search index
+ * This service handles data that's added to an ElasticSearch index.
  */
 public interface IndexProducer {
 
   /**
-   * Re-send all data of this service to the index
+   * Re-add all data of this service to the index.
+   *
+   * @param indexName
+   *           The name of the index to repopulate.
    */
   void repopulate(String indexName) throws Exception;
 
+  /**
+   * Get the service that implements IndexProducer.
+   *
+   * @return service
+   *           The service that implements IndexProducer.
+   */
   IndexRebuildService.Service getService();
 }

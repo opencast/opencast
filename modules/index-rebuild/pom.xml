@@ -15,20 +15,22 @@
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
-    <!-- osgi support -->
+    <!-- OSGI -->
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <!-- Opencast -->
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-elasticsearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Other -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
       <scope>compile</scope>
     </dependency>
   </dependencies>

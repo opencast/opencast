@@ -41,7 +41,7 @@ import java.util.Map;
 public class IndexRebuildService implements BundleActivator {
 
   /**
-   * The Services whose data is indexed by ElasticSearch
+   * The services whose data is indexed by ElasticSearch.
    * Attention: The order is relevant for the index rebuild and should not be changed!
    */
   public enum Service {
@@ -49,26 +49,15 @@ public class IndexRebuildService implements BundleActivator {
   }
 
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);
-
   private final Map<IndexRebuildService.Service, IndexProducer> indexProducers = new HashMap<>();
-
   private ServiceRegistration<?> serviceRegistration = null;
-
-  private void addIndexProducer(IndexProducer indexProducer) {
-    indexProducers.put(indexProducer.getService(), indexProducer);
-    logger.info("Service {} registered.", indexProducer.getService());
-  }
-
-  private void registerIndexRebuildService(BundleContext bundleContext) {
-    logger.info("All Services registered.");
-    serviceRegistration = bundleContext.registerService(this.getClass().getName(), IndexRebuildService.this, null);
-  }
 
   @Override
   public void start(BundleContext bundleContext) throws Exception {
 
     // check if there are already indexProducers available
-    ServiceReference<?>[] serviceReferences = bundleContext.getAllServiceReferences(IndexProducer.class.getName(), null);
+    ServiceReference<?>[] serviceReferences = bundleContext.getAllServiceReferences(IndexProducer.class.getName(),
+            null);
     if (serviceReferences != null) {
       for (ServiceReference<?> serviceReference : serviceReferences) {
         addIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
@@ -87,6 +76,7 @@ public class IndexRebuildService implements BundleActivator {
             ServiceReference<?> serviceReference = serviceEvent.getServiceReference();
             addIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
 
+            // all found?
             if (indexProducers.size() == IndexRebuildService.Service.values().length) {
               registerIndexRebuildService(bundleContext);
               bundleContext.removeServiceListener(this);
@@ -105,12 +95,15 @@ public class IndexRebuildService implements BundleActivator {
   }
 
   /**
-   * Recreate the index from all of the services that provide data.
+   * Recreate the index from all of the services that provide data for it.
+   *
+   * @param index
+   *           The index to rebuild.
    *
    * @throws IOException
    *           Thrown if the index cannot be cleared.
    * @throws IndexRebuildException
-   *           Thrown if the index-rebuild failed.
+   *           Thrown if the index rebuild failed.
    */
   public synchronized void recreateIndex(AbstractSearchIndex index)
           throws IOException, IndexRebuildException {
@@ -121,15 +114,42 @@ public class IndexRebuildService implements BundleActivator {
   }
 
   /**
-   * Ask for data to be rebuilt from a service.
+   * Recreate the index from a specific service that provides data for it.
    *
-   * @param service
-   *          The {@link IndexRebuildService.Service} representing the service to start re-sending the data from.
+   * @param index
+   *           The index to rebuild.
+   * @param serviceName
+   *           The name of the {@link Service}.
+   *
+   * @throws IllegalArgumentException
+   *           Thrown if the service doesn't exist.
    * @throws IndexRebuildException
-   *           Thrown if the index-rebuild failed.
+   *           Thrown if the index rebuild failed.
+   */
+  public synchronized void recreateIndex(AbstractSearchIndex index, String serviceName)
+          throws IllegalArgumentException, IndexRebuildException {
+    IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
+    recreateService(index, service);
+  }
+
+  /**
+   * Trigger repopulation of the specified index with data from the specified service.
+   *
+   * @param index
+   *           The index to rebuild.
+   * @param service
+   *          The {@link IndexRebuildService.Service} to re-add data from.
+   *
+   * @throws IndexRebuildException
+   *           Thrown if the index rebuild failed.
    */
   private void recreateService(AbstractSearchIndex index, IndexRebuildService.Service service)
           throws IndexRebuildException {
+
+    if (!indexProducers.containsKey(service)) {
+      throw new IllegalStateException(format("Service %s is not available", service));
+    }
+
     IndexProducer indexProducer = indexProducers.get(service);
     logger.info("Starting to recreate index {} for service '{}'", index.getIndexName(), service);
     try {
@@ -143,18 +163,24 @@ public class IndexRebuildService implements BundleActivator {
   }
 
   /**
-   * Recreate the index from a specific service that provide data.
+   * Add IndexProducer to internal map.
    *
-   * @param serviceName
-   *           The service name. The available services are:
-   *           Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager, Comments
-   *
-   * @throws IndexRebuildException
-   *           Thrown if the index-rebuild failed.
+   * @param indexProducer
+   *           The IndexProducer to add.
    */
-  public synchronized void recreateIndex(AbstractSearchIndex index, String serviceName)
-          throws IllegalArgumentException, IndexRebuildException {
-    IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
-    recreateService(index, service);
+  private void addIndexProducer(IndexProducer indexProducer) {
+    indexProducers.put(indexProducer.getService(), indexProducer);
+    logger.info("Service {} registered.", indexProducer.getService());
+  }
+
+  /**
+   * Register this service at OSGI.
+   *
+   * @param bundleContext
+   *           The bundle context.
+   */
+  private void registerIndexRebuildService(BundleContext bundleContext) {
+    logger.info("All Services registered.");
+    serviceRegistration = bundleContext.registerService(this.getClass().getName(), IndexRebuildService.this, null);
   }
 }
