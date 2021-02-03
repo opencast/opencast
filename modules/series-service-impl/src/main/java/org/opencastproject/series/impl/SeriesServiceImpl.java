@@ -29,6 +29,7 @@ import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.message.broker.api.MessageReceiver;
@@ -546,13 +547,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public void repopulate(final String indexName) {
+  public void repopulate(final String indexName) throws IndexRebuildException {
     final String destinationId = SeriesItem.SERIES_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
             + indexName.substring(1);
     try {
       final int total = persistence.countSeries();
-      logger.info("Re-populating '{}' index with series. There are {} series to add to the index.", indexName, total);
-      final int responseInterval = (total < 100) ? 1 : (total / 100);
+      logIndexRebuildBegin(indexName, total, "series");
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       int current = 1;
       for (SeriesEntity series: databaseSeries) {
@@ -590,16 +590,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     logger.error("Error requesting series properties", e);
                   }
                 });
-        if ((current % responseInterval == 0) || (current == total)) {
-          logger.info("Initializing {} series index rebuild {}/{}: {} percent", indexName, current, total,
-                  current * 100 / total);
-        }
+        logIndexRebuildProgress(indexName, total, current);
         current++;
       }
-      logger.info("Finished initializing '{}' index rebuild", indexName);
     } catch (Exception e) {
-      logger.warn("Unable to index series instances:", e);
-      throw new ServiceException(e.getMessage());
+      logIndexRebuildError(indexName, e);
+      throw new IndexRebuildException(indexName, getService(), e);
     }
   }
 

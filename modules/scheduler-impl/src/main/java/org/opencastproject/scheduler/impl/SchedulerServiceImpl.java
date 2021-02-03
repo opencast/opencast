@@ -1529,13 +1529,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   @Override
   public void repopulate(final String indexName) throws SchedulerServiceDatabaseException {
-    notEmpty(indexName, "indexName");
-
     final String destinationId = SchedulerItem.SCHEDULER_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
             + indexName.substring(1);
     final int[] current = {0};
     final int total = persistence.countEvents();
-    logger.info("Re-populating {} index with {} scheduled events", indexName, total);
+    logIndexRebuildBegin(indexName, total, "scheduled events");
 
     for (Organization organization: orgDirectoryService.getOrganizations()) {
       final User user = SecurityUtil.createSystemUser(systemUserName, organization);
@@ -1544,7 +1542,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         try {
           events = persistence.getEvents();
         } catch (SchedulerServiceDatabaseException e) {
-          logger.error("Failed to get scheduled events for organization {}", organization, e);
+          logIndexRebuildError(indexName, e, organization);
           return;
         }
 
@@ -1577,7 +1575,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue, message);
             logIndexRebuildProgress(indexName, total, current[0]);
           } catch (Exception e) {
-            logger.error("Failed to send scheduler update for event {}. Skipping.", event.getMediaPackageId());
+            logSkippingElement("scheduled event", event.getMediaPackageId(), e);
           }
         }
       });

@@ -21,6 +21,8 @@
 
 package org.opencastproject.index.rebuild;
 
+import org.opencastproject.security.api.Organization;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +32,37 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractIndexProducer implements IndexProducer {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractIndexProducer.class);
+
+  /**
+   * Log beginning of index rebuild for this service.
+   *
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param elementName
+   *           The elements to be added (e.g. 'events').
+   */
+  protected void logIndexRebuildBegin(String indexName, int total, String elementName) {
+    logger.info("Starting update of index {} for service {} with {} {}", indexName, getService(), total, elementName);
+  }
+
+  /**
+   * Log beginning of index rebuild for this service and a specific organization.
+   *
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param elementName
+   *           The elements to be added (e.g. 'events').
+   * @param org
+   *           The organization.
+   */
+  protected void logIndexRebuildBegin(String indexName, int total, String elementName, Organization org) {
+    logger.info("Starting update of index {} for service {} with {} {} of organization {}", indexName, getService(),
+            total, elementName, org);
+  }
 
   /**
    * Log the progress of the index rebuild for this service.
@@ -46,6 +79,22 @@ public abstract class AbstractIndexProducer implements IndexProducer {
   }
 
   /**
+   * Log the progress of the index rebuild for this service and a specific organization.
+   *
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param current
+   *           The amount of elements that have already been re-added.
+   * @param org
+   *           The organization.
+   */
+  protected void logIndexRebuildProgress(String indexName, int total, int current, Organization org) {
+    logIndexRebuildProgress(indexName, total, current, 1, org);
+  }
+
+  /**
    * Log the progress of the index rebuild for this service.
    *
    * @param indexName
@@ -58,31 +107,11 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The size of the batch we re-add in one go.
    */
   protected void logIndexRebuildProgress(String indexName, int total, int current, int batchSize) {
-    final int responseInterval = (total < 100) ? 1 : (total / 100);
-    if (responseInterval == 1 || batchSize > responseInterval || current == total
-            || current % responseInterval < batchSize) {
-      logger.info("Updating index {} for service '{}': {}/{} finished, {}% complete.", indexName, getService(), current,
-              total, (current * 100 / total));
-    }
-    if (current == total) {
-      logger.info("Waiting for service '{}' indexing to complete", getService().name());
-    }
+    logIndexRebuildProgress(indexName, total, current, batchSize, null);
   }
 
   /**
-   * Log an error during an index rebuild for this service.
-   *
-   * @param indexName
-   *           The name of the index that's being rebuild.
-   * @param e
-   *           The exception that occurred.
-   */
-  protected void logIndexRebuildError(String indexName, Exception e) {
-    logger.error("Error updating index {} for service '{}'.", indexName, getService(), e);
-  }
-
-  /**
-   * Log an error during an index rebuild for this service.
+   * Log the progress of the index rebuild for this service.
    *
    * @param indexName
    *           The name of the index that's being rebuild.
@@ -90,11 +119,80 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The total amount of elements to be re-added.
    * @param current
    *           The amount of elements that have already been re-added.
-   * @param e
-   *           The exception that occurred.
+   * @param batchSize
+   *           The size of the batch we re-add in one go.
+   * @param org
+   *           The organization (can be null).
    */
-  protected void logIndexRebuildError(String indexName, int total, int current, Exception e) {
-    logger.error("Error updating index {} for service '{}' with {}/{} finished.", indexName, getService(), current,
-            total, e);
+  protected void logIndexRebuildProgress(String indexName, int total, int current, int batchSize, Organization org) {
+    final int responseInterval = (total < 100) ? 1 : (total / 100);
+    if (responseInterval == 1 || batchSize > responseInterval || current == total
+            || current % responseInterval < batchSize) {
+
+      if (org == null) {
+        logger.info("Updating index {} for service {}: {}/{} finished, {}% complete.", indexName, getService(),
+                current, total, (current * 100 / total));
+      } else {
+        logger.info("Updating index {} for service {} and organization {}: {}/{} finished, {}% complete.", indexName,
+                getService(), org.getId(), current, total, (current * 100 / total));
+      }
+    }
+  }
+
+  /**
+   * Log an error when one element can't be re-indexed.
+   *
+   * @param elementName
+   *           The name of the element that can't be added (e.g. 'event').
+   * @param element
+   *           The element that can't be added.
+   * @param t
+   *           The error that occurred.
+   */
+  protected void logSkippingElement(String elementName, String element, Throwable t) {
+    logger.error("Unable to re-index {} {}, skipping.", elementName, element, t);
+  }
+
+  /**
+   * Log an error when one element can't be re-indexed.
+   *
+   * @param elementName
+   *           The name of the element that can't be added (e.g. 'event').
+   * @param element
+   *           The element that can't be added.
+   * @param t
+   *           The error that occurred.
+   * @param org
+   *           The organization.
+   */
+  protected void logSkippingElement(String elementName, String element, Organization org, Throwable t) {
+    logger.error("Unable to re-index {} {} of organization {}, skipping.", elementName, element, org.getId(), t);
+  }
+
+  /**
+   * Log an error during an index rebuild for this service.
+   *
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param t
+   *           The error that occurred.
+   */
+  protected void logIndexRebuildError(String indexName, Throwable t) {
+    logger.error("Error updating index {} for service '{}'.", indexName, getService(), t);
+  }
+
+  /**
+   * Log an error during an index rebuild for this service.
+   *
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param t
+   *           The error that occurred.
+   * @param org
+   *           The organization.
+   */
+  protected void logIndexRebuildError(String indexName, Throwable t, Organization org) {
+    logger.error("Error updating index {} for service {} and organization {}.", indexName, getService(), org.getId(),
+            t);
   }
 }

@@ -331,9 +331,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
           final List<Theme> themes = getThemes();
           int total = themes.size();
           int current = 1;
-          logger.info(
-                  "Re-populating '{}' index with themes from organization {}. There are {} theme(s) to add to the index.",
-                  indexName, securityService.getOrganization().getId(), total);
+          logIndexRebuildBegin(indexName, total, "themes", organization);
           for (Theme theme : themes) {
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     ThemeItem.update(toSerializableTheme(theme)));

@@ -2341,8 +2341,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     final String destinationId = WorkflowItem.WORKFLOW_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
             + indexName.substring(1);
     if (total > 0) {
-      logger.info("Populating index '{}' with {} workflows", indexName, total);
-      final int responseInterval = (total < 100) ? 1 : (total / 100);
+      logIndexRebuildBegin(indexName, total, "workflows");
       int current = 0;
       int offset = 0;
       List<String> workflows;

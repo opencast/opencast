@@ -114,10 +114,9 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
         AclService aclService = serviceFor(organization);
         List<ManagedAcl> acls = aclService.getAcls();
         int total = aclService.getAcls().size();
-        logger.info("Re-populating index with acls. There are {} acls(s) to add to the index.", total);
+        logIndexRebuildBegin(indexName, total, "ACLs", organization);
         int current = 1;
         for (ManagedAcl acl : acls) {
-          logger.trace("Adding acl '{}' for org '{}'", acl.getName(), organization.getId());
           messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                   AclItem.create(acl.getName()));
           logIndexRebuildProgress(indexName, total, current);

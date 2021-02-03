@@ -21,7 +21,6 @@
 package org.opencastproject.assetmanager.impl;
 
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
-import static org.opencastproject.util.RequireUtil.notEmpty;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -37,6 +36,7 @@ import org.opencastproject.assetmanager.impl.storage.AssetStore;
 import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageReceiver;
@@ -435,8 +435,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate(final String indexName) {
-    notEmpty(indexName, "indexName");
+  public void repopulate(final String indexName) throws IndexRebuildException {
     final Organization org = secSvc.getOrganization();
     final User user = (org != null ? secSvc.getUser() : null);
     try {
@@ -448,8 +447,8 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
       final AQueryBuilder q = delegate.createQuery();
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
       final int total = r.countSnapshots();
-      logger.info("Populating index '{}' with {} snapshots | start", indexName, total);
       int current = 0;
+      logIndexRebuildBegin(indexName, total, "snapshot(s)");
 
       final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
       for (String orgId : byOrg.keySet()) {
@@ -466,13 +465,13 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
               messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName),
                       MessageSender.DestinationType.Queue, takeSnapshot);
             } catch (Throwable t) {
-              logger.error("Unable to recreate event {} from organization {}",
-                      snapshot.getMediaPackage().getIdentifier().toString(), orgId, t);
+              logSkippingElement("event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
             }
             logIndexRebuildProgress(indexName, total, current);
           }
         } catch (Throwable t) {
-          logger.error("Unable to recreate event index for organization {}", orgId, t);
+          logIndexRebuildError(indexName, t, org);
+          throw new IndexRebuildException(indexName, getService(), org, t);
         } finally {
           secSvc.setOrganization(defaultOrg);
           secSvc.setUser(systemUser);

@@ -21,6 +21,8 @@
 
 package org.opencastproject.index.rebuild;
 
+import org.opencastproject.security.api.Organization;
+
 /**
  * An exception which indicates an error when rebuilding an ElasticSearch index.
  */
@@ -49,5 +51,37 @@ public class IndexRebuildException extends Exception {
    */
   public IndexRebuildException(String message, Throwable cause) {
     super(message, cause);
+  }
+
+  /**
+   * Constructor that builds an error message.
+   *
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param service
+   *           The service that's adding to the index.
+   * @param cause
+   *           The cause.
+   */
+  public IndexRebuildException(String indexName, IndexRebuildService.Service service, Throwable cause) {
+    super(String.format("Error updating index %s for service %s", indexName, service.name()), cause);
+  }
+
+  /**
+   * Constructor that builds an error message.
+   *
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param service
+   *           The service that's adding to the index.
+   * @param org
+   *           The organization.
+   * @param cause
+   *           The cause.
+   */
+  public IndexRebuildException(String indexName, IndexRebuildService.Service service, Organization org,
+          Throwable cause) {
+    super(String.format("Error updating index %s for service %s and organization %s", indexName, service.name(),
+            org.getId()), cause);
   }
 }

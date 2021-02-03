@@ -24,6 +24,7 @@ import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
@@ -43,7 +44,6 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.lang3.text.WordUtils;
-import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -404,8 +404,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       final int total = countComments();
       final int[] current = new int[1];
       current[0] = 0;
-      logger.info("Re-populating index '{}' with comments for events. There are {} events with comments to add",
-              indexName, total);
+      logIndexRebuildBegin(indexName, total, "events with comment");
       final Map<String, List<String>> eventsWithComments = getEventsWithComments();
       for (String orgId : eventsWithComments.keySet()) {
         Organization organization = organizationDirectoryService.getOrganization(orgId);
@@ -421,17 +420,15 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
                       current[0] += comments.size();
                       logIndexRebuildProgress(indexName, total, current[0]);
-                    } catch (EventCommentDatabaseException e) {
-                      logger.error("Unable to retrieve event comments for organization {}", orgId, e);
                     } catch (Throwable t) {
-                      logger.error("Unable to update comment on event {} for organization {}", eventId, orgId, t);
+                      logSkippingElement("comment of event", eventId, organization, t);
                     }
                   }
                 });
       }
     } catch (Exception e) {
-      logger.warn("Unable to index event comments", e);
-      throw new ServiceException(e.getMessage());
+      logIndexRebuildError(indexName, e);
+      throw new IndexRebuildException(indexName, getService(), e);
     }
   }
 
