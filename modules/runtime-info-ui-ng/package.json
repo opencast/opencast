@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "eslint": "^7.19.0",
-    "eslint-plugin-header": "^3.1.0",
+    "eslint-plugin-header": "^3.1.1",
     "html-linter": "^1.1.1"
   }
 }
