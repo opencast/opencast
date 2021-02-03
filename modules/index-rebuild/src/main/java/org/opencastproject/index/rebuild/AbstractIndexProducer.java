@@ -178,7 +178,24 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The error that occurred.
    */
   protected void logIndexRebuildError(String indexName, Throwable t) {
-    logger.error("Error updating index {} for service '{}'.", indexName, getService(), t);
+    logger.error("Error updating index {} for service {}.", indexName, getService(), t);
+  }
+
+  /**
+   * Log an error during an index rebuild for this service.
+   *
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param current
+   *           The amount of elements that have already been re-added.
+   * @param t
+   *           The error that occurred.
+   */
+  protected void logIndexRebuildError(String indexName, int total, int current, Throwable t) {
+    logger.error("Error updating index {} for service {}: {}/{} could be finished.", indexName, getService(), current,
+            total, t);
   }
 
   /**

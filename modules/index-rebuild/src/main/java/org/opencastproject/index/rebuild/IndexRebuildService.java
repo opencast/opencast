@@ -137,13 +137,7 @@ public class IndexRebuildService implements BundleActivator {
 
     IndexProducer indexProducer = indexProducers.get(service);
     logger.info("Starting to recreate index {} for service '{}'", index.getIndexName(), service);
-    try {
-      indexProducer.repopulate(index.getIndexName());
-    } catch (Exception e) {
-      logger.error("Error recreating index {} for service '{}' ", index.getIndexName(), service);
-      throw new IndexRebuildException(format("Index Rebuild of Index %s for Service %s failed.", index.getIndexName(),
-              service.name()), e);
-    }
+    indexProducer.repopulate(index.getIndexName());
     logger.info("Finished to recreate index {} for service '{}'", index.getIndexName(), service);
   }
 

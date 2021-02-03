@@ -46,6 +46,7 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -1528,11 +1529,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public void repopulate(final String indexName) throws SchedulerServiceDatabaseException {
+  public void repopulate(final String indexName) throws IndexRebuildException {
     final String destinationId = SchedulerItem.SCHEDULER_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
             + indexName.substring(1);
     final int[] current = {0};
-    final int total = persistence.countEvents();
+    final int total;
+    try {
+       total = persistence.countEvents();
+    } catch (SchedulerServiceDatabaseException e) {
+      logIndexRebuildError(indexName, e);
+      throw new IndexRebuildException(indexName, getService(), e);
+    }
     logIndexRebuildBegin(indexName, total, "scheduled events");
 
     for (Organization organization: orgDirectoryService.getOrganizations()) {

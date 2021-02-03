@@ -398,7 +398,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   };
 
   @Override
-  public void repopulate(final String indexName) throws Exception {
+  public void repopulate(final String indexName) throws IndexRebuildException {
     final String destinationId = CommentItem.COMMENT_QUEUE_PREFIX + WordUtils.capitalize(indexName);
     try {
       final int total = countComments();

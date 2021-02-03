@@ -35,6 +35,7 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -2333,9 +2334,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
 
   @Override
-  public void repopulate(final String indexName) throws ServiceRegistryException {
+  public void repopulate(final String indexName) throws IndexRebuildException {
     final String startWorkflow = Operation.START_WORKFLOW.toString();
-    final int total = serviceRegistry.getJobCount(startWorkflow);
+    final int total;
+    try {
+      total = serviceRegistry.getJobCount(startWorkflow);
+    } catch (ServiceRegistryException e) {
+      logIndexRebuildError(indexName, e);
+      throw new IndexRebuildException(indexName, getService(), e);
+    }
     final int limit = 1000;
 
     final String destinationId = WorkflowItem.WORKFLOW_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
@@ -2346,7 +2353,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       int offset = 0;
       List<String> workflows;
       do {
-        workflows = serviceRegistry.getJobPayloads(startWorkflow, limit, offset);
+        try {
+          workflows = serviceRegistry.getJobPayloads(startWorkflow, limit, offset);
+        } catch (ServiceRegistryException e) {
+          logIndexRebuildError(indexName, total, current, e);
+          throw new IndexRebuildException(indexName, getService(), e);
+        }
         logger.debug("Got {} workflows for re-indexing", workflows.size());
         offset += limit;
 

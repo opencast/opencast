@@ -32,7 +32,7 @@ public interface IndexProducer {
    * @param indexName
    *           The name of the index to repopulate.
    */
-  void repopulate(String indexName) throws Exception;
+  void repopulate(String indexName) throws IndexRebuildException;
 
   /**
    * Get the service that implements IndexProducer.
