@@ -56,7 +56,7 @@ function monitorService($http, $location, $translate, Storage) {
         Monitoring.populateService(LATEST_VERSION_NAME);
 
         if (response_latest_version.status === 200 && response_my_version.status === 200
-        && response_my_version.data.consistent) {
+        && response_my_version.data.consistent && response_latest_version.data != '') {
           var my_version = response_my_version.data.version,
               latest_version = response_latest_version.data;
           services.service[LATEST_VERSION_NAME].docs_url =
