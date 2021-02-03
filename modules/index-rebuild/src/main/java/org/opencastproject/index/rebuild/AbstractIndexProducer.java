@@ -44,7 +44,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The elements to be added (e.g. 'events').
    */
   protected void logIndexRebuildBegin(String indexName, int total, String elementName) {
-    logger.info("Starting update of index {} for service {} with {} {}", indexName, getService(), total, elementName);
+    logger.info("Starting update of index '{}' for service '{}' with {} {}", indexName, getService(), total, elementName);
   }
 
   /**
@@ -60,7 +60,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The organization.
    */
   protected void logIndexRebuildBegin(String indexName, int total, String elementName, Organization org) {
-    logger.info("Starting update of index {} for service {} with {} {} of organization {}", indexName, getService(),
+    logger.info("Starting update of index '{}' for service '{}' with {} {} of organization '{}'", indexName, getService(),
             total, elementName, org);
   }
 
@@ -130,10 +130,10 @@ public abstract class AbstractIndexProducer implements IndexProducer {
             || current % responseInterval < batchSize) {
 
       if (org == null) {
-        logger.info("Updating index {} for service {}: {}/{} finished, {}% complete.", indexName, getService(),
+        logger.info("Updating index '{}' for service '{}': {}/{} finished, {}% complete.", indexName, getService(),
                 current, total, (current * 100 / total));
       } else {
-        logger.info("Updating index {} for service {} and organization {}: {}/{} finished, {}% complete.", indexName,
+        logger.info("Updating index '{}' for service '{}' and organization '{}': {}/{} finished, {}% complete.", indexName,
                 getService(), org.getId(), current, total, (current * 100 / total));
       }
     }
@@ -150,7 +150,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The error that occurred.
    */
   protected void logSkippingElement(String elementName, String element, Throwable t) {
-    logger.error("Unable to re-index {} {}, skipping.", elementName, element, t);
+    logger.error("Unable to re-index '{}' {}, skipping.", elementName, element, t);
   }
 
   /**
@@ -166,7 +166,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The organization.
    */
   protected void logSkippingElement(String elementName, String element, Organization org, Throwable t) {
-    logger.error("Unable to re-index {} {} of organization {}, skipping.", elementName, element, org.getId(), t);
+    logger.error("Unable to re-index '{}' {} of organization '{}', skipping.", elementName, element, org.getId(), t);
   }
 
   /**
@@ -178,7 +178,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The error that occurred.
    */
   protected void logIndexRebuildError(String indexName, Throwable t) {
-    logger.error("Error updating index {} for service {}.", indexName, getService(), t);
+    logger.error("Error updating index '{}' for service '{}'.", indexName, getService(), t);
   }
 
   /**
@@ -194,7 +194,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The error that occurred.
    */
   protected void logIndexRebuildError(String indexName, int total, int current, Throwable t) {
-    logger.error("Error updating index {} for service {}: {}/{} could be finished.", indexName, getService(), current,
+    logger.error("Error updating index '{}' for service '{}': {}/{} could be finished.", indexName, getService(), current,
             total, t);
   }
 
@@ -209,7 +209,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The organization.
    */
   protected void logIndexRebuildError(String indexName, Throwable t, Organization org) {
-    logger.error("Error updating index {} for service {} and organization {}.", indexName, getService(), org.getId(),
+    logger.error("Error updating index '{}' for service '{}' and organization '{}'.", indexName, getService(), org.getId(),
             t);
   }
 }
