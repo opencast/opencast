@@ -67,31 +67,16 @@ public class IndexRebuildService implements BundleActivator {
     // all available?
     if (indexProducers.size() == IndexRebuildService.Service.values().length) {
       registerIndexRebuildService(bundleContext);
-    } else {  // wait for the rest
-      bundleContext.addServiceListener(new ServiceListener() {
-
-        @Override
-        public void serviceChanged(ServiceEvent serviceEvent) {
-          if (serviceEvent.getType() == ServiceEvent.REGISTERED) {
-            ServiceReference<?> serviceReference = serviceEvent.getServiceReference();
-            addIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
-
-            // all found?
-            if (indexProducers.size() == IndexRebuildService.Service.values().length) {
-              registerIndexRebuildService(bundleContext);
-              bundleContext.removeServiceListener(this);
-            }
-          }
-        }
-      }, "(objectClass=" + IndexProducer.class.getName() + ")");
     }
+
+    // listen to changes in availability
+    bundleContext.addServiceListener(new IndexProducerListener(bundleContext),
+            "(objectClass=" + IndexProducer.class.getName() + ")");
   }
 
   @Override
   public void stop(BundleContext bundleContext) throws Exception {
-    if (serviceRegistration != null)  {
-      serviceRegistration.unregister();
-    }
+    unregisterIndexRebuildService();
   }
 
   /**
@@ -170,7 +155,29 @@ public class IndexRebuildService implements BundleActivator {
    */
   private void addIndexProducer(IndexProducer indexProducer) {
     indexProducers.put(indexProducer.getService(), indexProducer);
-    logger.info("Service {} registered.", indexProducer.getService());
+    logger.info("Service {} added.", indexProducer.getService());
+  }
+
+  /**
+   * Remove IndexProducer from internal map.
+   *
+   * @param indexProducer
+   *           The IndexProducer to remove.
+   */
+  private void removeIndexProducer(IndexProducer indexProducer) {
+    indexProducers.remove(indexProducer.getService(), indexProducer);
+    logger.info("Service {} removed.", indexProducer.getService());
+  }
+
+  /**
+   * Unregister this service at OSGI.
+   */
+  private void unregisterIndexRebuildService() {
+    if (serviceRegistration != null)  {
+      logger.info("Unregister IndexRebuildService.");
+      serviceRegistration.unregister();
+      serviceRegistration = null;
+    }
   }
 
   /**
@@ -180,7 +187,48 @@ public class IndexRebuildService implements BundleActivator {
    *           The bundle context.
    */
   private void registerIndexRebuildService(BundleContext bundleContext) {
-    logger.info("All Services registered.");
-    serviceRegistration = bundleContext.registerService(this.getClass().getName(), IndexRebuildService.this, null);
+    if (serviceRegistration == null) {
+      logger.info("Register IndexRebuildService.");
+      serviceRegistration = bundleContext.registerService(this.getClass().getName(), IndexRebuildService.this, null);
+    }
+  }
+
+  /**
+   * Listen to changes in the availability of IndexProducer services.
+   */
+  private final class IndexProducerListener implements ServiceListener {
+
+    private final BundleContext bundleContext;
+
+    /**
+     * Constructor.
+     *
+     * @param bundleContext
+     *           The bundle context.
+     */
+    private IndexProducerListener(BundleContext bundleContext) {
+      this.bundleContext = bundleContext;
+    }
+
+    @Override
+    public void serviceChanged(ServiceEvent serviceEvent) {
+      if (serviceEvent.getType() == ServiceEvent.REGISTERED) {
+        ServiceReference<?> serviceReference = serviceEvent.getServiceReference();
+        addIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
+
+        // all found?
+        if (indexProducers.size() == IndexRebuildService.Service.values().length) {
+          registerIndexRebuildService(bundleContext);
+        }
+      } else if (serviceEvent.getType() == ServiceEvent.UNREGISTERING) {
+        ServiceReference<?> serviceReference = serviceEvent.getServiceReference();
+        removeIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
+
+        // one missing now?
+        if (indexProducers.size() != IndexRebuildService.Service.values().length) {
+          unregisterIndexRebuildService();
+        }
+      }
+    }
   }
 }
