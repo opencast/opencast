@@ -28,7 +28,7 @@ import static org.opencastproject.adminui.endpoint.AbstractEventEndpoint.SCHEDUL
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.elasticsearch.index.event.Event;
 

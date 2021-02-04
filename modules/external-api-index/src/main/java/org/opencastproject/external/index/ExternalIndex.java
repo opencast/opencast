@@ -21,6 +21,7 @@
 
 package org.opencastproject.external.index;
 
+import org.opencastproject.elasticsearch.impl.AbstractElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
@@ -88,7 +89,7 @@ public class ExternalIndex extends AbstractSearchIndex {
   }
 
   /**
-   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchIndex#getDocumentTypes()
+   * @see AbstractElasticsearchIndex#getDocumentTypes()
    */
   @Override
   public String[] getDocumentTypes() {

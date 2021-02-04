@@ -32,7 +32,7 @@ import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;

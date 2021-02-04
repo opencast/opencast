@@ -48,7 +48,7 @@ import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.util.RestUtils;
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;

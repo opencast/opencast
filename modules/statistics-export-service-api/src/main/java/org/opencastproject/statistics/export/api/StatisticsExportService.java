@@ -21,7 +21,7 @@
 
 package org.opencastproject.statistics.export.api;
 
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.statistics.api.DataResolution;

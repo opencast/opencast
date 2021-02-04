@@ -184,8 +184,8 @@
     <module>modules/scheduler-impl</module>
     <module>modules/scheduler-remote</module>
     <module>modules/schema</module>
-    <module>modules/search</module>
-    <module>modules/search-api</module>
+    <module>modules/elasticsearch-impl</module>
+    <module>modules/elasticsearch-api</module>
     <module>modules/elasticsearch-index</module>
     <module>modules/search-service-api</module>
     <module>modules/search-service-feeds</module>

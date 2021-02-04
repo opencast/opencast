@@ -89,7 +89,7 @@
     <dependency>
       <!-- we use this for the transitive dependency to elasticsearch -->
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search-api</artifactId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -85,7 +85,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search-api</artifactId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -121,7 +121,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search</artifactId>
+      <artifactId>opencast-elasticsearch-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

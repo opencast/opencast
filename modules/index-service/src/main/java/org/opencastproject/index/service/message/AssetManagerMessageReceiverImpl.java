@@ -27,7 +27,7 @@ import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.upda
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.index.service.util.AccessInformationUtil;
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;

@@ -29,7 +29,7 @@ import org.opencastproject.adminui.impl.ProviderQuery;
 import org.opencastproject.adminui.impl.RawProviderQuery;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.security.api.Organization;

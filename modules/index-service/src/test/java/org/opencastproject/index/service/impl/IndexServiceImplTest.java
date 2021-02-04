@@ -31,11 +31,11 @@ import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatal
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
-import org.opencastproject.matterhorn.search.SearchIndexException;
-import org.opencastproject.matterhorn.search.SearchQuery;
-import org.opencastproject.matterhorn.search.SearchResult;
-import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
-import org.opencastproject.matterhorn.search.impl.SearchResultItemImpl;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchQuery;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.impl.SearchResultImpl;
+import org.opencastproject.elasticsearch.impl.SearchResultItemImpl;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.CatalogImpl;

@@ -22,7 +22,7 @@
 
 package org.opencastproject.elasticsearch.index.series;
 
-import org.opencastproject.matterhorn.search.impl.IndexSchema;
+import org.opencastproject.elasticsearch.impl.IndexSchema;
 
 /**
  * Interface defining the mapping between data and field names in the search index.

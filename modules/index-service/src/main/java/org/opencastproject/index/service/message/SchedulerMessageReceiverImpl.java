@@ -24,7 +24,7 @@ package org.opencastproject.index.service.message;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.getOrCreateEvent;
 
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;

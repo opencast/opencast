@@ -21,10 +21,10 @@
 
 package org.opencastproject.elasticsearch.index.theme;
 
-import org.opencastproject.matterhorn.search.SearchTerms;
-import org.opencastproject.matterhorn.search.SearchTerms.Quantifier;
-import org.opencastproject.matterhorn.search.impl.AbstractElasticsearchQueryBuilder;
-import org.opencastproject.matterhorn.search.impl.IndexSchema;
+import org.opencastproject.elasticsearch.api.SearchTerms;
+import org.opencastproject.elasticsearch.api.SearchTerms.Quantifier;
+import org.opencastproject.elasticsearch.impl.AbstractElasticsearchQueryBuilder;
+import org.opencastproject.elasticsearch.impl.IndexSchema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

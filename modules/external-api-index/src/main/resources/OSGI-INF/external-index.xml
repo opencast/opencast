@@ -9,7 +9,7 @@
   <property name="service.description" value="org.opencastproject.external.index.ExternalIndex"/>
   <property name="service.pid" value="ch.entwine.matterhorn.external.search"/>
   <service>
-    <provide interface="org.opencastproject.matterhorn.search.SearchIndex"/>
+    <provide interface="org.opencastproject.elasticsearch.api.SearchIndex"/>
     <provide interface="org.opencastproject.external.index.ExternalIndex"/>
   </service>
 </scr:component>

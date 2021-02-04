@@ -31,7 +31,7 @@ import org.opencastproject.external.util.statistics.QueryUtils;
 import org.opencastproject.external.util.statistics.ResourceTypeUtils;
 import org.opencastproject.external.util.statistics.StatisticsProviderUtils;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.security.api.Organization;

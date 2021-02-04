@@ -24,7 +24,7 @@ package org.opencastproject.index.service.message;
 import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.getOrCreateEvent;
 import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.updateEvent;
 
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.workflow.WorkflowItem;

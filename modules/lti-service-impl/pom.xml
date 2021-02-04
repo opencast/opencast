@@ -76,7 +76,7 @@
     <dependency>
       <!-- we use this for the transitive dependency to elasticsearch -->
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search-api</artifactId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -107,7 +107,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search</artifactId>
+      <artifactId>opencast-elasticsearch-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -131,7 +131,7 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-search</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

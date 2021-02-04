@@ -22,8 +22,8 @@
 
 package org.opencastproject.elasticsearch.index.theme;
 
-import org.opencastproject.matterhorn.search.SearchTerms;
-import org.opencastproject.matterhorn.search.impl.AbstractSearchQuery;
+import org.opencastproject.elasticsearch.api.SearchTerms;
+import org.opencastproject.elasticsearch.impl.AbstractSearchQuery;
 import org.opencastproject.security.api.User;
 
 import org.apache.commons.lang3.StringUtils;

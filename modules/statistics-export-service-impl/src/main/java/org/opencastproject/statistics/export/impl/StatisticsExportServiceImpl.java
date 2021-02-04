@@ -25,10 +25,10 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.matterhorn.search.SearchIndexException;
-import org.opencastproject.matterhorn.search.SearchQuery;
-import org.opencastproject.matterhorn.search.SearchResult;
-import org.opencastproject.matterhorn.search.SearchResultItem;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchQuery;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;

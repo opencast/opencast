@@ -21,6 +21,7 @@
 
 package org.opencastproject.adminui.index;
 
+import org.opencastproject.elasticsearch.impl.AbstractElasticsearchIndex;
 import org.opencastproject.index.service.api.EventIndex;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.event.Event;
@@ -87,7 +88,7 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
   }
 
   /**
-   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchIndex#getDocumentTypes()
+   * @see AbstractElasticsearchIndex#getDocumentTypes()
    */
   @Override
   public String[] getDocumentTypes() {

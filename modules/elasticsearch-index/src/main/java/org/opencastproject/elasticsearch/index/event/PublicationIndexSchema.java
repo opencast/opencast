@@ -20,7 +20,7 @@
  */
 package org.opencastproject.elasticsearch.index.event;
 
-import org.opencastproject.matterhorn.search.impl.IndexSchema;
+import org.opencastproject.elasticsearch.impl.IndexSchema;
 
 public interface PublicationIndexSchema extends IndexSchema {
 

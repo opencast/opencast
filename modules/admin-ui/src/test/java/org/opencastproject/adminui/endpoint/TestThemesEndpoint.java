@@ -24,9 +24,9 @@ package org.opencastproject.adminui.endpoint;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
-import org.opencastproject.matterhorn.search.SearchResult;
-import org.opencastproject.matterhorn.search.SearchResultItem;
-import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.impl.SearchResultImpl;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
