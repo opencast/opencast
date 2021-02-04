@@ -82,8 +82,9 @@ public class SearchResultImpl<T> implements SearchResult<T> {
    *          the result item
    */
   public void addResultItem(SearchResultItem<T> item) {
-    if (result == null)
+    if (result == null) {
       result = new ArrayList<SearchResultItem<T>>();
+    }
     result.add(item);
   }
 
@@ -94,8 +95,9 @@ public class SearchResultImpl<T> implements SearchResult<T> {
    */
   @SuppressWarnings("unchecked")
   public SearchResultItem<T>[] getItems() {
-    if (result == null)
+    if (result == null) {
       return new SearchResultItem[] {};
+    }
     return result.toArray(new SearchResultItem[result.size()]);
   }
 
@@ -123,8 +125,9 @@ public class SearchResultImpl<T> implements SearchResult<T> {
    * @see SearchResult#getPage()
    */
   public long getPage() {
-    if (offset == 0 || limit == 0)
+    if (offset == 0 || limit == 0) {
       return 1;
+    }
     return (long) Math.floor(offset / limit) + 1;
   }
 

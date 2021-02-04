@@ -344,7 +344,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     try {
       final GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
       if (getResponse.isExists() && getResponse.getField(IndexSchema.VERSION) != null) {
-        final int actualIndexVersion = Integer.parseInt(getResponse.getField(IndexSchema.VERSION).getValue().toString());
+        final int actualIndexVersion = Integer.parseInt(getResponse.getField(IndexSchema.VERSION).getValue()
+                .toString());
         if (indexVersion != actualIndexVersion) {
           throw new SearchIndexException(
                   "Search index is at version " + actualIndexVersion + ", but codebase expects " + indexVersion);

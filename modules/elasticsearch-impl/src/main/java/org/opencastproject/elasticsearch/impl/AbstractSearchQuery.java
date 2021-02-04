@@ -83,8 +83,9 @@ public class AbstractSearchQuery implements SearchQuery {
    */
   public AbstractSearchQuery(String documentType) {
     this();
-    if (StringUtils.isNotBlank(documentType))
+    if (StringUtils.isNotBlank(documentType)) {
       this.types.add(documentType);
+    }
   }
 
   @Override
@@ -100,8 +101,9 @@ public class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public AbstractSearchQuery withField(String field) {
-    if (fields == null)
+    if (fields == null) {
       fields = new ArrayList<>();
+    }
     fields.add(field);
     return this;
   }
@@ -116,8 +118,9 @@ public class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public String[] getFields() {
-    if (fields == null)
+    if (fields == null) {
       return new String[] {};
+    }
     return fields.toArray(new String[0]);
   }
 
@@ -155,14 +158,17 @@ public class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public SearchQuery withText(boolean wildcardSearch, Quantifier quantifier, String... text) {
-    if (quantifier == null)
+    if (quantifier == null) {
       throw new IllegalArgumentException("Quantifier must not be null");
-    if (text == null)
+    }
+    if (text == null) {
       throw new IllegalArgumentException("Text must not be null");
+    }
 
     // Make sure the collection is initialized
-    if (this.text == null)
+    if (this.text == null) {
       this.text = new ArrayList<>();
+    }
 
     // Add the text to the search terms
     this.fuzzySearch = wildcardSearch;
@@ -194,20 +200,23 @@ public class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public Collection<SearchTerms<String>> getTerms() {
-    if (text == null)
+    if (text == null) {
       return Collections.emptyList();
+    }
     return text;
   }
 
   @Override
   public String getQueryString() {
-    if (text == null)
+    if (text == null) {
       return null;
+    }
     StringBuilder query = new StringBuilder();
     for (SearchTerms<String> s : text) {
       for (String t : s.getTerms()) {
-        if (query.length() == 0)
+        if (query.length() == 0) {
           query.append(" ");
+        }
         query.append(t);
       }
     }
@@ -243,8 +252,9 @@ public class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public Order getSortOrder(String field) {
-    if (!sortOrders.containsKey(field))
+    if (!sortOrders.containsKey(field)) {
       return Order.None;
+    }
 
     return sortOrders.get(field);
   }

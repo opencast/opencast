@@ -50,8 +50,9 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
   public SearchTermsImpl(Quantifier quantifier, T... values) {
     this.quantifier = quantifier;
     for (T value : values) {
-      if (!this.terms.contains(value))
+      if (!this.terms.contains(value)) {
         this.terms.add(value);
+      }
     }
   }
 
@@ -62,8 +63,9 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
    */
   @Override
   public void add(T term) {
-    if (!this.terms.contains(term))
+    if (!this.terms.contains(term)) {
       this.terms.add(term);
+    }
   }
 
   /**

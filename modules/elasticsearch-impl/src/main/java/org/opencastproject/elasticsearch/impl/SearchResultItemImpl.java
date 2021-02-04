@@ -79,10 +79,12 @@ public class SearchResultItemImpl<T> implements SearchResultItem<T> {
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   public int compareTo(SearchResultItem<T> sr) {
-    if (score < sr.getRelevance())
+    if (score < sr.getRelevance()) {
       return 1;
-    else if (score > sr.getRelevance())
+    }
+    else if (score > sr.getRelevance()) {
       return -1;
+    }
     return 0;
   }
 

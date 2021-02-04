@@ -48,13 +48,16 @@ public final class SortCriterionImpl implements SortCriterion {
     requireNonNull(sortCriterion);
 
     String[] parts = sortCriterion.split(":");
-    if (parts.length != 2)
+    if (parts.length != 2) {
       throw new IllegalArgumentException("sortOrder must be of form <field name>:ASC/DESC");
+    }
 
-    if ("ASC".equalsIgnoreCase(parts[1]) || "Ascending".equalsIgnoreCase(parts[1]))
+    if ("ASC".equalsIgnoreCase(parts[1]) || "Ascending".equalsIgnoreCase(parts[1])) {
       return new SortCriterionImpl(parts[0], Order.Ascending);
-    if ("DESC".equalsIgnoreCase(parts[1]) || "Descending".equalsIgnoreCase(parts[1]))
+    }
+    if ("DESC".equalsIgnoreCase(parts[1]) || "Descending".equalsIgnoreCase(parts[1])) {
       return new SortCriterionImpl(parts[0], Order.Descending);
+    }
 
     throw new IllegalArgumentException("Invalid order " + parts[1]);
   }
@@ -84,11 +87,13 @@ public final class SortCriterionImpl implements SortCriterion {
 
   @Override
   public boolean equals(Object o) {
-    if (o == this)
+    if (o == this) {
       return true;
+    }
 
-    if (!(o instanceof SortCriterionImpl))
+    if (!(o instanceof SortCriterionImpl)) {
       return false;
+    }
 
     SortCriterionImpl that = (SortCriterionImpl) o;
     return Objects.equals(this.fieldName, that.fieldName) && Objects.equals(this.order, that.order);
@@ -101,10 +106,12 @@ public final class SortCriterionImpl implements SortCriterion {
 
   @Override
   public String toString() {
-    if (order.equals(Order.Ascending))
+    if (order.equals(Order.Ascending)) {
       return fieldName + ":ASC";
-    if (order.equals(Order.Descending))
+    }
+    if (order.equals(Order.Descending)) {
       return fieldName + ":DESC";
+    }
     return fieldName + ":NONE";
   }
 

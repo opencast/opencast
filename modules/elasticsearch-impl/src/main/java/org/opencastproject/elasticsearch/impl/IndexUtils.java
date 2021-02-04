@@ -69,8 +69,9 @@ public final class IndexUtils {
    * @return the serialized date
    */
   public static String serializeDate(Date date) {
-    if (date == null)
+    if (date == null) {
       return null;
+    }
     return dateFormat.format(date);
   }
 
@@ -85,10 +86,12 @@ public final class IndexUtils {
    * @return the serialized search expression
    */
   public static String serializeDateRange(Date startDate, Date endDate) {
-    if (startDate == null)
+    if (startDate == null) {
       throw new IllegalArgumentException("Start date cannot be null");
-    if (endDate == null)
+    }
+    if (endDate == null) {
       throw new IllegalArgumentException("End date cannot be null");
+    }
     StringBuffer buf = new StringBuffer("[");
     buf.append(dateFormat.format(startDate));
     buf.append(" TO ");

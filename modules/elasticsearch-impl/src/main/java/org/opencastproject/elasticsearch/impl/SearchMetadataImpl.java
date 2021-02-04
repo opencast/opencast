@@ -85,13 +85,16 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
    *          the value
    */
   public void addLocalizedValue(Language language, T v) {
-    if (localizedValues == null)
+    if (localizedValues == null) {
       localizedValues = new HashMap<Language, List<T>>();
+    }
     List<T> values = localizedValues.get(language);
-    if (values == null)
+    if (values == null) {
       values = new ArrayList<T>();
-    if (!values.contains(v))
+    }
+    if (!values.contains(v)) {
       values.add(v);
+    }
     localizedValues.put(language, values);
   }
 
@@ -101,8 +104,9 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
    * @see SearchMetadata#getLocalizedValues()
    */
   public Map<Language, List<T>> getLocalizedValues() {
-    if (localizedValues == null)
+    if (localizedValues == null) {
       return Collections.emptyMap();
+    }
     return localizedValues;
   }
 
@@ -112,10 +116,12 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
    * @see SearchMetadata#addValue(java.lang.Object)
    */
   public void addValue(T v) {
-    if (values == null)
+    if (values == null) {
       values = new ArrayList<T>();
-    if (!values.contains(v))
+    }
+    if (!values.contains(v)) {
       values.add(v);
+    }
   }
 
   /**
@@ -124,8 +130,9 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
    * @see SearchMetadata#getValues()
    */
   public List<T> getValues() {
-    if (values == null)
+    if (values == null) {
       return Collections.emptyList();
+    }
     return values;
   }
 
@@ -136,8 +143,9 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
    */
   @Override
   public T getValue() {
-    if (values == null || values.size() == 0)
+    if (values == null || values.size() == 0) {
       return null;
+    }
     return values.get(0);
   }
 
@@ -163,10 +171,12 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
    * @see SearchMetadata#clear()
    */
   public void clear() {
-    if (values != null)
+    if (values != null) {
       values.clear();
-    if (localizedValues != null)
+    }
+    if (localizedValues != null) {
       localizedValues.clear();
+    }
   }
 
   /**
@@ -186,8 +196,9 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
    */
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof SearchMetadata<?>))
+    if (!(obj instanceof SearchMetadata<?>)) {
       return false;
+    }
     return name.equals(((SearchMetadata<?>) obj).getName());
   }
 
