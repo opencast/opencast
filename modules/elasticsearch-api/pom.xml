@@ -29,7 +29,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
-              org.opencastproject.matterhorn.elasticelasticsearch.api;version=${project.version}
+              org.opencastproject.elasticsearch.api;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>

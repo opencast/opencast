@@ -232,7 +232,7 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               org.opencastproject.external.index,
-              org.opencastproject.matterhorn.search.impl;version=${project.version},
+              org.opencastproject.elasticsearch.impl;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.index.service.message,
               org.opencastproject.metadata.dublincore;version=${project.version},
