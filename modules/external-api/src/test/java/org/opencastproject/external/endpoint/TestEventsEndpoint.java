@@ -28,6 +28,7 @@ import static org.easymock.EasyMock.replay;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 
 import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
@@ -43,7 +44,6 @@ import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
-import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;

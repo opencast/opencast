@@ -22,11 +22,11 @@
 package org.opencastproject.index.service.message;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.theme.Theme;
+import org.opencastproject.elasticsearch.index.theme.ThemeIndexUtils;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.theme.SerializableTheme;
 import org.opencastproject.message.broker.api.theme.ThemeItem;
-import org.opencastproject.elasticsearch.index.theme.Theme;
-import org.opencastproject.elasticsearch.index.theme.ThemeIndexUtils;
 import org.opencastproject.security.api.User;
 
 import org.slf4j.Logger;

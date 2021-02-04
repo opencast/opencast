@@ -25,12 +25,12 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.getOrCreateEvent;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;

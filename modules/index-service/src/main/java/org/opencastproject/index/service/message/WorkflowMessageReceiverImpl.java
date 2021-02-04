@@ -25,11 +25,11 @@ import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.getO
 import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.updateEvent;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.workflow.WorkflowItem;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 

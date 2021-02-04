@@ -23,9 +23,6 @@ package org.opencastproject.elasticsearch.index;
 
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesIndexUtils;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchMetadata;
 import org.opencastproject.elasticsearch.api.SearchQuery;
@@ -45,7 +42,10 @@ import org.opencastproject.elasticsearch.index.group.Group;
 import org.opencastproject.elasticsearch.index.group.GroupIndexUtils;
 import org.opencastproject.elasticsearch.index.group.GroupQueryBuilder;
 import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.series.SeriesIndexUtils;
 import org.opencastproject.elasticsearch.index.series.SeriesQueryBuilder;
+import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.index.theme.Theme;
 import org.opencastproject.elasticsearch.index.theme.ThemeIndexUtils;
 import org.opencastproject.elasticsearch.index.theme.ThemeQueryBuilder;

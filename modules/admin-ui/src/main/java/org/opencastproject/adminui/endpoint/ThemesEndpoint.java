@@ -40,8 +40,6 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.QueryPreprocessor;
-import org.opencastproject.index.service.resources.list.query.ThemesListQuery;
-import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
@@ -50,6 +48,8 @@ import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.index.theme.ThemeIndexSchema;
 import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
+import org.opencastproject.index.service.resources.list.query.ThemesListQuery;
+import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;

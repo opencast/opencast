@@ -21,9 +21,6 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.list.api.ListProviderException;
-import org.opencastproject.list.api.ResourceListProvider;
-import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
@@ -31,6 +28,9 @@ import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.theme.Theme;
 import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.framework.BundleContext;

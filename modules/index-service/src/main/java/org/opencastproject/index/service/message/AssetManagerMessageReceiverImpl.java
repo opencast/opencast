@@ -26,8 +26,10 @@ import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.upda
 
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
+import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
@@ -35,8 +37,6 @@ import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.Dele
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteSnapshot;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.User;

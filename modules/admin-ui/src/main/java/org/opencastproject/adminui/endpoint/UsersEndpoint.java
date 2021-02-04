@@ -36,10 +36,10 @@ import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.TextFilter;
-import org.opencastproject.index.service.resources.list.query.UsersListQuery;
-import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.elasticsearch.api.SearchQuery.Order;
 import org.opencastproject.elasticsearch.api.SortCriterion;
+import org.opencastproject.index.service.resources.list.query.UsersListQuery;
+import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;

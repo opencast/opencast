@@ -22,11 +22,11 @@
 
 package org.opencastproject.elasticsearch.index.group;
 
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchMetadata;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.impl.SearchMetadataCollection;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.security.api.User;
 
 import org.apache.commons.io.IOUtils;

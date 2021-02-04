@@ -21,10 +21,10 @@
 
 package org.opencastproject.index.service.message;
 
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.acl.AclItem;
 import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.elasticsearch.index.series.SeriesIndexUtils;
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.acl.AclItem;
 import org.opencastproject.security.api.User;
 
 import org.slf4j.Logger;
