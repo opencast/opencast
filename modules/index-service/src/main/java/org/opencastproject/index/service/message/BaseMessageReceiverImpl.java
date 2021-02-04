@@ -28,7 +28,7 @@ import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Status;
-import org.opencastproject.search.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Effect2;

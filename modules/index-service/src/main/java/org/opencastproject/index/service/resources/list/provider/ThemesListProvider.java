@@ -28,9 +28,9 @@ import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
-import org.opencastproject.search.index.AbstractSearchIndex;
-import org.opencastproject.search.index.theme.Theme;
-import org.opencastproject.search.index.theme.ThemeSearchQuery;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.theme.Theme;
+import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.framework.BundleContext;

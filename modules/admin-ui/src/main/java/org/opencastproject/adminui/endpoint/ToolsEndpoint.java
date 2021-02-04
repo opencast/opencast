@@ -65,7 +65,7 @@ import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.publication.api.ConfigurablePublicationService;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
 import org.opencastproject.publication.api.PublicationException;
-import org.opencastproject.search.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;

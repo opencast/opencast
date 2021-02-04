@@ -22,7 +22,7 @@
 package org.opencastproject.statistics.export.api;
 
 import org.opencastproject.matterhorn.search.SearchIndexException;
-import org.opencastproject.search.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.statistics.api.DataResolution;
 import org.opencastproject.statistics.api.StatisticsProvider;

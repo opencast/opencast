@@ -33,7 +33,7 @@ import static org.easymock.EasyMock.replay;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.search.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.RetryStrategy;

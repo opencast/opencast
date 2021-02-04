@@ -24,8 +24,8 @@ package org.opencastproject.index.service.message;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.group.GroupItem;
-import org.opencastproject.search.index.group.Group;
-import org.opencastproject.search.index.group.GroupIndexUtils;
+import org.opencastproject.elasticsearch.index.group.Group;
+import org.opencastproject.elasticsearch.index.group.GroupIndexUtils;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 

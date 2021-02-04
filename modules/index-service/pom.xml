@@ -144,7 +144,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search-index</artifactId>
+      <artifactId>opencast-elasticsearch-index</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

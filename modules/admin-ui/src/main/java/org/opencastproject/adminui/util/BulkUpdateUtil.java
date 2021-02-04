@@ -30,7 +30,7 @@ import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.search.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.Event;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

@@ -43,7 +43,7 @@ import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
-import org.opencastproject.search.index.group.Group;
+import org.opencastproject.elasticsearch.index.group.Group;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.util.NotFoundException;

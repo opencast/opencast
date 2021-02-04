@@ -26,7 +26,7 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataField;
-import org.opencastproject.search.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.workflow.handler.distribution.EngagePublicationChannel;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;

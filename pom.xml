@@ -186,7 +186,7 @@
     <module>modules/schema</module>
     <module>modules/search</module>
     <module>modules/search-api</module>
-    <module>modules/search-index</module>
+    <module>modules/elasticsearch-index</module>
     <module>modules/search-service-api</module>
     <module>modules/search-service-feeds</module>
     <module>modules/search-service-impl</module>
