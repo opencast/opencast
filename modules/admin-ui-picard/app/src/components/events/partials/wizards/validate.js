@@ -14,7 +14,12 @@ export const NewEventSchema = [Yup.object().shape({
 
 }),
     Yup.object().shape({
-    sourceMode: Yup.string(),
+    uploadAssetsTrack: Yup.array().when('sourceMode', {
+        is:  value => value === 'UPLOAD',
+        then: Yup.array().test('at-least-one-uploaded', 'at least one uploaded', uploadAssetsTrack => {
+            return uploadAssetsTrack.some(asset => !!asset.file)
+        })
+    }),
     scheduleStartDate: Yup.date().when('sourceMode', {
         is: value => value === 'SCHEDULE_SINGLE' || value === 'SCHEDULE_MULTIPLE',
         then: Yup.date().required('Required')

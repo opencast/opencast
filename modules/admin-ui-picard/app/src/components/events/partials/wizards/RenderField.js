@@ -227,7 +227,6 @@ const EditableSingleValue = ({ field, text, editMode, setEditMode, handleKeyDown
 };
 
 // Renders editable field for time value
-// todo: adjust dateTimePicker when actually used
 const EditableSingleValueTime = ({ field, text, form: { setFieldValue }, editMode, setEditMode, handleKeyDown }) => {
     const { t } = useTranslation();
 

@@ -23,6 +23,7 @@ const NewEventMetadata = ({ onSubmit, metadataFields, nextPage, formik }) => {
                             {/* Table view containing input fields for metadata */}
                             <div className="obj-container">
                                 <table className="main-tbl">
+                                    <tbody>
                                     {/* Render table row for each metadata field depending on type*/}
                                     {metadataFields.fields.map((field, key) =>
                                         (
@@ -46,6 +47,7 @@ const NewEventMetadata = ({ onSubmit, metadataFields, nextPage, formik }) => {
                                                 </td>
                                             </tr>
                                         ))}
+                                    </tbody>
                                 </table>
                             </div>
                         </div>

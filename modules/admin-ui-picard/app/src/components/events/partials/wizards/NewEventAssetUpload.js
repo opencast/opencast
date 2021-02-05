@@ -18,6 +18,14 @@ const NewEventAssetUpload = ({ onSubmit, previousPage, nextPage , formik }) => {
         nextPage(formik.values);
         return null;
     }
+
+    const handleChange = (e, assetId) => {
+        if (e.target.files.length === 0) {
+            formik.setFieldValue(assetId, null);
+        } else {
+            formik.setFieldValue(assetId, e.target.files[0]);
+        }
+    }
     return (
         <>
             <div className="modal-content">
@@ -27,39 +35,46 @@ const NewEventAssetUpload = ({ onSubmit, previousPage, nextPage , formik }) => {
                             <header>{t('EVENTS.EVENTS.NEW.UPLOAD_ASSET.SELECT_TYPE')}</header>
                             <div className="obj-container">
                                 <table className="main-tbl">
-                                    {/*Todo: option if theres no further assets, only if source mode UPLOAD*/}
-                                    {uploadAssets.length === 0 ? (
-                                        <tr>
-                                            <td>{t('EVENTS.EVENTS.NEW.UPLOAD_ASSET.NO_OPTIONS')}</td>
-                                        </tr>
-                                    ) : (
-                                        uploadAssets.map((asset, key) => (
-                                            <tr key={key}>
-                                                <td> {asset.id}
-                                                    <span
-                                                        className="ui-helper-hidden">({asset.type} "{asset.flavorType}//{asset.flavorSubType}")</span>
-                                                </td>
-                                                <td>
-                                                    <div className="file-upload">
-                                                        <input id={asset.id}
-                                                               className="blue-btn file-select-btn"
-                                                               accept={asset.accept}
-                                                               onChange={e => formik.setFieldValue(asset.id, e.target.files[0])}
-                                                               type="file"
-                                                               tabIndex=""/>
-                                                    </div>
-                                                </td>
-                                                {/*Button to remove asset*/}
-                                                <td className="fit">
-                                                    <a className="remove"
-                                                       onClick={e => {
-                                                           formik.setFieldValue(asset.id, null);
-                                                           document.getElementById(asset.id).value = '';
-                                                       }}/>
-                                                </td>
+                                    <tbody>
+                                        {uploadAssets.length === 0 ? (
+                                            <tr>
+                                                <td>{t('EVENTS.EVENTS.NEW.UPLOAD_ASSET.NO_OPTIONS')}</td>
                                             </tr>
-                                        ))
-                                    )}
+                                        ) : (
+                                            uploadAssets.map((asset, key) => (
+                                                <tr key={key}>
+                                                    <td> {asset.id}
+                                                        <span className="ui-helper-hidden">
+                                                            ({asset.type} "{asset.flavorType}//{asset.flavorSubType}")
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div className="file-upload">
+                                                            <input id={asset.id}
+                                                                   className="blue-btn file-select-btn"
+                                                                   accept={asset.accept}
+                                                                   onChange={e => handleChange(e, asset.id)}
+                                                                   type="file"
+                                                                   tabIndex=""/>
+                                                            {formik.values[asset.id] && (
+                                                                <span className="ui-helper">
+                                                                    {formik.values[asset.id].name.substr(0, 50)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    {/*Button to remove asset*/}
+                                                    <td className="fit">
+                                                        <a className="remove"
+                                                           onClick={() => {
+                                                               formik.setFieldValue(asset.id, null);
+                                                               document.getElementById(asset.id).value = '';
+                                                           }}/>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
                                 </table>
                             </div>
                         </div>

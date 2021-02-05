@@ -231,9 +231,18 @@ const getInitialValues = metadataFields => {
     // Add possible files that can be uploaded in source step
     // Todo: exchange uploadAssetOptions with Function for getting these options
     if (!!uploadAssetOptions) {
+        initialValues.uploadAssetsTrack = [];
+        // initial value of upload asset needs to be null, because object (file) is saved there
         uploadAssetOptions.forEach(option => {
-            // needs to be null, because it will save a object (file) not string or int
-            initialValues[option.id] = null;
+            if (option.type === 'track') {
+                initialValues.uploadAssetsTrack.push({
+                    ...option,
+                    file: null
+                });
+            } else {
+                initialValues[option.id] = null;
+            }
+
         });
     }
 

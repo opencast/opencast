@@ -1,11 +1,11 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import Notifications from "../../../shared/Notifications";
 import {DatePicker} from "@material-ui/pickers";
 import {getTimezoneOffset} from "../../../../utils/utils";
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
-import {Field} from "formik";
+import {Field, FieldArray} from "formik";
 import {sourceMetadata, uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
 import RenderField from "./RenderField";
 import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/newEventConfigs/newEventWizardConfig";
@@ -35,18 +35,25 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInput
                             removeNotificationEventsForm }) => {
     const { t } = useTranslation();
 
+
+
     useEffect(() => {
         // Load recordings that can be used for input
         loadingInputDevices();
+
+        // validate form because dependent default values need to be checked
+        formik.validateForm().then(r => console.log(r));
     }, []);
 
     // check user input for conflicts
     const checkConflicts = async () =>  {
         const values = formik.values
         let check = true;
+
         // Only perform checks if source mode is SCHEDULE_SINGLE or SCHEDULE_MULTIPLE
         if (values.sourceMode === 'SCHEDULE_SINGLE' ||
             values.sourceMode === 'SCHEDULE_MULTIPLE') {
+
             // Get timezone offset; Checks should be performed on UTC times
             let offset = getTimezoneOffset();
 
@@ -98,6 +105,8 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInput
         removeNotificationEventsForm();
     }
 
+
+
     return(
         <>
             <div className="modal-content">
@@ -143,12 +152,12 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInput
 
                         {/* Render rest of page depending on which source mode is chosen */}
                         {formik.values.sourceMode === 'UPLOAD' && (
-                            <Upload setFieldValue={formik.setFieldValue} />
+                            <Upload formik={formik}/>
                         )}
                         {(formik.values.sourceMode === 'SCHEDULE_SINGLE' ||
                             formik.values.sourceMode === 'SCHEDULE_MULTIPLE') && (
                             <Schedule formik={formik}
-                                      inputDevices={inputDevices}/>
+                                      inputDevices={inputDevices} />
                         )}
                     </div>
                 </div>
@@ -184,41 +193,72 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInput
 /*
  * Renders buttons for uploading files and fields for additional metadata
  */
-const Upload = ({ setFieldValue }) => {
+const Upload = ({ formik }) => {
     const { t } = useTranslation();
+
+    const handleChange = (e, assetId) => {
+        if (e.target.files.length === 0) {
+            formik.setFieldValue(assetId, null);
+        } else {
+            formik.setFieldValue(assetId, e.target.files[0]);
+        }
+    }
 
     return (
         <>
-            <div className="obj list-obj">
+            <div className="obj tbl-details">
                 <header>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_ELEMENTS')}</header>
                 <div className="obj-container">
-                    <ul>
-                        {/*File upload button for each upload asset*/}
-                        {uploadAssetOptions.map((asset, key) => (
-                            asset.type === 'track' ? (
-                            <li key={key}>
-                                <div className="file-upload">
-                                    <input id={asset.id}
-                                           className="blue-btn file-select-btn"
-                                           accept={asset.accept}
-                                           onChange={e => setFieldValue(asset.id, e.target.files[0])}
-                                           type="file"
-                                           tabIndex=""/>
-                                </div>
-                                <span>{t(asset.translate + ".SHORT")}</span>
-                                <span className="ui-helper-hidden">({asset.type} "{asset.flavorType}/{asset.flavorSubType}")</span>
-                                <p>{t(asset.translate + ".DETAIL")}</p>
-                            </li>
-                            ) : null
-                        ))
-                        }
-                    </ul>
+                    <table className="main-tbl">
+                        <tbody>
+                            <FieldArray name="uploadAssetsTrack">
+                                {/*File upload button for each upload asset*/}
+                                {({insert, remove, push}) => (
+                                    formik.values.uploadAssetsTrack.length > 0
+                                    && formik.values.uploadAssetsTrack.map((asset, key) => (
+                                        <tr key={key}>
+                                            <td>
+                                                <span style={{fontWeight: "bold"}}>{t(asset.translate + ".SHORT")}</span>
+                                                <span
+                                                    className="ui-helper-hidden">({asset.type} "{asset.flavorType}/{asset.flavorSubType}")</span>
+                                                <p>{t(asset.translate + ".DETAIL")}</p>
+                                            </td>
+                                            <td>
+                                                <div className="file-upload">
+                                                    <input id={asset.id}
+                                                           className="blue-btn file-select-btn"
+                                                           accept={asset.accept}
+                                                           onChange={e => handleChange(e, `uploadAssetsTrack.${key}.file`)}
+                                                           type="file"
+                                                           name={`uploadAssetsTrack.${key}.file`}
+                                                           tabIndex=""/>
+                                                    {/* Show name of file that is uploaded */}
+                                                    {formik.values.uploadAssetsTrack[key].file && (
+                                                        <span className="ui-helper">
+                                                            {formik.values.uploadAssetsTrack[key].file.name.substr(0, 50)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="fit">
+                                                <a className="remove"
+                                                   onClick={() => {
+                                                       formik.setFieldValue(`uploadAssetsTrack.${key}.file`, null);
+                                                   }}/>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </FieldArray>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div className="obj list-obj">
                 <header className="no-expand">{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_METADATA')}</header>
                 <div className="obj-container">
                     <table className="main-tbl">
+                        <tbody>
                         {/* One row for each metadata field*/}
                         {sourceMetadata.UPLOAD.metadata.map((field, key) => (
                             <tr key={key}>
@@ -235,6 +275,7 @@ const Upload = ({ setFieldValue }) => {
                                 </td>
                             </tr>
                         ))}
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -267,154 +308,174 @@ const Schedule = ({ formik, inputDevices }) => {
             <header>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.CAPTION')}</header>
             <div className="obj-container">
                 <table className="main-tbl">
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.TIMEZONE')}</td>
-                        <td>{'UTC' + getTimezoneOffset()}</td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')} <i className="required">*</i></td>
-                        <td>
-                            <ThemeProvider theme={theme}>
-                                <DatePicker name="scheduleStartDate"
-                                            value={formik.values.scheduleStartDate}
-                                            onChange={value => {
-                                                formik.setFieldValue("scheduleStartDate", value);
-                                                console.log(formik);
-                                            }}
-                                            tabIndex="4"/>
-                            </ThemeProvider>
-                        </td>
-                    </tr>
-                    {/* Render fields specific for multiple schedule (Only if this is current source mode)*/}
-                    {formik.values.sourceMode === 'SCHEDULE_MULTIPLE' && (
-                        <>
-                            <tr>
-                                <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE')} <i className="required">*</i></td>
-                                <td>
-                                    <ThemeProvider theme={theme}>
-                                        <DatePicker name="scheduleEndDate"
-                                                    value={formik.values.scheduleEndDate}
-                                                    onChange={value => formik.setFieldValue("scheduleEndDate", value)}
-                                                    tabIndex="4"/>
-                                    </ThemeProvider>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.REPEAT_ON')} <i className="required">*</i>
-                                </td>
-                                <td>
-                                    {/* Repeat checkbox for each week day*/}
-                                    {weekdays.map((day, key) => (
-                                        <div key={key} className="day-check-container">
-                                            {t(day.label)}
-                                            <br/>
-                                            <Field type="checkbox" name="repeatOn" value={day.name}/>
-                                        </div>
+                    <tbody>
+                        <tr>
+                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.TIMEZONE')}</td>
+                            <td>{'UTC' + getTimezoneOffset()}</td>
+                        </tr>
+                        <tr>
+                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')} <i className="required">*</i></td>
+                            <td>
+                                <ThemeProvider theme={theme}>
+                                    <DatePicker name="scheduleStartDate"
+                                                value={formik.values.scheduleStartDate}
+                                                onChange={value =>
+                                                    formik.setFieldValue("scheduleStartDate", value)
+                                                }
+                                                tabIndex="4"/>
+                                </ThemeProvider>
+                            </td>
+                        </tr>
+                        {/* Render fields specific for multiple schedule (Only if this is current source mode)*/}
+                        {formik.values.sourceMode === 'SCHEDULE_MULTIPLE' && (
+                            <>
+                                <tr>
+                                    <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE')} <i className="required">*</i></td>
+                                    <td>
+                                        <ThemeProvider theme={theme}>
+                                            <DatePicker name="scheduleEndDate"
+                                                        value={formik.values.scheduleEndDate}
+                                                        onChange={value => formik.setFieldValue("scheduleEndDate", value)}
+                                                        tabIndex="4"/>
+                                        </ThemeProvider>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.REPEAT_ON')} <i className="required">*</i>
+                                    </td>
+                                    <td>
+                                        {/* Repeat checkbox for each week day*/}
+                                        {weekdays.map((day, key) => (
+                                            <div key={key} className="day-check-container">
+                                                {t(day.label)}
+                                                <br/>
+                                                <Field type="checkbox" name="repeatOn" value={day.name}/>
+                                            </div>
+                                        ))}
+                                    </td>
+                                </tr>
+                            </>
+                        )}
+                        <tr>
+                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME')} <i className="required">*</i></td>
+                            <td>
+                                {/* one options for each entry in hours*/}
+                                <Field tabIndex="5"
+                                       as="select"
+                                       name="scheduleStartTimeHour"
+                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
+                                    <option value="" />
+                                    {hours.map((i, key) => (
+                                        <option key={key}
+                                                value={i.value}>
+                                            {i.value}
+                                        </option>
                                     ))}
-                                </td>
-                            </tr>
-                        </>
-                    )}
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME')} <i className="required">*</i></td>
-                        <td>
-                            {/* one options for each entry in hours*/}
-                            <Field tabIndex="5"
-                                   as="select"
-                                   name="scheduleStartTimeHour"
-                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                <option value="" />
-                                {hours.map(i => (
-                                    <option value={i.value}>{i.value}</option>
-                                ))}
-                            </Field>
-                            {/* one options for each entry in minutes*/}
-                            <Field tabIndex="6"
-                                   as="select"
-                                   name="scheduleStartTimeMinutes"
-                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                <option value=""/>
-                                {minutes.map((i) => (
-                                    <option value={i.value}>{i.value}</option>
-                                ))}
-                            </Field>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION')} <i className="required">*</i></td>
-                        <td>
-                            {/* one options for each entry in hours*/}
-                            <Field tabIndex="7"
-                                   as="select"
-                                   name="scheduleDurationHour"
-                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                <option value="" />
-                                {hours.map((i) => (
-                                    <option value={i.value}>{i.value}</option>
-                                ))}
-                            </Field>
-                            {/* one options for each entry in minutes*/}
-                            <Field tabIndex="8"
-                                   as="select"
-                                   name="scheduleDurationMinutes"
-                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                <option value=""/>
-                                {minutes.map((i) => (
-                                    <option value={i.value}>{i.value}</option>
-                                ))}
-                            </Field>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME')} <i className="required">*</i></td>
-                        <td>
-                            {/* one options for each entry in hours*/}
-                            <Field tabIndex="9"
-                                   as="select"
-                                   name="scheduleEndTimeHour"
-                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
-                                <option value="" />
-                                {hours.map((i) => (
-                                    <option value={i.value}>{i.value}</option>
-                                ))}
-                            </Field>
-                            {/* one options for each entry in minutes*/}
-                            <Field tabIndex="10"
-                                   as="select"
-                                   name="scheduleEndTimeMinutes"
-                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
-                                <option value=""/>
-                                {minutes.map((i) => (
-                                    <option value={i.value}>{i.value}</option>
-                                ))}
-                            </Field>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')} <i className="required">*</i></td>
-                        {/* one options for each capture agents that has input options */}
-                        <td>
-                            <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
-                                    tabIndex="11"
-                                    onChange={e => {
-                                        formik.setFieldValue("location", e.target.value);
-                                        formik.setFieldValue("deviceInputs", []);
-                                    }}
-                                    name="location">
-                                <option value=""/>
-                                {inputDevices.map((inputDevice, key) => (
-                                    <option key={key} value={inputDevice.Name}>{inputDevice.Name}</option>
-                                ))}
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS')} <i className="required">*</i></td>
-                        <td>
-                            {/* Render checkbox for each input option of the selected input device*/}
-                            {renderInputDeviceOptions()}
-                        </td>
-                    </tr>
+                                </Field>
+                                {/* one options for each entry in minutes*/}
+                                <Field tabIndex="6"
+                                       as="select"
+                                       name="scheduleStartTimeMinutes"
+                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
+                                    <option value=""/>
+                                    {minutes.map((i, key) => (
+                                        <option key={key}
+                                                value={i.value}>
+                                            {i.value}
+                                        </option>
+                                    ))}
+                                </Field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION')} <i className="required">*</i></td>
+                            <td>
+                                {/* one options for each entry in hours*/}
+                                <Field tabIndex="7"
+                                       as="select"
+                                       name="scheduleDurationHour"
+                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
+                                    <option value="" />
+                                    {hours.map((i, key) => (
+                                        <option value={i.value}
+                                                key={key}>
+                                            {i.value}
+                                        </option>
+                                    ))}
+                                </Field>
+                                {/* one options for each entry in minutes*/}
+                                <Field tabIndex="8"
+                                       as="select"
+                                       name="scheduleDurationMinutes"
+                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
+                                    <option value=""/>
+                                    {minutes.map((i, key) => (
+                                        <option key={key}
+                                                value={i.value}>
+                                            {i.value}
+                                        </option>
+                                    ))}
+                                </Field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME')} <i className="required">*</i></td>
+                            <td>
+                                {/* one options for each entry in hours*/}
+                                <Field tabIndex="9"
+                                       as="select"
+                                       name="scheduleEndTimeHour"
+                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
+                                    <option value="" />
+                                    {hours.map((i, key) => (
+                                        <option key={key}
+                                                value={i.value}>
+                                            {i.value}
+                                        </option>
+                                    ))}
+                                </Field>
+                                {/* one options for each entry in minutes*/}
+                                <Field tabIndex="10"
+                                       as="select"
+                                       name="scheduleEndTimeMinutes"
+                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}
+                                       value={formik.values.location}>
+                                    <option value=""/>
+                                    {minutes.map((i, key) => (
+                                        <option key={key}
+                                                value={i.value}>
+                                            {i.value}
+                                        </option>
+                                    ))}
+                                </Field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')} <i className="required">*</i></td>
+                            {/* one options for each capture agents that has input options */}
+                            <td>
+                                <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
+                                        tabIndex="11"
+                                        onChange={e => {
+                                            formik.setFieldValue("location", e.target.value);
+                                            formik.setFieldValue("deviceInputs", []);
+                                        }}
+                                        name="location">
+                                    <option value=""/>
+                                    {inputDevices.map((inputDevice, key) => (
+                                        <option key={key} value={inputDevice.Name}>{inputDevice.Name}</option>
+                                    ))}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS')} <i className="required">*</i></td>
+                            <td>
+                                {/* Render checkbox for each input option of the selected input device*/}
+                                {renderInputDeviceOptions()}
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
