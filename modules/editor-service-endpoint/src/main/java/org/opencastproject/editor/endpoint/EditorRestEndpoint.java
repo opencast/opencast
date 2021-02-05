@@ -35,8 +35,6 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.io.IOUtils;
 import org.json.simple.parser.JSONParser;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,16 +56,6 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the {@link EditorService} service
  */
-@Component(
-        property = {
-                "service.description=Editor REST Endpoint",
-                "opencast.service.type=org.opencastproject.editor",
-                "opencast.service.path=/editor"
-        },
-       immediate = true,
-       service = EditorRestEndpoint.class
-)
-
 @Path("/")
 @RestService(name = "EditorServiceEndpoint",
         title = "Editor Service Endpoint",
@@ -89,7 +77,6 @@ public class EditorRestEndpoint {
   /** The service */
   protected EditorService editorService;
 
-  @Reference
   public void setEditorService(EditorService service) {
     this.editorService = service;
   }
@@ -161,7 +148,7 @@ public class EditorRestEndpoint {
     try {
       editingInfo = EditingData.parse(details);
     } catch (Exception e) {
-      logger.warn("Unable to parse concat information ({})", details, e);
+      logger.debug("Unable to parse editing information ({})", details, e);
       return RestUtil.R.badRequest("Unable to parse details");
     }
 

@@ -20,62 +20,38 @@
  */
 package org.opencastproject.editor.api;
 
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
-import com.entwinemedia.fn.data.json.JObject;
-
-import org.json.simple.JSONObject;
+import com.google.gson.annotations.SerializedName;
 
 public final class TrackData {
-  public static final String SUBTYPE = "subtype";
-  public static final String TYPE = "type";
-  public static final String FLAVOR = "flavor";
   public static final String AUDIO_STREAM = "audio_stream";
   public static final String VIDEO_STREAM = "video_stream";
-  public static final String URI = "uri";
-  public static final String ID = "id";
-  private final String flavorType;
-  private final String flavorSubtype;
+
+  @SerializedName(AUDIO_STREAM)
   private final TrackSubData audio;
+
+  @SerializedName(VIDEO_STREAM)
   private final TrackSubData video;
+
+  private final FlavorData flavor;
   private final String uri;
   private final String id;
 
   public MediaPackageElementFlavor getFlavor() {
-    return new MediaPackageElementFlavor(flavorType, flavorSubtype);
+    if (flavor == null) {
+      return null;
+    }
+    return new MediaPackageElementFlavor(flavor.getType(), flavor.getSubtype());
   }
 
   public TrackData(final String flavorType, final String flavorSubtype, final TrackSubData audio,
           final TrackSubData video, String uri, String id) {
-    this.flavorType = flavorType;
-    this.flavorSubtype = flavorSubtype;
+    this.flavor = new FlavorData(flavorType, flavorSubtype);
     this.audio = audio;
     this.video = video;
     this.uri = uri;
     this.id = id;
-  }
-
-  protected static TrackData parse(final JSONObject object) {
-    if (object == null) {
-      return null;
-    }
-
-    final JSONObject flavor = (JSONObject) object.get(FLAVOR);
-    return new TrackData(flavor == null ? null : (String) flavor.get(TYPE),
-            flavor == null ? null : (String) flavor.get(SUBTYPE),
-            TrackSubData.parse((JSONObject) object.get(AUDIO_STREAM)),
-            TrackSubData.parse((JSONObject) object.get(VIDEO_STREAM)),
-            (String) object.get(URI),
-            (String) object.get(ID));
-  }
-
-  protected JObject toJson() {
-    final JObject flavor = obj(f(TYPE, flavorType), f(SUBTYPE, flavorSubtype));
-    return obj(f(ID, id), f(URI, uri), f(FLAVOR, flavor), f(AUDIO_STREAM, audio.toJson()),
-            f(VIDEO_STREAM, video.toJson()));
   }
 
   public TrackSubData getAudio() {

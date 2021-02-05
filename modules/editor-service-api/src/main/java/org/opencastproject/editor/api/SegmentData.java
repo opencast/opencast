@@ -20,20 +20,9 @@
  */
 package org.opencastproject.editor.api;
 
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-
-import com.entwinemedia.fn.data.json.JObject;
-
-import org.json.simple.JSONObject;
-
 import java.util.Objects;
 
 public class SegmentData {
-  private static final String START = "start";
-  private static final String END = "end";
-  private static final String DELETED = "deleted";
-
   private Long start;
   private Long end;
   private Boolean deleted;
@@ -48,23 +37,6 @@ public class SegmentData {
     this.start = start;
     this.end = end;
     this.deleted = false;
-  }
-
-  protected static SegmentData parse(final JSONObject object) {
-    if (object == null) {
-      return null;
-    }
-    final Long start = (Long) object.get(START);
-    final Long end = (Long) object.get(END);
-    final Boolean deleted = (Boolean) object.get(DELETED);
-    if (end < start) {
-      throw new IllegalArgumentException("The end date of a segment must be after the start date of the segment");
-    }
-    return new SegmentData(start, end, (deleted != null) ? deleted : false);
-  }
-
-  protected JObject toJson() {
-    return obj(f(START, getStart()), f(END, getEnd()), f(DELETED, isDeleted()));
   }
 
   public boolean isDeleted() {

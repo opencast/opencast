@@ -80,7 +80,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +101,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -109,13 +109,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
 
 
-@Component(
-        property = {
-                "service.description=Editor Service"
-        },
-        immediate = true,
-        service =  { EditorService.class }
-)
+//@Component(
+//        property = {
+//                "service.description=Editor Service"
+//        },
+//        immediate = true,
+//        service =  { EditorService.class }
+//)
 public class EditorServiceImpl implements EditorService {
 
   /** The module specific logger */
@@ -138,9 +138,7 @@ public class EditorServiceImpl implements EditorService {
   private WorkflowService workflowService;
   private Workspace workspace;
 
-  private String previewAudioSubtype;
   private MediaPackageElementFlavor smilCatalogFlavor;
-  private String[] smilCatalogTags;
   private String previewVideoSubtype;
   private String previewTag;
   private String previewSubtype;
@@ -148,19 +146,18 @@ public class EditorServiceImpl implements EditorService {
   private AdminUISearchIndex searchIndex;
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
-  private static final String DEFAULT_PREVIEW_TAG = "preview";
+  private static final String DEFAULT_PREVIEW_TAG = "editor";
   private static final String DEFAULT_SMIL_CATALOG_FLAVOR = "smil/cutting";
   private static final String DEFAULT_SMIL_CATALOG_TAGS = "archive";
   private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
   private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
-  private static final String DEFAULT_PREVIEW_AUDIO_SUBTYPE = "audio+preview";
 
   public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
   public static final String OPT_PREVIEW_TAG = "preview.tag";
   public static final String OPT_SMIL_CATALOG_FLAVOR = "smil.catalog.flavor";
   public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
-  public static final String OPT_PREVIEW_AUDIO_SUBTYPE = "preview.audio.subtype";
+
   public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
 
   private Set<String> smilCatalogTagSet = new HashSet<>();
@@ -225,15 +222,18 @@ public class EditorServiceImpl implements EditorService {
   @Modified
   public void activate(ComponentContext cc) {
     Dictionary<String, Object> properties = cc.getProperties();
+    if (properties == null) {
+      return;
+    }
+
     expireSeconds =  UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,this.getClass().getSimpleName());
     // Preview tag
-    previewTag = StringUtils
-            .defaultString((String) properties.get(OPT_PREVIEW_TAG), DEFAULT_PREVIEW_TAG);
-    logger.debug("Preview subtype configuration set to '{}'", previewTag);
+    previewTag = Objects.toString(properties.get(OPT_PREVIEW_TAG), DEFAULT_PREVIEW_TAG);
+    logger.debug("Preview tag configuration set to '{}'", previewTag);
 
     // Preview subtype
-    previewSubtype = StringUtils.defaultString((String) properties.get(OPT_PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
+    previewSubtype = Objects.toString(properties.get(OPT_PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype configuration set to '{}'", previewSubtype);
 
     // SMIL catalog flavor
@@ -242,7 +242,7 @@ public class EditorServiceImpl implements EditorService {
     logger.debug("Smil catalog flavor configuration set to '{}'", smilCatalogFlavor);
 
     // SMIL catalog tags
-    String tags = StringUtils.defaultString((String) properties.get(OPT_SMIL_CATALOG_TAGS), DEFAULT_SMIL_CATALOG_TAGS);
+    String tags =  Objects.toString(properties.get(OPT_SMIL_CATALOG_TAGS), DEFAULT_SMIL_CATALOG_TAGS);
     String[] smilCatalogTags = StringUtils.split(tags, ",");
     smilCatalogTagSet.clear();
     if (smilCatalogTags != null) {
@@ -255,14 +255,8 @@ public class EditorServiceImpl implements EditorService {
     logger.debug("Smil silence flavor configuration set to '{}'", smilSilenceFlavor);
 
     // Preview Video subtype
-    previewVideoSubtype = StringUtils.defaultString((String) properties.get(OPT_PREVIEW_VIDEO_SUBTYPE),
-            DEFAULT_PREVIEW_VIDEO_SUBTYPE);
+    previewVideoSubtype =  Objects.toString(properties.get(OPT_PREVIEW_VIDEO_SUBTYPE), DEFAULT_PREVIEW_VIDEO_SUBTYPE);
     logger.debug("Preview video subtype set to '{}'", previewVideoSubtype);
-
-    // Preview Audio subtype
-    previewAudioSubtype = StringUtils.defaultString((String) properties.get(OPT_PREVIEW_AUDIO_SUBTYPE),
-            DEFAULT_PREVIEW_AUDIO_SUBTYPE);
-    logger.debug("Preview audio subtype set to '{}'", previewAudioSubtype);
   }
 
   private Boolean elementHasPreviewTag(MediaPackageElement element) {
@@ -373,12 +367,8 @@ public class EditorServiceImpl implements EditorService {
     URI smilURI;
     try (InputStream is = IOUtils.toInputStream(smil.toXML(), "UTF-8")) {
       smilURI = workspace.put(mediaPackage.getIdentifier().toString(), catalogId, EditorService.TARGET_FILE_NAME, is);
-    } catch (SAXException e) {
-      logger.error("Error while serializing the SMIL catalog to XML: {}", e.getMessage());
-      throw new IOException(e);
-    } catch (JAXBException e) {
-      logger.error("Error while serializing the SMIL catalog to XML: {}", e.getMessage());
-      throw new IOException(e);
+    } catch (SAXException | JAXBException e) {
+      throw new IOException("Error while serializing the SMIL catalog to XML" ,e);
     }
 
     if (catalog == null) {
@@ -653,42 +643,41 @@ public class EditorServiceImpl implements EditorService {
     // We filter all the properties that have this format, and then those which have values "true".
     final Collection<Tuple<String, String>> hiddens = latestWfProperties.entrySet()
             .stream()
-            .map(p -> tuple(p.getKey().split("_"), p.getValue()))
-            .filter(p -> p.getA().length == 3)
-            .filter(p -> p.getA()[0].equals("hide"))
-            .filter(p -> p.getB().equals("true"))
-            .map(p -> tuple(p.getA()[1], p.getA()[2]))
+            .map(property -> tuple(property.getKey().split("_"), property.getValue()))
+            .filter(property -> property.getA().length == 3)
+            .filter(property -> property.getA()[0].equals("hide"))
+            .filter(property -> property.getB().equals("true"))
+            .map(property -> tuple(property.getA()[1], property.getA()[2]))
             .collect(Collectors.toSet());
 
-    final List<TrackData> tracks = Arrays.stream(mp.getElements())
-            .filter(e -> e.getElementType().equals(MediaPackageElement.Type.Track))
-            .map(e -> (Track)e)
-            .filter(e -> elementHasPreviewTag(e) || elementHasPreviewFlavor(e))
-            .map(e -> {
-              final String uri = Arrays.stream(internalPub.getTracks())
-                      .filter(a -> a.getFlavor().getType().equals(e.getFlavor().getType()))
-                      .filter(a -> a.getFlavor().getSubtype().equals(e.getFlavor().getSubtype()))
-                      .map(MediaPackageElement::getURI).map(this::signIfNecessary)
-                      .findAny()
-                      .orElse(e.getURI().toString());
-
-              final boolean audioEnabled = !hiddens.contains(tuple(e.getFlavor().getType(), "audio"));
-              final TrackSubData audio = new TrackSubData(e.hasAudio(), null,
-                      audioEnabled);
-              final boolean videoEnable = !hiddens.contains(tuple(e.getFlavor().getType(), "video"));
-              final String videoPreview = Arrays.stream(internalPub.getAttachments())
-                      .filter(a -> a.getFlavor().getType().equals(e.getFlavor().getType()))
-                      .filter(a -> a.getFlavor().getSubtype().equals(getPreviewVideoSubtype()))
-                      .map(MediaPackageElement::getURI).map(this::signIfNecessary)
-                      .findAny()
-                      .orElse(null);
-              final TrackSubData video = new TrackSubData(e.hasVideo(), videoPreview,
-                      videoEnable);
-
-              return new TrackData(e.getFlavor().getType(), e.getFlavor().getSubtype(), audio, video, uri,
-                      e.getIdentifier());
-            })
+    List<Track> trackList = Arrays.stream(internalPub.getTracks()).filter(this::elementHasPreviewTag)
             .collect(Collectors.toList());
+    if (trackList.isEmpty()) {
+      trackList = Arrays.stream(internalPub.getTracks()).filter(this::elementHasPreviewFlavor)
+              .collect(Collectors.toList());
+      if (trackList.isEmpty()) {
+        trackList = Arrays.asList(internalPub.getTracks());
+      }
+    }
+
+    final List<TrackData> tracks = trackList.stream().map(track -> {
+      final String uri = signIfNecessary(track.getURI());
+      final boolean audioEnabled = !hiddens.contains(tuple(track.getFlavor().getType(), "audio"));
+      final TrackSubData audio = new TrackSubData(track.hasAudio(), null,
+                        audioEnabled);
+      final boolean videoEnable = !hiddens.contains(tuple(track.getFlavor().getType(), "video"));
+      final String videoPreview = Arrays.stream(internalPub.getAttachments())
+                        .filter(attachment -> attachment.getFlavor().getType().equals(track.getFlavor().getType()))
+                        .filter(attachment -> attachment.getFlavor().getSubtype().equals(getPreviewVideoSubtype()))
+                        .map(MediaPackageElement::getURI).map(this::signIfNecessary)
+                        .findAny()
+                        .orElse(null);
+      final TrackSubData video = new TrackSubData(track.hasVideo(), videoPreview,
+                        videoEnable);
+
+      return new TrackData(track.getFlavor().getType(), track.getFlavor().getSubtype(), audio, video, uri,
+                        track.getIdentifier());
+    }).collect(Collectors.toList());
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
             event.getSeriesId(), event.getSeriesName());
@@ -703,13 +692,7 @@ public class EditorServiceImpl implements EditorService {
   private void errorExit(final String message, final String mediaPackageId, ErrorStatus status, Exception e)
           throws EditorServiceException {
     String errorMessage = MessageFormat.format("{0}. Event ID: {1}", message, mediaPackageId);
-    if (e != null) {
-      logger.warn(errorMessage, e);
-    } else {
-      logger.warn(errorMessage);
-    }
-
-    throw new EditorServiceException(errorMessage, status);
+    throw new EditorServiceException(errorMessage, status, e);
   }
 
   @Override
@@ -738,12 +721,21 @@ public class EditorServiceImpl implements EditorService {
 
       final Map<String, String> workflowProperties = new HashMap<String, String>();
       for (TrackData track : editingData.getTracks()) {
-        Track mpTrack = mediaPackage.getTrack(track.getId());
-        String type = mpTrack.getFlavor().getType();
+        MediaPackageElementFlavor flavor = track.getFlavor();
+        String type = null;
+        if (flavor != null) {
+          type = flavor.getType();
+        } else {
+          Track mpTrack = mediaPackage.getTrack(track.getId());
+          if (mpTrack != null) {
+            type = mpTrack.getFlavor().getType();
+          } else {
+            errorExit("Unable to determine track type", mediaPackageId, ErrorStatus.UNKNOWN);
+          }
+        }
         workflowProperties.put("hide_" + type + "_audio", Boolean.toString(!track.getAudio().isEnabled()));
         workflowProperties.put("hide_" + type + "_video", Boolean.toString(!track.getVideo().isEnabled()));
       }
-
       WorkflowPropertiesUtil.storeProperties(assetManager, mediaPackage, workflowProperties);
 
       try {

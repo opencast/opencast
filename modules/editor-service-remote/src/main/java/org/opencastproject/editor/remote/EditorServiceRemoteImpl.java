@@ -24,9 +24,7 @@ import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.EditorService;
 import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
-import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -35,43 +33,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(
-        property = {
-                "service.description=Editor Remote Service"
-        },
-        immediate = true,
-        service =  { EditorService.class }
-)
 public class EditorServiceRemoteImpl extends RemoteBase implements EditorService {
   private static final Logger logger = LoggerFactory.getLogger(EditorServiceRemoteImpl.class);
   public static final String EDIT_JSON_SUFFIX = "/edit.json";
-
-  /**
-   * Sets the trusted http client
-   *
-   * @param client
-   */
-  @Override
-  @Reference(name = "trustedHttpClient")
-  public void setTrustedHttpClient(TrustedHttpClient client) {
-    this.client = client;
-  }
-
-  /**
-   * Sets the remote service manager.
-   *
-   * @param remoteServiceManager
-   */
-  @Override
-  @Reference(name = "remoteServiceManager")
-  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
-    this.remoteServiceManager = remoteServiceManager;
-  }
 
   /**
    * Creates a remote implementation for the given type of service.
@@ -108,7 +75,7 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
       if (e instanceof EditorServiceException) {
         throw (EditorServiceException) e;
       } else {
-        throw new EditorServiceException("Editor Remote call failed", e);
+        throw new EditorServiceException("Editor Remote call failed", ErrorStatus.UNKNOWN, e);
       }
     } finally {
       closeConnection(response);
@@ -132,7 +99,7 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
       if (e instanceof EditorServiceException) {
         throw (EditorServiceException) e;
       } else {
-        throw new EditorServiceException("Execution of setEditData failed", e);
+        throw new EditorServiceException("Execution of setEditData failed", ErrorStatus.UNKNOWN, e);
       }
     } finally {
       closeConnection(response);

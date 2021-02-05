@@ -45,18 +45,9 @@ public class EditorServiceException extends Exception {
    * @param cause
    *          the error cause
    */
-  public EditorServiceException(String message, Throwable cause) {
+  public EditorServiceException(String message, ErrorStatus status, Throwable cause) {
     super(message, cause);
-  }
-
-  /**
-   * Creates a new editor service exception, caused by the given exception.
-   *
-   * @param cause
-   *          the error cause
-   */
-  public EditorServiceException(Throwable cause) {
-    super(cause);
+    this.status = status;
   }
 
   public ErrorStatus getErrorStatus() {

@@ -17,10 +17,6 @@
   <dependencies>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
     <!-- Opencast dependencies -->
@@ -54,12 +50,6 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-editor-service-api</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -90,6 +80,9 @@
             <Export-Package>
               org.opencastproject.editor.endpoint;version=${project.version}
             </Export-Package>
+            <Service-Component>
+              OSGI-INF/editor_service_endpoint.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

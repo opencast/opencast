@@ -35,6 +35,15 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 public class EditingDataTest {
+  public static final String TITLE = "title";
+  public static final String DATE = "date";
+  public static final String SERIES = "series";
+  public static final String DURATION = "duration";
+  public static final String SEGMENTS = "segments";
+  public static final String TRACKS = "tracks";
+  public static final String WORKFLOWS = "workflows";
+  public static final String SERIES_ID = "id";
+  public static final String SERIES_NAME = "title";
 
   protected String loadResource(String resourceName) throws Exception {
     URI postUri = EditingDataTest.class.getResource(resourceName).toURI();
@@ -84,13 +93,13 @@ public class EditingDataTest {
     JSONObject origJson = (JSONObject) parser.parse(originalJson);
     JSONObject resultingJson = (JSONObject) parser.parse(editingInfo.toString());
 
-    assertEquals(origJson.get(EditingData.TITLE), resultingJson.get(EditingData.TITLE));
-    assertEquals(origJson.get(EditingData.DURATION), resultingJson.get(EditingData.DURATION));
-    assertEquals(origJson.get(EditingData.DATE), resultingJson.get(EditingData.DATE));
-    JSONObject origSeries = (JSONObject) origJson.get(EditingData.SERIES);
-    JSONObject resultSeries = (JSONObject) resultingJson.get(EditingData.SERIES);
-    assertEquals(origSeries.get(EditingData.SERIES_ID), resultSeries.get(EditingData.SERIES_ID));
-    assertEquals(origSeries.get(EditingData.SERIES_NAME), resultSeries.get(EditingData.SERIES_NAME));
+    assertEquals(origJson.get(TITLE), resultingJson.get(TITLE));
+    assertEquals(origJson.get(DURATION), resultingJson.get(DURATION));
+    assertEquals(origJson.get(DATE), resultingJson.get(DATE));
+    JSONObject origSeries = (JSONObject) origJson.get(SERIES);
+    JSONObject resultSeries = (JSONObject) resultingJson.get(SERIES);
+    assertEquals(origSeries.get(SERIES_ID), resultSeries.get(SERIES_ID));
+    assertEquals(origSeries.get(SERIES_NAME), resultSeries.get(SERIES_NAME));
   }
 
   @Test

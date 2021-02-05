@@ -28,12 +28,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>osgi.cmpn</artifactId>
-      <version>6.0.0</version>
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
   <parent>
     <groupId>org.opencastproject</groupId>
@@ -60,6 +54,9 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>org.opencastproject.editor.remote;version=${project.version}</Export-Package>
+            <Service-Component>
+              OSGI-INF/editor_service_remote.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

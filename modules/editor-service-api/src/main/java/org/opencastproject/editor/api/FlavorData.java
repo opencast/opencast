@@ -20,23 +20,20 @@
  */
 package org.opencastproject.editor.api;
 
-import com.google.gson.annotations.SerializedName;
+public class FlavorData {
+  private final String type;
+  private final String subtype;
 
-public final class TrackSubData {
-  public static final String THUMBNAIL_URI = "thumbnail_uri";
-  private final boolean available;
-
-  @SerializedName(THUMBNAIL_URI)
-  private final String thumbnailUri;
-  private final boolean enabled;
-
-  public TrackSubData(final boolean available, final String thumbnailUri, final boolean enabled) {
-    this.available = available;
-    this.thumbnailUri = thumbnailUri;
-    this.enabled = enabled;
+  public FlavorData(String flavorType, String flavorSubtype) {
+    this.type = flavorType;
+    this.subtype = flavorSubtype;
   }
 
-  public boolean isEnabled() {
-    return enabled;
+  public String getType() {
+    return this.type;
+  }
+
+  public String getSubtype() {
+    return this.subtype;
   }
 }
