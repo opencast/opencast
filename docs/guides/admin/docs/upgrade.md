@@ -48,6 +48,18 @@ Please make sure to compare your configuration against the current configuration
   [this document](https://github.com/elan-ev/opencast-studio/blob/2020-09-14/CONFIGURATION.md).
 
 
+### Wowza streaming configuration changes
+
+In [pull request #1179](https://github.com/opencast/opencast/pull/1179), the configuration
+of Wowza servers was made tenant-specific and has been moved to
+`etc/org.opencastproject.distribution.streaming.wowza.WowzaStreamingDistributionService.cfg`.
+
+Additionally, support for RTMP was dropped. This shouldn't be a problem in most cases, as RTMP usually wasn't
+used before, despite being specified in the URL. If your streaming URL started with `rtmp://`, try changing
+it to `https://`.
+
+
+
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------
 
