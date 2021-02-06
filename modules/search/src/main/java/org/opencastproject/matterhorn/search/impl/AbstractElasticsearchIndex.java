@@ -404,7 +404,9 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    */
   protected SearchRequest getSearchRequest(SearchQuery query, QueryBuilder queryBuilder) {
 
-    final SearchSourceBuilder searchSource = new SearchSourceBuilder().query(queryBuilder);
+    final SearchSourceBuilder searchSource = new SearchSourceBuilder()
+        .query(queryBuilder)
+        .trackTotalHits(true);
 
     // Create the actual search query
     logger.debug("Searching for {}", searchSource.toString());
