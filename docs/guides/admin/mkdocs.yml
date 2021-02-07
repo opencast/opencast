@@ -5,6 +5,11 @@ edit_uri: edit/develop/docs/guides/admin/docs/
 markdown_extensions:
   - markdown_inline_graphviz
 
+plugins:
+  - mermaid2:
+      arguments:
+        theme: neutral
+
 # Default theme used is windmill
 theme: windmill
 
