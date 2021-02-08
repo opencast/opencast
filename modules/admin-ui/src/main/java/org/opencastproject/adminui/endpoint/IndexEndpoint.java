@@ -131,7 +131,7 @@ public class IndexEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
-        indexRebuildService.recreateIndex(adminUISearchIndex, service);
+        indexRebuildService.rebuildIndex(adminUISearchIndex, service);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -150,7 +150,7 @@ public class IndexEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index");
-        indexRebuildService.recreateIndex(adminUISearchIndex);
+        indexRebuildService.rebuildIndex(adminUISearchIndex);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }

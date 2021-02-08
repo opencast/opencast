@@ -285,7 +285,7 @@ public class BaseEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
-        indexRebuildService.recreateIndex(externalIndex, service);
+        indexRebuildService.rebuildIndex(externalIndex, service);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -303,7 +303,7 @@ public class BaseEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the external index");
-        indexRebuildService.recreateIndex(externalIndex);
+        indexRebuildService.rebuildIndex(externalIndex);
         logger.info("Finished repopulating the external index");
       } catch (Throwable t) {
         logger.error("Repopulating the external index failed", t);

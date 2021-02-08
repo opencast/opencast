@@ -80,7 +80,7 @@ public class IndexRebuildService implements BundleActivator {
   }
 
   /**
-   * Recreate the index from all of the services that provide data for it.
+   * Clear and rebuild the index from all services.
    *
    * @param index
    *           The index to rebuild.
@@ -90,16 +90,17 @@ public class IndexRebuildService implements BundleActivator {
    * @throws IndexRebuildException
    *           Thrown if the index rebuild failed.
    */
-  public synchronized void recreateIndex(AbstractSearchIndex index)
+  public synchronized void rebuildIndex(AbstractSearchIndex index)
           throws IOException, IndexRebuildException {
     index.clear();
+    logger.info("Index '{}' cleared, starting complete rebuild.", index.getIndexName());
     for (IndexRebuildService.Service service: IndexRebuildService.Service.values()) {
-      recreateService(index, service);
+      rebuildIndex(index, service);
     }
   }
 
   /**
-   * Recreate the index from a specific service that provides data for it.
+   * Partially rebuild the index from a specific service.
    *
    * @param index
    *           The index to rebuild.
@@ -111,14 +112,15 @@ public class IndexRebuildService implements BundleActivator {
    * @throws IndexRebuildException
    *           Thrown if the index rebuild failed.
    */
-  public synchronized void recreateIndex(AbstractSearchIndex index, String serviceName)
+  public synchronized void rebuildIndex(AbstractSearchIndex index, String serviceName)
           throws IllegalArgumentException, IndexRebuildException {
     IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
-    recreateService(index, service);
+    logger.info("Starting partial rebuild of index '{}' from service '{}'.", index.getIndexName(), service);
+    rebuildIndex(index, service);
   }
 
   /**
-   * Trigger repopulation of the specified index with data from the specified service.
+   * Trigger repopulation of the index with data from a specific service.
    *
    * @param index
    *           The index to rebuild.
@@ -128,7 +130,7 @@ public class IndexRebuildService implements BundleActivator {
    * @throws IndexRebuildException
    *           Thrown if the index rebuild failed.
    */
-  private void recreateService(AbstractSearchIndex index, IndexRebuildService.Service service)
+  private void rebuildIndex(AbstractSearchIndex index, IndexRebuildService.Service service)
           throws IndexRebuildException {
 
     if (!indexProducers.containsKey(service)) {
@@ -136,9 +138,9 @@ public class IndexRebuildService implements BundleActivator {
     }
 
     IndexProducer indexProducer = indexProducers.get(service);
-    logger.info("Starting to recreate index {} for service '{}'", index.getIndexName(), service);
+    logger.info("Starting to rebuild index '{}' from service '{}'", index.getIndexName(), service);
     indexProducer.repopulate(index.getIndexName());
-    logger.info("Finished to recreate index {} for service '{}'", index.getIndexName(), service);
+    logger.info("Finished to rebuild index '{}' from service '{}'", index.getIndexName(), service);
   }
 
   /**
