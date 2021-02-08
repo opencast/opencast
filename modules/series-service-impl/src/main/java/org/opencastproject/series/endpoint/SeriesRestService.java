@@ -714,7 +714,7 @@ public class SeriesRestService {
       q.setSeriesId(seriesId.toLowerCase());
     }
     if (StringUtils.isNotEmpty(seriesTitle)) {
-      q.setSeriesTitle(seriesTitle.toLowerCase());
+      q.setSeriesTitle(seriesTitle);
     }
     if (StringUtils.isNotEmpty(creator)) {
       q.setCreator(creator.toLowerCase());
