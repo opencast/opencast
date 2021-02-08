@@ -35,8 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class IndexRebuildService implements BundleActivator {
 
@@ -49,7 +49,7 @@ public class IndexRebuildService implements BundleActivator {
   }
 
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);
-  private final Map<IndexRebuildService.Service, IndexProducer> indexProducers = new HashMap<>();
+  private final Map<IndexRebuildService.Service, IndexProducer> indexProducers = new ConcurrentHashMap<>();
   private ServiceRegistration<?> serviceRegistration = null;
 
   @Override
@@ -148,8 +148,9 @@ public class IndexRebuildService implements BundleActivator {
    *           The IndexProducer to add.
    */
   private void addIndexProducer(IndexProducer indexProducer) {
-    indexProducers.put(indexProducer.getService(), indexProducer);
-    logger.info("Service {} added.", indexProducer.getService());
+      if (indexProducers.putIfAbsent(indexProducer.getService(), indexProducer) == null) {
+        logger.info("Service {} added.", indexProducer.getService());
+      }
   }
 
   /**
@@ -159,8 +160,9 @@ public class IndexRebuildService implements BundleActivator {
    *           The IndexProducer to remove.
    */
   private void removeIndexProducer(IndexProducer indexProducer) {
-    indexProducers.remove(indexProducer.getService(), indexProducer);
-    logger.info("Service {} removed.", indexProducer.getService());
+    if (indexProducers.remove(indexProducer.getService(), indexProducer)) {
+      logger.info("Service {} removed.", indexProducer.getService());
+    }
   }
 
   /**
