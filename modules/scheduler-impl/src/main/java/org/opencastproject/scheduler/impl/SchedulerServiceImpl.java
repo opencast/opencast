@@ -1537,10 +1537,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
        total = persistence.countEvents();
     } catch (SchedulerServiceDatabaseException e) {
-      logIndexRebuildError(indexName, e);
+      logIndexRebuildError(logger, indexName, e);
       throw new IndexRebuildException(indexName, getService(), e);
     }
-    logIndexRebuildBegin(indexName, total, "scheduled events");
+    logIndexRebuildBegin(logger, indexName, total, "scheduled events");
 
     for (Organization organization: orgDirectoryService.getOrganizations()) {
       final User user = SecurityUtil.createSystemUser(systemUserName, organization);
@@ -1549,7 +1549,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         try {
           events = persistence.getEvents();
         } catch (SchedulerServiceDatabaseException e) {
-          logIndexRebuildError(indexName, e, organization);
+          logIndexRebuildError(logger, indexName, e, organization);
           return;
         }
 
@@ -1580,9 +1580,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             }
             final Serializable message = new SchedulerItemList(event.getMediaPackageId(), schedulerItems);
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue, message);
-            logIndexRebuildProgress(indexName, total, current[0]);
+            logIndexRebuildProgress(logger, indexName, total, current[0]);
           } catch (Exception e) {
-            logSkippingElement("scheduled event", event.getMediaPackageId(), e);
+            logSkippingElement(logger, "scheduled event", event.getMediaPackageId(), e);
           }
         }
       });

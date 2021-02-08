@@ -2340,7 +2340,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       total = serviceRegistry.getJobCount(startWorkflow);
     } catch (ServiceRegistryException e) {
-      logIndexRebuildError(indexName, e);
+      logIndexRebuildError(logger.getSlf4jLogger(), indexName, e);
       throw new IndexRebuildException(indexName, getService(), e);
     }
     final int limit = 1000;
@@ -2348,7 +2348,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     final String destinationId = WorkflowItem.WORKFLOW_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
             + indexName.substring(1);
     if (total > 0) {
-      logIndexRebuildBegin(indexName, total, "workflows");
+      logIndexRebuildBegin(logger.getSlf4jLogger(), indexName, total, "workflows");
       int current = 0;
       int offset = 0;
       List<String> workflows;
@@ -2356,7 +2356,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         try {
           workflows = serviceRegistry.getJobPayloads(startWorkflow, limit, offset);
         } catch (ServiceRegistryException e) {
-          logIndexRebuildError(indexName, total, current, e);
+          logIndexRebuildError(logger.getSlf4jLogger(), indexName, total, current, e);
           throw new IndexRebuildException(indexName, getService(), e);
         }
         logger.debug("Got {} workflows for re-indexing", workflows.size());
@@ -2402,7 +2402,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                     messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                             WorkflowItem.updateInstance(instance, dcXml, accessControlList));
                   });
-          logIndexRebuildProgress(indexName, total, current);
+          logIndexRebuildProgress(logger.getSlf4jLogger(), indexName, total, current);
         }
       } while (current < total);
     }

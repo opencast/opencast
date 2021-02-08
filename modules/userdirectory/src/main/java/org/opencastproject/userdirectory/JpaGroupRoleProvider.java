@@ -617,11 +617,11 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
         final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
         int total = groups.size();
         int current = 1;
-        logIndexRebuildBegin(indexName, total, "groups", organization);
+        logIndexRebuildBegin(logger, indexName, total, "groups", organization);
         for (JpaGroup group : groups) {
           messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                   GroupItem.update(JaxbGroup.fromGroup(group)));
-          logIndexRebuildProgress(indexName, total, current);
+          logIndexRebuildProgress(logger, indexName, total, current);
           current++;
         }
       });

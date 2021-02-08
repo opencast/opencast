@@ -404,7 +404,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       final int total = countComments();
       final int[] current = new int[1];
       current[0] = 0;
-      logIndexRebuildBegin(indexName, total, "events with comment");
+      logIndexRebuildBegin(logger, indexName, total, "events with comment");
       final Map<String, List<String>> eventsWithComments = getEventsWithComments();
       for (String orgId : eventsWithComments.keySet()) {
         Organization organization = organizationDirectoryService.getOrganization(orgId);
@@ -419,15 +419,15 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                               CommentItem.update(eventId, !comments.isEmpty(), hasOpenComments, needsCutting));
 
                       current[0] += comments.size();
-                      logIndexRebuildProgress(indexName, total, current[0]);
+                      logIndexRebuildProgress(logger, indexName, total, current[0]);
                     } catch (Throwable t) {
-                      logSkippingElement("comment of event", eventId, organization, t);
+                      logSkippingElement(logger, "comment of event", eventId, organization, t);
                     }
                   }
                 });
       }
     } catch (Exception e) {
-      logIndexRebuildError(indexName, e);
+      logIndexRebuildError(logger, indexName, e);
       throw new IndexRebuildException(indexName, getService(), e);
     }
   }

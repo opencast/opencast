@@ -331,11 +331,11 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
           final List<Theme> themes = getThemes();
           int total = themes.size();
           int current = 1;
-          logIndexRebuildBegin(indexName, total, "themes", organization);
+          logIndexRebuildBegin(logger, indexName, total, "themes", organization);
           for (Theme theme : themes) {
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     ThemeItem.update(toSerializableTheme(theme)));
-            logIndexRebuildProgress(indexName, total, current);
+            logIndexRebuildProgress(logger, indexName, total, current);
             current++;
           }
         } catch (ThemesServiceDatabaseException e) {

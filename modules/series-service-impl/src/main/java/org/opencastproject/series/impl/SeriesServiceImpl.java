@@ -552,7 +552,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
             + indexName.substring(1);
     try {
       final int total = persistence.countSeries();
-      logIndexRebuildBegin(indexName, total, "series");
+      logIndexRebuildBegin(logger, indexName, total, "series");
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       int current = 1;
       for (SeriesEntity series: databaseSeries) {
@@ -590,11 +590,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     logger.error("Error requesting series properties", e);
                   }
                 });
-        logIndexRebuildProgress(indexName, total, current);
+        logIndexRebuildProgress(logger, indexName, total, current);
         current++;
       }
     } catch (Exception e) {
-      logIndexRebuildError(indexName, e);
+      logIndexRebuildError(logger, indexName, e);
       throw new IndexRebuildException(indexName, getService(), e);
     }
   }

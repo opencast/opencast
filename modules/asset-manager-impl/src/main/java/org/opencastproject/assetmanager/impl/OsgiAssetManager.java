@@ -447,7 +447,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
       final int total = r.countSnapshots();
       int current = 0;
-      logIndexRebuildBegin(indexName, total, "snapshot(s)");
+      logIndexRebuildBegin(logger, indexName, total, "snapshot(s)");
 
       final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
       for (String orgId : byOrg.keySet()) {
@@ -464,12 +464,12 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
               messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName),
                       MessageSender.DestinationType.Queue, takeSnapshot);
             } catch (Throwable t) {
-              logSkippingElement("event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
+              logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
             }
-            logIndexRebuildProgress(indexName, total, current);
+            logIndexRebuildProgress(logger, indexName, total, current);
           }
         } catch (Throwable t) {
-          logIndexRebuildError(indexName, t, org);
+          logIndexRebuildError(logger, indexName, t, org);
           throw new IndexRebuildException(indexName, getService(), org, t);
         } finally {
           secSvc.setOrganization(defaultOrg);
