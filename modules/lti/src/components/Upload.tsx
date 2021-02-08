@@ -108,13 +108,6 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         }));
     }
 
-    setUploadPogress(progress: number) {
-        this.setState({
-            ...this.state,
-            uploadProgress: progress
-        });
-    }
-
     onSubmit() {
         if (!isMetadata(this.state.metadata))
             return;
