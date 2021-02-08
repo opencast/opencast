@@ -166,24 +166,11 @@ class TranslatedEditForm extends React.Component<EditFormProps> {
                 </div>
             }
             {this.props.withUpload === true &&
-                <>
-                    <div className="form-group">
-                        <label htmlFor="caption">{this.props.t("LTI.CAPTION")}</label>
-                        <input type="file" className="form-control-file" onChange={this.onChangeCaptionFile.bind(this)} />
-                        <small className="form-text text-muted">{this.props.t("LTI.CAPTION_DESCRIPTION")}</small>
-                    </div>
-                    { this.props.captionFormat === "vtt" && languageOptions.length > 0 &&
-                        <div className="form-group">
-                            <label htmlFor="caption_language">{this.props.t("LTI.CAPTION")} {this.props.t("EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE")}</label>
-                            <Select
-                                id="caption_language"
-                                onChange={(value) => this.props.onCaptionLanguageChange((value as OptionType).value)}
-                                options={languageOptions}
-                                placeholder={this.props.t("LTI.SELECT_OPTION")}
-                            />
-                        </div>
-                    }
-                </>
+                <div className="form-group">
+                    <label htmlFor="caption">{this.props.t("LTI.CAPTION")}</label>
+                    <input type="file" className="form-control-file" onChange={this.onChangeCaptionFile.bind(this)} />
+                    <small className="form-text text-muted">{this.props.t("LTI.CAPTION_DESCRIPTION")}</small>
+                </div>
             }
             {this.props.hasSubmit === true &&
                 <button
