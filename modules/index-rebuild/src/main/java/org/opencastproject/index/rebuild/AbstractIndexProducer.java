@@ -43,7 +43,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The elements to be added (e.g. 'events').
    */
   protected void logIndexRebuildBegin(Logger logger, String indexName, int total, String elementName) {
-    logger.info("Starting update of index '{}' for service '{}' with {} {}", indexName, getService(), total, 
+    logger.info("Starting update of index '{}' for service '{}' with {} {}", indexName, getService(), total,
             elementName);
   }
 
@@ -63,7 +63,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    */
   protected void logIndexRebuildBegin(Logger logger, String indexName, int total, String elementName,
           Organization org) {
-    logger.info("Starting update of index '{}' for service '{}' with {} {} of organization '{}'", indexName, 
+    logger.info("Starting update of index '{}' for service '{}' with {} {} of organization '{}'", indexName,
             getService(), total, elementName, org);
   }
 

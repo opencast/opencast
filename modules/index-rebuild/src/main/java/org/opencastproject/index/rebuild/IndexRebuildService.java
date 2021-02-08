@@ -150,9 +150,9 @@ public class IndexRebuildService implements BundleActivator {
    *           The IndexProducer to add.
    */
   private void addIndexProducer(IndexProducer indexProducer) {
-      if (indexProducers.putIfAbsent(indexProducer.getService(), indexProducer) == null) {
-        logger.info("Service {} added.", indexProducer.getService());
-      }
+    if (indexProducers.putIfAbsent(indexProducer.getService(), indexProducer) == null) {
+      logger.info("Service {} added.", indexProducer.getService());
+    }
   }
 
   /**
