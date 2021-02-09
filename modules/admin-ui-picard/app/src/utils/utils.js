@@ -1,5 +1,6 @@
 import languages from "../i18n/languages";
 import i18n from "../i18n/i18n";
+import {weekdaysArray} from "../configs/utilsConfig";
 
 /**
  * This File contains methods that are needed in more than one places
@@ -45,3 +46,4 @@ export const initArray = (numberOfElements) => {
     }
     return result;
 }
+

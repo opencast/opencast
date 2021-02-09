@@ -65,3 +65,6 @@ export const NOTIFICATION_CONTEXT = 'events-form';
 
 // Context for notifications shown in access page
 export const NOTIFICATION_CONTEXT_ACCESS = 'events-access';
+
+// Workflow applied to upload assets that are not tracks
+export const WORKFLOW_UPLOAD_ASSETS_NON_TRACK = 'publish-uploaded-assets';

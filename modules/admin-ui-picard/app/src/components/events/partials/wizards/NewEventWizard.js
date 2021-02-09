@@ -20,6 +20,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import {getCurrentLanguageInformation} from "../../../../utils/utils";
 import NewEventAssetUpload from "./NewEventAssetUpload";
 import NewEventMetadataExtended from "./NewEventMetadataExtended";
+import {postNewEvent} from "../../../../thunks/eventThunks";
 
 // Base style for Stepper component
 const useStepperStyle = makeStyles((theme) => ({
@@ -48,7 +49,7 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manages the pages of the new event wizard and the submission of values
  */
-const NewEventWizard = ({onSubmit, metadataFields}) => {
+const NewEventWizard = ({ metadataFields, close }) => {
     const {t} = useTranslation();
 
     const classes = useStepperStyle();
@@ -116,9 +117,11 @@ const NewEventWizard = ({onSubmit, metadataFields}) => {
     }
 
     //todo: implement
-    const handleSubmit = values => {
+    const handleSubmit = (values) => {
         console.log("To be implemented!!!");
         console.log(values);
+        const response = postNewEvent(values, metadataFields);
+        close();
     }
 
     return (
@@ -137,50 +140,42 @@ const NewEventWizard = ({onSubmit, metadataFields}) => {
             <MuiPickersUtilsProvider  utils={DateFnsUtils} locale={currentLanguage.dateLocale}>
                 <Formik initialValues={snapshot}
                         validationSchema={currentValidationSchema}
-                        onSubmit={handleSubmit}>
+                        onSubmit={values => handleSubmit(values)}>
                     {/* Render wizard pages depending on current value of page variable */}
                     {formik => (
                         <div>
                             {page === 0 && <NewEventMetadata nextPage={nextPage}
-                                                             formik={formik}
-                                                             onSubmit={() => console.log(formik.values)}/>}
+                                                             formik={formik} />}
                             {page === 1 && (
                                 <NewEventMetadataExtended previousPage={previousPage}
                                                           nextPage={nextPage}
-                                                          formik={formik}
-                                                          onSubmit={() => console.log("Step Metadata Extended onSubmit")}/>
+                                                          formik={formik} />
                             )}
                             {page === 2 && (
                                 <NewEventSource previousPage={previousPage}
                                                 nextPage={nextPage}
-                                                formik={formik}
-                                                onSubmit={() => console.log(formik.values)}/>
+                                                formik={formik} />
                             )}
                             {page === 3  && (
                                 <NewEventAssetUpload previousPage={previousPage}
                                                      nextPage={nextPage}
-                                                     formik={formik}
-                                                     onSubmit={() => console.log("Step Asset onSubmit")} />
+                                                     formik={formik} />
                             )}
                             {page === 4 && (
                                 <NewEventProcessing previousPage={previousPage}
                                                     nextPage={nextPage}
-                                                    formik={formik}
-                                                    onSubmit={() => console.log("Step Processing onSubmit")}/>
+                                                    formik={formik} />
                             )}
                             {page === 5 && (
                                 <NewEventAccess previousPage={previousPage}
                                                 nextPage={nextPage}
-                                                formik={formik}
-                                                onSubmit={() => console.log("Step Access onSubmit")}/>
+                                                formik={formik} />
                             )}
                             {page === 6 && (
                                 <NewEventSummary previousPage={previousPage}
-                                                 nextPage={handleSubmit}
                                                  formik={formik}
                                                  metaDataExtendedHidden={steps[1].hidden}
-                                                 assetUploadHidden={steps[3].hidden}
-                                                 onSubmit={() => console.log("Step Summary onSubmit")}/>
+                                                 assetUploadHidden={steps[3].hidden} />
                             )}
                         </div>
                     )}
@@ -266,5 +261,7 @@ CustomStepIcon.propTypes = {
 const mapStateToProps = state => ({
     metadataFields: getEventMetadata(state)
 });
+
+
 
 export default connect(mapStateToProps)(NewEventWizard);

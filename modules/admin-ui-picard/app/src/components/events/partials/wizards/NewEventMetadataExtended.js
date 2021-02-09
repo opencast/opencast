@@ -1,6 +1,6 @@
 import React from "react";
 
-const NewEventMetadataExtended = ({ onSubmit, previousPage, nextPage, formik, hidden }) => {
+const NewEventMetadataExtended = ({ previousPage, nextPage, formik, hidden }) => {
         return (
             <div>
                 Metadata Extended

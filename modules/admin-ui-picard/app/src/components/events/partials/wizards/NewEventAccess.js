@@ -13,7 +13,7 @@ import {removeNotificationEventsAccess} from "../../../../actions/notificationAc
 /**
  * This component renders the access page for new events in the new event wizard.
  */
-const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik, addNotification,
+const NewEventAccess = ({ previousPage, nextPage, formik, addNotification,
                             removeNotificationEventsAccess }) => {
     const { t } = useTranslation();
 
@@ -271,7 +271,6 @@ const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik, addNotificat
                         onClick={() => {
                             if(checkPolicies()) {
                                 nextPage(formik.values);
-                                onSubmit();
                             }
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>

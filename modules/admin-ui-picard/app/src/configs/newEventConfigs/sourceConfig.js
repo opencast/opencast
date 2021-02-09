@@ -79,13 +79,13 @@ export const sourceMetadata = {
     UPLOAD: {
         metadata: [
             {
-                'id': 'startDate',
-                'label': 'EVENTS.EVENTS.DETAILS.METADATA.START_DATE',
-                'value': new Date(Date.now()).toISOString(),
-                'type': 'date',
-                'readOnly': false,
-                'required': false,
-                'tabindex': 7
+                id: 'startDate',
+                label: 'EVENTS.EVENTS.DETAILS.METADATA.START_DATE',
+                value: new Date(Date.now()).toISOString(),
+                type: 'date',
+                readOnly: false,
+                required: false,
+                tabindex: 7
             }
         ]
     }

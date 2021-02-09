@@ -10,7 +10,7 @@ import RenderWorkflowConfig from "./RenderWorkflowConfig";
 /**
  * This component renders the processing page for new events in the new event wizard.
  */
-const NewEventProcessing = ({ onSubmit, previousPage, nextPage, formik, loadingWorkflowDef, workflowDef }) => {
+const NewEventProcessing = ({ previousPage, nextPage, formik, loadingWorkflowDef, workflowDef }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -81,7 +81,6 @@ const NewEventProcessing = ({ onSubmit, previousPage, nextPage, formik, loadingW
                         disabled={!(formik.values.processingWorkflow && formik.isValid)}
                         onClick={() => {
                             nextPage(formik.values);
-                            onSubmit();
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
                 <button className="cancel"

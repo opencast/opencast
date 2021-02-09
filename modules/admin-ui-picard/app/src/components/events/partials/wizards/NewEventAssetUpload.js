@@ -7,7 +7,7 @@ import {uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConf
  * This component renders the asset upload page of the new event wizard
  * (only if its not set hidden (see newEventWizardConfig) or user chose UPLOAD as source mode)
  */
-const NewEventAssetUpload = ({ onSubmit, previousPage, nextPage , formik }) => {
+const NewEventAssetUpload = ({ previousPage, nextPage , formik }) => {
     const { t } = useTranslation();
 
     // Get upload assets that are not of type track
@@ -88,7 +88,6 @@ const NewEventAssetUpload = ({ onSubmit, previousPage, nextPage , formik }) => {
                         className={cn("submit")}
                         onClick={() => {
                             nextPage(formik.values);
-                            onSubmit();
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
                 <button className="cancel"

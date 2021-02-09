@@ -21,7 +21,7 @@ const NewEventModal = ({ handleClose, showModal }) => {
                     <h2>{t('EVENTS.EVENTS.NEW.CAPTION')}</h2>
                 </header>
                 {/*New Event Wizard*/}
-                <NewEventWizard />
+                <NewEventWizard close={close}/>
             </section>
         )
     )

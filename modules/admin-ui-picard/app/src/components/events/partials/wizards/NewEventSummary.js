@@ -10,7 +10,7 @@ import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 /**
  * This component renders the summary page for new events in the new event wizard.
  */
-const NewEventSummary = ({ onSubmit, previousPage, formik, metaDataExtendedHidden, assetUploadHidden,
+const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUploadHidden,
                              metadataEvents, workflowDef }) => {
     const { t } = useTranslation();
 
@@ -268,7 +268,7 @@ const NewEventSummary = ({ onSubmit, previousPage, formik, metaDataExtendedHidde
                             })}
                         disabled={!(formik.dirty && formik.isValid)}
                         onClick={() => {
-                            onSubmit();
+                            formik.handleSubmit();
                         }}
                         tabIndex="100">{t('WIZARD.CREATE')}</button>
                 <button className="cancel"

@@ -31,7 +31,7 @@ const theme = createMuiTheme({
 /**
  * This component renders the source page for new events in the new event wizard.
  */
-const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInputDevices, inputDevices, addNotification,
+const NewEventSource = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices, addNotification,
                             removeNotificationEventsForm }) => {
     const { t } = useTranslation();
 
@@ -176,7 +176,6 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInput
                             removeOldNotifications();
                             if(await checkConflicts()) {
                                 nextPage(formik.values);
-                                onSubmit();
                             }
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>

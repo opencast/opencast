@@ -10,7 +10,7 @@ import RenderMultiField from "./RenderMultiField";
 /**
  * This component renders the metadata page for new events in the new event wizard.
  */
-const NewEventMetadata = ({ onSubmit, metadataFields, nextPage, formik }) => {
+const NewEventMetadata = ({ metadataFields, nextPage, formik }) => {
     const { t } = useTranslation();
 
     return (
@@ -66,7 +66,6 @@ const NewEventMetadata = ({ onSubmit, metadataFields, nextPage, formik }) => {
                         disabled={!(formik.dirty && formik.isValid)}
                         onClick={() => {
                             nextPage(formik.values);
-                            onSubmit();
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
             </footer>
