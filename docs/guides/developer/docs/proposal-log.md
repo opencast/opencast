@@ -29,18 +29,18 @@ rare, so the RMs can check and move things about.  We will be checking before
 we commit the tag anyway, right? :)
 
 Short example:
-```
+
 - My spiffy new feature, which lets Opencast run on a 386 in 64k of RAM.
-```
+
 
 Long example:
-```
+
 - My short description
 
 My longer feature description
 ---------------------------------------
 Lorem ipsum....
-```
+
 
 Proposal passes EOD 2021-01-26 UTC-6
 
