@@ -128,7 +128,9 @@ public class ScheduledDataCollector extends TimerTask {
       throw new NumberFormatException("The number should be between 0 and 23 inclusive.");
     }
     int currentHour = NumberUtils.createInteger(new SimpleDateFormat("H").format(new Date()));
-    if (currentHour > timeToSend) timeToSend += 24;
+    if (currentHour > timeToSend) {
+      timeToSend += 24;
+    }
     int schedulerDelay = timeToSend - currentHour;
     logger.info("Starting the adopter statistic scheduler task in {} hours. "
             + "After then, it will repeat the task every 24 hours.", schedulerDelay);

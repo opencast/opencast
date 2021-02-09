@@ -151,8 +151,9 @@ public class Form implements IForm {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Organization))
+    if (!(obj instanceof Organization)) {
       return false;
+    }
     return ((Form) obj).adopterKey.equals(adopterKey);
   }
 

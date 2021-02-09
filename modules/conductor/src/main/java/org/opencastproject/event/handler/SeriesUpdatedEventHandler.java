@@ -265,8 +265,9 @@ public class SeriesUpdatedEventHandler {
           boolean retractSeriesCatalog = retractSeriesCatalog(mp);
           boolean updateEpisodeCatalog = updateEpisodeCatalog(mp);
 
-          if (!retractSeriesCatalog || !updateEpisodeCatalog)
+          if (!retractSeriesCatalog || !updateEpisodeCatalog) {
             continue;
+          }
         }
 
         // Update the search index with the modified mediapackage
