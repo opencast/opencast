@@ -70,6 +70,9 @@ public class EncodingProfileScanner implements ArtifactInstaller {
   /** Sum of profiles files currently installed */
   private int sumInstalledFiles = 0;
 
+  /** Sum of profiles files that could not be parsed */
+  private int sumUnparsableFiles = 0;
+
   /** The profiles map */
   private Map<String, EncodingProfile> profiles = new HashMap<String, EncodingProfile>();
 
@@ -310,6 +313,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
       sumInstalledFiles++;
     } catch (Exception e) {
       logger.error("Encoding profiles could not be read from {}: {}", artifact, e.getMessage());
+      sumUnparsableFiles++;
     }
 
     // Determine the number of available profiles
@@ -320,12 +324,18 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     });
 
     // Once all profiles have been loaded, announce readiness
-    if (filesInDirectory.length == sumInstalledFiles) {
+    if (filesInDirectory.length == (sumInstalledFiles + sumUnparsableFiles)) {
       Dictionary<String, String> properties = new Hashtable<String, String>();
       properties.put(ARTIFACT, "encodingprofile");
       logger.debug("Indicating readiness of encoding profiles");
       bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
-      logger.info("All {} encoding profiles installed", filesInDirectory.length);
+
+      if (filesInDirectory.length == sumInstalledFiles) {
+        logger.info("All {} encoding profiles installed", filesInDirectory.length);
+      } else {
+        logger.warn("{} encoding profile(s) installed, {} encoding profile(s) could not be installed",
+                sumInstalledFiles, sumUnparsableFiles);
+      }
     } else {
       logger.debug("{} of {} encoding profiles installed", sumInstalledFiles, filesInDirectory.length);
     }
