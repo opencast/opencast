@@ -10,7 +10,6 @@
     <suppress checks="LineLength" files="modules/asset-manager-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/asset-manager-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/asset-manager-storage-aws/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/authorization-manager/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/authorization-xacml/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/capture-admin-service-impl/.+\.(java|properties)"/>
@@ -130,7 +129,6 @@
     <suppress checks="Indentation" files="modules/asset-manager-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/asset-manager-storage-aws/.+\.java"/>
     <suppress checks="Indentation" files="modules/asset-manager-storage-fs/.+\.java"/>
-    <suppress checks="Indentation" files="modules/authorization-manager/.+\.java"/>
     <suppress checks="Indentation" files="modules/authorization-xacml/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/common/.+\.java"/>
@@ -227,7 +225,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/asset-manager-storage-aws/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/asset-manager-storage-fs/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/asset-manager-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/authorization-manager/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/authorization-xacml/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/caption-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/capture-admin-service-impl/.+\.java"/>
