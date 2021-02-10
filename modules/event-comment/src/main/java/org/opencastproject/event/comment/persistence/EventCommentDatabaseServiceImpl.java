@@ -29,8 +29,6 @@ import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -87,12 +85,6 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   /** The user directory service */
   private UserDirectoryService userDirectoryService;
 
-  /** The message broker sender service */
-  private MessageSender messageSender;
-
-  /** The message broker receiver service */
-  private MessageReceiver messageReceiver;
-
   /** The component context this bundle is running in. */
   private ComponentContext cc;
 
@@ -140,26 +132,6 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
-  }
-
-  /**
-   * OSGi callback to set the message sender.
-   *
-   * @param messageSender
-   *          the message sender
-   */
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
-  /**
-   * OSGi callback to set the message receiver.
-   *
-   * @param messageReceiver
-   *          the message receiver
-   */
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
   }
 
   /**
