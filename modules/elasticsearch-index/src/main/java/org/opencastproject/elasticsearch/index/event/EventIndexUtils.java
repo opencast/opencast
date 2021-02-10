@@ -480,7 +480,7 @@ public final class EventIndexUtils {
     }
   }
 
-  /**
+ /**
    * Gets all of the MediaPackageElement's flavors.
    *
    * @param publications
