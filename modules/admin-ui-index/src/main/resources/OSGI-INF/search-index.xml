@@ -8,6 +8,7 @@
   <property name="index.name" value="adminui"/>
   <service>
     <provide interface="org.opencastproject.elasticsearch.api.SearchIndex"/>
+    <provide interface="org.opencastproject.elasticsearch.index.AbstractSearchIndex"/>
     <provide interface="org.opencastproject.adminui.index.AdminUISearchIndex"/>
   </service>
 </scr:component>
