@@ -45,6 +45,7 @@ import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
@@ -1529,18 +1530,18 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public void repopulate(final String indexName) throws IndexRebuildException {
-    final String destinationId = SchedulerItem.SCHEDULER_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
-            + indexName.substring(1);
+  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
+    final String destinationId = SchedulerItem.SCHEDULER_QUEUE_PREFIX + index.getIndexName().substring(0, 1).toUpperCase()
+            + index.getIndexName().substring(1);
     final int[] current = {0};
     final int total;
     try {
        total = persistence.countEvents();
     } catch (SchedulerServiceDatabaseException e) {
-      logIndexRebuildError(logger, indexName, e);
-      throw new IndexRebuildException(indexName, getService(), e);
+      logIndexRebuildError(logger, index.getIndexName(), e);
+      throw new IndexRebuildException(index.getIndexName(), getService(), e);
     }
-    logIndexRebuildBegin(logger, indexName, total, "scheduled events");
+    logIndexRebuildBegin(logger, index.getIndexName(), total, "scheduled events");
 
     for (Organization organization: orgDirectoryService.getOrganizations()) {
       final User user = SecurityUtil.createSystemUser(systemUserName, organization);
@@ -1549,7 +1550,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         try {
           events = persistence.getEvents();
         } catch (SchedulerServiceDatabaseException e) {
-          logIndexRebuildError(logger, indexName, e, organization);
+          logIndexRebuildError(logger, index.getIndexName(), e, organization);
           return;
         }
 
@@ -1580,7 +1581,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             }
             final Serializable message = new SchedulerItemList(event.getMediaPackageId(), schedulerItems);
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue, message);
-            logIndexRebuildProgress(logger, indexName, total, current[0]);
+            logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
           } catch (Exception e) {
             logSkippingElement(logger, "scheduled event", event.getMediaPackageId(), e);
           }
