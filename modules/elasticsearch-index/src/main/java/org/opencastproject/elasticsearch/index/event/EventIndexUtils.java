@@ -583,11 +583,7 @@ public final class EventIndexUtils {
     event.setHasComments(hasComments);
     event.setHasOpenComments(hasOpenComments);
     event.setNeedsCutting(needsCutting);
-    try {
-      searchIndex.addOrUpdate(event);
-    } catch (SearchIndexException e) {
-      logger.warn("Unable to update event '{}'", event, e);
-    }
+    searchIndex.addOrUpdate(event);
   }
 
   /**
