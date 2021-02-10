@@ -27,6 +27,7 @@ import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Option.some;
 
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
@@ -547,12 +548,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public void repopulate(final String indexName) throws IndexRebuildException {
-    final String destinationId = SeriesItem.SERIES_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
-            + indexName.substring(1);
+  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
+    final String destinationId = SeriesItem.SERIES_QUEUE_PREFIX + index.getIndexName().substring(0, 1).toUpperCase()
+            + index.getIndexName().substring(1);
     try {
       final int total = persistence.countSeries();
-      logIndexRebuildBegin(logger, indexName, total, "series");
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "series");
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       int current = 1;
       for (SeriesEntity series: databaseSeries) {
@@ -590,12 +591,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     logger.error("Error requesting series properties", e);
                   }
                 });
-        logIndexRebuildProgress(logger, indexName, total, current);
+        logIndexRebuildProgress(logger, index.getIndexName(), total, current);
         current++;
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, indexName, e);
-      throw new IndexRebuildException(indexName, getService(), e);
+      logIndexRebuildError(logger, index.getIndexName(), e);
+      throw new IndexRebuildException(index.getIndexName(), getService(), e);
     }
   }
 

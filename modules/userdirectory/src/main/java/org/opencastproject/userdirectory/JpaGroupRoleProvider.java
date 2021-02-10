@@ -21,6 +21,7 @@
 
 package org.opencastproject.userdirectory;
 
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildService;
@@ -610,18 +611,18 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   }
 
   @Override
-  public void repopulate(final String indexName) {
-    final String destinationId = GroupItem.GROUP_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+  public void repopulate(final AbstractSearchIndex index) {
+    final String destinationId = GroupItem.GROUP_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName());
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
       SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
         final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
         int total = groups.size();
         int current = 1;
-        logIndexRebuildBegin(logger, indexName, total, "groups", organization);
+        logIndexRebuildBegin(logger, index.getIndexName(), total, "groups", organization);
         for (JpaGroup group : groups) {
           messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                   GroupItem.update(JaxbGroup.fromGroup(group)));
-          logIndexRebuildProgress(logger, indexName, total, current);
+          logIndexRebuildProgress(logger, index.getIndexName(), total, current);
           current++;
         }
       });
