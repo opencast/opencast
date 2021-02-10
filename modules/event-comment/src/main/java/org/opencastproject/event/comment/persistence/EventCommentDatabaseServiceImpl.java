@@ -95,6 +95,10 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   /** The component context this bundle is running in. */
   private ComponentContext cc;
 
+  /** The elasticsearch indices */
+  private AbstractSearchIndex adminUiIndex;
+  private AbstractSearchIndex externalApiIndex;
+
   /** OSGi component activation callback */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for event comments");
@@ -155,6 +159,26 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    */
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
+  }
+
+  /**
+   * OSgi callback for the Admin UI index.
+   *
+   * @param index
+   *          the admin UI index.
+   */
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
+  }
+
+  /**
+   * OSGi callback for the External API index
+   *
+   * @param index
+   *          the external API index.
+   */
+  public void setExternalApiIndex(AbstractSearchIndex index) {
+    this.externalApiIndex = index;
   }
 
   @Override
