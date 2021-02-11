@@ -42,4 +42,13 @@ public interface EditorService {
    */
   void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException;
 
+  /**
+   * Provide all meta information about the given mediaPackageId
+   */
+  String getMetadata(String mediaPackageId) throws EditorServiceException;
+
+  /**
+   * Store meta data of the given mediaPackage
+   */
+  void setMetadata(String mediaPackageId, String metadata) throws EditorServiceException;
 }

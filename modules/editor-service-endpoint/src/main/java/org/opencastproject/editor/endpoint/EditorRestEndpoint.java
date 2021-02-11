@@ -34,7 +34,6 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.io.IOUtils;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,21 +100,7 @@ public class EditorRestEndpoint {
         return RestUtil.R.serverError();
       }
     } catch (EditorServiceException e) {
-      switch(e.getErrorStatus()) {
-        case MEDIAPACKAGE_NOT_FOUND:
-          return RestUtil.R.notFound(String.format("Event '{%s}' not Found", mediaPackageId),
-                  MediaType.TEXT_PLAIN_TYPE);
-        case WORKFLOW_ACTIVE:
-          return RestUtil.R.locked();
-        case NO_INTERNAL_PUBLICATION:
-          return RestUtil.R.badRequest(e.getMessage());
-        case UNABLE_TO_CREATE_CATALOG:
-        case WORKFLOW_ERROR:
-        case WORKFLOW_NOT_FOUND:
-        case UNKNOWN:
-        default:
-          return RestUtil.R.serverError();
-      }
+      return checkErrorState(mediaPackageId, e);
     }
   }
 
@@ -135,19 +120,18 @@ public class EditorRestEndpoint {
   public Response editVideo(@PathParam("mediapackageid") final String mediaPackageId,
           @Context HttpServletRequest request) {
     String details;
-    try (InputStream is = request.getInputStream()) {
-      details = IOUtils.toString(is, request.getCharacterEncoding());
+    try {
+      details = readInputStream(request);
     } catch (IOException e) {
-      logger.error("Error reading request body:", e);
       return RestUtil.R.serverError();
     }
-    logger.info("Editor POST-Request received: {}", details);
+    logger.debug("Editor POST-Request received: {}", details);
 
-    JSONParser parser = new JSONParser();
     EditingData editingInfo;
     try {
       editingInfo = EditingData.parse(details);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       logger.debug("Unable to parse editing information ({})", details, e);
       return RestUtil.R.badRequest("Unable to parse details");
     }
@@ -155,24 +139,88 @@ public class EditorRestEndpoint {
     try {
       editorService.setEditData(mediaPackageId, editingInfo);
     } catch (EditorServiceException e) {
-      switch(e.getErrorStatus()) {
-        case MEDIAPACKAGE_NOT_FOUND:
-          return RestUtil.R.notFound(String.format("Event '{%s}' not Found", mediaPackageId),
-                  MediaType.TEXT_PLAIN_TYPE);
-        case WORKFLOW_ACTIVE:
-          return RestUtil.R.locked();
-        case WORKFLOW_NOT_FOUND:
-        case NO_INTERNAL_PUBLICATION:
-          return RestUtil.R.badRequest(e.getMessage());
-        case UNABLE_TO_CREATE_CATALOG:
-        case WORKFLOW_ERROR:
-        case UNKNOWN:
-        default:
-          return RestUtil.R.serverError();
-      }
+      return checkErrorState(mediaPackageId, e);
     }
-
     return RestUtil.R.ok();
+  }
+
+  @POST
+  @Path("{eventId}/metadata.json")
+  @RestQuery(name = "updateeventmetadata", description = "Update the passed metadata for the event with the given Id",
+          pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+                  type = RestParameter.Type.STRING) },
+          responses = {
+          @RestResponse(description = "The metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Could not parse metadata.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No event with this identifier was found.",
+                  responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "No content is returned.")
+  public Response updateEventMetadata(@PathParam("eventId") String eventId, @Context HttpServletRequest request) {
+    try {
+      String details = readInputStream(request);
+      editorService.setMetadata(eventId, details);
+    } catch (IOException e) {
+      return RestUtil.R.serverError();
+    } catch (EditorServiceException e) {
+      return checkErrorState(eventId, e);
+    }
+    return RestUtil.R.ok();
+  }
+
+  protected String readInputStream(HttpServletRequest request) throws IOException {
+    String details;
+    try (InputStream is = request.getInputStream()) {
+      details = IOUtils.toString(is, request.getCharacterEncoding());
+    } catch (IOException e) {
+      logger.error("Error reading request body:", e);
+      return null;
+    }
+    return details;
+  }
+
+  protected Response checkErrorState(@PathParam("eventId") String eventId, EditorServiceException e) {
+    switch (e.getErrorStatus()) {
+      case MEDIAPACKAGE_NOT_FOUND:
+        return RestUtil.R.notFound(String.format("Event '{%s}' not Found", eventId), MediaType.TEXT_PLAIN_TYPE);
+      case WORKFLOW_ACTIVE:
+        return RestUtil.R.locked();
+      case WORKFLOW_NOT_FOUND:
+      case NO_INTERNAL_PUBLICATION:
+        return RestUtil.R.badRequest(e.getMessage());
+      case UNABLE_TO_CREATE_CATALOG:
+      case WORKFLOW_ERROR:
+      case UNKNOWN:
+      default:
+        return RestUtil.R.serverError();
+    }
+  }
+
+  @GET
+  @Path("{eventId}/metadata.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "geteventmetadata",
+          description = "Returns all the data related to the metadata tab in the event details modal as JSON",
+          returnDescription = "All the data related to the event metadata tab as JSON",
+          pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+                  type = RestParameter.Type.STRING) },
+          responses = {
+          @RestResponse(description = "Returns all the data related to the event metadata tab as JSON",
+                  responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+                  responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getEventMetadata(@PathParam("eventId") String eventId) {
+    try {
+      String response = editorService.getMetadata(eventId);
+      if (response != null) {
+        return Response.ok(response, MediaType.APPLICATION_JSON_TYPE).build();
+      } else {
+        logger.error("EditorService returned empty response");
+        return RestUtil.R.serverError();
+      }
+    } catch (EditorServiceException e) {
+      return checkErrorState(eventId, e);
+    }
   }
 
   @GET

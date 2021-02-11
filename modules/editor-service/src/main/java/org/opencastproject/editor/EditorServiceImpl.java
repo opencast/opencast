@@ -42,6 +42,7 @@ import org.opencastproject.editor.api.WorkflowData;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
+import org.opencastproject.index.service.impl.index.event.EventUtils;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -51,7 +52,12 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
@@ -68,6 +74,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
@@ -93,7 +100,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -160,7 +166,7 @@ public class EditorServiceImpl implements EditorService {
 
   public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
 
-  private Set<String> smilCatalogTagSet = new HashSet<>();
+  private final Set<String> smilCatalogTagSet = new HashSet<>();
 
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -327,9 +333,9 @@ public class EditorServiceImpl implements EditorService {
       smilResponse = smilService.addParallel(smilResponse.getSmil());
       final String parentId = smilResponse.getEntity().getId();
 
-      final Long duration = segment.getEnd() - segment.getStart();
+      final long duration = segment.getEnd() - segment.getStart();
       if (!segment.isDeleted()) {
-        smilResponse = smilService.addClips(smilResponse.getSmil(), parentId, tracks.toArray(new Track[tracks.size()]),
+        smilResponse = smilService.addClips(smilResponse.getSmil(), parentId, tracks.toArray(new Track[0]),
                 segment.getStart(), duration);
       }
     }
@@ -344,11 +350,10 @@ public class EditorServiceImpl implements EditorService {
    *          the media package to at the SMIL catalog
    * @param smil
    *          the SMIL catalog
-   * @return the updated media package
    * @throws IOException
    *           if the SMIL catalog cannot be read or not be written to the archive
    */
-  MediaPackage addSmilToArchive(MediaPackage mediaPackage, final Smil smil) throws IOException {
+  void addSmilToArchive(MediaPackage mediaPackage, final Smil smil) throws IOException {
     MediaPackageElementFlavor mediaPackageElementFlavor = getSmilCatalogFlavor();
     //set default catalog Id if there is none existing
     String catalogId = smil.getId();
@@ -392,7 +397,6 @@ public class EditorServiceImpl implements EditorService {
       throw new IOException(e);
     }
 
-    return mediaPackage;
   }
 
   private Opt<Publication> getInternalPublication(MediaPackage mp) {
@@ -411,13 +415,20 @@ public class EditorServiceImpl implements EditorService {
    *          The mediapackage id that is also the event id.
    * @return The event if available or none if it is missing.
    */
-  private Opt<Event> getEvent(final String mediaPackageId) {
+  private Event getEvent(final String mediaPackageId) throws EditorServiceException {
     try {
-      return index.getEvent(mediaPackageId, searchIndex);
+      Opt<Event> optEvent = index.getEvent(mediaPackageId, searchIndex);
+      if (optEvent.isNone()) {
+        errorExit("Event not found", mediaPackageId,
+                ErrorStatus.MEDIAPACKAGE_NOT_FOUND);
+      } else {
+        return optEvent.get();
+      }
     } catch (SearchIndexException e) {
-      logger.error("Error while reading event '{}' from search index:", mediaPackageId, e);
-      return Opt.none();
+      errorExit("Error while reading event from search index:", mediaPackageId,
+              ErrorStatus.MEDIAPACKAGE_NOT_FOUND, e);
     }
+    return null;
   }
 
   /**
@@ -527,12 +538,7 @@ public class EditorServiceImpl implements EditorService {
   }
 
   private void sortSegments(List<SegmentData> mergedSegments) {
-    Collections.sort(mergedSegments, new Comparator<SegmentData>() {
-      @Override
-      public int compare(SegmentData t1, SegmentData t2) {
-        return t1.getStart().compareTo(t2.getStart());
-      }
-    });
+    mergedSegments.sort(Comparator.comparing(SegmentData::getStart));
   }
 
   /**
@@ -555,7 +561,7 @@ public class EditorServiceImpl implements EditorService {
         if (combinedEnd > combinedStart) {
           it.remove();
           it2.remove();
-          List<SegmentData> newSegments = new ArrayList<SegmentData>(segments);
+          List<SegmentData> newSegments = new ArrayList<>(segments);
           newSegments.add(new SegmentData(combinedStart, combinedEnd));
           return mergeInternal(newSegments, segments2);
         }
@@ -585,7 +591,7 @@ public class EditorServiceImpl implements EditorService {
             try {
               // pick longest element
               if (tuple == null || (videoElem.getClipEndMS()
-                      - videoElem.getClipBeginMS()) > (Long) tuple.getEnd() - (Long) tuple.getStart()) {
+                      - videoElem.getClipBeginMS()) > tuple.getEnd() - tuple.getStart()) {
                 tuple = new SegmentData(videoElem.getClipBeginMS(), videoElem.getClipEndMS());
               }
             } catch (SmilException e) {
@@ -605,18 +611,8 @@ public class EditorServiceImpl implements EditorService {
   @Override
   public EditingData getEditData(final String mediaPackageId) throws EditorServiceException {
     // Select tracks
-    Opt<Event> eventOpt = getEvent(mediaPackageId);
-    if (eventOpt.isNone()) {
-      errorExit("Not Found", mediaPackageId, ErrorStatus.MEDIAPACKAGE_NOT_FOUND);
-    }
-    final Event event = eventOpt.get();
-
-    MediaPackage mp = null;
-    try {
-      mp = index.getEventMediapackage(event);
-    } catch (IndexServiceException e) {
-      errorExit("Not Found", mediaPackageId, ErrorStatus.MEDIAPACKAGE_NOT_FOUND);
-    }
+    Event event = getEvent(mediaPackageId);
+    MediaPackage mp = getMediaPackage(event);
 
     final Opt<Publication> internalPubOpt = getInternalPublication(mp);
     if (internalPubOpt.isNone() || internalPubOpt.isEmpty()) {
@@ -683,6 +679,18 @@ public class EditorServiceImpl implements EditorService {
             event.getSeriesId(), event.getSeriesName());
   }
 
+  private MediaPackage getMediaPackage(Event event) throws EditorServiceException {
+    if (event == null) {
+      errorExit("No Event provided", "", ErrorStatus.UNKNOWN);
+      return null;
+    }
+    try {
+      return index.getEventMediapackage(event);
+    } catch (IndexServiceException e) {
+      errorExit("Not Found", event.getIdentifier(), ErrorStatus.MEDIAPACKAGE_NOT_FOUND);
+      return null;
+    }
+  }
 
   private void errorExit(final String message, final String mediaPackageId, ErrorStatus status)
           throws EditorServiceException {
@@ -697,75 +705,103 @@ public class EditorServiceImpl implements EditorService {
 
   @Override
   public void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException {
-    final Opt<Event> optEvent = getEvent(mediaPackageId);
-    if (optEvent.isNone()) {
-      errorExit("Event not found", mediaPackageId, ErrorStatus.MEDIAPACKAGE_NOT_FOUND);
-    } else {
-      if (WorkflowUtil.isActive(optEvent.get().getWorkflowState())) {
-        errorExit("Workflow is running", mediaPackageId, ErrorStatus.WORKFLOW_ACTIVE);
-      }
+    final Event event = getEvent(mediaPackageId);
 
-      MediaPackage mediaPackage = null;
-      try {
-        mediaPackage = index.getEventMediapackage(optEvent.get());
-      } catch (IndexServiceException e) {
-        errorExit("Event not found", mediaPackageId, ErrorStatus.MEDIAPACKAGE_NOT_FOUND, e);
-      }
-      Smil smil = null;
-      try {
-        smil = createSmilCuttingCatalog(editingData, mediaPackage);
-      } catch (Exception e) {
-        errorExit("Unable to create SMIL cutting catalog", mediaPackageId,
-                ErrorStatus.UNABLE_TO_CREATE_CATALOG, e);
-      }
+    if (WorkflowUtil.isActive(event.getWorkflowState())) {
+      errorExit("Workflow is running", mediaPackageId, ErrorStatus.WORKFLOW_ACTIVE);
+    }
 
-      final Map<String, String> workflowProperties = new HashMap<String, String>();
-      for (TrackData track : editingData.getTracks()) {
-        MediaPackageElementFlavor flavor = track.getFlavor();
-        String type = null;
-        if (flavor != null) {
-          type = flavor.getType();
+    MediaPackage mediaPackage = getMediaPackage(event);
+    Smil smil = null;
+    try {
+      smil = createSmilCuttingCatalog(editingData, mediaPackage);
+    } catch (Exception e) {
+      errorExit("Unable to create SMIL cutting catalog", mediaPackageId, ErrorStatus.UNABLE_TO_CREATE_CATALOG, e);
+    }
+
+    final Map<String, String> workflowProperties = new HashMap<String, String>();
+    for (TrackData track : editingData.getTracks()) {
+      MediaPackageElementFlavor flavor = track.getFlavor();
+      String type = null;
+      if (flavor != null) {
+        type = flavor.getType();
+      } else {
+        Track mpTrack = mediaPackage.getTrack(track.getId());
+        if (mpTrack != null) {
+          type = mpTrack.getFlavor().getType();
         } else {
-          Track mpTrack = mediaPackage.getTrack(track.getId());
-          if (mpTrack != null) {
-            type = mpTrack.getFlavor().getType();
-          } else {
-            errorExit("Unable to determine track type", mediaPackageId, ErrorStatus.UNKNOWN);
-          }
+          errorExit("Unable to determine track type", mediaPackageId, ErrorStatus.UNKNOWN);
         }
-        workflowProperties.put("hide_" + type + "_audio", Boolean.toString(!track.getAudio().isEnabled()));
-        workflowProperties.put("hide_" + type + "_video", Boolean.toString(!track.getVideo().isEnabled()));
       }
-      WorkflowPropertiesUtil.storeProperties(assetManager, mediaPackage, workflowProperties);
+      workflowProperties.put("hide_" + type + "_audio", Boolean.toString(!track.getAudio().isEnabled()));
+      workflowProperties.put("hide_" + type + "_video", Boolean.toString(!track.getVideo().isEnabled()));
+    }
+    WorkflowPropertiesUtil.storeProperties(assetManager, mediaPackage, workflowProperties);
 
+    try {
+      addSmilToArchive(mediaPackage, smil);
+    } catch (IOException e) {
+      errorExit("Unable to add SMIL cutting catalog to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    if (editingData.getPostProcessingWorkflow() != null) {
+      final String workflowId = editingData.getPostProcessingWorkflow();
       try {
-        addSmilToArchive(mediaPackage, smil);
-      } catch (IOException e) {
-        errorExit("Unable to add SMIL cutting catalog to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
-      }
-
-      if (editingData.getPostProcessingWorkflow() != null) {
-        final String workflowId = editingData.getPostProcessingWorkflow();
-        try {
-          final Map<String, String> workflowParameters = WorkflowPropertiesUtil
-                  .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().toString());
-          final Workflows workflows = new Workflows(assetManager, workflowService);
-          workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
-                  ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId),
-                          workflowParameters)).run();
-        } catch (AssetManagerException e) {
-          errorExit("Unable to start workflow" + workflowId, mediaPackageId,
-                  ErrorStatus.WORKFLOW_ERROR, e);
-        } catch (WorkflowDatabaseException e) {
-          errorExit("Unable to load workflow" + workflowId, mediaPackageId,
-                  ErrorStatus.WORKFLOW_ERROR, e);
-        } catch (NotFoundException e) {
-          errorExit("Unable to load workflow" + workflowId, mediaPackageId,
-                  ErrorStatus.WORKFLOW_NOT_FOUND, e);
-        }
+        final Map<String, String> workflowParameters = WorkflowPropertiesUtil
+                .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().toString());
+        final Workflows workflows = new Workflows(assetManager, workflowService);
+        workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
+                ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters))
+                .run();
+      } catch (AssetManagerException e) {
+        errorExit("Unable to start workflow" + workflowId, mediaPackageId, ErrorStatus.WORKFLOW_ERROR, e);
+      } catch (WorkflowDatabaseException e) {
+        errorExit("Unable to load workflow" + workflowId, mediaPackageId, ErrorStatus.WORKFLOW_ERROR, e);
+      } catch (NotFoundException e) {
+        errorExit("Unable to load workflow" + workflowId, mediaPackageId, ErrorStatus.WORKFLOW_NOT_FOUND, e);
       }
     }
   }
 
+  @Override
+  public String getMetadata(String mediaPackageId) throws EditorServiceException {
+    final Event event = getEvent(mediaPackageId);
+    MediaPackage mediaPackage = getMediaPackage(event);
+    MetadataList metadataList = new MetadataList();
+    List<EventCatalogUIAdapter> catalogUIAdapters = index.getEventCatalogUIAdapters();
+    catalogUIAdapters.remove(index.getCommonEventCatalogUIAdapter());
+    for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
+      metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
+    }
+
+    DublinCoreMetadataCollection metadataCollection = null;
+    try {
+      metadataCollection = EventUtils.getEventMetadata(event,
+              index.getCommonEventCatalogUIAdapter());
+    } catch (Exception e) {
+      errorExit("Unable to retrieve event metadata", mediaPackageId, ErrorStatus.UNKNOWN);
+    }
+    metadataList.add(index.getCommonEventCatalogUIAdapter(), metadataCollection);
+
+    final String wfState = event.getWorkflowState();
+    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
+      metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
+    }
+
+    return MetadataJson.listToJson(metadataList, true).toString();
+  }
+
+  @Override
+  public void setMetadata(String mediaPackageId, String metadata) throws EditorServiceException {
+    try {
+      index.updateAllEventMetadata(mediaPackageId, metadata, searchIndex);
+    } catch (SearchIndexException | IndexServiceException | IllegalArgumentException e) {
+      errorExit("Event metadata can't be updated.", mediaPackageId, ErrorStatus.METADATA_UPDATE_FAIL, e);
+    } catch (NotFoundException e) {
+      errorExit("Event not found.", mediaPackageId, ErrorStatus.MEDIAPACKAGE_NOT_FOUND, e);
+    } catch (UnauthorizedException e) {
+      errorExit("Not authorized to update event metadata .", mediaPackageId, ErrorStatus.NOT_AUTHORIZED, e);
+    }
+  }
 
 }

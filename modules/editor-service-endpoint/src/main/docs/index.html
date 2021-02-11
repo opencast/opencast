@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Editor REST API</title>
+  <title>Video-Editor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta charset="UTF-8" />
@@ -976,8 +976,8 @@
                     <li data-group="Metadata" data-name="editorMediapackageIdMetadataJsonOptions" class="">
                       <a href="#api-Metadata-editorMediapackageIdMetadataJsonOptions">editorMediapackageIdMetadataJsonOptions</a>
                     </li>
-                    <li data-group="Metadata" data-name="editorMediapackageIdMetadataJsonPut" class="">
-                      <a href="#api-Metadata-editorMediapackageIdMetadataJsonPut">editorMediapackageIdMetadataJsonPut</a>
+                    <li data-group="Metadata" data-name="editorMediapackageIdMetadataJsonPost" class="">
+                      <a href="#api-Metadata-editorMediapackageIdMetadataJsonPost">editorMediapackageIdMetadataJsonPost</a>
                     </li>
           </ul>
         </nav>
@@ -2714,10 +2714,10 @@ except ApiException as e:
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Metadata-editorMediapackageIdMetadataJsonPut">
-                      <article id="api-Metadata-editorMediapackageIdMetadataJsonPut-0" data-group="User" data-name="editorMediapackageIdMetadataJsonPut" data-version="0">
+                    <div id="api-Metadata-editorMediapackageIdMetadataJsonPost">
+                      <article id="api-Metadata-editorMediapackageIdMetadataJsonPost-0" data-group="User" data-name="editorMediapackageIdMetadataJsonPost" data-version="0">
                         <div class="pull-left">
-                          <h1>editorMediapackageIdMetadataJsonPut</h1>
+                          <h1>editorMediapackageIdMetadataJsonPost</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -2726,31 +2726,31 @@ except ApiException as e:
                         <p class="marked"></p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="put"><code><span class="pln">/editor/{mediapackageId}/metadata.json</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/editor/{mediapackageId}/metadata.json</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPut-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Metadata-editorMediapackageIdMetadataJsonPost-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-curl">
-                           <pre class="prettyprint"><code class="language-bsh">curl -X PUT\
+                          <div class="tab-pane active" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X POST\
 -H "Accept: application/json"\
 "http://localhost:8080/editor/{mediapackageId}/metadata.json"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-java">
+                          <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -2766,17 +2766,17 @@ public class MetadataApiExample {
         MetadataApi apiInstance = new MetadataApi();
         String mediapackageId = mediapackageId_example; // String | ID of the mediapackage
         try {
-            Object result = apiInstance.editorMediapackageIdMetadataJsonPut(mediapackageId);
+            Object result = apiInstance.editorMediapackageIdMetadataJsonPost(mediapackageId);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling MetadataApi#editorMediapackageIdMetadataJsonPut");
+            System.err.println("Exception when calling MetadataApi#editorMediapackageIdMetadataJsonPost");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-android">
+                          <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.MetadataApi;
 
 public class MetadataApiExample {
@@ -2785,25 +2785,25 @@ public class MetadataApiExample {
         MetadataApi apiInstance = new MetadataApi();
         String mediapackageId = mediapackageId_example; // String | ID of the mediapackage
         try {
-            Object result = apiInstance.editorMediapackageIdMetadataJsonPut(mediapackageId);
+            Object result = apiInstance.editorMediapackageIdMetadataJsonPost(mediapackageId);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling MetadataApi#editorMediapackageIdMetadataJsonPut");
+            System.err.println("Exception when calling MetadataApi#editorMediapackageIdMetadataJsonPost");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-groovy">
+  <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-objc">
+                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">String *mediapackageId = mediapackageId_example; // ID of the mediapackage
 
 MetadataApi *apiInstance = [[MetadataApi alloc] init];
 
-[apiInstance editorMediapackageIdMetadataJsonPutWith:mediapackageId
+[apiInstance editorMediapackageIdMetadataJsonPostWith:mediapackageId
               completionHandler: ^(Object output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -2815,7 +2815,7 @@ MetadataApi *apiInstance = [[MetadataApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-javascript">
+                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var VideoEditor = require('video_editor');
 
 var api = new VideoEditor.MetadataApi()
@@ -2828,14 +2828,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.editorMediapackageIdMetadataJsonPut(mediapackageId, callback);
+api.editorMediapackageIdMetadataJsonPost(mediapackageId, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-angular">
+                            <!--<div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-csharp">
+                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -2844,7 +2844,7 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class editorMediapackageIdMetadataJsonPutExample
+    public class editorMediapackageIdMetadataJsonPostExample
     {
         public void main()
         {
@@ -2854,12 +2854,12 @@ namespace Example
 
             try
             {
-                Object result = apiInstance.editorMediapackageIdMetadataJsonPut(mediapackageId);
+                Object result = apiInstance.editorMediapackageIdMetadataJsonPost(mediapackageId);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling MetadataApi.editorMediapackageIdMetadataJsonPut: " + e.Message );
+                Debug.Print("Exception when calling MetadataApi.editorMediapackageIdMetadataJsonPost: " + e.Message );
             }
         }
     }
@@ -2867,7 +2867,7 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-php">
+                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
@@ -2875,15 +2875,15 @@ $api_instance = new Swagger\Client\ApiMetadataApi();
 $mediapackageId = mediapackageId_example; // String | ID of the mediapackage
 
 try {
-    $result = $api_instance->editorMediapackageIdMetadataJsonPut($mediapackageId);
+    $result = $api_instance->editorMediapackageIdMetadataJsonPost($mediapackageId);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling MetadataApi->editorMediapackageIdMetadataJsonPut: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling MetadataApi->editorMediapackageIdMetadataJsonPost: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-perl">
+                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::MetadataApi;
@@ -2892,15 +2892,15 @@ my $api_instance = WWW::SwaggerClient::MetadataApi->new();
 my $mediapackageId = mediapackageId_example; # String | ID of the mediapackage
 
 eval { 
-    my $result = $api_instance->editorMediapackageIdMetadataJsonPut(mediapackageId => $mediapackageId);
+    my $result = $api_instance->editorMediapackageIdMetadataJsonPost(mediapackageId => $mediapackageId);
     print Dumper($result);
 };
 if ($@) {
-    warn "Exception when calling MetadataApi->editorMediapackageIdMetadataJsonPut: $@\n";
+    warn "Exception when calling MetadataApi->editorMediapackageIdMetadataJsonPost: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPut-0-python">
+                            <div class="tab-pane" id="examples-Metadata-editorMediapackageIdMetadataJsonPost-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -2912,10 +2912,10 @@ api_instance = swagger_client.MetadataApi()
 mediapackageId = mediapackageId_example # String | ID of the mediapackage
 
 try: 
-    api_response = api_instance.editor_mediapackage_id_metadata_json_put(mediapackageId)
+    api_response = api_instance.editor_mediapackage_id_metadata_json_post(mediapackageId)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling MetadataApi->editorMediapackageIdMetadataJsonPut: %s\n" % e)</code></pre>
+    print("Exception when calling MetadataApi->editorMediapackageIdMetadataJsonPost: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
@@ -2931,7 +2931,7 @@ except ApiException as e:
                                   <td>
                                   
                                   
-                                      <div id="d2e199_editorMediapackageIdMetadataJsonPut_mediapackageId">
+                                      <div id="d2e199_editorMediapackageIdMetadataJsonPost_mediapackageId">
                                           <div class="json-schema-view">
                                               <div class="primitive">
                                                   <span class="type">
@@ -2960,17 +2960,17 @@ except ApiException as e:
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-editorMediapackageIdMetadataJsonPut-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-editorMediapackageIdMetadataJsonPost-200-schema">Schema</a>
                                 </li>
 
                                 <li class="">
-                                  <a data-toggle="tab" href="#responses-editorMediapackageIdMetadataJsonPut-200-headers">Headers</a>
+                                  <a data-toggle="tab" href="#responses-editorMediapackageIdMetadataJsonPost-200-headers">Headers</a>
                                 </li>
                             </ul>
 
                             <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-editorMediapackageIdMetadataJsonPut-200-schema">
-                                  <div id='responses-editorMediapackageIdMetadataJsonPut-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                <div class="tab-pane active" id="responses-editorMediapackageIdMetadataJsonPost-200-schema">
+                                  <div id='responses-editorMediapackageIdMetadataJsonPost-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
@@ -3172,16 +3172,16 @@ except ApiException as e:
 
                                         //console.log(JSON.stringify(schema));
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-editorMediapackageIdMetadataJsonPut-200-schema-data').val(stringify(schema));
-                                        var result = $('#responses-editorMediapackageIdMetadataJsonPut-200-schema-200');
+                                        $('#responses-editorMediapackageIdMetadataJsonPost-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-editorMediapackageIdMetadataJsonPost-200-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-editorMediapackageIdMetadataJsonPut-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-editorMediapackageIdMetadataJsonPost-200-schema-data' type='hidden' value=''></input>
                                 </div>
-                                <div class="tab-pane" id="responses-editorMediapackageIdMetadataJsonPut-200-headers">
+                                <div class="tab-pane" id="responses-editorMediapackageIdMetadataJsonPost-200-headers">
                                     <table>
                                         <tr>
                                             <th width="150px">Name</th>
@@ -4313,7 +4313,7 @@ except ApiException as e:
   
       _classCallCheck(this, JSONSchemaView);
   
-      this.schema = schema; //console.log(schema);
+      this.schema = schema;
       this.open = open;
       this.options = options;
       this.isCollapsed = open <= 0;
@@ -4326,7 +4326,7 @@ except ApiException as e:
       // Determine if a schema is an array
       this.isArray = !this.isAny && this.schema && this.schema.type === 'array';
   
-      this.isObject = this.schema && (this.schema.type === 'object' || this.schema.properties || this.schema.anyOf || this.schema.oneof || this.schema.allOf);
+      this.isObject = this.schema && (this.schema.type === 'object' || this.schema.properties || this.schema.allOf);
   
       // Determine if a schema is a primitive
       this.isPrimitive = !this.isAny && !this.isArray && !this.isObject;

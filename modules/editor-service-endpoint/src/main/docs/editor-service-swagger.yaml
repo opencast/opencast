@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Editor REST API
+  title: Video-Editor
   description: API for the new Opencast Video Editor
   version: '1.0'
 servers:
@@ -472,7 +472,7 @@ paths:
             type: string
           required: true
           description: ID of the mediapackage 
-    put:
+    post:
       tags:
         - metadata
       responses:
