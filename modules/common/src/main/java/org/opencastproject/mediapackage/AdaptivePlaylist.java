@@ -59,6 +59,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * HLS-VOD
@@ -139,10 +140,12 @@ public interface AdaptivePlaylist extends Track {
   static boolean checkForMaster(File file) throws IOException {
     if (!isPlaylist(file))
       return false;
-    Optional<Matcher> m = Files.lines(file.toPath()).map(masterPatt::matcher).filter(Matcher::find).findFirst();
-    if (m.isPresent()) {
-      m = null;
-      return true;
+    try (Stream<String> lines = Files.lines(file.toPath())) {
+      Optional<Matcher> m = lines.map(masterPatt::matcher).filter(Matcher::find).findFirst();
+      if (m.isPresent()) {
+        m = null;
+        return true;
+      }
     }
     return false;
   }
@@ -159,10 +162,12 @@ public interface AdaptivePlaylist extends Track {
   static boolean checkForVariant(File file) throws IOException {
     if (!isPlaylist(file))
       return false;
-    Optional<Matcher> m = Files.lines(file.toPath()).map(variantPatt::matcher).filter(Matcher::find).findFirst();
-    if (m.isPresent()) {
-      m = null;
-      return true;
+    try (Stream<String> lines = Files.lines(file.toPath())) {
+      Optional<Matcher> m = lines.map(variantPatt::matcher).filter(Matcher::find).findFirst();
+      if (m.isPresent()) {
+        m = null;
+        return true;
+      }
     }
     return false;
   }
