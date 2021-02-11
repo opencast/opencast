@@ -172,7 +172,7 @@ public final class SmilUtil {
 
   public static SMILDocument getSmilDocumentFromMediaPackage(MediaPackage mp, MediaPackageElementFlavor smilFlavor,
       Workspace workspace)
-      throws IOException, SAXException, NotFoundException {
+          throws IOException, SAXException, NotFoundException {
     final AbstractMediaPackageElementSelector<Catalog> smilSelector = new CatalogSelector();
     smilSelector.addFlavor(smilFlavor);
     final Collection<Catalog> smilCatalog = smilSelector.select(mp, false);
@@ -186,7 +186,7 @@ public final class SmilUtil {
 
   /** Get the SMIL document from a catalog. */
   private static SMILDocument getSmilDocument(final Catalog smilCatalog, Workspace workspace) throws NotFoundException,
-      IOException, SAXException {
+          IOException, SAXException {
     FileInputStream in = null;
     try {
       File smilXmlFile = workspace.get(smilCatalog.getURI());

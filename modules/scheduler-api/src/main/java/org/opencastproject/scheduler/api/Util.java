@@ -65,7 +65,8 @@ public final class Util {
   public static void adjustRrule(final RRule rRule, final Date start, final TimeZone tz) {
     final Recur recur = rRule.getRecur();
     if (recur.getHourList().size() != 1 || recur.getMinuteList().size() != 1) {
-      throw new IllegalArgumentException("RRules with multiple hours/minutes are not supported by Opencast. " + recur.toString());
+      throw new IllegalArgumentException(
+          "RRules with multiple hours/minutes are not supported by Opencast. " + recur.toString());
     }
     final ZonedDateTime adjustedDate = ZonedDateTime.ofInstant(start.toInstant(), ZoneOffset.UTC)
             .withHour(recur.getHourList().get(0))
@@ -104,14 +105,15 @@ public final class Util {
    * @param tz, the timezone of the scheduled CA
    * @return a list of event Periods that match the rule and start and end times
    */
-  public static List<Period> calculatePeriods(Calendar startCalTz, Calendar endCalTz, long duration, Recur recur, TimeZone tz) {
+  public static List<Period> calculatePeriods(
+      Calendar startCalTz, Calendar endCalTz, long duration, Recur recur, TimeZone tz) {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
     simpleDateFormat.setTimeZone(tz);
     String tzStr = tz.getID();
     List<Period> event = new LinkedList<>();
     logger.debug("Inbound start of recurrence {} to end of recurrence {}, in Tz {}",
-            simpleDateFormat.format(startCalTz.getTime()),
-            simpleDateFormat.format(endCalTz.getTime()), tzStr);
+        simpleDateFormat.format(startCalTz.getTime()),
+        simpleDateFormat.format(endCalTz.getTime()), tzStr);
 
     DateTime periodStart = new DateTime(startCalTz.getTime());
     logger.debug("ical4j timeZone for {} is {}", tzStr, registry.getTimeZone(tzStr).toZoneId());
@@ -121,8 +123,8 @@ public final class Util {
 
     logger.trace("is utc {}? Tz is {} ", periodStart.isUtc(), periodStart.getTimeZone().toZoneId());
     logger.debug("({}) Looking at recurrences for {} to {}, duration {}, {}", periodStart.getTimeZone().toZoneId(),
-            simpleDateFormat.format(new Date(periodStart.getTime())),
-            simpleDateFormat.format(new Date(periodEnd.getTime())), duration, recur.toString());
+        simpleDateFormat.format(new Date(periodStart.getTime())),
+        simpleDateFormat.format(new Date(periodEnd.getTime())), duration, recur.toString());
 
     DateList dates = recur.getDates(periodStart, periodEnd, DATE_TIME);
     logger.trace("Got {} dates: {}, tz '{}'", dates.size(), dates.toString(), dates.getTimeZone().toZoneId());
@@ -138,7 +140,10 @@ public final class Util {
       Calendar cal = Calendar.getInstance(e.getStart().getTimeZone());
       cal.setTimeInMillis(e.getStart().getTime());
       logger.debug("EventList start {} Instance {}, calendar hour {}, zone {}",
-              e.getStart().toString(), simpleDateFormat.format(cal.getTime()), cal.get(Calendar.HOUR_OF_DAY), e.getStart().getTimeZone().toZoneId());
+          e.getStart().toString(),
+          simpleDateFormat.format(cal.getTime()),
+          cal.get(Calendar.HOUR_OF_DAY),
+          e.getStart().getTimeZone().toZoneId());
     }
     return event;
   }
@@ -151,11 +156,12 @@ public final class Util {
    * @param end2 end of second interval
    * @return <code>true</code> if they overlap, <code>false</code> if they don't
    */
-  public static boolean schedulingIntervalsOverlap(final Date start1, final Date end1, final Date start2, final Date end2) {
+  public static boolean schedulingIntervalsOverlap(
+      final Date start1, final Date end1, final Date start2, final Date end2) {
     return (start1.after(start2) && start1.before(end2)
-            || end1.after(start2) && end1.before(end2)
-            || start1.before(start2) && end1.after(end2)
-            || eventWithinMinimumSeparation(start1, end1, start2, end2));
+        || end1.after(start2) && end1.before(end2)
+        || start1.before(start2) && end1.after(end2)
+        || eventWithinMinimumSeparation(start1, end1, start2, end2));
   }
 
   /**
@@ -164,8 +170,8 @@ public final class Util {
    */
   private static boolean eventWithinMinimumSeparation(Date checkStart, Date checkEnd, Date start, Date end) {
     return Math.abs(checkStart.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
-            || Math.abs(checkStart.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
-            || Math.abs(checkEnd.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
-            || Math.abs(checkEnd.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS;
+        || Math.abs(checkStart.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkEnd.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkEnd.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS;
   }
 }

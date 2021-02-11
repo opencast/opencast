@@ -24,6 +24,11 @@
     <property name="max" value="120"/>
   </module>
 
+  <!-- Allow to disable checkstyle for sections of the code with `// CHECKSTYLE:OFF`
+       and `// CHECKSTYLE:ON`. Unlike `SuppressionCommentFilter` below, this
+       also works for checks not in "TreeWalker" -->
+  <module name="SuppressWithPlainTextCommentFilter"/>
+
   <!-- Checks whether files end with a new line.                        -->
   <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
   <module name="NewlineAtEndOfFile">

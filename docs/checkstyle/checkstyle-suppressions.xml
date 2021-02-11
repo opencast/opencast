@@ -10,7 +10,6 @@
     <suppress checks="LineLength" files="modules/asset-manager-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/asset-manager-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/asset-manager-storage-aws/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/authorization-manager/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/authorization-xacml/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/capture-admin-service-impl/.+\.(java|properties)"/>
@@ -21,9 +20,6 @@
     <suppress checks="LineLength" files="modules/composer-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/cover-image-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/crop-ffmpeg/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/crop-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-aws-s3/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-download/.+\.(java|properties)"/>
@@ -59,7 +55,6 @@
     <suppress checks="LineLength" files="modules/publication-service-oaipmh-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/publication-service-youtube-v3/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/runtime-info/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/scheduler-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
@@ -83,7 +78,6 @@
     <suppress checks="LineLength" files="modules/statistics-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-aws/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/textanalyzer-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/textanalyzer-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/themes/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/themes-workflowoperation/.+\.(java|properties)"/>
@@ -130,7 +124,6 @@
     <suppress checks="Indentation" files="modules/asset-manager-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/asset-manager-storage-aws/.+\.java"/>
     <suppress checks="Indentation" files="modules/asset-manager-storage-fs/.+\.java"/>
-    <suppress checks="Indentation" files="modules/authorization-manager/.+\.java"/>
     <suppress checks="Indentation" files="modules/authorization-xacml/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/common/.+\.java"/>
@@ -138,16 +131,9 @@
     <suppress checks="Indentation" files="modules/composer-ffmpeg/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-workflowoperation/.+\.java"/>
-    <suppress checks="Indentation" files="modules/crop-api/.+\.java"/>
-    <suppress checks="Indentation" files="modules/crop-ffmpeg/.+\.java"/>
-    <suppress checks="Indentation" files="modules/db/.+\.java"/>
-    <suppress checks="Indentation" files="modules/dictionary-hunspell/.+\.java"/>
-    <suppress checks="Indentation" files="modules/dictionary-regexp/.+\.java"/>
     <suppress checks="Indentation" files="modules/distribution-service-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/distribution-service-aws-s3/.+\.java"/>
-    <suppress checks="Indentation" files="modules/distribution-service-aws-s3-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/distribution-service-download/.+\.java"/>
-    <suppress checks="Indentation" files="modules/distribution-service-streaming-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/distribution-service-streaming-wowza/.+\.java"/>
     <suppress checks="Indentation" files="modules/distribution-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/dublincore/.+\.java"/>
@@ -183,7 +169,6 @@
     <suppress checks="Indentation" files="modules/publication-service-oaipmh/.+\.java"/>
     <suppress checks="Indentation" files="modules/publication-service-youtube-v3/.+\.java"/>
     <suppress checks="Indentation" files="modules/runtime-info/.+\.java"/>
-    <suppress checks="Indentation" files="modules/scheduler-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/search-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/security-aai/.+\.java"/>
@@ -191,13 +176,10 @@
     <suppress checks="Indentation" files="modules/series-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="Indentation" files="modules/silencedetection-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/smil-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/smil-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/static-file-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-export-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-service-api/.+\.java"/>
-    <suppress checks="Indentation" files="modules/textanalyzer-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/textextractor-tesseract/.+\.java"/>
     <suppress checks="Indentation" files="modules/timelinepreviews-ffmpeg/.+\.java"/>
     <suppress checks="Indentation" files="modules/timelinepreviews-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-amberscript/.+\.java"/>
@@ -221,13 +203,11 @@
     <suppress checks="Indentation" files="modules/workspace-impl/.+\.java"/>
 
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/admin-ui/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/adopter-statistics-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/annotation-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/asset-manager-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/asset-manager-storage-aws/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/asset-manager-storage-fs/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/asset-manager-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/authorization-manager/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/authorization-xacml/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/caption-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/capture-admin-service-impl/.+\.java"/>
@@ -237,11 +217,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-service-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-service-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/conductor/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/cover-image-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/cover-image-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/crop-api/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/db/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/distribution-service-aws-s3/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/distribution-service-download/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/distribution-service-streaming-wowza/.+\.java"/>
@@ -290,9 +265,7 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/textanalyzer-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/textanalyzer-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/textextractor-tesseract/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/themes-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/themes/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/timelinepreviews-ffmpeg/.+\.java"/>
