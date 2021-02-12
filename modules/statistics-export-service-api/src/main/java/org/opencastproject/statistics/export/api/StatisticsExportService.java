@@ -62,7 +62,7 @@ public interface StatisticsExportService {
    */
   String getCSV(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution dataResolution,
                 AbstractSearchIndex index, ZoneId zoneId) throws SearchIndexException, UnauthorizedException,
-      NotFoundException;
+          NotFoundException;
 
   /**
    * Get a CSV representation for the query result based on the given parameters.
@@ -98,7 +98,7 @@ public interface StatisticsExportService {
    *           If the resource identified by resourceId could not be found.
    */
   String getCSV(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution dataResolution,
-          AbstractSearchIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel, int limit, int offset,
-          Map<String, String> filters)
+          AbstractSearchIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel, int limit,
+          int offset, Map<String, String> filters)
           throws SearchIndexException, UnauthorizedException, NotFoundException;
 }

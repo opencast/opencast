@@ -34,7 +34,7 @@ this repository are explained later in this guide.
   which will show up on the project's list of open pull requests.
 
 
-### Accepting Criteria for Patches in Different Versions
+### Acceptance Criteria for Patches in Different Versions
 
 Updates between minor versions should be as smooth as possible and should usually not need manual intervention.
 That is why patches may only be accepted into releases branches (`r/?.x`) if they meet the following criteria:
@@ -59,8 +59,6 @@ conflicts, that it works as expected and that it does not break anything else.
 If the reviewer discovers any kind of issue, he should comment on the pull request in GitHub, so that the author can
 fix the problem.
 
-For more details about the review and merge process, have a look at [Reviewing, Merging and Declining Pull
-Requests](reviewing-and-merging.md).
 
 #### Pull Request Guidelines
 
@@ -78,6 +76,13 @@ of what work has been done. To this end, there are a few expectations for all pu
 * The commands `mvn clean install`, `mvn javadoc:javadoc javadoc:aggregate`, and `mvn site` should all succeed
 * The licenses of any external libraries used in the pull request comply with the [licensing rules](license.md) both
   in terms of the license itself as well as its listing in NOTICES
+
+Some changes require special attention:
+
+Folder                         | Description
+:------------------------------|------------
+etc/listproviders              | Changes here might need to be reflected in the static mockup data for the Admin UI facade found in modules/admin-ui/src/test/resources/app/admin-ng/resources
+modules/admin-ui/src/main/java | In case the interface of the Admin UI facade changes, those changes need to be also reflected in the static mockup data for the Admin UI facade found in modules/admin-ui/src/test/resources/app.
 
 While a committer may accept a patch even if it does not meet these expectations, it is encouraged that anyone filing
 a pull request ensures that they meet these expectations.

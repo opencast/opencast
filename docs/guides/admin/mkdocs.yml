@@ -58,6 +58,7 @@ nav:
       - Using Apache httpd: configuration/https/apache-httpd.md
       - Internal HTTPS: 'configuration/https/opencast.only.md'
       - Migrating old content to HTTPS: 'configuration/https/migration.md'
+      - Self-Signed Certificates: 'configuration/https/self-signed-certificates.md'
    - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
@@ -165,6 +166,7 @@ nav:
    - Clone: 'workflowoperationhandlers/clone-woh.md'
    - Cover Image: 'workflowoperationhandlers/coverimage-woh.md'
    - Crop Video: 'workflowoperationhandlers/cropvideo-woh.md'
+   - Cut Marks To Smil: 'workflowoperationhandlers/cut-marks-to-smil-woh.md'
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
    - Demux: 'workflowoperationhandlers/demux-woh.md'
    - Duplicate Event: 'workflowoperationhandlers/duplicate-event-woh.md'

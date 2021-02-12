@@ -76,10 +76,11 @@ public final class JsonConv {
                p(KEY_ALLOW, ace.isAllow()));
   }
 
-  public static final Function<AccessControlEntry, Val> fullAccessControlEntry = new Function<AccessControlEntry, Val>() {
-    @Override public Val apply(AccessControlEntry ace) {
-      return full(ace);
-    }
-  };
-
+  public static final Function<AccessControlEntry, Val> fullAccessControlEntry
+      = new Function<AccessControlEntry, Val>() {
+        @Override
+        public Val apply(AccessControlEntry ace) {
+          return full(ace);
+        }
+      };
 }

@@ -1,0 +1,1 @@
+- [#1938](https://github.com/opencast/opencast/pull/1938): Move streaming directory config to Wowza config

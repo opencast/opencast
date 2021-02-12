@@ -7,13 +7,33 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 1. Stop your current Opencast instance
 2. Replace Opencast with the new version
 3. Back-up Opencast files and database (optional)
-4. Upgrade the database
-5. [Install and configure a standalone Elasticsearch node](#install-and-confifure-a-standalone-elasticsearch-node)
+4. [Upgrade the database](#database-migration)
+5. [Install and configure a standalone Elasticsearch node](#install-and-configure-a-standalone-elasticsearch-node)
 6. [Review the configuration changes and adjust your configuration accordingly](#configuration-changes)
 7. Remove search index data folder
 8. Start Opencast
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 10. [Check passwords](#check-passwords)
+11. Static file delivery
+
+
+
+Database Migration
+------------------
+
+There are two parts to the Opencast 9 database migration:
+
+- Two database tables become unnecessary with Opencast 9 and can be dropped.
+  Opencast provides database upgrade script which include all necessary SQL commands.
+  You will find them in
+  [`docs/upgrade/8_to_9/`](https://github.com/opencast/opencast/blob/develop/docs/upgrade/8_to_9/mysql5.sql).
+  This script is suitable for both, MariaDB and MySQL.
+
+- Opencast no longer needs scripts to manually create the database structure.
+  This will now happen automatically and Opencast 9 will create a new table on its first run.
+  This means that Opencast's database user now needs additional priviledges.
+  Please consult the [database configuration guide](configuration/database.md) for more details.
+
 
 Configuration Changes
 ---------------------
@@ -29,18 +49,20 @@ Please make sure to compare your configuration against the current configuration
   the variables passed into the Mustache ACL template have changed. For more information, see
   [this document](https://github.com/elan-ev/opencast-studio/blob/2020-09-14/CONFIGURATION.md).
 
+
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------
 
-In the past, Opencast came with its own integrated Elasticsearch node. However, recent versions of Elasticsearch no longer
-support to be embedded in applications. Since the Elasticsearch client was updated to version 7, Opencast now requires an
-external Elasticsearch node of the same version to be present. This means, that all Opencast adopters now have to run
-Elasticsearch.
+Although Opencast has come with its own integrated Elasticsearch node in the past, recent versions of Elasticsearch no
+longer support being embedded in applications. Since the Elasticsearch client was updated to version 7, Opencast requires
+an external Elasticsearch node of the same version to be present. This means all Opencast adopters now have to run
+Elasticsearch as a service.
 
 Please check [the installation guides](installation/index.md) for information about how to setup Elasticsearch.
 
 If you already used an external Elasticsearch node in the past, please update your node to version 7. Since the index
-schema has changed, you will need to drop you indices and [rebuild them](#rebuild-the-elasticsearch-indexes).
+schema has changed, you will need to drop your indices and [rebuild them](#rebuild-the-elasticsearch-indexes).
+
 
 Rebuild the Elasticsearch Indexes
 ----------------------------------
@@ -89,3 +111,16 @@ but to benefit from this mechanism, users have to reset their password.
 
 You can use the endpoint `/user-utils/users/md5.json` to find out which users are still using MD5-hashed passwords and
 suggest to them that they update their passwords.
+
+
+Static File Delivery
+--------------------
+
+Opencast 9.2 came with a [completely new system for securing static file content](configuration/serving-static-files.md)
+which is now active by default in Opencast 10. If you are deferring the file access authorization to another system
+using Opencast's [security token mechanism](configuration/stream-security.md), you need to deactivate this protection
+in:
+
+```
+etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
+```

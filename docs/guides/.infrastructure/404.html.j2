@@ -6,7 +6,7 @@
     <script type="text/javascript">
       // Redirect if URL links to stable
       if (window.location.pathname.startsWith('/stable/')) {
-        window.location.pathname = window.location.pathname.replace(/^\/stable\//, '/{{ stable_branch }}/')
+        window.location.replace(window.location.pathname.replace(/^\/stable\//, '/{{ stable_branch }}/'));
       }
     </script>
   </head>

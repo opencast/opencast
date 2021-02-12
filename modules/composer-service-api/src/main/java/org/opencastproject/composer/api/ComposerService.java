@@ -218,7 +218,7 @@ public interface ComposerService {
    *           if the mediapackage is invalid
    */
   List<Attachment> imageSync(Track sourceTrack, String profileId, double... time) throws EncoderException,
-      MediaPackageException;
+          MediaPackageException;
 
   /**
    * Extracts an image from the media package element identified by <code>sourceTrack</code>. The image is taken by the

@@ -30,12 +30,6 @@ if ! grep -L '<Build-Number>${buildNumber}</Build-Number>' modules/*/pom.xml | w
   ret=1
 fi
 
-# maven-dependency-plugin should be active for all new modules
-grep -L maven-dependency-plugin modules/*/pom.xml > maven-dependency-plugin.list
-if ! diff -q maven-dependency-plugin.list docs/checkstyle/maven-dependency-plugin.exceptions; then
-  ret=1
-fi
-
 cd docs/guides
 
 for docs in admin developer; do

@@ -102,7 +102,7 @@ whole chain between the root certificate, all intermediates and the
 certificate itself.
 
 
-### Obtaining the certificate chain
+### Step 1: Obtaining the certificate chain
 
 If you only have the key and the certificate, I recommend
 [certificatechain.io](https://certificatechain.io/) or
@@ -119,7 +119,7 @@ cert-chain-resolver -s -o "opencast.chain.pem.tmp" "cert.pem"
 openssl verify -crl_download -crl_check -untrusted "opencast.chain.pem.tmp" "cert.pem"
 ```
 
-### Create the p12 keystore
+### Step 2: Create the p12 keystore
 
 If the private key (assumed to be `key.pem`) is encrypted
 (password protected), issue the following command. Note that there
@@ -149,7 +149,7 @@ openssl pkcs12 \
 ```
 
 
-### Import the p12 keystore into a Java keystore:
+### Step 3: Import the p12 keystore into a Java keystore:
 
 ```bash
 keytool \

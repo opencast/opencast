@@ -1,11 +1,14 @@
-EmailWorkflowOperation
-======================
+Send Email Workflow Operation
+=============================
+
+ID: `send-email`
 
 Description
 -----------
 
-The EmailWorkflowOperationHandler invokes the SMTP Service to send an email with the parameters provided. It is useful
-to send email notifications when some operation(s) have been completed or some error(s) have occurred in a workflow.
+The send-email operation invokes the SMTP Service to send an email with the parameters provided.
+It is useful to send email notifications when some operation(s) have been completed or some error(s) have occurred in a
+workflow.
 
 The email body, if not specified by body or body-template-file, will consist of a single line of the form:
 `<Recording Title> (<Mediapackage ID>)`.
@@ -58,12 +61,19 @@ Use `${mediaPackage.FIELD}`
 
 Use `${workflow.FIELD}`
 
-#### Examples
+|Field                    |How To Get It             |
+|-------------------------|--------------------------|
+|workflow id              |${workflow.id}            |
+|workflow template id     |${workflow.template}      |
+|workflow state           |${workflow.state}         |
+|workflow title           |${workflow.title}         |
+|workflow description     |${workflow.description}   |
+|id of parent workflow    |${workflow.parentId}      |
+|name of workflow creator |${workflow.creatorName}   |
+|workflow organization    |${workflow.organizationId}|
 
-|Field        |How To Get It       |
-|-------------|--------------------|
-|workflow id  |${workflow.id}      |
-|workflow name|${workflow.template}|
+Note that some of these values may not exist depending on the workflow.
+
 
 ### Workflow Configuration Properties
 
@@ -315,4 +325,22 @@ The user name is stored in the episode dublin core `contributor` field. There's 
         scheme=W3C-DTF;</dcterms:temporal>
     <dcterms:title>Test Lecture</dcterms:title>
 </dublincore>
+```
+
+
+### Example 6
+
+Send an email to the user which started the workflow.
+Requires the user account to have a valid email address.
+
+```xml
+<operation
+    id="send-email"
+    description="Sending email to user after media package is published">
+  <configurations>
+    <!-- Lookup email address of the creator -->
+    <configuration key="to">${workflow.creatorName}</configuration>
+    <configuration key="subject">${mediaPackage.title} has been published</configuration>
+  </configurations>
+</operation>
 ```
