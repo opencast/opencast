@@ -39,7 +39,7 @@ class TranslatedJobList extends React.Component<JobListProps, JobListState> {
     componentDidMount() {
         this.retrieveJobs();
 
-        const timerMillis = 1000;
+        const timerMillis = 30000;
         /* eslint react/no-did-mount-set-state: "off" */
         this.setState({
             ...this.state,
