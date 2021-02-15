@@ -134,8 +134,8 @@ allow a simpler specification of cutting information for the video editor. This 
 Some problems with the new adopter registration and update reporting have been resolved. If you stumbled over these
 before, this is the release to try again.
 
-A [security problem](https://github.com/opencast/opencast/security/advisories/GHSA-vpc2-3wcv-qj4w) where chaning access rights to an individual video lead to
-cooresponding changes to its entire series was fixed.
+A [security problem](https://github.com/opencast/opencast/security/advisories/GHSA-vpc2-3wcv-qj4w) where chaning access
+ights to an individual video lead to cooresponding changes to its entire series was fixed.
 
 
 Additional Notes about 9.1
