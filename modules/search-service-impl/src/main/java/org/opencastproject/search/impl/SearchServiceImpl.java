@@ -360,7 +360,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           UnauthorizedException, ServiceRegistryException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Add.toString(),
-              Arrays.asList(MediaPackageParser.getAsXml(mediaPackage)), addJobLoad);
+          Collections.singletonList(MediaPackageParser.getAsXml(mediaPackage)), addJobLoad);
     } catch (ServiceRegistryException e) {
       throw new SearchException(e);
     }
@@ -373,28 +373,32 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    *          the media package
    * @throws SearchException
    *           if the media package cannot be added to the search index
-   * @throws MediaPackageException
-   *           if the mediapckage is invalid
    * @throws IllegalArgumentException
    *           if the mediapackage is <code>null</code>
    * @throws UnauthorizedException
    *           if the user does not have the rights to add the mediapackage
    */
-  public void addSynchronously(MediaPackage mediaPackage) throws SearchException, MediaPackageException,
-          IllegalArgumentException, UnauthorizedException {
+  public void addSynchronously(MediaPackage mediaPackage)
+      throws SearchException, IllegalArgumentException, UnauthorizedException, NotFoundException,
+      SearchServiceDatabaseException {
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Unable to add a null mediapackage");
     }
-    logger.debug("Attempting to add mediapackage {} to search index", mediaPackage.getIdentifier());
+    final String mediaPackageId = mediaPackage.getIdentifier().toString();
+    logger.debug("Attempting to add media package {} to search index", mediaPackageId);
     AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
+
+    AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId).stream()
+        .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
+    logger.debug("Updating series with merged access control list: {}", seriesAcl);
 
     Date now = new Date();
 
     try {
-      if (indexManager.add(mediaPackage, acl, now)) {
-        logger.info("Added mediapackage `{}` to the search index, using ACL `{}`", mediaPackage, acl);
+      if (indexManager.add(mediaPackage, acl, seriesAcl, now)) {
+        logger.info("Added media package `{}` to the search index, using ACL `{}`", mediaPackageId, acl);
       } else {
-        logger.warn("Failed to add mediapackage {} to the search index", mediaPackage.getIdentifier());
+        logger.warn("Failed to add media package {} to the search index", mediaPackageId);
       }
     } catch (SolrServerException e) {
       throw new SearchException(e);
@@ -403,8 +407,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     try {
       persistence.storeMediaPackage(mediaPackage, acl, now);
     } catch (SearchServiceDatabaseException e) {
-      logger.error("Could not store media package to search database {}: {}", mediaPackage.getIdentifier(), e);
-      throw new SearchException(e);
+      throw new SearchException(
+          String.format("Could not store media package to search database %s", mediaPackageId), e);
     }
   }
 
@@ -429,23 +433,18 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @return <code>true</code> if the mediapackage was deleted
    * @throws SearchException
    *           if deletion failed
-   * @throws UnauthorizedException
-   *           if the user did not have access to the media package
-   * @throws NotFoundException
-   *           if the mediapackage did not exist
    */
-  public boolean deleteSynchronously(String mediaPackageId) throws SearchException, UnauthorizedException,
-          NotFoundException {
+  public boolean deleteSynchronously(final String mediaPackageId) throws SearchException {
     SearchResult result;
     try {
       result = solrRequester.getForWrite(new SearchQuery().withId(mediaPackageId));
       if (result.getItems().length == 0) {
-        logger.warn(
-                "Can not delete mediapackage {}, which is not available for the current user to delete from the search index.",
-                mediaPackageId);
+        logger.warn("Can not delete mediapackage {}, which is not available for the current user to delete from the "
+                    + "search index.", mediaPackageId);
         return false;
       }
-      logger.info("Removing mediapackage {} from search index", mediaPackageId);
+      final String seriesId = result.getItems()[0].getDcIsPartOf();
+      logger.info("Removing media package {} from search index", mediaPackageId);
 
       Date now = new Date();
       try {
@@ -453,15 +452,31 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         logger.info("Removed mediapackage {} from search persistence", mediaPackageId);
       } catch (NotFoundException e) {
         // even if mp not found in persistence, it might still exist in search index.
-        logger.info("Could not find mediapackage with id {} in persistence, but will try remove it from index, anyway.",
+        logger.info("Could not find mediapackage with id {} in persistence, but will try remove it from index anyway.",
                 mediaPackageId);
       } catch (SearchServiceDatabaseException e) {
-        logger.error("Could not delete media package with id {} from persistence storage", mediaPackageId);
-        throw new SearchException(e);
+        throw new SearchException(String.format("Could not delete mediapackage with id %s from persistence storage",
+            mediaPackageId), e);
       }
 
-      return indexManager.delete(mediaPackageId, now);
-    } catch (SolrServerException e) {
+      final boolean success = indexManager.delete(mediaPackageId, now);
+
+      // Update series
+      if (seriesId != null) {
+        if (persistence.getMediaPackages(seriesId).size() > 0) {
+          // Update series acl if there are still episodes in the series
+          final AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId).stream()
+              .reduce(new AccessControlList(), AccessControlList::mergeActions);
+          indexManager.addSeries(seriesId, seriesAcl);
+
+        } else {
+          // Remove series if there are no episodes in the series any longer
+          indexManager.delete(seriesId, now);
+        }
+      }
+
+      return success;
+    } catch (SolrServerException | SearchServiceDatabaseException e) {
       logger.info("Could not delete media package with id {} from search index", mediaPackageId);
       throw new SearchException(e);
     }

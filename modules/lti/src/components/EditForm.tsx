@@ -88,7 +88,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
             value={field.value}
             onChange={(e) => valueChange(field.id, e.currentTarget.value)} />;
 
-    if (field.collection !== undefined && field.type === "mixed_text")
+    if (field.collection !== undefined && field.type === "mixed_text") {
         return <CreatableSelect
             isMulti={true}
             isClearable={true}
@@ -98,7 +98,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
                 valueChange(
                     field.id,
                     value === undefined || value === null || !Array.isArray(value) ? [] : (value as OptionType[]).map((v) => v.value))} />;
-
+    }
     if (field.collection !== undefined) {
         const options: OptionType[] = collectionToOptions(field.collection, field.translatable, t);
         const currentValue = options.find((o: OptionType) => o.value === field.value);
