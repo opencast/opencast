@@ -46,6 +46,9 @@ Please make sure to compare your configuration against the current configuration
   now specified as a string in the TOML file and not as a separate file (usually `acl.xml`) anymore. Finally,
   the variables passed into the Mustache ACL template have changed. For more information, see
   [this document](https://github.com/elan-ev/opencast-studio/blob/2020-09-14/CONFIGURATION.md).
+- The configuration keys `source-tags` and `source-flavors` of the _publish-configure_ workflow operation were renamed
+  to `download-source-tags` and `download-source-flavors` respectively. If you use custom workflows, you may need to
+  adjust them accordingly.
 
 
 Install and configure a standalone Elasticsearch node
