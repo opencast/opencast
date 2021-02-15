@@ -852,10 +852,10 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       q.setText(text.toLowerCase());
     }
     if (StringUtils.isNotEmpty(seriesId)) {
-      q.setSeriesId(seriesId.toLowerCase());
+      q.setSeriesId(seriesId);
     }
     if (StringUtils.isNotEmpty(seriesTitle)) {
-      q.setSeriesTitle(seriesTitle.toLowerCase());
+      q.setSeriesTitle(seriesTitle);
     }
     if (StringUtils.isNotEmpty(creator)) {
       q.setCreator(creator.toLowerCase());
