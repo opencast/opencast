@@ -4,6 +4,89 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.2
+
+*Released on February 15th, 2021*
+
+- [[GHSA-vpc2-3wcv-qj4w#1](https://github.com/opencast/opencast-ghsa-vpc2-3wcv-qj4w/pull/1)] -
+  Fix Engage Series Publication and Access
+- [[#2309](https://github.com/opencast/opencast/pull/2309)] -
+  HTTPS / Port
+- [[#2300](https://github.com/opencast/opencast/pull/2300)] -
+  Add Mermaid to Documentation
+- [[#2299](https://github.com/opencast/opencast/pull/2299)] -
+  Fix Total Search Results
+- [[#2295](https://github.com/opencast/opencast/pull/2295)] -
+  Limit Incident Text ID Text
+- [[#2292](https://github.com/opencast/opencast/pull/2292)] -
+  Fix Adopter Registration Configuration
+- [[#2291](https://github.com/opencast/opencast/pull/2291)] -
+  Shorten Adopter Registration Primary Key
+- [[#2290](https://github.com/opencast/opencast/pull/2290)] -
+  Fix Exception if GitHub is Unreachable
+- [[#2281](https://github.com/opencast/opencast/pull/2281)] -
+  Admin UI says current OC version unsupported when it can't reach GitHub
+- [[#2275](https://github.com/opencast/opencast/pull/2275)] -
+  Fixed possible typo in database grants statement
+- [[#2274](https://github.com/opencast/opencast/pull/2274)] -
+  Fix checkstyle violations for 7 modules
+- [[#2273](https://github.com/opencast/opencast/pull/2273)] -
+  Fix checkstyle violations for 9 modules
+- [[#2270](https://github.com/opencast/opencast/pull/2270)] -
+  Fix checkstyle violations for `authorization-manager`
+- [[#2259](https://github.com/opencast/opencast/pull/2259)] -
+  Enforce indentation checkstyle
+- [[#2258](https://github.com/opencast/opencast/pull/2258)] -
+  Fix Series Details
+- [[#2257](https://github.com/opencast/opencast/pull/2257)] -
+  Add syncronization to the access of the not thread safe xml marshaller.
+- [[#2249](https://github.com/opencast/opencast/pull/2249)] -
+  Test documentation only if necessary
+- [[#2247](https://github.com/opencast/opencast/pull/2247)] -
+  LTI Tools Mock Data and UI Server
+- [[#2245](https://github.com/opencast/opencast/pull/2245)] -
+  Default to server localhost also for multi tenancy
+- [[#2244](https://github.com/opencast/opencast/pull/2244)] -
+  Fix NullPointerException when accessing series details
+- [[#2243](https://github.com/opencast/opencast/pull/2243)] -
+  Fix Feeds REST Docs
+- [[#2237](https://github.com/opencast/opencast/pull/2237)] -
+  Add checkstyle-enforced rule about bracing style (K&R style, braces are mandatory)
+- [[#2216](https://github.com/opencast/opencast/pull/2216)] -
+  Add checkstyle-enforced line length limit (with most modules being excluded for now)
+- [[#2203](https://github.com/opencast/opencast/pull/2203)] -
+  Improved Development Runtime Dependency Containers
+- [[#2198](https://github.com/opencast/opencast/pull/2198)] -
+  List Upload Tool on LTI Landing Page
+- [[#2188](https://github.com/opencast/opencast/pull/2188)] -
+  Inspect Media Size
+- [[#2186](https://github.com/opencast/opencast/pull/2186)] -
+  No Decoration on Section Links
+- [[#2185](https://github.com/opencast/opencast/pull/2185)] -
+  Copy to Clipboard Tooltip
+- [[#2181](https://github.com/opencast/opencast/pull/2181)] -
+  Fix LTI Tool Documentation
+- [[#2169](https://github.com/opencast/opencast/pull/2169)] -
+  Better Port Randomization
+- [[#2168](https://github.com/opencast/opencast/pull/2168)] -
+  Fixes the lti captions upload together with the default ingest workflow #2167
+- [[#2166](https://github.com/opencast/opencast/pull/2166)] -
+  Add Firewall Documentation
+- [[#2134](https://github.com/opencast/opencast/pull/2134)] -
+  Addressing (most of) the missing ES config documentation
+- [[#2106](https://github.com/opencast/opencast/pull/2106)] -
+  Attempt to detect invalid DB credentials
+- [[#2078](https://github.com/opencast/opencast/pull/2078)] -
+  Setting appropriate defaults for AWS S3 dist config, matching the docs
+- [[#2055](https://github.com/opencast/opencast/pull/2055)] -
+  Metrics Exporter
+- [[#2042](https://github.com/opencast/opencast/pull/2042)] -
+  More efficient retrieval of active jobs
+- [[#1686](https://github.com/opencast/opencast/pull/1686)] -
+  Workflow Operation "CutMarksToSmil"
+- [[#1017](https://github.com/opencast/opencast/pull/1017)] -
+  Securing Static Files
+
 ### Opencast 9.1
 
 *Released on December 16th, 2020*

@@ -113,12 +113,6 @@ API changes
   different types of events in one request
 - The Series API can now return ACLs within its response, if you tell it to
 
-Additional Notes about 9.1
---------------------------
-
-This release contains an important bugfix where unprivileged users
-could not upload videos, before.
-
 Additional Notes about 9.2
 --------------------------
 
@@ -137,6 +131,18 @@ A new [workflow operation `cut-marks-to-smil`](workflowoperationhandlers/cut-mar
 allow a simpler specification of cutting information for the video editor. This was also the last piece missing from the
 [BigBlueButton recordings integration](https://github.com/elan-ev/opencast-bigbluebutton-integration) in Opencast.
 
+Some problems with the new adopter registration and update reporting have been resolved. If you stumbled over these
+before, this is the release to try again.
+
+A [security problem](https://github.com/opencast/opencast/security/advisories/GHSA-vpc2-3wcv-qj4w) where chaning access rights to an individual video lead to
+cooresponding changes to its entire series was fixed.
+
+
+Additional Notes about 9.1
+--------------------------
+
+This release contains an important bugfix where unprivileged users
+could not upload videos, before.
 
 Release Schedule
 ----------------
