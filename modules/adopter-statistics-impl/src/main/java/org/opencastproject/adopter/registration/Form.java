@@ -55,7 +55,7 @@ public class Form implements IForm {
   //================================================================================
 
   @Id
-  @Column(name = "adopter_key")
+  @Column(name = "adopter_key", length = 64)
   private String adopterKey;
 
   @Column(name = "statistic_key")

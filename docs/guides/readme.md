@@ -21,6 +21,7 @@ Requires python virtual environment.
 % pip install mkdocs mkdocs-windmill
 % pip install markdown_inline_graphviz_extension
 % pip install markdown-inline-graphviz-extension-png
+% pip install mkdocs-mermaid2-plugin
 % cd developer
 % python -m mkdocs serve
 ```
