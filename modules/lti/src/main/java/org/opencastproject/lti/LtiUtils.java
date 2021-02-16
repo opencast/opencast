@@ -58,7 +58,7 @@ public final class LtiUtils {
 
   /**
     * Add the necessary fields and sign.
-    * 
+    *
     * @param postProp
     * @param url
     * @param method
@@ -73,32 +73,42 @@ public final class LtiUtils {
     * @return
   */
   public static Map<String, String> signProperties(
-    Map<String, String> postProp, String url, String method,
-    String oauthConsumerKey, String oauthConsumerSecret,
-    String toolConsumerInstanceGuid,
-    String toolConsumerInstanceDescription,
-    String toolConsumerInstanceUrl, String toolConsumerInstanceName,
-    String toolConsumerInstanceContactEmail,
-    Map<String, String> extra) {
+      Map<String, String> postProp, String url, String method,
+      String oauthConsumerKey, String oauthConsumerSecret,
+      String toolConsumerInstanceGuid,
+      String toolConsumerInstanceDescription,
+      String toolConsumerInstanceUrl, String toolConsumerInstanceName,
+      String toolConsumerInstanceContactEmail,
+      Map<String, String> extra) {
 
-    if (postProp.get(LTI_VERSION) == null) postProp.put(LTI_VERSION, "LTI-1p0");
-    if (postProp.get(LTI_MESSAGE_TYPE) == null) postProp.put(LTI_MESSAGE_TYPE, "basic-lti-launch-request");
+    if (postProp.get(LTI_VERSION) == null) {
+      postProp.put(LTI_VERSION, "LTI-1p0");
+    }
+    if (postProp.get(LTI_MESSAGE_TYPE) == null) {
+      postProp.put(LTI_MESSAGE_TYPE, "basic-lti-launch-request");
+    }
 
-    if (toolConsumerInstanceGuid != null)
+    if (toolConsumerInstanceGuid != null) {
       postProp.put(TOOL_CONSUMER_INSTANCE_GUID, toolConsumerInstanceGuid);
-    if (toolConsumerInstanceDescription != null)
+    }
+    if (toolConsumerInstanceDescription != null) {
       postProp.put(TOOL_CONSUMER_INSTANCE_DESCRIPTION,
           toolConsumerInstanceDescription);
-    if (toolConsumerInstanceUrl != null)
+    }
+    if (toolConsumerInstanceUrl != null) {
       postProp.put(TOOL_CONSUMER_INSTANCE_URL, toolConsumerInstanceUrl);
-    if (toolConsumerInstanceName != null)
+    }
+    if (toolConsumerInstanceName != null) {
       postProp.put(TOOL_CONSUMER_INSTANCE_NAME, toolConsumerInstanceName);
-    if (toolConsumerInstanceContactEmail != null)
+    }
+    if (toolConsumerInstanceContactEmail != null) {
       postProp.put(TOOL_CONSUMER_INSTANCE_CONTACT_EMAIL,
           toolConsumerInstanceContactEmail);
+    }
 
-    if (postProp.get("oauth_callback") == null)
+    if (postProp.get("oauth_callback") == null) {
       postProp.put("oauth_callback", "about:blank");
+    }
 
     if (oauthConsumerKey == null || oauthConsumerSecret == null) {
       logger.debug("No signature generated in signProperties");
@@ -141,7 +151,7 @@ public final class LtiUtils {
 
   /**
   * Create the HTML to render a POST form and then automatically submit it.
-  * 
+  *
   * @param cleanProperties
   * @param endpoint
   *  The LTI launch url.
@@ -154,8 +164,8 @@ public final class LtiUtils {
   * @return the HTML ready for IFRAME src = inclusion.
   */
   public static String postLaunchHTML(
-    final Map<String, String> cleanProperties, String endpoint,
-    String launchtext, boolean debug, Map<String,String> extra) {
+      final Map<String, String> cleanProperties, String endpoint,
+      String launchtext, boolean debug, Map<String,String> extra) {
     // Assume autosubmit is true for backwards compatibility
     boolean autosubmit = true;
     return postLaunchHTML(cleanProperties, endpoint, launchtext, autosubmit, debug, extra);
@@ -164,7 +174,7 @@ public final class LtiUtils {
 
   /**
    * Create the HTML to render a POST form and then automatically submit it.
-   * 
+   *
    * @param cleanProperties
    * @param endpoint
    *  The LTI launch url.
@@ -177,9 +187,9 @@ public final class LtiUtils {
    * @return the HTML ready for IFRAME src = inclusion.
    */
   public static String postLaunchHTML(
-    final Map<String, String> cleanProperties, String endpoint,
-    String launchtext, boolean autosubmit, boolean debug,
-    Map<String,String> extra) {
+      final Map<String, String> cleanProperties, String endpoint,
+      String launchtext, boolean autosubmit, boolean debug,
+      Map<String,String> extra) {
 
     if (cleanProperties == null || cleanProperties.isEmpty()) {
       throw new IllegalArgumentException(
@@ -210,8 +220,9 @@ public final class LtiUtils {
     for (Entry<String, String> entry : newMap.entrySet()) {
       String key = entry.getKey();
       String value = entry.getValue();
-      if (value == null)
+      if (value == null) {
         continue;
+      }
       // This will escape the contents pretty much - at least
       // we will be safe and not generate dangerous HTML
       key = htmlspecialchars(key);
@@ -240,7 +251,9 @@ public final class LtiUtils {
 
     if (extra != null) {
       String buttonHtml = extra.get("button_html");
-      if (buttonHtml != null) text.append(buttonHtml);
+      if (buttonHtml != null) {
+        text.append(buttonHtml);
+      }
     }
 
     text.append("</form>\n");
@@ -276,8 +289,9 @@ public final class LtiUtils {
       for (Entry<String, String> entry : newMap.entrySet()) {
         String key = entry.getKey();
         String value = entry.getValue();
-        if (value == null)
+        if (value == null) {
           continue;
+        }
         text.append(htmlspecialchars(key));
         text.append("=");
         text.append(htmlspecialchars(value));
@@ -309,8 +323,9 @@ public final class LtiUtils {
 
   // Basic utility to encode form text - handle the "safe cases"
   public static String htmlspecialchars(String input) {
-    if (input == null)
+    if (input == null) {
       return null;
+    }
     String retval = input.replace("&", "&amp;");
     retval = retval.replace("\"", "&quot;");
     retval = retval.replace("<", "&lt;");
