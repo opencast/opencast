@@ -1,0 +1,38 @@
+name: Test admin interface frontend
+
+on:
+  pull_request:
+    paths:
+      - 'docs/checkstyle/**'
+      - 'modules/admin-ui-frontend/**'
+  push:
+    paths:
+      - 'docs/checkstyle/**'
+      - 'modules/admin-ui-frontend/**'
+
+jobs:
+  frontend:
+    strategy:
+      matrix:
+        browser:
+          - chrome
+          - firefox
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: use node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+
+    - name: install dependencies
+      run: |
+        cd modules/admin-ui-frontend
+        npm ci
+        ./node_modules/.bin/bower install
+
+    - name: run front-end tests
+      run: |
+        cd modules/admin-ui-frontend
+        npm run test-${{ matrix.browser }}
