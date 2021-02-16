@@ -21,7 +21,6 @@
 
 package org.opencastproject.mediapackage;
 
-
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function2;
 
@@ -141,13 +140,8 @@ public interface AdaptivePlaylist extends Track {
     if (!isPlaylist(file))
       return false;
     try (Stream<String> lines = Files.lines(file.toPath())) {
-      Optional<Matcher> m = lines.map(masterPatt::matcher).filter(Matcher::find).findFirst();
-      if (m.isPresent()) {
-        m = null;
-        return true;
-      }
+      return lines.map(masterPatt::matcher).anyMatch(Matcher::find);
     }
-    return false;
   }
 
   /**
@@ -163,13 +157,8 @@ public interface AdaptivePlaylist extends Track {
     if (!isPlaylist(file))
       return false;
     try (Stream<String> lines = Files.lines(file.toPath())) {
-      Optional<Matcher> m = lines.map(variantPatt::matcher).filter(Matcher::find).findFirst();
-      if (m.isPresent()) {
-        m = null;
-        return true;
-      }
+      return lines.map(variantPatt::matcher).anyMatch(Matcher::find);
     }
-    return false;
   }
 
   /**
@@ -211,8 +200,7 @@ public interface AdaptivePlaylist extends Track {
    */
   static Set<String> getReferencedFiles(File file, boolean segmentsOnly) throws IOException {
     Set<String> allFiles = new HashSet<String>(); // don't include playlist variants
-    Set<String> segments = getVariants(file).stream().filter(isPlaylistPred.negate())
-            .collect(Collectors.toSet());
+    Set<String> segments = getVariants(file).stream().filter(isPlaylistPred.negate()).collect(Collectors.toSet());
     Set<String> variants = getVariants(file).stream().filter(isPlaylistPred).collect(Collectors.toSet());
 
     if (!segmentsOnly)
@@ -301,7 +289,6 @@ public interface AdaptivePlaylist extends Track {
     }
     return new ArrayList<File>(map.values());
   }
-
 
   /**
    * Fix all the HLS file references in a manifest when a referenced file is renamed
@@ -747,7 +734,6 @@ public interface AdaptivePlaylist extends Track {
       List<Track> newTracks = new ArrayList<Track>();
       Rep rep = segments.get(0); // use segment dir as temp space
 
-
       // Lambda to rewrite a track using the passed in functions, using closure
       Function<Rep, Boolean> rewriteTrack = (trackRep) -> {
         File srcFile = trackRep.origMpfile;
@@ -780,7 +766,6 @@ public interface AdaptivePlaylist extends Track {
         newTrack.setLogicalName(fileMap.get(trackRep.name)); // set logical name for publication
         return true;
       };
-
 
       try {
         // Rewrite the variants and masters tracks in order and throw exception if there are any failures

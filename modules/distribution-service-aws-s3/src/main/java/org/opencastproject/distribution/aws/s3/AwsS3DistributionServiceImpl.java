@@ -132,7 +132,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   public static final String OPENCAST_STORAGE_DIR = "org.opencastproject.storage.dir";
   public static final String DEFAULT_TEMP_DIR = "tmp/s3dist";
 
-
   /** The load on the system introduced by creating a distribute job */
   public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;
 
@@ -259,9 +258,11 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       // AWS presigned URL expiration time in millis
       String presignedUrlExpTimeMillisConfigValue = OsgiUtil.getComponentContextProperty(cc,
               AWS_S3_PRESIGNED_URL_VALID_DURATION_CONFIG, null);
-      presignedUrlValidDuration = NumberUtils.toInt(presignedUrlExpTimeMillisConfigValue, DEFAULT_PRESIGNED_URL_EXPIRE_MILLIS);
+      presignedUrlValidDuration = NumberUtils.toInt(presignedUrlExpTimeMillisConfigValue,
+              DEFAULT_PRESIGNED_URL_EXPIRE_MILLIS);
       if (presignedUrlValidDuration > MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS) {
-        logger.warn("Valid duration of presigned URL is too large, MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS(7 days) is used");
+        logger.warn(
+                "Valid duration of presigned URL is too large, MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS(7 days) is used");
         presignedUrlValidDuration = MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS;
       }
 
@@ -295,12 +296,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       // Create AWS client
 
       s3 = AmazonS3ClientBuilder.standard()
-              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
-                      , regionStr))
-              .withPathStyleAccessEnabled(pathStyle)
-              .withCredentials(provider)
-              .build();
-
+              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, regionStr))
+              .withPathStyleAccessEnabled(pathStyle).withCredentials(provider).build();
 
       s3TransferManager = new TransferManager(s3);
 
@@ -327,9 +324,9 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds,
-    boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
+          boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
     throw new UnsupportedOperationException("Not supported yet.");
-  //stub function
+    // stub function
   }
 
   /**
@@ -461,7 +458,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
           MediaPackageElement element, boolean checkAvailability, File source) throws DistributionException {
 
     // Use TransferManager to take advantage of multipart upload.
-      // TransferManager processes all transfers asynchronously, so this call will return immediately.
+    // TransferManager processes all transfers asynchronously, so this call will return immediately.
     try {
       String objectName = buildObjectName(channelId, mediaPackage.getIdentifier().toString(), element);
       logger.info("Uploading {} to bucket {}...", objectName, bucketName);
@@ -563,9 +560,9 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
-         boolean checkAvailability) throws DistributionException {
-    final MediaPackageElement[] distributedElements =
-        distributeElements(channelId, mediapackage, elementIds, checkAvailability);
+          boolean checkAvailability) throws DistributionException {
+    final MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
+            checkAvailability);
     if (distributedElements == null) {
       return null;
     }
@@ -574,7 +571,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
-      throws DistributionException {
+          throws DistributionException {
     final MediaPackageElement[] retractedElements = retractElements(channelId, mediaPackage, elementIds);
     if (retractedElements == null) {
       return null;
@@ -804,15 +801,13 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
    * @throws IOException
    */
   private MediaPackageElement[] distributeHLSElements(String channelId, MediaPackage mediapackage,
-          Set<MediaPackageElement> elements, boolean checkAvailability)
-                  throws DistributionException {
+          Set<MediaPackageElement> elements, boolean checkAvailability) throws DistributionException {
 
     List<MediaPackageElement> distributedElements = new ArrayList<MediaPackageElement>();
     List<MediaPackageElement> nontrackElements = elements.stream()
             .filter(e -> e.getElementType() != MediaPackageElement.Type.Track).collect(Collectors.toList());
     // Distribute non track items
     for (MediaPackageElement element : nontrackElements) {
-      logger.info("distributing non-track element {}", element.getElementDescription());
       MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element, checkAvailability);
       distributedElements.add(distributedElement);
     }
@@ -822,7 +817,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
             .map(e -> (Track) e).collect(Collectors.toList());
     HashMap<MediaPackageElementFlavor, List<Track>> trackElementsMap = new HashMap<MediaPackageElementFlavor, List<Track>>();
     for (Track t : trackElements) {
-      logger.info("Found track {}", t.getElementDescription());
       List<Track> l = trackElementsMap.get(t.getFlavor());
       if (l == null)
         l = new ArrayList<Track>();
@@ -844,12 +838,10 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
             // and put them into a temporary directory
             List<Track> tmpTracks = new ArrayList<Track>();
             for (Track t : tracks) {
-
               Track tcopy = (Track) t.clone();
               String newName = "./" + t.getURI().getPath();
               Path newPath = tmpDir.resolve(newName).normalize();
               Files.createDirectories(newPath.getParent());
-              logger.info("Putting track {} into {}", t.getElementDescription(), newPath);
               // If this flavor is a HLS playlist and therefore has internal references
               if (AdaptivePlaylist.isPlaylist(t)) {
                 File f = workspace.get(t.getURI()); // Get actual file
@@ -929,19 +921,12 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
           return (retractedElements != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(retractedElements))
                   : null;
         /*
-         * TODO
-         * Commented out due to changes in the way the element IDs are passed (ie, a list rather than individual ones
-         * per job). This code is still useful long term, but I don't have time to write the necessary wrapper code
-         * around it right now.
-         * case Restore:
-         * String fileName = arguments.get(3);
-         * MediaPackageElement restoredElement = null;
-         * if (StringUtils.isNotBlank(fileName)) {
-         * restoredElement = restoreElement(channelId, mediaPackage, elementIds, fileName);
-         * } else {
-         * restoredElement = restoreElement(channelId, mediaPackage, elementIds, null);
-         * }
-         * return (restoredElement != null) ? MediaPackageElementParser.getAsXml(restoredElement) : null;
+         * TODO Commented out due to changes in the way the element IDs are passed (ie, a list rather than individual
+         * ones per job). This code is still useful long term, but I don't have time to write the necessary wrapper code
+         * around it right now. case Restore: String fileName = arguments.get(3); MediaPackageElement restoredElement =
+         * null; if (StringUtils.isNotBlank(fileName)) { restoredElement = restoreElement(channelId, mediaPackage,
+         * elementIds, fileName); } else { restoredElement = restoreElement(channelId, mediaPackage, elementIds, null);
+         * } return (restoredElement != null) ? MediaPackageElementParser.getAsXml(restoredElement) : null;
          */
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
@@ -973,9 +958,10 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
           Policy policy = new Policy().withStatements(allowPublicReadStatement);
           s3.setBucketPolicy(bucketName, policy.toJson());
 
-          //Set the website configuration.  This needs to be static-site-enabled currently.
+          // Set the website configuration. This needs to be static-site-enabled currently.
           BucketWebsiteConfiguration defaultWebsite = new BucketWebsiteConfiguration();
-          //These files don't actually exist, but that doesn't matter since no one should be looking around in the bucket anyway.
+          // These files don't actually exist, but that doesn't matter since no one should be looking around in the
+          // bucket anyway.
           defaultWebsite.setIndexDocumentSuffix("index.html");
           defaultWebsite.setErrorDocument("error.html");
           s3.setBucketWebsiteConfiguration(new SetBucketWebsiteConfigurationRequest(bucketName, defaultWebsite));
