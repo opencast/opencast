@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - 'docs/guides/**'
+      - 'docs/checkstyle/check-docs.sh'
       - '**.md'
   push:
     paths:
       - 'docs/guides/**'
+      - 'docs/checkstyle/check-docs.sh'
       - '**.md'
 
 jobs:
@@ -32,4 +34,4 @@ jobs:
       run: npm ci
 
     - name: check documentation
-      run: bash ./.style-and-markdown-build.sh
+      run: ./docs/checkstyle/check-docs.sh
