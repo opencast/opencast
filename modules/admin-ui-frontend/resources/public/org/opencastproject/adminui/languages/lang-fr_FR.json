@@ -4,59 +4,64 @@
    "NAV_ABOUT": "À propos",
    "NO": "Non",
    "SUBMIT": "Envoyer",
-   "UPDATE": "Appliquer",
+   "UPDATE": {
+      "MINOR": "Mise à jour mineure disponible",
+      "MAJOR": "Mise à jour majeure disponible",
+      "UNSUPPORTED": "La version {{ version }} n'est plus prise en charge",
+      "UNDETERMINED": "Version indéterminée"
+   },
    "CANCEL": "Annuler",
    "CONFIRM": "Confirmer",
    "SAVE": "Enregistrer",
-   "CONTINUE": "Continue",
-   "CLOSE": "Close",
+   "CONTINUE": "Continuer",
+   "CLOSE": "Fermer",
    "LOGOUT": "Déconnexion",
    "RESET": "Remise à zéro",
    "SELECT_NO_OPTION_SELECTED": "Aucune option sélectionnée",
    "SELECT_NO_OPTIONS_AVAILABLE": "Aucune option disponible",
    "YES": "Oui",
-   "COPY": "Copy to clipboard",
+   "COPY": "Copier dans le presse-papiers",
    "LTI": {
-      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
-      "SERIES_TITLE": "View Series",
-      "UPLOAD_TITLE": "Upload event",
-      "LOADING": "Loading…",
-      "NEW_UPLOAD": "Upload new event",
-      "EDIT_UPLOAD": "Edit event",
-      "CURRENT_JOBS": "Today's jobs",
-      "PRESENTER": "Presenter",
-      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
-      "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
-      "UPLOAD": "Upload",
-      "UPLOADING": "Uploading",
-      "EDIT": "Save",
-      "EDIT_TITLE": "Edit event",
-      "NO_OPTION_SELECTED": "No option selected",
-      "EDITING": "Saving…",
-      "SELECT_OPTION": "Select option",
-      "JOB_TITLE": "Title",
-      "JOB_STATUS": "Status",
-      "UPLOAD_SUCCESS": "Upload succeded!",
-      "UPLOAD_FAILURE": "Upload failed!",
-      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
-      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
-      "EDIT_FAILURE": "Edit failed!",
-      "COPY_SUCCESS": "Copying started…",
-      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
-      "GENERIC_ERROR": "Error: {{message}}",
-      "DELETION_SUCCESS": "Event deletion successful",
-      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
-      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
-      "DELETION_FAILURE": "Event deletion failed",
-      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
-      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
-      "CONFIRM_DELETION": "Really delete this event?",
-      "COPY_TO_SERIES": "Copy event to series",
-      "SELECT_COPY_TARGET": "Select destination series",
-      "COPY": "Copy",
-      "COPY_IN_PROGRESS": "Starting copy…",
-      "CREATOR": "by {{creator}}"
+      "ERROR_LOADING_METADATA": "Erreur lors du chargement des métadonnées de l'événement. Veuillez réessayer plus tard.",
+      "SERIES_TITLE": "Voir les séries",
+      "UPLOAD_TITLE": "Envoyer un événement",
+      "LOADING": "Chargement…",
+      "NEW_UPLOAD": "Envoyer un nouvel événement",
+      "EDIT_UPLOAD": "Modifier l'événement",
+      "CURRENT_JOBS": "Tâches du jour",
+      "PRESENTER": "Présentateur",
+      "PRESENTER_DESCRIPTION": "Fichier vidéo pour la piste du présentateur",
+      "CAPTION": "Sous-titres",
+      "CAPTION_DESCRIPTION": "Sous-titres; Le format VTT est pris en charge",
+      "UPLOAD": "Envoyer",
+      "UPLOADING": "Envoi en cours",
+      "EDIT": "Enregistrer",
+      "EDIT_TITLE": "Modifier l'événement",
+      "NO_OPTION_SELECTED": "Aucune option sélectionnée",
+      "EDITING": "Sauvegarde en cours...",
+      "SELECT_OPTION": "Sélectionnez une option",
+      "JOB_TITLE": "Titre",
+      "JOB_STATUS": "Statut",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
+      "UPLOAD_FAILURE": "Envoi échoué !",
+      "UPLOAD_FAILURE_DESCRIPTION": "Veuillez réessayer plus tard.",
+      "EDIT_SUCCESS": "Modification réussie, republication en cours.",
+      "EDIT_FAILURE": "Échec de la modification !",
+      "COPY_SUCCESS": "Copie en cours…",
+      "COPY_SUCCESS_DESCRIPTION": "Veuillez patienter…",
+      "GENERIC_ERROR": "Erreur: {{message}}",
+      "DELETION_SUCCESS": "Événement supprimé avec succès",
+      "DELETION_SUCCESS_DESCRIPTION": "L'événement sera supprimé de la liste dans quelques instants…",
+      "EVENT_LOCKED": "L'événement est en cours de traitement. Veuillez patienter jusqu'à ce que d'autres modifications soient apportées…",
+      "DELETION_FAILURE": "La suppression de l'événement a échoué",
+      "DELETION_FAILURE_DESCRIPTION": "Veuillez réessayer plus tard…",
+      "RESULT_HEADING": "Résultats {{range.begin}}-{{range.end}} sur {{total}}",
+      "CONFIRM_DELETION": "Voulez-vous vraiment supprimer cet événement ?",
+      "COPY_TO_SERIES": "Copier l'évènement dans la série",
+      "SELECT_COPY_TARGET": "Sélectionner la série de destination",
+      "COPY": "Copier",
+      "COPY_IN_PROGRESS": "Démarrage de la copie…",
+      "CREATOR": "par {{creator}}"
    },
    "LANGUAGES": {
       "ARABIC": "Arabe",
@@ -92,7 +97,7 @@
       }
    },
    "CONFIRMATIONS": {
-      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+      "EMBEDDING_CODE": "Le code d'intégration a été copié dans le presse-papiers :",
       "CONTINUE_ACTION": "Êtes-vous sûr de vouloir continuer ?",
       "METADATA": {
          "NOTICE": {
@@ -110,7 +115,7 @@
       "ACTIONS": {
          "CONFIRMATION": "Confirmation",
          "SHOW": {
-            "EMBEDDING_CODE": "Embedding code"
+            "EMBEDDING_CODE": "Code d'intégration"
          }
       },
       "WARNINGS": {
@@ -129,7 +134,8 @@
       "USERS_GUIDE": "Guide de l'utilisateur",
       "DOCUMENTATION": "Documentation",
       "REST_DOC": "Documentation des API REST",
-      "HOTKEY_CHEAT_SHEET": "Raccourcis clavier"
+      "HOTKEY_CHEAT_SHEET": "Raccourcis clavier",
+      "ADOPTER_REGISTRATION": "Incription utilisateur"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Les droits d'accès ont été créés",
@@ -221,11 +227,15 @@
       "SERVICE_UNAVAILABLE": "Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
       "ACTIVE_TRANSACTION": "Cet événement ne peut pas être modifié, pendant qu’il y a un flux de travail actif ou une transaction.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
-         "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
-      }
+         "UNEXPECTED_ERROR": "Une erreur inattendue s'est produite lors de la mise à jour. Certains événements peuvent avoir été mis à jour.",
+         "ALL_EVENTS_UPDATED": "Tous les événements ont été mis à jour avec succès.",
+         "NO_EVENTS_UPDATED": "Toutes les mises à jour ont échoué.",
+         "SOME_EVENTS_NOT_UPDATED": "Certains événements n'ont pas pu être mis à jour."
+      },
+      "ADOPTER_PROFILE_UPDATED": "Les informations de profil ont été mises à jour avec succès.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oups ! Impossible de mettre à jour les informations de profil. Veuillez réessayer !",
+      "ADOPTER_PROFILE_DELETED": "Les informations de profil ont bien été supprimées.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oups ! Impossible de supprimer les informations de profil. Veuillez réessayer !"
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -295,15 +305,15 @@
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "CAPTION": "Modifier les métadonnées d'événements multiples",
+         "FATAL_ERROR": "Une erreur fatale est survenue : {{ fatalError }}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
-            "NOT_FOUND": "Not found",
-            "RUNNING_WORKFLOW": "Running workflow",
+            "CANNOT_EDIT_SOME": "Les événements en surbrillance ne peuvent pas être modifiés.",
+            "NOTHING_TO_EDIT": "Les événements ne peuvent pas être modifiés.",
+            "NOT_FOUND": "Non trouvé",
+            "RUNNING_WORKFLOW": "Workflow en cours d'exécution",
             "TABLE": {
-               "CAPTION": "Selected events",
+               "CAPTION": "Événements sélectionnés",
                "ERRORS": "Errors"
             }
          },
@@ -380,6 +390,63 @@
       },
       "STATISTICS": {
          "TITLE": "Statistiques"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Registration",
+         "SKIP": "Not now",
+         "CONTINUE": "Continue",
+         "BACK": "Back",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Terms of Service and Privacy Policy"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Thank you for using Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Organisation",
+            "DEPARTMENT": "Department",
+            "COUNTRY": "Country",
+            "POSTAL_CODE": "Postal code",
+            "CITY": "City",
+            "CONTACT_INFO": "Contact information",
+            "GENDER": "Gender",
+            "GENDER_MALE": "male",
+            "GENDER_FEMALE": "female",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name",
+            "STREET": "Street",
+            "NUMBER": "Number",
+            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "MAIL": "Email",
+            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
+            "POLICY_HEADLINE": "Privacy policy and terms of use",
+            "USAGE_STATISTICS": "Usage statistcs",
+            "ERROR_REPORTS": "Error reports",
+            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
+            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Maybe next time!",
+            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Thank you for your registration!",
+            "TEXT_LEADING_TO_PATH": "You can change your data at ",
+            "TEXT_LEADING_AFTER_PATH": "at any time."
+         },
+         "ERROR": {
+            "HEADER": "Error",
+            "TEXT": "An error occurred while processing your request."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Are you sure you want to delete your registration data?"
+         }
       }
    },
    "EVENTS": {

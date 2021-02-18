@@ -35,8 +35,9 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.SchedulingUtils;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.util.RequestUtils;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
@@ -128,7 +129,7 @@ public class EventsEndpointTest {
     given().multiPart("metadata", jsonString).pathParam("event_id", eventId).expect().statusCode(SC_NO_CONTENT)
             .when().post(env.host("{event_id}"));
     MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList1().getValue();
-    assertThat(actualMetadataList.toJSON().toString(), SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
+    assertThat(MetadataJson.listToJson(actualMetadataList, true).toString(), SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 
   @Test
@@ -147,7 +148,7 @@ public class EventsEndpointTest {
     given().formParam("metadata", jsonString).pathParam("event_id", eventId).queryParam("type", "dublincore/episode")
             .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/metadata"));
     MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList2().getValue();
-    assertThat(actualMetadataList.getMetadataByFlavor("dublincore/episode").get().toJSON().toString(),
+    assertThat(MetadataJson.collectionToJson(actualMetadataList.getMetadataByFlavor("dublincore/episode"), true).toString(),
             SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 

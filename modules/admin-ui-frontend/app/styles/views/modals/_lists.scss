@@ -81,20 +81,14 @@
         vertical-align: middle;
     }
 
+    .custom-icon {
+      width: 24px;
+      height: 24px;
+    }
+
     .video-icon {
-        @include build-icon(auto, auto, video, 34px, 34px);
+        @include fa-icon($fa-var-play-circle, before, inherit, 0, 0, $primary-color-green-light-2, 24px);
     }
-
-    .engage {
-        @include build-icon(auto, auto, engage, 18px, 26px);
-        margin-left: 7px; // Center icon
-    }
-
-    .youtube {
-        @include build-icon(auto, auto, youtube, 30px, 36px);
-        margin-left: 3px; // Center icon
-    }
-
 
     // Right side icons / elements
     // ----------------------------------------

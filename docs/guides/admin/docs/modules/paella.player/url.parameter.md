@@ -4,7 +4,7 @@ Paella Player - URL Parameters
 Parameter      | Example   | Description
 ---------------|-----------|------------
 **id**         | `SOME-ID` | Video Id to play
-**time**       | `10m20s`  | Seeks intially automatically to a specified time
+**time**       | `10m20s`  | Seeks initially automatically to a specified time
 **autoplay**   | `true`    | Automatically starts playing the video
 
 
@@ -14,7 +14,7 @@ Video Id to play
 
 time
 ----
-Seeks intially automatically to a specified time.
+Seeks initially automatically to a specified time.
 automatically plays the video from the specified time on
 
 Possible values

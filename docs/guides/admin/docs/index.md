@@ -33,6 +33,7 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     * [Atom and RSS Feed](modules/atomrss.md)
     * [AWS S3 Distribution](modules/awss3distribution.md)
     * [Media Module](modules/mediamodule.configuration.md)
+    * [Metrics (OpenMetrics, Prometheus)](modules/metrics.md)
     * [Stream Security](modules/stream-security.md)
     * [Studio](modules/studio.md)
     * [Text Extraction](modules/textextraction.md)
@@ -40,9 +41,3 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     * [YouTube Publication](modules/youtubepublication.md)
     * [more...](modules/index.md)
 * [Version Support](version-support.md)
-
-Further Documentation
----------------------
-
-In addition to this official documentation, further guides and tips can be found in the on the mailing lists, the IRC
-channel and at the regular meetings.

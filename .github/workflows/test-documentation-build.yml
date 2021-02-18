@@ -1,0 +1,35 @@
+name: Test documentation
+
+on:
+  pull_request:
+    paths:
+      - 'docs/guides/**'
+      - '**.md'
+  push:
+    paths:
+      - 'docs/guides/**'
+      - '**.md'
+
+jobs:
+
+  # Check documentation with markdownlint and build it using mkdocs
+  documentation:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: set up python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: install mkdocs
+      run: pip install -q mkdocs markdown_inline_graphviz_extension mkdocs-windmill mkdocs-mermaid2-plugin
+
+    - name: install javascript dependencies
+      working-directory: docs/guides
+      run: npm ci
+
+    - name: check documentation
+      run: bash ./.style-and-markdown-build.sh

@@ -49,7 +49,7 @@ For more details, take a look at the options in
 
 
 The “delete” key in the series overview tool can be configured by specifying the retraction workflow in
-`etc/org.opencastproject.lti.endpoint.EventsEndpoint.cfg`. The property is called `retract-workflow-id`, and it defaults
+`etc/org.opencastproject.lti.service.impl.LtiServiceImpl.cfg`. The property is called `retract-workflow-id`, and it defaults
 to `retract`.
 
 Configure and test an LTI tool in the LMS
@@ -73,10 +73,13 @@ because of the Opencast roles which they have. The Opencast LTI module grants an
 from the LTI parameters `context_id` and `roles`.
 
 The LTI context is typically the LMS course ID, and the default LTI role for a student in a course is `Learner`.
-The Opencast role granted would therefore be `SITEID_Learner`.
+The Opencast role granted would therefore be `<context-id>_Learner`.
 
 To make a series or video visible to students who access Opencast through LTI in an LMS course,
-add the role `SITEID_Learner` to the Series or Event Access Control List (ACL).
+add the role `<context-id>_Learner` to the series or event access control list (ACL).
+
+An additional prefix for these generated roles may be defined in Opencast's LTI configuration file based on the used
+OAuth consumer. That way, you can distinguish between users from multiple different consumers.
 
 LTI users may also have additional roles if the LTI user is created as an Opencast user in the Admin UI and
 given additional roles, or if one or more Opencast User Providers or Role Providers are configured.
@@ -89,20 +92,20 @@ Opencast will redirect an LTI user to the URL specified by the LTI custom `tool`
 custom parameters to be defined separately in each place where an LTI tool is used, whereas other systems only allow
 custom parameters to be defined globally.
 
-- To show the media module, use `tool=engage/ui/`
-- To show all videos for a single series, specify the following parameters
-  - `tool=ltitools/index.html`
-  - `subtool=series`
-  - `series=SERIESID` if you have the series ID
-  - `series_name=SERIESNAME` if you just have the series name (has to be unique)
-  - `deletion=true` if you want to display a deletion button next to each episode
-  - `edit=true` if you want to display an edit button next to each episode
-- To show an upload form, specify the following parameters:
-  - `tool=ltitools/index.html`
-  - `subtool=upload`
-  - `series=SERIESID` if you have the series ID
-  - `series_name=SERIESNAME` if you just have the series name (has to be unique)
-- To show a single video, use `tool=/play/MEDIAPACKAGEID`
+- To show the media module, use `engage/ui/` as LTI `custom_tool` launch parameter
+- To show all videos for a single series, use `ltitools/index.html` as LTI `custom_tool` launch parameter
+  and specify the following query parameters:
+    - `subtool=series`
+    - `series=SERIESID` if you have the series ID
+    - `series_name=SERIESNAME` if you just have the series name (has to be unique)
+    - `deletion=true` to show a delete button next to each episode
+    - `edit=true` if you want to display an edit button next to each episode
+- To show an upload dialog, use `ltitools/index.html` as LTI `custom_tool` launch parameter
+  and specify the following query parameters:
+    - `subtool=upload`
+    - `series=SERIESID` if you have the series ID
+    - `series_name=SERIESNAME` if you just have the series name (has to be unique)
+- To show a single video, use `/play/<id>` as LTI `custom_tool` launch parameter
 - To show a debug page before proceeding to the tool, append the parameter `test=true`
 
 For more information about how to set custom LTI parameters, please check the documentation of your LMS.

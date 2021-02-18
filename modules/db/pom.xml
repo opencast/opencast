@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -16,31 +16,12 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
     <!-- Database Drivers and Connection Pooling -->
     <dependency>
@@ -77,6 +58,21 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <!-- this module provides database driver as runtime dependencies -->
+            <ignoredUnusedDeclaredDependency>com.typesafe:config</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>com.mchange:mchange-commons-java</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.mariadb.jdbc:mariadb-java-client</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.postgresql:postgresql</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>net.java.dev.jna:jna</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

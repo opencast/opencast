@@ -270,6 +270,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       }
     }
 
+    seriesName = StringUtils.trimToNull(seriesName);
+    seriesId = StringUtils.trimToNull(seriesId);
     if (seriesName != null && seriesId != null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("invalid request, both 'sid' and 'sname' specified")
               .build();

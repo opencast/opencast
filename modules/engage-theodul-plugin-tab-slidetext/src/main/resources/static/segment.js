@@ -19,54 +19,54 @@
  *
  */
 /*jslint browser: true, nomen: true*/
-/*global define, CustomEvent*/
+/*global define*/
 define(function() {
-    "use strict";
+  'use strict';
 
-    /**
+  /**
      * Segment
      *
      * @param time
      * @param image_url
      */
-    var Segment = function(time, image_url, text) {
-        this.time = time;
-        this.humanReadableTime = formatSeconds(time);
-        this.image_url = image_url;
-        this.text = text;
-    };
+  var Segment = function(time, image_url, text) {
+    this.time = time;
+    this.humanReadableTime = formatSeconds(time);
+    this.image_url = image_url;
+    this.text = text;
+  };
 
-    /**
+  /**
      * Returns the formatted seconds
      *
      * @param seconds seconds to format
      * @return formatted seconds
      */
-    function formatSeconds (seconds) {
-        if (!seconds) {
-            seconds = 0;
-        }
-        seconds = (seconds < 0) ? 0 : seconds;
-        var result = "";
-        if (parseInt(seconds / 3600) < 10) {
-            result += "0";
-        }
-        result += parseInt(seconds / 3600);
-        result += ":";
-        if ((parseInt(seconds / 60) - parseInt(seconds / 3600) * 60) < 10) {
-            result += "0";
-        }
-        result += parseInt(seconds / 60) - parseInt(seconds / 3600) * 60;
-        result += ":";
-        if (seconds % 60 < 10) {
-            result += "0";
-        }
-        result += seconds % 60;
-        if (result.indexOf(".") != -1) {
-            result = result.substring(0, result.lastIndexOf(".")); // get rid of the .ms
-        }
-        return result;
-    };
+  function formatSeconds (seconds) {
+    if (!seconds) {
+      seconds = 0;
+    }
+    seconds = (seconds < 0) ? 0 : seconds;
+    var result = '';
+    if (parseInt(seconds / 3600) < 10) {
+      result += '0';
+    }
+    result += parseInt(seconds / 3600);
+    result += ':';
+    if ((parseInt(seconds / 60) - parseInt(seconds / 3600) * 60) < 10) {
+      result += '0';
+    }
+    result += parseInt(seconds / 60) - parseInt(seconds / 3600) * 60;
+    result += ':';
+    if (seconds % 60 < 10) {
+      result += '0';
+    }
+    result += seconds % 60;
+    if (result.indexOf('.') != -1) {
+      result = result.substring(0, result.lastIndexOf('.')); // get rid of the .ms
+    }
+    return result;
+  }
 
-    return Segment;
+  return Segment;
 });

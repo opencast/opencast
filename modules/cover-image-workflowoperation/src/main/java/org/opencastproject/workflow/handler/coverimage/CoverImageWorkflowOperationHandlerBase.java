@@ -126,8 +126,9 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
 
     // Read optional poster image flavor
     String posterImgUri = getPosterImageFileUrl(operation.getConfiguration(POSTERIMAGE_URL));
-    if (posterImgUri == null)
+    if (posterImgUri == null) {
       posterImgUri = getPosterImageFileUrl(mediaPackage, operation.getConfiguration(POSTERIMAGE_FLAVOR));
+    }
     if (posterImgUri == null) {
       logger.debug("No optional poster image set");
     } else {
@@ -171,8 +172,9 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       if (targetTags != null) {
         for (String tag : asList(targetTags)) {
           logger.trace("Tagging image with '{}'", tag);
-          if (StringUtils.trimToNull(tag) != null)
+          if (StringUtils.trimToNull(tag) != null) {
             coverImage.addTag(tag);
+          }
         }
       }
 
@@ -216,7 +218,8 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     if (atts.length > 1) {
       logger.warn("More than one attachment with the flavor '{}' found in media package '{}'", posterimageFlavor,
               mediaPackage.getIdentifier());
-      throw new WorkflowOperationException("More than one attachment with the flavor'" + posterimageFlavor + "' found.");
+      throw new WorkflowOperationException(
+              "More than one attachment with the flavor'" + posterimageFlavor + "' found.");
     } else if (atts.length == 0) {
       logger.warn("No attachment with the flavor '{}' found in media package '{}'", posterimageFlavor,
               mediaPackage.getIdentifier());
@@ -233,8 +236,9 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
 
   protected String getPosterImageFileUrl(String posterimageUrlOpt) {
 
-    if (StringUtils.isBlank(posterimageUrlOpt))
+    if (StringUtils.isBlank(posterimageUrlOpt)) {
       return null;
+    }
 
     URL url = null;
     try {
@@ -243,11 +247,13 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       logger.debug("Given poster image URI '{}' is not valid", posterimageUrlOpt);
     }
 
-    if (url == null)
+    if (url == null) {
       return null;
+    }
 
-    if ("file".equals(url.getProtocol()))
+    if ("file".equals(url.getProtocol())) {
       return url.toExternalForm();
+    }
 
     try {
       File coverImageFile = getWorkspace().get(url.toURI());
@@ -267,24 +273,27 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
   protected int getIntConfiguration(WorkflowOperationInstance operation, String key) throws WorkflowOperationException {
     String confString = operation.getConfiguration(key);
     int confValue = 0;
-    if (StringUtils.isBlank(confString))
+    if (StringUtils.isBlank(confString)) {
       throw new WorkflowOperationException("Configuration key '" + key + "' must be set");
+    }
     try {
       confValue = Integer.parseInt(confString);
-      if (confValue < 1)
+      if (confValue < 1) {
         throw new WorkflowOperationException("Configuration key '" + key
-                + "' must be set to a valid positive integer value");
+            + "' must be set to a valid positive integer value");
+      }
     } catch (NumberFormatException e) {
       throw new WorkflowOperationException("Configuration key '" + key
-              + "' must be set to a valid positive integer value");
+          + "' must be set to a valid positive integer value");
     }
     return confValue;
   }
 
   protected String loadXsl(WorkflowOperationInstance operation) throws WorkflowOperationException {
     String xslUriString = operation.getConfiguration(XSL_FILE_URL);
-    if (StringUtils.isBlank(xslUriString))
+    if (StringUtils.isBlank(xslUriString)) {
       throw new WorkflowOperationException("Configuration option '" + XSL_FILE_URL + "' must not be empty");
+    }
     FileReader reader = null;
     try {
       URI xslUri = new URI(xslUriString);
@@ -382,6 +391,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
         default: appendXml(xml, entry.getKey().getLocalName(), getValuesAsString(entry));
       }
     }
+
     xml.append("</metadata>");
     return xml.toString();
   }
@@ -401,8 +411,9 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
   }
 
   protected void appendXml(StringBuilder xml, String name, String body) {
-    if (StringUtils.isBlank(body) || StringUtils.isBlank(name))
+    if (StringUtils.isBlank(body) || StringUtils.isBlank(name)) {
       return;
+    }
 
     xml.append("<");
     xml.append(name);

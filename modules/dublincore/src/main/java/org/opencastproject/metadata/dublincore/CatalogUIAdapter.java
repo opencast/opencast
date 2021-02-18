@@ -24,7 +24,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
 /**
  * A {@link CatalogUIAdapter} converts between a concrete {@link org.opencastproject.metadata.api.MetadataCatalog}
- * implementation and a {@link MetadataCollection} that
+ * implementation and a {@link DublinCoreMetadataCollection} that
  */
 public interface CatalogUIAdapter {
 
@@ -54,6 +54,6 @@ public interface CatalogUIAdapter {
    *
    * @return The fields with raw data
    */
-  MetadataCollection getRawFields();
+  DublinCoreMetadataCollection getRawFields();
 
 }

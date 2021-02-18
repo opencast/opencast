@@ -5,6 +5,11 @@ edit_uri: edit/develop/docs/guides/admin/docs/
 markdown_extensions:
   - markdown_inline_graphviz
 
+plugins:
+  - mermaid2:
+      arguments:
+        theme: neutral
+
 # Default theme used is windmill
 theme: windmill
 
@@ -55,8 +60,11 @@ nav:
    - HTTPS:
       - Overview: 'configuration/https/index.md'
       - Using Nginx: 'configuration/https/nginx.md'
+      - Using Apache httpd: configuration/https/apache-httpd.md
       - Internal HTTPS: 'configuration/https/opencast.only.md'
       - Migrating old content to HTTPS: 'configuration/https/migration.md'
+      - Self-Signed Certificates: 'configuration/https/self-signed-certificates.md'
+   - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
    - Metadata: 'configuration/metadata.md'
@@ -67,7 +75,7 @@ nav:
    - Log: 'configuration/log.md'
    - User Statistics and Privacy Configuration: 'configuration/user-statistics.and.privacy.md'
    - Multi Tenancy: 'configuration/multi.tenancy.md'
-   - Authentication, Autorization and User Management:
+   - Authentication, Authorization and User Management:
       - General Security: 'configuration/security.md'
       - Access Control Lists: 'configuration/acl.md'
       - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
@@ -76,6 +84,8 @@ nav:
       - Moodle User Provider: 'configuration/security.user.moodle.md'
       - Sakai User Provider: 'configuration/security.user.sakai.md'
       - Brightspace User Provider: 'configuration/security.user.brightspace.md'
+      - Canvas User Provider: 'configuration/security.user.canvas.md'
+   - Serving Static Files: 'configuration/serving-static-files.md'
    - Stream Security: 'configuration/stream-security.md'
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
@@ -101,6 +111,7 @@ nav:
    - Live Schedule: 'modules/liveschedule.md'
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
+   - Metrics (OpenMetrics, Prometheus): modules/metrics.md
    - Player:
       - Configuration: 'modules/player.configuration.md'
       - URL Parameters: 'modules/player.url.parameter.md'
@@ -121,7 +132,7 @@ nav:
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'
-      - Elasticsearch: 'modules/searchindex/elasticsearch.md'
+      - Elasticsearch: 'configuration/elasticsearch.md'
    - Stream Security: 'modules/stream-security.md'
    - Studio: 'modules/studio.md'
    - Termination State:
@@ -160,6 +171,7 @@ nav:
    - Clone: 'workflowoperationhandlers/clone-woh.md'
    - Cover Image: 'workflowoperationhandlers/coverimage-woh.md'
    - Crop Video: 'workflowoperationhandlers/cropvideo-woh.md'
+   - Cut Marks To Smil: 'workflowoperationhandlers/cut-marks-to-smil-woh.md'
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
    - Demux: 'workflowoperationhandlers/demux-woh.md'
    - Duplicate Event: 'workflowoperationhandlers/duplicate-event-woh.md'
@@ -202,7 +214,9 @@ nav:
    - Retract Engage: 'workflowoperationhandlers/retract-engage-woh.md'
    - Retract Configure: 'workflowoperationhandlers/retract-configure-woh.md'
    - Retract OAI-PMH: 'workflowoperationhandlers/retract-oaipmh-woh.md'
+   - Retract Partial: 'workflowoperationhandlers/retract-partial-woh.md'
    - Retract YouTube: 'workflowoperationhandlers/retract-youtube-woh.md'
+   - Sanitize Adaptive: 'workflowoperationhandlers/sanitize-adaptive-woh.md'
    - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
    - Segment Video: 'workflowoperationhandlers/segmentvideo-woh.md'
    - Select Streams: 'workflowoperationhandlers/select-streams-woh.md'
@@ -217,5 +231,6 @@ nav:
    - Timelinepreviews: 'workflowoperationhandlers/timelinepreviews-woh.md'
    - Transfer Metadata: 'workflowoperationhandlers/transfer-metadata-woh.md'
    - Theme: 'workflowoperationhandlers/theme-woh.md'
+   - Video Grid: 'workflowoperationhandlers/video-grid-woh.md'
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'

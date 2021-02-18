@@ -8,14 +8,14 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <lucene.version>6.6.1</lucene.version>
-    <elasticsearch.version>7.4.2</elasticsearch.version>
+    <lucene.version>8.6.2</lucene.version>
+    <elasticsearch.version>7.9.2</elasticsearch.version>
   </properties>
   <dependencies>
     <dependency>
@@ -79,19 +79,28 @@
       <version>4.1.4</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>${httpcomponents-httpcore.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore-osgi</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
-      <version>8.2.0</version>
+      <version>${lucene.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-join</artifactId>
-      <version>8.2.0</version>
+      <version>${lucene.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-queryparser</artifactId>
-      <version>8.2.0</version>
+      <version>${lucene.version}</version>
     </dependency>
     <dependency>
       <groupId>com.carrotsearch</groupId>
@@ -134,6 +143,26 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <ignoredUnusedDeclaredDependency>org.elasticsearch:elasticsearch-core</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.elasticsearch.plugin:lang-mustache-client</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.elasticsearch.plugin:rank-eval-client</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpasyncclient</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-join</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queryparser</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>com.carrotsearch:hppc</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.logging.log4j:log4j-core</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

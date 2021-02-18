@@ -309,7 +309,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           }
         }
 
-        if (streamingDistributionService.publishToStreaming()) {
+        if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()) {
           for (String elementId : streamingElementIds) {
             Job job = streamingDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId);
             if (job != null) {
@@ -378,7 +378,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         mediaPackage.add(publicationElement);
 
         // create publication URI for streaming
-        if (streamingDistributionService.publishToStreaming() && !publishedStreamingFormats.isEmpty()) {
+        if (streamingDistributionService != null && streamingDistributionService.publishToStreaming() && !publishedStreamingFormats.isEmpty()) {
           for (Track track : mediaPackageForSearch.getTracks()) {
             String mimeType = track.getMimeType().toString();
             if (isStreamingFormat(track) && (publishedStreamingFormats.contains(mimeType)

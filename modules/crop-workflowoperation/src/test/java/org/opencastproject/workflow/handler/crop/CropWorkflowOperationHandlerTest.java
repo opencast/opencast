@@ -140,7 +140,8 @@ public class CropWorkflowOperationHandlerTest {
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowInstance.WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op", WorkflowOperationInstance.OperationState.RUNNING);
+    WorkflowOperationInstanceImpl operation
+        = new WorkflowOperationInstanceImpl("op", WorkflowOperationInstance.OperationState.RUNNING);
     operation.setState(WorkflowOperationInstance.OperationState.RUNNING);
     for (String key : configurations.keySet()) {
       operation.setConfiguration(key, configurations.get(key));

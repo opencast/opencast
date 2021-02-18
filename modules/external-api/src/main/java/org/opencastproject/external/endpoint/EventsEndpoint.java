@@ -45,8 +45,6 @@ import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
-import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.IndexObject;
@@ -77,9 +75,12 @@ import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.metadata.dublincore.MetadataList.Locked;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -168,8 +169,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
-@RestService(name = "externalapievents", title = "External API Events Service", notes = {}, abstractText = "Provides resources and operations related to the events")
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+@RestService(name = "externalapievents", title = "External API Events Service", notes = {},
+             abstractText = "Provides resources and operations related to the events")
 public class EventsEndpoint implements ManagedService {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
@@ -193,7 +196,7 @@ public class EventsEndpoint implements ManagedService {
 
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
 
-  private Map<String, MetadataField<?>> configuredMetadataFields = new TreeMap<>();
+  private Map<String, MetadataField> configuredMetadataFields = new TreeMap<>();
 
   /** The resolutions */
   private enum CommentResolution {
@@ -325,6 +328,10 @@ public class EventsEndpoint implements ManagedService {
     configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
   }
 
+  public static <T> boolean isNullOrEmpty(List<String> list) {
+    return list == null || list.isEmpty();
+  }
+
   @GET
   @Path("{eventId}")
   @RestQuery(name = "getevent", description = "Returns a single event. By setting the optional sign parameter to true, the method will pre-sign distribution urls if signing is turned on in Opencast. Remember to consider the maximum validity of signed URLs when caching this response.", returnDescription = "", pathParameters = {
@@ -441,8 +448,8 @@ public class EventsEndpoint implements ManagedService {
           @PathParam("eventId") String eventId) {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     try {
-      Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
-      Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
+      String startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : null;
+      String startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : null;
       for (final Event event : indexService.getEvent(eventId, externalIndex)) {
         EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.updateFromHttpServletRequest(event,
                 request, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
@@ -538,8 +545,8 @@ public class EventsEndpoint implements ManagedService {
   public Response createNewEvent(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request) {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     try {
-      Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
-      Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
+      String startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : null;
+      String startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : null;
       EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.createFromHttpServletRequest(request,
           ingestService, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
 
@@ -622,7 +629,7 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "A (potentially empty) list of events is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getEvents(@HeaderParam("Accept") String acceptHeader, @QueryParam("id") String id,
           @QueryParam("commentReason") String reasonFilter, @QueryParam("commentResolution") String resolutionFilter,
-          @QueryParam("filter") String filter, @QueryParam("sort") String sort, @QueryParam("offset") Integer offset,
+          @QueryParam("filter") List<String> filter, @QueryParam("sort") String sort, @QueryParam("offset") Integer offset,
           @QueryParam("limit") Integer limit, @QueryParam("sign") boolean sign, @QueryParam("withacl") Boolean withAcl,
           @QueryParam("withmetadata") Boolean withMetadata, @QueryParam("withscheduling") Boolean withScheduling,
           @QueryParam("onlyWithWriteAccess") Boolean onlyWithWriteAccess, @QueryParam("withpublications") Boolean withPublications) {
@@ -642,177 +649,265 @@ public class EventsEndpoint implements ManagedService {
       optLimit = Option.none();
     }
 
-    // Parse the filters
-    if (StringUtils.isNotBlank(filter)) {
-      for (String f : filter.split(",")) {
-        String[] filterTuple = f.split(":");
-        if (filterTuple.length < 2) {
-          logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
-          continue;
-        }
+    //List of all events from the filters
+    List<IndexObject> allEvents = new ArrayList<>();
 
-        String name = filterTuple[0];
-        String value;
+    if (!isNullOrEmpty(filter)) {
+      // API version 1.5.0: Additive filter
+      if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_5_0)) {
+        filter = filter.subList(0,1);
+      }
+      for (String filterPart : filter) {
+        // Parse the filters
 
-        if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
-          // MH-13038 - 1.1.0 and higher support colons in values
-          value = f.substring(name.length() + 1);
-        } else {
-          value = filterTuple[1];
-        }
+        for (String f : filterPart.split(",")) {
+          String[] filterTuple = f.split(":");
+          if (filterTuple.length < 2) {
+            logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
+            continue;
+          }
 
-        if ("presenters".equals(name)) {
-          query.withPresenter(value);
-        } else if ("contributors".equals(name)) {
-          query.withContributor(value);
-        } else if ("location".equals(name)) {
-          query.withLocation(value);
-        } else if ("textFilter".equals(name)) {
-          query.withText("*" + value + "*");
-        } else if ("series".equals(name)) {
-          query.withSeriesId(value);
-        } else if ("subject".equals(name)) {
-          query.withSubject(value);
-        } else if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
-          // additional filters only available with Version 1.1.0 or higher
-          if ("identifier".equals(name)) {
-            query.withIdentifier(value);
-          } else if ("title".equals(name)) {
-            query.withTitle(value);
-          } else if ("description".equals(name)) {
-            query.withDescription(value);
-          } else if ("series_name".equals(name)) {
-            query.withSeriesName(value);
-          } else if ("language".equals(name)) {
-            query.withLanguage(value);
-          } else if ("created".equals(name)) {
-            query.withCreated(value);
-          } else if ("license".equals(name)) {
-            query.withLicense(value);
-          } else if ("rightsholder".equals(name)) {
-            query.withRights(value);
-          } else if ("is_part_of".equals(name)) {
-            query.withSeriesId(value);
-          } else if ("source".equals(name)) {
-            query.withSource(value);
-          } else if ("status".equals(name)) {
-            query.withEventStatus(value);
-          } else if ("agent_id".equals(name)) {
-            query.withAgentId(value);
-          } else if ("start".equals(name)) {
-            try {
-              Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
-              query.withStartFrom(fromAndToCreationRange.getA());
-              query.withStartTo(fromAndToCreationRange.getB());
-            } catch (Exception e) {
-              return RestUtil.R
-                      .badRequest(String.format("Filter 'start' could not be parsed: %s", e.getMessage()));
+          String name = filterTuple[0];
+          String value;
 
-            }
-          } else if ("technical_start".equals(name)) {
-            try {
-              Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
-              query.withTechnicalStartFrom(fromAndToCreationRange.getA());
-              query.withTechnicalStartTo(fromAndToCreationRange.getB());
-            } catch (Exception e) {
-              return RestUtil.R
-                      .badRequest(String.format("Filter 'technical_start' could not be parsed: %s", e.getMessage()));
-
-            }
+          if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+            // MH-13038 - 1.1.0 and higher support colons in values
+            value = f.substring(name.length() + 1);
           } else {
-            logger.warn("Unknown filter criteria {}", name);
-            return RestUtil.R
-                    .badRequest(String.format("Unknown filter criterion in request: %s", name));
+            value = filterTuple[1];
+          }
 
+          if ("presenters".equals(name)) {
+            query.withPresenter(value);
+          } else if ("contributors".equals(name)) {
+            query.withContributor(value);
+          } else if ("location".equals(name)) {
+            query.withLocation(value);
+          } else if ("textFilter".equals(name)) {
+            query.withText("*" + value + "*");
+          } else if ("series".equals(name)) {
+            query.withSeriesId(value);
+          } else if ("subject".equals(name)) {
+            query.withSubject(value);
+          } else if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+            // additional filters only available with Version 1.1.0 or higher
+            if ("identifier".equals(name)) {
+              query.withIdentifier(value);
+            } else if ("title".equals(name)) {
+              query.withTitle(value);
+            } else if ("description".equals(name)) {
+              query.withDescription(value);
+            } else if ("series_name".equals(name)) {
+              query.withSeriesName(value);
+            } else if ("language".equals(name)) {
+              query.withLanguage(value);
+            } else if ("created".equals(name)) {
+              query.withCreated(value);
+            } else if ("license".equals(name)) {
+              query.withLicense(value);
+            } else if ("rightsholder".equals(name)) {
+              query.withRights(value);
+            } else if ("is_part_of".equals(name)) {
+              query.withSeriesId(value);
+            } else if ("source".equals(name)) {
+              query.withSource(value);
+            } else if ("status".equals(name)) {
+              query.withEventStatus(value);
+            } else if ("agent_id".equals(name)) {
+              query.withAgentId(value);
+            } else if ("start".equals(name)) {
+              try {
+                Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
+                query.withStartFrom(fromAndToCreationRange.getA());
+                query.withStartTo(fromAndToCreationRange.getB());
+              } catch (Exception e) {
+                return RestUtil.R
+                        .badRequest(String.format("Filter 'start' could not be parsed: %s", e.getMessage()));
+
+              }
+            } else if ("technical_start".equals(name)) {
+              try {
+                Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
+                query.withTechnicalStartFrom(fromAndToCreationRange.getA());
+                query.withTechnicalStartTo(fromAndToCreationRange.getB());
+              } catch (Exception e) {
+                return RestUtil.R
+                        .badRequest(String.format("Filter 'technical_start' could not be parsed: %s", e.getMessage()));
+
+              }
+            } else {
+              logger.warn("Unknown filter criteria {}", name);
+              return RestUtil.R.badRequest(String.format("Unknown filter criterion in request: %s", name));
+
+            }
+          }
+        }
+
+        if (optSort.isSome()) {
+          Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+          for (SortCriterion criterion : sortCriteria) {
+
+            switch (criterion.getFieldName()) {
+              case EventIndexSchema.TITLE:
+                query.sortByTitle(criterion.getOrder());
+                break;
+              case EventIndexSchema.PRESENTER:
+                query.sortByPresenter(criterion.getOrder());
+                break;
+              case EventIndexSchema.TECHNICAL_START:
+              case "technical_date":
+                query.sortByTechnicalStartDate(criterion.getOrder());
+                break;
+              case EventIndexSchema.TECHNICAL_END:
+                query.sortByTechnicalEndDate(criterion.getOrder());
+                break;
+              case EventIndexSchema.START_DATE:
+              case "date":
+                query.sortByStartDate(criterion.getOrder());
+                break;
+              case EventIndexSchema.END_DATE:
+                query.sortByEndDate(criterion.getOrder());
+                break;
+              case EventIndexSchema.WORKFLOW_STATE:
+                query.sortByWorkflowState(criterion.getOrder());
+                break;
+              case EventIndexSchema.SERIES_NAME:
+                query.sortBySeriesName(criterion.getOrder());
+                break;
+              case EventIndexSchema.LOCATION:
+                query.sortByLocation(criterion.getOrder());
+                break;
+              // For compatibility, we mimic to support the old review_status and scheduling_status sort criteria (MH-13407)
+              case "review_status":
+              case "scheduling_status":
+                break;
+              default:
+                return RestUtil.R.badRequest(String.format("Unknown sort criterion in request: %s", criterion.getFieldName()));
+            }
+          }
+        }
+
+        // TODO: Add the comment resolution filter to the query
+        if (StringUtils.isNotBlank(resolutionFilter)) {
+          try {
+            CommentResolution.valueOf(resolutionFilter);
+          } catch (Exception e) {
+            logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
+            return Response.status(Status.BAD_REQUEST).build();
+          }
+        }
+
+        if (optLimit.isSome())
+          query.withLimit(optLimit.get());
+        if (optOffset.isSome())
+          query.withOffset(offset);
+        // TODO: Add other filters to the query
+
+        SearchResult<Event> results = null;
+        try {
+          results = externalIndex.getByQuery(query);
+        } catch (SearchIndexException e) {
+          logger.error("The External Search Index was not able to get the events list", e);
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        }
+
+        SearchResultItem<Event>[] items = results.getItems();
+        List<IndexObject> events = new ArrayList<>();
+        for (SearchResultItem<Event> item : items) {
+          Event source = item.getSource();
+          source.updatePreview(previewSubtype);
+          events.add(source);
+        }
+        //Append  filtered results to the list
+        allEvents.addAll(events);
+      }
+    } else {
+      if (optSort.isSome()) {
+        Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+        for (SortCriterion criterion : sortCriteria) {
+
+          switch (criterion.getFieldName()) {
+            case EventIndexSchema.TITLE:
+              query.sortByTitle(criterion.getOrder());
+              break;
+            case EventIndexSchema.PRESENTER:
+              query.sortByPresenter(criterion.getOrder());
+              break;
+            case EventIndexSchema.TECHNICAL_START:
+            case "technical_date":
+              query.sortByTechnicalStartDate(criterion.getOrder());
+              break;
+            case EventIndexSchema.TECHNICAL_END:
+              query.sortByTechnicalEndDate(criterion.getOrder());
+              break;
+            case EventIndexSchema.START_DATE:
+            case "date":
+              query.sortByStartDate(criterion.getOrder());
+              break;
+            case EventIndexSchema.END_DATE:
+              query.sortByEndDate(criterion.getOrder());
+              break;
+            case EventIndexSchema.WORKFLOW_STATE:
+              query.sortByWorkflowState(criterion.getOrder());
+              break;
+            case EventIndexSchema.SERIES_NAME:
+              query.sortBySeriesName(criterion.getOrder());
+              break;
+            case EventIndexSchema.LOCATION:
+              query.sortByLocation(criterion.getOrder());
+              break;
+            // For compatibility, we mimic to support the old review_status and scheduling_status sort criteria (MH-13407)
+            case "review_status":
+            case "scheduling_status":
+              break;
+            default:
+              return RestUtil.R.badRequest(String.format("Unknown sort criterion in request: %s", criterion.getFieldName()));
           }
         }
       }
-    }
 
-    if (optSort.isSome()) {
-      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
-      for (SortCriterion criterion : sortCriteria) {
-
-        switch (criterion.getFieldName()) {
-          case EventIndexSchema.TITLE:
-            query.sortByTitle(criterion.getOrder());
-            break;
-          case EventIndexSchema.PRESENTER:
-            query.sortByPresenter(criterion.getOrder());
-            break;
-          case EventIndexSchema.TECHNICAL_START:
-          case "technical_date":
-            query.sortByTechnicalStartDate(criterion.getOrder());
-            break;
-          case EventIndexSchema.TECHNICAL_END:
-            query.sortByTechnicalEndDate(criterion.getOrder());
-            break;
-          case EventIndexSchema.START_DATE:
-          case "date":
-            query.sortByStartDate(criterion.getOrder());
-            break;
-          case EventIndexSchema.END_DATE:
-            query.sortByEndDate(criterion.getOrder());
-            break;
-          case EventIndexSchema.WORKFLOW_STATE:
-            query.sortByWorkflowState(criterion.getOrder());
-            break;
-          case EventIndexSchema.SERIES_NAME:
-            query.sortBySeriesName(criterion.getOrder());
-            break;
-          case EventIndexSchema.LOCATION:
-            query.sortByLocation(criterion.getOrder());
-            break;
-          // For compatibilty, we mimic to support the old review_status and scheduling_status sort criteria (MH-13407)
-          case "review_status":
-          case "scheduling_status":
-            break;
-          default:
-            return RestUtil.R
-                    .badRequest(String.format("Unknown sort criterion in request: %s", criterion.getFieldName()));
+      // TODO: Add the comment resolution filter to the query
+      if (StringUtils.isNotBlank(resolutionFilter)) {
+        try {
+          CommentResolution.valueOf(resolutionFilter);
+        } catch (Exception e) {
+          logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
+          return Response.status(Status.BAD_REQUEST).build();
         }
       }
-    }
 
-    // TODO: Add the comment resolution filter to the query
-    if (StringUtils.isNotBlank(resolutionFilter)) {
-      try {
-        CommentResolution.valueOf(resolutionFilter);
-      } catch (Exception e) {
-        logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
-        return Response.status(Status.BAD_REQUEST).build();
+      if (optLimit.isSome())
+        query.withLimit(optLimit.get());
+      if (optOffset.isSome())
+        query.withOffset(offset);
+
+      if (onlyWithWriteAccess != null && onlyWithWriteAccess) {
+        query.withoutActions();
+        query.withAction(Permissions.Action.WRITE);
       }
-    }
+      // TODO: Add other filters to the query
 
-    if (optLimit.isSome())
-      query.withLimit(optLimit.get());
-    if (optOffset.isSome())
-      query.withOffset(offset);
+      SearchResult<Event> results = null;
+      try {
+        results = externalIndex.getByQuery(query);
+      } catch (SearchIndexException e) {
+        logger.error("The External Search Index was not able to get the events list", e);
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
 
-    if (onlyWithWriteAccess != null && onlyWithWriteAccess) {
-      query.withoutActions();
-      query.withAction(Permissions.Action.WRITE);
-    }
-    // TODO: Add other filters to the query
-
-    SearchResult<Event> results = null;
-    try {
-      results = externalIndex.getByQuery(query);
-    } catch (SearchIndexException e) {
-      logger.error("The External Search Index was not able to get the events list", e);
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    }
-
-    SearchResultItem<Event>[] items = results.getItems();
-    List<IndexObject> events = new ArrayList<>();
-    for (SearchResultItem<Event> item : items) {
-      Event source = item.getSource();
-      source.updatePreview(previewSubtype);
-      events.add(source);
+      SearchResultItem<Event>[] items = results.getItems();
+      List<IndexObject> events = new ArrayList<>();
+      for (SearchResultItem<Event> item : items) {
+        Event source = item.getSource();
+        source.updatePreview(previewSubtype);
+        events.add(source);
+      }
+      //Append  filtered results to the list
+      allEvents.addAll(events);
     }
     try {
       return getJsonEvents(
-          acceptHeader, events, withAcl, withMetadata, withScheduling, withPublications, sign, requestedVersion);
+          acceptHeader, allEvents, withAcl, withMetadata, withScheduling, withPublications, sign, requestedVersion);
     } catch (Exception e) {
       logger.error("Unable to get events", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -930,7 +1025,7 @@ public class EventsEndpoint implements ManagedService {
       try {
         Opt<MetadataList> metadata = getEventMetadata(event);
         if (metadata.isSome()) {
-          fields.add(f("metadata", metadata.get().toJSON()));
+          fields.add(f("metadata", MetadataJson.listToJson(metadata.get(), true)));
         }
       } catch (Exception e) {
         logger.error("Unable to get metadata for event '{}'", event.getIdentifier(), e);
@@ -1104,13 +1199,13 @@ public class EventsEndpoint implements ManagedService {
         MetadataList actualList = metadataList.get();
 
         // API v1 should return a two separate fields for start date and start time. Since those fields were merged in index service, we have to split them up.
-        Opt<MetadataCollection> collection = actualList.getMetadataByFlavor("dublincore/episode");
-        if (collection.isSome()) {
-          convertStartDateTimeToApiV1(collection.get());
-          ExternalMetadataUtils.changeTypeOrderedTextToText(collection.get());
+        final DublinCoreMetadataCollection collection = actualList.getMetadataByFlavor("dublincore/episode");
+        final boolean withOrderedText = collection == null;
+        if (collection != null) {
+          convertStartDateTimeToApiV1(collection);
         }
 
-        return ApiResponses.Json.ok(requestedVersion, actualList.toJSON());
+        return ApiResponses.Json.ok(requestedVersion, MetadataJson.listToJson(actualList, withOrderedText));
       }
       else
         return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
@@ -1119,42 +1214,31 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  private void convertStartDateTimeToApiV1(MetadataCollection collection) throws java.text.ParseException {
+  private void convertStartDateTimeToApiV1(DublinCoreMetadataCollection collection) throws java.text.ParseException {
 
     if (!collection.getOutputFields().containsKey("startDate")) return;
 
-    MetadataField<String> oldStartDateField = (MetadataField<String>) collection.getOutputFields().get("startDate");
-    SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(oldStartDateField.getPattern().get());
-    Date startDate = sdf.parse(oldStartDateField.getValue().get());
+    MetadataField oldStartDateField = collection.getOutputFields().get("startDate");
+    SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(oldStartDateField.getPattern());
+    Date startDate = sdf.parse((String) oldStartDateField.getValue());
 
     if (configuredMetadataFields.containsKey("startDate")) {
-      MetadataField<String> startDateField = (MetadataField<String>) configuredMetadataFields.get("startDate");
-      startDateField = MetadataField.createTemporalStartDateMetadata(startDateField.getInputID(),
-              Opt.some(startDateField.getOutputID()),
-              startDateField.getLabel(),
-              startDateField.isReadOnly(),
-              startDateField.isRequired(),
-              startDateField.getPattern().getOr("yyyy-MM-dd"),
-              startDateField.getOrder(),
-              startDateField.getNamespace());
-      sdf.applyPattern(startDateField.getPattern().get());
+      MetadataField startDateField = configuredMetadataFields.get("startDate");
+      final String pattern = startDateField.getPattern() == null ? "yyyy-MM-dd" : startDateField.getPattern();
+      startDateField = new MetadataField(startDateField);
+      startDateField.setPattern(pattern);
+      sdf.applyPattern(startDateField.getPattern());
       startDateField.setValue(sdf.format(startDate));
       collection.removeField(oldStartDateField);
       collection.addField(startDateField);
     }
 
     if (configuredMetadataFields.containsKey("startTime")) {
-      MetadataField<String> startTimeField = (MetadataField<String>) configuredMetadataFields.get("startTime");
-      startTimeField = MetadataField.createTemporalStartTimeMetadata(
-              startTimeField.getInputID(),
-              Opt.some(startTimeField.getOutputID()),
-              startTimeField.getLabel(),
-              startTimeField.isReadOnly(),
-              startTimeField.isRequired(),
-              startTimeField.getPattern().getOr("HH:mm"),
-              startTimeField.getOrder(),
-              startTimeField.getNamespace());
-      sdf.applyPattern(startTimeField.getPattern().get());
+      MetadataField startTimeField = configuredMetadataFields.get("startTime");
+      final String pattern = startTimeField.getPattern() == null ? "HH:mm" : startTimeField.getPattern();
+      startTimeField = new MetadataField(startTimeField);
+      startTimeField.setPattern(pattern);
+      sdf.applyPattern(startTimeField.getPattern());
       startTimeField.setValue(sdf.format(startDate));
       collection.addField(startTimeField);
     }
@@ -1175,12 +1259,12 @@ public class EventsEndpoint implements ManagedService {
     if (catalogUIAdapters.size() > 0) {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
         // TODO: This is very slow:
-        MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
+        DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
         if (fields != null) metadataList.add(catalogUIAdapter, fields);
       }
     }
     // TODO: This is slow:
-    MetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
+    DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
     ExternalMetadataUtils.removeCollectionList(collection);
     metadataList.add(eventCatalogUIAdapter, collection);
@@ -1208,12 +1292,11 @@ public class EventsEndpoint implements ManagedService {
       }
       // Try the main catalog first as we load it from the index.
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
-        MetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
+        DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
         convertStartDateTimeToApiV1(collection);
-        ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
-        return ApiResponses.Json.ok(requestedVersion, collection.toJSON());
+        return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
       }
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
@@ -1222,11 +1305,10 @@ public class EventsEndpoint implements ManagedService {
       if (catalogUIAdapters.size() > 0) {
         for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
           if (flavor.get().equals(catalogUIAdapter.getFlavor())) {
-            MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
+            DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
             convertStartDateTimeToApiV1(fields);
-            ExternalMetadataUtils.changeTypeOrderedTextToText(fields);
-            return ApiResponses.Json.ok(requestedVersion, fields.toJSON());
+            return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(fields, false));
           }
         }
       }
@@ -1270,7 +1352,7 @@ public class EventsEndpoint implements ManagedService {
               String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
     }
 
-    MetadataCollection collection = null;
+    DublinCoreMetadataCollection collection = null;
     EventCatalogUIAdapter adapter = null;
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       MetadataList metadataList = new MetadataList();
@@ -1303,7 +1385,7 @@ public class EventsEndpoint implements ManagedService {
 
       for (String key : updatedFields.keySet()) {
         if ("subjects".equals(key)) {
-          MetadataField<?> field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
+          MetadataField field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
           Opt<Response> error = validateField(field, key, id, type, updatedFields);
           if (error.isSome()) {
             return error.get();
@@ -1311,39 +1393,42 @@ public class EventsEndpoint implements ManagedService {
           collection.removeField(field);
           JSONArray subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
           collection.addField(
-                  MetadataField.copyMetadataFieldWithValue(field, StringUtils.join(subjectArray.iterator(), ",")));
+                  MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjectArray.iterator(), ",")));
         } else if ("startDate".equals(key)) {
           // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
-          MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get(key);
+          MetadataField field = collection.getOutputFields().get(key);
           Opt<Response> error = validateField(field, key, id, type, updatedFields);
           if (error.isSome()) {
             return error.get();
           }
-          String apiPattern = field.getPattern().get();
+          String apiPattern = field.getPattern();
           if (configuredMetadataFields.containsKey("startDate")) {
-            apiPattern = configuredMetadataFields.get("startDate").getPattern().getOr(apiPattern);
+            final String startDate = configuredMetadataFields.get("startDate").getPattern();
+            apiPattern = startDate == null ? apiPattern : startDate;
           }
           SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
-          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
-          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
+          DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
           DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
           DateTime updatedStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
           collection.removeField(field);
-          collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(updatedStartDate.toDate())));
+          collection.addField(
+                  MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
         } else if ("startTime".equals(key)) {
           // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
-          MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get("startDate");
+          MetadataField field = collection.getOutputFields().get("startDate");
           Opt<Response> error = validateField(field, "startDate", id, type, updatedFields);
           if (error.isSome()) {
             return error.get();
           }
           String apiPattern = "HH:mm";
           if (configuredMetadataFields.containsKey("startTime")) {
-            apiPattern = configuredMetadataFields.get("startTime").getPattern().getOr(apiPattern);
+            final String startTime = configuredMetadataFields.get("startTime").getPattern();
+            apiPattern = startTime == null ? apiPattern : startTime;
           }
           SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
-          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
-          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
+          DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
           DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
           DateTime updatedStartDate = oldStartDate.withTime(
                   newStartDate.hourOfDay().get(),
@@ -1351,15 +1436,17 @@ public class EventsEndpoint implements ManagedService {
                   newStartDate.secondOfMinute().get(),
                   newStartDate.millisOfSecond().get());
           collection.removeField(field);
-          collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(updatedStartDate.toDate())));
+          collection.addField(
+                  MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
         } else {
-          MetadataField<?> field = collection.getOutputFields().get(key);
+          MetadataField field = collection.getOutputFields().get(key);
           Opt<Response> error = validateField(field, key, id, type, updatedFields);
           if (error.isSome()) {
             return error.get();
           }
           collection.removeField(field);
-          collection.addField(MetadataField.copyMetadataFieldWithValue(field, updatedFields.get(key)));
+          collection.addField(
+                  MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
         }
       }
 
@@ -1370,7 +1457,7 @@ public class EventsEndpoint implements ManagedService {
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
 
-  private Opt<Response> validateField(MetadataField<?> field, String key, String id, String type, Map<String, String> updatedFields) {
+  private Opt<Response> validateField(MetadataField field, String key, String id, String type, Map<String, String> updatedFields) {
     if (field == null) {
       return Opt.some(ApiResponses.notFound(
               "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
@@ -1685,7 +1772,8 @@ public class EventsEndpoint implements ManagedService {
 
   @GET
   @Path("{eventId}/scheduling")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
+              ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1713,7 +1801,8 @@ public class EventsEndpoint implements ManagedService {
 
   @PUT
   @Path("{eventId}/scheduling")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
+              ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),

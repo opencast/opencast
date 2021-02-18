@@ -46,14 +46,11 @@ import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
 import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentImpl;
@@ -61,6 +58,8 @@ import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.IncidentTreeImpl;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
 import org.opencastproject.matterhorn.search.impl.SearchResultItemImpl;
@@ -77,9 +76,10 @@ import org.opencastproject.mediapackage.track.AbstractStreamImpl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -630,7 +630,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       }
 
       @Override
-      public MetadataCollection getFields(MediaPackage mediapackage) {
+      public DublinCoreMetadataCollection getFields(MediaPackage mediapackage) {
         return super.getRawFields();
       }
     };

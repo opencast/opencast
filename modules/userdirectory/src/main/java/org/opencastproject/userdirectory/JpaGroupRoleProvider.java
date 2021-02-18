@@ -47,6 +47,8 @@ import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.userdirectory.api.AAIRoleProvider;
+import org.opencastproject.userdirectory.api.GroupRoleProvider;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
 
@@ -81,7 +83,7 @@ import javax.persistence.EntityTransaction;
   immediate = true,
   service = { RoleProvider.class, JpaGroupRoleProvider.class }
 )
-public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider, GroupProvider {
+public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);
@@ -181,6 +183,17 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.userdirectory.api.AAIRoleProvider#getRoles()
+   */
+  @Override
+  public Iterator<Role> getRoles() {
+    String orgId = securityService.getOrganization().getId();
+    return getGroupsRoles(UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf)).iterator();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override
@@ -263,6 +276,22 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    *          the list of group role names
    */
   public void updateGroupMembershipFromRoles(String userName, String orgId, List<String> roleList) {
+      updateGroupMembershipFromRoles(userName, orgId, roleList, "");
+  }
+
+  /**
+   * Updates a user's group membership
+   *
+   * @param userName
+   *          the username
+   * @param orgId
+              the user's organization
+   * @param roleList
+   *          the list of group role names
+   * @param prefix
+   *          handle only roles with given prefix
+   */
+  public void updateGroupMembershipFromRoles(String userName, String orgId, List<String> roleList, String prefix) {
 
     logger.debug("updateGroupMembershipFromRoles({}, size={})", userName, roleList.size());
 
@@ -275,6 +304,10 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     // List of the user's groups
     List<JpaGroup> membership = UserDirectoryPersistenceUtil.findGroupsByUser(userName, orgId, emf);
     for (JpaGroup group : membership) {
+      if (StringUtils.isNotBlank(prefix) && !group.getRole().startsWith(prefix)) {
+        //ignore groups of other providers
+        continue;
+      }
       try {
         if (roleList.contains(group.getRole())) {
           // record this membership
@@ -286,7 +319,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
           addGroup(group);
         }
       } catch (UnauthorizedException e) {
-         logger.warn("Unable to add or remove user {} from group {} - unauthorized", userName, group.getRole());
+         logger.warn("Unauthorized to add or remove user {} from group {}", userName, group.getRole(), e);
       }
     }
 
@@ -303,7 +336,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
             logger.warn("Cannot add user {} to group {} - no group found with that role", userName, rolename);
           }
         } catch (UnauthorizedException e) {
-          logger.warn("Unable to add user {} to group {} - unauthorized", userName, group.getRole());
+          logger.warn("Unauthorized to add user {} to group {}", userName, group.getRole(), e);
         }
       }
     }
@@ -329,6 +362,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @param group
    *          the group to add
    */
+  @Override
   public void addGroup(final JpaGroup group) throws UnauthorizedException {
     if (group != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, group.getRoles()))
       throw new UnauthorizedException("The user is not allowed to add or update a group with the admin role");
@@ -519,23 +553,11 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   }
 
   /**
-   * Update a group
+   * {@inheritDoc}
    *
-   * @param groupId
-   *          the id of the group to update
-   * @param name
-   *          the name to update
-   * @param description
-   *          the description to update
-   * @param roles
-   *          the roles to update
-   * @param users
-   *          the users to update
-   * @throws NotFoundException
-   *           if the group is not found
-   * @throws UnauthorizedException
-   *           if the user does not have rights to update the group
+   * @see org.opencastproject.userdirectory.api.GroupRoleProvider#updateGroup(String, String, String, String, String)
    */
+  @Override
   public void updateGroup(String groupId, String name, String description, String roles, String users)
           throws NotFoundException, UnauthorizedException {
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();

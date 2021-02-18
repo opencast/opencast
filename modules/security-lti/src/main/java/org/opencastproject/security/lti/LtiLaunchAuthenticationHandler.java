@@ -52,6 +52,7 @@ import org.springframework.security.oauth.provider.token.OAuthAccessProviderToke
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -134,6 +135,12 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /** A List of Roles to add to the user if he has the custom role name **/
   private static final String CUSTOM_ROLES = "lti.custom_roles";
 
+  /** Key prefix for configuring consumer role prefixes */
+  private static final String ROLE_PREFIX_KEY = "lti.consumer_role_prefix.";
+
+  /** Consumer role prefix store */
+  private final ConcurrentHashMap<String, String> rolePrefixes = new ConcurrentHashMap<>();
+
   private String customRoleName = "";
 
   private String[] customRoles;
@@ -187,7 +194,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   protected void activate(ComponentContext cc) {
     logger.info("Activating LtiLaunchAuthenticationHandler");
     componentContext = cc;
-    Dictionary properties = cc.getProperties();
+    Dictionary<String, Object> properties = cc.getProperties();
 
     logger.debug("Updating LtiLaunchAuthenticationHandler");
 
@@ -240,12 +247,23 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       customRoles = custumRolesString.split(",");
     }
 
+    // Allow configuring prefixes for certain consumer
+    for (String key: Collections.list(properties.keys())) {
+      if (key.startsWith(ROLE_PREFIX_KEY)) {
+        final String consumerKey = key.substring(ROLE_PREFIX_KEY.length());
+        final String prefix = Objects.toString(properties.get(key), "");
+        logger.debug("Adding role prefix '{}' for consumer using OAuth key '{}'", prefix, consumerKey);
+        rolePrefixes.put(consumerKey, prefix);
+      }
+    }
+
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.springframework.security.oauth.provider.OAuthAuthenticationHandler#createAuthentication(javax.servlet.http.HttpServletRequest,
+   * @see org.springframework.security.oauth.provider.OAuthAuthenticationHandler#createAuthentication(
+   *      javax.servlet.http.HttpServletRequest,
    *      org.springframework.security.oauth.provider.ConsumerAuthentication,
    *      org.springframework.security.oauth.provider.token.OAuthAccessProviderToken)
    */
@@ -270,8 +288,11 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     // We need to construct a complex ID to avoid confusion
     String username = LTI_USER_ID_PREFIX + LTI_ID_DELIMITER + consumerGUID + LTI_ID_DELIMITER + userIdFromConsumer;
 
+    final String oaAuthKey = request.getParameter("oauth_consumer_key");
+
+    final String rolePrefix = rolePrefixes.getOrDefault(oaAuthKey, "");
+
     // if this is a trusted consumer we trust their details
-    String oaAuthKey = request.getParameter("oauth_consumer_key");
     if (highlyTrustedConsumerKeys.contains(oaAuthKey)) {
       logger.debug("{} is a trusted key", oaAuthKey);
 
@@ -315,7 +336,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       // we still need to enrich this user with the LTI Roles
       String roles = request.getParameter(ROLES);
       String context = request.getParameter(CONTEXT_ID);
-      enrichRoleGrants(roles, context, userAuthorities);
+      enrichRoleGrants(roles, context, rolePrefix, userAuthorities);
     } catch (UsernameNotFoundException e) {
       logger.trace("This user is known to the tool consumer only. Creating an Opencast user on the fly.", e);
 
@@ -323,9 +344,9 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       // We should add the authorities passed in from the tool consumer?
       String roles = request.getParameter(ROLES);
       String context = request.getParameter(CONTEXT_ID);
-      enrichRoleGrants(roles, context, userAuthorities);
+      enrichRoleGrants(roles, context, rolePrefix, userAuthorities);
 
-      logger.info("Returning user with {} authorities", userAuthorities.size());
+      logger.debug("Returning user with {} authorities", userAuthorities.size());
 
       userDetails = new User(username, "oauth", true, true, true, true, userAuthorities);
     }
@@ -405,31 +426,25 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
    * @param userAuthorities
    *          Collection to append to.
    */
-  private void enrichRoleGrants(String roles, String context, Collection<GrantedAuthority> userAuthorities) {
-    // Roles could be a list
+  private void enrichRoleGrants(String roles, String context, final String rolePrefix,
+      Collection<GrantedAuthority> userAuthorities) {
     if (roles != null) {
+      // Roles could be a list
       String[] roleList = roles.split(",");
 
       // Use a generic context and learner if none is given:
       context = StringUtils.isBlank(context) ? DEFAULT_CONTEXT : context;
 
-      for (String learner : roleList) {
+      for (final String ltiRole : roleList) {
         // Build the role
-        String role;
-        String group;
-        if (learner.equals(customRoleName)) {
-          for (String rolename : customRoles) {
-            userAuthorities.add(new SimpleGrantedAuthority(rolename));
+        if (ltiRole.equals(customRoleName)) {
+          for (String roleName : customRoles) {
+            userAuthorities.add(new SimpleGrantedAuthority(roleName));
           }
         }
 
-        if (StringUtils.isBlank(learner)) {
-          role = context + "_" + DEFAULT_LEARNER;
-        } else {
-          role = context + "_" + learner;
-          group = "ROLE_GROUP_" + learner.toUpperCase();
-          logger.debug("Adding group: {}", group);
-        }
+        final String normalizedLtiRole = StringUtils.defaultIfBlank(ltiRole, DEFAULT_LEARNER);
+        final String role = rolePrefix + context + "_" + normalizedLtiRole;
 
         // Make sure to not accept ROLE_…
         if (role.trim().toUpperCase().startsWith("ROLE_")) {

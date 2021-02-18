@@ -11,7 +11,7 @@ Key               | Type    | Description                                       
 list.name         | String  | The list's unique identifier within a tenant       | yes       | n/a
 list.default      | String  | The name of the default key                        | no        | n/a
 list.translatable | Boolean | Whether the values are supposed to be translatable | no        | false
-list.org          | String  | The organisation ID                                | no        | "\*"
+list.org          | String  | The organization ID                                | no        | "\*"
 
 Note that it is up to the client to handle the keys `list.default` and `list.translatable`.
 
@@ -29,7 +29,7 @@ The following logic is used to locate a list with a given list name *LISTNAME*:
 2. If not found, return the list *LISTNAME* available for all tenants
 3. If not found, return no list
 
-While the filename of the list does not affect the list itself, we recommend to include the organisation identifier
+While the filename of the list does not affect the list itself, we recommend to include the organization identifier
 in the filename.
 
 ### Example

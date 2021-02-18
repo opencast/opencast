@@ -26,10 +26,10 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.data.Option;
 

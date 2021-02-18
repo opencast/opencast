@@ -4,21 +4,26 @@
    "NAV_ABOUT": "Over",
    "NO": "Neen",
    "SUBMIT": "Verzenden",
-   "UPDATE": "Updaten",
+   "UPDATE": {
+      "MINOR": "Minor update beschikbaar",
+      "MAJOR": "Majoor update beschikbaar",
+      "UNSUPPORTED": "Versie {{ version }} wordt niet langer ondersteund",
+      "UNDETERMINED": "Onbepaalde versie"
+   },
    "CANCEL": "Annuleren",
    "CONFIRM": "Bevestigen",
    "SAVE": "Opslaan",
-   "CONTINUE": "Continue",
-   "CLOSE": "Close",
+   "CONTINUE": "Doorgaan",
+   "CLOSE": "Afsluiten",
    "LOGOUT": "Afmelden",
    "RESET": "Reset",
    "SELECT_NO_OPTION_SELECTED": "Geen optie geselecteerd",
    "SELECT_NO_OPTIONS_AVAILABLE": "Geen opties beschikbaar",
    "YES": "Ja",
-   "COPY": "Copy to clipboard",
+   "COPY": "Naar klembord kopiëren",
    "LTI": {
       "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
-      "SERIES_TITLE": "View Series",
+      "SERIES_TITLE": "Bekijk serie",
       "UPLOAD_TITLE": "Upload event",
       "LOADING": "Loading…",
       "NEW_UPLOAD": "Upload new event",
@@ -37,7 +42,7 @@
       "SELECT_OPTION": "Select option",
       "JOB_TITLE": "Title",
       "JOB_STATUS": "Status",
-      "UPLOAD_SUCCESS": "Upload succeded!",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
       "UPLOAD_FAILURE": "Upload failed!",
       "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
       "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
@@ -47,7 +52,7 @@
       "GENERIC_ERROR": "Error: {{message}}",
       "DELETION_SUCCESS": "Event deletion successful",
       "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
-      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
+      "EVENT_LOCKED": "Deze evenement wordt momenteel verwerkt. Wacht tut u verdere wijzigingen aanbrengt...",
       "DELETION_FAILURE": "Event deletion failed",
       "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
       "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
@@ -129,7 +134,8 @@
       "USERS_GUIDE": "Gebruikershandleiding",
       "DOCUMENTATION": "Documentatie",
       "REST_DOC": "REST API documentatie",
-      "HOTKEY_CHEAT_SHEET": "Sneltoetsen"
+      "HOTKEY_CHEAT_SHEET": "Sneltoetsen",
+      "ADOPTER_REGISTRATION": "Adopter Registration"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "De toegangspolicy werd aangemaakt",
@@ -222,10 +228,14 @@
       "ACTIVE_TRANSACTION": "Het huidige evenement kan momenteel niet worden bewerkt aangezien het bij een actieve transactie betrokken is.",
       "BULK_METADATA_UPDATE": {
          "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "ALL_EVENTS_UPDATED": "Alle evenementen zijn met succes geüpdatet.",
          "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
-      }
+         "SOME_EVENTS_NOT_UPDATED": "Sommige evenementen konden niet geüpdatet worden."
+      },
+      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
+      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
    },
    "BULK_ACTIONS": {
       "CAPTION": "Acties",
@@ -272,7 +282,7 @@
             "CANNOTSTART": "Gemarkeerde Event (s) kunnen niet worden verwerkt, alleen geplande gebeurtenissen worden ondersteund.",
             "NOCHANGES": "Geen veranderingen in de gebeurtenissen gedetecteerd!",
             "CONFLICT_FIRST_EVENT": "Evenement veranderd",
-            "CONFLICT_SECOND_EVENT": "Event in conflict",
+            "CONFLICT_SECOND_EVENT": "Evenement in conflict",
             "CANNOTEDITSCHEDULE": "Onvoldoende permissies om de tijdschema informatie aan te passen voor het geselecteerde event. Je kan verdergaan, zonder de mogelijkheid om tijdschema informatie aan te passen voor alle events."
          },
          "METADATA": {
@@ -287,23 +297,23 @@
          },
          "EDIT": {
             "CAPTION": "Bewerken",
-            "EVENT": "event",
-            "EVENTS": "events",
+            "EVENT": "evenement",
+            "EVENTS": "evenementen",
             "HEADER": "Deze pagina stelt u in staat geplande gebeurtenissen te bewerken, gegroepeerd op weekdagen. De invoervelden zijn vooraf ingevuld in het geval alle geplande gebeurtenissen dezelfde waarde hebben voor een specifiek veld. Anders worden de invoervelden leeg gelaten. Door de invoervelden leeg te laten, betekent dit dat de respectieve waarden niet gewijzigd moeten worden.",
             "METADATA": "Metadata",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Edit the metadata of multiple events",
+         "CAPTION": "Bewerk de metadata van meerdere evenementen",
          "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "CANNOT_EDIT_SOME": "Gemarkeerde evenementen kunnen niet bewerkt worden.",
+            "NOTHING_TO_EDIT": "Deze evenementen kunnen niet bewerkt worden.",
             "NOT_FOUND": "Not found",
             "RUNNING_WORKFLOW": "Running workflow",
             "TABLE": {
-               "CAPTION": "Selected events",
+               "CAPTION": "Geselecteerde evenementen",
                "ERRORS": "Errors"
             }
          },
@@ -380,6 +390,63 @@
       },
       "STATISTICS": {
          "TITLE": "Statistieken"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Registration",
+         "SKIP": "Not now",
+         "CONTINUE": "Continue",
+         "BACK": "Back",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Terms of Service and Privacy Policy"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Thank you for using Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Organisation",
+            "DEPARTMENT": "Department",
+            "COUNTRY": "Country",
+            "POSTAL_CODE": "Postal code",
+            "CITY": "City",
+            "CONTACT_INFO": "Contact information",
+            "GENDER": "Gender",
+            "GENDER_MALE": "male",
+            "GENDER_FEMALE": "female",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name",
+            "STREET": "Street",
+            "NUMBER": "Number",
+            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "MAIL": "Email",
+            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
+            "POLICY_HEADLINE": "Privacy policy and terms of use",
+            "USAGE_STATISTICS": "Usage statistcs",
+            "ERROR_REPORTS": "Error reports",
+            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
+            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Maybe next time!",
+            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Thank you for your registration!",
+            "TEXT_LEADING_TO_PATH": "You can change your data at ",
+            "TEXT_LEADING_AFTER_PATH": "at any time."
+         },
+         "ERROR": {
+            "HEADER": "Error",
+            "TEXT": "An error occurred while processing your request."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Are you sure you want to delete your registration data?"
+         }
       }
    },
    "EVENTS": {

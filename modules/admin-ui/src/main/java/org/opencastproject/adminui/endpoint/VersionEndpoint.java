@@ -28,6 +28,7 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -39,6 +40,8 @@ import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Map;
 
 import javax.ws.rs.GET;
@@ -68,12 +71,13 @@ public class VersionEndpoint {
   private String version = "";
 
   /** GitHub URL */
-  private String url = "https://api.github.com/repos/opencast/opencast/releases";
+  private static final String URL = "https://api.github.com/repos/opencast/opencast/releases";
 
   /** The date */
   private long lastUpdated = 0;
 
   private static final Gson gson = new Gson();
+  private static final Type mapArrayType = new TypeToken<Map<String, Object>[]>() { }.getType();
 
   /** OSGi callback. */
   @Activate
@@ -98,12 +102,19 @@ public class VersionEndpoint {
     if (System.currentTimeMillis() / 1000L - lastUpdated < 3600) {
       return;
     }
+    HttpClient client = HttpClientBuilder.create().build();
+    HttpGet request = new HttpGet(URL);
+    final String responseString;
     try {
-      HttpClient client = HttpClientBuilder.create().build();
-      HttpGet request = new HttpGet(url);
       HttpResponse response = client.execute(request);
-      String responseString = IOUtils.toString(response.getEntity().getContent(), "utf-8");
-      Map[] data = gson.fromJson(responseString, Map[].class);
+      responseString = IOUtils.toString(response.getEntity().getContent(), "utf-8");
+    } catch (IOException e) {
+      // Be silent about not reaching GitHub. It's not the end of the world and we don't want to spam the logs.
+      logger.debug("Could not get version from GitHub", e);
+      return;
+    }
+    try {
+      Map<String, Object>[] data = gson.fromJson(responseString, mapArrayType);
       double latestVersion = 0;
       for (Map<String,Object> release : data) {
         if (Double.parseDouble((String) release.get("tag_name")) > latestVersion) {

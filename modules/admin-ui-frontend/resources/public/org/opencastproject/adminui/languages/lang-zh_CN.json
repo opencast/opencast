@@ -1,0 +1,2145 @@
+{
+   "MATTERHORN": "Opencast",
+   "NAV_HOME": "开始",
+   "NAV_ABOUT": "关于",
+   "NO": "否",
+   "SUBMIT": "提交",
+   "UPDATE": {
+      "MINOR": "有小版本更新",
+      "MAJOR": "有大版本更新",
+      "UNSUPPORTED": "版本 {{ version }} 已失去支持",
+      "UNDETERMINED": "无法识别版本号"
+   },
+   "CANCEL": "取消",
+   "CONFIRM": "确定",
+   "SAVE": "保存",
+   "CONTINUE": "继续",
+   "CLOSE": "关闭",
+   "LOGOUT": "注销",
+   "RESET": "重置",
+   "SELECT_NO_OPTION_SELECTED": "未选择选项。",
+   "SELECT_NO_OPTIONS_AVAILABLE": "无可用的选项",
+   "YES": "是",
+   "COPY": "复制到剪贴板",
+   "LTI": {
+      "ERROR_LOADING_METADATA": "加载事件元数据时出错。请稍后再试。",
+      "SERIES_TITLE": "查看系列",
+      "UPLOAD_TITLE": "上传事件",
+      "LOADING": "加载中...",
+      "NEW_UPLOAD": "上传新事件",
+      "EDIT_UPLOAD": "编辑事件",
+      "CURRENT_JOBS": "今天的任务",
+      "PRESENTER": "演讲者",
+      "PRESENTER_DESCRIPTION": "拍摄演讲者的视频文件",
+      "CAPTION": "字幕",
+      "CAPTION_DESCRIPTION": "字幕文件，支持VTT格式",
+      "UPLOAD": "上传",
+      "UPLOADING": "上传中",
+      "EDIT": "保存",
+      "EDIT_TITLE": "编辑事件",
+      "NO_OPTION_SELECTED": "没有选择任何选项",
+      "EDITING": "保存中…",
+      "SELECT_OPTION": "选择选项",
+      "JOB_TITLE": "标题",
+      "JOB_STATUS": "状态",
+      "UPLOAD_SUCCESS": "上传成功！",
+      "UPLOAD_FAILURE": "上传失败!",
+      "UPLOAD_FAILURE_DESCRIPTION": "请稍后再试。",
+      "EDIT_SUCCESS": "编辑成功，重新发布中。",
+      "EDIT_FAILURE": "编辑失败！",
+      "COPY_SUCCESS": "已开始复制…",
+      "COPY_SUCCESS_DESCRIPTION": "请稍等…",
+      "GENERIC_ERROR": "错误: {{message}}",
+      "DELETION_SUCCESS": "事件删除成功",
+      "DELETION_SUCCESS_DESCRIPTION": "事件将很快从列表中移除…",
+      "EVENT_LOCKED": "事件正在处理中。请等待以进行进一步更改…",
+      "DELETION_FAILURE": "事件删除失败",
+      "DELETION_FAILURE_DESCRIPTION": "请稍后再试…",
+      "RESULT_HEADING": "结果： 第{{range.begin}}-{{range.end}}项，共{{total}}项",
+      "CONFIRM_DELETION": "确定要删除此事件吗？",
+      "COPY_TO_SERIES": "将事件复制到系列",
+      "SELECT_COPY_TARGET": "选择目标系列",
+      "COPY": "复制",
+      "COPY_IN_PROGRESS": "正在开始复制…",
+      "CREATOR": "{{creator}}"
+   },
+   "LANGUAGES": {
+      "ARABIC": "阿拉伯语",
+      "DANISH": "丹麦语",
+      "GERMAN": "德语",
+      "GERMAN_CH": "瑞士德语",
+      "FINNISH": "芬兰语",
+      "HINDI": "印地语",
+      "ITALIAN": "意大利语",
+      "JAPANESE": "日语",
+      "DUTCH": "荷兰语",
+      "NORWEGIAN": "挪威语",
+      "FRENCH": "法语",
+      "ENGLISH": "英语",
+      "SPANISH": "西班牙语",
+      "ROMANSH": "罗曼什语",
+      "POLISH": "波兰语",
+      "PORTUGESE": "葡萄牙语",
+      "SLOVENIAN": "斯洛文尼亚语",
+      "SWEDISH": "瑞典语",
+      "RUSSIAN": "俄语",
+      "TURKISH": "土耳其语",
+      "UKRAINIAN": "乌克兰语",
+      "CHINESE": "中文"
+   },
+   "PREFERENCES": {
+      "TABLE": {
+         "CAPTION": "编辑表格视图",
+         "SUBHEADING": "选择择您希望在 {{ tableName }} 显示的默认值",
+         "AVAILABLE_COLUMNS": "可用的列",
+         "SELECTED_COLUMNS": "选定的列",
+         "FOOTER_TEXT": "设定的选项及其顺序会自动保存。您可以点击 \"{{resetTranslation}}\" 恢复到默认视图。"
+      }
+   },
+   "CONFIRMATIONS": {
+      "EMBEDDING_CODE": "嵌入代码已复制到剪贴板：",
+      "CONTINUE_ACTION": "您确定要继续吗?",
+      "METADATA": {
+         "NOTICE": {
+            "UNKNOWN": "下列元素将被删除",
+            "EVENT": "下列事件将被删除",
+            "SERIES": "下列系列将被删除",
+            "ACL": "下列ACL将被删除",
+            "GROUP": "下列分组将被删除",
+            "USER": "下列用户将被删除",
+            "THEME": "下列主题将被删除",
+            "LOCATION": "下列位置将被删除"
+         },
+         "NAME": "名称"
+      },
+      "ACTIONS": {
+         "CONFIRMATION": "确认",
+         "SHOW": {
+            "EMBEDDING_CODE": "内嵌代码"
+         }
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "此系列包含事件。删除此系列将不会删除其中的事件。",
+         "EVENT_WILL_BE_GONE": "如果您继续，该事件将彻底丢失。"
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "此系列无法删除，因为它仍然包含事件。"
+      }
+   },
+   "MEDIAMODULE": "媒体模块",
+   "SYSTEM_NOTIFICATIONS": "系统警告和通知",
+   "LANGUAGE": "选择语言",
+   "HELP": {
+      "HELP": "帮助",
+      "USERS_GUIDE": "用户指南",
+      "DOCUMENTATION": "文档",
+      "REST_DOC": "REST API 文档",
+      "HOTKEY_CHEAT_SHEET": "快捷键",
+      "ADOPTER_REGISTRATION": "使用者登记"
+   },
+   "NOTIFICATIONS": {
+      "ACL_ADDED": "已创建访问权限",
+      "ACL_NOT_SAVED": "无法保存访问权限",
+      "ACL_UPDATED": "访问权限已更新",
+      "ACL_DELETED": "访问权限已删除",
+      "ACL_NOT_DELETED": "无法删除访问权限",
+      "USER_ADDED": "已新建用户",
+      "USER_UPDATED": "用户已更新",
+      "USER_NOT_SAVED": "无法保存用户",
+      "USER_DELETED": "用户已删除",
+      "USER_NOT_DELETED": "无法删除该用户",
+      "USER_NOT_MANAGEABLE": "无法管理该用户",
+      "GROUP_ADDED": "该群组已创建",
+      "GROUP_CONFLICT": "生成的组名称已经存在",
+      "GROUP_UPDATED": "该群组已更新",
+      "GROUP_NOT_SAVED": "无法保存该群组",
+      "GROUP_DELETED": "该群组已删除",
+      "GROUP_NOT_DELETED": "无法删除该群组",
+      "ACCESS_DENIED": "拒绝访问。您无权查看此页",
+      "SERIES_ADDED": "该系列已新增",
+      "SERIES_NOT_SAVED": "无法保存此系列",
+      "EVENTS_CREATED": "事件已创建",
+      "EVENTS_UPLOAD_STARTED": "事件正在上传中......",
+      "EVENTS_NOT_CREATED": "无法新建事件",
+      "EVENTS_UPDATED_NB": "已成功上传 {{ number }} 个事件",
+      "EVENTS_UPDATED_ALL": "已成功更新所有事件",
+      "EVENTS_NOT_UPDATED": "无法保存事件",
+      "EVENTS_NOT_UPDATED_ID": "无法保存事件 {{ id }}",
+      "EVENTS_NOT_UPDATED_ALL": "所有事件都无法保存",
+      "EVENTS_PROCESSING_ACTION_RETRY": "处理已恢复。",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "无法继续处理。",
+      "EVENTS_PROCESSING_ACTION_NONE": "处理已中止。",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "处理无法中止。",
+      "EVENTS_PROCESSING_ACTION_STOP": "处理已停止。",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "处理无法中止。",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "删除的工作流。",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "无法删除工作流。",
+      "SERIES_UPDATED_NB": "已成功更新 {{ number }} 个系列",
+      "SERIES_UPDATED_ALL": "已成功更新所有系列",
+      "SERIES_NOT_UPDATED": "无法保存此系列",
+      "SERIES_NOT_UPDATED_ID": "系列 {{ id }} 无法保存",
+      "SERIES_NOT_UPDATED_ALL": "所有系列均无法保存",
+      "EVENT_DELETED": "该事件已被删除。",
+      "EVENT_WILL_BE_DELETED": "正在删除事件",
+      "EVENTS_DELETED": "正在删除事件。",
+      "EVENTS_NOT_DELETED": "无法删除事件。",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "您无权删除该事件。",
+      "SERIES_DELETED": "该系列已删除",
+      "SERIES_NOT_DELETED": "无法删除该系列",
+      "LOCATION_DELETED": "已删除位置",
+      "LOCATION_NOT_DELETED": "无法删除位置",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "您无权删除该位置。",
+      "CONFLICT_DETECTED": "计划冲突：新事件与已存在的事件有重叠。请修改位置或时间。",
+      "CONFLICT_BULK_DETECTED": "计划冲突：修改此时间会导致冲突。请修改位置或时间。",
+      "CONFLICT_ALREADY_ENDED": "计划冲突：此事件已结束。",
+      "CONFLICT_END_BEFORE_START": "计划错误：结束时间应晚于开始时间。",
+      "CONFLICT_IN_THE_PAST": "计划无法更新: 无法预约过去的事件。",
+      "INVALID_ACL_RULES": "规则必须含有一个拥有读或写权限的有效角色。",
+      "MISSING_ACL_RULES": "至少有一个角色必须具有读取和写入权限。",
+      "SAVED_ACL_RULES": "访问权限已保存",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "这个系列中已有的事件需要重新处理",
+      "SERIES_ACL_LOCKED": "当系列中的事件正在处理时，无法编辑访问权限",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "访问策略需要至少一个具有读写权限的角色。",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "访问策略需要至少一个具有读写权限的角色。",
+      "THEME_NAME_ALREADY_TAKEN": "该名称已被使用",
+      "THEME_NAME_EMPTY": "名称不能为空",
+      "BUMPER_UPLOAD_ERROR": "上传视频时出错",
+      "BUMPER_REQUIRED": "你必须上传片头。",
+      "TRAILER_UPLOAD_ERROR": "上传视频时出错",
+      "TITLE_UPLOAD_ERROR": "上传视频时出错",
+      "LICENSE_UPLOAD_ERROR": "上传视频时出错",
+      "WATERMARK_UPLOAD_ERROR": "上传视频时出错",
+      "WATERMARK_REQUIRED": "您必须上传一个水印",
+      "THEME_UPLOAD_STARTED": "视频上传中",
+      "THEME_CREATED": "主题已创建",
+      "THEME_NOT_CREATED": "无法创建主题",
+      "THEME_DELETED": "主题已被删除",
+      "THEME_NOT_DELETED": "无法删除主题",
+      "TASK_CREATED": "任务已创建",
+      "TASK_NOT_CREATED": "无法删除任务",
+      "VIDEO_CUT_NOT_SAVED": "无法保存更改",
+      "VIDEO_CUT_SAVED": "更改已保存",
+      "VIDEO_CUT_PROCESSING": "视频正在处理中......",
+      "THUMBNAIL_CHANGE_FAILED": "更改缩略图失败。",
+      "VIDEO_SOURCE_TRACKS_INVALID": "您未选择要处理的视频轨道",
+      "VIDEO_TOO_MANY_AUDIOS": "您不能在一个视频流上放置多个音频流",
+      "SERVER_UNRESPONSIVE": "服务器没有响应，请稍后再试。",
+      "SERVICE_UNAVAILABLE": "服务器没有响应，请稍后再试。",
+      "ACTIVE_TRANSACTION": "当前事件处于某个工作流的处理过程中，因此无法编辑。",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "更新时发生意外错误。一些事件可能已更新。",
+         "ALL_EVENTS_UPDATED": "已成功更新所有事件",
+         "NO_EVENTS_UPDATED": "所有更新失败。",
+         "SOME_EVENTS_NOT_UPDATED": "部分事件无法被更新。"
+      },
+      "ADOPTER_PROFILE_UPDATED": "资料已更新",
+      "ADOPTER_PROFILE_NOT_UPDATED": "哎呀！无法更新资料信息。请重试！",
+      "ADOPTER_PROFILE_DELETED": "成功删除资料信息",
+      "ADOPTER_PROFILE_NOT_DELETED": "哎呀！无法删除资料信息。请重试！"
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "操作",
+      "DELETE": {
+         "SERIES": {
+            "CAPTION": "删除",
+            "BUTTON": "删除",
+            "CANNOT_DELETE": "不能删除突出显示的系列，因为它们仍然包含事件。"
+         },
+         "EVENTS": {
+            "CAPTION": "删除",
+            "DELETE_EVENTS": "刪除事件",
+            "UNAUTHORIZED": "您无权删除突出显示的事件。请取消选择以继续。"
+         }
+      },
+      "DELETE_EVENTS_WARNING_LINE1": "一经删除，所有事件的元数据、视音频文件将被删除，无法恢复。",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "一旦删除，所有系列元数据将无法恢复。系列中的事件将不会被删除。",
+      "DELETE_SERIES_WARNING_LINE2": "",
+      "SCHEDULE_TASK": {
+         "CAPTION": "启动任务",
+         "GENERAL": {
+            "CAPTION": "概述",
+            "SUMMARY": "(已选定 {{ count }} 个事件)",
+            "CANNOTSTART": "目前无法处理突出显示的事件 。请取消选择或稍后再试。"
+         },
+         "TASKS": {
+            "CAPTION": "任务",
+            "SELECT": "选择任务"
+         },
+         "SUMMARY": {
+            "CAPTION": "概要",
+            "EVENTS": "事件",
+            "EVENTS_SUMMARY": "您已选择 {{numberOfEvents}} 个事件",
+            "CONFIGURATION": "设置",
+            "WORKFLOW": "任务"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "编辑计划事件",
+         "CONFLICT_CHECK_RUNNING": "正在运行冲突检查…",
+         "GENERAL": {
+            "CAPTION": "概述",
+            "CANNOTSTART": "突出显示的事件无法处理，仅支持计划事件。",
+            "NOCHANGES": "未检测到事件更改！",
+            "CONFLICT_FIRST_EVENT": "更改的事件",
+            "CONFLICT_SECOND_EVENT": "冲突的事件",
+            "CANNOTEDITSCHEDULE": "对于突出显示的事件，您没有权限编辑计划信息。您可以继续，但是您无法编辑任何事件的计划信息。"
+         },
+         "METADATA": {
+            "EDIT": "编辑元数据"
+         },
+         "SUMMARY": {
+            "CAPTION": "概要",
+            "SINGLE_EVENT_CAPTION": "事件“{{ title }}”",
+            "TYPE": "类型",
+            "PREVIOUS": "原值",
+            "NEXT": "新值"
+         },
+         "EDIT": {
+            "CAPTION": "编辑",
+            "EVENT": "事件",
+            "EVENTS": "事件",
+            "HEADER": "此页面允许您按工作日编辑计划事件。如果所有计划事件具有相同的字段值，输入字段将被预填。否则，输入字段留空值。输入字段留空意味着相应的值不应被改变。",
+            "METADATA": "元数据",
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "编辑多个事件的元数据",
+         "FATAL_ERROR": "发生致命错误: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "无法编辑高亮的事件。",
+            "NOTHING_TO_EDIT": "无法编辑此事件。",
+            "NOT_FOUND": "找不到内容",
+            "RUNNING_WORKFLOW": "正在运行工作流",
+            "TABLE": {
+               "CAPTION": "选定的事件",
+               "ERRORS": "错误"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "编辑或选择您想更新的元数据字段。如果修改字段不会更新任何事件或字段无效（例如：字段不能为空），那么此字段就不能被选择。高亮的元数据字段表示对于选定的事件有不同的值。",
+            "TABLE": {
+               "CAPTION": "选定事件的元数据",
+               "FIELDS": "元数据",
+               "VALUES": "值"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "更新失败"
+            },
+            "UPDATE_FAILED": "更新失败",
+            "NO_EVENTS_UPDATED": "所有更新失败。",
+            "SOME_EVENTS_NOT_UPDATED": "无法更新高亮的事件。"
+         }
+      }
+   },
+   "DATES": {
+      "TODAY": "今天",
+      "TOMORROW": "明天",
+      "YESTERDAY": "昨天",
+      "THIS_WEEK": "本周",
+      "THIS_MONTH": "本月",
+      "THIS_YEAR": "今年"
+   },
+   "DATETIMES": {
+      "TODAY": "今天  {{ time }}",
+      "TOMORROW": "明天  {{ time }}",
+      "YESTERDAY": "昨天  {{ time }}"
+   },
+   "WIZARD": {
+      "NEXT_STEP": "下一项",
+      "BACK": "上一项",
+      "CREATE": "创建",
+      "DELETE": "删除",
+      "UPDATE": "更新",
+      "DURATION": {
+         "HOURS": "小时",
+         "MINUTES": "分钟"
+      }
+   },
+   "CAPTURE_AGENT": {
+      "DEVICE": {
+         "MICROPHONE": "麦克风",
+         "CAMERA": "摄像头",
+         "PRESENTATION": "演示文稿"
+      }
+   },
+   "NAV": {
+      "DASHBOARD": {
+         "TITLE": "仪表盘"
+      },
+      "EVENTS": {
+         "TITLE": "录制中"
+      },
+      "SYSTEMS": {
+         "TITLE": "系统"
+      },
+      "CAPTUREAGENTS": {
+         "TITLE": "抓取"
+      },
+      "USERS": {
+         "TITLE": "组织机构"
+      },
+      "INTEGRATIONS": {
+         "TITLE": "集成"
+      },
+      "CONFIGURATION": {
+         "TITLE": "配置"
+      },
+      "STATISTICS": {
+         "TITLE": "统计"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "注册",
+         "SKIP": "暂不",
+         "CONTINUE": "继续",
+         "BACK": "返回",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "服务条款和隐私政策"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "感谢您使用Opencast！",
+            "INFORMATION_PARAGRAPH_1": "我们的开发者一直努力为您提供最好的用户体验。因此，我们需要更多地了解谁使用Opencast以及如何使用。您可以通过快速注册来帮助我们。",
+            "INFORMATION_PARAGRAPH_2": "我们非常感谢任何反馈，因为即使是关于Opencast使用情况的一部分数据也将有助于我们创造更好的软件，获得更多的资助，吸引更多公司为Opencast提供周边服务。"
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "组织",
+            "DEPARTMENT": "部门",
+            "COUNTRY": "国家/地区",
+            "POSTAL_CODE": "邮政编码",
+            "CITY": "城市",
+            "CONTACT_INFO": "联系信息",
+            "GENDER": "性别",
+            "GENDER_MALE": "男",
+            "GENDER_FEMALE": "女",
+            "FIRST_NAME": "名",
+            "LAST_NAME": "姓",
+            "STREET": "街道",
+            "NUMBER": "号码",
+            "ADDITIONAL_ADRESS_INFO": "增加地址信息",
+            "MAIL": "电子邮件",
+            "CONTACT_ME": "有更新或安全问题时联系我",
+            "WHICH_DATA_TO_SHARE": "您愿意分享哪些信息？",
+            "POLICY_HEADLINE": "隐私政策和服务条款",
+            "USAGE_STATISTICS": "使用情况统计",
+            "ERROR_REPORTS": "错误报告",
+            "READ_TERMS_OF_USE_BEFORE": "我已阅读并同意",
+            "READ_TERMS_OF_USE_LINK": "隐私政策和服务条款",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "也许下次！",
+            "TEXT": "如果你想稍后注册，你可以通过点击右上角的帮助按钮来进行注册。"
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "谢谢您的注册！",
+            "TEXT_LEADING_TO_PATH": "您可以随时更改您的数据",
+            "TEXT_LEADING_AFTER_PATH": "。"
+         },
+         "ERROR": {
+            "HEADER": "错误",
+            "TEXT": "处理您的请求时出错。"
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "您确认要删除注册信息吗？"
+         }
+      }
+   },
+   "EVENTS": {
+      "LICENSE": {
+         "ALLRIGHTS": "保留所有权利",
+         "CCBY": "CC BY",
+         "CCBYSA": "CC BY-SA",
+         "CCBYND": "CC BY-ND",
+         "CCBYNC": "CC BY-NC",
+         "CCBYNCSA": "CC BY-NC-SA",
+         "CCBYNCND": "CC BY-NC-ND",
+         "CC0": "CC0",
+         "BSD": "BSD",
+         "CCND": "CCND",
+         "GPL": "GPL"
+      },
+      "EVENTS": {
+         "NEW": {
+            "CAPTION": "创建事件",
+            "METADATA": {
+               "CAPTION": "元数据"
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "扩展元数据",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "扩展元数据"
+               }
+            },
+            "SOURCE": {
+               "CAPTION": "源文件",
+               "SELECT_SOURCE": "选择源",
+               "PLACEHOLDER": {
+                  "LOCATION": "位置",
+                  "INPUTS": "输入",
+                  "HOUR": "小时",
+                  "MINUTE": "分钟",
+                  "REPEATS": "重复",
+                  "START_DATE": "yyyy-mm-dd",
+                  "START_DATE_FORMAT": "yyyy-mm-dd",
+                  "END_DATE": "yyyy-mm-dd",
+                  "END_DATE_FORMAT": "yyyy-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "上传",
+                  "RECORDING_ELEMENTS": "录制元素",
+                  "RECORDING_METADATA": "录制元数据",
+                  "SEGMENTABLE": {
+                     "SHORT": "幻灯片",
+                     "DETAIL": "该文件包含PowerPoint、Keynote等软件制作的幻灯片演示录像。"
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "演讲者",
+                     "DETAIL": "该文件包含对演讲者的录制。"
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "仅音频",
+                     "DETAIL": "该文件仅包含音频。"
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "多个部分",
+                     "DETAIL": "包含事件不同部分的一组文件。"
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "计划",
+                  "START_DATE": "开始日期",
+                  "START_TIME": "开始时间",
+                  "TIMEZONE": "时区",
+                  "END_DATE": "结束日期",
+                  "END_TIME": "结束时间",
+                  "DURATION": "时长"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "计划单个事件"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "计划多个事件",
+                  "REPEATS": "重复",
+                  "REPEAT_ON": "重复于",
+                  "WEEKDAYS": "工作日",
+                  "WEEKDAY": "工作日"
+               },
+               "NO_SOURCE_AVAILABLE": "没有可以用于计划的视频捕捉设备"
+            },
+            "PROCESSING": {
+               "CAPTION": "处理流程",
+               "SELECT_WORKFLOW": "选择工作流",
+               "SELECT_WORKFLOW_EMPTY": "未找到工作流",
+               "WORKFLOW": "工作流"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "上传素材",
+               "SELECT_TYPE": "选择素材类型",
+               "ADD": "添加资源",
+               "NO_OPTIONS": "此网页的这一节没有提供资源选项列表！",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "课堂讲义",
+                  "CAPTIONS_DFXP": "DFXP格式字幕",
+                  "CAPTIONS_WEBVTT": "WebVTT格式字幕",
+                  "PREVIEW_IMAGE": "预览图片",
+                  "SMIL": "Smil编目",
+                  "TRACK_PARTS": "轨道部分"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "访问权限",
+               "POLICY": "访问权限",
+               "ACL": "访问权限"
+            },
+            "SUMMARY": {
+               "CAPTION": "概要",
+               "SOURCE": {
+                  "INPUT": "输入"
+               }
+            },
+            "WEEKDAYS": {
+               "MO": "一",
+               "TU": "二",
+               "WE": "三",
+               "TH": "四",
+               "FR": "五",
+               "SA": "六",
+               "SU": "日"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "星期一 ",
+               "TU": "星期二",
+               "WE": "星期三",
+               "TH": "星期四 ",
+               "FR": "星期五 ",
+               "SA": "星期六",
+               "SU": "星期日"
+            }
+         },
+         "NAVIGATION": {
+            "EVENTS": "事件",
+            "SERIES": "系列",
+            "OVERVIEW": "概览"
+         },
+         "UPLOAD": "上传",
+         "ADD_SERIES": "添加系列",
+         "ADD_EVENT": "添加事件",
+         "TABLE": {
+            "CAPTION": "事件",
+            "TITLE": "标题",
+            "PRESENTERS": "演讲者",
+            "SERIES": "系列",
+            "DATE": "日期",
+            "START": "开始",
+            "END": "结束",
+            "STOP": "停止",
+            "STATUS": "状态",
+            "LOCATION": "位置",
+            "ACTION": "操作",
+            "FIRST": "第一项",
+            "LAST": "最后一项",
+            "NEXT": "下一项",
+            "MANAGED_ACL": "访问权限",
+            "WORKFLOW_STATE": "进度",
+            "PREVIOUS": "上一项",
+            "NOCONTENT": "无可用数据",
+            "PUBLISHED": "已发布",
+            "WEEKDAY": "工作日",
+            "TOOLTIP": {
+               "ASSETS": "打开资源文件详情",
+               "START": "只显示此开始日期的事件",
+               "SERIES": "只显示此系列的事件",
+               "STATUS": "只显示此状态的事件",
+               "LOCATION": "只显示此位置的事件",
+               "DETAILS": "打开事件详情",
+               "DELETE": "删除事件",
+               "EMBEDDING_CODE": "内嵌代码",
+               "EDITOR": "打开视频编辑器",
+               "EDITOR_NEEDS_CUTTING": "打开视频编辑器（有人通过评论建议剪辑视频）",
+               "COMMENTS": "查看评论",
+               "PAUSED_WORKFLOW": "查看已暂停的工作流",
+               "PRESENTER": "只显示此演讲者的事件"
+            }
+         },
+         "STATUS": {
+            "SCHEDULED": "计划",
+            "RECORDING": "录制中",
+            "UPLOADING": "上传中",
+            "INGESTING": "抓取",
+            "PENDING": "排队中",
+            "PROCESSING": "运行中",
+            "PAUSED": "暂停",
+            "PROCESSED": "已完成",
+            "RECORDING_FAILURE": "录制失败",
+            "PROCESSING_FAILURE": "处理失败",
+            "PROCESSING_CANCELED": "处理已取消"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "撤回中",
+            "DELETING": "删除中",
+            "DUPLICATING": "复制中",
+            "PUBLISHING": "发布中",
+            "IMPORTING": "导入中",
+            "REPUBLISHING_METADATA": "重新发布元数据中",
+            "UPDATING_PREVIEWS": "更新预览中"
+         },
+         "DETAILS": {
+            "HEADER": "事件详情 - {{resourceId}}",
+            "TABS": {
+               "METADATA": "元数据",
+               "EXTENDED-METADATA": "扩展元数据",
+               "ASSETS": "资源",
+               "PUBLICATIONS": "发布状态",
+               "SCHEDULING": "计划中",
+               "WORKFLOWS": "工作流",
+               "ACCESS": "访问权限",
+               "COMMENTS": "评论",
+               "STATISTICS": "统计"
+            },
+            "PUBLICATIONS": {
+               "CAPTION": "发布状态",
+               "NO_PUBLICATIONS_AVAILABLE": "此事件尚未发布",
+               "PUBLICATION_DESCRIPTION": "此事件已发布到下列渠道：",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "此事件尚未开始处理",
+               "CUSTOM": "自定义",
+               "ENGAGE": "播放",
+               "ENGAGE_LIVE": "Engage直播",
+               "EXTERNAL_API": "外部API发布",
+               "YOUTUBE": "Youtube",
+               "OAIPMH": "OAI-PMH",
+               "SELECT_WORKFLOW": "选择工作流",
+               "SELECT_WORKFLOW_EMPTY": "无可用工作流"
+            },
+            "MEDIA": {
+               "TRIM_MEDIA": "修剪媒体",
+               "MEDIA": "媒体",
+               "ID": "ID",
+               "TYPE": "类型",
+               "MIMETYPE": "MIME类型",
+               "URL": "网址",
+               "DETAILS": "详情"
+            },
+            "ATTACHMENTS": {
+               "CAPTION": "附件",
+               "ID": "ID",
+               "TYPE": "类型",
+               "MIMETYPE": "MIME类型",
+               "TAGS": "标签",
+               "LINK": "链接"
+            },
+            "SOURCE": {
+               "CAPTION": "源",
+               "SELECT_SOURCE": "选择源",
+               "PLACEHOLDER": {
+                  "LOCATION": "位置",
+                  "INPUTS": "输入",
+                  "HOUR": "小时",
+                  "MINUTE": "分钟",
+                  "REPEATS": "重复",
+                  "START_DATE": "yyyy-mm-dd",
+                  "END_DATE": "yyyy-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "上传",
+                  "RECORDING_ELEMENTS": "录制元素",
+                  "SEGMENTABLE": {
+                     "SHORT": "幻灯片",
+                     "DETAIL": "该文件包含PowerPoint、Keynote等软件制作的幻灯片演示录像。"
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "演讲者",
+                     "DETAIL": "该文件包含对演讲者的录制。"
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "仅音频",
+                     "DETAIL": "该文件仅包含音频。"
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "计划",
+                  "START_DATE": "开始日期",
+                  "START_TIME": "开始时间",
+                  "TIMEZONE": "时区",
+                  "END_DATE": "结束日期",
+                  "END_TIME": "结束时间",
+                  "DURATION": "时长"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "计划单个事件"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "计划多个事件",
+                  "REPEATS": "重复",
+                  "REPEAT_ON": "重复于",
+                  "WEEKDAYS": "工作日"
+               }
+            },
+            "ASSETS": {
+               "CAPTION": "资源",
+               "TYPE": "类型",
+               "SIZE": "文件大小",
+               "DETAILS": "详情",
+               "STREAMS": "媒体流",
+               "PREVIEW": "预览",
+               "ATTACHMENTS": {
+                  "TITLE": "附件",
+                  "CAPTION": "附件",
+                  "ID": "ID",
+                  "TYPE": "类型",
+                  "MIMETYPE": "MIME类型",
+                  "TAGS": "标签",
+                  "LINK": "链接",
+                  "DETAILS": {
+                     "TITLE": "附件详情",
+                     "CAPTION": "附件详情",
+                     "ID": "ID",
+                     "TYPE": "类型",
+                     "MIMETYPE": "MIME类型",
+                     "TAGS": "标签",
+                     "URL": "网址",
+                     "SIZE": "文件大小",
+                     "CHECKSUM": "校验和",
+                     "REFERENCE": "参考"
+                  }
+               },
+               "CATALOGS": {
+                  "TITLE": "目录",
+                  "CAPTION": "目录",
+                  "ID": "ID",
+                  "TYPE": "类型",
+                  "MIMETYPE": "MIME类型",
+                  "TAGS": "标签",
+                  "LINK": "链接",
+                  "DETAILS": {
+                     "TITLE": "目录详情",
+                     "CAPTION": "目录详情",
+                     "ID": "ID",
+                     "TYPE": "类型",
+                     "MIMETYPE": "MIME类型",
+                     "TAGS": "标签",
+                     "URL": "网址",
+                     "SIZE": "文件大小",
+                     "CHECKSUM": "校验和",
+                     "REFERENCE": "参考"
+                  }
+               },
+               "MEDIA": {
+                  "TITLE": "媒体",
+                  "CAPTION": "媒体",
+                  "ID": "ID",
+                  "TYPE": "类型",
+                  "MIMETYPE": "MIME类型",
+                  "TAGS": "标签",
+                  "LINK": "链接",
+                  "DETAILS": {
+                     "TITLE": "媒体详情",
+                     "ID": "ID",
+                     "TYPE": "类型",
+                     "MIMETYPE": "MIME类型",
+                     "URL": "网址",
+                     "RECORDING_DATE": "录制时间",
+                     "FLAVOR": "样式",
+                     "TAGS": "标签",
+                     "DURATION": "时长",
+                     "STREAM_AUDIO": "音频流",
+                     "STREAM_VIDEO": "视频流",
+                     "CHANNELS": "频道",
+                     "BITRATE": "比特率",
+                     "BITDEPTH": "位深度",
+                     "SAMPLINGRATE": "采样率",
+                     "FRAMECOUNT": "帧数",
+                     "PEAKLEVELDB": "峰值 (dB)",
+                     "RMSLEVELDB": "RMS 级别 (dB)",
+                     "RMSPEAKDB": "RMS 峰值(dB)",
+                     "FRAMERATE": "帧速",
+                     "RESOLUTION": "分辨率",
+                     "SIZE": "文件大小",
+                     "SCANTYPE": "扫描类型",
+                     "SCANORDER": "扫描顺序"
+                  }
+               },
+               "PUBLICATIONS": {
+                  "TITLE": "发布状态",
+                  "CAPTION": "发布状态",
+                  "CHANNEL": "频道",
+                  "ID": "ID",
+                  "TYPE": "类型",
+                  "MIMETYPE": "MIME类型",
+                  "TAGS": "标签",
+                  "LINK": "链接",
+                  "DETAILS": {
+                     "TITLE": "发布详情",
+                     "CAPTION": "发布详情",
+                     "ID": "ID",
+                     "TYPE": "类型",
+                     "MIMETYPE": "MIME类型",
+                     "TAGS": "标签",
+                     "URL": "网址",
+                     "SIZE": "文件大小",
+                     "CHANNEL": "频道",
+                     "REFERENCE": "参考"
+                  }
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "访问权限",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "模板"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "访问权限",
+                  "DESCRIPTION": "",
+                  "LABEL": "选择模板",
+                  "EMPTY": "没有找到模板",
+                  "ROLE": "角色",
+                  "WRITE": "写",
+                  "READ": "读",
+                  "ADDITIONAL_ACTIONS": "其他操作",
+                  "ACTION": "操作",
+                  "NEW": "新建策略",
+                  "DETAILS": "详情"
+               },
+               "ROLES": {
+                  "LABEL": "选择角色",
+                  "EMPTY": "找不到角色"
+               }
+            },
+            "COMMENTS": {
+               "CAPTION": "评论",
+               "PLACEHOLDER": "评论...",
+               "SELECTPLACEHOLDER": "选择原因",
+               "RESOLVED": "已解决",
+               "REPLY": "回复",
+               "REPLY_TO": "回复给",
+               "CANCEL_REPLY": "取消",
+               "DELETE": "删除",
+               "REASON": "原因",
+               "REASONS": {
+                  "CUTTING": "需要剪切",
+                  "REVIEW": "需要审核",
+                  "ASYNC": "视音频轨道不同步",
+                  "AUDIO_ISSUE": "音频轨道丢失或有缺陷",
+                  "CANCELED": "已取消事件",
+                  "CONFLICTING_METADATA": "元数据冲突",
+                  "IMPROPER_POINT": "入点或出点不当",
+                  "MISSING_AGREEMENT": "缺少协议",
+                  "OTHER": "其他",
+                  "PRIVACY": "隐私关注",
+                  "SEGMENTATION": "分割不准确",
+                  "UNKNOWN_CREATOR": "未知创建者",
+                  "VIDEO_ISSUE": "视频失真或已裁剪",
+                  "WRONG_INPUT_FORMAT": "不支持输入文件格式",
+                  "WRONG_METADATA": "元数据需要校正",
+                  "WRONG_SERIES_PUBLICATION": "系列或发布频道错误",
+                  "WRONG_WORKFLOW": "错误工作流",
+                  "PROCESSING_FAILURE": "处理失败"
+               }
+            },
+            "STATISTICS": {
+               "CAPTION": "统计"
+            },
+            "METADATA": {
+               "CAPTION": "事件详情",
+               "TITLE": "标题",
+               "ID": "UID",
+               "SERIES": "系列",
+               "RECORDING_DATE": "录制时间",
+               "SUBJECT": "主题",
+               "DESCRIPTION": "描述",
+               "START_DATE": "开始日期",
+               "START_TIME": "开始时间",
+               "DURATION": "时长",
+               "LOCATION": "位置",
+               "SOURCE": "源",
+               "CREATED": "已创建",
+               "CREATED_BY": "创建人",
+               "PUBLISHER": "发布人",
+               "LICENSE": "许可证",
+               "CONTRIBUTORS": "贡献者",
+               "RIGHTS": "权利",
+               "PRESENTERS": "演讲人",
+               "LANGUAGE": "语言",
+               "COPYRIGHT": "版权",
+               "VISIBILITY": "可见性",
+               "PUBLIC": "公共目标",
+               "OS": "操作系统",
+               "LOCKED": {
+                  "RUNNING": "操作执行时, 无法编辑元数据。"
+               }
+            },
+            "SCHEDULING": {
+               "CAPTION": "计划设置",
+               "PLACEHOLDER": {
+                  "PRESENTERS": "演讲者"
+               }
+            },
+            "WORKFLOWS": {
+               "ACTIONS": "操作",
+               "DETAILS": "详情",
+               "DESCRIPTION": "描述",
+               "MORE_INFO": "更多信息",
+               "ID": "ID",
+               "TYPE": "类型",
+               "TITLE": "标题",
+               "STATUS": "状态",
+               "STARTED": "已启动",
+               "SERIES": "系列",
+               "SUBMITTED": "已提交",
+               "SUBMITTER": "提交人",
+               "EXECUTION_TIME": "执行时间",
+               "WDID": "工作流定义",
+               "MIMETYPE": "MIME类型",
+               "URL": "网址",
+               "CONFIGURATION": "设置",
+               "NO_CONFIGURATION": "选中的工作流定义配置参数不存在。",
+               "WORKFLOW": "工作流",
+               "TOOLTIP": {
+                  "STOP": "停止工作流",
+                  "ABORT": "中止工作流的执行（不再重试已失败的操作环节）",
+                  "RETRY": "重新执行工作流",
+                  "DELETE": "删除工作流",
+                  "DETAILS": "打开工作流详情"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "已创建运行实例",
+                  "RUNNING": "运行中",
+                  "PAUSED": "已暂停",
+                  "SUCCEEDED": "成功",
+                  "FAILED": "失败",
+                  "FAILING": "失败中",
+                  "SKIPPED": "已跳过",
+                  "STOPPED": "已停止",
+                  "RETRY": "重试"
+               }
+            },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "工作流"
+            },
+            "WORKFLOW_DETAILS": {
+               "TITLE": "工作流详情",
+               "CONFIGURATION": "工作流配置"
+            },
+            "WORKFLOW_OPERATIONS": {
+               "TITLE": "工作流操作",
+               "DETAILS_LINK": "操作",
+               "TABLE_HEADERS": {
+                  "TITLE": "标题",
+                  "STATUS": "状态",
+                  "DESCRIPTION": "说明"
+               }
+            },
+            "OPERATION_DETAILS": {
+               "TITLE": "操作详情",
+               "TABLE_HEADERS": {
+                  "TITLE": "标题",
+                  "STATE": "状态",
+                  "DESCRIPTION": "说明",
+                  "EXECUTION_HOST": "执行主机",
+                  "JOB": "任务",
+                  "TIME_IN_QUEUE": "队列中的时间",
+                  "STARTED": "已启动",
+                  "FINISHED": "已完成",
+                  "RETRY_STRATEGY": "重试策略",
+                  "FAILED_ATTEMPTS": "已失败的尝试",
+                  "MAX_ATTEMPTS": "最大",
+                  "EXCEPTION_HANDLER_WORKFLOW": "异常处理工作流",
+                  "FAIL_ON_ERROR": "错误时失败"
+               }
+            },
+            "QUICKACTION_WORKFLOW_DETAILS": {
+               "TITLE": "工作流详情"
+            },
+            "MEDIA_DETAILS": {
+               "TITLE": "视频详情",
+               "ID": "ID",
+               "TYPE": "类型",
+               "MIMETYPE": "MIME类型",
+               "URL": "网址",
+               "RECORDING_DATE": "录制日期",
+               "TAGS": "标签",
+               "DURATION": "时长",
+               "STREAM_AUDIO": "音频流",
+               "STREAM_VIDEO": "视频流",
+               "CHANNELS": "频道",
+               "BITRATE": "比特率",
+               "FRAMERATE": "帧率",
+               "RESOLUTION": "分辨率"
+            },
+            "ERRORS_AND_WARNINGS": {
+               "HEADER": "错误和警告",
+               "TITLE": "错误和警告",
+               "DATE": "日期",
+               "HOST": "主机",
+               "TYPE": "类型",
+               "EMPTY": "没有错误",
+               "DETAILS": {
+                  "HEADER": "错误信息",
+                  "SEVERITY": "严重性",
+                  "TITLE": "标题",
+                  "DESCRIPTION": "说明",
+                  "JOB_ID": "任务ID",
+                  "DATE": "日期",
+                  "HOST": "处理主机",
+                  "TYPE": "服务类型",
+                  "TECHNICAL_DETAILS": "技术详情"
+               }
+            }
+         }
+      },
+      "SERIES": {
+         "NEW": {
+            "CAPTION": "创建系列",
+            "METADATA": {
+               "CAPTION": "元数据",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "元数据"
+               }
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "扩展元数据",
+               "METADATA": {
+                  "TITLE": "扩展元数据"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "访问权限",
+               "TEMPLATES": {
+                  "TITLE": "模板"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "访问权限",
+                  "DESCRIPTION": "至少有一个角色必须具有读取和写入权限。",
+                  "LABEL": "选择模板",
+                  "EMPTY": "未找到模板",
+                  "ROLE": "角色",
+                  "WRITE": "写",
+                  "READ": "读",
+                  "ADDITIONAL_ACTIONS": "其他操作",
+                  "ACTION": "操作",
+                  "NEW": "新建策略",
+                  "DETAILS": "详情"
+               },
+               "ROLES": {
+                  "LABEL": "选择角色",
+                  "EMPTY": "找不到角色"
+               }
+            },
+            "THEME": {
+               "CAPTION": "主题",
+               "DESCRIPTION": {
+                  "TEXT": "您可以通过主题在视频中打上标记。主题可以包括片头、片尾、水印和包含元数据的幻灯片。"
+               },
+               "TITLE": "主题",
+               "LABEL": "请选择主题",
+               "EMPTY": "未找到主题"
+            },
+            "SUMMARY": {
+               "CAPTION": "摘要"
+            }
+         },
+         "TABLE": {
+            "CAPTION": "系列",
+            "TITLE": "系列",
+            "HAS_EVENTS": "包含事件",
+            "ORGANIZERS": "组织者",
+            "CONTRIBUTORS": "贡献者",
+            "CREATED": "已创建",
+            "MANAGED_ACL": "访问权限",
+            "EVENTS": "事件",
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "SERIES": "只显示此系列的事件",
+               "DETAILS": "打开系列详情",
+               "DELETE": "删除系列"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "系列 {{resourceId}} 详情",
+            "TABS": {
+               "METADATA": "元数据",
+               "EXTENDED_METADATA": "扩展元数据",
+               "EVENTS": "事件",
+               "PERMISSIONS": "访问权限",
+               "THEME": "主题",
+               "STATISTICS": "统计"
+            },
+            "ACCESS": {
+               "CAPTION": "访问权限",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "模板"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "访问权限",
+                  "DESCRIPTION": "",
+                  "LABEL": "选择模板",
+                  "EMPTY": "未找到模板",
+                  "ROLE": "角色",
+                  "WRITE": "写",
+                  "READ": "读",
+                  "ADDITIONAL_ACTIONS": "其他操作",
+                  "ACTION": "操作",
+                  "NEW": "新建策略",
+                  "DETAILS": "详情",
+                  "REPLACE_EVENT_ACLS": "更新事件权限",
+                  "REPLACE_EVENT_ACLS_HINT": "确保此系列中的所有事件都具有这些权限",
+                  "LOAD_MORE_LIMIT": "显示策略.",
+                  "LOAD_MORE_LINK": "载入更多"
+               },
+               "ROLES": {
+                  "LABEL": "选择角色",
+                  "EMPTY": "找不到角色"
+               }
+            },
+            "METADATA": {
+               "TITLE": "标题",
+               "ID": "UID",
+               "SERIES": "系列",
+               "PUBLISHERS": "发布人",
+               "ORGANIZERS": "组织者",
+               "CONTRIBUTORS": "贡献者",
+               "RECORDING_DATE": "录制日期",
+               "CREATED_BY": "创建自",
+               "RIGHTS": "权利",
+               "SUBJECT": "主题",
+               "LANGUAGE": "语言",
+               "LICENSE": "许可证",
+               "DESCRIPTION": "说明"
+            },
+            "EVENTS": {
+               "TITLE": "标题",
+               "PRESENTER": "演讲人",
+               "CREATED": "已创建",
+               "MODIFIED": "已修改",
+               "STATUS": "状态",
+               "LOCATION": "位置",
+               "LINK": "链接"
+            }
+         }
+      }
+   },
+   "RECORDINGS": {
+      "NAVIGATION": {
+         "LOCATIONS": "位置"
+      },
+      "ACTIONS": {
+         "EXPORT": "导出",
+         "REMOVE": "移除"
+      },
+      "RECORDINGS": {
+         "TABLE": {
+            "CAPTION": "位置",
+            "TITLE": "UID",
+            "NAME": "名称",
+            "LOCATION": "位置",
+            "UPDATED": "最后更新",
+            "NEXT_DATE": "下一个事件",
+            "NEXT_NAME": "下一个事件的标题",
+            "STATUS": "状态",
+            "VERSION": "版本",
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "NAME": "只显示此位置的事件",
+               "DETAILS": "打开位置详情",
+               "DELETE": "删除位置 (取消注册录制代理设备)"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "位置详情 - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "概况",
+               "CONFIGURATION": "设置",
+               "CAPABILITIES": "权限"
+            },
+            "GENERAL": {
+               "CAPTION": "概况",
+               "NAME": "名称",
+               "URL": "网址",
+               "STATUS": "状态",
+               "UPDATE": "最后听到来自"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "设置",
+               "NO_CONFIGURATION": "没有提供配置"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "权限",
+               "NO_CAPABILITIES": "没有提供权限"
+            }
+         }
+      }
+   },
+   "USERS": {
+      "ACTIONS": {
+         "ADD_USER": "新增用户",
+         "ADD_GROUP": "添加组",
+         "ADD_ACL": "添加权限策略"
+      },
+      "NAVIGATION": {
+         "USERS": "用户",
+         "GROUPS": "群组",
+         "PERMISSIONS": "访问权限"
+      },
+      "USERS": {
+         "TABLE": {
+            "CAPTION": "用户",
+            "NAME": "姓名",
+            "USERNAME": "用户名",
+            "EMAIL": "电子邮件",
+            "ROLES": "角色",
+            "TYPE": "类型",
+            "PROVIDER": "提供者",
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "DELETE": "删除用户",
+               "DETAILS": "打开用户详情"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "新建用户",
+            "EDITCAPTION": "用户详情- {{username}}",
+            "TABS": {
+               "USER": "用户",
+               "ROLES": "角色",
+               "EXTERNALROLES": "外部角色",
+               "EFFECTIVEROLES": "有效角色"
+            },
+            "DESCRIPTION": {
+               "ROLES": "可以或已经分配给用户的角色和组。",
+               "EXTERNALROLES": "外部角色提供者授予用户的外部角色列表。",
+               "EFFECTIVEROLES": "直接分配给用户的有效角色列表以及通过群组成员间接加载的角色。"
+            },
+            "FORM": {
+               "USERNAME": "用户名",
+               "NAME": "姓名",
+               "EMAIL": "电子邮件",
+               "PASSWORD": "密码",
+               "REPEAT_PASSWORD": "确认密码"
+            },
+            "ROLES": {
+               "LEFT": "角色",
+               "RIGHT": "选定角色",
+               "REMOVE": "移除角色",
+               "ADD": "添加角色"
+            }
+         }
+      },
+      "GROUPS": {
+         "NEW": {
+            "CAPTION": "创建组"
+         },
+         "TABLE": {
+            "CAPTION": "群组",
+            "NAME": "名称",
+            "DESCRIPTION": "描述",
+            "ROLE": "角色",
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "DETAILS": "打开组详情",
+               "DELETE": "删除组"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "创建组",
+            "EDITCAPTION": "组详情 - {{name}}",
+            "TABS": {
+               "GROUP": "组",
+               "ROLES": "角色",
+               "METADATA": "元数据",
+               "USERS": "用户",
+               "SUMMARY": "摘要"
+            },
+            "FORM": {
+               "NAME": "名称",
+               "DESCRIPTION": "说明",
+               "SUMMARY": "摘要",
+               "ROLES": "角色",
+               "USERS": "用户"
+            },
+            "USERS": {
+               "LEFT": "用户",
+               "RIGHT": "选定用户",
+               "REMOVE": "移除用户",
+               "ADD": "新增用户"
+            },
+            "ROLES": {
+               "LEFT": "角色",
+               "RIGHT": "选定角色",
+               "REMOVE": "移除角色",
+               "ADD": "增加角色"
+            }
+         }
+      },
+      "ACLS": {
+         "TABLE": {
+            "CAPTION": "访问权限",
+            "NAME": "名称",
+            "CREATED": "已创建",
+            "CREATOR": "创始人",
+            "IN_USE": "使用中",
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "DELETE": "删除访问策略",
+               "DETAILS": "打开访问策略详情"
+            }
+         },
+         "NEW": {
+            "CAPTION": "新建访问策略",
+            "TABS": {
+               "SUMMARY": "概要",
+               "METADATA": "元数据",
+               "ACCESS": "访问权限"
+            },
+            "METADATA": {
+               "TITLE": "元数据",
+               "NAME": {
+                  "CAPTION": "名称",
+                  "PLACEHOLDER": "名称..."
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "访问权限",
+               "TEMPLATES": {
+                  "TITLE": "模板"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "访问权限",
+                  "LABEL": "选择模板",
+                  "EMPTY": "未找到模板",
+                  "ROLE": "角色",
+                  "WRITE": "写",
+                  "READ": "读",
+                  "ADDITIONAL_ACTIONS": "其他操作",
+                  "ACTION": "操作",
+                  "NEW": "新建策略",
+                  "DETAILS": "详情",
+                  "DESCRIPTION": "请选择一套预先配置的策略或在下方添加自定义策略"
+               },
+               "ROLES": {
+                  "LABEL": "选择角色",
+                  "EMPTY": "找不到角色"
+               }
+            }
+         },
+         "DETAILS": {
+            "HEADER": "访问策略详情 - {{name}}",
+            "TABS": {
+               "SUMMARY": "概要",
+               "METADATA": "元数据",
+               "ACCESS": "访问权限"
+            },
+            "METADATA": {
+               "TITLE": "元数据",
+               "NAME": {
+                  "CAPTION": "名称",
+                  "PLACEHOLDER": "名称..."
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "访问权限",
+               "TEMPLATES": {
+                  "TITLE": "模板"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "访问权限",
+                  "LABEL": "选择模板",
+                  "EMPTY": "未找到模板",
+                  "ROLE": "角色",
+                  "WRITE": "写",
+                  "READ": "读",
+                  "ADDITIONAL_ACTIONS": "其他操作",
+                  "ACTION": "操作",
+                  "NEW": "新建策略",
+                  "DETAILS": "详情",
+                  "DESCRIPTION": "请选择一套预先配置的策略或在下方添加自定义策略"
+               },
+               "ROLES": {
+                  "LABEL": "选择角色",
+                  "EMPTY": "找不到角色"
+               }
+            }
+         }
+      }
+   },
+   "THEMES": {
+      "THEMES": {
+         "DETAILS": {
+            "HEADER": "主题详情 {{resourceId}}",
+            "TABS": {
+               "GENERAL": "概况",
+               "BUMPER": "片头（开始）",
+               "TRAILER": "片头（结束）",
+               "TITLE": "标题",
+               "LICENSE": "许可证",
+               "WATERMARK": "水印",
+               "USAGE": "用量"
+            },
+            "GENERAL": {
+               "CAPTION": "概况",
+               "NAME": "名称",
+               "DESCRIPTION": "说明",
+               "DEFAULT": "默认值",
+               "SET_DEFAULT_INFO": "设置为所有系列和事件的默认主题",
+               "NAME_ERROR": "名称已在使用",
+               "NAME_REQUIRED": "必填"
+            },
+            "BUMPER": {
+               "CAPTION": "片头（开始）",
+               "DESCRIPTION": "在录制视频开始前插入的预定义视频。",
+               "ACTIVE": "启用"
+            },
+            "TRAILER": {
+               "CAPTION": "片头（结束）",
+               "DESCRIPTION": "在录制视频结束后插入的预定义视频。",
+               "ACTIVE": "启用"
+            },
+            "TITLE": {
+               "CAPTION": "标题",
+               "DESCRIPTION": "在录制视频开始前插入的预定义幻灯片，包括描述性的元数据。",
+               "ACTIVE": "启用"
+            },
+            "WATERMARK": {
+               "CAPTION": "水印",
+               "DESCRIPTION": "在视频的每一帧上覆盖的半透明图像。",
+               "ACTIVE": "启用"
+            },
+            "USAGE": {
+               "CAPTION": "用量",
+               "SERIES": "系列名称"
+            }
+         }
+      }
+   },
+   "CONFIGURATION": {
+      "ACTIONS": {
+         "ADD_MAIL_TEMPLATE": "添加模板",
+         "ADD_THEME": "添加主题"
+      },
+      "NAVIGATION": {
+         "THEMES": "主题"
+      },
+      "THEMES": {
+         "TABLE": {
+            "CAPTION": "主题",
+            "NAME": "名称",
+            "DESCRIPTION": "描述",
+            "CREATOR": "创建者",
+            "CREATED": "已创建",
+            "DEFAULT": "默认值",
+            "USAGE": "用量",
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "DELETE": "删除主题",
+               "DETAILS": "打开主题详情"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "创建主题",
+            "EDITCAPTION": "主题详情 - {{name}}",
+            "GENERAL": {
+               "CAPTION": "概况",
+               "NAME": "名称",
+               "DESCRIPTION": "说明",
+               "DEFAULT": "默认值",
+               "SET_DEFAULT_INFO": "设置为所有系列和事件的默认主题",
+               "NAME_REQUIRED": "必填"
+            },
+            "BUMPER": {
+               "CAPTION": "片头（开始）",
+               "FILE_UPLOADED": "已上传文件: ",
+               "DESCRIPTION": "在录制视频开始前插入的预定义视频。",
+               "ACTIVE": "启用",
+               "ENABLE": "启用片头",
+               "SELECT": "选择",
+               "UPLOAD_LABEL": "上传视频",
+               "UPLOAD_BUTTON": "上传"
+            },
+            "TRAILER": {
+               "CAPTION": "片头（结束）",
+               "FILE_UPLOADED": "已上传文件: ",
+               "DESCRIPTION": "在录制视频结束后插入的预定义视频。",
+               "ACTIVE": "启用",
+               "ENABLE": "启用片头",
+               "UPLOAD_LABEL": "上传视频",
+               "UPLOAD_BUTTON": "上传",
+               "SELECT": "选择"
+            },
+            "TITLE": {
+               "CAPTION": "标题",
+               "FILE_UPLOADED": "已上传的文件: ",
+               "DESCRIPTION": "在录制视频开始前插入的预定义幻灯片，包括描述性的元数据。",
+               "ACTIVE": "启用",
+               "ENABLE": "启用标题幻灯片",
+               "BACKGROUND": "背景",
+               "EXTRACT": "提取背景",
+               "UPLOAD": "上传",
+               "UPLOAD_LABEL": "上传图片",
+               "UPLOAD_BUTTON": "上传"
+            },
+            "WATERMARK": {
+               "CAPTION": "水印",
+               "FILE_UPLOADED": "已上传文件: ",
+               "DESCRIPTION": "在视频的每一帧上覆盖的半透明图像。",
+               "ACTIVE": "启用",
+               "ENABLE": "启用水印",
+               "TOP_LEFT": "左上",
+               "TOP_RIGHT": "右上",
+               "BOTTOM_LEFT": "左下",
+               "BOTTOM_RIGHT": "右下",
+               "UPLOAD": "上传",
+               "POSITION": "水印位置和预览",
+               "FILEUPLOAD_DESCRIPTION": "文件应该有一个 alpha 通道 (透明背景)。可接受的文件类型是：.PNG, .GIF, .SVG, .WEBP",
+               "UPLOAD_LABEL": "上传图片",
+               "UPLOAD_BUTTON": "上传"
+            },
+            "SUMMARY": {
+               "CAPTION": "概要"
+            },
+            "USAGE": {
+               "CAPTION": "用法",
+               "SERIE": "系列名称",
+               "EMPTY": "未找到为当前主题的系列"
+            }
+         }
+      }
+   },
+   "SYSTEMS": {
+      "NAVIGATION": {
+         "JOBS": "任务",
+         "SERVERS": "服务器",
+         "SERVICES": "服务"
+      },
+      "JOBS": {
+         "TABLE": {
+            "ID": "任务标识符",
+            "CAPTION": "任务",
+            "CREATED": "已创建",
+            "CREATOR": "创建者",
+            "HOST_NAME": "主机名",
+            "NODE_NAME": "节点名",
+            "OPERATION": "操作",
+            "STARTED": "已启动",
+            "STATUS": "状态",
+            "SUBMITTED": "已提交",
+            "TYPE": "类型"
+         },
+         "STATUS": {
+            "QUEUED": "排队中",
+            "PAUSED": "已暂停",
+            "RUNNING": "运行中",
+            "FINISHED": "已完成",
+            "FAILED": "失败",
+            "DELETED": "已删除",
+            "INSTANTIATED": "已实例化",
+            "DISPATCHING": "分发中",
+            "RESTART": "重启",
+            "CANCELED": "已取消",
+            "WAITING": "等待中"
+         }
+      },
+      "SERVERS": {
+         "TABLE": {
+            "CAPTION": "服务器",
+            "STATUS": "状态",
+            "HOST_NAME": "主机名",
+            "NODE_NAME": "节点名",
+            "CORES": "核",
+            "COMPLETED": "已完成任务",
+            "RUNNING": "进行中的任务",
+            "QUEUED": "排队中的任务",
+            "MEAN_RUN_TIME": "平均运行时间",
+            "MEAN_QUEUE_TIME": "平均排队时间",
+            "MAINTENANCE": "维护",
+            "MAINTENANCE_OFF": "进入维护模式",
+            "MAINTENANCE_ON": "退出维护模式"
+         }
+      },
+      "SERVICES": {
+         "TABLE": {
+            "CAPTION": "服务",
+            "STATUS": "状态",
+            "NAME": "服务名",
+            "HOST_NAME": "主机名",
+            "NODE_NAME": "节点名",
+            "COMPLETED": "已完成任务",
+            "RUNNING": "进行中的任务",
+            "QUEUED": "排队中的任务",
+            "MEAN_RUN_TIME": "平均运行时间",
+            "MEAN_QUEUE_TIME": "平均排队时间",
+            "SANITIZE": "清除失败的服务",
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "SANITIZE": "请理服务 (重置服务到正常状态)"
+            }
+         },
+         "STATUS": {
+            "NORMAL": "正常",
+            "WARNING": "警告",
+            "ERROR": "错误"
+         }
+      }
+   },
+   "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "警告：您的一些更改没有保存。如果您离开视频编辑器，这些更改将会丢失。您确实想要继续吗？",
+      "TIMELINE": "时间线",
+      "ZOOMLEVEL": "缩放级别",
+      "PREVIEW_MODE": "预览模式",
+      "PREVIEW_MODE_TOOLTIP": "仅播放所选部分",
+      "ZOOM": "缩放",
+      "BUTTONS": {
+         "CLOSE": "关闭",
+         "SAVE": "保存",
+         "PROCESS": "保存并继续",
+         "ADD_COMMENT": "添加评论"
+      },
+      "TABS": {
+         "EDIT": "编辑器",
+         "CAPTIONS": "字幕",
+         "ANNOTATIONS": "注释"
+      },
+      "AREAS": {
+         "METADATA": "元数据",
+         "THUMBNAIL": "缩略图",
+         "COMMENTS": "评论",
+         "SEGMENTS": "段",
+         "TRACKS": "轨道"
+      },
+      "ACTIONS": {
+         "SPLIT": "分割",
+         "SPLIT_TOOLTIP": "在当前光标位置执行分段。",
+         "CUT": "隐藏/显示",
+         "CUT_TOOLTIP": "隐藏或显示选中的视频部分。",
+         "REPLAY_SEGMENT": "从分段开始处播放",
+         "REPLAY_SEGMENT_TOOLTIP": "从当前分段的开始处播放。",
+         "REPLAY_END_OF_SEGMENT": "从分段结束处播放",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "从当前分段的结束处播放几秒。",
+         "REPLAY_SEGMENT_WITH_PREROLL": "播放过渡",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "播放几秒钟，包含上一段结束处和下一步段开始处。",
+         "UNDO": "撤消",
+         "REDO": "重做",
+         "CLEAR_SEGMENTS": "清除所有分段",
+         "CLEAR_SEGMENTS_TOOLTIP": "清除所有部分，留下一个大段。"
+      },
+      "SEGMENTS": {
+         "REMOVE_SEGMENT": "删除分段",
+         "SHOW_SEGMENT": "显示此段",
+         "HIDE_SEGMENT": "隐藏此段",
+         "START": "开始",
+         "END": "结束"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "已自动生成用于表示此事件的默认缩略图。如果您想使用其他缩略图，您可以从视频的当前播放位置提取或上传图片。",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "从视频提取",
+                  "TOOLTIP": "从视频当前播放位置提取缩略图"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "从左侧视频提取",
+                  "TOOLTIP": "从当前播放位置左侧视频提取缩略图"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "从右侧视频提取",
+                  "TOOLTIP": "从当前播放位置右侧视频提取缩略图"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "上传图片",
+               "TOOLTIP": "上传缩略图图像"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "使用默认缩略图",
+               "TOOLTIP": "使用自动生成的默认缩略图"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "无可用预览",
+            "OUTDATED": "因分段更改已导致预览过时。一旦您保存更改，它将尽快更新。"
+         },
+         "CURRENT": {
+            "DEFAULT": "您当前正在使用默认缩略图。",
+            "SNAPSHOT": "当前缩略图已从视频中提取。",
+            "UPLOAD": "您当前正在使用上传的缩略图。"
+         }
+      },
+      "TRACKS": {
+         "DESCRIPTION": "您可以取消选择轨道，将其排除在进一步处理之外。请注意您需要重新发布事件才能使更改生效。",
+         "NOTIFICATION": {
+            "NO_VIDEO_TRACK_SELECTED": "您必须启用至少一个视频轨道",
+            "NO_AUDIO_TRACK_SELECTED": "您必须启用至少一个音频轨道"
+         },
+         "TRACK": {
+            "HEADER": "轨道"
+         },
+         "VIDEO": {
+            "HEADER": "视频轨道",
+            "NOT_AVAILABLE": "没有可用的视频轨道",
+            "NO_PREVIEW_AVAILABLE": "未找到预览图像",
+            "NO_TRACK_SELECTED": "没有选择视频轨道",
+            "TOOLTIPS": {
+               "HIDE": "此视频轨道当前已启用。点击以禁用",
+               "UNHIDE": "此视频轨道目前已禁用。点击以启用。"
+            }
+         },
+         "AUDIO": {
+            "HEADER": "音频轨道",
+            "NOT_AVAILABLE": "没有可用的音频轨道",
+            "NO_PREVIEW_AVAILABLE": "未找到预览图像",
+            "NO_TRACK_SELECTED": "没有选择音频轨道",
+            "TOOLTIPS": {
+               "HIDE": "此音频轨道当前已启用。点击以禁用",
+               "UNHIDE": "此音频轨道当前已禁用。点击以启用"
+            }
+         }
+      },
+      "PLAYER": {
+         "PLAY": "播放",
+         "PAUSE": "暂停",
+         "NEXT_FRAME": "下一帧",
+         "PREVIOUS_FRAME": "前一帧",
+         "NEXT_SEGMENT": "下一段 / 跳转到结束",
+         "PREVIOUS_SEGMENT": "前一段 / 跳转到开始",
+         "MUTE": "静音",
+         "VOLUME": "音量"
+      }
+   },
+   "LOGIN": {
+      "WELCOME": "欢迎来到Opencast",
+      "REMEMBER": "在这台电脑上记住我",
+      "USERNAME": "用户名...",
+      "PASSWORD": "密码...",
+      "LOGIN": "登录",
+      "ERROR": "用户名或密码错误"
+   },
+   "TABLE_FILTERS": {
+      "FILTER_SELECTION": {
+         "PLACEHOLDER": "请选择一个过滤器…",
+         "NO_OPTIONS": "没找到过滤器"
+      },
+      "FILTER_VALUE_SELECTION": {
+         "PLACEHOLDER": "请选择一个值…",
+         "NO_OPTIONS": "没有找到值"
+      },
+      "CLEAR": "清除所有过滤器",
+      "REMOVE": "删除过滤器",
+      "ADD": "添加过滤器",
+      "PLACEHOLDER": "搜索...",
+      "PROFILES": {
+         "FILTERS_HEADER": "已保存过滤器组",
+         "EDIT": "编辑过滤器组",
+         "REMOVE": "删除已保存的过滤器",
+         "EMPTY": "还没有已保存的过滤器",
+         "SAVE_FILTERS": "保存",
+         "FILTER_HEADER": "保存过滤器组",
+         "NAME": "名称",
+         "NAME_PLACEHOLDER": "名称...",
+         "DESCRIPTION": "描述",
+         "DESCRIPTION_PLACEHOLDER": "描述…"
+      }
+   },
+   "FILTERS": {
+      "ACLS": {
+         "NAME": {
+            "LABEL": "名称"
+         }
+      },
+      "AGENTS": {
+         "NAME": {
+            "LABEL": "名称"
+         },
+         "STATUS": {
+            "LABEL": "状态"
+         }
+      },
+      "EVENTS": {
+         "AGENT_ID": {
+            "LABEL": "捕获代理ID"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "访问权限"
+         },
+         "COMMENTS": {
+            "LABEL": "评论",
+            "NONE": "无",
+            "OPEN": "打开",
+            "RESOLVED": "已解决"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "贡献者"
+         },
+         "CREATOR": {
+            "LABEL": "创建者"
+         },
+         "PUBLISHER": {
+            "LABEL": "发布者"
+         },
+         "HOSTNAME": {
+            "LABEL": "主机名"
+         },
+         "LANGUAGE": {
+            "LABEL": "语言"
+         },
+         "LICENSE": {
+            "LABEL": "许可证"
+         },
+         "LOCATION": {
+            "LABEL": "位置"
+         },
+         "PERIOD": {
+            "LABEL": "周期"
+         },
+         "PRESENTERS_BIBLIOGRAPHIC": {
+            "LABEL": "演讲者简历"
+         },
+         "PRESENTERS_TECHNICAL": {
+            "LABEL": "演讲者专长"
+         },
+         "PROGRESS": {
+            "LABEL": "进度"
+         },
+         "SERIES": {
+            "LABEL": "系列"
+         },
+         "SOURCE": {
+            "LABEL": "源"
+         },
+         "START_DATE": {
+            "LABEL": "开始日期"
+         },
+         "STATUS": {
+            "LABEL": "状态",
+            "SCHEDULED": "已计划",
+            "RECORDING": "录制中",
+            "INGESTING": "抓取中",
+            "PROCESSING": "处理中",
+            "ARCHIVE": "归档",
+            "WAITINGFOR": "等待",
+            "UPLOAD": "上传",
+            "ONHOLD": "已暂停"
+         },
+         "SUBJECT": {
+            "LABEL": "主题"
+         },
+         "TRACK_MIMETYPE": {
+            "LABEL": "MIME类型"
+         },
+         "TRACK_RESOLUTION": {
+            "LABEL": "分辨率"
+         },
+         "TRACK_TYPE": {
+            "LABEL": "类型"
+         },
+         "WORKFLOW_DEFINITION": {
+            "LABEL": "工作流定义"
+         },
+         "WORKFLOW_STATE": {
+            "LABEL": "工作流状态"
+         }
+      },
+      "JOBS": {
+         "HOSTNAME": {
+            "LABEL": "主机名"
+         },
+         "NODE_NAME": {
+            "LABEL": "节点名"
+         },
+         "STATUS": {
+            "LABEL": "状态",
+            "PAUSED": "已暂停",
+            "QUEUED": "排队中",
+            "RUNNING": "运行中",
+            "WAITING": "等待中"
+         }
+      },
+      "SERIES": {
+         "TITLE": {
+            "LABEL": "名称"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "贡献者"
+         },
+         "ORGANIZERS": {
+            "LABEL": "组织者"
+         },
+         "SUBJECT": {
+            "LABEL": "主题"
+         },
+         "LANGUAGE": {
+            "LABEL": "语言"
+         },
+         "CREATOR": {
+            "LABEL": "创建者"
+         },
+         "LICENSE": {
+            "LABEL": "许可证"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "访问权限"
+         },
+         "CREATION_DATE": {
+            "LABEL": "创建日期"
+         }
+      },
+      "SERVERS": {
+         "HOSTNAME": {
+            "LABEL": "主机名"
+         },
+         "NODE_NAME": {
+            "LABEL": "节点名"
+         },
+         "STATUS": {
+            "LABEL": "状态",
+            "MAINTENANCE": "维护",
+            "ONLINE": "在线",
+            "OFFLINE": "离线"
+         }
+      },
+      "SERVICES": {
+         "ACTIONS": {
+            "LABEL": "可用操作"
+         },
+         "HOSTNAME": {
+            "LABEL": "主机名"
+         },
+         "NODE_NAME": {
+            "LABEL": "节点名"
+         },
+         "NAME": {
+            "LABEL": "名称"
+         },
+         "STATUS": {
+            "LABEL": "状态",
+            "ERROR": "错误",
+            "NORMAL": "正常",
+            "WARNING": "警告"
+         }
+      },
+      "THEMES": {
+         "NAME": {
+            "LABEL": "名称"
+         },
+         "DESCRIPTION": {
+            "LABEL": "说明"
+         },
+         "CREATOR": {
+            "LABEL": "创建者"
+         },
+         "CREATION_DATE": {
+            "LABEL": "已创建"
+         }
+      },
+      "USERS": {
+         "PROVIDER": {
+            "LABEL": "提供者"
+         },
+         "ROLE": {
+            "LABEL": "角色"
+         },
+         "USERNAME": {
+            "LABEL": "用户名"
+         },
+         "NAME": {
+            "LABEL": "姓名"
+         },
+         "USER_DIRECTORY": {
+            "LABEL": "用户目录"
+         }
+      },
+      "REVIEW_STATUS": {
+         "UNSENT": "未发送",
+         "UNCONFIRMED": "未确认",
+         "CONFIRMED": "已确认"
+      }
+   },
+   "TABLE_SUMMARY": "{{numberOfRows}} 行",
+   "TABLE_NO_RESULT": "未找到结果",
+   "TABLE_LOADING": "加载中...",
+   "TABLE_EDIT": "编辑",
+   "DASHBOARD": {
+      "RUNNING": "运行中",
+      "FINISHED": "已完成",
+      "PAUSED": "已暂停",
+      "FAILED": "失败",
+      "FINISHED_WITH_COMMENTS": "待办",
+      "SCHEDULED": "已计划",
+      "RECORDING": "录制中"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "快捷键",
+         "HINT": "该页面显示当前页面可用的快捷键。注意：不同页面可能显示的不一样。"
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "空格键",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "概况",
+         "PLAYER": "播放器",
+         "EDITOR": "编辑器"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "主菜单",
+            "SELECT_NEXT_DASHBOARD_FILTER": "选择下一个仪表盘过滤器",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "选择上一个仪表盘过滤器",
+            "REMOVE_FILTERS": "清除所有过滤器",
+            "EVENT_VIEW": "事件",
+            "SERIES_VIEW": "系列",
+            "NEW_EVENT": "添加事件",
+            "NEW_SERIES": "添加系列",
+            "CHEAT_SHEET": "快捷键"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "播放/暂停",
+            "PREVIOUS_FRAME": "上一帧",
+            "NEXT_FRAME": "下一帧",
+            "STEP_BACKWARD": "后退10秒",
+            "STEP_FORWARD": "快进10秒",
+            "PREVIOUS_SEGMENT": "前一个分段/跳到开始处",
+            "NEXT_SEGMENT": "后一个分段/跳到结尾处",
+            "VOLUME_UP": "增大音量",
+            "VOLUME_DOWN": "减小音量",
+            "MUTE": "静音/取消静音"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "分割",
+            "CUT_SELECTED_SEGMENT": "剪切",
+            "PLAY_CURRENT_SEGMENT": "播放当前分段",
+            "CLEAR_LIST": "清除分段",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "重新播放片段（在片段开始稍前处开始播放）",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "分段结尾"
+         }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "捕获中",
+         "ERROR": "错误",
+         "IDLE": "空闲",
+         "OFFLINE": "离线",
+         "SHUTTING_DOWN": "关机中",
+         "UNKNOWN": "未知",
+         "UPLOADING": "上传中"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "通过一行一个值的方式输入多个值"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "统计数据目前无法显示。请稍后再试。",
+      "UNSUPPORTED_TYPE": "对不起，Opencast无法显示此类型的统计数据。",
+      "FROM": "从",
+      "TO": "到",
+      "TOTAL": "总计",
+      "GRANULARITY": "粒度",
+      "NAVIGATION": {
+         "ORGANIZATION": "组织"
+      },
+      "TITLE": {
+         "RANDOM": "随机数据",
+         "VIEWS_SUM": "总查看数",
+         "VIEWS_AVG": "平均查看数",
+         "PUBLISHEDHOURS": "已发布视频的小时数"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "显示随机数据作为展示。您可以通过删除 etc/providers 中相应的统计定义json 来禁用此图表。",
+         "VIEWS_SUM": "显示单位时间内的查看数。",
+         "VIEWS_AVG": "显示单位时间内的平均每天查看数。",
+         "PUBLISHEDHOURS": "显示已发布的视频小时数"
+      }
+   }
+}

@@ -20,8 +20,7 @@
  */
 'use strict';
 
-angular.module('adminNg.services')
-.factory('RestServiceMonitor', ['$http', '$location', 'Storage', function($http, $location, Storage) {
+function monitorService($http, $location, $translate, Storage) {
   var Monitoring = {};
   var services = {
     service: {},
@@ -57,27 +56,34 @@ angular.module('adminNg.services')
         Monitoring.populateService(LATEST_VERSION_NAME);
 
         if (response_latest_version.status === 200 && response_my_version.status === 200
-        && response_my_version.data.consistent) {
-          var my_version = response_my_version.data.version;
-          var latest_version = response_latest_version.data;
+        && response_my_version.data.consistent && response_latest_version.data != '') {
+          var my_version = response_my_version.data.version,
+              latest_version = response_latest_version.data;
           services.service[LATEST_VERSION_NAME].docs_url =
             'https://docs.opencast.org/r/' + parseInt(latest_version) + '.x/admin/';
 
           if (parseFloat(my_version) >= parseFloat(latest_version)
-             || (my_version[0] == latest_version[0] && my_version.endsWith('SNAPSHOT'))) {
+             || (parseInt(my_version) == parseInt(latest_version) && my_version.endsWith('SNAPSHOT'))) {
             services.service[LATEST_VERSION_NAME].status = OK;
             services.service[LATEST_VERSION_NAME].error = false;
-          } else if (my_version[0] == latest_version[0]) {
-            services.service[LATEST_VERSION_NAME].status = 'There is a minor update available.';
+          } else if (parseInt(my_version) == parseInt(latest_version)) {
+            $translate('UPDATE.MINOR').then(function(translation) {
+              services.service[LATEST_VERSION_NAME].status = translation;
+            }).catch(angular.noop);
             services.service[LATEST_VERSION_NAME].error = true;
-          } else if (parseInt(latest_version[0]) - parseInt(my_version[0]) < 2) {
-            Monitoring.setError(LATEST_VERSION_NAME, 'There is a major update available.');
+          } else if (parseInt(latest_version) - parseInt(my_version) < 2) {
+            $translate('UPDATE.MAJOR').then(function(translation) {
+              Monitoring.setError(LATEST_VERSION_NAME, translation);
+            }).catch(angular.noop);
           } else {
-            Monitoring.setError(LATEST_VERSION_NAME,
-              'Version ' + my_version + ' of Opencast is no longer supported. Please update.');
+            $translate('UPDATE.UNSUPPORTED', {'version': my_version}).then(function(translation) {
+              Monitoring.setError(LATEST_VERSION_NAME, translation);
+            }).catch(angular.noop);
           }
         } else {
-          Monitoring.setError(LATEST_VERSION_NAME, 'Version not found');
+          $translate('UPDATE.UNDETERMINED').then(function(translation) {
+            Monitoring.setError(LATEST_VERSION_NAME, translation);
+          }).catch(angular.noop);
           services.service[LATEST_VERSION_NAME].docs_url = 'https://docs.opencast.org';
         }
       });
@@ -173,4 +179,7 @@ angular.module('adminNg.services')
   };
 
   return Monitoring;
-}]);
+}
+
+angular.module('adminNg.services')
+.factory('RestServiceMonitor', ['$http', '$location', '$translate', 'Storage', monitorService]);

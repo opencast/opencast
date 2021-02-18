@@ -4,7 +4,12 @@
    "NAV_ABOUT": "Acerca de",
    "NO": "Non",
    "SUBMIT": "Enviar",
-   "UPDATE": "Actualizar",
+   "UPDATE": {
+      "MINOR": "Minor update available",
+      "MAJOR": "Major update available",
+      "UNSUPPORTED": "Version {{ version }} no longer supported",
+      "UNDETERMINED": "Indeterminable version"
+   },
    "CANCEL": "Cancelar",
    "CONFIRM": "Confirmar",
    "SAVE": "Gardar",
@@ -37,7 +42,7 @@
       "SELECT_OPTION": "Seleccionar opción",
       "JOB_TITLE": "Título",
       "JOB_STATUS": "Estado",
-      "UPLOAD_SUCCESS": "Carga rematada con éxito!",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
       "UPLOAD_FAILURE": "Fallo ao cargar!",
       "UPLOAD_FAILURE_DESCRIPTION": "Por favor, inténteo de novo máis tarde.",
       "EDIT_SUCCESS": "Edición rematada con éxito. Volvendo a publicar...",
@@ -129,7 +134,8 @@
       "USERS_GUIDE": "Guía do Usuario",
       "DOCUMENTATION": "Documentación",
       "REST_DOC": "Documentación da API REST",
-      "HOTKEY_CHEAT_SHEET": "Atallos de teclado"
+      "HOTKEY_CHEAT_SHEET": "Atallos de teclado",
+      "ADOPTER_REGISTRATION": "Adopter Registration"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Política de acceso creada",
@@ -225,7 +231,11 @@
          "ALL_EVENTS_UPDATED": "Todos os eventos se actualizaron correctamente.",
          "NO_EVENTS_UPDATED": "Fallaron tódalas actualizacións.",
          "SOME_EVENTS_NOT_UPDATED": "Non se puideron crear algúns eventos."
-      }
+      },
+      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
+      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
    },
    "BULK_ACTIONS": {
       "CAPTION": "Accións",
@@ -380,6 +390,63 @@
       },
       "STATISTICS": {
          "TITLE": "Estatísticas"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Registration",
+         "SKIP": "Not now",
+         "CONTINUE": "Continue",
+         "BACK": "Back",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Terms of Service and Privacy Policy"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Thank you for using Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Organisation",
+            "DEPARTMENT": "Department",
+            "COUNTRY": "Country",
+            "POSTAL_CODE": "Postal code",
+            "CITY": "City",
+            "CONTACT_INFO": "Contact information",
+            "GENDER": "Gender",
+            "GENDER_MALE": "male",
+            "GENDER_FEMALE": "female",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name",
+            "STREET": "Street",
+            "NUMBER": "Number",
+            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "MAIL": "Email",
+            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
+            "POLICY_HEADLINE": "Privacy policy and terms of use",
+            "USAGE_STATISTICS": "Usage statistcs",
+            "ERROR_REPORTS": "Error reports",
+            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
+            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Maybe next time!",
+            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Thank you for your registration!",
+            "TEXT_LEADING_TO_PATH": "You can change your data at ",
+            "TEXT_LEADING_AFTER_PATH": "at any time."
+         },
+         "ERROR": {
+            "HEADER": "Error",
+            "TEXT": "An error occurred while processing your request."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Are you sure you want to delete your registration data?"
+         }
       }
    },
    "EVENTS": {

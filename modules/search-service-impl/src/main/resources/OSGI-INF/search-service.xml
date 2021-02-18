@@ -9,6 +9,7 @@
     <provide interface="org.opencastproject.search.api.SearchService"/>
     <provide interface="org.opencastproject.search.impl.SearchServiceImpl"/>
     <provide interface="org.osgi.service.cm.ManagedService"/>
+    <provide interface="org.opencastproject.security.api.StaticFileAuthorization" />
   </service>
   <reference name="staticMetadata"
              interface="org.opencastproject.metadata.api.StaticMetadataService"

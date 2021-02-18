@@ -4,59 +4,64 @@
    "NAV_ABOUT": "Σχετικά με",
    "NO": "'Οχι",
    "SUBMIT": "Υποβολή",
-   "UPDATE": "Ενημέρωση",
+   "UPDATE": {
+      "MINOR": "Ενημέρωση διαθέσιμη",
+      "MAJOR": "Σημαντική ενημέρωση διαθέσιμη",
+      "UNSUPPORTED": "Η έκδοση δεν υποστηρίζεται πλέον ",
+      "UNDETERMINED": "Απροσδιόριστη έκδοση"
+   },
    "CANCEL": "Ακύρωση",
    "CONFIRM": "Επιβεβαίωση",
    "SAVE": "Αποθήκευση",
-   "CONTINUE": "Continue",
-   "CLOSE": "Close",
+   "CONTINUE": "Συνέχεια",
+   "CLOSE": "Κλείσιμο",
    "LOGOUT": "Αποσύνδεση",
    "RESET": "Επαναφορά",
    "SELECT_NO_OPTION_SELECTED": "Δεν επιλέχθηκε κάποια επιλογή",
    "SELECT_NO_OPTIONS_AVAILABLE": "Δεν υπάρχουν διαθέσιμες επιλογές",
    "YES": "Ναί",
-   "COPY": "Copy to clipboard",
+   "COPY": "Αντιγραφή στο πρόχειρο",
    "LTI": {
-      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
-      "SERIES_TITLE": "View Series",
-      "UPLOAD_TITLE": "Upload event",
-      "LOADING": "Loading…",
-      "NEW_UPLOAD": "Upload new event",
-      "EDIT_UPLOAD": "Edit event",
-      "CURRENT_JOBS": "Today's jobs",
-      "PRESENTER": "Presenter",
-      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
-      "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
-      "UPLOAD": "Upload",
-      "UPLOADING": "Uploading",
-      "EDIT": "Save",
-      "EDIT_TITLE": "Edit event",
-      "NO_OPTION_SELECTED": "No option selected",
-      "EDITING": "Saving…",
-      "SELECT_OPTION": "Select option",
-      "JOB_TITLE": "Title",
-      "JOB_STATUS": "Status",
-      "UPLOAD_SUCCESS": "Upload succeded!",
-      "UPLOAD_FAILURE": "Upload failed!",
-      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
-      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
-      "EDIT_FAILURE": "Edit failed!",
-      "COPY_SUCCESS": "Copying started…",
-      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
-      "GENERIC_ERROR": "Error: {{message}}",
-      "DELETION_SUCCESS": "Event deletion successful",
-      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
-      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
-      "DELETION_FAILURE": "Event deletion failed",
-      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
-      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
-      "CONFIRM_DELETION": "Really delete this event?",
-      "COPY_TO_SERIES": "Copy event to series",
-      "SELECT_COPY_TARGET": "Select destination series",
-      "COPY": "Copy",
-      "COPY_IN_PROGRESS": "Starting copy…",
-      "CREATOR": "by {{creator}}"
+      "ERROR_LOADING_METADATA": "Σφάλμα στην φόρτωση των μεταδεδομένων της εκδήλωσης. Παρακαλώ προσπαθείστε αργότερα.",
+      "SERIES_TITLE": "Προβολή σειράς",
+      "UPLOAD_TITLE": "Μεταφόρτωση εκδήλωσης",
+      "LOADING": "Φόρτωση...",
+      "NEW_UPLOAD": "Μεταφόρτωση νέας εκδήλωσης",
+      "EDIT_UPLOAD": "Επεξεργασία εκδήλωσης",
+      "CURRENT_JOBS": "Σημερινές εργασίες",
+      "PRESENTER": "Παρουσιαστής",
+      "PRESENTER_DESCRIPTION": "Αρχείο βίντεο για το κομμάτι του παρουσιαστή",
+      "CAPTION": "Λεζάντες",
+      "CAPTION_DESCRIPTION": "Αρχείο λεζάντας; Ο τύπος αρχείου VTT υποστηρίζεται",
+      "UPLOAD": "Μεταφόρτωση",
+      "UPLOADING": "Αποστολή...",
+      "EDIT": "Αποθήκευση",
+      "EDIT_TITLE": "Επεξεργασία εκδήλωσης",
+      "NO_OPTION_SELECTED": "Δεν επιλέχθηκε κάποια επιλογή",
+      "EDITING": "Αποθήκευση...",
+      "SELECT_OPTION": "Επιλογή ρυθμίσεων",
+      "JOB_TITLE": "Τίτλος",
+      "JOB_STATUS": "Κατάσταση",
+      "UPLOAD_SUCCESS": "Η μεταφόρτωση ολοκληρώθηκε με επιτυχία!",
+      "UPLOAD_FAILURE": "Η μεταφόρτωση απέτυχε",
+      "UPLOAD_FAILURE_DESCRIPTION": "Παρακαλούμε δοκιμάστε ξανά αργότερα.",
+      "EDIT_SUCCESS": "Η επεξεργασία ολοκληρώθηκε, ξεκινάει η επαναδημοσίευση",
+      "EDIT_FAILURE": "Αποτυχία επεξεργασίας.",
+      "COPY_SUCCESS": "Η αντιγραφή ξεκίνησε...",
+      "COPY_SUCCESS_DESCRIPTION": "Παρακαλώ περιμένετε λίγο...",
+      "GENERIC_ERROR": "Μήνυμα σφάλματος:",
+      "DELETION_SUCCESS": "Επιτυχής διαγραφή εκδήλωσης",
+      "DELETION_SUCCESS_DESCRIPTION": "Η εκδήλωση θα διαγραφεί από την λίστα σε λίγα λεπτά...",
+      "EVENT_LOCKED": "Η εκδήλωσε βρίσκεται σε επεξεργασία. Παρακαλώ περιμένετε μέχρι να κάνετε περαιτέρω αλλαγές...",
+      "DELETION_FAILURE": "Η διαγραφή της εκδήλωσης απέτυχε",
+      "DELETION_FAILURE_DESCRIPTION": "Παρακαλούμε δοκιμάστε ξανά αργότερα.",
+      "RESULT_HEADING": "Αποτελέσματα {{range.begin}}-{{range.end}} από {{total}}",
+      "CONFIRM_DELETION": "ειστε σιγουροι οτι θελετε να διαγραψετε την εκδήλωση?",
+      "COPY_TO_SERIES": "Αντιγραφή εκδήλωσης στην σειρά",
+      "SELECT_COPY_TARGET": "Επιλέξτε σειρά προορισμού",
+      "COPY": "Αντιγραφή",
+      "COPY_IN_PROGRESS": "Έναρξη αντιγραφής...",
+      "CREATOR": "από {{creator}}"
    },
    "LANGUAGES": {
       "ARABIC": "Αραβικά",
@@ -92,7 +97,7 @@
       }
    },
    "CONFIRMATIONS": {
-      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+      "EMBEDDING_CODE": "Αυτός ο κώδικας αντιγράφτηκε στο πρόχειρο:",
       "CONTINUE_ACTION": "Είστε βέβαιοι ότι θέλετε να συνεχίσετε;",
       "METADATA": {
          "NOTICE": {
@@ -110,7 +115,7 @@
       "ACTIONS": {
          "CONFIRMATION": "Επιβεβαίωση",
          "SHOW": {
-            "EMBEDDING_CODE": "Embedding code"
+            "EMBEDDING_CODE": "Ενσωμάτωση κώδικα"
          }
       },
       "WARNINGS": {
@@ -129,7 +134,8 @@
       "USERS_GUIDE": "Εγχειρίδιο χρήσης",
       "DOCUMENTATION": "Τεκμηρίωση",
       "REST_DOC": "Εγχειρίδιο REST API",
-      "HOTKEY_CHEAT_SHEET": "Συντομεύσεις πληκτρολογίου"
+      "HOTKEY_CHEAT_SHEET": "Συντομεύσεις πληκτρολογίου",
+      "ADOPTER_REGISTRATION": "Εγγραφή adopter"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "H πολιτική πρόσβασης έχει δημιουργηθεί",
@@ -221,11 +227,15 @@
       "SERVICE_UNAVAILABLE": "Ωχ! Ο server φαίνεται να μην ανταποκρίνεται. Παρακαλώ δοκιμάστε ξανά αργότερα.",
       "ACTIVE_TRANSACTION": "Δεν μπορεί να επεξεργαστεί αυτή την εκδήλωση, ενώ υπάρχει μια ενεργή ροή εργασίας ή συναλλαγή.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
-         "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
-      }
+         "UNEXPECTED_ERROR": "Παρουσιάστηκε μη αναμενόμενο σφάλμα κατά την ενημέρωση. Ορισμένες εκδηλώσεις ενδέχεται να έχουν ενημερωθεί.",
+         "ALL_EVENTS_UPDATED": "Όλες οι εκδηλώσεις έχουν ενημερωθεί με επιτυχία",
+         "NO_EVENTS_UPDATED": "Όλες οι ενημερώσεις απέτυχαν.",
+         "SOME_EVENTS_NOT_UPDATED": "Δεν ήταν δυνατή η ενημέρωση ορισμένων εκδηλώσεων."
+      },
+      "ADOPTER_PROFILE_UPDATED": "Οι πληροφορίες προφίλ ενημερώθηκαν επιτυχώς.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Δεν ήταν δυνατή η ενημέρωση των πληροφοριών προφίλ.  Παρακαλώ προσπαθησε ξανά!",
+      "ADOPTER_PROFILE_DELETED": "Οι πληροφορίες προφίλ διαγράφηκαν με επιτυχία.",
+      "ADOPTER_PROFILE_NOT_DELETED": " Δεν ήταν δυνατή η διαγραφή πληροφοριών προφίλ. Παρακαλώ προσπαθησε ξανα!"
    },
    "BULK_ACTIONS": {
       "CAPTION": "Ενέργειες",
@@ -236,7 +246,7 @@
             "CANNOT_DELETE": "Η επιλεγμένη σειρά δεν μπορεί να διαγραφεί, καθώς περιέχει ακόμα εκδηλώσεις."
          },
          "EVENTS": {
-            "CAPTION": "Delete",
+            "CAPTION": "Διαγραφή",
             "DELETE_EVENTS": "Διαγραφή εκδηλώσεων",
             "UNAUTHORIZED": "Δεν είστε εξουσιοδοτημένοι να διαγράψετε τις επιλεγμένες εκδηλώσεις. Παρακαλώ αποεπιλέξετε τις εκδηλώσεις για να συνεχίσετε."
          }
@@ -295,33 +305,33 @@
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "CAPTION": "Επεξεργασία μεταδεδομένων για πολλαπλές εκδηλώσεις",
+         "FATAL_ERROR": "Παρουσιάστηκε ανεπανόρθωτο σφάλμα: {{fatalError}}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
-            "NOT_FOUND": "Not found",
-            "RUNNING_WORKFLOW": "Running workflow",
+            "CANNOT_EDIT_SOME": "Οι επισημασμένες εκδηλώσεις δεν γίνεται να επεξεργαστούν",
+            "NOTHING_TO_EDIT": "Οι  εκδηλώσεις δεν γίνεται να επεξεργαστούν",
+            "NOT_FOUND": "Δε βρέθηκε",
+            "RUNNING_WORKFLOW": "Εκτελούμενες ροές εργασίας",
             "TABLE": {
-               "CAPTION": "Selected events",
-               "ERRORS": "Errors"
+               "CAPTION": "Επιλεγμένες εκδηλώσεις",
+               "ERRORS": "Σφάλματα"
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Επεξεργαστείτε και / ή επιλέξτε τα πεδία μεταδεδομένων που θέλετε να ενημερώσετε. Δεν είναι δυνατή η επιλογή πεδίου εάν αυτό δεν έχει ως αποτέλεσμα αλλαγή τιμής για τουλάχιστον μια εκδήλωση ή εάν το πεδίο δεν είναι έγκυρο (π.χ. τα απαιτούμενα πεδία δεν μπορούν να είναι κενά). Τα επισημασμένα πεδία μεταδεδομένων έχουν αποκλίνουσες τιμές για τις επιλεγμένες εκδηλώσεις.",
             "TABLE": {
-               "CAPTION": "Metadata of selected events",
-               "FIELDS": "Metadata",
-               "VALUES": "Values"
+               "CAPTION": "Μεταδεδομένα επιλεγμένων εκδηλώσεων",
+               "FIELDS": "Μεταδεδομένα",
+               "VALUES": "Τιμές"
             }
          },
          "UPDATE_FAILURES": {
             "TABLE": {
-               "CAPTION": "Update Failures"
+               "CAPTION": "Αποτυχίες ενημέρωσης"
             },
-            "UPDATE_FAILED": "Update failed",
-            "NO_EVENTS_UPDATED": "All updates failed.",
-            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+            "UPDATE_FAILED": "Η ενημέρωση απέτυχε",
+            "NO_EVENTS_UPDATED": "Όλες οι ενημερώσεις απέτυχαν.",
+            "SOME_EVENTS_NOT_UPDATED": "Οι επισημασμένες εκδηλώσεις δεν γίνεται να ενημερωθούν."
          }
       }
    },
@@ -380,6 +390,63 @@
       },
       "STATISTICS": {
          "TITLE": "Στατιστικά"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Εγγραφή",
+         "SKIP": "Να μην γίνει τώρα",
+         "CONTINUE": "Συνέχεια",
+         "BACK": "Επιστροφή",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Αποδοχή Όρων Παροχής Υπηρεσιών και Πολιτικής Απορρήτου"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Σας ευχαριστούμε για τη χρήση του Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Οι προγραμματιστές μας εργάζονται συνεχώς για να σας προσφέρουν την καλύτερη δυνατή εμπειρία χρήστη. Για αυτό, πρέπει να μάθουμε περισσότερα σχετικά με το ποιος χρησιμοποιεί το Opencast και πώς χρησιμοποιείται. Μπορείτε να μας βοηθήσετε με μια γρήγορη εγγραφή.",
+            "INFORMATION_PARAGRAPH_2": "\nΕκτιμούμε ιδιαίτερα τα σχόλια, καθώς ακόμη και μερικά από τα δεδομένα που συλλέγουμε σχετικά με τη χρήση του Opencast θα μας βοηθήσουν να δημιουργήσουμε καλύτερο λογισμικό, να έχουμε καλύτερες πιθανότητες για πρόσθετη χρηματοδότηση και να προσελκύσουμε περισσότερες εταιρείες για να παρέχουν υπηρεσίες γύρω από το Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Οργανισμός",
+            "DEPARTMENT": "Τμήμα",
+            "COUNTRY": "Χώρα",
+            "POSTAL_CODE": "Ταχυδρομικός Κώδικας",
+            "CITY": "Πόλη",
+            "CONTACT_INFO": "Πληροφορίες επικοινωνίας",
+            "GENDER": "Φύλο",
+            "GENDER_MALE": "Άνδρας",
+            "GENDER_FEMALE": "Γυναίκα",
+            "FIRST_NAME": "Όνομα",
+            "LAST_NAME": "Επώνυμο",
+            "STREET": "Οδός",
+            "NUMBER": "Αριθμός",
+            "ADDITIONAL_ADRESS_INFO": "Επιπλέον πληροφορίες διεύθυνσης",
+            "MAIL": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
+            "CONTACT_ME": "Επικοινωνήστε μαζί μου για ενημερώσεις και ζητήματα ασφάλειας",
+            "WHICH_DATA_TO_SHARE": "Ποια δεδομένα θέλετε να μοιραστείτε;",
+            "POLICY_HEADLINE": "Πολιτική Απορρήτου και όροι χρήσης",
+            "USAGE_STATISTICS": "Στατιστικά χρήσης",
+            "ERROR_REPORTS": "Αναφορές σφαλμάτων",
+            "READ_TERMS_OF_USE_BEFORE": "Έχω διαβάσει και αποδέχομαι τους ",
+            "READ_TERMS_OF_USE_LINK": "την πολιτική απορρήτου και τους όρους χρήσης",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Ισως την επόμενη φορά!",
+            "TEXT": "Εάν θέλετε να εγγραφείτε αργότερα, μπορείτε να το κάνετε πατώντας το κουμπί βοήθειας στην επάνω δεξιά γωνία."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Σας ευχαριστουμε για την εγγραφη σας.",
+            "TEXT_LEADING_TO_PATH": "Μπορείτε να αλλάξετε τα δεδομένα σας σε",
+            "TEXT_LEADING_AFTER_PATH": "οποιαδήποτε στιγμή."
+         },
+         "ERROR": {
+            "HEADER": "Σφάλμα",
+            "TEXT": "Παρουσιάστηκε μη αναμενόμενο σφάλμα κατά την επεξεργασία του αιτήματος."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Είστε βέβαιοι ότι θέλετε να διαγράψετε τα στοιχεία εγγραφής σας;"
+         }
       }
    },
    "EVENTS": {
@@ -552,7 +619,7 @@
                "LOCATION": "Εκδήλωση για αυτήν την τοποθεσία",
                "DETAILS": "Προβολή λεπτομερειών εκδήλωσης",
                "DELETE": "Διαγραφή εκδήλωσης",
-               "EMBEDDING_CODE": "Embedding code",
+               "EMBEDDING_CODE": "Ενσωμάτωση κώδικα",
                "EDITOR": "Άνοιγμα επεξεργασίας βίντεο",
                "EDITOR_NEEDS_CUTTING": "Άνοιγμα επεξεργασίας βίντεο (ένα σχόλιο δείχνει ότι έχει ζητηθεί η επεξεργασία του βίντεο)",
                "COMMENTS": "Δείτε σχόλια",
@@ -812,7 +879,7 @@
                "REPLY": "Απάντηση",
                "REPLY_TO": "Απάντηση σε",
                "CANCEL_REPLY": "Ακύρωση",
-               "DELETE": "Delete",
+               "DELETE": "Διαγραφή",
                "REASON": "Αιτία",
                "REASONS": {
                   "CUTTING": "Απαιτείται μοντάζ",
@@ -1084,8 +1151,8 @@
                   "DETAILS": "Λεπτομέρειες",
                   "REPLACE_EVENT_ACLS": "Ενημέρωση δικαιωμάτων εκδήλωσης",
                   "REPLACE_EVENT_ACLS_HINT": "Επιβεβαίωση ότι όλες οι εκδηλώσεις σε αυτή την σειρά έχουν τα ίδια δικαιώματα σε ισχύ",
-                  "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LOAD_MORE_LIMIT": "Εμφάνιση πολιτικών.",
+                  "LOAD_MORE_LINK": "Φόρτωση περισσοτέρων"
                },
                "ROLES": {
                   "LABEL": "Επιλέξτε ένα ρόλο",
@@ -1962,7 +2029,7 @@
       "FINISHED": "Ολοκληρώθηκε",
       "PAUSED": "Σε παύση",
       "FAILED": "Απέτυχε",
-      "FINISHED_WITH_COMMENTS": "Todo",
+      "FINISHED_WITH_COMMENTS": "Να γίνουν",
       "SCHEDULED": "Προγραμματισμένη",
       "RECORDING": "Εγγραφή"
    },
@@ -1975,7 +2042,7 @@
          "CTRL": "Ctrl",
          "ALT": "Alt",
          "OPTION": "⌥",
-         "SPACE": "Space",
+         "SPACE": "Πλήκτρο διαστήματος",
          "BACKSPACE": "⌫",
          "LEFT": "←",
          "RIGHT": "→",

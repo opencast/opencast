@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -94,11 +94,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common-jpa-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -106,6 +101,12 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-urlsigning-service-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-list-providers-service</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -131,6 +132,11 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore-osgi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>${httpcomponents-httpcore.version}</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
@@ -172,12 +178,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-distribution-workflowoperation</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>uk.co.datumedge</groupId>
       <artifactId>hamcrest-json</artifactId>
       <version>0.2</version>
@@ -197,6 +197,20 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <!-- provide a logger for tests -->
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-list-providers-service</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

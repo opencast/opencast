@@ -25,7 +25,7 @@ A complete setup consists of the following components:
 For example, using Opencast's [_opencast-influxdb-adapter_](https://github.com/opencast/opencast-influxdb-adapter), your
 architecture would look like this:
 
-{% dot statistics-architecture.svg
+```graphviz dot statistics-architecture.png
 
 /**
 Webserver Logs --> opencast-influxdb-adapter --> InfluxDB --> Opencast
@@ -43,7 +43,7 @@ digraph G {
   influxdb[label="InfluxDB"];
   opencast[label="Opencast"];
 }
-%}
+```
 
 Precisely, the Opencast bundle `opencast-statistics-provider-influx` is the one that needs to be able to connect to
 InfluxDB using http(s). So the node hosting this bundle needs network access to InfluxDB.

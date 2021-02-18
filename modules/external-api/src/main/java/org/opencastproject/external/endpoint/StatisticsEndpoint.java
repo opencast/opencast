@@ -79,7 +79,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
 @RestService(
   name = "externalapistatistics", title = "External API Statistics Endpoint",
   notes = {}, abstractText = "Provides statistics")

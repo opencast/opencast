@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.api;
 
 import org.opencastproject.event.comment.EventComment;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
@@ -37,6 +36,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.security.api.AccessControlList;

@@ -378,7 +378,7 @@ process during vacation, sickness and in case of local
 emergencies.
 
 I am looking forward to your applications on list, please
-voice your interest until <DATE>.
+voice your interest until <DATE_ROUGHLY_2_WEEKS_IN_THE_FUTURE>.
 ```
 
 In the case where someone steps up and offers to fill in the role of a release manager for the upcoming release, a vote

@@ -22,6 +22,8 @@
 
 package org.opencastproject.feed.impl;
 
+import static org.apache.http.HttpStatus.SC_OK;
+
 import org.opencastproject.feed.api.Feed;
 import org.opencastproject.feed.api.FeedGenerator;
 import org.opencastproject.security.api.Organization;
@@ -110,6 +112,15 @@ public class FeedServiceImpl {
   @GET
   @Path("/feeds")
   @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(
+      name = "feeds",
+      description = "List available series based feeds",
+      returnDescription = "Return list of feeds",
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "List of available feeds returned.")
+      })
   public String listFeedServices() {
 
     List<Map<String, String>> feedServices = new ArrayList<>();
@@ -131,7 +142,7 @@ public class FeedServiceImpl {
     return gson.toJson(feedServices);
   }
 
-  /*
+  /**
    * Note: We're using Regex matching for the path here, instead of normal JAX-RS paths.  Previously this class was a servlet,
    * which was fine except that it had auth issues.  Removing the servlet fixed the auth issues, but then the paths (as written
    * in the RestQuery docs) don't work because  JAX-RS does not support having "/" characters as part of the variable's value.

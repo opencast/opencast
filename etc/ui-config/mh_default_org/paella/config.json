@@ -38,10 +38,6 @@
         "enabled": true
       },
       {
-        "factory": "Html5VideoFactory",
-        "enabled": true
-      },
-      {
         "factory": "MpegDashVideoFactory",
         "enabled": true
       },
@@ -60,6 +56,10 @@
         "iOSMaxStreams": 2,
         "androidMaxStreams": 2,
         "initialQualityLevel": 2
+      },
+      {
+        "factory": "Html5VideoFactory",
+        "enabled": true
       },
       {
         "factory": "RTMPVideoFactory",
@@ -216,7 +216,11 @@
           0.75,
           1,
           1.25,
-          1.5
+          1.5,
+          1.75,
+          2,
+          2.5,
+          3
         ]
       },
       "es.upv.paella.playPauseButtonPlugin": {

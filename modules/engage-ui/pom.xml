@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -27,6 +27,11 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 
@@ -119,7 +124,6 @@
                 </goals>
                 <configuration>
                   <nodeVersion>${node.version}</nodeVersion>
-                  <npmVersion>${npm.version}</npmVersion>
                 </configuration>
               </execution>
 
@@ -202,9 +206,6 @@
               *
             </Import-Package>
             <Export-Package>org.opencastproject.engage.ui</Export-Package>
-            <Service-Component>
-              OSGI-INF/player-redirect.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

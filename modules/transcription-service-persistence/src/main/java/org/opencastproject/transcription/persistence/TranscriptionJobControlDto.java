@@ -70,15 +70,15 @@ public class TranscriptionJobControlDto implements Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateCreated;
 
-  @Column(name = "date_expected", nullable = true)
+  @Column(name = "date_expected")
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateExpected;
 
-  @Column(name = "date_completed", nullable = true)
+  @Column(name = "date_completed")
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateCompleted;
 
-  @Column(name = "status", nullable = true, length = 128)
+  @Column(name = "status", length = 128)
   private String status;
 
   @Column(name = "track_duration", nullable = false)
@@ -202,8 +202,9 @@ public class TranscriptionJobControlDto implements Serializable {
   public static List<TranscriptionJobControlDto> findByMediaPackageTrackAndStatus(EntityManager em,
           final String mediaPackageId, String trackId, final String... status) throws TranscriptionDatabaseException {
     Collection<String> statusCol = new HashSet<String>();
-    for (String st : status)
+    for (String st : status) {
       statusCol.add(st);
+    }
     Query query = null;
     try {
       query = em.createNamedQuery("TranscriptionJobControl.findByMediaPackageTrackAndStatus");

@@ -21,20 +21,28 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.apache.http.HttpStatus.SC_OK;
+
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("/")
 @RestService(name = "FeedService", title = "Admin UI Feed Service",
@@ -56,25 +64,40 @@ public class FeedEndpoint extends RemoteBase {
   }
 
   /** Logging facility */
-  private static Logger logger = LoggerFactory.getLogger(FeedEndpoint.class);
+  private static final Logger logger = LoggerFactory.getLogger(FeedEndpoint.class);
 
   @GET
   @Path("/feeds")
   @Produces(MediaType.APPLICATION_JSON)
-  public String listFeedServices() {
+  @RestQuery(
+      name = "feeds",
+      description = "List available series based feeds retrieved from the search service",
+      returnDescription = "Return list of feeds",
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "List of available feeds returned.")
+      })
+  public Response listFeedServices() {
 
     HttpGet get = new HttpGet("/feeds");
-    HttpResponse response = null;
-    String result = null;
-
     try {
-      response = getResponse(get);
-      result = IOUtils.toString(response.getEntity().getContent(), "utf-8");
+      InputStream response = getResponse(get).getEntity().getContent();
+      return Response.ok(response).build();
     } catch (Exception e) {
-      logger.error("Could not get /feeds request in FeedEndpoint. " + e.toString());
+      logger.error("Error requesting data from feeds endpoint", e);
+      return Response.serverError().build();
     }
+  }
 
-    return result;
+  @Reference
+  public void setTrustedHttpClient(final TrustedHttpClient client) {
+    this.client = client;
+  }
+
+  @Reference
+  public void setRemoteServiceManager(final ServiceRegistry remoteServiceManager) {
+    this.remoteServiceManager = remoteServiceManager;
   }
 
 }

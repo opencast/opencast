@@ -62,7 +62,10 @@
             <ul>
               <li ng-repeat="publication in publications.publications | orderBy:'order' track by $index" ng-if="!publication.hide">
                 <div class="v-container">
-                  <span class="icon-container"><i custom-icon="{{ publication.icon }}" class="video-icon"></i></span>
+                  <span class="icon-container">
+                    <i ng-if="publication.icon" custom-icon="{{ publication.icon }}" class="custom-icon"></i>
+                    <i ng-if="!publication.icon" class="video-icon"><!-- holds the FontAwesome icon --></i>
+                  </span>
                   <div>
                     <span translate="{{ publication.label }}">{{ publication.label }}</span>
                     <p class="description" translate="{{ publication.description }}" ng-if="publication.description">{{ publication.description }}</p>
@@ -342,7 +345,7 @@
                           data-width="'200px'"
                           ng-change="roomChanged(); saveScheduling()"
                           ng-model="source.device"
-                          ng-options="value.name for (id, value) in captureAgents | filter:currentAgentOrAccess"
+                          ng-options="ca.name for ca in captureAgents | filter:currentAgentOrAccess track by ca.id"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                           />
                 </td>
@@ -743,7 +746,7 @@
   <div class="modal-content" data-modal-tab-content="statistics">
     <div class="modal-body">
       <div class="full-col">
-        <div class="modal-alert danger" ng-if="statReusable.error" translate="STATISTICS.NOT_AVAILABLE"/>
+        <div class="modal-alert danger" ng-if="statReusable.error" translate="STATISTICS.NOT_AVAILABLE"></div>
 
         <div class="obj" ng-repeat="data in statReusable.statProviderData" ng-if="!statReusable.error">
           <header class="no-expand" translate="{{ data.title }}">
@@ -767,7 +770,10 @@
               >
             </statistics-graph>
           </div>
-          <div class="modal-alert danger" ng-if="data.providerType != 'timeSeries'" translate="STATISTICS.UNSUPPORTED_TYPE"/>
+          <div class="modal-alert danger"
+               ng-if="data.providerType != 'timeSeries'"
+               translate="STATISTICS.UNSUPPORTED_TYPE">
+          </div>
         </div>
       </div>
     </div>
@@ -1393,305 +1399,307 @@
         <div class="obj tbl-container media-stream-details">
           <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PREVIEW"><!-- Preview --></header>
           <div class="obj-container">
-
-            <div ng-if="subTab == 'media-details'" data-video-player data-player="{}" data-video="subNavData.video" data-adapter="html5" data-player-ref="player" data-controls="true" data-sub-controls="false"/>
-
-            </div>
-            </header>
-          </div>
-        </div>
-
-
-      </div>
-    </div>
-
-    <div class="modal-content" data-modal-tab-content="publications-details" data-parent="publications" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TITLE">
-      <div class="modal-body">
-        <div data-admin-ng-notifications="" context="events-access"></div>
-        <div class="full-col">
-          <div class="obj tbl-container operations-tbl">
-            <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CAPTION">
-              <!-- Publications -->
-            </header>
-            <div class="obj-container">
-              <table class="main-tbl">
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.ID">
-                    <!-- Id -->
-                  </td>
-                  <td>{{ subNavData.id }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TYPE">
-                    <!-- Type -->
-                  </td>
-                  <td>{{ subNavData.type }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.MIMETYPE">
-                    <!-- Mimetype -->
-                  </td>
-                  <td>{{ subNavData.mimetype }}</td>
-                </tr>
-                <tr ng-if="subNavData.size > 0">
-                  <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.SIZE">
-                    <!-- Size -->
-                  </td>
-                  <td>{{ subNavData.size | humanBytes }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CHANNEL">
-                    <!-- Channel -->
-                  </td>
-                  <td>{{ subNavData.channel }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.REFERENCE">
-                    <!-- Reference -->
-                  </td>
-                  <td>{{ subNavData.reference }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TAGS">
-                    <!-- Tags -->
-                  </td>
-                  <td>{{ subNavData.tags|joinBy:', ' }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.URL">
-                    <!-- Link -->
-                  </td>
-                  <td><a href="{{ subNavData.url }}" class="fa fa-external-link"></a></td>
-                </tr>
-              </table>
+            <div ng-if="subTab == 'media-details'"
+                 data-video-player data-player="{}"
+                 data-video="subNavData.video"
+                 data-adapter="html5"
+                 data-player-ref="player"
+                 data-controls="true"
+                 data-sub-controls="false">
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="modal-content" data-modal-tab-content="publications-details" data-parent="publications" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TITLE">
+    <div class="modal-body">
+      <div data-admin-ng-notifications="" context="events-access"></div>
+      <div class="full-col">
+        <div class="obj tbl-container operations-tbl">
+          <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CAPTION">
+            <!-- Publications -->
+          </header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.ID">
+                  <!-- Id -->
+                </td>
+                <td>{{ subNavData.id }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TYPE">
+                  <!-- Type -->
+                </td>
+                <td>{{ subNavData.type }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.MIMETYPE">
+                  <!-- Mimetype -->
+                </td>
+                <td>{{ subNavData.mimetype }}</td>
+              </tr>
+              <tr ng-if="subNavData.size > 0">
+                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.SIZE">
+                  <!-- Size -->
+                </td>
+                <td>{{ subNavData.size | humanBytes }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CHANNEL">
+                  <!-- Channel -->
+                </td>
+                <td>{{ subNavData.channel }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.REFERENCE">
+                  <!-- Reference -->
+                </td>
+                <td>{{ subNavData.reference }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TAGS">
+                  <!-- Tags -->
+                </td>
+                <td>{{ subNavData.tags|joinBy:', ' }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.URL">
+                  <!-- Link -->
+                </td>
+                <td><a href="{{ subNavData.url }}" class="fa fa-external-link"></a></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
-    <div class="modal-content" data-modal-tab-content="workflow-details" data-parent="workflows" data-level="2" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE">
-      <div class="modal-body">
-        <div data-admin-ng-notifications="" context="events-access"></div>
-        <div class="full-col">
-          <div class="obj tbl-details">
-            <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE"><!-- Workflow Details --></header>
-            <div class="obj-container">
-              <table class="main-tbl vertical-headers">
+  <div class="modal-content" data-modal-tab-content="workflow-details" data-parent="workflows" data-level="2" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE">
+    <div class="modal-body">
+      <div data-admin-ng-notifications="" context="events-access"></div>
+      <div class="full-col">
+        <div class="obj tbl-details">
+          <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE"><!-- Workflow Details --></header>
+          <div class="obj-container">
+            <table class="main-tbl vertical-headers">
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TITLE"><!-- Title --></td>
+                <td>{{ subNavData.title }}</td>
+              </tr>
+              <tr ng-if="subNavData.description">
+                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DESCRIPTION"><!-- Description --></td>
+                <td>{{ subNavData.description }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTER"><!-- Submitter--></td>
+                <td>
+                  {{ subNavData.creator.name }}
+                  <span ng-if="subNavData.creator.email">{{'<' + subNavData.creator.email + '>' }}</span>
+                </td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED"><!-- Submitted --></td>
+                <td>{{ subNavData.submittedAt | localizeDate : 'dateTime' : 'medium' }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATUS"><!-- Status --></td>
+                <td>{{ subNavData.status | translate }}</td>
+              </tr>
+              <tr ng-if="subNavData.status !== 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.RUNNING'">
+                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.EXECUTION_TIME"><!-- Execution time --></td>
+                <td>{{ subNavData.executionTime | humanDuration }}</td>
+              </tr>
+              <tr with-role="ROLE_ADMIN">
+                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID"><!-- ID --></td>
+                <td>{{ subNavData.wiid }}</td>
+              </tr>
+              <tr with-role="ROLE_ADMIN">
+                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.WDID"><!-- Workflow definition --></td>
+                <td>{{ subNavData.wdid }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="obj tbl-details" with-role="ROLE_ADMIN">
+          <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION">
+            <!-- Workflow configuration -->
+          </header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr ng-repeat="(key, value) in subNavData.configuration">
+                <td>{{ key }}</td>
+                <td>{{ value }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="obj tbl-container more-info-actions">
+          <header translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.MORE_INFO">
+            <!-- More Information -->
+          </header>
+          <div class="obj-container">
+            <ul>
+              <li>
+                <span translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.DETAILS_LINK">
+                  <!-- Operations -->
+                </span>
+                <a class="details-link" ng-click="openSubTab('workflow-operations', 'EventWorkflowOperationsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">
+                  <!-- Details -->
+                </a>
+              </li>
+              <li>
+                <span translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">
+                  <!-- Errors & Warnings -->
+                </span>
+                <a class="details-link" ng-click="openSubTab('errors-and-warnings', 'EventErrorsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">
+                  <!-- Details -->
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-content" data-modal-tab-content="workflow-operations" data-parent="workflows" data-level="3" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">
+    <div class="modal-body">
+      <div data-admin-ng-notifications="" context="events-access"></div>
+      <div class="full-col">
+        <div class="obj tbl-container">
+          <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">
+            <!-- Workflow Operations -->
+          </header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <thead>
                 <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TITLE"><!-- Title --></td>
-                  <td>{{ subNavData.title }}</td>
+                  <th translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.STATUS"><!-- Status --></th>
+                  <th translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.TITLE"><!-- Title --> <i></i></th>
+                  <th translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.DESCRIPTION"><!-- Description --> <i></i></th>
+                  <th class="medium"></th>
                 </tr>
-                <tr ng-if="subNavData.description">
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DESCRIPTION"><!-- Description --></td>
-                  <td>{{ subNavData.description }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTER"><!-- Submitter--></td>
+              </thead>
+              <tbody>
+                <tr ng-repeat="item in subNavData.entries track by $index">
+                  <td>{{ item.status | translate }}</td>
+                  <td>{{ item.title }}</td>
+                  <td>{{ item.description }}</td>
                   <td>
-                    {{ subNavData.creator.name }}
-                    <span ng-if="subNavData.creator.email">{{'<' + subNavData.creator.email + '>' }}</span>
+                    <a class="details-link" ng-click="openSubTab('operation-details', 'EventWorkflowOperationDetailsResource', $index)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">
+                      <!-- Details -->
+                    </a>
                   </td>
                 </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED"><!-- Submitted --></td>
-                  <td>{{ subNavData.submittedAt | localizeDate : 'dateTime' : 'medium' }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATUS"><!-- Status --></td>
-                  <td>{{ subNavData.status | translate }}</td>
-                </tr>
-                <tr ng-if="subNavData.status !== 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.RUNNING'">
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.EXECUTION_TIME"><!-- Execution time --></td>
-                  <td>{{ subNavData.executionTime | humanDuration }}</td>
-                </tr>
-                <tr with-role="ROLE_ADMIN">
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID"><!-- ID --></td>
-                  <td>{{ subNavData.wiid }}</td>
-                </tr>
-                <tr with-role="ROLE_ADMIN">
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.WDID"><!-- Workflow definition --></td>
-                  <td>{{ subNavData.wdid }}</td>
-                </tr>
-              </table>
-            </div>
-          </div>
-
-          <div class="obj tbl-details" with-role="ROLE_ADMIN">
-            <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION">
-              <!-- Workflow configuration -->
-            </header>
-            <div class="obj-container">
-              <table class="main-tbl">
-                <tr ng-repeat="(key, value) in subNavData.configuration">
-                  <td>{{ key }}</td>
-                  <td>{{ value }}</td>
-                </tr>
-              </table>
-            </div>
-          </div>
-
-          <div class="obj tbl-container more-info-actions">
-            <header translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.MORE_INFO">
-              <!-- More Information -->
-            </header>
-            <div class="obj-container">
-              <ul>
-                <li>
-                  <span translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.DETAILS_LINK">
-                    <!-- Operations -->
-                  </span>
-                  <a class="details-link" ng-click="openSubTab('workflow-operations', 'EventWorkflowOperationsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">
-                    <!-- Details -->
-                  </a>
-                </li>
-                <li>
-                  <span translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">
-                    <!-- Errors & Warnings -->
-                  </span>
-                  <a class="details-link" ng-click="openSubTab('errors-and-warnings', 'EventErrorsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">
-                    <!-- Details -->
-                  </a>
-                </li>
-              </ul>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="modal-content" data-modal-tab-content="workflow-operations" data-parent="workflows" data-level="3" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">
-      <div class="modal-body">
-        <div data-admin-ng-notifications="" context="events-access"></div>
-        <div class="full-col">
-          <div class="obj tbl-container">
-            <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">
-              <!-- Workflow Operations -->
-            </header>
-            <div class="obj-container">
-              <table class="main-tbl">
-                <thead>
-                  <tr>
-                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.STATUS"><!-- Status --></th>
-                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.TITLE"><!-- Title --> <i></i></th>
-                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.DESCRIPTION"><!-- Description --> <i></i></th>
-                    <th class="medium"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="item in subNavData.entries track by $index">
-                    <td>{{ item.status | translate }}</td>
-                    <td>{{ item.title }}</td>
-                    <td>{{ item.description }}</td>
-                    <td>
-                      <a class="details-link" ng-click="openSubTab('operation-details', 'EventWorkflowOperationDetailsResource', $index)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">
-                        <!-- Details -->
-                      </a>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+  <div class="modal-content" data-modal-tab-content="operation-details" data-parent="workflows" data-level="4" data-label="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">
+    <div class="modal-body">
+      <div data-admin-ng-notifications="" context="events-access"></div>
+      <div class="full-col">
+        <div class="obj tbl-details">
+          <header translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">
+            <!-- Operation Details -->
+          </header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.TITLE">
+                  <!-- Title -->
+                </td>
+                <td>{{ subNavData.name}}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.DESCRIPTION">
+                  <!-- Description -->
+                </td>
+                <td>{{ subNavData.description }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.STATE">
+                  <!-- State -->
+                </td>
+                <td>{{ subNavData.state | translate }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.EXECUTION_HOST">
+                  <!-- Execution Host -->
+                </td>
+                <td>{{ subNavData.execution_host }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.JOB">
+                  <!-- Job -->
+                </td>
+                <td>{{ subNavData.job }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.TIME_IN_QUEUE">
+                  <!-- Time in Queue -->
+                </td>
+                <td>{{ subNavData.time_in_queue }}ms</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.STARTED">
+                  <!-- Started -->
+                </td>
+                <td>{{ subNavData.started | localizeDate : 'dateTime' : 'medium'}}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.FINISHED">
+                  <!-- Finished -->
+                </td>
+                <td>{{ subNavData.completed | localizeDate : 'dateTime' : 'medium'}}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.RETRY_STRATEGY">
+                  <!-- Retry Strategy -->
+                </td>
+                <td>{{ subNavData.retry_strategy }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.FAILED_ATTEMPTS">
+                  <!-- Failed Attempts -->
+                </td>
+                <td>{{ subNavData.failed_attempts }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.MAX_ATTEMPTS">
+                  <!-- Max -->
+                </td>
+                <td>{{ subNavData.max_attempts }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.EXCEPTION_HANDLER_WORKFLOW">
+                  <!-- Exception Handler Workflow -->
+                </td>
+                <td>{{ subNavData.exception_handler_workflow }}</td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.FAIL_ON_ERROR">
+                  <!-- Fail on Error -->
+                </td>
+                <td>{{ subNavData.fail_on_error }}</td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="modal-content" data-modal-tab-content="operation-details" data-parent="workflows" data-level="4" data-label="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">
-      <div class="modal-body">
-        <div data-admin-ng-notifications="" context="events-access"></div>
-        <div class="full-col">
-          <div class="obj tbl-details">
-            <header translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">
-              <!-- Operation Details -->
-            </header>
-            <div class="obj-container">
-              <table class="main-tbl">
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.TITLE">
-                    <!-- Title -->
-                  </td>
-                  <td>{{ subNavData.name}}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.DESCRIPTION">
-                    <!-- Description -->
-                  </td>
-                  <td>{{ subNavData.description }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.STATE">
-                    <!-- State -->
-                  </td>
-                  <td>{{ subNavData.state | translate }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.EXECUTION_HOST">
-                    <!-- Execution Host -->
-                  </td>
-                  <td>{{ subNavData.execution_host }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.JOB">
-                    <!-- Job -->
-                  </td>
-                  <td>{{ subNavData.job }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.TIME_IN_QUEUE">
-                    <!-- Time in Queue -->
-                  </td>
-                  <td>{{ subNavData.time_in_queue }}ms</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.STARTED">
-                    <!-- Started -->
-                  </td>
-                  <td>{{ subNavData.started | localizeDate : 'dateTime' : 'medium'}}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.FINISHED">
-                    <!-- Finished -->
-                  </td>
-                  <td>{{ subNavData.completed | localizeDate : 'dateTime' : 'medium'}}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.RETRY_STRATEGY">
-                    <!-- Retry Strategy -->
-                  </td>
-                  <td>{{ subNavData.retry_strategy }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.FAILED_ATTEMPTS">
-                    <!-- Failed Attempts -->
-                  </td>
-                  <td>{{ subNavData.failed_attempts }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.MAX_ATTEMPTS">
-                    <!-- Max -->
-                  </td>
-                  <td>{{ subNavData.max_attempts }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.EXCEPTION_HANDLER_WORKFLOW">
-                    <!-- Exception Handler Workflow -->
-                  </td>
-                  <td>{{ subNavData.exception_handler_workflow }}</td>
-                </tr>
-                <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.FAIL_ON_ERROR">
-                    <!-- Fail on Error -->
-                  </td>
-                  <td>{{ subNavData.fail_on_error }}</td>
-                </tr>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="btm-spacer"></div>
+  <div class="btm-spacer"></div>
 </section>

@@ -49,7 +49,7 @@ public class DictionaryServiceImpl implements DictionaryService, ManagedService 
 
   /** The logging facility */
   private static final Logger logger =
-    LoggerFactory.getLogger(DictionaryServiceImpl.class);
+      LoggerFactory.getLogger(DictionaryServiceImpl.class);
 
   public static final String PATTERN_CONFIG_KEY = "pattern";
 

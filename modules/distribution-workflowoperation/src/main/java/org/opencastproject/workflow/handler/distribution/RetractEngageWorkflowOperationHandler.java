@@ -23,6 +23,7 @@ package org.opencastproject.workflow.handler.distribution;
 
 import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
+import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
@@ -57,13 +58,13 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final Logger logger = LoggerFactory.getLogger(RetractEngageWorkflowOperationHandler.class);
 
   /** The streaming distribution service */
-  private StreamingDistributionService streamingDistributionService = null;
+  protected StreamingDistributionService streamingDistributionService = null;
 
   /** The download distribution service */
-  private DownloadDistributionService downloadDistributionService = null;
+  protected DownloadDistributionService downloadDistributionService = null;
 
   /** The search service */
-  private SearchService searchService = null;
+  protected SearchService searchService = null;
 
   /**
    * Callback for the OSGi declarative services configuration.
@@ -104,7 +105,35 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
+  }
+
+  /**
+   * Generate the jobs retracted the selected elements
+   * @param retractElementIds The list of element ids to retract
+   * @param searchMediaPackage The mediapackage from the search service
+   * @return
+   * @throws DistributionException
+   */
+  protected List<Job> retractElements(Set<String> retractElementIds, MediaPackage searchMediaPackage) throws
+    DistributionException {
+    List<Job> jobs = new ArrayList<Job>();
+    if (retractElementIds.size() > 0) {
+      Job retractDownloadDistributionJob = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds);
+      if (retractDownloadDistributionJob != null) {
+        jobs.add(retractDownloadDistributionJob);
+      }
     }
+    if (streamingDistributionService.publishToStreaming()) {
+      for (MediaPackageElement element : searchMediaPackage.getElements()) {
+        Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, searchMediaPackage,
+                element.getIdentifier());
+        if (retractStreamingJob != null) {
+          jobs.add(retractStreamingJob);
+        }
+      }
+    }
+    return jobs;
+  }
 
   /**
    * {@inheritDoc}
@@ -115,9 +144,8 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
+    List<Job> jobs;
     try {
-      List<Job> jobs = new ArrayList<Job>();
-
       SearchQuery query = new SearchQuery().withId(mediaPackage.getIdentifier().toString());
       SearchResult result = searchService.getByQuery(query);
       if (result.size() == 0) {
@@ -134,21 +162,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         for (MediaPackageElement element : searchMediaPackage.getElements()) {
           retractElementIds.add(element.getIdentifier());
         }
-        if (retractElementIds.size() > 0) {
-          Job retractDownloadDistributionJob = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds);
-          if (retractDownloadDistributionJob != null) {
-            jobs.add(retractDownloadDistributionJob);
-          }
-        }
-        if (streamingDistributionService.publishToStreaming()) {
-          for (MediaPackageElement element : searchMediaPackage.getElements()) {
-            Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, searchMediaPackage,
-                    element.getIdentifier());
-            if (retractStreamingJob != null) {
-              jobs.add(retractStreamingJob);
-            }
-          }
-        }
+        jobs = retractElements(retractElementIds, searchMediaPackage);
       }
 
       // Wait for retraction to finish

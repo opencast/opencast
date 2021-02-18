@@ -89,8 +89,9 @@ public final class JpaAclDb implements AclDb {
       if (e instanceof RollbackException) {
         final Throwable cause = e.getCause();
         String message = cause.getMessage().toLowerCase();
-        if (message.contains("unique") || message.contains("duplicate"))
+        if (message.contains("unique") || message.contains("duplicate")) {
           return null;
+        }
       }
       return chuck(e);
     }

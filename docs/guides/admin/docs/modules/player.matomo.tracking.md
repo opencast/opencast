@@ -1,57 +1,57 @@
 Opencast Player - Matomo Tracking Plugin
 =======================================
 
-This plugin allows to use Matomo (https://matomo.org/), formerly known as Piwik, to track usage data. To setup Matomo
-please follow the instructions on the Matomo website:
-https://matomo.org/docs/installation/#the-5-minute-matomo-installation
+This plugin allows using [Matomo](https://matomo.org) to track usage data.
+To setup Matomo please follow the instructions on the Matomo website:
 
-The plugin respects the [Do-Not-Track](https://en.wikipedia.org/wiki/Do_Not_Track) settings of a browser. You might also
-need to consider the legal requirements of your country when you setup Matomo.
+- [The 5-minute Matomo Installation](https://matomo.org/docs/installation/#the-5-minute-matomo-installation)
 
-This plugin uses a Matomo javascript library that is loaded from the remote Matomo server!
+The plugin respects the [Do-Not-Track](https://en.wikipedia.org/wiki/Do_Not_Track) settings of a browser.
+Please consider the legal requirements of your country when you set up Matomo.
 
-Tested Matomo version: 3.0.2+
+This plugin uses a Matomo JavaScript library that is loaded from the remote Matomo server!
 
-The configurations for the Matomo player plugin are done for each tenant. So the configuration keys are located in
-`.../etc/org.opencastproject.organization-mh_default_org.cfg`.
+Tested Matomo version: 3.0.2+ ; Matomo Analytics Cloud
 
-To activate the plugin set:
+The configurations for the Matomo player plugin are done for each tenant.
+The configuration keys are located in `etc/ui-config/<organization>/theodul/config.yml`.
 
-    prop.player.matomo.server=http://localhost/matomo
+To activate the plugin set the Matomo server URL:
 
-Where localhost should be replaced with your Piwik server URL.
+    server: https://matomo.example.com/matomo
+
 
 Configuration
 -------------
 
-### prop.player.matomo.server
-
-The plugin shows a notification about the tracking to the user. This can be disabled with this option. (Default: true)
-Before you disable the notification, make sure that you do not violate any local regulations.
-
-### prop.player.matomo.server
+### server:
 
 The Matomo server from which the Piwik JS library will be loaded and where the data will be reported.
 
-### prop.player.matomo.site_id=1
+### site_id: 1
 
 The Matomo site ID has to be numeric value. If not set this will be 1. It is recommended to use different site IDs for
 each tenant that is configured in Opencast.
 
-### prop.player.matomo.heartbeat=30
+### heartbeat: 30
 
 The heartbeat setting to track how long a user stayed on the player page. Set to 0 or comment this line to
 disable the heartbeat.
 
-### prop.player.matomo.track_events
+### notification: true
 
-This setting lets you track several player events. Add the events that you want to track to the list. Comment this
-property to prevent event tracking.
+The plugin shows a notification about the tracking to the user. This can be disabled with this option. (Default: `true`)
+Before you disable the notification, make sure that you do not violate any local regulations.
+
+### track_events: ["play", "pause", "seek", "ended"]
+
+This setting lets you track several player events. Add the events that you want to track to the list.
+Comment this property to prevent event tracking.
 
 Events that can be tracked:
 
 * play: play has been pressed (will also be called if after seeking).
-* pause: pause has been pressend (will also be called if before seeking).
+* pause: pause has been pressed (will also be called if before seeking).
 * seek: user jumps to a different time. Time in seconds will be stored
 * ended: video has reached the end
 * playbackrate: user changes the playback speed (values 0.75 to 3.00)
@@ -59,7 +59,7 @@ Events that can be tracked:
 * quality: manual change of video quality (quality tag is stored)
 * fullscreen: user presses fullscreen button
 * focus: user selects one video to be enlarged (flavor of selected video is stored)
-* layout_reset: user switches back to default layout
+* layout\_reset: user switches back to default layout
 * zoom: user changes the zoom of the video
 
 Tracked Data
@@ -68,12 +68,12 @@ Tracked Data
 Additional to the event data that can be turned on for each event (see above), this Opencast specific data is tracked
 if tracking is allowed:
 
-* Page name as "<title of the event> - <lecturer name>"
+* Page name as `<title of the event> - <lecturer name>`
 * Custom Matomo variables:
-    * "event" as "<title of the event> (<event id>)"
-    * "series" as "<title of the series> (<series id>)"
+    * "event" as `<title of the event> (<event id>)`
+    * "series" as `<title of the series> (<series id>)`
     * "presenter"
-    * "view_mode" which can be "desktop", "mobile" or "embed"
+    * "view\_mode" which can be `desktop`, `mobile` or `embed`
 
 Heartbeat data does not show how long a video has been played but how long a viewer remained on the page, while the page
 was in the foreground.

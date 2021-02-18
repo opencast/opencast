@@ -27,6 +27,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -81,7 +82,18 @@ public interface SearchServiceDatabase {
   MediaPackage getMediaPackage(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException;
 
   /**
-   * Retrieves ACL for series with given ID.
+   * Gets media packages from a specific series
+   *
+   * @param seriesId
+   *          the series identifier
+   * @return collection of media packages
+   * @throws SearchServiceDatabaseException
+   *           if there is a problem communicating with the underlying data store
+   */
+  Collection<MediaPackage> getMediaPackages(String seriesId) throws SearchServiceDatabaseException;
+
+  /**
+   * Retrieves ACL for episode with given ID.
    *
    * @param mediaPackageId
    *          media package for which ACL will be retrieved
@@ -92,7 +104,21 @@ public interface SearchServiceDatabase {
    *           if exception occurred
    */
   AccessControlList getAccessControlList(String mediaPackageId) throws NotFoundException,
-          SearchServiceDatabaseException;
+      SearchServiceDatabaseException;
+
+  /**
+   * Retrieves ACLs for series with given ID.
+   *
+   * @param seriesId
+   *          series identifier for which ACL will be retrieved
+   * @param excludeIds
+   *          list of media package identifier to exclude from the list
+   * @return Collection of {@link AccessControlList} of media packages from the series
+   * @throws SearchServiceDatabaseException
+   *           if exception occurred
+   */
+  Collection<AccessControlList> getAccessControlLists(String seriesId, String ... excludeIds)
+      throws SearchServiceDatabaseException;
 
   /**
    * Returns the modification date from the selected media package.

@@ -106,7 +106,8 @@ public class AnimateWorkflowOperationHandlerTest {
     EasyMock.expect(animateService.animate(anyObject(), anyObject(), anyObject())).andReturn(job);
 
     Workspace workspace = EasyMock.createMock(Workspace.class);
-    EasyMock.expect(workspace.put(anyString(), anyString(), anyString(), anyObject())).andReturn(file.toURI()).anyTimes();
+    EasyMock.expect(workspace.put(anyString(), anyString(), anyString(), anyObject())).andReturn(file.toURI())
+            .anyTimes();
     EasyMock.expect(workspace.read(anyObject()))
             .andAnswer(() -> getClass().getResourceAsStream("/dc-episode.xml")).anyTimes();
     workspace.cleanup(anyObject(Id.class));

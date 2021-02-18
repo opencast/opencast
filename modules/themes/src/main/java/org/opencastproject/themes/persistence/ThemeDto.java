@@ -45,11 +45,11 @@ import javax.persistence.TemporalType;
 @Access(AccessType.FIELD)
 @Table(name = "oc_themes")
 @NamedQueries({
-        @NamedQuery(name = "Themes.count", query = "SELECT COUNT(t) FROM Themes t WHERE t.organization = :org"),
-        @NamedQuery(name = "Themes.findById", query = "SELECT t FROM Themes t WHERE t.id = :id AND t.organization = :org"),
-        @NamedQuery(name = "Themes.findByOrg", query = "SELECT t FROM Themes t WHERE t.organization = :org"),
-        @NamedQuery(name = "Themes.findByUserName", query = "SELECT t FROM Themes t WHERE t.username = :username AND t.organization = :org"),
-        @NamedQuery(name = "Themes.clear", query = "DELETE FROM Themes t WHERE t.organization = :org") })
+    @NamedQuery(name = "Themes.count", query = "SELECT COUNT(t) FROM Themes t WHERE t.organization = :org"),
+    @NamedQuery(name = "Themes.findById", query = "SELECT t FROM Themes t WHERE t.id = :id AND t.organization = :org"),
+    @NamedQuery(name = "Themes.findByOrg", query = "SELECT t FROM Themes t WHERE t.organization = :org"),
+    @NamedQuery(name = "Themes.findByUserName", query = "SELECT t FROM Themes t WHERE t.username = :username AND t.organization = :org"),
+    @NamedQuery(name = "Themes.clear", query = "DELETE FROM Themes t WHERE t.organization = :org") })
 public class ThemeDto {
 
   @Id
@@ -57,7 +57,7 @@ public class ThemeDto {
   @Column(name = "id", nullable = false)
   private long id;
 
-  @Column(name = "organization", nullable = false)
+  @Column(name = "organization", nullable = false, length = 128)
   private String organization;
 
   @Column(name = "creation_date", nullable = false)
@@ -67,7 +67,7 @@ public class ThemeDto {
   @Column(name = "isDefault", nullable = false)
   private boolean isDefault = false;
 
-  @Column(name = "username", nullable = false)
+  @Column(name = "username", nullable = false, length = 128)
   private String username;
 
   @Column(name = "name", nullable = false)
@@ -79,13 +79,13 @@ public class ThemeDto {
   @Column(name = "bumper_active", nullable = false)
   private boolean bumperActive = false;
 
-  @Column(name = "bumper_file")
+  @Column(name = "bumper_file", length = 128)
   private String bumperFile;
 
   @Column(name = "trailer_active", nullable = false)
   private boolean trailerActive = false;
 
-  @Column(name = "trailer_file")
+  @Column(name = "trailer_file", length = 128)
   private String trailerFile;
 
   @Column(name = "title_slide_active", nullable = false)
@@ -94,13 +94,13 @@ public class ThemeDto {
   @Column(name = "title_slide_metadata")
   private String titleSlideMetadata;
 
-  @Column(name = "title_slide_background")
+  @Column(name = "title_slide_background", length = 128)
   private String titleSlideBackground;
 
   @Column(name = "license_slide_active", nullable = false)
   private boolean licenseSlideActive = false;
 
-  @Column(name = "license_slide_background")
+  @Column(name = "license_slide_background", length = 128)
   private String licenseSlideBackground;
 
   @Column(name = "license_slide_description")
@@ -109,7 +109,7 @@ public class ThemeDto {
   @Column(name = "watermark_active", nullable = false)
   private boolean watermarkActive = false;
 
-  @Column(name = "watermark_file")
+  @Column(name = "watermark_file", length = 128)
   private String watermarkFile;
 
   @Column(name = "watermark_position")

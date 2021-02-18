@@ -7,7 +7,7 @@ Overview
 The Live Schedule Service manages a live event in the Search index on the engage server.
 
 When an event is scheduled and the publishLive configuration is set, a live media package is published to the Search
-index. The live media package contains track(s) with live streaming urls.
+index. The live media package contains track(s) with live streaming URLs.
 
 The live media package is retracted from the Search index when the capture finishes or if it fails.
 
@@ -19,9 +19,9 @@ Pre-requisites
 
 To use this service, you need to have:
 
-1. A streaming server (Wowza, Adobe Media Server) or CDN already set up to stream live content
+1. A streaming server (Wowza, nginx-rtmp) or CDN already set up to stream live content
 2. A capture agent capable of streaming to it
-3. A player capable of playing live streams. The Paella player using the Flash component supports the rtmp protocol.
+3. A player capable of playing live streams. The Paella player supports the HLS protocol.
    Other players/protocols have not been tested.
 
 Configuration
@@ -34,11 +34,14 @@ Edit  _etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg_.
 If your capture agent does not register a _capture.device.live.resolution.WIDTHxHEIGHT_ property, it's mandatory to
 configure the _live.streamingUrl_.
 
-The _live.streamingUrl_ should be set to your streaming server url (or the subscriber url specified by your CDN).
+The _live.streamingUrl_ should be set to your streaming server's output URL (or
+the subscriber URL specified by your CDN) and is indexed by the engage server.
 
-This is the url that the player will use to play the live stream. For instance, if using rtmp, set it to something like:
+This is the URL that the player will use to play the live stream. For instance,
+if using rtmp, set it to something like:
 rtmp://STREAMING_SERVER_HOST:PORT/STREAMING_APPLICATION/
 
+For HLS, see below:
 ```
 # Configuration for the Live Schedule Service
 
@@ -48,8 +51,8 @@ rtmp://STREAMING_SERVER_HOST:PORT/STREAMING_APPLICATION/
 #
 # -----------------------------
 
-# The streaming base url e.g. rtmp://streaming.server/live/
-#live.streamingUrl=rtmp://streaming.server/live
+# The base URL that the player will use to play the live stream
+live.streamingUrl=http://streaming.server/hls/
 
 # If a comma-separated list is provided, several resolutions will be generated for each flavor
 live.resolution=1920x540,960x270
@@ -59,13 +62,13 @@ live.resolution=1920x540,960x270
 # #{flavor} = type-subtype of flavor
 # #{caName} = capture agent name
 # #{resolution} = video resolution e.g. 1920x1080
-#live.streamName=#{id}-#{flavor}.stream
-live.streamName=#{caName}-#{flavor}.stream-#{resolution}
+#live.streamName=#{caName}-#{flavor}.stream-#{resolution}
+live.streamName=#{caName}/playlist.m3u8
 
 # -----------------------------
 
 # The same mime-type applies to all flavors and resolutions
-live.mimeType=video/x-flv
+live.mimeType=application/x-mpegURL
 
 # If a comma-separated list is provided, several streams links will be generated, one for each
 # resolution-targetFlavor combination.
@@ -85,7 +88,7 @@ live.distributionService=download
 
 #### Capture agent does not register the _capture.device.live.resolution.WIDTHxHEIGHT_ property
 
-Configure the capture agent to stream to your streaming server (or the publisher url specified by your CDN), using the
+Configure the capture agent to stream to your streaming server (or the publisher URL specified by your CDN), using the
 same stream name specified in live.streamName.
 
 #### Capture agent registers the _capture.device.live.resolution.WIDTHxHEIGHT_ property
@@ -98,7 +101,7 @@ when registering to Opencast:
 * capture.device.live.resolution.WIDTHxHEIGHT=STREAMING_URL_USED_BY_PLAYER: one for each desired stream
 
 Then, the LiveScheduleService will generate as many live tracks as the resolutions registered, with their streaming
-urls, using 'presenter/delivery' (or the flavor configured, but only one flavor can be used).
+URLs, using 'presenter/delivery' (or the flavor configured, but only one flavor can be used).
 
 If a property capture.device.live.resolution.WIDTHxHEIGHT was registered, it will take precedence over the
 LiveScheduleService configuration.
@@ -117,10 +120,10 @@ If:
 Then, the capture agent should stream to ('/' is replaced by '-'):
 rtmp://STREAMING_SERVER_HOST:PORT/STREAMING_APPLICATION/ca01-presenter-delivery.stream
 
-Note: Please refer to your streaming server or CDN documentation for the correct syntax of the streaming url. The
-_live.streamingUrl_ may be very different from the url the capture agent streams to. For instance, with Akamai, the url
+Note: Please refer to your streaming server or CDN documentation for the correct syntax of the streaming URL. The
+_live.streamingUrl_ may be very different from the URL the capture agent streams to. For instance, with Akamai, the URL
 used by the player will be something like live.streamingUrl=rtmp://xyz.live.edgefcs.net/live/ and the capture agent's
-publish url something like rtmp://a.bcd.e.akamaientrypoint.net/EntryPoint. The stream name should always match.
+publish URL something like rtmp://a.bcd.e.akamaientrypoint.net/EntryPoint. The stream name should always match.
 
 #### Example 2:
 

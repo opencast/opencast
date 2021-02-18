@@ -33,10 +33,10 @@ that are too short to be reasonably clickable, too short segments are filtered o
 How the Optimization works
 --------------------------
 
-In general the optimization repeats a cycle of calling the ffmpeg filter, merging too small segments and calculating a
+In general the optimization repeats a cycle of calling the FFmpeg filter, merging too small segments and calculating a
 new changes threshold until the segmentation is good enough.
 
-Additional to calling the ffmpeg function there is a filter function that merges small segments to a bigger segment or
+Additional to calling the FFmpeg function there is a filter function that merges small segments to a bigger segment or
 splits it to the surrounding segments if the resulting segment would be too small. This can be beneficial for example
 if a video is shown in a lecture, so that the video will be only one segment and not many short segments.
 The stability threshold is used in the filter method to determine which segments are long enough and which should be

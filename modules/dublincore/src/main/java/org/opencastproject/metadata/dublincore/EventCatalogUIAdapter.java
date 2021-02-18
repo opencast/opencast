@@ -31,7 +31,7 @@ public interface EventCatalogUIAdapter extends CatalogUIAdapter {
   /**
    * @return Get the field names and values for the catalogs of this media package.
    */
-  MetadataCollection getFields(MediaPackage mediapackage);
+  DublinCoreMetadataCollection getFields(MediaPackage mediapackage);
 
   /**
    * Store a change in the metadata into the media package as a {@link Catalog}
@@ -42,5 +42,5 @@ public interface EventCatalogUIAdapter extends CatalogUIAdapter {
    *          The new metadata to update the media package with
    * @return the stored catalog
    */
-  Catalog storeFields(MediaPackage mediapackage, MetadataCollection metadataCollection);
+  Catalog storeFields(MediaPackage mediapackage, DublinCoreMetadataCollection metadataCollection);
 }

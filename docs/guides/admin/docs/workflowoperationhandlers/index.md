@@ -40,6 +40,7 @@ The following table contains the workflow operations that are available in an ou
 |copy                |Copy media package elements to target directory                |[Documentation](copy-woh.md)|
 |cover-image         |Generate a cover-image containing metadata                     |[Documentation](coverimage-woh.md)|
 |crop-video          |Checks for black bars on the sides of the video                |[Documentation](cropvideo-woh.md)|
+|cut-marks-to-smil   |Parses timestamps into a SMIL for the editor workflow          |[Documentation](cut-marks-to-smil-woh.md)|
 |defaults            |Applies default workflow configuration values                  |[Documentation](defaults-woh.md)|
 |demux               |Demuxes streams to multiple output files                       |[Documentation](demux-woh.md)|
 |duplicate-event     |Create an event by cloning an existing one                     |[Documentation](duplicate-event-woh.md)|
@@ -66,6 +67,7 @@ The following table contains the workflow operations that are available in an ou
 |multiencode         |Encode to multiple profiles in one operation                   |[Documentation](multiencode-woh.md)|
 |normalize-audio     |Normalize first audio stream                                   |[Documentation](normalizeaudio-woh.md)|
 |partial-import      |Import partial tracks and process according to a SMIL document |[Documentation](partial-import-woh.md)|
+|partial-retract     |Retract a subset of the mediapackage from a publication        |[Documentation](partial-import-woh.md)|
 |post-mediapackage   |Send mediapackage to remote service                            |[Documentation](postmediapackage-woh.md)|
 |prepare-av          |Preparing audio and video work versions                        |[Documentation](prepareav-woh.md)|
 |probe-resolution    |Set workflow instance variables based on video resolution      |[Documentation](probe-resolution-woh.md)|

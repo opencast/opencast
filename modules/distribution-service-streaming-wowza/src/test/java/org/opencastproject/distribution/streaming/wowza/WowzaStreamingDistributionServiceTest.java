@@ -43,12 +43,9 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -79,6 +76,7 @@ public class WowzaStreamingDistributionServiceTest {
   private static SecurityService securityService = null;
   private static OrganizationDirectoryService orgDirectoryService = null;
   private static UserDirectoryService userDirectoryService = null;
+  private static final String opencastStorageDirectory = "org.opencastproject.storage.dir";
 
   private static final String defaultTenant = "mh_default_org";
   private static final String defaultUrlProperty = format(WowzaStreamingDistributionService.WOWZA_URL_KEY, defaultTenant);
@@ -106,9 +104,10 @@ public class WowzaStreamingDistributionServiceTest {
   @Before
   public void before() throws Exception {
     map = new HashMap();
+    map.put(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY, "/tmp/opencast/streams");
 
     bundleContext = createNiceMock(BundleContext.class);
-    expect(bundleContext.getProperty(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY)).andReturn("/")
+    expect(bundleContext.getProperty(opencastStorageDirectory)).andReturn("/tmp/opencast")
             .anyTimes();
     replay(bundleContext);
 
@@ -145,14 +144,6 @@ public class WowzaStreamingDistributionServiceTest {
 
     final TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
     EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
-    EasyMock.expect(httpClient.run((HttpUriRequest) EasyMock.anyObject()))
-            .andAnswer(new IAnswer<Function<Function<HttpResponse, Object>, Either<Exception, Object>>>() {
-              @Override
-              public Function<Function<HttpResponse, Object>, Either<Exception, Object>> answer() throws Throwable {
-                HttpUriRequest req = (HttpUriRequest) EasyMock.getCurrentArguments()[0];
-                return StandAloneTrustedHttpClientImpl.run(httpClient, req);
-              }
-            }).anyTimes();
     EasyMock.replay(httpClient);
     streamingService.setTrustedHttpClient(httpClient);
 
@@ -222,6 +213,22 @@ public class WowzaStreamingDistributionServiceTest {
     assertTrue(streamingService.streamingUrls.containsKey(defaultTenant));
     assertEquals(1, streamingService.streamingUrls.size());
     assertEquals(completeStreamingUrl, streamingService.streamingUrls.get(defaultTenant).toString());
+  }
+
+  @Test
+  public void testSetStreamingDirectory() throws Exception {
+    setUpDefault();
+    streamingService.activate(bundleContext, map);
+    assertEquals("/tmp/opencast/streams",streamingService.getDistributionDirectory().getAbsolutePath().toString());
+  }
+
+  @Test
+  public void testDefaultSetStreamingDirectory() throws Exception {
+    map.remove(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY);
+    setUpDefault();
+    streamingService.activate(bundleContext, map);
+    map.put(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY, "/tmp/opencast/streams");
+    assertEquals("/tmp/opencast/streams",streamingService.getDistributionDirectory().getAbsolutePath().toString());
   }
 
   @Test
