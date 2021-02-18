@@ -62,4 +62,9 @@ export const NewEventSchema = [Yup.object().shape({
     })
 }), Yup.object().shape({
     processingWorkflow: Yup.string().required('Required')
-})]
+})];
+
+// Validation Schema used in new series wizard (each step has its own yup validation object)
+export const NewSeriesSchema = [Yup.object().shape({
+    title: Yup.string().required('Required')
+})];

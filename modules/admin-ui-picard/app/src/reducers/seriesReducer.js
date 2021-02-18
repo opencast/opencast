@@ -2,7 +2,10 @@ import {seriesTableConfig} from "../configs/tableConfigs/seriesTableConfig";
 import {
     LOAD_SERIES_FAILURE,
     LOAD_SERIES_IN_PROGRESS,
-    LOAD_SERIES_SUCCESS,
+    LOAD_SERIES_METADATA_FAILURE,
+    LOAD_SERIES_METADATA_IN_PROGRESS,
+    LOAD_SERIES_METADATA_SUCCESS,
+    LOAD_SERIES_SUCCESS, LOAD_SERIES_THEMES_FAILURE, LOAD_SERIES_THEMES_IN_PROGRESS, LOAD_SERIES_THEMES_SUCCESS,
     SHOW_ACTIONS
 } from "../actions/seriesActions";
 
@@ -26,7 +29,9 @@ const initialState = {
     total: 0,
     count: 0,
     offset: 0,
-    limit: 0
+    limit: 0,
+    metadata: {},
+    themes: {}
 }
 
 // Reducer for series
@@ -63,6 +68,46 @@ const series = (state=initialState, action) => {
             return {
                 ...state,
                 showActions: isShowing
+            }
+        }
+        case LOAD_SERIES_METADATA_IN_PROGRESS: {
+            return {
+                ...state,
+                isLoading: true
+            }
+        }
+        case LOAD_SERIES_METADATA_SUCCESS: {
+            const { metadata } = payload;
+            return {
+                ...state,
+                isLoading: false,
+                metadata: metadata
+            }
+        }
+        case LOAD_SERIES_METADATA_FAILURE: {
+            return {
+                ...state,
+                isLoading: false
+            }
+        }
+        case LOAD_SERIES_THEMES_IN_PROGRESS: {
+            return {
+                ...state,
+                isLoading: true
+            }
+        }
+        case LOAD_SERIES_THEMES_SUCCESS: {
+            const { themes } = payload;
+            return {
+                ...state,
+                isLoading: false,
+                themes: themes
+            }
+        }
+        case LOAD_SERIES_THEMES_FAILURE: {
+            return {
+                ...state,
+                isLoading: false
             }
         }
         default:

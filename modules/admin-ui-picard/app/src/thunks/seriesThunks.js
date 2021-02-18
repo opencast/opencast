@@ -1,6 +1,17 @@
-import {loadSeriesFailure, loadSeriesInProgress, loadSeriesSuccess} from "../actions/seriesActions";
-import {getURLParams} from "../utils/resourceUtils";
+import {
+    loadSeriesFailure,
+    loadSeriesInProgress,
+    loadSeriesMetadataInProgress, loadSeriesMetadataSuccess,
+    loadSeriesSuccess, loadSeriesThemesFailure, loadSeriesThemesInProgress, loadSeriesThemesSuccess
+} from "../actions/seriesActions";
+import {
+    getURLParams, prepareAccessPolicyRulesForPost,
+    prepareMetadataFieldsForPost,
+    transformMetadataCollection
+} from "../utils/resourceUtils";
+import {transformToObjectArray} from "../utils/utils";
 import axios from "axios";
+
 
 // fetch series from server
 export const fetchSeries = () => async (dispatch, getState) => {
@@ -21,4 +32,77 @@ export const fetchSeries = () => async (dispatch, getState) => {
        dispatch(loadSeriesFailure());
        console.log(e);
    }
+}
+
+// fetch series metadata from server
+export const fetchSeriesMetadata = () => async dispatch => {
+    try {
+       dispatch(loadSeriesMetadataInProgress());
+
+       let data = await axios.get('admin-ng/series/new/metadata');
+       const response = await data.data;
+
+        const metadata = transformMetadataCollection(response[0]);
+
+       dispatch(loadSeriesMetadataSuccess(metadata));
+    } catch (e) {
+        dispatch(loadSeriesFailure());
+        console.log(e);
+    }
+}
+
+// fetch series themes from server
+export const fetchSeriesThemes = () => async dispatch => {
+    try {
+        dispatch(loadSeriesThemesInProgress());
+
+        let data = await axios.get('/admin-ng/series/new/themes');
+
+        const response = await data.data;
+
+        const themes = transformToObjectArray(response);
+
+        dispatch(loadSeriesThemesSuccess(themes));
+    } catch (e) {
+        dispatch(loadSeriesThemesFailure());
+        console.log(e);
+    }
+
+};
+
+// post new series to backend
+export const postNewSeries = async (values, metadataInfo) => {
+
+    let metadataFields, metadata, access;
+
+    metadataFields = prepareMetadataFieldsForPost(metadataInfo.fields, values);
+
+    // metadata for post request
+    metadata = {
+        flavor: metadataInfo.flavor,
+        title: metadataInfo.title,
+        fields: metadataFields
+    };
+
+    access = prepareAccessPolicyRulesForPost(values.policies);
+
+    let jsonData = {
+            metadata: metadata,
+            options: {},
+            access: access,
+            theme: values.theme,
+        };
+
+    let data = new URLSearchParams();
+    data.append("metadata", JSON.stringify(jsonData));
+
+    // Todo: process bar notification
+    axios.post('/admin-ng/series/new', data.toString(),
+        {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ).then(response => console.log(response)).catch(response => console.log(response));
+
 }

@@ -1,6 +1,6 @@
 import React from "react";
 
-const NewEventMetadataExtended = ({ previousPage, nextPage, formik, hidden }) => {
+const NewMetadataExtendedPage = ({ previousPage, nextPage, formik, hidden }) => {
         return (
             <div>
                 Metadata Extended
@@ -8,4 +8,4 @@ const NewEventMetadataExtended = ({ previousPage, nextPage, formik, hidden }) =>
         );
 }
 
-export default NewEventMetadataExtended;
+export default NewMetadataExtendedPage;

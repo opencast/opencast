@@ -1,6 +1,7 @@
 import {loadAclsFailure, loadAclsInProgress, loadAclsSuccess} from "../actions/aclActions";
 import {getURLParams} from "../utils/resourceUtils";
 import axios from "axios";
+import {transformToIdValueArray} from "../utils/utils";
 
 // fetch acls from server
 export const fetchAcls = () => async (dispatch, getState) => {
@@ -29,12 +30,7 @@ export const fetchAclTemplates = async () => {
 
     const response = await data.data;
 
-    return Object.keys(response).map(key => {
-        return {
-            id: key,
-            label: response[key]
-        }
-    });
+    return transformToIdValueArray(response);
 };
 
 // fetch additional actions that a policy allows user to perform on an event
@@ -43,12 +39,7 @@ export const fetchAclActions = async () => {
 
     const response = await data.data;
 
-    return Object.keys(response).map(key => {
-        return {
-            id: key,
-            value: response[key]
-        }
-    });
+    return transformToIdValueArray(response);
 
 };
 
@@ -64,12 +55,7 @@ export const fetchRoles = async () => {
 
     const response = await data.data;
 
-    return Object.keys(response).map(key => {
-        return {
-            id: key,
-            label: response[key]
-        }
-    });
+    return transformToIdValueArray(response);
 };
 
 // fetch all policies of an certain acl template

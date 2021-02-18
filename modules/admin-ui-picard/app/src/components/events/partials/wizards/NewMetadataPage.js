@@ -1,16 +1,14 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import {connect} from "react-redux";
-import {getEventMetadata} from "../../../../selectors/eventSelectors";
 import {Field} from "formik";
 import cn from 'classnames';
 import RenderField from "./RenderField";
 import RenderMultiField from "./RenderMultiField";
 
 /**
- * This component renders the metadata page for new events in the new event wizard.
+ * This component renders the metadata page for new events and series in the wizards.
  */
-const NewEventMetadata = ({ metadataFields, nextPage, formik }) => {
+const NewMetadataPage = ({ metadataFields, nextPage, formik, header }) => {
     const { t } = useTranslation();
 
     return (
@@ -19,7 +17,7 @@ const NewEventMetadata = ({ metadataFields, nextPage, formik }) => {
                 <div className="modal-body">
                     <div className="full-col">
                         <div className="obj tbl-list">
-                            <header className="no-expand">{t('EVENTS.EVENTS.NEW.METADATA.CAPTION')}</header>
+                            <header className="no-expand">{t(header)}</header>
                             {/* Table view containing input fields for metadata */}
                             <div className="obj-container">
                                 <table className="main-tbl">
@@ -65,6 +63,8 @@ const NewEventMetadata = ({ metadataFields, nextPage, formik }) => {
                             })}
                         disabled={!(formik.dirty && formik.isValid)}
                         onClick={() => {
+                            console.log("CURRENT FORMIK VALUES");
+                            console.log(formik.values);
                             nextPage(formik.values);
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
@@ -73,11 +73,6 @@ const NewEventMetadata = ({ metadataFields, nextPage, formik }) => {
             <div className="btm-spacer"/>
         </>
     )
-}
+};
 
-// Getting state data out of redux store
-const mapStateToProps = state => ({
-    metadataFields: getEventMetadata(state)
-});
-
-export default connect(mapStateToProps)(NewEventMetadata);
+export default NewMetadataPage;

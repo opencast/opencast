@@ -1,10 +1,6 @@
 import React, {useState} from "react";
 import PropTypes from 'prop-types';
 import {Formik} from "formik";
-import NewEventMetadata from "./NewEventMetadata";
-import NewEventSource from "./NewEventSource";
-import NewEventProcessing from "./NewEventProcessing";
-import NewEventAccess from "./NewEventAccess";
 import NewEventSummary from "./NewEventSummary";
 import {getEventMetadata} from "../../../../selectors/eventSelectors";
 import {connect} from "react-redux";
@@ -13,14 +9,18 @@ import {NewEventSchema} from "./validate";
 import {makeStyles, Step, StepLabel, Stepper,} from '@material-ui/core';
 import {FaCircle, FaDotCircle} from "react-icons/all";
 import {useTranslation} from "react-i18next";
-import {sourceMetadata, uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
-import {initialFormValuesNewEvents} from "../../../../configs/newEventConfigs/newEventWizardConfig";
+import {sourceMetadata, uploadAssetOptions} from "../../../../configs/wizard/sourceConfig";
+import {initialFormValuesNewEvents} from "../../../../configs/wizard/newEventWizardConfig";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import {getCurrentLanguageInformation} from "../../../../utils/utils";
-import NewEventAssetUpload from "./NewEventAssetUpload";
-import NewEventMetadataExtended from "./NewEventMetadataExtended";
+import NewAssetUploadPage from "./NewAssetUploadPage";
+import NewMetadataExtendedPage from "./NewMetadataExtendedPage";
 import {postNewEvent} from "../../../../thunks/eventThunks";
+import NewMetadataPage from "./NewMetadataPage";
+import NewAccessPage from "./NewAccessPage";
+import NewProcessingPage from "./NewProcessingPage";
+import NewSourcePage from "./NewSourcePage";
 
 // Base style for Stepper component
 const useStepperStyle = makeStyles((theme) => ({
@@ -116,10 +116,7 @@ const NewEventWizard = ({ metadataFields, close }) => {
         }
     }
 
-    //todo: implement
     const handleSubmit = (values) => {
-        console.log("To be implemented!!!");
-        console.log(values);
         const response = postNewEvent(values, metadataFields);
         close();
     }
@@ -144,32 +141,36 @@ const NewEventWizard = ({ metadataFields, close }) => {
                     {/* Render wizard pages depending on current value of page variable */}
                     {formik => (
                         <div>
-                            {page === 0 && <NewEventMetadata nextPage={nextPage}
-                                                             formik={formik} />}
+                            {page === 0 && (
+                                <NewMetadataPage nextPage={nextPage}
+                                                            formik={formik}
+                                                            metadataFields={metadataFields}
+                                                            header={steps[page].translation} />
+                            )}
                             {page === 1 && (
-                                <NewEventMetadataExtended previousPage={previousPage}
-                                                          nextPage={nextPage}
-                                                          formik={formik} />
+                                <NewMetadataExtendedPage previousPage={previousPage}
+                                                         nextPage={nextPage}
+                                                         formik={formik} />
                             )}
                             {page === 2 && (
-                                <NewEventSource previousPage={previousPage}
+                                <NewSourcePage previousPage={previousPage}
                                                 nextPage={nextPage}
                                                 formik={formik} />
                             )}
                             {page === 3  && (
-                                <NewEventAssetUpload previousPage={previousPage}
-                                                     nextPage={nextPage}
-                                                     formik={formik} />
+                                <NewAssetUploadPage previousPage={previousPage}
+                                                    nextPage={nextPage}
+                                                    formik={formik} />
                             )}
                             {page === 4 && (
-                                <NewEventProcessing previousPage={previousPage}
+                                <NewProcessingPage previousPage={previousPage}
                                                     nextPage={nextPage}
                                                     formik={formik} />
                             )}
                             {page === 5 && (
-                                <NewEventAccess previousPage={previousPage}
-                                                nextPage={nextPage}
-                                                formik={formik} />
+                                <NewAccessPage previousPage={previousPage}
+                                               nextPage={nextPage}
+                                               formik={formik} />
                             )}
                             {page === 6 && (
                                 <NewEventSummary previousPage={previousPage}

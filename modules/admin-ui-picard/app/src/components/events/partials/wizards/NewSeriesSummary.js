@@ -1,0 +1,90 @@
+import React from "react";
+import {useTranslation} from "react-i18next";
+import {connect} from "react-redux";
+import {getSeriesMetadata, getSeriesThemes} from "../../../../selectors/seriesSeletctor";
+import MetadataSummaryTable from "./summaryTables/MetadataSummaryTable";
+import MetadataExtendedSummaryTable from "./summaryTables/MetadataExtendedSummaryTable";
+import AccessSummaryTable from "./summaryTables/AccessSummaryTable";
+import cn from "classnames";
+
+/**
+ * This component renders the summary page for new series in the new series wizard.
+ */
+const NewSeriesSummary = ({ formik, previousPage, metaDataExtendedHidden, metadataSeries,
+                              seriesThemes }) => {
+    const { t } = useTranslation();
+
+
+    // Get additional information about chosen series theme
+    const theme = seriesThemes.find(theme => theme.id === formik.values.theme);
+
+    return (
+        <>
+            <div className="modal-content">
+                <div className="modal-body">
+                    <div className="full-col">
+                        {/*Summary metadata*/}
+                        <MetadataSummaryTable metadataFields={metadataSeries.fields}
+                                              formikValues={formik.values}
+                                              header={'EVENTS.SERIES.NEW.METADATA.CAPTION'}/>
+
+                        {/*Summary metadata extended*/}
+                        {/*todo: metadata extended not implemented yet, so there are no values provided by user yet*/}
+                        {!metaDataExtendedHidden ? (
+                            <MetadataExtendedSummaryTable header={'EVENTS.SERIES.NEW.METADATA_EXTENDED.CAPTION'}/>
+                        ): null}
+
+                        {/*Summary access configuration*/}
+                        <AccessSummaryTable policies={formik.values.policies}
+                                            header={'EVENTS.SERIES.NEW.ACCESS.CAPTION'}/>
+
+                        {/*Summary themes*/}
+                        {!!formik.values.theme && (
+                            <div className="obj tbl-list">
+                                <header className="no-expand">
+                                    {t('EVENTS.SERIES.NEW.THEME.CAPTION')}
+                                </header>
+                                <table className="main-tbl">
+                                    <tbody>
+                                    <tr>
+                                        <td>{t('EVENTS.SERIES.NEW.THEME.CAPTION')}</td>
+                                        <td>{theme.name}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Button for navigation to next page and previous page */}
+            <footer>
+                <button type="submit"
+                        className={cn("submit",
+                            {
+                                active: (formik.dirty && formik.isValid),
+                                inactive: !(formik.dirty && formik.isValid)
+                            })}
+                        disabled={!(formik.dirty && formik.isValid)}
+                        onClick={() => {
+                            formik.handleSubmit();
+                        }}
+                        tabIndex="100">{t('WIZARD.CREATE')}</button>
+                <button className="cancel"
+                        onClick={() => previousPage(formik.values, false)}
+                        tabIndex="101">{t('WIZARD.BACK')}</button>
+            </footer>
+
+            <div className="btm-spacer"/>
+        </>
+    )
+};
+
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    metadataSeries: getSeriesMetadata(state),
+    seriesThemes: getSeriesThemes(state)
+})
+
+export default connect(mapStateToProps)(NewSeriesSummary);

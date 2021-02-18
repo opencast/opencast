@@ -6,9 +6,9 @@ import {DatePicker} from "@material-ui/pickers";
 import {getTimezoneOffset} from "../../../../utils/utils";
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import {Field, FieldArray} from "formik";
-import {sourceMetadata, uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
+import {sourceMetadata, uploadAssetOptions} from "../../../../configs/wizard/sourceConfig";
 import RenderField from "./RenderField";
-import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/newEventConfigs/newEventWizardConfig";
+import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/wizard/newEventWizardConfig";
 import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../../../thunks/recordingThunks";
 import {connect} from "react-redux";
@@ -31,7 +31,7 @@ const theme = createMuiTheme({
 /**
  * This component renders the source page for new events in the new event wizard.
  */
-const NewEventSource = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices, addNotification,
+const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices, addNotification,
                             removeNotificationEventsForm }) => {
     const { t } = useTranslation();
 
@@ -495,4 +495,4 @@ const mapDispatchToProps = dispatch => ({
 });
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewEventSource);
+export default connect(mapStateToProps, mapDispatchToProps)(NewSourcePage);

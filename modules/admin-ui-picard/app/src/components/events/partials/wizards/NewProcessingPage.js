@@ -10,7 +10,7 @@ import RenderWorkflowConfig from "./RenderWorkflowConfig";
 /**
  * This component renders the processing page for new events in the new event wizard.
  */
-const NewEventProcessing = ({ previousPage, nextPage, formik, loadingWorkflowDef, workflowDef }) => {
+const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef, workflowDef }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -93,6 +93,7 @@ const NewEventProcessing = ({ previousPage, nextPage, formik, loadingWorkflowDef
     )
 }
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     workflowDef: getWorkflowDef(state)
 });
@@ -101,4 +102,4 @@ const mapDispatchToProps = dispatch => ({
     loadingWorkflowDef: () => dispatch(fetchWorkflowDef())
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewEventProcessing);
+export default connect(mapStateToProps, mapDispatchToProps)(NewProcessingPage);

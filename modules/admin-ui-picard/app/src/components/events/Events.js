@@ -16,7 +16,7 @@ import {withRouter} from "react-router-dom";
 import {fetchSeries} from "../../thunks/seriesThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import Notifications from "../shared/Notifications";
-import NewEventModal from "./partials/modals/NewEventModal";
+import NewResourceModal from "../shared/NewResourceModal";
 
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
@@ -114,8 +114,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                 </div>
 
                 {/* Display modal for new event if add event button is clicked */}
-                <NewEventModal showModal={displayNewEventModal}
-                               handleClose={hideNewEventModal} />
+                <NewResourceModal showModal={displayNewEventModal}
+                                  handleClose={hideNewEventModal}
+                                  resource={"events"} />
 
                 {/* Include Burger-button menu */}
                 <MainNav  isOpen={displayNavigation}

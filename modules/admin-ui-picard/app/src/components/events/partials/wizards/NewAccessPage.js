@@ -7,13 +7,13 @@ import {FieldArray, Field} from "formik";
 import RenderMultiField from "./RenderMultiField";
 import {connect} from "react-redux";
 import {addNotification} from "../../../../thunks/notificationThunks";
-import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/newEventConfigs/newEventWizardConfig";
+import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/wizard/newEventWizardConfig";
 import {removeNotificationEventsAccess} from "../../../../actions/notificationActions";
 
 /**
- * This component renders the access page for new events in the new event wizard.
+ * This component renders the access page for new events and series in the wizards.
  */
-const NewEventAccess = ({ previousPage, nextPage, formik, addNotification,
+const NewAccessPage = ({ previousPage, nextPage, formik, addNotification,
                             removeNotificationEventsAccess }) => {
     const { t } = useTranslation();
 
@@ -123,7 +123,7 @@ const NewEventAccess = ({ previousPage, nextPage, formik, addNotification,
                                                                             <option value=""/>
                                                                             {aclTemplates.map((template, key) => (
                                                                                 <option value={template.id}
-                                                                                        key={key}>{template.label}</option>
+                                                                                        key={key}>{template.value}</option>
                                                                             ))}
                                                                         </select>
                                                                     </div>
@@ -290,4 +290,4 @@ const mapDispatchToProps = dispatch => ({
     removeNotificationEventsAccess: () => dispatch(removeNotificationEventsAccess())
 });
 
-export default connect(null, mapDispatchToProps)(NewEventAccess);
+export default connect(null, mapDispatchToProps)(NewAccessPage);

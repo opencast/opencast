@@ -1,11 +1,13 @@
 import React from "react";
 import cn from "classnames";
 import {useTranslation} from "react-i18next";
-import Notifications from "../../../shared/Notifications";
 import {getEventMetadata} from "../../../../selectors/eventSelectors";
 import {connect} from "react-redux";
-import {uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
+import {uploadAssetOptions} from "../../../../configs/wizard/sourceConfig";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
+import MetadataSummaryTable from "./summaryTables/MetadataSummaryTable";
+import MetadataExtendedSummaryTable from "./summaryTables/MetadataExtendedSummaryTable";
+import AccessSummaryTable from "./summaryTables/AccessSummaryTable";
 
 /**
  * This component renders the summary page for new events in the new event wizard.
@@ -13,19 +15,6 @@ import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUploadHidden,
                              metadataEvents, workflowDef }) => {
     const { t } = useTranslation();
-
-    // metadata that user has provided
-    let metadata = [];
-    for (let i = 0; metadataEvents.fields.length > i; i++) {
-        let fieldValue = formik.values[metadataEvents.fields[i].id];
-        if (!!fieldValue && fieldValue.length > 0) {
-            metadata = metadata.concat({
-                name: metadataEvents.fields[i].id,
-                label: metadataEvents.fields[i].label,
-                value: fieldValue
-            });
-        }
-    }
 
     // Get upload assets that are not of type track
     const uploadAssetsOptionsNonTrack = uploadAssetOptions.filter(asset => asset.type !== 'track');
@@ -55,41 +44,14 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                 <div className="modal-body">
                     <div className="full-col">
                         {/*Summary metadata*/}
-                        <div className="obj tbl-list">
-                            <header className="no-expand">{t('EVENTS.EVENTS.NEW.METADATA.CAPTION')}</header>
-                            <div className="obj-container">
-                                <table className="main-tbl">
-                                    <tbody>
-                                        {/*Insert row for each metadata entry user has provided*/}
-                                        {metadata.map((entry, key) => (
-                                            <tr key={key}>
-                                                <td>{t(entry.label)}</td>
-                                                <td>{Array.isArray(entry.value) ?
-                                                    entry.value.join(', ')
-                                                    : entry.value}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <MetadataSummaryTable metadataFields={metadataEvents.fields}
+                                              formikValues={formik.values}
+                                              header={'EVENTS.EVENTS.NEW.METADATA.CAPTION'}/>
 
                         {/*Summary metadata extended*/}
                         {/*todo: metadata extended not implemented yet, so there are no values provided by user yet*/}
                         {!metaDataExtendedHidden ? (
-                            <div className="obj tbl-list">
-                                <header className="no-expand">{t('EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION')}</header>
-                                <div className="obj-container">
-                                    <table className="main-tbl">
-                                        <tbody>
-                                            <tr>
-                                                <td>Placeholder Label</td>
-                                                <td>Placeholder Value</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                            <MetadataExtendedSummaryTable header={'EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION'}/>
                         ): null}
 
                         {/*Summary upload assets*/}
@@ -216,45 +178,8 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                         </div>
 
                         {/*Summary access configuration*/}
-                        <div className="obj tbl-list">
-                            <header className="no-expand">
-                                {t('EVENTS.EVENTS.NEW.ACCESS.CAPTION')}
-                            </header>
-                            <table className="main-tbl">
-                                <thead>
-                                    <tr>
-                                        <th className="fit">
-                                            {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE')}
-                                        </th>
-                                        <th className="fit">
-                                            {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ')}
-                                        </th>
-                                        <th className="fit">
-                                            {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE')}
-                                        </th>
-                                        <th className="fit">
-                                            {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS')}
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {/*Insert row for each policy user has provided*/}
-                                    {formik.values.policies.map((policy, key) => (
-                                        <tr key={key}>
-                                            <td>{policy.role}</td>
-                                            <td className="fit"><input type="checkbox" disabled checked={policy.read} /></td>
-                                            <td className="fit"><input type="checkbox" disabled checked={policy.write} /></td>
-                                            <td className="fit">
-                                                {/*repeat for each additional action*/}
-                                                {policy.actions.map((action, key) => (
-                                                    <div key={key}>{action}</div>
-                                                ))}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <AccessSummaryTable policies={formik.values.policies}
+                                            header={'EVENTS.EVENTS.NEW.ACCESS.CAPTION'}/>
                     </div>
                 </div>
             </div>

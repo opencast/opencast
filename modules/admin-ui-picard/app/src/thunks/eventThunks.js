@@ -6,10 +6,15 @@ import {
     loadEventsInProgress,
     loadEventsSuccess
 } from "../actions/eventActions";
-import {getURLParams} from "../utils/resourceUtils";
+import {
+    getURLParams,
+    prepareAccessPolicyRulesForPost,
+    prepareMetadataFieldsForPost,
+    transformMetadataCollection
+} from "../utils/resourceUtils";
 import axios from "axios";
-import {sourceMetadata, uploadAssetOptions} from "../configs/newEventConfigs/sourceConfig";
-import {WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/newEventConfigs/newEventWizardConfig";
+import {sourceMetadata, uploadAssetOptions} from "../configs/wizard/sourceConfig";
+import {WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizard/newEventWizardConfig";
 import {getTimezoneOffset} from "../utils/utils";
 
 // fetch events from server
@@ -56,25 +61,14 @@ export const fetchEvents = () => async (dispatch, getState) => {
 }
 
 // fetch event metadata from server
-export const fetchEventMetadata = () => async (dispatch, getState) => {
+export const fetchEventMetadata = () => async dispatch => {
     try {
         dispatch(loadEventMetadataInProgress());
 
         let data = await axios.get('admin-ng/event/new/metadata');
         const response = await data.data;
 
-        const metadata = response[0];
-
-        for (let i = 0; metadata.fields.length > i; i++) {
-            if (!!metadata.fields[i].collection) {
-                metadata.fields[i].collection = Object.keys(metadata.fields[i].collection).map(key => {
-                    return {
-                        name: key,
-                        value: metadata.fields[i].collection[key]
-                    }
-                })
-            }
-        }
+        const metadata = transformMetadataCollection(response[0]);
 
         dispatch(loadEventMetadataSuccess(metadata));
     } catch (e) {
@@ -109,28 +103,14 @@ export const checkForConflicts =  async (startDate, endDate, duration, device) =
 
 }
 
+// post new event to backend
 export const postNewEvent = async (values, metadataInfo) => {
-    let formData = new FormData();
-    let metadataFields = [], metadata, source, access, assets;
 
-    // fill metadataField with field information send by server previously and values provided by user
-    // Todo: What is hashkey?
-    for (let i = 0; metadataInfo.fields.length > i; i++) {
-        let fieldValue = {
-            id: metadataInfo.fields[i].id,
-            type: metadataInfo.fields[i].type,
-            value: values[metadataInfo.fields[i].id],
-            tabindex: i + 1,
-            $$hashKey: "object:123"
-        };
-        if (!!metadataInfo.fields[i].translatable) {
-            fieldValue = {
-                ...fieldValue,
-                translatable: metadataInfo.fields[i].translatable
-            }
-        }
-        metadataFields = metadataFields.concat(fieldValue);
-    }
+    let formData = new FormData();
+    let metadataFields, metadata, source, access, assets;
+
+    // prepare metadata provided by user
+    metadataFields = prepareMetadataFieldsForPost(metadataInfo.fields, values);
 
     // if source mode is UPLOAD than also put metadata fields of that in metadataFields
     if(values.sourceMode === "UPLOAD") {
@@ -226,34 +206,8 @@ export const postNewEvent = async (values, metadataInfo) => {
         assets.options = assets.options.concat(uploadAssetOptions[i]);
     }
 
-    // access policies for post request
-    access = {
-        acl: {
-            ace: []
-        }
-    };
-
-    // iterate through all policies provided by user and transform them into form required for request
-    for (let i = 0; values.policies.length > i; i++) {
-        access.acl.ace = access.acl.ace.concat({
-            action: 'read',
-            allow: values.policies[i].read,
-            role: values.policies[i].role
-        },{
-            action: 'write',
-            allow: values.policies[i].write,
-            role: values.policies[i].role
-        });
-        if (values.policies[i].actions.length > 0) {
-            for (let j = 0; values.policies[i].actions.length > j; j++) {
-                access.acl.ace = access.acl.ace.concat({
-                    action: values.policies[i].actions[j],
-                    allow: true,
-                    role: values.policies[i].role
-                })
-            }
-        }
-    }
+    // prepare access rules provided by user
+   access = prepareAccessPolicyRulesForPost(values.policies);
 
     // todo: change placeholder in configuration
     formData.append('metadata', JSON.stringify({

@@ -6,7 +6,7 @@ import cn from "classnames";
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
 
-import {fetchSeries} from "../../thunks/seriesThunks";
+import {fetchSeries, fetchSeriesMetadata, fetchSeriesThemes} from "../../thunks/seriesThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
 import {seriesTemplateMap} from "../../configs/tableConfigs/seriesTableConfig";
 import {connect} from "react-redux";
@@ -15,6 +15,7 @@ import {fetchEvents} from "../../thunks/eventThunks";
 import {getSeries, isShowActions} from "../../selectors/seriesSeletctor";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import Notifications from "../shared/Notifications";
+import NewResourceModal from "../shared/NewResourceModal";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -24,10 +25,11 @@ const containerAction = React.createRef();
  * This component renders the table view of series
  */
 const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEvents, loadingEventsIntoTable,
-                    series, loadingFilters, loadingStats }) => {
+                    series, loadingFilters, loadingStats, loadingSeriesMetadata, loadingSeriesThemes }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
+    const [displayNewSeriesModal, setNewSeriesModal] = useState(false);
 
     const loadEvents = () => {
         // Fetching stats from server
@@ -80,8 +82,15 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         setActionMenu(!displayActionMenu);
     }
 
-    const placeholder = () => {
-        console.log("To be implemented");
+    const showNewSeriesEventModal = async () => {
+        await loadingSeriesMetadata();
+        await loadingSeriesThemes();
+
+        setNewSeriesModal(true);
+    }
+
+    const hideNewSeriesModal = () => {
+        setNewSeriesModal(false);
     }
 
     const styleNavOpen = {
@@ -95,11 +104,16 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
             <section className="action-nav-bar">
                 {/*TODO: include with role ROLE_UI_SERIES_CREATE */}
                 <div className="btn-group">
-                    <button className="add" onClick={() => placeholder()}>
+                    <button className="add" onClick={() => showNewSeriesEventModal()}>
                         <i className="fa fa-plus" />
                         <span>{t('EVENTS.EVENTS.ADD_SERIES')}</span>
                     </button>
                 </div>
+
+                {/* Display modal for new series if add series button is clicked */}
+                <NewResourceModal showModal={displayNewSeriesModal}
+                                  handleClose={hideNewSeriesModal}
+                                  resource={"series"}/>
 
                 {/* Include Burger-button menu */}
                 <MainNav  isOpen={displayNavigation}
@@ -171,7 +185,9 @@ const mapDispatchToProps = dispatch => ({
     loadingEvents: () => dispatch(fetchEvents()),
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
     loadingFilters: resource => dispatch(fetchFilters(resource)),
-    loadingStats: () => dispatch(fetchStats())
+    loadingStats: () => dispatch(fetchStats()),
+    loadingSeriesMetadata: () => dispatch(fetchSeriesMetadata()),
+    loadingSeriesThemes: () => dispatch(fetchSeriesThemes())
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Series));

@@ -1,13 +1,13 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
-import {uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
+import {uploadAssetOptions} from "../../../../configs/wizard/sourceConfig";
 
 /**
  * This component renders the asset upload page of the new event wizard
  * (only if its not set hidden (see newEventWizardConfig) or user chose UPLOAD as source mode)
  */
-const NewEventAssetUpload = ({ previousPage, nextPage , formik }) => {
+const NewAssetUploadPage = ({ previousPage, nextPage , formik }) => {
     const { t } = useTranslation();
 
     // Get upload assets that are not of type track
@@ -102,4 +102,4 @@ const NewEventAssetUpload = ({ previousPage, nextPage , formik }) => {
 
 }
 
-export default NewEventAssetUpload;
+export default NewAssetUploadPage;
