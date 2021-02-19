@@ -22,6 +22,7 @@ for docs in admin developer; do
   else
     echo mkdocs exited abnormally.
     cat mkdocs.log
+    ret=1
   fi
   cd ..
 done
