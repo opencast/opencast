@@ -82,16 +82,18 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
     String repository = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(REPOSITORY));
-    if (repository == null)
+    if (repository == null) {
       throw new IllegalArgumentException("No repository has been specified");
+    }
 
     try {
       logger.info("Retracting media package {} publication from OAI-PMH repository {}", mediaPackage, repository);
 
       // Wait for OAI-PMH retraction to finish
       Job retractJob = publicationService.retract(mediaPackage, repository);
-      if (!waitForStatus(retractJob).isSuccess())
+      if (!waitForStatus(retractJob).isSuccess()) {
         throw new WorkflowOperationException("The OAI-PMH retract job did not complete successfully");
+      }
 
       logger.debug("Retraction from OAI-PMH operation complete");
 

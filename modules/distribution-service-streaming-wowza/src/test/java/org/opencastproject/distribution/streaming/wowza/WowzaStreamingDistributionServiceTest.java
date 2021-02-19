@@ -78,8 +78,10 @@ public class WowzaStreamingDistributionServiceTest {
   private static UserDirectoryService userDirectoryService = null;
 
   private static final String defaultTenant = "mh_default_org";
-  private static final String defaultUrlProperty = format(WowzaStreamingDistributionService.WOWZA_URL_KEY, defaultTenant);
-  private static final String defaultPortProperty = format(WowzaStreamingDistributionService.WOWZA_PORT_KEY, defaultTenant);
+  private static final String defaultUrlProperty
+      = format(WowzaStreamingDistributionService.WOWZA_URL_KEY, defaultTenant);
+  private static final String defaultPortProperty
+      = format(WowzaStreamingDistributionService.WOWZA_PORT_KEY, defaultTenant);
 
   private static final String tenant1 = "tenant_1";
   private static final String tenant2 = "tenant_2";
@@ -240,23 +242,23 @@ public class WowzaStreamingDistributionServiceTest {
     setUpDefault();
 
     final String[] inputStreamingUrls = new String[] {
-            "incorrect url",
-            "noschema.myserver.com/my/path/to/server",
-            "http://withhttp.example.com/path",
-            "https://withhttps.testing.com/this/is/a/path",
-            "rtmp://withrtmp.test.ext/another/path",
-            "rtmps://withrtmps.anothertest.test/path/to/server",
-            "other://withotherschema.test/mypath"
+        "incorrect url",
+        "noschema.myserver.com/my/path/to/server",
+        "http://withhttp.example.com/path",
+        "https://withhttps.testing.com/this/is/a/path",
+        "rtmp://withrtmp.test.ext/another/path",
+        "rtmps://withrtmps.anothertest.test/path/to/server",
+        "other://withotherschema.test/mypath"
     };
 
     final String[] outputStreamingUrls = new String[] {
-            null,
-            "http://noschema.myserver.com:10/my/path/to/server",
-            "http://withhttp.example.com:10/path",
-            "https://withhttps.testing.com:10/this/is/a/path",
-            null,
-            null,
-            null
+        null,
+        "http://noschema.myserver.com:10/my/path/to/server",
+        "http://withhttp.example.com:10/path",
+        "https://withhttps.testing.com:10/this/is/a/path",
+        null,
+        null,
+        null
     };
 
     map.put(defaultPortProperty, port);

@@ -116,16 +116,26 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   };
 
   // Service configuration
-  public static final String AWS_S3_DISTRIBUTION_ENABLE = "org.opencastproject.distribution.aws.s3.distribution.enable";
-  public static final String AWS_S3_DISTRIBUTION_BASE_CONFIG = "org.opencastproject.distribution.aws.s3.distribution.base";
-  public static final String AWS_S3_ACCESS_KEY_ID_CONFIG = "org.opencastproject.distribution.aws.s3.access.id";
-  public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG = "org.opencastproject.distribution.aws.s3.secret.key";
-  public static final String AWS_S3_REGION_CONFIG = "org.opencastproject.distribution.aws.s3.region";
-  public static final String AWS_S3_BUCKET_CONFIG = "org.opencastproject.distribution.aws.s3.bucket";
-  public static final String AWS_S3_ENDPOINT_CONFIG = "org.opencastproject.distribution.aws.s3.endpoint";
-  public static final String AWS_S3_PATH_STYLE_CONFIG = "org.opencastproject.distribution.aws.s3.path.style";
-  public static final String AWS_S3_PRESIGNED_URL_CONFIG = "org.opencastproject.distribution.aws.s3.presigned.url";
-  public static final String AWS_S3_PRESIGNED_URL_VALID_DURATION_CONFIG = "org.opencastproject.distribution.aws.s3.presigned.url.valid.duration";
+  public static final String AWS_S3_DISTRIBUTION_ENABLE
+      = "org.opencastproject.distribution.aws.s3.distribution.enable";
+  public static final String AWS_S3_DISTRIBUTION_BASE_CONFIG
+      = "org.opencastproject.distribution.aws.s3.distribution.base";
+  public static final String AWS_S3_ACCESS_KEY_ID_CONFIG
+      = "org.opencastproject.distribution.aws.s3.access.id";
+  public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG
+      = "org.opencastproject.distribution.aws.s3.secret.key";
+  public static final String AWS_S3_REGION_CONFIG
+      = "org.opencastproject.distribution.aws.s3.region";
+  public static final String AWS_S3_BUCKET_CONFIG
+      = "org.opencastproject.distribution.aws.s3.bucket";
+  public static final String AWS_S3_ENDPOINT_CONFIG
+      = "org.opencastproject.distribution.aws.s3.endpoint";
+  public static final String AWS_S3_PATH_STYLE_CONFIG
+      = "org.opencastproject.distribution.aws.s3.path.style";
+  public static final String AWS_S3_PRESIGNED_URL_CONFIG
+      = "org.opencastproject.distribution.aws.s3.presigned.url";
+  public static final String AWS_S3_PRESIGNED_URL_VALID_DURATION_CONFIG
+      = "org.opencastproject.distribution.aws.s3.presigned.url.valid.duration";
   // config.properties
   public static final String OPENCAST_DOWNLOAD_URL = "org.opencastproject.download.url";
   public static final String OPENCAST_STORAGE_DIR = "org.opencastproject.storage.dir";
@@ -255,9 +265,11 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       // AWS presigned URL expiration time in millis
       String presignedUrlExpTimeMillisConfigValue = OsgiUtil.getComponentContextProperty(cc,
               AWS_S3_PRESIGNED_URL_VALID_DURATION_CONFIG, null);
-      presignedUrlValidDuration = NumberUtils.toInt(presignedUrlExpTimeMillisConfigValue, DEFAULT_PRESIGNED_URL_EXPIRE_MILLIS);
+      presignedUrlValidDuration = NumberUtils.toInt(
+          presignedUrlExpTimeMillisConfigValue, DEFAULT_PRESIGNED_URL_EXPIRE_MILLIS);
       if (presignedUrlValidDuration > MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS) {
-        logger.warn("Valid duration of presigned URL is too large, MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS(7 days) is used");
+        logger.warn(
+            "Valid duration of presigned URL is too large, MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS(7 days) is used");
         presignedUrlValidDuration = MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS;
       }
 
@@ -282,11 +294,12 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       // Keys not informed so use default credentials provider chain, which
       // will look at the environment variables, java system props, credential files, and instance
       // profile credentials
-      if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone())
+      if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone()) {
         provider = new DefaultAWSCredentialsProviderChain();
-      else
+      } else {
         provider = new AWSStaticCredentialsProvider(
                 new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
+      }
 
       // Create AWS client
 
@@ -315,15 +328,16 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   public void deactivate() {
     // Transfer manager is null if service disabled
-    if (s3TransferManager != null)
+    if (s3TransferManager != null) {
       s3TransferManager.shutdownNow();
+    }
 
     logger.info("AwsS3DistributionService deactivated!");
   }
 
   @Override
   public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds,
-    boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
+      boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
     throw new UnsupportedOperationException("Not supported yet.");
   //stub function
   }
@@ -570,7 +584,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
-      throws DistributionException {
+          throws DistributionException {
     final MediaPackageElement[] retractedElements = retractElements(channelId, mediaPackage, elementIds);
     if (retractedElements == null) {
       return null;
@@ -639,12 +653,15 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job restore(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
-    if (mediaPackage == null)
+    if (mediaPackage == null) {
       throw new IllegalArgumentException("Media package must be specified");
-    if (elementId == null)
+    }
+    if (elementId == null) {
       throw new IllegalArgumentException("Element ID must be specified");
-    if (channelId == null)
+    }
+    if (channelId == null) {
       throw new IllegalArgumentException("Channel ID must be specified");
+    }
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Restore.toString(),
@@ -657,14 +674,18 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   @Override
   public Job restore(String channelId, MediaPackage mediaPackage, String elementId, String fileName)
           throws DistributionException {
-    if (mediaPackage == null)
+    if (mediaPackage == null) {
       throw new IllegalArgumentException("Media package must be specified");
-    if (elementId == null)
+    }
+    if (elementId == null) {
       throw new IllegalArgumentException("Element ID must be specified");
-    if (channelId == null)
+    }
+    if (channelId == null) {
       throw new IllegalArgumentException("Channel ID must be specified");
-    if (fileName == null)
+    }
+    if (fileName == null) {
       throw new IllegalArgumentException("Filename must be specified");
+    }
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Restore.toString(),
@@ -775,8 +796,9 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     } else {
       // Cannot retract
       logger.warn(
-              "Cannot retract {}. Uri must be in the format https://host/bucketName/channelId/mpId/originalElementId/fileName.extension",
-              uriString);
+          "Cannot retract {}. Uri must be in the format "
+              + "https://host/bucketName/channelId/mpId/originalElementId/fileName.extension",
+          uriString);
       return null;
     }
   }
@@ -815,11 +837,13 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     // Each flavor is one video with multiple renditions
     List<Track> trackElements = elements.stream().filter(e -> e.getElementType() == MediaPackageElement.Type.Track)
             .map(e -> (Track) e).collect(Collectors.toList());
-    HashMap<MediaPackageElementFlavor, List<Track>> trackElementsMap = new HashMap<MediaPackageElementFlavor, List<Track>>();
+    HashMap<MediaPackageElementFlavor, List<Track>> trackElementsMap
+        = new HashMap<MediaPackageElementFlavor, List<Track>>();
     for (Track t : trackElements) {
       List<Track> l = trackElementsMap.get(t.getFlavor());
-      if (l == null)
+      if (l == null) {
         l = new ArrayList<Track>();
+      }
       l.add(t);
       trackElementsMap.put(t.getFlavor(), l);
     }
@@ -864,11 +888,12 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
           }
           for (Track track : transformedTracks) {
             MediaPackageElement distributedElement;
-            if (AdaptivePlaylist.isPlaylist(track))
+            if (AdaptivePlaylist.isPlaylist(track)) {
               distributedElement = distributeElement(channelId, mediapackage, track, checkAvailability,
                       new File(track.getURI()));
-            else
+            } else {
               distributedElement = distributeElement(channelId, mediapackage, track, checkAvailability);
+            }
             distributedElements.add(distributedElement);
           }
         } catch (MediaPackageException | NotFoundException | IOException e1) {
@@ -967,7 +992,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
           //Set the website configuration.  This needs to be static-site-enabled currently.
           BucketWebsiteConfiguration defaultWebsite = new BucketWebsiteConfiguration();
-          //These files don't actually exist, but that doesn't matter since no one should be looking around in the bucket anyway.
+          //These files don't actually exist, but that doesn't matter since no one should be
+          //looking around in the bucket anyway.
           defaultWebsite.setIndexDocumentSuffix("index.html");
           defaultWebsite.setErrorDocument("error.html");
           s3.setBucketWebsiteConfiguration(new SetBucketWebsiteConfigurationRequest(bucketName, defaultWebsite));
