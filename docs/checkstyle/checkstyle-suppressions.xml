@@ -49,11 +49,6 @@
     <suppress checks="LineLength" files="modules/oaipmh/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh-persistence/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/presets/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/publication-service-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/publication-service-configurable/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/publication-service-oaipmh/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/publication-service-oaipmh-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/publication-service-youtube-v3/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/runtime-info/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-remote/.+\.(java|properties)"/>
@@ -166,8 +161,6 @@
     <suppress checks="Indentation" files="modules/notification-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
-    <suppress checks="Indentation" files="modules/publication-service-oaipmh/.+\.java"/>
-    <suppress checks="Indentation" files="modules/publication-service-youtube-v3/.+\.java"/>
     <suppress checks="Indentation" files="modules/runtime-info/.+\.java"/>
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/search-service-impl/.+\.java"/>
@@ -244,8 +237,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/notification-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh-persistence/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/publication-service-oaipmh/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/publication-service-youtube-v3/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/schema/.+\.java"/>
