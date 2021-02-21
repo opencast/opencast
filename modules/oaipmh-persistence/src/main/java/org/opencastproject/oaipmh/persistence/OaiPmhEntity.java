@@ -81,11 +81,7 @@ public class OaiPmhEntity {
 
   /** The last modification date */
   @Column(
-      name = "modification_date",
-      insertable = false,
-      updatable = false,
-      // this is H2 syntax - Opencast uses a dedicated database dependent schema in production
-      columnDefinition = "TIMESTAMP AS CURRENT_TIMESTAMP()")
+      name = "modification_date")
   @Temporal(TemporalType.TIMESTAMP)
   private Date modificationDate;
 
@@ -107,6 +103,7 @@ public class OaiPmhEntity {
    * Default constructor without any import.
    */
   public OaiPmhEntity() {
+    this.modificationDate = new Date();
   }
 
   /**
@@ -125,6 +122,7 @@ public class OaiPmhEntity {
    */
   public void setMediaPackageId(String mediaPackageId) {
     this.mediaPackageId = mediaPackageId;
+    this.modificationDate = new Date();
   }
 
   /**
@@ -140,6 +138,7 @@ public class OaiPmhEntity {
    */
   public void setOrganization(String organization) {
     this.organization = organization;
+    this.modificationDate = new Date();
   }
 
   /**
@@ -157,6 +156,7 @@ public class OaiPmhEntity {
    */
   public void setDeleted(boolean deleted) {
     this.deleted = deleted;
+    this.modificationDate = new Date();
   }
 
   /**
@@ -174,6 +174,7 @@ public class OaiPmhEntity {
    */
   public void setSeries(String series) {
     this.series = series;
+    this.modificationDate = new Date();
   }
 
   /**
@@ -199,6 +200,7 @@ public class OaiPmhEntity {
    */
   public void setMediaPackageXML(String mediaPackageXML) {
     this.mediaPackageXML = mediaPackageXML;
+    this.modificationDate = new Date();
   }
 
   /**
@@ -215,6 +217,7 @@ public class OaiPmhEntity {
    */
   public void setRepositoryId(String repositoryId) {
     this.repositoryId = repositoryId;
+    this.modificationDate = new Date();
   }
 
   /**
@@ -262,6 +265,7 @@ public class OaiPmhEntity {
   public void addMediaPackageElement(OaiPmhElementEntity mediaPackageElementEntity) {
     mediaPackageElements.add(mediaPackageElementEntity);
     mediaPackageElementEntity.setOaiPmhEntity(this);
+    this.modificationDate = new Date();
   }
 
   /**
@@ -271,6 +275,7 @@ public class OaiPmhEntity {
    */
   public void removeMediaPackageElement(OaiPmhElementEntity mediaPackageElementEntity) {
     mediaPackageElements.remove(mediaPackageElementEntity);
+    this.modificationDate = new Date();
   }
 
   /**
