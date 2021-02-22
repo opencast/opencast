@@ -27,8 +27,6 @@ import org.opencastproject.elasticsearch.index.group.GroupIndexUtils;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildService;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.GroupProvider;
 import org.opencastproject.security.api.JaxbGroup;
@@ -92,12 +90,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   /** The JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
-  /** The message broker service */
-  protected MessageSender messageSender;
-
-  /** The message broker receiver */
-  protected MessageReceiver messageReceiver;
-
   /** The security service */
   protected SecurityService securityService = null;
 
@@ -132,24 +124,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   @Reference(name = "userDirectoryService")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
-  }
-
-  /**
-   * @param messageSender
-   *          The messageSender to set
-   */
-  @Reference(name = "message-broker-sender")
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
-  /**
-   * @param messageReceiver
-   *          The messageReceiver to set
-   */
-  @Reference(name = "message-broker-receiver")
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
   }
 
   /**
