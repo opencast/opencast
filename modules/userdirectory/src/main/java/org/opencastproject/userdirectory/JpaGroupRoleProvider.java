@@ -21,13 +21,14 @@
 
 package org.opencastproject.userdirectory;
 
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.group.GroupIndexUtils;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.group.GroupItem;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.GroupProvider;
 import org.opencastproject.security.api.JaxbGroup;
@@ -40,6 +41,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.impl.jpa.JpaGroup;
@@ -52,7 +54,6 @@ import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -415,8 +416,13 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
         em.merge(foundGroup);
       }
       tx.commit();
-      messageSender.sendObjectMessage(GroupItem.GROUP_QUEUE, MessageSender.DestinationType.Queue,
-              GroupItem.update(JaxbGroup.fromGroup(jpaGroup)));
+
+      // update the elasticsearch indices
+      String orgId = organization.getId();
+      User user = securityService.getUser();
+      JaxbGroup jaxbGroup = JaxbGroup.fromGroup(group);
+      addOrUpdateGroupInIndex(jaxbGroup, adminUiIndex, orgId, user);
+      addOrUpdateGroupInIndex(jaxbGroup, externalApiIndex, orgId, user);
     } finally {
       if (tx.isActive()) {
         tx.rollback();
@@ -426,14 +432,40 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
     }
   }
 
-  private void removeGroup(String groupId, String orgId) throws NotFoundException, UnauthorizedException, Exception {
-    Group group = loadGroup(groupId, orgId);
-    if (group != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, group.getRoles()))
-      throw new UnauthorizedException("The user is not allowed to delete a group with the admin role");
-
-    UserDirectoryPersistenceUtil.removeGroup(groupId, orgId, emf);
-    messageSender.sendObjectMessage(GroupItem.GROUP_QUEUE, MessageSender.DestinationType.Queue,
-            GroupItem.delete(groupId));
+  /**
+   * Add or update a group to/in an ElasticSearch index.
+   *
+   * @param jaxbGroup
+   *          the group to add or update
+   * @param index
+   *          the index to update
+   * @param orgId
+   *          the organization the group belongs to
+   * @param user
+   *          the user for the query
+   */
+  private void addOrUpdateGroupInIndex(JaxbGroup jaxbGroup, AbstractSearchIndex index, String orgId, User user) {
+    logger.debug(
+            "Updating the group with id '{}', name '{}', description '{}', organization '{}', roles '{}', members '{}' "
+                    + "in the {} index.",
+            jaxbGroup.getGroupId(), jaxbGroup.getName(), jaxbGroup.getDescription(), jaxbGroup.getOrganization(),
+            jaxbGroup.getRoles(), jaxbGroup.getMembers(), index.getIndexName());
+    try {
+      org.opencastproject.elasticsearch.index.group.Group group = GroupIndexUtils.getOrCreate(jaxbGroup.getGroupId(),
+              orgId, user, index);
+      group.setName(jaxbGroup.getName());
+      group.setDescription(jaxbGroup.getDescription());
+      group.setMembers(jaxbGroup.getMembers());
+      Set<String> roles = new HashSet<>();
+      for (Role role : jaxbGroup.getRoles()) {
+        roles.add(role.getName());
+      }
+      group.setRoles(roles);
+      index.addOrUpdate(group);
+      logger.debug("Group {} updated in the {} index.", jaxbGroup.getGroupId(), index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error updating the group {} in the {} index.", jaxbGroup.getGroupId(), index.getIndexName(), e);
+    }
   }
 
   /**
@@ -522,7 +554,38 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
    */
   public void removeGroup(String groupId) throws NotFoundException, UnauthorizedException, Exception {
     String orgId = securityService.getOrganization().getId();
-    removeGroup(groupId, orgId);
+    Group group = loadGroup(groupId, orgId);
+    if (group != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, group.getRoles()))
+      throw new UnauthorizedException("The user is not allowed to delete a group with the admin role");
+
+    UserDirectoryPersistenceUtil.removeGroup(groupId, orgId, emf);
+
+    // update the elasticsearch indices
+    String organization = securityService.getOrganization().getId();
+    removeGroupFromIndex(groupId, adminUiIndex, organization);
+    removeGroupFromIndex(groupId, externalApiIndex, organization);
+  }
+
+  /**
+   * Remove a group from an ElasticSearch index.
+   *
+   * @param groupId
+   *          the id of the group to remove
+   * @param index
+   *          the index to remove the group from
+   * @param orgId
+   *          the organization the group belongs to
+   */
+  private void removeGroupFromIndex(String groupId, AbstractSearchIndex index, String orgId) {
+    logger.debug("Removing group {} from the {} index.", groupId, index.getIndexName());
+
+    try {
+      index.delete(
+              org.opencastproject.elasticsearch.index.group.Group.DOCUMENT_TYPE, groupId.concat(orgId));
+      logger.debug("Group {} removed from the {} index", groupId, index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error deleting the group {} from the {} index", groupId, e);
+    }
   }
 
   /**
@@ -634,16 +697,16 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
 
   @Override
   public void repopulate(final AbstractSearchIndex index) {
-    final String destinationId = GroupItem.GROUP_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName());
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
+      User systemUser =SecurityUtil.createSystemUser(cc, organization);
+      SecurityUtil.runAs(securityService, organization, systemUser, () -> {
         final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
         int total = groups.size();
         int current = 1;
         logIndexRebuildBegin(logger, index.getIndexName(), total, "groups", organization);
         for (JpaGroup group : groups) {
-          messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                  GroupItem.update(JaxbGroup.fromGroup(group)));
+          JaxbGroup jaxbGroup = JaxbGroup.fromGroup(group);
+          addOrUpdateGroupInIndex(jaxbGroup, index, organization.getId(), systemUser);
           logIndexRebuildProgress(logger, index.getIndexName(), total, current);
           current++;
         }
