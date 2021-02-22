@@ -26,8 +26,6 @@ import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.theme.ThemeIndexUtils;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildService;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.theme.SerializableTheme;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -73,12 +71,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   /** The user directory service */
   protected UserDirectoryService userDirectoryService;
 
-  /** The message broker sender service */
-  protected MessageSender messageSender;
-
-  /** The message broker receiver service */
-  protected MessageReceiver messageReceiver;
-
   /** The organization directory service to get organizations */
   protected OrganizationDirectoryService organizationDirectoryService;
 
@@ -122,16 +114,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
-  }
-
-  /** OSGi DI */
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
-  /** OSGi DI */
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
   }
 
   /** OSGi DI */
