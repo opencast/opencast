@@ -26,7 +26,6 @@ import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.theme.ThemeIndexUtils;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildService;
-import org.opencastproject.message.broker.api.theme.SerializableTheme;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -38,6 +37,7 @@ import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -207,9 +207,8 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       // update the elasticsearch indices
       String orgId = securityService.getOrganization().getId();
       User user = securityService.getUser();
-      SerializableTheme serializableTheme = toSerializableTheme(theme);
-      updateThemeInIndex(serializableTheme, adminUiIndex, orgId, user);
-      updateThemeInIndex(serializableTheme, externalApiIndex, orgId, user);
+      updateThemeInIndex(theme, adminUiIndex, orgId, user);
+      updateThemeInIndex(theme, externalApiIndex, orgId, user);
 
       return theme;
     } catch (Exception e) {
@@ -321,24 +320,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     }
   }
 
-  /**
-   * Converts a theme to a {@link SerializableTheme} for using by the theme message queue
-   *
-   * @param theme
-   *          the theme
-   * @return the {@link SerializableTheme}
-   */
-  private SerializableTheme toSerializableTheme(Theme theme) {
-    String creator = StringUtils.isNotBlank(theme.getCreator().getName()) ? theme.getCreator().getName()
-            : theme.getCreator().getUsername();
-    return new SerializableTheme(theme.getId().getOrElse(org.apache.commons.lang3.math.NumberUtils.LONG_MINUS_ONE),
-            theme.getCreationDate(), theme.isDefault(), creator, theme.getName(), theme.getDescription(),
-            theme.isBumperActive(), theme.getBumperFile(), theme.isTrailerActive(), theme.getTrailerFile(),
-            theme.isTitleSlideActive(), theme.getTitleSlideMetadata(), theme.getTitleSlideBackground(),
-            theme.isLicenseSlideActive(), theme.getLicenseSlideBackground(), theme.getLicenseSlideDescription(),
-            theme.isWatermarkActive(), theme.getWatermarkFile(), theme.getWatermarkPosition());
-  }
-
   @Override
   public void repopulate(final AbstractSearchIndex index) {
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
@@ -350,9 +331,8 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
           int current = 1;
           logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
           for (Theme theme : themes) {
-            SerializableTheme serializableTheme = toSerializableTheme(theme);
-            updateThemeInIndex(serializableTheme, adminUiIndex, organization.getId(), systemUser);
-            updateThemeInIndex(serializableTheme, externalApiIndex, organization.getId(), systemUser);
+            updateThemeInIndex(theme, adminUiIndex, organization.getId(), systemUser);
+            updateThemeInIndex(theme, externalApiIndex, organization.getId(), systemUser);
 
             logIndexRebuildProgress(logger, index.getIndexName(), total, current);
             current++;
@@ -394,46 +374,48 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
   /**
    * Update the theme in the ElasticSearch index.
-   *
-   * @param serializableTheme
+   *  @param theme
    *           the theme to update
    * @param index
    *           the index to update
    * @param orgId
-   *           the organization the theme belongs to
+ *           the organization the theme belongs to
    * @param user
-   *           the user used to query the index
    */
-  private void updateThemeInIndex(SerializableTheme serializableTheme, AbstractSearchIndex index, String orgId,
+  private void updateThemeInIndex(Theme theme, AbstractSearchIndex index, String orgId,
           User user) {
     logger.debug("Updating the theme with id '{}', name '{}', description '{}', organization '{}' in the {} index.",
-            serializableTheme.getId(), serializableTheme.getName(), serializableTheme.getDescription(),
+            theme.getId(), theme.getName(), theme.getDescription(),
             orgId, index.getIndexName());
     try {
-      org.opencastproject.elasticsearch.index.theme.Theme theme = ThemeIndexUtils
-              .getOrCreate(serializableTheme.getId(), orgId, user, index);
-      theme.setCreationDate(serializableTheme.getCreationDate());
-      theme.setDefault(serializableTheme.isDefault());
-      theme.setName(serializableTheme.getName());
-      theme.setDescription(serializableTheme.getDescription());
-      theme.setCreator(serializableTheme.getCreator());
-      theme.setBumperActive(serializableTheme.isBumperActive());
-      theme.setBumperFile(serializableTheme.getBumperFile());
-      theme.setTrailerActive(serializableTheme.isTrailerActive());
-      theme.setTrailerFile(serializableTheme.getTrailerFile());
-      theme.setTitleSlideActive(serializableTheme.isTitleSlideActive());
-      theme.setTitleSlideBackground(serializableTheme.getTitleSlideBackground());
-      theme.setTitleSlideMetadata(serializableTheme.getTitleSlideMetadata());
-      theme.setLicenseSlideActive(serializableTheme.isLicenseSlideActive());
-      theme.setLicenseSlideBackground(serializableTheme.getLicenseSlideBackground());
-      theme.setLicenseSlideDescription(serializableTheme.getLicenseSlideDescription());
-      theme.setWatermarkActive(serializableTheme.isWatermarkActive());
-      theme.setWatermarkFile(serializableTheme.getWatermarkFile());
-      theme.setWatermarkPosition(serializableTheme.getWatermarkPosition());
-      index.addOrUpdate(theme);
-      logger.debug("Updated the theme {} in the {} index", serializableTheme.getId(), index.getIndexName());
+      Long id = theme.getId().getOrElse(NumberUtils.LONG_MINUS_ONE);
+      String creator = StringUtils.isNotBlank(theme.getCreator().getName()) ?
+              theme.getCreator().getName() : theme.getCreator().getUsername();
+
+      org.opencastproject.elasticsearch.index.theme.Theme indexTheme = ThemeIndexUtils
+              .getOrCreate(id, orgId, user, index);
+      indexTheme.setCreationDate(theme.getCreationDate());
+      indexTheme.setDefault(theme.isDefault());
+      indexTheme.setName(theme.getName());
+      indexTheme.setDescription(theme.getDescription());
+      indexTheme.setCreator(creator);
+      indexTheme.setBumperActive(theme.isBumperActive());
+      indexTheme.setBumperFile(theme.getBumperFile());
+      indexTheme.setTrailerActive(theme.isTrailerActive());
+      indexTheme.setTrailerFile(theme.getTrailerFile());
+      indexTheme.setTitleSlideActive(theme.isTitleSlideActive());
+      indexTheme.setTitleSlideBackground(theme.getTitleSlideBackground());
+      indexTheme.setTitleSlideMetadata(theme.getTitleSlideMetadata());
+      indexTheme.setLicenseSlideActive(theme.isLicenseSlideActive());
+      indexTheme.setLicenseSlideBackground(theme.getLicenseSlideBackground());
+      indexTheme.setLicenseSlideDescription(theme.getLicenseSlideDescription());
+      indexTheme.setWatermarkActive(theme.isWatermarkActive());
+      indexTheme.setWatermarkFile(theme.getWatermarkFile());
+      indexTheme.setWatermarkPosition(theme.getWatermarkPosition());
+      index.addOrUpdate(indexTheme);
+      logger.debug("Updated the theme {} in the {} index", theme.getId(), index.getIndexName());
     } catch (SearchIndexException e) {
-      logger.error("Error updating the theme {} in the {} index", serializableTheme.getId(), index.getIndexName(), e);
+      logger.error("Error updating the theme {} in the {} index", theme.getId(), index.getIndexName(), e);
     }
   }
 }
