@@ -112,6 +112,10 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   /** The component context */
   private ComponentContext cc;
 
+  /** The elasticsearch indices */
+  private AbstractSearchIndex adminUiIndex;
+  private AbstractSearchIndex externalApiIndex;
+
   /** OSGi DI */
   @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -163,6 +167,24 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   @Reference(name = "organization-directory-service")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+/**
+   * @param index
+   *          the admin UI index.
+   */
+  @Reference(name = "admin-ui-index", target = "(index.name=adminui)")
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
+  }
+
+  /**
+   * @param index
+   *          the external API index.
+   */
+  @Reference(name = "external-api-index", target = "(index.name=externalapi)")
+  public void setExternalApiIndex(AbstractSearchIndex index) {
+    this.externalApiIndex = index;
   }
 
   /**
