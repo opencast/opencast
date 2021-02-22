@@ -81,6 +81,10 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   /** The organization directory service to get organizations */
   protected OrganizationDirectoryService organizationDirectoryService;
 
+  /** The elasticsearch indices */
+  protected AbstractSearchIndex adminUiIndex;
+  protected AbstractSearchIndex externalApiIndex;
+
   /** The component context for this themes service database */
   private ComponentContext cc;
 
@@ -132,6 +136,16 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   /** OSGi DI */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  /** OSGi DI */
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
+  }
+
+  /** OSGi DI */
+  public void setExternalApiIndex(AbstractSearchIndex index) {
+    this.externalApiIndex = index;
   }
 
   @Override
