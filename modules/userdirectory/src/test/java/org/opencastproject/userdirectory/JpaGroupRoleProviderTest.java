@@ -30,7 +30,6 @@ import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntity
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
@@ -51,7 +50,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -75,13 +73,6 @@ public class JpaGroupRoleProviderTest {
     EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
     EasyMock.replay(securityService);
 
-    // Create the message sender service
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    messageSender.sendObjectMessage(EasyMock.anyObject(String.class),
-            EasyMock.anyObject(MessageSender.DestinationType.class), EasyMock.anyObject(Serializable.class));
-    EasyMock.expectLastCall();
-    EasyMock.replay(messageSender);
-
     SearchResult result = EasyMock.createMock(SearchResult.class);
     EasyMock.expect(result.getDocumentCount()).andReturn(0L).anyTimes();
     EasyMock.replay(result);
@@ -99,7 +90,6 @@ public class JpaGroupRoleProviderTest {
 
     provider = new JpaGroupRoleProvider();
     provider.setSecurityService(securityService);
-    provider.setMessageSender(messageSender);
     provider.setEntityManagerFactory(newTestEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
     provider.setAdminUiIndex(adminUiIndex);
     provider.setExternalApiIndex(externalApiIndex);
