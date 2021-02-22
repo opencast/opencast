@@ -76,7 +76,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
   /** The elasticsearch indices */
   protected AbstractSearchIndex adminUiIndex;
-  protected AbstractSearchIndex externalApiIndex;
 
   /** The component context for this themes service database */
   private ComponentContext cc;
@@ -124,11 +123,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   /** OSGi DI */
   public void setAdminUiIndex(AbstractSearchIndex index) {
     this.adminUiIndex = index;
-  }
-
-  /** OSGi DI */
-  public void setExternalApiIndex(AbstractSearchIndex index) {
-    this.externalApiIndex = index;
   }
 
   @Override
@@ -208,7 +202,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       String orgId = securityService.getOrganization().getId();
       User user = securityService.getUser();
       updateThemeInIndex(theme, adminUiIndex, orgId, user);
-      updateThemeInIndex(theme, externalApiIndex, orgId, user);
 
       return theme;
     } catch (Exception e) {
@@ -264,9 +257,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       // update the elasticsearch indices
       String organization = securityService.getOrganization().getId();
       removeThemeFromIndex(id, adminUiIndex, organization);
-      removeThemeFromIndex(id, externalApiIndex, organization);
-
-
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -332,8 +322,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
           logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
           for (Theme theme : themes) {
             updateThemeInIndex(theme, adminUiIndex, organization.getId(), systemUser);
-            updateThemeInIndex(theme, externalApiIndex, organization.getId(), systemUser);
-
             logIndexRebuildProgress(logger, index.getIndexName(), total, current);
             current++;
           }
