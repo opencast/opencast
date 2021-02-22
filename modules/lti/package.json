@@ -19,7 +19,7 @@
     "react-js-pagination": "^3.0.2",
     "react-scripts": "^3.2.0",
     "react-select": "^4.1.0",
-    "typescript": "3.6.3"
+    "typescript": "3.9.9"
   },
   "scripts": {
     "i18n": "./copy-translations.sh",
