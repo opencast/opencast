@@ -377,8 +377,8 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
             orgId, index.getIndexName());
     try {
       Long id = theme.getId().getOrElse(NumberUtils.LONG_MINUS_ONE);
-      String creator = StringUtils.isNotBlank(theme.getCreator().getName()) ?
-              theme.getCreator().getName() : theme.getCreator().getUsername();
+      String creator = StringUtils.isNotBlank(theme.getCreator().getName())
+              ? theme.getCreator().getName() : theme.getCreator().getUsername();
 
       org.opencastproject.elasticsearch.index.theme.Theme indexTheme = ThemeIndexUtils
               .getOrCreate(id, orgId, user, index);
