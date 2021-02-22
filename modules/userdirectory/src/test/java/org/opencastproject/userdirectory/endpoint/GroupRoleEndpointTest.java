@@ -26,6 +26,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.SecurityConstants;
@@ -74,10 +77,27 @@ public class GroupRoleEndpointTest {
     EasyMock.expectLastCall();
     EasyMock.replay(messageSender);
 
+    SearchResult result = EasyMock.createMock(SearchResult.class);
+    EasyMock.expect(result.getDocumentCount()).andReturn(0L).anyTimes();
+    EasyMock.replay(result);
+
+    AbstractSearchIndex adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(adminUiIndex.getIndexName()).andReturn("adminui").anyTimes();
+    EasyMock.expect(adminUiIndex.getByQuery(EasyMock.anyObject(GroupSearchQuery.class))).andReturn(result).anyTimes();
+    EasyMock.replay(adminUiIndex);
+
+    AbstractSearchIndex externalApiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(externalApiIndex.getIndexName()).andReturn("externalapi").anyTimes();
+    EasyMock.expect(externalApiIndex.getByQuery(EasyMock.anyObject(GroupSearchQuery.class))).andReturn(result).
+            anyTimes();
+    EasyMock.replay(externalApiIndex);
+
     provider = new JpaGroupRoleProvider();
     provider.setSecurityService(securityService);
     provider.setMessageSender(messageSender);
     provider.setEntityManagerFactory(newTestEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
+    provider.setAdminUiIndex(adminUiIndex);
+    provider.setExternalApiIndex(externalApiIndex);
     provider.activate(null);
 
     endpoint = new GroupRoleEndpoint();

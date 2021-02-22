@@ -418,7 +418,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
       tx.commit();
 
       // update the elasticsearch indices
-      String orgId = organization.getId();
+      String orgId = securityService.getOrganization().getId();
       User user = securityService.getUser();
       JaxbGroup jaxbGroup = JaxbGroup.fromGroup(group);
       addOrUpdateGroupInIndex(jaxbGroup, adminUiIndex, orgId, user);
@@ -698,7 +698,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   @Override
   public void repopulate(final AbstractSearchIndex index) {
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      User systemUser =SecurityUtil.createSystemUser(cc, organization);
+      User systemUser = SecurityUtil.createSystemUser(cc, organization);
       SecurityUtil.runAs(securityService, organization, systemUser, () -> {
         final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
         int total = groups.size();
