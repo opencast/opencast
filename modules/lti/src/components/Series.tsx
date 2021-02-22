@@ -8,7 +8,7 @@ import Pagination from "react-js-pagination";
 import Helmet from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
-import i18next from "i18next";
+import * as i18next from "i18next";
 import { parsedQueryString } from "../utils";
 
 interface SeriesState {
