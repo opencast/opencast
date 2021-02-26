@@ -30,6 +30,16 @@ if ! grep -L '<Build-Number>${buildNumber}</Build-Number>' modules/*/pom.xml | w
   ret=1
 fi
 
+# maven-dependency-plugin should be active for all new modules
+#NB: Do not remove the '| cat' below, otherwise this check will (likely) break
+# grep -L exits with a status of 1 in the case of no matching files, BUT
+# set -ue above causes the whole script to bail if there is a non-zero exit code
+# Normally this would be fine, except that the script exits *before* the diff below
+grep -L maven-dependency-plugin modules/*/pom.xml | cat > maven-dependency-plugin.list
+if ! diff -q maven-dependency-plugin.list docs/checkstyle/maven-dependency-plugin.exceptions; then
+  ret=1
+fi
+
 cd docs/guides
 
 for docs in admin developer; do

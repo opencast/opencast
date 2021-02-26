@@ -1,0 +1,40 @@
+name: Test database upgrade
+
+on:
+  pull_request:
+    paths:
+      - 'docs/upgrade/**'
+  push:
+    paths:
+      - 'docs/upgrade/**'
+
+jobs:
+  # Test database upgrade path.
+  # For this, we initialize a 2.2 database and upgrade all the way to the latest version
+  database:
+    strategy:
+      matrix:
+        db:
+          - 'mysql:8'
+          - 'mariadb:10'
+    runs-on: ubuntu-20.04
+    container: ubuntu
+    services:
+      mydb:
+        image: ${{ matrix.db }}
+        env:
+          MYSQL_ROOT_PASSWORD: password
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: initialize database
+      run: |
+        apt update -q
+        apt install -q -y mysql-client curl bc
+        mysql --host mydb -uroot -ppassword -e 'select version()'
+
+    - name: check upgrade path
+      run: |
+        sed -i 's_remote=""_remote="--host mydb -ppassword"_' docs/upgrade/.test.sh
+        ./docs/upgrade/.test.sh

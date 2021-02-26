@@ -7,7 +7,7 @@ import {
     collectionToPairs
 } from "../OpencastRest";
 import Select from "react-select";
-import i18next from "i18next";
+import * as i18next from "i18next";
 import { ValueType } from "react-select/src/types"; // tslint:disable-line no-submodule-imports
 
 import CreatableSelect from "react-select/creatable";
