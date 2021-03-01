@@ -40,8 +40,10 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Objects;
+
 import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 /**
@@ -67,6 +69,9 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   static final String SUBJECT_PROPERTY = "subject";
   static final String BODY_PROPERTY = "body";
   static final String BODY_TEMPLATE_FILE_PROPERTY = "body-template-file";
+  static final String ADDRESS_SEPARATOR_PROPERTY = "address-separator";
+  static final String ADDRESS_SEPARATOR_DEFAULT = ", \t";
+  static final String SKIP_INVALID_ADDRESS_PROPERTY = "skip-invalid-address";
   static final String IS_HTML = "use-html";
 
   /*
@@ -78,6 +83,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
+    logger.debug("Activating email workflow operation handler");
   }
 
   /**
@@ -94,28 +100,33 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     MediaPackage srcPackage = workflowInstance.getMediaPackage();
 
     // "To", "CC", "BCC", subject, body can be Freemarker templates
-    String to = processDestination(workflowInstance, operation, TO_PROPERTY);
-    String cc = processDestination(workflowInstance, operation, CC_PROPERTY);
-    String bcc = processDestination(workflowInstance, operation, BCC_PROPERTY);
-    String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
-    String bodyText = null;
+    String[] to = processDestination(workflowInstance, operation, TO_PROPERTY);
+    String[] cc = processDestination(workflowInstance, operation, CC_PROPERTY);
+    String[] bcc = processDestination(workflowInstance, operation, BCC_PROPERTY);
+
+    if (to.length + cc.length + bcc.length == 0) {
+      logger.info("No recipients. Skipping operation.");
+      return createResult(srcPackage, Action.SKIP);
+    }
+
+    String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY, ", ");
+    String bodyText;
     String body = operation.getConfiguration(BODY_PROPERTY);
-    Boolean isHTML = BooleanUtils.toBoolean(operation.getConfiguration(IS_HTML));
+    boolean isHTML = BooleanUtils.toBoolean(operation.getConfiguration(IS_HTML));
     // If specified, templateFile is a file that contains the Freemarker template
     String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
     // Body informed? If not, use the default.
     if (body == null && bodyTemplateFile == null) {
       // Set the body of the message to be the ID of the media package
-      bodyText = srcPackage.getTitle() + "(" + srcPackage.getIdentifier().toString() + ")";
+      bodyText = String.format("%s (%s)", srcPackage.getTitle(), srcPackage.getIdentifier());
     } else if (body != null) {
-      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_PROPERTY);
+      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_PROPERTY, ", ");
     } else {
-      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_TEMPLATE_FILE_PROPERTY);
+      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_TEMPLATE_FILE_PROPERTY, ", ");
     }
 
     try {
-      logger.debug(
-              "Sending e-mail notification with subject {} and body {} to {}, CC addresses {} and BCC addresses {}",
+      logger.debug("Sending e-mail notification with subject '{}' and body '{}' to '{}', CC '{}' and BCC '{}'",
               subject, bodyText, to, cc, bcc);
       // "To", "CC" and "BCC" can be comma- or space-separated lists of emails
       smtpService.send(to, cc, bcc, subject, bodyText, isHTML);
@@ -128,41 +139,48 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     return createResult(srcPackage, Action.CONTINUE);
   }
 
-  private String processDestination(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
-          String configName) throws WorkflowOperationException {
+  private String[] processDestination(final WorkflowInstance workflowInstance, final WorkflowOperationInstance operation,
+          final String emailHeader) throws WorkflowOperationException {
+    final String separator = Objects.toString(
+        operation.getConfiguration(ADDRESS_SEPARATOR_PROPERTY),
+        ADDRESS_SEPARATOR_DEFAULT);
     // First apply the template if there's one
-    String templateApplied = applyTemplateIfNecessary(workflowInstance, operation, configName);
-    if (templateApplied == null)
-      return null;
+    final String templateApplied = applyTemplateIfNecessary(workflowInstance, operation, emailHeader, separator);
+    if (templateApplied == null) {
+      return new String[0];
+    }
 
     // Are these valid email addresses?
-    StringBuffer result = new StringBuffer();
-    for (String part : templateApplied.split(",|\\s")) {
-      result.append(result.length() > 0 ? "," : "");
+    final ArrayList<String> recipients = new ArrayList<>();
+    final boolean skipInvalid = BooleanUtils.toBoolean(operation.getConfiguration(SKIP_INVALID_ADDRESS_PROPERTY));
+    for (final String part : StringUtils.split(templateApplied, separator)) {
       // Is this a user name? Look for that user via user directory service.
-      User user = userDirectoryService.loadUser(part);
+      final User user = userDirectoryService.loadUser(part);
       if (user != null && StringUtils.isNotEmpty(user.getEmail())) {
         // Yes, this is a user name and the user has an email registered. Use it.
-        result.append(user.getEmail());
+        recipients.add(user.getEmail());
       } else {
         // Either not a user name or user doesn't have an email registered.
         try {
           // Validate it as an email address
-          InternetAddress emailAddr = new InternetAddress(part);
-          emailAddr.validate();
-          result.append(part);
-        } catch (AddressException e) {
+          new InternetAddress(part).validate();
+          recipients.add(part);
+        } catch (Exception e) {
           // Otherwise, log an error
-          throw new WorkflowOperationException(
-                  String.format("Email address invalid or user doesn't have an email: %s.", part), e);
+          if (skipInvalid) {
+            logger.debug("Skip sending mail to invalid email address {}", part);
+          } else {
+            throw new WorkflowOperationException(
+                String.format("Email address invalid or user doesn't have an email: %s.", part), e);
+          }
         }
       }
     }
-    return result.toString();
+    return recipients.toArray(new String[0]);
   }
 
   private String applyTemplateIfNecessary(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
-          String configName) {
+          String configName, String separator) {
     String configValue = operation.getConfiguration(configName);
 
     // Templates are cached, use as template name: the template name or, if
@@ -173,7 +191,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
     if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName)) {
       templateName = configValue; // Use body template file name
-    } else if (configValue != null && configValue.indexOf("${") > -1) {
+    } else if (configValue != null && configValue.contains("${")) {
       // If value contains a "${", it may be a template so apply it
       // Give a name to the inline template
       templateName = workflowInstance.getTemplate() + "_" + operation.getPosition() + "_" + configName;
@@ -186,7 +204,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
       return configValue;
     }
     // Apply the template
-    return emailTemplateService.applyTemplate(templateName, templateContent, workflowInstance);
+    return emailTemplateService.applyTemplate(templateName, templateContent, workflowInstance, separator);
   }
 
   /**

@@ -36,13 +36,10 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,6 +65,11 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     logger.info("EmailTemplateServiceImpl activated");
   }
 
+  @Override
+  public String applyTemplate(String templateName, String templateContent, WorkflowInstance workflowInstance) {
+    return applyTemplate(templateName, templateContent, workflowInstance, DEFAULT_DELIMITER_FOR_MULTIPLE);
+  }
+
   /**
    * Apply the template to the workflow instance.
    *
@@ -80,7 +82,8 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
    * @return text with applied template
    */
   @Override
-  public String applyTemplate(String templateName, String templateContent, WorkflowInstance workflowInstance) {
+  public String applyTemplate(String templateName, String templateContent, WorkflowInstance workflowInstance,
+      String delimiter) {
     if (templateContent == null && templateScannerRef.get() != null) {
       templateContent = templateScannerRef.get().getTemplate(templateName);
     }
@@ -91,7 +94,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     }
 
     // Build email data structure and apply the template
-    HashMap<String, HashMap<String, String>> catalogs = initCatalogs(workflowInstance.getMediaPackage());
+    HashMap<String, HashMap<String, String>> catalogs = initCatalogs(workflowInstance.getMediaPackage(), delimiter);
 
     WorkflowOperationInstance failed = findFailedOperation(workflowInstance);
     List<Incident> incidentList = null;
@@ -112,34 +115,27 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
   /**
    * Initializes the map with all fields from the dublin core catalogs.
    */
-  private HashMap<String, HashMap<String, String>> initCatalogs(MediaPackage mediaPackage) {
+  private HashMap<String, HashMap<String, String>> initCatalogs(MediaPackage mediaPackage, String delimiter) {
     HashMap<String, HashMap<String, String>> catalogs = new HashMap<String, HashMap<String, String>>();
     Catalog[] dcs = mediaPackage.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE);
 
     for (int i = 0; dcs != null && i < dcs.length; i++) {
-      DublinCoreCatalog dc = null;
-      InputStream in = null;
-      try {
-        File f = workspace.get(dcs[i].getURI());
-        in = new FileInputStream(f);
+      DublinCoreCatalog dc;
+      try (InputStream in = workspace.read(dcs[i].getURI())) {
         dc = DublinCores.read(in);
       } catch (Exception e) {
         logger.warn("Error when populating catalog data", e);
         // Don't include the info
         continue;
-      } finally {
-        IOUtils.closeQuietly(in);
       }
 
-      if (dc != null) {
-        String catalogFlavor = dcs[i].getFlavor().getSubtype();
-        HashMap<String, String> catalogHash = new HashMap<String, String>();
-        for (EName ename : dc.getProperties()) {
-          String name = ename.getLocalName();
-          catalogHash.put(name, dc.getAsText(ename, DublinCore.LANGUAGE_ANY, DEFAULT_DELIMITER_FOR_MULTIPLE));
-        }
-        catalogs.put(catalogFlavor, catalogHash);
+      String catalogFlavor = dcs[i].getFlavor().getSubtype();
+      HashMap<String, String> catalogHash = new HashMap<>();
+      for (EName ename : dc.getProperties()) {
+        String name = ename.getLocalName();
+        catalogHash.put(name, dc.getAsText(ename, DublinCore.LANGUAGE_ANY, delimiter));
       }
+      catalogs.put(catalogFlavor, catalogHash);
     }
 
     return catalogs;
