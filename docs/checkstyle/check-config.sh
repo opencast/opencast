@@ -34,6 +34,9 @@ echo Checking that modules use the maven-dependency-plugin…
 grep -L maven-dependency-plugin modules/*/pom.xml > maven-dependency-plugin.list
 if ! diff -q maven-dependency-plugin.list docs/checkstyle/maven-dependency-plugin.exceptions; then
   ret=1
+else
+  #Cleanup the file
+  rm -f maven-dependency-plugin.list
 fi
 
 exit $ret
