@@ -20,11 +20,6 @@
     <suppress checks="LineLength" files="modules/composer-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/distribution-service-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/distribution-service-aws-s3/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/distribution-service-download/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/distribution-service-streaming-wowza/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/distribution-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/dublincore/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/email-template-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/engage-theodul-core/.+\.(java|properties)"/>
@@ -126,11 +121,6 @@
     <suppress checks="Indentation" files="modules/composer-ffmpeg/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-workflowoperation/.+\.java"/>
-    <suppress checks="Indentation" files="modules/distribution-service-api/.+\.java"/>
-    <suppress checks="Indentation" files="modules/distribution-service-aws-s3/.+\.java"/>
-    <suppress checks="Indentation" files="modules/distribution-service-download/.+\.java"/>
-    <suppress checks="Indentation" files="modules/distribution-service-streaming-wowza/.+\.java"/>
-    <suppress checks="Indentation" files="modules/distribution-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/dublincore/.+\.java"/>
     <suppress checks="Indentation" files="modules/engage-theodul-core/.+\.java"/>
     <suppress checks="Indentation" files="modules/engage-theodul-plugin-controls/.+\.java"/>
@@ -210,10 +200,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-service-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-service-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/distribution-service-aws-s3/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/distribution-service-download/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/distribution-service-streaming-wowza/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/distribution-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/dublincore/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/event-comment/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/execute-impl/.+\.java"/>
