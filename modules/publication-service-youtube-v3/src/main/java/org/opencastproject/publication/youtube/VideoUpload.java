@@ -47,7 +47,14 @@ public class VideoUpload {
    * @param progressListener may be {@code null}.
    * @param tags may be {@code null}.
    */
-  public VideoUpload(final String title, final String description, final String privacyStatus, final File videoFile, final MediaHttpUploaderProgressListener progressListener, final String... tags) {
+  public VideoUpload(
+      final String title,
+      final String description,
+      final String privacyStatus,
+      final File videoFile,
+      final MediaHttpUploaderProgressListener progressListener,
+      final String... tags
+  ) {
     this.title = title;
     this.description = description;
     this.privacyStatus = privacyStatus;
