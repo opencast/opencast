@@ -158,10 +158,8 @@ public final class Util {
    */
   public static boolean schedulingIntervalsOverlap(
       final Date start1, final Date end1, final Date start2, final Date end2) {
-    return (start1.after(start2) && start1.before(end2)
-        || end1.after(start2) && end1.before(end2)
-        || start1.before(start2) && end1.after(end2)
-        || eventWithinMinimumSeparation(start1, end1, start2, end2));
+    return end2.after(start1) && end1.after(start2)
+        || eventWithinMinimumSeparation(start1, end1, start2, end2);
   }
 
   /**
