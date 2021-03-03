@@ -38,7 +38,26 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The bundle activator is defined in the pom.xml of this bundle.
+ */
 public class IndexRebuildService implements BundleActivator {
+
+  /*
+   * How starting and stopping this service works:
+   *
+   * The Index Rebuild can only be started when all services that feed data into the ElasticSearch index, called
+   * IndexProducers, are available via OSGI. To check for this, we use a service listener (see inner class at the
+   * bottom) that reacts whenever an IndexProducer becomes available or is no longer available. We keep these
+   * IndexProducers in an internal map.
+   *
+   * When our requirements - at least one IndexProducer of each type (defined by the Service enum below) available - are
+   * fulfilled, we register the IndexRebuildService with OSGI so it can be used. If our requirements are no longer
+   * fulfilled, we unregister it.
+   *
+   * We make this work by hooking into the OSGI lifecycle with the BundleActivator interface - this way we can start
+   * the listener in the beginning and make sure we properly shut down in the end.
+   */
 
   /**
    * The services whose data is indexed by ElasticSearch.
@@ -52,10 +71,17 @@ public class IndexRebuildService implements BundleActivator {
   private final Map<IndexRebuildService.Service, IndexProducer> indexProducers = new ConcurrentHashMap<>();
   private ServiceRegistration<?> serviceRegistration = null;
 
+  /**
+   * Called by OSGI when this bundle is started.
+   *
+   * @param bundleContext
+   *         The bundle context.
+   *
+   * @throws Exception
+   */
   @Override
   public void start(BundleContext bundleContext) throws Exception {
-
-    // check if there are already indexProducers available
+    // check if there are already IndexProducers available
     ServiceReference<?>[] serviceReferences = bundleContext.getAllServiceReferences(IndexProducer.class.getName(),
             null);
     if (serviceReferences != null) {
@@ -69,8 +95,17 @@ public class IndexRebuildService implements BundleActivator {
             "(objectClass=" + IndexProducer.class.getName() + ")");
   }
 
+  /**
+   * Called by OSGI when this bundle is stopped.
+   *
+   * @param bundleContext
+   *         The bundle context.
+   *
+   * @throws Exception
+   */
   @Override
   public void stop(BundleContext bundleContext) throws Exception {
+    // unregister this service from OSGI
     unregisterIndexRebuildService();
   }
 
@@ -139,7 +174,7 @@ public class IndexRebuildService implements BundleActivator {
   }
 
   /**
-   * Add IndexProducer to internal map.
+   * Add IndexProducer service to internal map.
    *
    * @param indexProducer
    *           The IndexProducer to add.
@@ -147,10 +182,11 @@ public class IndexRebuildService implements BundleActivator {
    *           The bundle context.
    */
   private void addIndexProducer(IndexProducer indexProducer, BundleContext bundleContext) {
+    // add only if there's not already a service of the same type in there
     if (indexProducers.putIfAbsent(indexProducer.getService(), indexProducer) == null) {
       logger.info("Service {} added.", indexProducer.getService());
 
-      // requirements fulfilled?
+      // all required IndexProducers found? Register this service at OSGI
       if (indexProducers.size() == IndexRebuildService.Service.values().length) {
         registerIndexRebuildService(bundleContext);
       }
@@ -158,16 +194,17 @@ public class IndexRebuildService implements BundleActivator {
   }
 
   /**
-   * Remove IndexProducer from internal map.
+   * Remove IndexProducer service from internal map.
    *
    * @param indexProducer
    *           The IndexProducer to remove.
    */
   private void removeIndexProducer(IndexProducer indexProducer) {
+    // remove only if it's in there
     if (indexProducers.remove(indexProducer.getService(), indexProducer)) {
       logger.info("Service {} removed.", indexProducer.getService());
 
-      // requirements no longer fulfilled?
+      // no longer all required IndexProducers available? Unregister this service from OSGI
       if (indexProducers.size() != IndexRebuildService.Service.values().length) {
         unregisterIndexRebuildService();
       }
@@ -175,9 +212,10 @@ public class IndexRebuildService implements BundleActivator {
   }
 
   /**
-   * Unregister this service at OSGI.
+   * Unregister this service from OSGI.
    */
   private void unregisterIndexRebuildService() {
+    // if this service is registered with OSGI, unregister it
     if (serviceRegistration != null)  {
       logger.info("Unregister IndexRebuildService.");
       serviceRegistration.unregister();
@@ -192,6 +230,7 @@ public class IndexRebuildService implements BundleActivator {
    *           The bundle context.
    */
   private void registerIndexRebuildService(BundleContext bundleContext) {
+    // if this service is not registered at OSGI, register it
     if (serviceRegistration == null) {
       logger.info("Register IndexRebuildService.");
       serviceRegistration = bundleContext.registerService(this.getClass().getName(), IndexRebuildService.this, null);
@@ -206,7 +245,7 @@ public class IndexRebuildService implements BundleActivator {
     private final BundleContext bundleContext;
 
     /**
-     * Constructor.
+     * Constructor to hand over the bundle context.
      *
      * @param bundleContext
      *           The bundle context.
@@ -217,10 +256,12 @@ public class IndexRebuildService implements BundleActivator {
 
     @Override
     public void serviceChanged(ServiceEvent serviceEvent) {
+      // new IndexProducer service available? Add to map
       if (serviceEvent.getType() == ServiceEvent.REGISTERED) {
         ServiceReference<?> serviceReference = serviceEvent.getServiceReference();
         addIndexProducer((IndexProducer) bundleContext.getService(serviceReference), bundleContext);
 
+        // Index Producer no longer available? Remove from map
       } else if (serviceEvent.getType() == ServiceEvent.UNREGISTERING) {
         ServiceReference<?> serviceReference = serviceEvent.getServiceReference();
         removeIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
