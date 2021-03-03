@@ -36,14 +36,14 @@ import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.group.Group;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.impl.index.group.Group;
-import org.opencastproject.matterhorn.search.SearchIndexException;
-import org.opencastproject.matterhorn.search.SearchResult;
-import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.util.NotFoundException;

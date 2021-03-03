@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.index.service.impl.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;

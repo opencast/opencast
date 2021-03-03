@@ -21,7 +21,7 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.security.api.SecurityService;

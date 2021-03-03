@@ -40,16 +40,16 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.QueryPreprocessor;
-import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
-import org.opencastproject.index.service.impl.index.theme.ThemeIndexSchema;
-import org.opencastproject.index.service.impl.index.theme.ThemeSearchQuery;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.api.SortCriterion;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.theme.ThemeIndexSchema;
+import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.resources.list.query.ThemesListQuery;
 import org.opencastproject.index.service.util.RestUtils;
-import org.opencastproject.matterhorn.search.SearchIndexException;
-import org.opencastproject.matterhorn.search.SearchResult;
-import org.opencastproject.matterhorn.search.SearchResultItem;
-import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -232,7 +232,7 @@ public class ThemesEndpoint {
 
     logger.trace("Using Query: " + query.toString());
 
-    SearchResult<org.opencastproject.index.service.impl.index.theme.Theme> results = null;
+    SearchResult<org.opencastproject.elasticsearch.index.theme.Theme> results = null;
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
@@ -248,8 +248,8 @@ public class ThemesEndpoint {
       return okJsonList(themesJSON, nul(offset).getOr(0), nul(limit).getOr(0), 0);
     }
 
-    for (SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> item : results.getItems()) {
-      org.opencastproject.index.service.impl.index.theme.Theme theme = item.getSource();
+    for (SearchResultItem<org.opencastproject.elasticsearch.index.theme.Theme> item : results.getItems()) {
+      org.opencastproject.elasticsearch.index.theme.Theme theme = item.getSource();
       themesJSON.add(themeToJSON(theme, false));
     }
 
@@ -263,7 +263,7 @@ public class ThemesEndpoint {
           @RestResponse(description = "Returns the theme as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No theme with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getThemeResponse(@PathParam("themeId") long id) throws Exception {
-    Opt<org.opencastproject.index.service.impl.index.theme.Theme> theme = getTheme(id);
+    Opt<org.opencastproject.elasticsearch.index.theme.Theme> theme = getTheme(id);
     if (theme.isNone())
       return notFound("Cannot find a theme with id '%s'", id);
 
@@ -277,7 +277,7 @@ public class ThemesEndpoint {
           @RestResponse(description = "Returns the theme usage as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Theme with the given id does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getThemeUsage(@PathParam("themeId") long themeId) throws Exception {
-    Opt<org.opencastproject.index.service.impl.index.theme.Theme> theme = getTheme(themeId);
+    Opt<org.opencastproject.elasticsearch.index.theme.Theme> theme = getTheme(themeId);
     if (theme.isNone())
       return notFound("Cannot find a theme with id {}", themeId);
 
@@ -524,13 +524,13 @@ public class ThemesEndpoint {
    * @return a theme or none if not found, wrapped in an option
    * @throws SearchIndexException
    */
-  private Opt<org.opencastproject.index.service.impl.index.theme.Theme> getTheme(long id) throws SearchIndexException {
-    SearchResult<org.opencastproject.index.service.impl.index.theme.Theme> result = searchIndex
+  private Opt<org.opencastproject.elasticsearch.index.theme.Theme> getTheme(long id) throws SearchIndexException {
+    SearchResult<org.opencastproject.elasticsearch.index.theme.Theme> result = searchIndex
             .getByQuery(new ThemeSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
                     .withIdentifier(id));
     if (result.getPageSize() == 0) {
       logger.debug("Didn't find theme with id {}", id);
-      return Opt.<org.opencastproject.index.service.impl.index.theme.Theme> none();
+      return Opt.<org.opencastproject.elasticsearch.index.theme.Theme> none();
     }
     return Opt.some(result.getItems()[0].getSource());
   }
@@ -544,7 +544,7 @@ public class ThemesEndpoint {
    *          whether the returning representation should contain edit information
    * @return the JSON representation of this theme.
    */
-  private JValue themeToJSON(org.opencastproject.index.service.impl.index.theme.Theme theme, boolean editResponse) {
+  private JValue themeToJSON(org.opencastproject.elasticsearch.index.theme.Theme theme, boolean editResponse) {
     List<Field> fields = new ArrayList<Field>();
     fields.add(f("id", v(theme.getIdentifier())));
     fields.add(f("creationDate", v(DateTimeSupport.toUTC(theme.getCreationDate().getTime()))));

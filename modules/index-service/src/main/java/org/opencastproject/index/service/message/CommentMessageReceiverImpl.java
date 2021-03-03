@@ -21,8 +21,8 @@
 
 package org.opencastproject.index.service.message;
 
-import org.opencastproject.index.service.impl.index.event.EventIndexUtils;
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.comments.CommentItem;
 import org.opencastproject.security.api.User;

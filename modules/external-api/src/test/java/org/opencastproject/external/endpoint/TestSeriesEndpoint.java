@@ -30,13 +30,13 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
-import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
-import org.opencastproject.matterhorn.search.SearchResult;
-import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;

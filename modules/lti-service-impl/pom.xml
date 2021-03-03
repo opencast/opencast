@@ -65,13 +65,18 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-elasticsearch-index</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
     </dependency>
     <dependency>
       <!-- we use this for the transitive dependency to elasticsearch -->
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search-api</artifactId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -102,7 +107,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search</artifactId>
+      <artifactId>opencast-elasticsearch-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -126,7 +131,7 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-search</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -139,7 +144,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
-              org.opencastproject.matterhorn.search.impl;version=${project.version},
+              org.opencastproject.elasticsearch.impl;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.index.service.message,
               org.opencastproject.metadata.dublincore;version=${project.version},
