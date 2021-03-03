@@ -245,6 +245,10 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
             properties.get(APPLY_ROLEATTRIBUTES_AS_ROLES_KEY), "true"));
     boolean applyRoleattributesAsGroups = BooleanUtils.toBoolean(Objects.toString(
             properties.get(APPLY_ROLEATTRIBUTES_AS_GROUPS_KEY), "true"));
+    if (applyRoleattributesAsGroups && !applyRoleattributesAsRoles) {
+      throw new ConfigurationException(APPLY_ROLEATTRIBUTES_AS_GROUPS_KEY,
+              "'" + APPLY_ROLEATTRIBUTES_AS_ROLES_KEY + "' needs to be 'true' to enable this option");
+    }
 
     // extra roles
     String[] extraRoles =  StringUtils.split(Objects.toString(properties.get(EXTRA_ROLES_KEY), ""), ",");
@@ -355,14 +359,14 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
     // Instantiate this LDAP instance and register it as such
     LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
-            password, roleAttributes, rolePrefix, extraRoles, excludePrefixes, applyRoleattributesAsRoles,
-            ldapAssignmentRoleMap, convertToUppercase, cacheSize, cacheExpiration, securityService);
+            password, roleAttributes, convertToUppercase, cacheSize, cacheExpiration, securityService);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 
     OpencastLdapAuthoritiesPopulator authoritiesPopulator = new OpencastLdapAuthoritiesPopulator(roleAttributes,
-            rolePrefix, excludePrefixes, groupCheckPrefix, applyRoleattributesAsGroups, ldapAssignmentGroupMap,
-            convertToUppercase, org, securityService, groupRoleProvider, extraRoles);
+            rolePrefix, excludePrefixes, groupCheckPrefix, applyRoleattributesAsRoles, applyRoleattributesAsGroups,
+            ldapAssignmentRoleMap, ldapAssignmentGroupMap, convertToUppercase, org, securityService,
+            groupRoleProvider, extraRoles);
 
     // Also, register this instance as LdapAuthoritiesPopulator so that it can be used within the security.xml file
     authoritiesPopulatorRegistrations.put(pid,

@@ -109,7 +109,8 @@ org.opencastproject.userdirectory.ldap.roleattributes=
 #org.opencastproject.userdirectory.ldap.map.examplemap2.groups=ROLE_GROUP_EXAMPLE
 
 ## If the mapping is used there may be no need for the direct translation of roleattributes to roles/groups.
-## The direct translation can be disabled by setting the following properties to false:
+## The direct translation can be disabled by setting the following properties to false
+## (if applyasroles is disabled applyasgroups can't be set to true):
 ## Default: true
 #org.opencastproject.userdirectory.ldap.roleattributes.applyasroles=true
 #org.opencastproject.userdirectory.ldap.roleattributes.applyasgroups=true
