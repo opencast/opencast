@@ -26,10 +26,9 @@ jobs:
         sudo apt install -yq graphviz
 
     - name: install dependencies
+      working-directory: docs/guides/
       run: |
-        pip install -q mkdocs mkdocs-windmill requests
-        pip install -q markdown_inline_graphviz_extension
-        pip install -q markdown_inline_graphviz_extension-png
+        pip install -q -r requirements.txt
 
     - name: build admin docs
       working-directory: docs/guides/admin/
