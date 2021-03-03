@@ -214,7 +214,7 @@ public class IndexRebuildService implements BundleActivator {
   /**
    * Unregister this service from OSGI.
    */
-  private void unregisterIndexRebuildService() {
+  private synchronized void unregisterIndexRebuildService() {
     // if this service is registered with OSGI, unregister it
     if (serviceRegistration != null)  {
       logger.info("Unregister IndexRebuildService.");
@@ -229,7 +229,7 @@ public class IndexRebuildService implements BundleActivator {
    * @param bundleContext
    *           The bundle context.
    */
-  private void registerIndexRebuildService(BundleContext bundleContext) {
+  private synchronized void registerIndexRebuildService(BundleContext bundleContext) {
     // if this service is not registered at OSGI, register it
     if (serviceRegistration == null) {
       logger.info("Register IndexRebuildService.");
