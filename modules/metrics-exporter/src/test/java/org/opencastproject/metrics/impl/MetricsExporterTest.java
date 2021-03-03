@@ -21,6 +21,7 @@
 
 package org.opencastproject.metrics.impl;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -88,13 +89,19 @@ public class MetricsExporterTest {
     OrganizationDirectoryService directoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(directoryService.getOrganizations()).andReturn(Collections.singletonList(organization)).anyTimes();
 
+    // prepare asset manager
+    AssetManager assetManager = EasyMock.createMock(AssetManager.class);
+    EasyMock.expect(assetManager.countEvents(EasyMock.anyString())).andReturn(5L);
+
     // prepare exporter
-    EasyMock.replay(serviceRegistry, directoryService);
+    EasyMock.replay(serviceRegistry, directoryService, assetManager);
     exporter.setServiceRegistry(serviceRegistry);
     exporter.setOrganizationDirectoryService(directoryService);
+    exporter.setAssetManager(assetManager);
 
     // test exporter
     final String body = exporter.metrics().getEntity().toString();
     Assert.assertTrue(body.contains("opencast_job_load_max{host=\"opencast.org\",} 12.3"));
+    Assert.assertTrue(body.contains("opencast_asset_manager_events{organization=\"mh_default_org\",} 5.0"));
   }
 }

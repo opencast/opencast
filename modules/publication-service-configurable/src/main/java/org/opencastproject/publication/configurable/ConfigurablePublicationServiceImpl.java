@@ -198,7 +198,8 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
         if (!JobUtil.waitForJob(serviceRegistry, job).isSuccess()) {
           throw new DistributionException("At least one of the publication jobs did not complete successfully");
         }
-        List<? extends MediaPackageElement> distributedElements = MediaPackageElementParser.getArrayFromXml(job.getPayload());
+        List<? extends MediaPackageElement> distributedElements
+            = MediaPackageElementParser.getArrayFromXml(job.getPayload());
         for (MediaPackageElement mpe : distributedElements) {
           PublicationImpl.addElementToPublication(publication, mpe);
         }

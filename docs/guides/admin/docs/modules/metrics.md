@@ -17,6 +17,7 @@ and should allow for good alerting rules:
 - How many workflows are being processed
 - How many jobs are being processed
 - Are there any services in a warning or error state
+- How many events are in the asset manager
 
 Here is a complete list of available metrics:
 
@@ -45,6 +46,9 @@ opencast_version{part="minor",} 0.0
 # HELP requests_total Total requests.
 # TYPE requests_total counter
 requests_total 1.0
+# HELP opencast_asset_manager_events Events in Asset Manager
+# TYPE opencast_asset_manager_events gauge
+opencast_asset_manager_events{organization="mh_default_org",} 1.0
 ```
 
 
