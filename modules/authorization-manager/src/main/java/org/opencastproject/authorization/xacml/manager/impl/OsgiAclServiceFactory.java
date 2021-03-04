@@ -61,6 +61,10 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   private OrganizationDirectoryService organizationDirectoryService;
   private ComponentContext cc;
 
+  /** The elasticsearch indices */
+  protected AbstractSearchIndex adminUiIndex;
+  protected AbstractSearchIndex externalApiIndex;
+
   @Override
   public AclService serviceFor(Organization org) {
     return new AclServiceImpl(org, aclDb, seriesService, assetManager,
@@ -105,6 +109,16 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   /** OSGi DI callback. */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  /** OSGi DI callback. */
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
+  }
+
+  /** OSGi DI callback. */
+  public void setExternalApiIndex(AbstractSearchIndex index) {
+    this.externalApiIndex = index;
   }
 
   @Override

@@ -26,4 +26,8 @@
   <reference name="organization-directory-service"
              interface="org.opencastproject.security.api.OrganizationDirectoryService"
              cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
+  <reference name="admin-ui-index" interface="org.opencastproject.elasticsearch.index.AbstractSearchIndex"
+             bind="setAdminUiIndex" target="(index.name=adminui)"/>
+  <reference name="external-api-index" interface="org.opencastproject.elasticsearch.index.AbstractSearchIndex"
+             bind="setExternalApiIndex" target="(index.name=externalapi)"/>
 </scr:component>
