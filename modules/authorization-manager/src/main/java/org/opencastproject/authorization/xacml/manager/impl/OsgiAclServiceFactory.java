@@ -68,7 +68,7 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   @Override
   public AclService serviceFor(Organization org) {
     return new AclServiceImpl(org, aclDb, seriesService, assetManager,
-            authorizationService, messageSender);
+            authorizationService, messageSender, adminUiIndex, externalApiIndex);
   }
 
   /** OSGi DI callback. */

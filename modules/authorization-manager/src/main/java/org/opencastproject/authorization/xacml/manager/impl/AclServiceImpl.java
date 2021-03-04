@@ -27,6 +27,7 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.message.broker.api.MessageSender;
@@ -61,14 +62,21 @@ public final class AclServiceImpl implements AclService {
   private final AuthorizationService authorizationService;
   private final MessageSender messageSender;
 
+  /** The elasticsearch indices */
+  protected AbstractSearchIndex adminUiIndex;
+  protected AbstractSearchIndex externalApiIndex;
+
   public AclServiceImpl(Organization organization, AclDb aclDb, SeriesService seriesService, AssetManager assetManager,
-          AuthorizationService authorizationService, MessageSender messageSender) {
+          AuthorizationService authorizationService, MessageSender messageSender, AbstractSearchIndex adminUiIndex,
+          AbstractSearchIndex externalApiIndex) {
     this.organization = organization;
     this.aclDb = aclDb;
     this.seriesService = seriesService;
     this.assetManager = assetManager;
     this.authorizationService = authorizationService;
     this.messageSender = messageSender;
+    this.adminUiIndex = adminUiIndex;
+    this.externalApiIndex = externalApiIndex;
   }
 
   @Override

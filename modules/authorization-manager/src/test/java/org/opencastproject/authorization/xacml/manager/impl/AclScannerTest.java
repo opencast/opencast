@@ -31,6 +31,7 @@ import org.opencastproject.authorization.xacml.XACMLParsingException;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -80,13 +81,16 @@ public class AclScannerTest {
 
     final MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
 
-    EasyMock.replay(orgService, messageSender, securityService);
+    final AbstractSearchIndex adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    final AbstractSearchIndex externalApiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+
+    EasyMock.replay(orgService, messageSender, securityService, adminUiIndex, externalApiIndex);
 
     AclServiceFactory aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
         return new AclServiceImpl(new DefaultOrganization(), aclDb, null, null, null,
-                messageSender);
+                messageSender, adminUiIndex, externalApiIndex);
       }
     };
 

@@ -40,6 +40,7 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.impl.AclDb;
 import org.opencastproject.authorization.xacml.manager.impl.AclServiceImpl;
 import org.opencastproject.authorization.xacml.manager.impl.persistence.JpaAclDb;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
@@ -88,6 +89,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   public static final AssetManager assetManager;
   public static final MessageSender messageSender;
   public static final Workspace workspace;
+  public static final AbstractSearchIndex adminUiIndex;
+  public static final AbstractSearchIndex externalApiIndex;
   public static final EntityManagerFactory authorizationEMF = newTestEntityManagerFactory(
           "org.opencastproject.authorization.xacml.manager");
 
@@ -104,11 +107,15 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     assetManager = newAssetManager();
     messageSender = newMessageSender();
     workspace = newWorkspace();
+    adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    externalApiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.replay(adminUiIndex, externalApiIndex);
+
     aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
         return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(),
-                seriesService, assetManager, authorizationService, messageSender);
+                seriesService, assetManager, authorizationService, messageSender, adminUiIndex, externalApiIndex);
       }
     };
   }
