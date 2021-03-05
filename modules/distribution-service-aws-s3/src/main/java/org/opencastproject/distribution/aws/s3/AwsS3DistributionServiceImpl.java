@@ -141,7 +141,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   public static final String OPENCAST_STORAGE_DIR = "org.opencastproject.storage.dir";
   public static final String DEFAULT_TEMP_DIR = "tmp/s3dist";
 
-
   /** The load on the system introduced by creating a distribute job */
   public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;
 
@@ -265,11 +264,11 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       // AWS presigned URL expiration time in millis
       String presignedUrlExpTimeMillisConfigValue = OsgiUtil.getComponentContextProperty(cc,
               AWS_S3_PRESIGNED_URL_VALID_DURATION_CONFIG, null);
-      presignedUrlValidDuration = NumberUtils.toInt(
-          presignedUrlExpTimeMillisConfigValue, DEFAULT_PRESIGNED_URL_EXPIRE_MILLIS);
+      presignedUrlValidDuration = NumberUtils.toInt(presignedUrlExpTimeMillisConfigValue,
+              DEFAULT_PRESIGNED_URL_EXPIRE_MILLIS);
       if (presignedUrlValidDuration > MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS) {
         logger.warn(
-            "Valid duration of presigned URL is too large, MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS(7 days) is used");
+                "Valid duration of presigned URL is too large, MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS(7 days) is used");
         presignedUrlValidDuration = MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS;
       }
 
@@ -304,12 +303,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       // Create AWS client
 
       s3 = AmazonS3ClientBuilder.standard()
-              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
-                      , regionStr))
-              .withPathStyleAccessEnabled(pathStyle)
-              .withCredentials(provider)
-              .build();
-
+              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, regionStr))
+              .withPathStyleAccessEnabled(pathStyle).withCredentials(provider).build();
 
       s3TransferManager = new TransferManager(s3);
 
@@ -337,9 +332,9 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds,
-      boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
+          boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
     throw new UnsupportedOperationException("Not supported yet.");
-  //stub function
+    // stub function
   }
 
   /**
@@ -471,7 +466,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
           MediaPackageElement element, boolean checkAvailability, File source) throws DistributionException {
 
     // Use TransferManager to take advantage of multipart upload.
-      // TransferManager processes all transfers asynchronously, so this call will return immediately.
+    // TransferManager processes all transfers asynchronously, so this call will return immediately.
     try {
       String objectName = buildObjectName(channelId, mediaPackage.getIdentifier().toString(), element);
       logger.info("Uploading {} to bucket {}...", objectName, bucketName);
@@ -573,9 +568,9 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
-         boolean checkAvailability) throws DistributionException {
-    final MediaPackageElement[] distributedElements =
-        distributeElements(channelId, mediapackage, elementIds, checkAvailability);
+          boolean checkAvailability) throws DistributionException {
+    final MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
+            checkAvailability);
     if (distributedElements == null) {
       return null;
     }
@@ -822,8 +817,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
    * @throws IOException
    */
   private MediaPackageElement[] distributeHLSElements(String channelId, MediaPackage mediapackage,
-          Set<MediaPackageElement> elements, boolean checkAvailability)
-                  throws DistributionException {
+          Set<MediaPackageElement> elements, boolean checkAvailability) throws DistributionException {
 
     List<MediaPackageElement> distributedElements = new ArrayList<MediaPackageElement>();
     List<MediaPackageElement> nontrackElements = elements.stream()
@@ -990,10 +984,10 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
           Policy policy = new Policy().withStatements(allowPublicReadStatement);
           s3.setBucketPolicy(bucketName, policy.toJson());
 
-          //Set the website configuration.  This needs to be static-site-enabled currently.
+          // Set the website configuration. This needs to be static-site-enabled currently.
           BucketWebsiteConfiguration defaultWebsite = new BucketWebsiteConfiguration();
-          //These files don't actually exist, but that doesn't matter since no one should be
-          //looking around in the bucket anyway.
+          // These files don't actually exist, but that doesn't matter since no one should be looking around in the
+          // bucket anyway.
           defaultWebsite.setIndexDocumentSuffix("index.html");
           defaultWebsite.setErrorDocument("error.html");
           s3.setBucketWebsiteConfiguration(new SetBucketWebsiteConfigurationRequest(bucketName, defaultWebsite));
