@@ -32,7 +32,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -84,17 +83,15 @@ public class AclScannerTest {
     final SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
 
-    final MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-
     final AbstractSearchIndex index = EasyMock.createNiceMock(AbstractSearchIndex.class);
 
-    EasyMock.replay(orgService, messageSender, securityService, index, user);
+    EasyMock.replay(orgService, securityService, index, user);
 
     AclServiceFactory aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
         return new AclServiceImpl(new DefaultOrganization(), aclDb, null, null, null,
-                messageSender, index, index, securityService);
+                index, index, securityService);
       }
     };
 

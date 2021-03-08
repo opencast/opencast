@@ -25,42 +25,25 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;
 
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /** OSGi implementation of {@link org.opencastproject.authorization.xacml.manager.api.AclServiceFactory}. */
 public class OsgiAclServiceFactory implements AclServiceFactory {
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(OsgiAclServiceFactory.class);
-
   private AclDb aclDb;
   private SeriesService seriesService;
   private AssetManager assetManager;
   private AuthorizationService authorizationService;
   private SecurityService securityService;
-  private MessageReceiver messageReceiver;
-  private MessageSender messageSender;
-  /** The organization directory service */
-  private OrganizationDirectoryService organizationDirectoryService;
-  private ComponentContext cc;
-
-  /** The elasticsearch indices */
   protected AbstractSearchIndex adminUiIndex;
   protected AbstractSearchIndex externalApiIndex;
 
   @Override
   public AclService serviceFor(Organization org) {
     return new AclServiceImpl(org, aclDb, seriesService, assetManager,
-            authorizationService, messageSender, adminUiIndex, externalApiIndex, securityService);
+            authorizationService, adminUiIndex, externalApiIndex, securityService);
   }
 
   /** OSGi DI callback. */
@@ -89,21 +72,6 @@ public class OsgiAclServiceFactory implements AclServiceFactory {
   }
 
   /** OSGi DI callback. */
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
-  /** OSGi DI callback. */
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
-  }
-
-  /** OSGi DI callback. */
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
-    this.organizationDirectoryService = organizationDirectoryService;
-  }
-
-  /** OSGi DI callback. */
   public void setAdminUiIndex(AbstractSearchIndex index) {
     this.adminUiIndex = index;
   }
@@ -111,15 +79,5 @@ public class OsgiAclServiceFactory implements AclServiceFactory {
   /** OSGi DI callback. */
   public void setExternalApiIndex(AbstractSearchIndex index) {
     this.externalApiIndex = index;
-  }
-
-  /**
-   * Callback for activation of this component.
-   *
-   * @param cc
-   *          the component context
-   */
-  public void activate(ComponentContext cc) {
-    this.cc = cc;
   }
 }

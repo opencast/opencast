@@ -87,7 +87,6 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   public static final SeriesService seriesService;
   public static final AuthorizationService authorizationService;
   public static final AssetManager assetManager;
-  public static final MessageSender messageSender;
   public static final Workspace workspace;
   public static final AbstractSearchIndex adminUiIndex;
   public static final AbstractSearchIndex externalApiIndex;
@@ -105,7 +104,6 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     authorizationService = newAuthorizationService();
     seriesService = newSeriesService();
     assetManager = newAssetManager();
-    messageSender = newMessageSender();
     workspace = newWorkspace();
     adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
     externalApiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
@@ -115,7 +113,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
       @Override
       public AclService serviceFor(Organization org) {
         return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(),
-                seriesService, assetManager, authorizationService, messageSender, adminUiIndex, externalApiIndex,
+                seriesService, assetManager, authorizationService, adminUiIndex, externalApiIndex,
                 securityService);
       }
     };

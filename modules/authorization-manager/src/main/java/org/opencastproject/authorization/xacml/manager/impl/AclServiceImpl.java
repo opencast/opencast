@@ -32,7 +32,6 @@ import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.elasticsearch.index.series.SeriesIndexUtils;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -64,21 +63,19 @@ public final class AclServiceImpl implements AclService {
   private final AssetManager assetManager;
   private final AuthorizationService authorizationService;
   private final SecurityService securityService;
-  private final MessageSender messageSender;
 
   /** The Elasticsearch indices */
   protected AbstractSearchIndex adminUiIndex;
   protected AbstractSearchIndex externalApiIndex;
 
   public AclServiceImpl(Organization organization, AclDb aclDb, SeriesService seriesService, AssetManager assetManager,
-          AuthorizationService authorizationService, MessageSender messageSender, AbstractSearchIndex adminUiIndex,
+          AuthorizationService authorizationService, AbstractSearchIndex adminUiIndex,
           AbstractSearchIndex externalApiIndex, SecurityService securityService) {
     this.organization = organization;
     this.aclDb = aclDb;
     this.seriesService = seriesService;
     this.assetManager = assetManager;
     this.authorizationService = authorizationService;
-    this.messageSender = messageSender;
     this.adminUiIndex = adminUiIndex;
     this.externalApiIndex = externalApiIndex;
     this.securityService = securityService;
@@ -187,9 +184,8 @@ public final class AclServiceImpl implements AclService {
 
   @Override
   public Option<ManagedAcl> createAcl(AccessControlList acl, String name) {
-    Option<ManagedAcl> createAcl = aclDb.createAcl(organization, acl, name);
     // we don't need to update the Elasticsearch indices in this case
-    return createAcl;
+    return aclDb.createAcl(organization, acl, name);
   }
 
   @Override
