@@ -437,8 +437,7 @@ const Schedule = ({ formik, inputDevices }) => {
                                 <Field tabIndex="10"
                                        as="select"
                                        name="scheduleEndTimeMinutes"
-                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}
-                                       value={formik.values.location}>
+                                       placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
                                     <option value=""/>
                                     {minutes.map((i, key) => (
                                         <option key={key}

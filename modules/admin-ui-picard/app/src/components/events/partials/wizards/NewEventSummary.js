@@ -8,6 +8,7 @@ import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import MetadataSummaryTable from "./summaryTables/MetadataSummaryTable";
 import MetadataExtendedSummaryTable from "./summaryTables/MetadataExtendedSummaryTable";
 import AccessSummaryTable from "./summaryTables/AccessSummaryTable";
+import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 
 /**
  * This component renders the summary page for new events in the new event wizard.
@@ -183,25 +184,11 @@ const NewEventSummary = ({ previousPage, formik, metaDataExtendedHidden, assetUp
                     </div>
                 </div>
             </div>
-            {/* Button for navigation to next page and previous page */}
-            <footer>
-                <button type="submit"
-                        className={cn("submit",
-                            {
-                                active: (formik.dirty && formik.isValid),
-                                inactive: !(formik.dirty && formik.isValid)
-                            })}
-                        disabled={!(formik.dirty && formik.isValid)}
-                        onClick={() => {
-                            formik.handleSubmit();
-                        }}
-                        tabIndex="100">{t('WIZARD.CREATE')}</button>
-                <button className="cancel"
-                        onClick={() => previousPage(formik.values, false)}
-                        tabIndex="101">{t('WIZARD.BACK')}</button>
-            </footer>
 
-            <div className="btm-spacer"/>
+            {/* Button for navigation to next page and previous page */}
+            <WizardNavigationButtons isLast
+                                     previousPage={previousPage}
+                                     formik={formik}/>
         </>
     )
 }

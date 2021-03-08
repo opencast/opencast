@@ -1,9 +1,4 @@
 import React, {useState} from "react";
-import {useTranslation} from "react-i18next";
-import {makeStyles, Step, StepLabel, Stepper} from "@material-ui/core";
-import {NewSeriesSchema} from "./validate";
-import cn from "classnames";
-import {FaCircle, FaDotCircle} from "react-icons/all";
 import {Formik} from "formik";
 import NewThemePage from "./NewThemePage";
 import NewSeriesSummary from "./NewSeriesSummary";
@@ -14,35 +9,14 @@ import NewMetadataExtendedPage from "./NewMetadataExtendedPage";
 import NewAccessPage from "./NewAccessPage";
 import {initialFormValuesNewSeries} from "../../../../configs/wizard/newSeriesWizardConfig";
 import {postNewSeries} from "../../../../thunks/seriesThunks";
+import {NewSeriesSchema} from "../../../shared/wizard/validate";
+import WizardStepper from "../../../shared/wizard/WizardStepper";
 
-// Base style for Stepper component
-const useStepperStyle = makeStyles(theme => ({
-    root: {
-        background: '#eeeff0',
-        height: '100px'
-    },
-}));
-
-// Style of icons used in Stepper
-const useStepIconStyles = makeStyles({
-    root: {
-        height: 22,
-        alignItems: 'center',
-    },
-    circle: {
-        color: '#92a0ab',
-        width: '20px',
-        height: '20px'
-    },
-});
 
 /**
  * This component manages the pages of the new series wizard and the submission of values
  */
 const NewSeriesWizard = ({ metadataFields, close}) => {
-    const { t } = useTranslation();
-
-    const classes = useStepperStyle();
 
     const initialValues = getInitialValues(metadataFields);
 
@@ -98,15 +72,8 @@ const NewSeriesWizard = ({ metadataFields, close}) => {
     return (
         <>
             {/* Stepper that shows each step of wizard as header */}
-            <Stepper activeStep={page} alternativeLabel connector={false} className={cn("step-by-step", classes.root)}>
-                {steps.map(label => (
-                    !label.hidden ? (
-                        <Step key={label.translation}>
-                            <StepLabel StepIconComponent={CustomStepIcon}>{t(label.translation)}</StepLabel>
-                        </Step>
-                    ) : null
-                ))}
-            </Stepper>
+            <WizardStepper steps={steps} page={page}/>
+
             {/* Initialize overall form */}
             <Formik initialValues={snapshot}
                     validationSchema={currentValidationSchema}
@@ -146,18 +113,6 @@ const NewSeriesWizard = ({ metadataFields, close}) => {
         </>
     );
 };
-
-// Component that renders icons of Stepper depending on completeness of steps
-const CustomStepIcon = (props) => {
-    const classes = useStepIconStyles();
-    const { completed } = props;
-
-    return (
-        <div className={cn(classes.root)}>
-            {completed ? <FaCircle className={classes.circle}/> : <FaDotCircle className={classes.circle}/>}
-        </div>
-    )
-}
 
 const getInitialValues = metadataFields => {
     // Transform metadata fields provided by backend (saved in redux)

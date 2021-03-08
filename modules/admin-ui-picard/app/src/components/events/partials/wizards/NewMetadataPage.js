@@ -4,6 +4,7 @@ import {Field} from "formik";
 import cn from 'classnames';
 import RenderField from "./RenderField";
 import RenderMultiField from "./RenderMultiField";
+import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 
 /**
  * This component renders the metadata page for new events and series in the wizards.
@@ -54,23 +55,9 @@ const NewMetadataPage = ({ metadataFields, nextPage, formik, header }) => {
             </div>
 
             {/* Button for navigation to next page */}
-            <footer>
-                <button type="submit"
-                        className={cn("submit",
-                            {
-                                active: (formik.dirty && formik.isValid),
-                                inactive: !(formik.dirty && formik.isValid)
-                            })}
-                        disabled={!(formik.dirty && formik.isValid)}
-                        onClick={() => {
-                            console.log("CURRENT FORMIK VALUES");
-                            console.log(formik.values);
-                            nextPage(formik.values);
-                        }}
-                        tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
-            </footer>
-
-            <div className="btm-spacer"/>
+            <WizardNavigationButtons isFirst
+                                     formik={formik}
+                                     nextPage={nextPage}/>
         </>
     )
 };

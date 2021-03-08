@@ -1,14 +1,8 @@
 import React, {useState} from "react";
-import PropTypes from 'prop-types';
 import {Formik} from "formik";
 import NewEventSummary from "./NewEventSummary";
 import {getEventMetadata} from "../../../../selectors/eventSelectors";
 import {connect} from "react-redux";
-import cn from 'classnames';
-import {NewEventSchema} from "./validate";
-import {makeStyles, Step, StepLabel, Stepper,} from '@material-ui/core';
-import {FaCircle, FaDotCircle} from "react-icons/all";
-import {useTranslation} from "react-i18next";
 import {sourceMetadata, uploadAssetOptions} from "../../../../configs/wizard/sourceConfig";
 import {initialFormValuesNewEvents} from "../../../../configs/wizard/newEventWizardConfig";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
@@ -21,27 +15,9 @@ import NewMetadataPage from "./NewMetadataPage";
 import NewAccessPage from "./NewAccessPage";
 import NewProcessingPage from "./NewProcessingPage";
 import NewSourcePage from "./NewSourcePage";
+import {NewEventSchema} from "../../../shared/wizard/validate";
+import WizardStepper from "../../../shared/wizard/WizardStepper";
 
-// Base style for Stepper component
-const useStepperStyle = makeStyles((theme) => ({
-    root: {
-        background: '#eeeff0',
-        height: '100px'
-    },
-}));
-
-// Style of icons used in Stepper
-const useStepIconStyles = makeStyles({
-    root: {
-        height: 22,
-        alignItems: 'center',
-    },
-    circle: {
-        color: '#92a0ab',
-        width: '20px',
-        height: '20px'
-    },
-});
 
 // Get info about the current language and its date locale
 const currentLanguage = getCurrentLanguageInformation();
@@ -50,9 +26,6 @@ const currentLanguage = getCurrentLanguageInformation();
  * This component manages the pages of the new event wizard and the submission of values
  */
 const NewEventWizard = ({ metadataFields, close }) => {
-    const {t} = useTranslation();
-
-    const classes = useStepperStyle();
 
     const initialValues = getInitialValues(metadataFields);
 
@@ -124,15 +97,8 @@ const NewEventWizard = ({ metadataFields, close }) => {
     return (
         <>
             {/* Stepper that shows each step of wizard as header */}
-            <Stepper activeStep={page} alternativeLabel connector={false} className={cn("step-by-step", classes.root)}>
-                {steps.map(label => (
-                    !label.hidden ? (
-                        <Step key={label.translation}>
-                            <StepLabel StepIconComponent={CustomStepIcon}>{t(label.translation)}</StepLabel>
-                        </Step>
-                    ) : null
-                ))}
-            </Stepper>
+            <WizardStepper steps={steps} page={page}/>
+
             {/* Initialize overall form */}
             <MuiPickersUtilsProvider  utils={DateFnsUtils} locale={currentLanguage.dateLocale}>
                 <Formik initialValues={snapshot}
@@ -143,9 +109,9 @@ const NewEventWizard = ({ metadataFields, close }) => {
                         <div>
                             {page === 0 && (
                                 <NewMetadataPage nextPage={nextPage}
-                                                            formik={formik}
-                                                            metadataFields={metadataFields}
-                                                            header={steps[page].translation} />
+                                                 formik={formik}
+                                                 metadataFields={metadataFields}
+                                                 header={steps[page].translation} />
                             )}
                             {page === 1 && (
                                 <NewMetadataExtendedPage previousPage={previousPage}
@@ -184,20 +150,8 @@ const NewEventWizard = ({ metadataFields, close }) => {
             </MuiPickersUtilsProvider>
         </>
 
-    )
-}
-
-// Component that renders icons of Stepper depending on completeness of steps
-const CustomStepIcon = (props) => {
-    const classes = useStepIconStyles();
-    const { completed } = props;
-
-    return (
-        <div className={cn(classes.root)}>
-            {completed ? <FaCircle className={classes.circle}/> : <FaDotCircle className={classes.circle}/>}
-        </div>
-    )
-}
+    );
+};
 
 // Transform all initial values needed from information provided by backend
 const getInitialValues = metadataFields => {
@@ -246,16 +200,8 @@ const getInitialValues = metadataFields => {
     for (const [key, value] of Object.entries(initialFormValuesNewEvents)) {
         initialValues[key] = value;
     }
-    console.log("INITIAL VALUES NEW EVENTS:");
-    console.log(initialValues);
 
     return initialValues;
-}
-
-// Prop types of CustomStepIcon component
-CustomStepIcon.propTypes = {
-    active: PropTypes.bool,
-    completed: PropTypes.bool
 };
 
 // Getting state data out of redux store

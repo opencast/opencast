@@ -82,7 +82,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         setActionMenu(!displayActionMenu);
     }
 
-    const showNewSeriesEventModal = async () => {
+    const showNewSeriesModal = async () => {
         await loadingSeriesMetadata();
         await loadingSeriesThemes();
 
@@ -104,7 +104,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
             <section className="action-nav-bar">
                 {/*TODO: include with role ROLE_UI_SERIES_CREATE */}
                 <div className="btn-group">
-                    <button className="add" onClick={() => showNewSeriesEventModal()}>
+                    <button className="add" onClick={() => showNewSeriesModal()}>
                         <i className="fa fa-plus" />
                         <span>{t('EVENTS.EVENTS.ADD_SERIES')}</span>
                     </button>

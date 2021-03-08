@@ -2,6 +2,7 @@ import React from "react";
 import {useTranslation} from "react-i18next";
 import NewEventWizard from "../events/partials/wizards/NewEventWizard";
 import NewSeriesWizard from "../events/partials/wizards/NewSeriesWizard";
+import NewThemeWizard from "../configuration/partials/wizard/NewThemeWizard";
 
 
 /**
@@ -26,6 +27,9 @@ const NewResourceModal = ({ handleClose, showModal, resource }) => {
                     {resource === 'series' && (
                         <h2>{t('EVENTS.SERIES.NEW.CAPTION')}</h2>
                     )}
+                    {resource === 'themes' && (
+                        <h2>{t('CONFIGURATION.THEMES.DETAILS.NEWCAPTION')}</h2>
+                    )}
                 </header>
                 {resource === 'events' && (
                     //New Event Wizard
@@ -35,7 +39,10 @@ const NewResourceModal = ({ handleClose, showModal, resource }) => {
                     // New Series Wizard
                     <NewSeriesWizard close={close}/>
                 )}
-
+                {resource === 'themes' && (
+                    // New Theme Wizard
+                    <NewThemeWizard close={close}/>
+                )}
             </section>
         )
     )

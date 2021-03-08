@@ -68,3 +68,7 @@ export const NewEventSchema = [Yup.object().shape({
 export const NewSeriesSchema = [Yup.object().shape({
     title: Yup.string().required('Required')
 })];
+
+export const NewThemeSchema = [Yup.object().shape({
+    name: Yup.string().required('Required')
+})];

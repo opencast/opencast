@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import {Field} from "formik";
 import cn from "classnames";
 import {getSeriesThemes} from "../../../../selectors/seriesSeletctor";
+import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 
 /**
  * This component renders the theme page for new series in the new series wizard.
@@ -60,25 +61,9 @@ const NewThemePage = ({ formik, nextPage, previousPage, seriesThemes }) => {
             </div>
 
             {/* Button for navigation to next page and previous page */}
-            <footer>
-                <button type="submit"
-                        className={cn("submit",
-                            {
-                                active: (formik.dirty && formik.isValid),
-                                inactive: !(formik.dirty && formik.isValid)
-                            })}
-                        disabled={!(formik.dirty && formik.isValid)}
-                        onClick={() => {
-                            console.log(formik.values);
-                            nextPage(formik.values);
-                        }}
-                        tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
-                <button className="cancel"
-                        onClick={() => previousPage()}
-                        tabIndex="101">{t('WIZARD.BACK')}</button>
-            </footer>
-
-            <div className="btm-spacer"/>
+            <WizardNavigationButtons formik={formik}
+                                     nextPage={nextPage}
+                                     previousPage={previousPage}/>
 
         </>
     )

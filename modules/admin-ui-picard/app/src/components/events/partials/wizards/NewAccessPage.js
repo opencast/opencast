@@ -59,6 +59,11 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification,
         let bothRights = false;
 
         for (let i = 0; policies.length > i; i++) {
+            // check if a role is chosen
+            if (policies[i].role === '') {
+                check = false;
+            }
+
             // check if there is at least one policy with read and write rights
             if (policies[i].read && policies[i].write) {
                 bothRights = true;

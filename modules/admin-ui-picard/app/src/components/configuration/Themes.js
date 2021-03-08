@@ -13,6 +13,7 @@ import {getThemes} from "../../selectors/themeSelectors";
 import {fetchThemes} from "../../thunks/themeThunks";
 import {loadThemesIntoTable} from "../../thunks/tableThunks";
 import Notifications from "../shared/Notifications";
+import NewResourceModal from "../shared/NewResourceModal";
 
 /**
  * This component renders the table view of events
@@ -20,6 +21,7 @@ import Notifications from "../shared/Notifications";
 const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
+    const [displayNewThemesModal, setNewThemesModal] = useState(false);
 
     const loadThemes = async () => {
         // Fetching themes from server
@@ -42,8 +44,12 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters 
         setNavigation(!displayNavigation);
     }
 
-    const placeholder = () => {
-        console.log("To be implemented");
+    const showNewThemesModal = () => {
+        setNewThemesModal(true);
+    }
+
+    const hideNewThemesModal = () => {
+        setNewThemesModal(false);
     }
 
     const styleNavOpen = {
@@ -59,11 +65,16 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters 
                 {/* Add theme button */}
                 <div className="btn-group">
                     {/*todo: implement onClick and with role*/}
-                    <button className="add" onClick={() => placeholder()}>
+                    <button className="add" onClick={() => showNewThemesModal()}>
                         <i className="fa fa-plus"/>
                         <span>{t('CONFIGURATION.ACTIONS.ADD_THEME')}</span>
                     </button>
                 </div>
+
+                {/* Display modal for new series if add series button is clicked */}
+                <NewResourceModal showModal={displayNewThemesModal}
+                                  handleClose={hideNewThemesModal}
+                                  resource={"themes"}/>
 
                 {/* Include Burger-button menu*/}
                 <MainNav isOpen={displayNavigation}
