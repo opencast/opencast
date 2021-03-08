@@ -38,6 +38,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.util.data.Option;
 
@@ -77,20 +78,23 @@ public class AclScannerTest {
     orgService = EasyMock.createNiceMock(OrganizationDirectoryService.class);
     EasyMock.expect(orgService.getOrganizations()).andReturn(orgs).anyTimes();
 
+    User user = EasyMock.createNiceMock(User.class);
+    EasyMock.expect(user.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+
     final SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
 
     final MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
 
-    final AbstractSearchIndex adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
-    final AbstractSearchIndex externalApiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    final AbstractSearchIndex index = EasyMock.createNiceMock(AbstractSearchIndex.class);
 
-    EasyMock.replay(orgService, messageSender, securityService, adminUiIndex, externalApiIndex);
+    EasyMock.replay(orgService, messageSender, securityService, index, user);
 
     AclServiceFactory aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
         return new AclServiceImpl(new DefaultOrganization(), aclDb, null, null, null,
-                messageSender, adminUiIndex, externalApiIndex, securityService);
+                messageSender, index, index, securityService);
       }
     };
 
