@@ -849,40 +849,40 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       q.setEdit(edit);
     }
     if (StringUtils.isNotEmpty(text)) {
-      q.setText(text.toLowerCase());
+      q.setText(text);
     }
     if (StringUtils.isNotEmpty(seriesId)) {
-      q.setSeriesId(seriesId.toLowerCase());
+      q.setSeriesId(seriesId);
     }
     if (StringUtils.isNotEmpty(seriesTitle)) {
-      q.setSeriesTitle(seriesTitle.toLowerCase());
+      q.setSeriesTitle(seriesTitle);
     }
     if (StringUtils.isNotEmpty(creator)) {
-      q.setCreator(creator.toLowerCase());
+      q.setCreator(creator);
     }
     if (StringUtils.isNotEmpty(contributor)) {
-      q.setContributor(contributor.toLowerCase());
+      q.setContributor(contributor);
     }
     if (StringUtils.isNotEmpty(language)) {
-      q.setLanguage(language.toLowerCase());
+      q.setLanguage(language);
     }
     if (StringUtils.isNotEmpty(license)) {
-      q.setLicense(license.toLowerCase());
+      q.setLicense(license);
     }
     if (StringUtils.isNotEmpty(subject)) {
-      q.setSubject(subject.toLowerCase());
+      q.setSubject(subject);
     }
     if (StringUtils.isNotEmpty(publisher)) {
-      q.setPublisher(publisher.toLowerCase());
+      q.setPublisher(publisher);
     }
     if (StringUtils.isNotEmpty(seriesAbstract)) {
-      q.setSeriesAbstract(seriesAbstract.toLowerCase());
+      q.setSeriesAbstract(seriesAbstract);
     }
     if (StringUtils.isNotEmpty(description)) {
-      q.setDescription(description.toLowerCase());
+      q.setDescription(description);
     }
     if (StringUtils.isNotEmpty(rightsHolder)) {
-      q.setRightsHolder(rightsHolder.toLowerCase());
+      q.setRightsHolder(rightsHolder);
     }
     // allow seriesId wild card search
     if (isFuzzyMatch != null) {
