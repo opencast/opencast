@@ -18,7 +18,7 @@ import {loadFilterProfile} from "../../actions/tableFilterActions";
  */
 const TableFiltersProfiles = ({showFilterSettings, setFilterSettings, createFilterProfile, filterMap,
                                   cancelEditFilterProfile, profiles, removeFilterProfile, loadFilterProfile,
-                                  loadResource, loadResourceIntoTable}) => {
+                                  loadResource, loadResourceIntoTable, resource}) => {
 
     // State for switching between list of profiles and saving/editing dialog
     const [settingsMode, setSettingsMode] = useState(true);
@@ -31,13 +31,16 @@ const TableFiltersProfiles = ({showFilterSettings, setFilterSettings, createFilt
 
     const { t } = useTranslation();
 
+    const currentProfiles = profiles.filter(profile => profile.resource === resource);
+
     // todo: Maybe saving to storage is needed
     const saveProfile = () => {
         if (validName) {
             const filterProfile = {
                 name: profileName,
                 description: profileDescription,
-                filterMap: filterMap
+                filterMap: filterMap,
+                resource: resource
             }
             createFilterProfile(filterProfile);
         }
@@ -112,12 +115,12 @@ const TableFiltersProfiles = ({showFilterSettings, setFilterSettings, createFilt
                         <h4>{t('TABLE_FILTERS.PROFILES.FILTERS_HEADER')}</h4>
                     </header>
                     <ul>
-                        {profiles.length === 0 ? (
+                        {currentProfiles.length === 0 ? (
                             //if no profiles saved yet
                             <li>{t('TABLE_FILTERS.PROFILES.EMPTY')}</li>
                         ) : (
-                            // repeat for each profile in profiles (else-case)
-                            profiles.map((profile, key) => (
+                            // repeat for each profile in profiles filtered for currently shown resource (else-case)
+                            currentProfiles.map((profile, key) => (
                                 <li key={key}>
                                     <a title="profile.description"
                                        onClick={() => chooseFilterProfile(profile.filterMap)}>

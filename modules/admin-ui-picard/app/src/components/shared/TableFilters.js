@@ -255,6 +255,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
                     {/* Filter profile dialog for saving and editing filter profiles */}
                     <TableFilterProfiles showFilterSettings={showFilterSettings}
                                          setFilterSettings={setFilterSettings}
+                                         resource={resource}
                                          loadResource={loadResource}
                                          loadResourceIntoTable={loadResourceIntoTable} />
 

@@ -146,7 +146,7 @@
 
         .input-container {
 
-            padding: 10px;
+            //padding: 10px;
 
             > label {
                 display: block;
@@ -189,7 +189,7 @@
 
         .cancel {
             @include btn(white);
-            margin-right: 5px;
+            margin-right: 3px;
             float: left;
         } // cancel
 
