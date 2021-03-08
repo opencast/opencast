@@ -312,6 +312,11 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
   @Override
   public void repopulate(final AbstractSearchIndex index) {
+    if (index.getIndexName() != adminUiIndex.getIndexName()) {
+      logger.info("Themes are currently not part of the {} index, no re-indexing necessary.");
+      return;
+    }
+
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
       User systemUser = SecurityUtil.createSystemUser(cc, organization);
       SecurityUtil.runAs(securityService, organization, systemUser, () -> {
@@ -321,7 +326,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
           int current = 1;
           logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
           for (Theme theme : themes) {
-            updateThemeInIndex(theme, adminUiIndex, organization.getId(), systemUser);
+            updateThemeInIndex(theme, index, organization.getId(), systemUser);
             logIndexRebuildProgress(logger, index.getIndexName(), total, current);
             current++;
           }
