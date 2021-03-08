@@ -36,6 +36,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
@@ -60,6 +61,7 @@ public final class AclServiceImpl implements AclService {
   private final SeriesService seriesService;
   private final AssetManager assetManager;
   private final AuthorizationService authorizationService;
+  private final SecurityService securityService;
   private final MessageSender messageSender;
 
   /** The elasticsearch indices */
@@ -68,7 +70,7 @@ public final class AclServiceImpl implements AclService {
 
   public AclServiceImpl(Organization organization, AclDb aclDb, SeriesService seriesService, AssetManager assetManager,
           AuthorizationService authorizationService, MessageSender messageSender, AbstractSearchIndex adminUiIndex,
-          AbstractSearchIndex externalApiIndex) {
+          AbstractSearchIndex externalApiIndex, SecurityService securityService) {
     this.organization = organization;
     this.aclDb = aclDb;
     this.seriesService = seriesService;
@@ -77,6 +79,7 @@ public final class AclServiceImpl implements AclService {
     this.messageSender = messageSender;
     this.adminUiIndex = adminUiIndex;
     this.externalApiIndex = externalApiIndex;
+    this.securityService = securityService;
   }
 
   @Override

@@ -90,7 +90,7 @@ public class AclScannerTest {
       @Override
       public AclService serviceFor(Organization org) {
         return new AclServiceImpl(new DefaultOrganization(), aclDb, null, null, null,
-                messageSender, adminUiIndex, externalApiIndex);
+                messageSender, adminUiIndex, externalApiIndex, securityService);
       }
     };
 

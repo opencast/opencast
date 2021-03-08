@@ -115,7 +115,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
       @Override
       public AclService serviceFor(Organization org) {
         return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(),
-                seriesService, assetManager, authorizationService, messageSender, adminUiIndex, externalApiIndex);
+                seriesService, assetManager, authorizationService, messageSender, adminUiIndex, externalApiIndex,
+                securityService);
       }
     };
   }
