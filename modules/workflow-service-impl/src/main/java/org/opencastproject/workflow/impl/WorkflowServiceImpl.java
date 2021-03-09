@@ -51,8 +51,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.metadata.api.MetadataService;
@@ -255,12 +253,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   /** The asset manager */
   protected AssetManager assetManager = null;
-
-  /** The message broker receiver service */
-  protected MessageReceiver messageReceiver;
-
-  /** The message broker sender service */
-  protected MessageSender messageSender;
 
   /** The workflow definition scanner */
   private WorkflowDefinitionScanner workflowDefinitionScanner;
@@ -2109,28 +2101,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Reference(name = "assetManager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
-  }
-
-  /**
-   * Sets the message receiver
-   *
-   * @param messageReceiver
-   *          the messageReceiver to set
-   */
-  @Reference(name = "message-broker-receiver")
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
-  }
-
-  /**
-   * Sets the message sender
-   *
-   * @param messageSender
-   *          the messageSender to set
-   */
-  @Reference(name = "message-broker-sender")
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
   }
 
   /**
