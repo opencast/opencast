@@ -268,6 +268,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   private final Striped<Lock> updateLock = Striped.lazyWeakLock(1024);
   private final Striped<Lock> mediaPackageLocks = Striped.lazyWeakLock(1024);
 
+  /** The Elasticsearch indices */
+  private AbstractSearchIndex adminUiIndex;
+  private AbstractSearchIndex externalApiIndex;
+
   /**
    * Constructs a new workflow service impl, with a priority-sorted map of metadata services
    */
@@ -2154,6 +2158,29 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     workflowDefinitionScanner = scanner;
   }
 
+  /**
+   * Callback to set the Admin UI index.
+   *
+   * @param index
+   *          the admin UI index.
+   */
+  @Reference(name = "admin-ui-index", target = "(index.name=adminui)")
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
+  }
+
+  /**
+   *
+   * Callback to set the External API index.
+   *
+   * @param index
+   *          the external API index.
+   */
+  @Reference(name = "external-api-index", target = "(index.name=externalapi)")
+  public void setExternalApiIndex(AbstractSearchIndex index) {
+    this.externalApiIndex = index;
+  }
+  
   /**
    * {@inheritDoc}
    *
