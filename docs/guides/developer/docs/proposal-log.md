@@ -9,6 +9,33 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Closing old Pull Requests
+Proposed by Katrin Ihler <ihler@elan-ev.de>, passed on Mon, 9 Mar 2021
+
+```no-highlight
+Hi everyone,
+
+I'd like to establish a rule for closing old pull requests, since we
+have some of those lying around for quite a while and I'd like a
+guideline. I propose the following:
+
+A pull request can be closed if neither the pull request creator nor
+another person working on the PR has addressed any review findings
+within 6 months. (Note that this is optional, so we don't _have_ to do it.)
+
+A review would be considered addressed if the PR is amended or the
+finding is disputed. So a discussion would also count, but something
+like "I don't have time for this right now" wouldn't.
+
+Closing a PR doesn't constitute a rejection, it can be re-opened at any
+time once the person responsible can give it attention again.
+
+As usual, if no one objects, this proposal passes after the next 72 hours.
+
+Best regards,
+
+Katrin
+```
 
 ### Release Notes
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Tue, 26 Jan 2021

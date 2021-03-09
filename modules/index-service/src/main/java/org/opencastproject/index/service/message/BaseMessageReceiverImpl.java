@@ -21,8 +21,8 @@
 
 package org.opencastproject.index.service.message;
 
-import org.opencastproject.index.IndexProducer;
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;

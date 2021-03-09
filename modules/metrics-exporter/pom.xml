@@ -23,6 +23,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-asset-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- External dependencies -->
+    <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>

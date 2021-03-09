@@ -51,8 +51,11 @@ public class GoogleAPICredentialRequestorTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testFileDoesNotExist() throws IOException, ParseException {
-    GoogleAPICredentialRequestor.main(new String[] {"/this/path/does/exist", "credentialDataStore",
-      "dataStoreDirectory"});
+    GoogleAPICredentialRequestor.main(new String[] {
+        "/this/path/does/exist",
+        "credentialDataStore",
+        "dataStoreDirectory"
+    });
   }
 
   @Test

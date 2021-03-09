@@ -97,7 +97,7 @@ public class YouTubeV3PublicationServiceImplTest {
     final File baseDir = new File(this.getClass().getResource("/mediapackage").toURI());
     final String xml = FileUtils.readFileToString(new File(baseDir, "manifest.xml"));
     final MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-      .loadFromXml(xml);
+        .loadFromXml(xml);
     //
     expect(youTubeService.getMyPlaylistByTitle(mediaPackage.getTitle())).andReturn(null).once();
     expect(youTubeService.createPlaylist(mediaPackage.getSeriesTitle(), null, mediaPackage.getSeries()))

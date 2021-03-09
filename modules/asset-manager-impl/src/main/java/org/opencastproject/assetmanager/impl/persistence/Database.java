@@ -358,6 +358,17 @@ public class Database implements EntityPaths {
     return PropertyDto.select(entityManagerFactory.createEntityManager(), mediaPackageId, namespace);
   }
 
+  /**
+   * Count events with snapshots in the asset manager
+   *
+   * @param organization
+   *          An organization to count in
+   * @return Number of events
+   */
+  public long countEvents(final String organization) {
+    return SnapshotDto.countEvents(entityManagerFactory.createEntityManager(), organization);
+  }
+
   public Opt<AssetDtos.Full> findAssetByChecksumAndStore(final String checksum, final String storeId) {
     return penv.tx(new Fn<EntityManager, Opt<AssetDtos.Full>>() {
       @Override

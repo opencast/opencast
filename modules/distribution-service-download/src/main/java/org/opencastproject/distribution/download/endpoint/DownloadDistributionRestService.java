@@ -66,8 +66,8 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("/")
 @RestService(name = "localdistributionservice", title = "Local Distribution Service",
-  abstractText = "This service distributes media packages to the Opencast feed and engage services.",
-  notes = {
+    abstractText = "This service distributes media packages to the Opencast feed and engage services.",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
         + "not working and is either restarting or has failed",
@@ -115,31 +115,41 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
   @POST
   @Path("/")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "distribute",
-             description = "Distribute a media package element to this distribution channel",
-             returnDescription = "The job that can be used to track the distribution",
-             restParameters = {
-                     @RestParameter(name = "mediapackage",
-                                    isRequired = true,
-                                    description = "The mediapackage",
-                                    type = Type.TEXT),
-                     @RestParameter(name = "channelId",
-                                    isRequired = true,
-                                    description = "The publication channel ID",
-                                    type = Type.TEXT),
-                     @RestParameter(name = "elementId",
-                                    isRequired = true,
-                                    description = "The element to distribute. The Id or multiple Ids as JSON Array ( ['IdOne','IdTwo'] )",
-                                    type = Type.STRING) },
-             responses = {
-                     @RestResponse(responseCode = SC_OK,
-                                   description = "An XML representation of the distribution job") })
-  public Response distribute(@FormParam("mediapackage") String mediaPackageXml,
-                             @FormParam("elementId") String elementId,
-                             @FormParam("channelId") String channelId,
-                             @DefaultValue("true") @FormParam("checkAvailability") boolean checkAvailability,
-                             @DefaultValue("false") @FormParam("preserveReference") boolean preserveReference)
-          throws Exception {
+  @RestQuery(
+      name = "distribute",
+      description = "Distribute a media package element to this distribution channel",
+      returnDescription = "The job that can be used to track the distribution",
+      restParameters = {
+          @RestParameter(
+              name = "mediapackage",
+              isRequired = true,
+              description = "The mediapackage",
+              type = Type.TEXT
+          ),
+          @RestParameter(
+              name = "channelId",
+              isRequired = true,
+              description = "The publication channel ID",
+              type = Type.TEXT
+          ),
+          @RestParameter(
+              name = "elementId",
+              isRequired = true,
+              description = "The element to distribute. The Id or multiple Ids as JSON Array ( ['IdOne','IdTwo'] )",
+              type = Type.STRING
+          )
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job")
+      }
+  )
+  public Response distribute(
+      @FormParam("mediapackage") String mediaPackageXml,
+      @FormParam("elementId") String elementId,
+      @FormParam("channelId") String channelId,
+      @FormParam("checkAvailability") @DefaultValue("true") boolean checkAvailability,
+      @FormParam("preserveReference") @DefaultValue("false") boolean preserveReference
+  ) throws Exception {
     try {
       Gson gson = new Gson();
       Set<String> setElementIds = gson.fromJson(elementId, new TypeToken<Set<String>>() { }.getType());
@@ -181,7 +191,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
                              @FormParam("elementId") String elementId,
                              @FormParam("channelId") String channelId,
                              @DefaultValue("true") @FormParam("checkAvailability") boolean checkAvailability)
-      throws Exception {
+          throws Exception {
     try {
       Gson gson = new Gson();
       Set<String> setElementIds = gson.fromJson(elementId, new TypeToken<Set<String>>() { }.getType());
@@ -201,27 +211,39 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
   @POST
   @Path("/retract")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "retract", description = "Retract a media package element from this distribution channel", returnDescription = "The job that can be used to track the retraction",
-             restParameters = {
-                     @RestParameter(name = "mediapackage",
-                                    isRequired = true,
-                                    description = "The mediapackage",
-                                    type = Type.TEXT),
-                     @RestParameter(name = "channelId",
-                                    isRequired = true,
-                                    description = "The publication channel ID",
-                                    type = Type.TEXT),
-                     @RestParameter(name = "elementId",
-                                    isRequired = true,
-                                    description = "The element to retract. The Id or multiple Ids as JSON Array ( ['IdOne','IdTwo'] )",
-                                    type = Type.STRING) },
-             responses = {
-                     @RestResponse(responseCode = SC_OK,
-                                   description = "An XML representation of the retraction job") })
-  public Response retract(@FormParam("mediapackage") String mediaPackageXml,
-                          @FormParam("elementId") String elementId,
-                          @FormParam("channelId") String channelId)
-          throws Exception {
+  @RestQuery(
+      name = "retract",
+      description = "Retract a media package element from this distribution channel",
+      returnDescription = "The job that can be used to track the retraction",
+      restParameters = {
+          @RestParameter(
+              name = "mediapackage",
+              isRequired = true,
+              description = "The mediapackage",
+              type = Type.TEXT
+          ),
+          @RestParameter(
+              name = "channelId",
+              isRequired = true,
+              description = "The publication channel ID",
+              type = Type.TEXT
+          ),
+          @RestParameter(
+              name = "elementId",
+              isRequired = true,
+              description = "The element to retract. The Id or multiple Ids as JSON Array ( ['IdOne','IdTwo'] )",
+              type = Type.STRING
+          )
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job")
+      }
+  )
+  public Response retract(
+      @FormParam("mediapackage") String mediaPackageXml,
+      @FormParam("elementId") String elementId,
+      @FormParam("channelId") String channelId
+  ) throws Exception {
     try {
       Gson gson = new Gson();
       Set<String> setElementIds = gson.fromJson(elementId, new TypeToken<Set<String>>() { }.getType());
@@ -240,27 +262,36 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
   @POST
   @Path("/retractsync")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "retractsync", description = "Synchronously retract a media package element from this distribution channel", returnDescription = "The retraction",
+  @RestQuery(
+      name = "retractsync",
+      description = "Synchronously retract a media package element from this distribution channel",
+      returnDescription = "The retraction",
       restParameters = {
           @RestParameter(name = "mediapackage",
               isRequired = true,
               description = "The mediapackage",
-              type = Type.TEXT),
+              type = Type.TEXT
+          ),
           @RestParameter(name = "channelId",
               isRequired = true,
               description = "The publication channel ID",
-              type = Type.TEXT),
+              type = Type.TEXT
+          ),
           @RestParameter(name = "elementId",
               isRequired = true,
               description = "The element to retract. The Id or multiple Ids as JSON Array ( ['IdOne','IdTwo'] )",
-              type = Type.STRING) },
+              type = Type.STRING
+          )
+      },
       responses = {
-          @RestResponse(responseCode = SC_OK,
-              description = "An XML representation of the retraction") })
-  public Response retractSync(@FormParam("mediapackage") String mediaPackageXml,
-                          @FormParam("elementId") String elementId,
-                          @FormParam("channelId") String channelId)
-      throws Exception {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction")
+      }
+  )
+  public Response retractSync(
+      @FormParam("mediapackage") String mediaPackageXml,
+      @FormParam("elementId") String elementId,
+      @FormParam("channelId") String channelId
+  ) throws Exception {
     try {
       Gson gson = new Gson();
       Set<String> setElementIds = gson.fromJson(elementId, new TypeToken<Set<String>>() { }.getType());
@@ -283,10 +314,11 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
    */
   @Override
   public JobProducer getService() {
-    if (service instanceof JobProducer)
+    if (service instanceof JobProducer) {
       return (JobProducer) service;
-    else
+    } else {
       return null;
+    }
   }
 
   /**

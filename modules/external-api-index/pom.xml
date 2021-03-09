@@ -23,13 +23,12 @@
     <!-- opencast -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-index-service</artifactId>
+      <artifactId>opencast-elasticsearch-impl</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search</artifactId>
+      <artifactId>opencast-elasticsearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -46,7 +45,7 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <!-- Doesn't compile without that dependency-->
-            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-search</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

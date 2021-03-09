@@ -27,8 +27,8 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.lang.String.format;
 
-import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.matterhorn.search.impl.SortCriterionImpl;
+import org.opencastproject.elasticsearch.api.SortCriterion;
+import org.opencastproject.elasticsearch.impl.SortCriterionImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.data.Tuple;
 

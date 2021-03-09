@@ -27,7 +27,12 @@ package org.opencastproject.publication.youtube;
  * @see com.google.api.client.googleapis.auth.oauth2.GoogleCredential
  */
 public enum YouTubeKey {
-
-  credentialDatastore, scopes, clientSecretsV3, dataStore, keywords, defaultPlaylist, makeVideosPrivate, maxFieldLength,;
-
+  credentialDatastore,
+  scopes,
+  clientSecretsV3,
+  dataStore,
+  keywords,
+  defaultPlaylist,
+  makeVideosPrivate,
+  maxFieldLength;
 }

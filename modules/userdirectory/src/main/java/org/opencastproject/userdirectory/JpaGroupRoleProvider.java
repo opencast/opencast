@@ -21,11 +21,11 @@
 
 package org.opencastproject.userdirectory;
 
-import org.opencastproject.index.IndexProducer;
+import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.group.GroupItem;
-import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -83,7 +83,8 @@ import javax.persistence.EntityTransaction;
   immediate = true,
   service = { RoleProvider.class, JpaGroupRoleProvider.class }
 )
-public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
+public class JpaGroupRoleProvider extends AbstractIndexProducer
+        implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);

@@ -162,10 +162,6 @@
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.xalan</artifactId>
     </dependency>
-    <dependency>
-      <groupId>dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>

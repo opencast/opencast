@@ -166,4 +166,13 @@ public interface AssetManager {
    * @return a version or none, if no version can be archived from the given string
    */
   Opt<Version> toVersion(String version);
+
+  /**
+   * Count the number of events stored for a given organization.
+   *
+   * @param organization
+   *          The organization to check
+   * @return Number of events
+   */
+  long countEvents(String organization);
 }
