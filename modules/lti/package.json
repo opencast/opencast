@@ -9,7 +9,7 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
-    "i18next": "^19.8.9",
+    "i18next": "^19.9.1",
     "i18next-browser-languagedetector": "^6.0.1",
     "query-string": "^6.14.1",
     "react": "^17.0.1",
