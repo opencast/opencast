@@ -116,6 +116,10 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   /** The system user name */
   private String systemUserName;
 
+  /** The Elasticsearch indices */
+  private AbstractSearchIndex adminUiIndex;
+  private AbstractSearchIndex externalApiIndex;
+
   /** OSGi callback for setting index. */
   @Reference(name = "series-index")
   public void setIndex(SeriesServiceIndex index) {
@@ -150,6 +154,17 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   @Reference(name = "message-broker-receiver")
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
+  }
+
+  /** OSGi callbacks for setting the Elasticsearch indices. */
+  @Reference(name = "admin-ui-index", target = "(index.name=adminui)")
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
+  }
+
+  @Reference(name = "external-api-index", target = "(index.name=externalapi)")
+  public void setExternalApiIndex(AbstractSearchIndex index) {
+    this.externalApiIndex = index;
   }
 
   /**
