@@ -221,6 +221,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The organization directory service */
   private OrganizationDirectoryService orgDirectoryService;
 
+  /** The Elasticsearch indices */
+  private AbstractSearchIndex adminUiIndex;
+  private AbstractSearchIndex externalApiIndex;
+
   /** The list of registered event catalog UI adapters */
   private List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
 
@@ -319,6 +323,26 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    */
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
+  }
+
+  /**
+   * OSgi callback to set the Admin UI index.
+   *
+   * @param index
+   *          the admin UI index.
+   */
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
+  }
+
+  /**
+   * OSGi callback to set the External API index
+   *
+   * @param index
+   *          the external API index.
+   */
+  public void setExternalApiIndex(AbstractSearchIndex index) {
+    this.externalApiIndex = index;
   }
 
   /** OSGi callback to add {@link EventCatalogUIAdapter} instance. */

@@ -30,4 +30,8 @@
              cardinality="0..n" policy="dynamic" bind="addCatalogUIAdapter" unbind="removeCatalogUIAdapter"/>
   <reference name="org-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
              cardinality="1..1" policy="static" bind="setOrgDirectoryService"/>
+  <reference name="admin-ui-index" interface="org.opencastproject.elasticsearch.index.AbstractSearchIndex"
+             bind="setAdminUiIndex" target="(index.name=adminui)"/>
+  <reference name="external-api-index" interface="org.opencastproject.elasticsearch.index.AbstractSearchIndex"
+             bind="setExternalApiIndex" target="(index.name=externalapi)"/>
 </scr:component>
