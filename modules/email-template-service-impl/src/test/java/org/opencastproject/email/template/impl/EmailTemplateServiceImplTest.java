@@ -41,6 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,8 +69,10 @@ public class EmailTemplateServiceImplTest {
     URI episodeURI = EmailTemplateServiceImplTest.class.getResource("/episode_dublincore.xml").toURI();
     URI seriesURI = EmailTemplateServiceImplTest.class.getResource("/series_dublincore.xml").toURI();
     Workspace workspace = EasyMock.createMock(Workspace.class);
-    EasyMock.expect(workspace.get(new URI("episode_dublincore.xml"))).andReturn(new File(episodeURI));
-    EasyMock.expect(workspace.get(new URI("series_dublincore.xml"))).andReturn(new File(seriesURI));
+    EasyMock.expect(workspace.read(new URI("episode_dublincore.xml")))
+        .andReturn(new FileInputStream(new File(episodeURI)));
+    EasyMock.expect(workspace.read(new URI("series_dublincore.xml")))
+        .andReturn(new FileInputStream(new File(seriesURI)));
     EasyMock.replay(workspace);
     service.setWorkspace(workspace);
 
