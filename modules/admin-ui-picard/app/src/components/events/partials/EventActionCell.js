@@ -1,34 +1,7 @@
 import React from 'react';
-import styled from "styled-components";
 import {useTranslation} from "react-i18next";
 
-import moreIcon from '../../../img/more-icon.png';
-import moreSeriesIcon from '../../../img/more-series-icon.png';
-import removeIcon from '../../../img/remove-icon.png';
 
-const DetailsLink = styled.a`
-    background-image: url(${moreIcon});
-    top: auto;
-    left: auto;
-    width: 19px;
-    height: 15px;
-`;
-
-const SeriesDetailsLink = styled.a`
-    background-image: url(${moreSeriesIcon});
-    top: auto;
-    left: auto;
-    width: 19px;
-    height: 15px;
-`;
-
-const RemoveLink = styled.a`
-    background-image: url(${removeIcon});
-    top: auto;
-    left: auto;
-    width: 17px;
-    height: 17px;
-`;
 
 /**
  * This component renders the action cells of events in the table view
@@ -40,15 +13,17 @@ const EventActionCell = ({ row })  => {
             {/* Open event details */}
             {/*TODO: When event details are implemented, remove placeholder */}
             {/*TODO: with-Role ROLE_UI_EVENTS_DETAILS_VIEW*/}
-            <DetailsLink onClick={() => onClickPlaceholder()}
-                         title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DETAILS')}/>
+            <a onClick={() => onClickPlaceholder()}
+               className="more"
+               title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DETAILS')}/>
 
             {/* If event belongs to a series then the corresponding series details can be opened */}
             {!!row.series && (
                 //{/*TODO: When series details are implemented, remove placeholder
                 //{/*TODO: with-Role ROLE_UI_SERIES_DETAILS_VIEW
-                <SeriesDetailsLink onClick={() => onClickPlaceholder()}
-                                   title={t('EVENTS.SERIES.TABLE.TOOLTIP.DETAILS')}/>
+                <a onClick={() => onClickPlaceholder()}
+                   className="more-series"
+                   title={t('EVENTS.SERIES.TABLE.TOOLTIP.DETAILS')}/>
 
             )}
 
@@ -56,8 +31,9 @@ const EventActionCell = ({ row })  => {
             {/*TODO: When event action for deleting an event is implemented, remove placeholder,
             needs to be checked if event is published */}
             {/*TODO: with-Role ROLE_UI_EVENTS_DELETE*/}
-            <RemoveLink onClick={() => onClickPlaceholder()}
-                        title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DELETE')}/>
+            <a onClick={() => onClickPlaceholder()}
+               className="remove"
+               title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DELETE')}/>
 
             {/* If the event has an preview then the editor can be opened and status if it needs to be cut is shown */}
             {!!row.has_preview && (
@@ -71,6 +47,14 @@ const EventActionCell = ({ row })  => {
                         <span id="badge" className="badge" />
                     )}
                 </a>
+            )}
+
+            {/* If the event has comments and no open comments then the comment tab of event details can be opened directly */}
+            {(row.has_comments && !row.has_open_comments) && (
+                //todo: when eventDetails are implemented, remove placeholder (opens comment-tab)
+                <a onClick={() => onClickPlaceholder()}
+                   title={t('EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS')}
+                   className="comments" />
             )}
 
             {/* If the event has comments and open comments then the comment tab of event details can be opened directly */}
@@ -97,9 +81,15 @@ const EventActionCell = ({ row })  => {
             <a onClick={() => onClickPlaceholder()}
                title={t('EVENTS.EVENTS.TABLE.TOOLTIP.ASSETS')}
                className="fa fa-folder-open"/>
+
+           {/* Open dialog for embedded code*/}
+           {/*todo: with-role ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW*/}
+           <a onClick={() => onClickPlaceholder()}
+              title={t('EVENTS.EVENTS.TABLE.TOOLTIP.EMBEDDING_CODE')}
+              className="fa fa-link"/>
         </>
     );
-}
+};
 
 //todo: remove if not needed anymore
 const onClickPlaceholder = () => {

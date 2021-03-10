@@ -22,7 +22,7 @@ import {addNotification} from "../../thunks/notificationThunks";
  */
 const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                    loadingGroups, loadingGroupsIntoTable, loadingAcls,
-                   loadingAclsIntoTable, addNotification }) => {
+                   loadingAclsIntoTable }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -58,8 +58,6 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
 
         // Load filters
         loadingFilters('users');
-
-        addNotification('warning', 'USER_NOT_DELETED', null, null, null);
 
     }, []);
 
@@ -147,8 +145,7 @@ const mapDispatchToProps = dispatch => ({
     loadingGroups: () => dispatch(fetchGroups()),
     loadingGroupsIntoTable: () => dispatch(loadGroupsIntoTable()),
     loadingAcls: () => dispatch(fetchAcls()),
-    loadingAclsIntoTable: () => dispatch(loadAclsIntoTable()),
-    addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context))
+    loadingAclsIntoTable: () => dispatch(loadAclsIntoTable())
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Users));

@@ -1,20 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import styled from 'styled-components';
 import {useTranslation} from "react-i18next";
 
-import playIconOn from '../../../img/play-icon-on.png';
-import playIcon from '../../../img/play-icon.png';
 
-// Style for list items in popup listing publications of an event
-const PublicationLink = styled.a`
-    background-image: url(${props => (props.enabled ? playIconOn : playIcon)});
-    background-position-y: center;
-    margin: 6px 0;
-    padding-left: 30px;
-    line-height: 22px;
-    background-repeat: no-repeat;
-    display: block;
-`;
 
 // References for detecting a click outside of the container of the popup listing publications of an event
 const containerPublications = React.createRef();
@@ -63,16 +50,17 @@ const PublishCell = ({ row }) => {
                                     !publication.hiding ? (
                                         // Check if publications is enabled and choose icon according
                                         publication.enabled ? (
-                                            <PublicationLink href={publication.url}
+                                            <a href={publication.url}
+                                               className="popover__list-item"
                                                              target="_blank"
                                                              key = {key}
                                                              enabled>
-                                                {t(publication.name)}
-                                            </PublicationLink>
+                                                <span>{t(publication.name)}</span>
+                                            </a>
                                         ) : (
-                                            <PublicationLink key={key}>
-                                                {t(publication.name)}
-                                            </PublicationLink>
+                                            <a key={key} className="popover__list-item">
+                                                <span>{t(publication.name)}</span>
+                                            </a>
                                         )
                                     ) : null
                                 ))

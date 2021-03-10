@@ -18,19 +18,12 @@ import {
 } from '../../actions/tableFilterActions';
 import TableFilterProfiles from "./TableFilterProfiles";
 
-import searchIcon from '../../img/search.png';
 import {getCurrentLanguageInformation} from "../../utils/utils";
 
 //todo: implement/look if really needed (handleEnddatePicker is quite similar)
 function selectFilterPeriodValue() {
     console.log("select filter period value");
 }
-
-const SearchInput = styled.input`
-    background-image: url(${searchIcon});
-￼   background-repeat: no-repeat;
-￼   background-position: 14px center;
-`;
 
 
 /**
@@ -136,12 +129,12 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
         <div className="filters-container">
             {/* Text filter - Search Query */}
             {/* todo: Search icon is not showing yet*/}
-            <SearchInput type="text"
-                         className="search expand"
-                         placeholder={t('TABLE_FILTERS.PLACEHOLDER')}
-                         onChange={e => handleChange(e)}
-                         name="textFilter"
-                         value={textFilter}/>
+            <input type="text"
+                   className="search expand"
+                   placeholder={t('TABLE_FILTERS.PLACEHOLDER')}
+                   onChange={e => handleChange(e)}
+                   name="textFilter"
+                   value={textFilter}/>
 
             {/* Selection of filters and management of filter profiles*/}
             {/*show only if filters.filters contains filters*/}

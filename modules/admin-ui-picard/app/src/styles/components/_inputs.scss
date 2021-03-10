@@ -85,6 +85,7 @@ textarea {
     &.search,
     &#search {
         @include appearance(none);
+        @include retina-image("#{$img-path}search", 13px 13px);
         background-repeat: no-repeat;
         background-position: 14px center;
         vertical-align: top;

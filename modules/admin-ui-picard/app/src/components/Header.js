@@ -10,7 +10,6 @@ import languages from "../i18n/languages";
 // image and icon imports
 import opencastLogo from '../img/opencast-white.svg';
 
-import {FaBell, FaChevronDown, FaPlayCircle, FaPowerOff, FaQuestionCircle, FaVideo} from "react-icons/fa";
 import {connect} from "react-redux";
 import {fetchHealthStatus} from "../thunks/healthThunks";
 import {getHealthStatus} from "../selectors/healthSelectors";
@@ -129,7 +128,7 @@ const Header = ({ loadingHealthStatus, healthStatus }) => {
                 {!!mediaModuleUrl && (
                     <div className="nav-dd" title={t('MEDIAMODULE')}>
                         <a href={mediaModuleUrl}>
-                            <FaPlayCircle className="fa fa-play-circle"/>
+                            <span className="fa fa-play-circle"/>
                         </a>
                     </div>
                 )}
@@ -138,7 +137,7 @@ const Header = ({ loadingHealthStatus, healthStatus }) => {
                 {/* Todo: before with 'with Role="ROLE_STUDIO": What is this? implement React equivalent */}
                 <div className="nav-dd" title="Studio">
                     <a href={studio}>
-                        <FaVideo className="fa fa-video-circle"/>
+                        <span className="fa fa-video-camera"/>
                     </a>
                 </div>
 
@@ -146,7 +145,7 @@ const Header = ({ loadingHealthStatus, healthStatus }) => {
                 {/* Todo: before with 'with Role="ROLE_ADMIN": What is this? implement React equivalent */}
                 <div className="nav-dd info-dd" id="info-dd" title={t('SYSTEM_NOTIFICATIONS')} ref={containerNotify}>
                     <div onClick={() => setMenuNotify(!displayMenuNotify)}>
-                        <FaBell className="fa fa-bell" aria-hidden="true"/>
+                        <i className="fa fa-bell" aria-hidden="true"/>
                         <span id="error-count" className="badge" >{healthStatus.numErr}</span>
                         {/* Click on the bell icon, a dropdown menu with all services in serviceList and their status opens */}
                         {displayMenuNotify && (
@@ -159,7 +158,7 @@ const Header = ({ loadingHealthStatus, healthStatus }) => {
                 {/* Show only if documentationUrl or restdocsUrl is set */}
                 {(!!documentationUrl || !!restUrl) && (
                     <div title="Help" className="nav-dd" id="help-dd" ref={containerHelp} >
-                        <FaQuestionCircle className="fa fa-question-circle" onClick={() => setMenuHelp(!displayMenuHelp)}/>
+                        <div className="fa fa-question-circle" onClick={() => setMenuHelp(!displayMenuHelp)}/>
                         {/* Click on the help icon, a dropdown menu with documentation, REST-docs and shortcuts (if available) opens */}
                         {displayMenuHelp && (
                             <MenuHelp />
@@ -170,7 +169,7 @@ const Header = ({ loadingHealthStatus, healthStatus }) => {
                 {/* Username */}
                 <div className="nav-dd user-dd" id="user-dd" ref={containerUser}>
                     {/* Todo: User name of currently logged in user*/}
-                    <div className="h-nav" onClick={() => setMenuUser(!displayMenuUser)}>Here is space for a name <FaChevronDown className="dropdown-icon"/></div>
+                    <div className="h-nav" onClick={() => setMenuUser(!displayMenuUser)}>Here is space for a name <span className="dropdown-icon"/></div>
                     {/* Click on username, a dropdown menu with the option to logout opens */}
                     {displayMenuUser && (
                         <MenuUser />
@@ -258,8 +257,7 @@ const MenuUser = () => {
         <ul className="dropdown-ul">
             <li>
                 <a onClick={() => logout}>
-                <span>
-                    <FaPowerOff className="logout-icon"/>
+                <span className="logout-icon">
                     {t('LOGOUT')}
                 </span>
                 </a>
