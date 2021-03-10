@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class EmailTemplateServiceImpl implements EmailTemplateService {
   private static final Logger logger = LoggerFactory.getLogger(EmailTemplateServiceImpl.class);
 
-  public static final String DEFAULT_DELIMITER_FOR_MULTIPLE = ",";
+  public static final String DEFAULT_DELIMITER_FOR_MULTIPLE = ", ";
 
   /** The workspace (needed to read the catalogs when processing templates) **/
   private Workspace workspace;

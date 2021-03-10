@@ -109,7 +109,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
       return createResult(srcPackage, Action.SKIP);
     }
 
-    String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY, ", ");
+    String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
     String bodyText;
     String body = operation.getConfiguration(BODY_PROPERTY);
     boolean isHTML = BooleanUtils.toBoolean(operation.getConfiguration(IS_HTML));
@@ -120,9 +120,9 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
       // Set the body of the message to be the ID of the media package
       bodyText = String.format("%s (%s)", srcPackage.getTitle(), srcPackage.getIdentifier());
     } else if (body != null) {
-      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_PROPERTY, ", ");
+      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_PROPERTY);
     } else {
-      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_TEMPLATE_FILE_PROPERTY, ", ");
+      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_TEMPLATE_FILE_PROPERTY);
     }
 
     try {
@@ -180,6 +180,11 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   }
 
   private String applyTemplateIfNecessary(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
+      String configName) {
+    return applyTemplateIfNecessary(workflowInstance, operation, configName, null);
+  }
+
+  private String applyTemplateIfNecessary(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
           String configName, String separator) {
     String configValue = operation.getConfiguration(configName);
 
@@ -203,7 +208,11 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
       // template and thus return the value as it is
       return configValue;
     }
+
     // Apply the template
+    if (separator == null) {
+      return emailTemplateService.applyTemplate(templateName, templateContent, workflowInstance);
+    }
     return emailTemplateService.applyTemplate(templateName, templateContent, workflowInstance, separator);
   }
 
