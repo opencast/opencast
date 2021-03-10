@@ -68,7 +68,6 @@
               org.opencastproject.adminui.index;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/message-receiver-scheduler.xml
             </Service-Component>
           </instructions>
         </configuration>

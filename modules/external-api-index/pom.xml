@@ -70,7 +70,6 @@
               org.opencastproject.external.index
             </Export-Package>
             <Service-Component>
-              OSGI-INF/message-receiver-scheduler.xml
             </Service-Component>
           </instructions>
         </configuration>
