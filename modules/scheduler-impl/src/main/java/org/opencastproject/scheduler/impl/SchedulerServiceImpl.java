@@ -22,6 +22,8 @@ package org.opencastproject.scheduler.impl;
 
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.some;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.getOrCreateEvent;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.calculateChecksum;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.episodeToMp;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.eventOrganizationFilter;
@@ -45,7 +47,10 @@ import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
@@ -82,6 +87,7 @@ import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
 import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.scheduler.impl.persistence.ExtendedEventDto;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
@@ -873,8 +879,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (deletedProperties + deletedSnapshots == 0)
         throw new NotFoundException();
 
+      // still sent for the live schedule service
       sendSchedulerMessage(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
-
+      removeSchedulingFromIndex(mediaPackageId, adminUiIndex);
+      removeSchedulingFromIndex(mediaPackageId, externalApiIndex);
     } catch (NotFoundException | SchedulerException e) {
       throw e;
     } catch (Exception e) {
@@ -1314,7 +1322,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       persistence.resetRecordingState(id);
 
+      // still sent for live scheduler service
       sendSchedulerMessage(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
+      removeRecordingStatusFromIndex(id, adminUiIndex);
+      removeRecordingStatusFromIndex(id, externalApiIndex);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1363,38 +1374,168 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     );
   }
 
-  private List<SchedulerItem> updateAddEventItems(Opt<AccessControlList> acl, Opt<DublinCoreCatalog> dublinCore,
-          Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters,
+  private List<SchedulerItem> updateAddEventItems(String mediaPackageId, Opt<AccessControlList> acl,
+          Opt<DublinCoreCatalog> dublinCore, Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters,
           Opt<String> agentId, Opt<Map<String, String>> properties) {
     List<SchedulerItem> items = new ArrayList<>();
     if (acl.isSome()) {
-      items.add(SchedulerItem.updateAcl(acl.get()));
+      items.add(SchedulerItem.updateAcl(acl.get())); // still sent for live scheduler service
+      updateAclInIndex(mediaPackageId, acl.get(), adminUiIndex);
+      updateAclInIndex(mediaPackageId, acl.get(), externalApiIndex);
     }
     if (dublinCore.isSome()) {
-      items.add(SchedulerItem.updateCatalog(dublinCore.get()));
+      items.add(SchedulerItem.updateCatalog(dublinCore.get())); // still sent for live scheduler service
+      updateCatalogInIndex(mediaPackageId, dublinCore.get(), adminUiIndex);
+      updateCatalogInIndex(mediaPackageId, dublinCore.get(), externalApiIndex);
     }
     if (startTime.isSome()) {
-      items.add(SchedulerItem.updateStart(startTime.get()));
+      items.add(SchedulerItem.updateStart(startTime.get())); // still sent for live scheduler service
+      updateStartTimeInIndex(mediaPackageId, startTime.get(), adminUiIndex);
+      updateStartTimeInIndex(mediaPackageId, startTime.get(), externalApiIndex);
     }
     if (endTime.isSome()) {
-      items.add(SchedulerItem.updateEnd(endTime.get()));
+      items.add(SchedulerItem.updateEnd(endTime.get())); // still sent for live scheduler service
+      updateEndTimeInIndex(mediaPackageId, endTime.get(), adminUiIndex);
+      updateEndTimeInIndex(mediaPackageId, endTime.get(), externalApiIndex);
     }
     if (presenters.isSome()) {
-      items.add(SchedulerItem.updatePresenters(presenters.get()));
+      updatePresentersInIndex(mediaPackageId, presenters.get(), adminUiIndex);
+      updatePresentersInIndex(mediaPackageId, presenters.get(), externalApiIndex);
     }
     if (agentId.isSome()) {
-      items.add(SchedulerItem.updateAgent(agentId.get()));
+      items.add(SchedulerItem.updateAgent(agentId.get())); // still sent for live scheduler service
+      updateCaptureAgentIdInIndex(mediaPackageId, agentId.get(), adminUiIndex);
+      updateCaptureAgentIdInIndex(mediaPackageId, agentId.get(), externalApiIndex);
     }
     if (properties.isSome()) {
-      items.add(SchedulerItem.updateProperties(properties.get()));
+      items.add(SchedulerItem.updateProperties(properties.get())); // still sent for live scheduler service
+      updateCaptureAgentConfigInIndex(mediaPackageId, properties.get(), adminUiIndex);
+      updateCaptureAgentConfigInIndex(mediaPackageId, properties.get(), externalApiIndex);
     }
     return items;
+  }
+
+  private void updateAclInIndex(String mediaPackageId, AccessControlList acl, AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+
+    try {
+      Event event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, index);
+      event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
+      index.addOrUpdate(event);
+      logger.debug("Scheduled recording {} updated in the {} search index",
+              event.getIdentifier(), index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error retrieving the recording event from the search index:", e);
+    }
+  }
+
+  private void updateCatalogInIndex(String mediaPackageId, DublinCoreCatalog dc, AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+
+    try {
+      Event event = getOrCreateEvent(mediaPackageId, organization, user, index);
+      if (isBlank(event.getCreator()))
+        event.setCreator(getSecurityService().getUser().getName());
+      if (dc != null)
+        EventIndexUtils.updateEvent(event, dc);
+
+      // Update series name if not already done
+      EventIndexUtils.updateSeriesName(event, organization, user, index);
+
+      index.addOrUpdate(event);
+      logger.debug("Scheduled recording {} updated in the {} search index",
+              event.getIdentifier(), index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error retrieving the recording event from the search index:", e);
+    }
+  }
+
+  private void updateEndTimeInIndex(String mediaPackageId, Date endTime, AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+
+    String endTimeStr = endTime == null ? null : DateTimeSupport.toUTC(endTime.getTime());
+
+    try {
+      Event event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, index);
+      event.setTechnicalEndTime(endTimeStr);
+      index.addOrUpdate(event);
+      logger.debug("Scheduled recording {} updated in the {} search index",
+              event.getIdentifier(), index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error retrieving the recording event from the search index:", e);
+    }
+  }
+
+  private void updateStartTimeInIndex(String mediaPackageId, Date startTime, AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+
+    String startTimeStr = startTime == null ? null : DateTimeSupport.toUTC(startTime.getTime());
+
+    try {
+      Event event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, index);
+      event.setTechnicalStartTime(startTimeStr);
+      index.addOrUpdate(event);
+      logger.debug("Scheduled recording {} updated in the {} search index",
+              event.getIdentifier(), index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error retrieving the recording event from the search index:", e);
+    }
+  }
+
+  private void updatePresentersInIndex(String mediaPackageId, Set<String> presenters, AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+
+    try {
+      Event event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, index);
+      event.setTechnicalPresenters(new ArrayList<>(presenters));
+      index.addOrUpdate(event);
+      logger.debug("Scheduled recording {} updated in the {} search index",
+              event.getIdentifier(), index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error retrieving the recording event from the search index:", e);
+    }
+  }
+
+  private void updateCaptureAgentIdInIndex(String mediaPackageId, String captureAgentId, AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+
+    try {
+      Event event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, index);
+      event.setAgentId(captureAgentId);
+      index.addOrUpdate(event);
+      logger.debug("Scheduled recording {} updated in the {} search index",
+              event.getIdentifier(), index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error retrieving the recording event from the search index:", e);
+    }
+  }
+
+  private void updateCaptureAgentConfigInIndex(String mediaPackageId, Map<String, String> captureAgentConfig,
+          AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+
+    try {
+      Event event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, index);
+      event.setAgentConfiguration(captureAgentConfig);
+      index.addOrUpdate(event);
+      logger.debug("Scheduled recording {} updated in the {} search index",
+              event.getIdentifier(), index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error retrieving the recording event from the search index:", e);
+    }
   }
 
   private void sendUpdateAddEvent(String mpId, Opt<AccessControlList> acl, Opt<DublinCoreCatalog> dublinCore,
           Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters, Opt<String> agentId,
           Opt<Map<String, String>> properties) {
-    List<SchedulerItem> items = updateAddEventItems(acl, dublinCore, startTime, endTime, presenters, agentId,
+    List<SchedulerItem> items = updateAddEventItems(mpId, acl, dublinCore, startTime, endTime, presenters, agentId,
             properties);
     if (!items.isEmpty()) {
       sendSchedulerMessage(new SchedulerItemList(mpId, items));
@@ -1533,8 +1674,27 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (RecordingState.UNKNOWN.equals(recording.getState()))
       return Collections.emptyList();
 
+    updateRecordingStatusInIndex(recording.getID(), recording.getState(), adminUiIndex);
+    updateRecordingStatusInIndex(recording.getID(), recording.getState(), externalApiIndex);
+    // still sent for the live schedule service
     return Collections.singletonList(SchedulerItem
             .updateRecordingStatus(recording.getState(), recording.getLastCheckinTime()));
+  }
+
+  private void updateRecordingStatusInIndex(String mediaPackageId, String recordingStatus,
+          AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+
+    try {
+      Event event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, index);
+      event.setRecordingStatus(recordingStatus);
+      index.addOrUpdate(event);
+      logger.debug("Scheduled recording {} updated in the {} search index",
+              event.getIdentifier(), index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error retrieving the recording event from the search index:", e);
+    }
   }
 
   private void sendRecordingUpdate(Recording recording) {
@@ -1598,7 +1758,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             final Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
             final List<SchedulerItem> schedulerItems = new ArrayList<>(
-                    updateAddEventItems(acl, dublinCore, Opt.some(start), Opt.some(end), Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata)));
+                    updateAddEventItems(event.getMediaPackageId(), acl, dublinCore, Opt.some(start), Opt.some(end),
+                            Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata)));
             if (recordingStatus.isSome() && lastHeard.isSome()) {
               schedulerItems.addAll(recordingUpdateMessages(
                       new RecordingImpl(event.getMediaPackageId(), recordingStatus.get(), lastHeard.get())));
@@ -1625,5 +1786,36 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   public SecurityService getSecurityService() {
     return securityService;
+  }
+
+  private void removeSchedulingFromIndex(String mediaPackageId, AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+    try {
+      index.deleteScheduling(organization, user, mediaPackageId);
+      logger.debug("Scheduling information of event {} removed from the {} index.", mediaPackageId, index.getIndexName());
+    } catch (NotFoundException e) {
+      logger.warn("Scheduled recording {} not found for deletion from the {} index.", mediaPackageId,
+              index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Failed to delete the scheduling information of event {} from the {} index.", mediaPackageId,
+              index.getIndexName(), e);
+    }
+  }
+
+  private void removeRecordingStatusFromIndex(String mediaPackageId, AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+    try {
+      Event event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, index);
+      event.setRecordingStatus(null);
+
+      index.addOrUpdate(event);
+      logger.debug("Recording state of event {} removed from the {} index.", event.getIdentifier(),
+              index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Failed to remove the recording state of event {} from the {} index.", mediaPackageId,
+            index.getIndexName(), e);
+    }
   }
 }
