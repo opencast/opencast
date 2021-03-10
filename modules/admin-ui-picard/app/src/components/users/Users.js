@@ -15,7 +15,6 @@ import {loadAclsIntoTable, loadGroupsIntoTable, loadUsersIntoTable} from "../../
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
 import Notifications from "../shared/Notifications";
-import {addNotification} from "../../thunks/notificationThunks";
 
 /**
  * This component renders the table view of users

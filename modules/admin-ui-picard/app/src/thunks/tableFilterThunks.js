@@ -100,14 +100,43 @@ export const fetchFilters = resource => async dispatch => {
 
 export const fetchStats = () => async dispatch => {
     try {
+        // fetch information about possible status an event can have
         let data =  await axios.get('admin-ng/resources/STATS.json');
         let response = await data.data;
 
-        const stats = Object.keys(response).map(key => {
+        // transform response
+        const statsResponse = Object.keys(response).map(key => {
             let stat = JSON.parse(response[key]);
             stat.name = key;
             return stat;
         });
+
+        let stats = [];
+
+        // fetch for each status the corresponding count of events having this status
+        for (let i in statsResponse) {
+            let filter = [];
+            for (let j in statsResponse[i].filters) {
+                filter.push(statsResponse[i].filters[j].name + ':' + statsResponse[i].filters[j].value)
+            }
+            let data = await axios.get('admin-ng/event/events.json', {
+                params: {
+                    filters: filter.join(','),
+                    limit: 1
+                }
+            });
+
+            let response = await data.data;
+
+            // add count to status information fetched before
+            statsResponse[i] = {
+                ...statsResponse[i],
+                count: response.total
+            };
+
+            // fill stats array for redux state
+            stats.push(statsResponse[i]);
+        }
 
         dispatch(loadStats(stats));
 

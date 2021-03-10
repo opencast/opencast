@@ -44,13 +44,13 @@ const Stats = ({ loadingStats, stats, filterMap, editFilterValue, loadEvents, lo
                 {stats.map((st, key) => (
                     <div className="col" key={key}>
                         <div className="stat" onClick={() => showStatsFilter(st.description)} title={t(st.description)}>
-                            <h1>{st.order}</h1>
+                            <h1>{st.count}</h1>
                             {/* Show the description of the status, if defined,
                             else show name of filter and its value*/}
                             {!!st.description ? (
                                 <span>{t(st.description)}</span>
                             ) : (st.filters.map((filter, key) => (
-                                    <span>{t(filter.filter)}: {t(filter.value)}</span>
+                                    <span key={key}>{t(filter.filter)}: {t(filter.value)}</span>
                                 ))
                             )}
                         </div>
