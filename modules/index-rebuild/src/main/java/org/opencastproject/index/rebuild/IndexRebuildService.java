@@ -24,182 +24,248 @@ package org.opencastproject.index.rebuild;
 import static java.lang.String.format;
 
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.message.broker.api.BaseMessage;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 
-import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-@Component(
-        property = {
-                "service.description=Index Rebuild Service"
-        },
-        immediate = true,
-        service = { IndexRebuildService.class }
-)
-public class IndexRebuildService {
+/**
+ * The bundle activator is defined in the pom.xml of this bundle.
+ */
+public class IndexRebuildService implements BundleActivator {
+
+  /*
+   * How starting and stopping this service works:
+   *
+   * The Index Rebuild can only be started when all services that feed data into the ElasticSearch index, called
+   * IndexProducers, are available via OSGI. To check for this, we use a service listener (see inner class at the
+   * bottom) that reacts whenever an IndexProducer becomes available or is no longer available. We keep these
+   * IndexProducers in an internal map.
+   *
+   * When our requirements - at least one IndexProducer of each type (defined by the Service enum below) available - are
+   * fulfilled, we register the IndexRebuildService with OSGI so it can be used. If our requirements are no longer
+   * fulfilled, we unregister it.
+   *
+   * We make this work by hooking into the OSGI lifecycle with the BundleActivator interface - this way we can start
+   * the listener in the beginning and make sure we properly shut down in the end.
+   */
+
+  /**
+   * The services whose data is indexed by ElasticSearch.
+   * Attention: The order is relevant for the index rebuild and should not be changed!
+   */
+  public enum Service {
+    Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager, Comments
+  }
 
   private static final Logger logger = LoggerFactory.getLogger(IndexRebuildService.class);
+  private final Map<IndexRebuildService.Service, IndexProducer> indexProducers = new ConcurrentHashMap<>();
+  private ServiceRegistration<?> serviceRegistration = null;
 
-  /** The message sender */
-  private MessageSender messageSender;
+  /**
+   * Called by OSGI when this bundle is started.
+   *
+   * @param bundleContext
+   *         The bundle context.
+   *
+   * @throws Exception
+   */
+  @Override
+  public void start(BundleContext bundleContext) throws Exception {
+    // check if there are already IndexProducers available
+    ServiceReference<?>[] serviceReferences = bundleContext.getAllServiceReferences(IndexProducer.class.getName(),
+            null);
+    if (serviceReferences != null) {
+      for (ServiceReference<?> serviceReference : serviceReferences) {
+        addIndexProducer((IndexProducer) bundleContext.getService(serviceReference), bundleContext);
+      }
+    }
 
-  /** The message receiver */
-  private MessageReceiver messageReceiver;
-
-  /** An Executor to get messages */
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
-
-  @Reference(name = "messageSender")
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
-  @Reference(name = "messageReceiver")
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
+    // listen to changes in availability
+    bundleContext.addServiceListener(new IndexProducerListener(bundleContext),
+            "(objectClass=" + IndexProducer.class.getName() + ")");
   }
 
   /**
-   * Recreate the index from all of the services that provide data.
+   * Called by OSGI when this bundle is stopped.
    *
-   * @throws InterruptedException
-   *           Thrown if the process is interupted.
-   * @throws CancellationException
-   *           Thrown if listeing to messages has been canceled.
-   * @throws ExecutionException
-   *           Thrown if there is a problem executing the process.
+   * @param bundleContext
+   *         The bundle context.
+   *
+   * @throws Exception
+   */
+  @Override
+  public void stop(BundleContext bundleContext) throws Exception {
+    // unregister this service from OSGI
+    unregisterIndexRebuildService();
+  }
+
+  /**
+   * Clear and rebuild the index from all services.
+   *
+   * @param index
+   *           The index to rebuild.
+   *
    * @throws IOException
    *           Thrown if the index cannot be cleared.
+   * @throws IndexRebuildException
+   *           Thrown if the index rebuild failed.
    */
-  public synchronized void recreateIndex(AbstractSearchIndex index)
-          throws InterruptedException, CancellationException, ExecutionException, IOException, IndexRebuildException {
-    // Clear index first
+  public synchronized void rebuildIndex(AbstractSearchIndex index)
+          throws IOException, IndexRebuildException {
     index.clear();
-    recreateService(index, IndexRecreateObject.Service.Groups);
-    recreateService(index, IndexRecreateObject.Service.Acl);
-    recreateService(index, IndexRecreateObject.Service.Themes);
-    recreateService(index, IndexRecreateObject.Service.Series);
-    recreateService(index, IndexRecreateObject.Service.Scheduler);
-    recreateService(index, IndexRecreateObject.Service.Workflow);
-    recreateService(index, IndexRecreateObject.Service.AssetManager);
-    recreateService(index, IndexRecreateObject.Service.Comments);
+    logger.info("Index '{}' cleared, starting complete rebuild.", index.getIndexName());
+    for (IndexRebuildService.Service service: IndexRebuildService.Service.values()) {
+      rebuildIndex(index, service);
+    }
   }
 
   /**
-   * Ask for data to be rebuilt from a service.
+   * Partially rebuild the index from a specific service.
    *
-   * @param service
-   *          The {@link IndexRecreateObject.Service} representing the service to start re-sending the data from.
-   * @throws InterruptedException
-   *           Thrown if the process of re-sending the data is interupted.
-   * @throws CancellationException
-   *           Thrown if listening to messages has been canceled.
-   * @throws ExecutionException
-   *           Thrown if the process of re-sending the data has an error.
+   * @param index
+   *           The index to rebuild.
+   * @param serviceName
+   *           The name of the {@link Service}.
+   *
+   * @throws IllegalArgumentException
+   *           Thrown if the service doesn't exist.
+   * @throws IndexRebuildException
+   *           Thrown if the index rebuild failed.
    */
-  private void recreateService(AbstractSearchIndex index, IndexRecreateObject.Service service)
-          throws InterruptedException, CancellationException, ExecutionException, IndexRebuildException {
-    logger.info("Starting to recreate index for service '{}'", service);
-    messageSender.sendObjectMessage(IndexProducer.RECEIVER_QUEUE + "." + service, MessageSender.DestinationType.Queue,
-            IndexRecreateObject.start(index.getIndexName(), service));
-    boolean done = false;
-    // TODO Add a timeout for services that are not going to respond.
-    while (!done) {
-      FutureTask<Serializable> future = messageReceiver.receiveSerializable(IndexProducer.RESPONSE_QUEUE,
-              MessageSender.DestinationType.Queue);
-      executor.execute(future);
-      BaseMessage message = (BaseMessage) future.get();
-      if (message.getObject() instanceof IndexRecreateObject) {
-        IndexRecreateObject indexRecreateObject = (IndexRecreateObject) message.getObject();
-        switch (indexRecreateObject.getStatus()) {
-          case Update:
-            logger.info("Updating service: '{}' with {}/{} finished, {}% complete.",
-                indexRecreateObject.getService(),
-                indexRecreateObject.getCurrent(),
-                indexRecreateObject.getTotal(),
-                (int) (indexRecreateObject.getCurrent() * 100 / indexRecreateObject.getTotal())
-            );
-            if (indexRecreateObject.getCurrent() == indexRecreateObject.getTotal()) {
-              logger.info("Waiting for service '{}' indexing to complete", indexRecreateObject.getService());
-            }
-            break;
-          case End:
-            done = true;
-            logger.info("Finished re-creating data for service '{}'", indexRecreateObject.getService());
-            break;
-          case Error:
-            logger.error("Error updating service '{}' with {}/{} finished.",
-                    indexRecreateObject.getService(), indexRecreateObject.getCurrent(),
-                    indexRecreateObject.getTotal());
-            throw new IndexRebuildException(
-                    format("Error updating service '%s' with %s/%s finished.", indexRecreateObject.getService(),
-                            indexRecreateObject.getCurrent(), indexRecreateObject.getTotal()));
-          default:
-            logger.error("Unable to handle the status '{}' for service '{}'", indexRecreateObject.getStatus(),
-                    indexRecreateObject.getService());
-            throw new IllegalArgumentException(format("Unable to handle the status '%s' for service '%s'",
-                    indexRecreateObject.getStatus(), indexRecreateObject.getService()));
+  public synchronized void rebuildIndex(AbstractSearchIndex index, String serviceName)
+          throws IllegalArgumentException, IndexRebuildException {
+    IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
+    logger.info("Starting partial rebuild of index '{}' from service '{}'.", index.getIndexName(), service);
+    rebuildIndex(index, service);
+  }
 
-        }
+  /**
+   * Trigger repopulation of the index with data from a specific service.
+   *
+   * @param index
+   *           The index to rebuild.
+   * @param service
+   *          The {@link IndexRebuildService.Service} to re-add data from.
+   *
+   * @throws IndexRebuildException
+   *           Thrown if the index rebuild failed.
+   */
+  private void rebuildIndex(AbstractSearchIndex index, IndexRebuildService.Service service)
+          throws IndexRebuildException {
+
+    if (!indexProducers.containsKey(service)) {
+      throw new IllegalStateException(format("Service %s is not available", service));
+    }
+
+    IndexProducer indexProducer = indexProducers.get(service);
+    logger.info("Starting to rebuild index '{}' from service '{}'", index.getIndexName(), service);
+    indexProducer.repopulate(index.getIndexName());
+    logger.info("Finished to rebuild index '{}' from service '{}'", index.getIndexName(), service);
+  }
+
+  /**
+   * Add IndexProducer service to internal map.
+   *
+   * @param indexProducer
+   *           The IndexProducer to add.
+   * @param bundleContext
+   *           The bundle context.
+   */
+  private void addIndexProducer(IndexProducer indexProducer, BundleContext bundleContext) {
+    // add only if there's not already a service of the same type in there
+    if (indexProducers.putIfAbsent(indexProducer.getService(), indexProducer) == null) {
+      logger.info("Service {} added.", indexProducer.getService());
+
+      // all required IndexProducers found? Register this service at OSGI
+      if (indexProducers.size() == IndexRebuildService.Service.values().length) {
+        registerIndexRebuildService(bundleContext);
       }
     }
   }
 
   /**
-   * Recreate the index from a specific service that provide data.
+   * Remove IndexProducer service from internal map.
    *
-   * @param service
-   *           The service name. The available services are:
-   *           Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager, Comments
-   *
-   * @throws IllegalArgumentException
-   *           Thrown if the service name is invalid
-   * @throws InterruptedException
-   *           Thrown if the process is interupted.
-   * @throws ExecutionException
-   *           Thrown if there is a problem executing the process.
+   * @param indexProducer
+   *           The IndexProducer to remove.
    */
-  public synchronized void recreateIndex(AbstractSearchIndex index, String service)
-          throws IllegalArgumentException, InterruptedException, ExecutionException, IndexRebuildException {
-    if (StringUtils.equalsIgnoreCase("Groups", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Groups);
+  private void removeIndexProducer(IndexProducer indexProducer) {
+    // remove only if it's in there
+    if (indexProducers.remove(indexProducer.getService(), indexProducer)) {
+      logger.info("Service {} removed.", indexProducer.getService());
+
+      // no longer all required IndexProducers available? Unregister this service from OSGI
+      if (indexProducers.size() != IndexRebuildService.Service.values().length) {
+        unregisterIndexRebuildService();
+      }
     }
-    else if (StringUtils.equalsIgnoreCase("Acl", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Acl);
+  }
+
+  /**
+   * Unregister this service from OSGI.
+   */
+  private synchronized void unregisterIndexRebuildService() {
+    // if this service is registered with OSGI, unregister it
+    if (serviceRegistration != null)  {
+      logger.info("Unregister IndexRebuildService.");
+      serviceRegistration.unregister();
+      serviceRegistration = null;
     }
-    else if (StringUtils.equalsIgnoreCase("Themes", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Themes);
+  }
+
+  /**
+   * Register this service at OSGI.
+   *
+   * @param bundleContext
+   *           The bundle context.
+   */
+  private synchronized void registerIndexRebuildService(BundleContext bundleContext) {
+    // if this service is not registered at OSGI, register it
+    if (serviceRegistration == null) {
+      logger.info("Register IndexRebuildService.");
+      serviceRegistration = bundleContext.registerService(this.getClass().getName(), IndexRebuildService.this, null);
     }
-    else if (StringUtils.equalsIgnoreCase("Series", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Series);
+  }
+
+  /**
+   * Listen to changes in the availability of IndexProducer services.
+   */
+  private final class IndexProducerListener implements ServiceListener {
+
+    private final BundleContext bundleContext;
+
+    /**
+     * Constructor to hand over the bundle context.
+     *
+     * @param bundleContext
+     *           The bundle context.
+     */
+    private IndexProducerListener(BundleContext bundleContext) {
+      this.bundleContext = bundleContext;
     }
-    else if (StringUtils.equalsIgnoreCase("Scheduler", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Scheduler);
-    }
-    else if (StringUtils.equalsIgnoreCase("Workflow", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Workflow);
-    }
-    else if (StringUtils.equalsIgnoreCase("AssetManager", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.AssetManager);
-    }
-    else if (StringUtils.equalsIgnoreCase("Comments", StringUtils.trim(service))) {
-      recreateService(index, IndexRecreateObject.Service.Comments);
-    } else {
-      throw new IllegalArgumentException("Unknown service " + service);
+
+    @Override
+    public void serviceChanged(ServiceEvent serviceEvent) {
+      // new IndexProducer service available? Add to map
+      if (serviceEvent.getType() == ServiceEvent.REGISTERED) {
+        ServiceReference<?> serviceReference = serviceEvent.getServiceReference();
+        addIndexProducer((IndexProducer) bundleContext.getService(serviceReference), bundleContext);
+
+        // Index Producer no longer available? Remove from map
+      } else if (serviceEvent.getType() == ServiceEvent.UNREGISTERING) {
+        ServiceReference<?> serviceReference = serviceEvent.getServiceReference();
+        removeIndexProducer((IndexProducer) bundleContext.getService(serviceReference));
+      }
     }
   }
 }

@@ -21,118 +21,217 @@
 
 package org.opencastproject.index.rebuild;
 
-import org.opencastproject.message.broker.api.BaseMessage;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.Organization;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 
 /**
- * This service produces messages for an elastic search index
+ * This implementation of IndexProducer adds logging methods for convenience.
  */
 public abstract class AbstractIndexProducer implements IndexProducer {
 
-  public abstract String getClassName();
-
-  public abstract MessageReceiver getMessageReceiver();
-
-  public abstract MessageSender getMessageSender();
-
-  public abstract SecurityService getSecurityService();
-
-  public abstract IndexRecreateObject.Service getService();
-
-  public abstract String getSystemUserName();
-
-  /** The message watcher */
-  private MessageWatcher messageWatcher;
-
-  /** Single thread executor */
-  private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-
   /**
-   * Initialize the index producer.
+   * Log beginning of index rebuild for this service.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param elementName
+   *           The elements to be added (e.g. 'events').
    */
-  public void activate() {
-    messageWatcher = new MessageWatcher();
-    singleThreadExecutor.execute(messageWatcher);
+  protected void logIndexRebuildBegin(Logger logger, String indexName, int total, String elementName) {
+    logger.info("Starting update of index '{}' for service '{}' with {} {}", indexName, getService(), total,
+            elementName);
   }
 
   /**
-   * Clean-up resources at shutdown.
+   * Log beginning of index rebuild for this service and a specific organization.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param elementName
+   *           The elements to be added (e.g. 'events').
+   * @param org
+   *           The organization.
    */
-  public void deactivate() {
-    if (messageWatcher != null) {
-      messageWatcher.stopListening();
-    }
-    singleThreadExecutor.shutdown();
+  protected void logIndexRebuildBegin(Logger logger, String indexName, int total, String elementName,
+          Organization org) {
+    logger.info("Starting update of index '{}' for service '{}' with {} {} of organization '{}'", indexName,
+            getService(), total, elementName, org);
   }
 
-  /* --------------------------------------------------------------------------------------------------------------- */
+  /**
+   * Log the progress of the index rebuild for this service.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param current
+   *           The amount of elements that have already been re-added.
+   */
+  protected void logIndexRebuildProgress(Logger logger, String indexName, int total, int current) {
+    logIndexRebuildProgress(logger, indexName, total, current, 1);
+  }
 
-  private class MessageWatcher implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(MessageWatcher.class);
-    private volatile boolean listening = true;
-    private volatile FutureTask<Serializable> future;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+  /**
+   * Log the progress of the index rebuild for this service and a specific organization.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param current
+   *           The amount of elements that have already been re-added.
+   * @param org
+   *           The organization.
+   */
+  protected void logIndexRebuildProgress(Logger logger, String indexName, int total, int current, Organization org) {
+    logIndexRebuildProgress(logger, indexName, total, current, 1, org);
+  }
 
-    public void stopListening() {
-      this.listening = false;
-      if (future != null) {
-        future.cancel(true);
+  /**
+   * Log the progress of the index rebuild for this service.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param current
+   *           The amount of elements that have already been re-added.
+   * @param batchSize
+   *           The size of the batch we re-add in one go.
+   */
+  protected void logIndexRebuildProgress(Logger logger, String indexName, int total, int current, int batchSize) {
+    logIndexRebuildProgress(logger, indexName, total, current, batchSize, null);
+  }
+
+  /**
+   * Log the progress of the index rebuild for this service.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param current
+   *           The amount of elements that have already been re-added.
+   * @param batchSize
+   *           The size of the batch we re-add in one go.
+   * @param org
+   *           The organization (can be null).
+   */
+  protected void logIndexRebuildProgress(Logger logger, String indexName, int total, int current, int batchSize,
+          Organization org) {
+    final int responseInterval = (total < 100) ? 1 : (total / 100);
+    if (responseInterval == 1 || batchSize > responseInterval || current == total
+            || current % responseInterval < batchSize) {
+
+      if (org == null) {
+        logger.info("Updating index '{}' for service '{}': {}/{} finished, {}% complete.", indexName, getService(),
+                current, total, (current * 100 / total));
+      } else {
+        logger.info("Updating index '{}' for service '{}' and organization '{}': {}/{} finished, {}% complete.",
+                indexName, getService(), org.getId(), current, total, (current * 100 / total));
       }
-      executor.shutdown();
     }
+  }
 
-    @Override
-    public void run() {
-      if (getMessageReceiver() == null) {
-        logger.warn("The message receiver for {} was null so unable to listen for repopulate index "
-            + "messages. Ignore this warning if this is a test.", getClassName());
-        listening = false;
-        return;
-      }
-      logger.info("Starting to listen for {} Messages", getClassName());
-      while (listening) {
-        try {
-          future = getMessageReceiver().receiveSerializable(RECEIVER_QUEUE + "." + getService(),
-                  MessageSender.DestinationType.Queue);
-          executor.execute(future);
-          BaseMessage message = (BaseMessage) future.get();
-          if (message == null || !(message.getObject() instanceof IndexRecreateObject)) {
-            continue;
-          }
+  /**
+   * Log an error when one element can't be re-indexed.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param elementName
+   *           The name of the element that can't be added (e.g. 'event').
+   * @param element
+   *           The element that can't be added.
+   * @param t
+   *           The error that occurred.
+   */
+  protected void logSkippingElement(Logger logger, String elementName, String element, Throwable t) {
+    logger.error("Unable to re-index '{}' {}, skipping.", elementName, element, t);
+  }
 
-          IndexRecreateObject indexObject = (IndexRecreateObject) message.getObject();
-          if (!indexObject.getService().equals(getService())
-                  || !indexObject.getStatus().equals(IndexRecreateObject.Status.Start)) {
-            continue;
-          }
-          logger.info("Index '{}' has received a start repopulating command for service '{}'.",
-                  indexObject.getIndexName(), getService());
-          repopulate(indexObject.getIndexName());
-          logger.info("Index '{}' has finished repopulating service '{}'.", indexObject.getIndexName(), getService());
-        } catch (InterruptedException e) {
-          logger.error("Problem while getting {} message events", getClassName(), e);
-        } catch (ExecutionException e) {
-          logger.error("Problem while getting {} message events", getClassName(), e);
-        } catch (CancellationException e) {
-          logger.trace("Listening for messages {} has been cancelled.", getClassName());
-        } catch (Throwable t) {
-          logger.error("Problem while getting {} message events", getClassName(), t);
-        }
-      }
-      logger.info("Stopping listening for {} Messages", getClassName());
-    }
+  /**
+   * Log an error when one element can't be re-indexed.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param elementName
+   *           The name of the element that can't be added (e.g. 'event').
+   * @param element
+   *           The element that can't be added.
+   * @param t
+   *           The error that occurred.
+   * @param org
+   *           The organization.
+   */
+  protected void logSkippingElement(Logger logger, String elementName, String element, Organization org, Throwable t) {
+    logger.error("Unable to re-index '{}' {} of organization '{}', skipping.", elementName, element, org.getId(), t);
+  }
+
+  /**
+   * Log an error during an index rebuild for this service.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param t
+   *           The error that occurred.
+   */
+  protected void logIndexRebuildError(Logger logger, String indexName, Throwable t) {
+    logger.error("Error updating index '{}' for service '{}'.", indexName, getService(), t);
+  }
+
+  /**
+   * Log an error during an index rebuild for this service.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param total
+   *           The total amount of elements to be re-added.
+   * @param current
+   *           The amount of elements that have already been re-added.
+   * @param t
+   *           The error that occurred.
+   */
+  protected void logIndexRebuildError(Logger logger, String indexName, int total, int current, Throwable t) {
+    logger.error("Error updating index '{}' for service '{}': {}/{} could be finished.", indexName, getService(),
+            current, total, t);
+  }
+
+  /**
+   * Log an error during an index rebuild for this service.
+   *
+   * @param logger
+   *           An slf4j logger to preserve the context.
+   * @param indexName
+   *           The name of the index that's being rebuild.
+   * @param t
+   *           The error that occurred.
+   * @param org
+   *           The organization.
+   */
+  protected void logIndexRebuildError(Logger logger, String indexName, Throwable t, Organization org) {
+    logger.error("Error updating index '{}' for service '{}' and organization '{}'.", indexName, getService(),
+            org.getId(), t);
   }
 }

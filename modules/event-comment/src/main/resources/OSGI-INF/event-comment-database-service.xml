@@ -5,6 +5,7 @@
   <property name="service.description" value="Event Comment Database Service"/>
   <service>
     <provide interface="org.opencastproject.event.comment.persistence.EventCommentDatabaseService"/>
+    <provide interface="org.opencastproject.index.rebuild.IndexProducer"/>
   </service>
   <reference name="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
              target="(osgi.unit.name=org.opencastproject.event.comment)" cardinality="1..1" policy="static"
