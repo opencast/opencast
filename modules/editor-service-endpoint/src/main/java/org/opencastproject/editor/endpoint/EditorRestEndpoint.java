@@ -81,16 +81,16 @@ public class EditorRestEndpoint {
   }
 
   @GET
-  @Path("{mediapackageid}/edit.json")
+  @Path("{mediapackageId}/edit.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getEditorData",
           description = "Returns all the information required to get the editor tool started",
           returnDescription = "JSON object",
-          pathParameters = { @RestParameter(name = "mediapackageid", description = "The id of the media package",
+          pathParameters = { @RestParameter(name = "mediapackageId", description = "The id of the media package",
                   isRequired = true, type = RestParameter.Type.STRING) }, responses = {
           @RestResponse(description = "Media package found", responseCode = SC_OK),
           @RestResponse(description = "Media package not found", responseCode = SC_NOT_FOUND) })
-  public Response getEditorData(@PathParam("mediapackageid") final String mediaPackageId) {
+  public Response getEditorData(@PathParam("mediapackageId") final String mediaPackageId) {
     try {
       EditingData response = editorService.getEditData(mediaPackageId);
       if (response != null) {
@@ -105,42 +105,35 @@ public class EditorRestEndpoint {
   }
 
   @POST
-  @Path("{mediapackageid}/edit.json")
+  @Path("{mediapackageId}/edit.json")
   @Consumes(MediaType.APPLICATION_JSON)
   @RestQuery(name = "editVideo", description = "Takes editing information from the client side and processes it",
           returnDescription = "",
           pathParameters = {
-          @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true,
+          @RestParameter(name = "mediapackageId", description = "The id of the media package", isRequired = true,
                   type = RestParameter.Type.STRING) },
           responses = {
           @RestResponse(description = "Editing information saved and processed", responseCode = SC_OK),
           @RestResponse(description = "Media package not found", responseCode = SC_NOT_FOUND),
           @RestResponse(description = "The editing information cannot be parsed",
                   responseCode = HttpServletResponse.SC_BAD_REQUEST) })
-  public Response editVideo(@PathParam("mediapackageid") final String mediaPackageId,
+  public Response editVideo(@PathParam("mediapackageId") final String mediaPackageId,
           @Context HttpServletRequest request) {
-    String details;
+    String details = null;
     try {
       details = readInputStream(request);
+      logger.debug("Editor POST-Request received: {}", details);
+      EditingData editingInfo = EditingData.parse(details);
+      editorService.setEditData(mediaPackageId, editingInfo);
     } catch (IOException e) {
       return RestUtil.R.serverError();
-    }
-    logger.debug("Editor POST-Request received: {}", details);
-
-    EditingData editingInfo;
-    try {
-      editingInfo = EditingData.parse(details);
-    }
-    catch (Exception e) {
+    } catch (EditorServiceException e) {
+      return checkErrorState(mediaPackageId, e);
+    } catch (Exception e) {
       logger.debug("Unable to parse editing information ({})", details, e);
       return RestUtil.R.badRequest("Unable to parse details");
     }
 
-    try {
-      editorService.setEditData(mediaPackageId, editingInfo);
-    } catch (EditorServiceException e) {
-      return checkErrorState(mediaPackageId, e);
-    }
     return RestUtil.R.ok();
   }
 

@@ -25,9 +25,9 @@ import java.util.Objects;
 public class SegmentData {
   private Long start;
   private Long end;
-  private Boolean deleted;
+  private boolean deleted = false;
 
-  public SegmentData(Long start, Long end, Boolean deleted) {
+  public SegmentData(Long start, Long end, boolean deleted) {
     this.start = start;
     this.end = end;
     this.deleted = deleted;
@@ -40,7 +40,7 @@ public class SegmentData {
   }
 
   public boolean isDeleted() {
-    return (deleted != null) ? deleted : false;
+    return deleted;
   }
 
   public Long getStart() {

@@ -34,7 +34,7 @@ public final class TrackData {
   @SerializedName(VIDEO_STREAM)
   private final TrackSubData video;
 
-  private final FlavorData flavor;
+  private final MediaPackageElementFlavor flavor;
   private final String uri;
   private final String id;
 
@@ -47,7 +47,7 @@ public final class TrackData {
 
   public TrackData(final String flavorType, final String flavorSubtype, final TrackSubData audio,
           final TrackSubData video, String uri, String id) {
-    this.flavor = new FlavorData(flavorType, flavorSubtype);
+    this.flavor = new MediaPackageElementFlavor(flavorType, flavorSubtype);
     this.audio = audio;
     this.video = video;
     this.uri = uri;
