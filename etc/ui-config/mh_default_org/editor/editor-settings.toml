@@ -1,8 +1,3 @@
-### Ungrouped values, used to make GET-Parameters easier to write
-### Values are assigned here only for debugging purposes
-# Id of the event that the editor should open
-#mediaPackageId = '27cd7156-fda6-4b31-aab5-d56833012caf'
-
 #### Values pertaining to accessing opencast
 [opencast]
 # URL of the opencast server on which we are editing events.
