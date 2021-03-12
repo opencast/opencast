@@ -100,11 +100,13 @@ custom parameters to be defined globally.
     - `series_name=SERIESNAME` if you just have the series name (has to be unique)
     - `deletion=true` to show a delete button next to each episode
     - `edit=true` if you want to display an edit button next to each episode
+    - `lng=LANG` to force a language (the browser language is used otherwise)
 - To show an upload dialog, use `ltitools/index.html` as LTI `custom_tool` launch parameter
   and specify the following query parameters:
     - `subtool=upload`
     - `series=SERIESID` if you have the series ID
     - `series_name=SERIESNAME` if you just have the series name (has to be unique)
+    - `lng=LANG` to force a language (the browser language is used otherwise)
 - To show a single video, use `/play/<id>` as LTI `custom_tool` launch parameter
 - To show a debug page before proceeding to the tool, append the parameter `test=true`
 

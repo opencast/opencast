@@ -68,9 +68,7 @@ public class AssetManagerWithMessagingTest extends AbstractTieredStorageAssetMan
     EasyMock.expect(authSvc.getActiveAcl(EasyMock.<MediaPackage>anyObject())).andReturn(tuple(acl, AclScope.Episode)).anyTimes();
     EasyMock.replay(authSvc);
     ms = EasyMock.createMock(MessageSender.class);
-    return new AssetManagerWithMessaging(
-            // message receive part is currently not under test so we can pass null values
-            mkTieredStorageAM(), ms, null, authSvc, null, null, workspace, null);
+    return new AssetManagerWithMessaging(mkTieredStorageAM(), ms, authSvc, workspace);
   }
 
   @Override public AbstractAssetManager getAbstractAssetManager() {

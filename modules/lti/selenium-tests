@@ -120,6 +120,18 @@ def check_upload_tool(edit=False, deletion=False):
         pass
 
 
+def check_i18next():
+    header('Testing Internationalization')
+
+    # Probe German translation of the series tool
+    navigate(f'/ltitools/index.html?subtool=series&lng=de')
+    wait_for(driver, (By.TAG_NAME, 'header'))
+
+    # Check for a translated results header
+    elem = driver.find_element(By.TAG_NAME, 'header')
+    assert not elem.text.startswith('Results')
+
+
 def main():
     os.setpgrp()
     try:
@@ -129,6 +141,7 @@ def main():
         check_series_tool()
         check_series_tool(True, True)
         check_upload_tool()
+        check_i18next()
         driver.close()
     finally:
         try:

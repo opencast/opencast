@@ -29,11 +29,11 @@ import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildException;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -44,7 +44,6 @@ import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -64,7 +63,6 @@ import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +87,7 @@ import javax.xml.parsers.ParserConfigurationException;
     "service.description=Series Service"
   },
   immediate = true,
-  service = { SeriesService.class }
+  service = { SeriesService.class, IndexProducer.class }
 )
 public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesService {
 
@@ -163,12 +161,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     logger.info("Activating Series Service");
     systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
     populateSolr(systemUserName);
-    super.activate();
-  }
-
-  @Deactivate
-  public void deactivate() {
-    super.deactivate();
   }
 
   /** If the solr index is empty, but there are series in the database, populate the solr index. */
@@ -555,13 +547,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public void repopulate(final String indexName) {
+  public void repopulate(final String indexName) throws IndexRebuildException {
     final String destinationId = SeriesItem.SERIES_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
             + indexName.substring(1);
     try {
       final int total = persistence.countSeries();
-      logger.info("Re-populating '{}' index with series. There are {} series to add to the index.", indexName, total);
-      final int responseInterval = (total < 100) ? 1 : (total / 100);
+      logIndexRebuildBegin(logger, indexName, total, "series");
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       int current = 1;
       for (SeriesEntity series: databaseSeries) {
@@ -599,53 +590,17 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     logger.error("Error requesting series properties", e);
                   }
                 });
-        if ((current % responseInterval == 0) || (current == total)) {
-          logger.info("Initializing {} series index rebuild {}/{}: {} percent", indexName, current, total,
-                  current * 100 / total);
-        }
+        logIndexRebuildProgress(logger, indexName, total, current);
         current++;
       }
-      logger.info("Finished initializing '{}' index rebuild", indexName);
     } catch (Exception e) {
-      logger.warn("Unable to index series instances:", e);
-      throw new ServiceException(e.getMessage());
+      logIndexRebuildError(logger, indexName, e);
+      throw new IndexRebuildException(indexName, getService(), e);
     }
-
-    Organization org = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(systemUserName, org), () -> {
-      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Series));
-    });
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Series;
   }
-
-  @Override
-  public Service getService() {
-    return Service.Series;
-  }
-
-  @Override
-  public String getClassName() {
-    return SeriesServiceImpl.class.getName();
-  }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return systemUserName;
-  }
-
 }
