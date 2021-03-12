@@ -62,7 +62,6 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
@@ -202,9 +201,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The message broker sender service */
   private MessageSender messageSender;
 
-  /** The message broker receiver service */
-  private MessageReceiver messageReceiver;
-
   /** Persistent storage for events */
   private SchedulerServiceDatabase persistence;
 
@@ -245,15 +241,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    */
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
-  }
-
-  /**
-   * OSGi callback to set message receiver.
-   *
-   * @param messageReceiver
-   */
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
   }
 
   /**
