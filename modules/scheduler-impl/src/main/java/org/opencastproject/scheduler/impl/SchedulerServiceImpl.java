@@ -1659,28 +1659,26 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         }
 
         for (ExtendedEventDto event : events) {
+          String mpId = event.getMediaPackageId();
           current[0] = current[0] + 1;
           try {
-            final String agentId = event.getCaptureAgentId();
-            final Date start = event.getStartDate();
-            final Date end = event.getEndDate();
             final Set<String> presenters = getPresenters(Opt.nul(event.getPresenters()).getOr(""));
             final Map<String, String> caMetadata = deserializeExtendedEventProperties(event.getCaptureAgentProperties());
-            final Opt<String> recordingStatus = Opt.nul(event.getRecordingState());
 
             AQueryBuilder query = assetManager.createQuery();
             final AResult result = query.select(query.snapshot())
-                    .where(query.mediaPackageId(event.getMediaPackageId()).and(query.version().isLatest())).run();
+                    .where(query.mediaPackageId(mpId).and(query.version().isLatest())).run();
             final Snapshot snapshot = result.getRecords().head().get().getSnapshot().get();
             final Opt<AccessControlList> acl = Opt.some(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA());
 
             final Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
-            updateEventInIndex(event.getMediaPackageId(), index, acl, dublinCore, Opt.some(start), Opt.some(end),
-                            Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata), recordingStatus);
+            updateEventInIndex(mpId, index, acl, dublinCore, Opt.some(event.getStartDate()),
+                    Opt.some(event.getEndDate()), Opt.some(presenters), Opt.some(event.getCaptureAgentId()),
+                    Opt.some(caMetadata), Opt.nul(event.getRecordingState()));
             logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
           } catch (Exception e) {
-            logSkippingElement(logger, "scheduled event", event.getMediaPackageId(), e);
+            logSkippingElement(logger, "scheduled event", mpId, e);
           }
         }
       });
