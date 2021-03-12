@@ -5,7 +5,7 @@ import { searchEpisode, getLti, SearchEpisodeResults, postDeeplinkData } from ".
 import { parsedQueryString } from "../utils";
 import { withTranslation, WithTranslation } from "react-i18next";
 import Pagination from "react-js-pagination";
-import i18next from "i18next";
+import * as i18next from "i18next";
 import { Container, Tabs, Tab, Form, Button, Col } from 'react-bootstrap';
 import InnerHTML from 'dangerously-set-html-content'
 import "../App.css";
