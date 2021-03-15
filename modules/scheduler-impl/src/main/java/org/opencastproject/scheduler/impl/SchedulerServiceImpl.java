@@ -481,8 +481,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             schedulingSource);
   }
 
-
-
   private Map<String, Period> addMultipleEventInternal(List<Period> periods, String captureAgentId,
           Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
           Map<String, String> caMetadata, Opt<String> schedulingSource) throws SchedulerException {
@@ -522,7 +520,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           ids.clear();
         }
       }
-
 
       Opt<String> seriesId = Opt.nul(StringUtils.trimToNull(templateMp.getSeries()));
 
@@ -1394,6 +1391,20 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     );
   }
 
+  /**
+   * Update the event in the Elasticsearch index. Fields will only be updated of the corresponding Opt is not none.
+   *
+   * @param mediaPackageId
+   * @param index
+   * @param acl
+   * @param dublinCore
+   * @param startTime
+   * @param endTime
+   * @param presenters
+   * @param agentId
+   * @param properties
+   * @param recordingStatus
+   */
   private void updateEventInIndex(String mediaPackageId, AbstractSearchIndex index, Opt<AccessControlList> acl,
           Opt<DublinCoreCatalog> dublinCore, Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters,
           Opt<String> agentId, Opt<Map<String, String>> properties, Opt<String> recordingStatus) {
@@ -1442,6 +1453,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
+  /**
+   * Set recording status to null for this event in the Elasticsearch index.
+   *
+   * @param mediaPackageId
+   * @param index
+   */
   private void removeRecordingStatusFromIndex(String mediaPackageId, AbstractSearchIndex index) {
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
@@ -1458,26 +1475,58 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
+  /**
+   * Remove scheduling information for this event from the Elasticsearch index.
+   *
+   * @param mediaPackageId
+   * @param index
+   */
+  private void removeSchedulingFromIndex(String mediaPackageId, AbstractSearchIndex index) {
+    String organization = getSecurityService().getOrganization().getId();
+    User user = getSecurityService().getUser();
+    try {
+      index.deleteScheduling(organization, user, mediaPackageId);
+      logger.debug("Scheduling information of event {} removed from the {} index.", mediaPackageId, index.getIndexName());
+    } catch (NotFoundException e) {
+      logger.warn("Scheduled recording {} not found for deletion from the {} index.", mediaPackageId,
+              index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Failed to delete the scheduling information of event {} from the {} index.", mediaPackageId,
+              index.getIndexName(), e);
+    }
+  }
+
+  /**
+   * Send messages to trigger an update in the LiveScheduleService.
+   *
+   * @param mpId
+   * @param acl
+   * @param dublinCore
+   * @param startTime
+   * @param endTime
+   * @param agentId
+   * @param properties
+   */
   private void updateLiveEvent(String mpId, Opt<AccessControlList> acl, Opt<DublinCoreCatalog> dublinCore,
           Opt<Date> startTime, Opt<Date> endTime, Opt<String> agentId, Opt<Map<String, String>> properties) {
     List<SchedulerItem> items = new ArrayList<>();
     if (acl.isSome()) {
-      items.add(SchedulerItem.updateAcl(acl.get())); // still sent for live scheduler service
+      items.add(SchedulerItem.updateAcl(acl.get()));
     }
     if (dublinCore.isSome()) {
-      items.add(SchedulerItem.updateCatalog(dublinCore.get())); // still sent for live scheduler service
+      items.add(SchedulerItem.updateCatalog(dublinCore.get()));
     }
     if (startTime.isSome()) {
-      items.add(SchedulerItem.updateStart(startTime.get())); // still sent for live scheduler service
+      items.add(SchedulerItem.updateStart(startTime.get()));
     }
     if (endTime.isSome()) {
-      items.add(SchedulerItem.updateEnd(endTime.get())); // still sent for live scheduler service
+      items.add(SchedulerItem.updateEnd(endTime.get()));
     }
     if (agentId.isSome()) {
-      items.add(SchedulerItem.updateAgent(agentId.get())); // still sent for live scheduler service
+      items.add(SchedulerItem.updateAgent(agentId.get()));
     }
     if (properties.isSome()) {
-      items.add(SchedulerItem.updateProperties(properties.get())); // still sent for live scheduler service
+      items.add(SchedulerItem.updateProperties(properties.get()));
     }
 
     if (!items.isEmpty()) {
@@ -1677,26 +1726,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return IndexRebuildService.Service.Scheduler;
   }
 
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
   public SecurityService getSecurityService() {
     return securityService;
-  }
-
-  private void removeSchedulingFromIndex(String mediaPackageId, AbstractSearchIndex index) {
-    String organization = getSecurityService().getOrganization().getId();
-    User user = getSecurityService().getUser();
-    try {
-      index.deleteScheduling(organization, user, mediaPackageId);
-      logger.debug("Scheduling information of event {} removed from the {} index.", mediaPackageId, index.getIndexName());
-    } catch (NotFoundException e) {
-      logger.warn("Scheduled recording {} not found for deletion from the {} index.", mediaPackageId,
-              index.getIndexName());
-    } catch (SearchIndexException e) {
-      logger.error("Failed to delete the scheduling information of event {} from the {} index.", mediaPackageId,
-              index.getIndexName(), e);
-    }
   }
 }
