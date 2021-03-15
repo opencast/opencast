@@ -15,7 +15,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
-    "react-i18next": "^11.8.9",
+    "react-i18next": "^11.8.10",
     "react-js-pagination": "^3.0.2",
     "react-scripts": "^3.2.0",
     "react-select": "^4.2.1",
