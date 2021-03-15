@@ -4,6 +4,57 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.3
+
+*Released on March 15th, 2021*
+
+- [[#2395](https://github.com/opencast/opencast/pull/2395)] -
+  Fix Hardcoded Dependency Version
+- [[#2394](https://github.com/opencast/opencast/pull/2394)] -
+  Editor Workflow Description
+- [[#2373](https://github.com/opencast/opencast/pull/2373)] -
+  Fix code formatting for aws s3 distribution
+- [[#2368](https://github.com/opencast/opencast/pull/2368)] -
+  Improve Email Workflow Operation
+- [[#2361](https://github.com/opencast/opencast/pull/2361)] -
+  Handle image extraction from very short videos
+- [[#2355](https://github.com/opencast/opencast/pull/2355)] -
+  Document and Test i18next in LTI Tools
+- [[#2353](https://github.com/opencast/opencast/pull/2353)] -
+  OAI-PMH Primary Key Length
+- [[#2343](https://github.com/opencast/opencast/pull/2343)] -
+  Fix LTI Tool Value Checks
+- [[#2340](https://github.com/opencast/opencast/pull/2340)] -
+  Fix checkstyle violations in 5 `distribution-*` modules
+- [[#2338](https://github.com/opencast/opencast/pull/2338)] -
+  Fix checkstyle violations in 5 `publications-service-*` modules
+- [[#2335](https://github.com/opencast/opencast/pull/2335)] -
+  Distinguish Between Documentation and Configuration Checks
+- [[#2331](https://github.com/opencast/opencast/pull/2331)] -
+  Simplify Conflict Check
+- [[#2330](https://github.com/opencast/opencast/pull/2330)] -
+  Fix Search Capability in Documentation
+- [[#2329](https://github.com/opencast/opencast/pull/2329)] -
+  Fixes Solr search failing when titles containing lots of upper case characters
+- [[#2328](https://github.com/opencast/opencast/pull/2328)] -
+  Document publish-configure changes from #1663 in upgrade guide
+- [[#2316](https://github.com/opencast/opencast/pull/2316)] -
+  Changed PartialImportWOH to ignore smil entries for tracks that don't exist
+- [[#2301](https://github.com/opencast/opencast/pull/2301)] -
+  Run Tests Only If Necessary
+- [[#2296](https://github.com/opencast/opencast/pull/2296)] -
+  Admin UI now shows a warning if it cannot reach Github
+- [[#2277](https://github.com/opencast/opencast/pull/2277)] -
+  Add Event Metrics
+- [[#2263](https://github.com/opencast/opencast/pull/2263)] -
+  Fix memory leak / performance in the LTI upload and job overview
+- [[#2260](https://github.com/opencast/opencast/pull/2260)] -
+  Stand-Alone Video Editor
+- [[#2248](https://github.com/opencast/opencast/pull/2248)] -
+  Selenium Tests for LTI Tools
+- [[#2026](https://github.com/opencast/opencast/pull/2026)] -
+  Fix Job Dispatching Test
+
 ### Opencast 9.2
 
 *Released on February 15th, 2021*
