@@ -4,6 +4,16 @@
   <artifactId>opencast-editor-service-api</artifactId>
   <packaging>bundle</packaging>
   <name>Opencast :: editor-service-api</name>
+  <parent>
+    <groupId>org.opencastproject</groupId>
+    <artifactId>base</artifactId>
+    <version>10-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <properties>
+    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
+    <checkstyle.skip>false</checkstyle.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -31,16 +41,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <parent>
-    <groupId>org.opencastproject</groupId>
-    <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
-  </parent>
-  <properties>
-    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
-  </properties>
   <build>
     <plugins>
       <plugin>
