@@ -118,9 +118,8 @@ Additional Notes about 9.3
 
 Besides many fixes and improvements, Opencast 9.3 comes with the following new features:
 
-The metrics endpoint now provides information about the number of events per organization.
-
-This release also includes a first version of the standalone video editor.
+- The [metrics endpoint](modules/metrics.md) now provides information about the number of events per organization.
+- A first beta version of [the standalone video editor](modules/editor.md).
 
 Additional Notes about 9.2
 --------------------------
