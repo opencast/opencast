@@ -46,6 +46,7 @@ import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.userdirectory.ConflictException;
+import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -91,6 +92,7 @@ public class GroupsEndpoint {
   /* OSGi service references */
   private ExternalIndex externalIndex;
   private IndexService indexService;
+  private JpaGroupRoleProvider jpaGroupRoleProvider;
 
   /** OSGi DI */
   void setExternalIndex(ExternalIndex externalIndex) {
@@ -100,6 +102,11 @@ public class GroupsEndpoint {
   /** OSGi DI */
   void setIndexService(IndexService indexService) {
     this.indexService = indexService;
+  }
+
+  /** OSGi DI */
+  public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
+    this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
   /** OSGi activation method */

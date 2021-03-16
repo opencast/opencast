@@ -55,6 +55,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.userdirectory.ConflictException;
+import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.data.Option;
@@ -123,6 +124,9 @@ public class GroupsEndpoint {
   /** The index service */
   private IndexService indexService;
 
+  /** The group provider */
+  private JpaGroupRoleProvider jpaGroupRoleProvider;
+
   /** OSGi callback for the security service. */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -141,6 +145,11 @@ public class GroupsEndpoint {
   /** OSGi callback for the search index. */
   public void setSearchIndex(AdminUISearchIndex searchIndex) {
     this.searchIndex = searchIndex;
+  }
+
+  /** OSGi callback for the group provider. */
+  public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
+    this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
   /** OSGi callback. */
