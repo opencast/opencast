@@ -22,12 +22,8 @@
 
 package org.opencastproject.elasticsearch.index.group;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchMetadata;
-import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.impl.SearchMetadataCollection;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.security.api.User;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -90,35 +86,5 @@ public final class GroupIndexUtils {
       metadata.addField(GroupIndexSchema.MEMBERS, group.getMembers().toArray(), true);
     }
     return metadata;
-  }
-
-  /**
-   * Loads the group from the search index or creates a new one that can then be persisted.
-   *
-   * @param groupId
-   *          the group identifier
-   * @param organization
-   *          the organization
-   * @param user
-   *          the user
-   * @param searchIndex
-   *          the Index to search in
-   * @return the group
-   * @throws SearchIndexException
-   *           if querying the search index fails
-   * @throws IllegalStateException
-   *           if multiple groups with the same identifier are found
-   */
-  public static Group getOrCreate(String groupId, String organization, User user, AbstractSearchIndex searchIndex)
-          throws SearchIndexException {
-    GroupSearchQuery query = new GroupSearchQuery(organization, user).withoutActions().withIdentifier(groupId);
-    SearchResult<Group> searchResult = searchIndex.getByQuery(query);
-    if (searchResult.getDocumentCount() == 0) {
-      return new Group(groupId, organization);
-    } else if (searchResult.getDocumentCount() == 1) {
-      return searchResult.getItems()[0].getSource();
-    } else {
-      throw new IllegalStateException("Multiple groups with identifier " + groupId + " found in search index");
-    }
   }
 }

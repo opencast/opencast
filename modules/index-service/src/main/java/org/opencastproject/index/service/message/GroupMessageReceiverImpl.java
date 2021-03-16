@@ -22,8 +22,9 @@
 package org.opencastproject.index.service.message;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.group.Group;
-import org.opencastproject.elasticsearch.index.group.GroupIndexUtils;
+import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.group.GroupItem;
 import org.opencastproject.security.api.Role;
@@ -59,7 +60,18 @@ public class GroupMessageReceiverImpl extends BaseMessageReceiverImpl<GroupItem>
                 jaxbGroup.getGroupId(), jaxbGroup.getName(), jaxbGroup.getDescription(), jaxbGroup.getOrganization(),
                 jaxbGroup.getRoles(), jaxbGroup.getMembers());
         try {
-          Group group = GroupIndexUtils.getOrCreate(jaxbGroup.getGroupId(), organization, user, getSearchIndex());
+          Group group;
+          String groupId = jaxbGroup.getGroupId();
+          GroupSearchQuery query = new GroupSearchQuery(organization, user).withoutActions().withIdentifier(groupId);
+          SearchResult<Group> searchResult = getSearchIndex().getByQuery(query);
+          if (searchResult.getDocumentCount() == 0) {
+            group = new Group(groupId, organization);
+          } else if (searchResult.getDocumentCount() == 1) {
+            group = searchResult.getItems()[0].getSource();
+          } else {
+            throw new IllegalStateException("Multiple groups with identifier " + groupId + " found in search index");
+          }
+
           group.setName(jaxbGroup.getName());
           group.setDescription(jaxbGroup.getDescription());
           group.setMembers(jaxbGroup.getMembers());
