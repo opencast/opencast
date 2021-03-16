@@ -30,52 +30,62 @@ package org.opencastproject.assetmanager.api.query;
 // TODO split type into predicate builder and order builder methods
 public interface Field<A> {
   /**
-   * Create a predicate that holds true if the field's value and constant value <code>right</code> are equal.
+   * Create a predicate that holds true if the field's value and constant value
+   * <code>right</code> are equal.
    */
   Predicate eq(A right);
 
   /**
-   * Create a predicate that holds true if the field's value and the value of property field <code>right</code> are equal.
+   * Create a predicate that holds true if the field's value and the value of
+   * property field <code>right</code> are equal.
    */
   Predicate eq(PropertyField<A> right);
 
   /**
-   * Create a predicate that holds true if the field's value is strictly less than constant value <code>right</code>.
+   * Create a predicate that holds true if the field's value is strictly less
+   * than constant value <code>right</code>.
    */
   Predicate lt(A right);
 
   /**
-   * Create a predicate that holds true if the field's value is strictly less than the value of property field <code>right</code>.
+   * Create a predicate that holds true if the field's value is strictly less
+  * than the value of property field <code>right</code>.
    */
   Predicate lt(PropertyField<A> right);
 
   /**
-   * Create a predicate that holds true if the field's value is less than constant value <code>right</code> or equal to it.
+   * Create a predicate that holds true if the field's value is less than
+   * constant value <code>right</code> or equal to it.
    */
   Predicate le(A right);
 
   /**
-   * Create a predicate that holds true if the field's value is less than the value of property field <code>right</code> or equal to it.
+   * Create a predicate that holds true if the field's value is less than the
+   * value of property field <code>right</code> or equal to it.
    */
   Predicate le(PropertyField<A> right);
 
   /**
-   * Create a predicate that holds true if the field's value is strictly greater than constant value <code>right</code>.
+   * Create a predicate that holds true if the field's value is strictly greater
+   * than constant value <code>right</code>.
    */
   Predicate gt(A right);
 
   /**
-   * Create a predicate that holds true if the field's value is strictly greater than the value of property field <code>right</code>.
+   * Create a predicate that holds true if the field's value is strictly greater
+   * than the value of property field <code>right</code>.
    */
   Predicate gt(PropertyField<A> right);
 
   /**
-   * Create a predicate that holds true if the field's value is greater than constant value <code>right</code> or equal to it.
+   * Create a predicate that holds true if the field's value is greater than
+   * constant value <code>right</code> or equal to it.
    */
   Predicate ge(A right);
 
   /**
-   * Create a predicate that holds true if the field's value is greater than the value of property field <code>right</code> or equal to it.
+   * Create a predicate that holds true if the field's value is greater than the
+   * value of property field <code>right</code> or equal to it.
    */
   Predicate ge(PropertyField<A> right);
 
