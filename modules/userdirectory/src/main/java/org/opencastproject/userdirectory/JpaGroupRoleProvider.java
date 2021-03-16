@@ -447,22 +447,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   }
 
   /**
-   * Retrieves a group list based on input constraints.
-   *
-   * @param limit
-   *          the int amount to limit the results
-   * @param offset
-   *          the offset to start this result set at
-   * @return the JaxbGroupList of results
-   * @throws IOException
-   *           if unexpected IO exception occurs
-   */
-  public JaxbGroupList getGroupsAsJson(int limit, int offset)
-          throws IOException {
-    return getGroupsAsXml(limit, offset);
-  }
-
-  /**
    * Returns a XML representation of the list of groups available the current user's organization.
    *
    * @param limit
@@ -473,7 +457,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
    * @throws IOException
    *           if unexpected IO exception occurs
    */
-  public JaxbGroupList getGroupsAsXml(int limit, int offset)
+  public JaxbGroupList getGroups(int limit, int offset)
           throws IOException {
     if (limit < 1)
       limit = 100;
