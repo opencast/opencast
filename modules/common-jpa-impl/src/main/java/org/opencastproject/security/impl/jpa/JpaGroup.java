@@ -248,6 +248,31 @@ public final class JpaGroup implements Group {
     this.members = members;
   }
 
+  /**
+   * Add a member
+   *
+   * @param member
+   *          The member's name.
+   */
+  public void addMember(String member) {
+    if (members == null) {
+      members = new HashSet<>();
+    }
+    members.add(member);
+  }
+
+  /**
+   * Remove a member
+   *
+   * @param member
+   *          The member's name.
+   */
+  public void removeMember(String member) {
+    if (members != null) {
+      members.remove(member);
+    }
+  }
+
   @Override
   public Set<Role> getRoles() {
     return new HashSet<Role>(roles);

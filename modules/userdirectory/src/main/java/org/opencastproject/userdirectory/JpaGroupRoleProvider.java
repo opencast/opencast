@@ -534,6 +534,60 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   }
 
   /**
+   * Remove member from group.
+   *
+   * @param groupId
+   * @param member
+   *
+   * @return true if we updated the group, false otherwise
+   *
+   * @throws NotFoundException
+   * @throws UnauthorizedException
+   */
+  public boolean removeMemberFromGroup(String groupId, String member) throws NotFoundException, UnauthorizedException {
+    JpaGroup group = getGroup(groupId);
+    if (group == null) {
+      throw new NotFoundException();
+    }
+    Set<String> members = group.getMembers();
+    if (!members.contains(member)) {
+      return false; // nothing to do here
+    }
+    group.removeMember(member);
+    userDirectoryService.invalidate(member);
+
+    addGroup(group);
+    return true;
+  }
+
+  /**
+   * Add member to group.
+   *
+   * @param groupId
+   * @param member
+   *
+   * @return true if we updated the group, false otherwise
+   *
+   * @throws NotFoundException
+   * @throws UnauthorizedException
+   */
+  public boolean addMemberToGroup(String groupId, String member) throws NotFoundException, UnauthorizedException {
+    JpaGroup group = getGroup(groupId);
+    if (group == null) {
+      throw new NotFoundException();
+    }
+    Set<String> members = group.getMembers();
+    if (members.contains(member)) {
+      return false; // nothing to do here
+    }
+    group.addMember(member);
+    userDirectoryService.invalidate(member);
+
+    addGroup(group);
+    return true;
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.userdirectory.api.GroupRoleProvider#updateGroup(String, String, String, String, String)

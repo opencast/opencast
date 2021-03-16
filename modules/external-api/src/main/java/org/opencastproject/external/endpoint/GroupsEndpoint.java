@@ -64,7 +64,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -247,34 +246,21 @@ public class GroupsEndpoint {
   public Response addGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @FormParam("member") String member) {
     try {
-      Opt<Group> groupOpt = indexService.getGroup(id, externalIndex);
-      if (groupOpt.isSome()) {
-        Group group = groupOpt.get();
-        Set<String> members = group.getMembers();
-        if (!members.contains(member)) {
-          group.addMember(member);
-          try {
-            jpaGroupRoleProvider.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
-                    StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
-          } catch (IllegalArgumentException e) {
-            logger.warn("Unable to add member to group id '{}': {}", id, e.getMessage());
-            return Response.status(SC_BAD_REQUEST).build();
-          } catch (UnauthorizedException ex) {
-            return Response.status(SC_FORBIDDEN).build();
-          }
-          return Response.ok().build();
-        } else {
-          return ApiResponses.Json.ok(acceptHeader, "Member is already member of group");
-        }
+      if (jpaGroupRoleProvider.addMemberToGroup(id, member)) {
+        return Response.ok().build();
       } else {
-        return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+        return ApiResponses.Json.ok(acceptHeader, "Member is already member of group.");
       }
-    } catch (SearchIndexException e) {
-      logger.warn("The external search index was not able to retrieve the group with id '{}', reason: ", id, e);
-      return ApiResponses.serverError("Could not retrieve group with id '%s', reason: '%s'", id, getMessage(e));
+    } catch (IllegalArgumentException e) {
+      logger.warn("Unable to add member to group id {}.", id, e);
+      return Response.status(SC_BAD_REQUEST).build();
+    } catch (UnauthorizedException ex) {
+      return Response.status(SC_FORBIDDEN).build();
     } catch (NotFoundException e) {
-      logger.warn("The external search index was not able to update the group with id {}, ", id, e);
-      return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
+      return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+    } catch (Exception e) {
+      logger.warn("Could not update the group with id {}.",id, e);
+      return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'",id,getMessage(e));
     }
   }
 
@@ -288,34 +274,20 @@ public class GroupsEndpoint {
   public Response removeGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @PathParam("memberId") String memberId) {
     try {
-      Opt<Group> groupOpt = indexService.getGroup(id, externalIndex);
-      if (groupOpt.isSome()) {
-        Group group = groupOpt.get();
-        Set<String> members = group.getMembers();
-        if (members.contains(memberId)) {
-          members.remove(memberId);
-          group.setMembers(members);
-          try {
-            jpaGroupRoleProvider.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
-                    StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
-          } catch (IllegalArgumentException e) {
-            logger.warn("Unable to remove member from group id '{}': {}", id, e.getMessage());
-            return Response.status(SC_BAD_REQUEST).build();
-          } catch (UnauthorizedException ex) {
-            return Response.status(SC_FORBIDDEN).build();
-          }
-          return Response.ok().build();
-        } else {
-          return ApiResponses.notFound("Cannot find member '%s' in group '%s'.", memberId, id);
-        }
+      if (jpaGroupRoleProvider.removeMemberFromGroup(id, memberId)) {
+        return Response.ok().build();
       } else {
-        return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+        return ApiResponses.Json.ok(acceptHeader, "Member is already not member of group.");
       }
-    } catch (SearchIndexException e) {
-      logger.warn("The external search index was not able to retrieve the group with id {}, ", id, e);
-      return ApiResponses.serverError("Could not retrieve groups, reason: '%s'", getMessage(e));
+    } catch (IllegalArgumentException e) {
+      logger.warn("Unable to remove member from group id {}.", id, e);
+      return Response.status(SC_BAD_REQUEST).build();
+    } catch (UnauthorizedException ex) {
+      return Response.status(SC_FORBIDDEN).build();
     } catch (NotFoundException e) {
-      logger.warn("The external search index was not able to update the group with id {}, ", id, e);
+      return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+    } catch (Exception e) {
+      logger.warn("Could not update the group with id {}.", id, e);
       return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
     }
   }
