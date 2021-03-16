@@ -20,8 +20,13 @@ jobs:
 
     - name: install dependencies
       run: |
-        pip install -q mkdocs markdown_inline_graphviz_extension mkdocs-windmill
+        sudo apt update -q
+        sudo apt install -y -q \
+          graphviz
         cd docs/guides
+        pip install -q -r requirements.txt
+        #Unclear why this needs to be a separate step, but it 100% does
+        pip install -q markdown-inline-graphviz-extension-png
         npm ci
 
     - name: check documentation
