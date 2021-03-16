@@ -42,7 +42,6 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 
@@ -84,60 +83,6 @@ public interface IndexService {
    */
   Opt<Group> getGroup(String id, AbstractSearchIndex index) throws SearchIndexException;
 
-  /**
-   * Remove a group by id
-   *
-   * @param groupId
-   *          the id of the group to remove
-   * @throws NotFoundException
-   *           the group was not found
-   * @throws UnauthorizedException
-   *           user is not authorized to remove this group
-   * @throws Exception
-   *           unexpected error occurred
-   *
-   */
-  void removeGroup(String groupId) throws NotFoundException, UnauthorizedException, Exception;
-
-  /**
-   * Update a {@link Group} with new data
-   *
-   * @param groupId
-   *          The unique id for the group.
-   * @param name
-   *          The name to use for the group.
-   * @param description
-   *          The description of the group.
-   * @param roles
-   *          A comma separated list of roles to add to this group.
-   * @param members
-   *          A comma separated list of roles to add to this group.
-   * @throws NotFoundException
-   *           Thrown if the group was not found
-   * @throws UnauthorizedException
-   *           Thrown if the user does not have rights to update the group
-   */
-  void updateGroup(String groupId, String name, String description, String roles, String members)
-          throws NotFoundException, UnauthorizedException;
-
-  /**
-   * Create a new {@link Group}
-   *
-   * @param name
-   *          The name of the group, also transformed to be the id for this group.
-   * @param description
-   *          The description of the group.
-   * @param roles
-   *          A comma separated list of roles to add to this group.
-   * @param members
-   *          A comma separated list of members to add to this group.
-   * @throws UnauthorizedException
-   *           if user does not have rights to create group
-   * @throws ConflictException
-   *           if group already exists
-   */
-   void createGroup(String name, String description, String roles, String members)
-          throws IllegalArgumentException, UnauthorizedException, ConflictException;
   /**
    * Get a single event
    *

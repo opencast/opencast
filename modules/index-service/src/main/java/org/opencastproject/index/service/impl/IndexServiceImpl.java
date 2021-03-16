@@ -109,8 +109,6 @@ import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.userdirectory.ConflictException;
-import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.DateTimeSupport;
@@ -218,7 +216,6 @@ public class IndexServiceImpl implements IndexService {
   private AssetManager assetManager;
   private SchedulerService schedulerService;
   private SecurityService securityService;
-  private JpaGroupRoleProvider jpaGroupRoleProvider;
   private SeriesService seriesService;
   private UserDirectoryService userDirectoryService;
   private WorkflowService workflowService;
@@ -417,16 +414,6 @@ public class IndexServiceImpl implements IndexService {
    */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
-  }
-
-  /**
-   * OSGi DI.
-   *
-   * @param jpaGroupRoleProvider
-   *          the provider to set
-   */
-  public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
-    this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
   /**
@@ -1481,27 +1468,6 @@ public class IndexServiceImpl implements IndexService {
       return Opt.none();
     }
     return Opt.some(result.getItems()[0].getSource());
-  }
-
-  @Override
-  public void removeGroup(String id) throws NotFoundException, UnauthorizedException, Exception {
-    jpaGroupRoleProvider.removeGroup(id);
-  }
-
-  @Override
-  public void updateGroup(String id, String name, String description, String roles, String members)
-          throws NotFoundException, UnauthorizedException {
-    jpaGroupRoleProvider.updateGroup(id, name, description, roles, members);
-  }
-
-  @Override
-  public void createGroup(String name, String description, String roles, String members)
-          throws IllegalArgumentException, UnauthorizedException, ConflictException {
-    if (StringUtils.isEmpty(roles))
-      roles = "";
-    if (StringUtils.isEmpty(members))
-      members = "";
-    jpaGroupRoleProvider.createGroup(name, description, roles, members);
   }
 
   @Override

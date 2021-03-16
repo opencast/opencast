@@ -171,7 +171,7 @@ public class GroupsEndpoint {
   public Response deleteGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
           throws NotFoundException {
     try {
-      indexService.removeGroup(id);
+      jpaGroupRoleProvider.removeGroup(id);
       return Response.noContent().build();
     } catch (NotFoundException e) {
       return Response.status(SC_NOT_FOUND).build();
@@ -197,7 +197,7 @@ public class GroupsEndpoint {
           @FormParam("name") String name, @FormParam("description") String description,
           @FormParam("roles") String roles, @FormParam("members") String members) throws Exception {
     try {
-      indexService.updateGroup(id, name, description, roles, members);
+      jpaGroupRoleProvider.updateGroup(id, name, description, roles, members);
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to update group id {}: {}", id, e.getMessage());
       return Response.status(SC_BAD_REQUEST).build();
@@ -220,7 +220,11 @@ public class GroupsEndpoint {
           @FormParam("description") String description, @FormParam("roles") String roles,
           @FormParam("members") String members) {
     try {
-      indexService.createGroup(name, description, roles, members);
+      if (StringUtils.isEmpty(roles))
+        roles = "";
+      if (StringUtils.isEmpty(members))
+        members = "";
+      jpaGroupRoleProvider.createGroup(name, description, roles, members);
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to create group {}: {}", name, e.getMessage());
       return Response.status(SC_BAD_REQUEST).build();
@@ -250,7 +254,7 @@ public class GroupsEndpoint {
         if (!members.contains(member)) {
           group.addMember(member);
           try {
-            indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
+            jpaGroupRoleProvider.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
                     StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
           } catch (IllegalArgumentException e) {
             logger.warn("Unable to add member to group id '{}': {}", id, e.getMessage());
@@ -292,7 +296,7 @@ public class GroupsEndpoint {
           members.remove(memberId);
           group.setMembers(members);
           try {
-            indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
+            jpaGroupRoleProvider.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
                     StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
           } catch (IllegalArgumentException e) {
             logger.warn("Unable to remove member from group id '{}': {}", id, e.getMessage());

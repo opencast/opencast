@@ -274,7 +274,7 @@ public class GroupsEndpoint {
       @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An internal server error occured.")})
   public Response removeGroup(@PathParam("id") String groupId) throws NotFoundException {
     try {
-      indexService.removeGroup(groupId);
+      jpaGroupRoleProvider.removeGroup(groupId);
       return Response.noContent().build();
     } catch (NotFoundException e) {
       return Response.status(SC_NOT_FOUND).build();
@@ -305,7 +305,11 @@ public class GroupsEndpoint {
   public Response createGroup(@FormParam("name") String name, @FormParam("description") String description,
           @FormParam("roles") String roles, @FormParam("users") String users) {
     try {
-      indexService.createGroup(name, description, roles, users);
+      if (StringUtils.isEmpty(roles))
+        roles = "";
+      if (StringUtils.isEmpty(users))
+        users = "";
+      jpaGroupRoleProvider.createGroup(name, description, roles, users);
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to create group with name {}: {}", name, e.getMessage());
       return Response.status(Status.BAD_REQUEST).build();
@@ -339,7 +343,7 @@ public class GroupsEndpoint {
           @FormParam("description") String description, @FormParam("roles") String roles,
           @FormParam("users") String users) throws NotFoundException {
     try {
-      indexService.updateGroup(groupId, name, description, roles, users);
+      jpaGroupRoleProvider.updateGroup(groupId, name, description, roles, users);
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to update group with id {}: {}", groupId, e.getMessage());
       return Response.status(Status.BAD_REQUEST).build();
