@@ -45,6 +45,7 @@ import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
@@ -153,12 +154,23 @@ public class GroupsEndpoint {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The group is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
-          throws Exception {
-    for (final Group group : indexService.getGroup(id, externalIndex)) {
-      return ApiResponses.Json.ok(acceptHeader, groupToJSON(group));
+  public Response getGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id) {
+    JpaGroup group = jpaGroupRoleProvider.getGroup(id);
+
+    if (group == null) {
+      return ApiResponses.notFound("Cannot find a group with id '%s'.", id);
     }
-    return ApiResponses.notFound("Cannot find a group with id '%s'.", id);
+
+    return ApiResponses.Json.ok(acceptHeader,
+            obj(
+                    f("identifier", v(group.getGroupId())),
+                    f("organization", v(group.getOrganization().getId())),  f("role", v(group.getRole())),
+                    f("name", v(group.getName(), Jsons.BLANK)),
+                    f("description", v(group.getDescription(), Jsons.BLANK)),
+                    f("roles", v(join(group.getRoleNames(), ","), Jsons.BLANK)),
+                    f("members", v(join(group.getMembers(), ","), Jsons.BLANK))
+            )
+    );
   }
 
   @DELETE

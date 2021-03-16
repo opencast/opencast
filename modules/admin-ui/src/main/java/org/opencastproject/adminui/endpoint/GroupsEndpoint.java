@@ -54,6 +54,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
@@ -365,32 +366,23 @@ public class GroupsEndpoint {
     responses = {
       @RestResponse(responseCode = SC_OK, description = "Group found and returned as JSON"),
       @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found")})
-  public Response getGroup(@PathParam("id") String groupId) throws NotFoundException, SearchIndexException {
-    Opt<Group> groupOpt = indexService.getGroup(groupId, searchIndex);
-    if (groupOpt.isNone())
+  public Response getGroup(@PathParam("id") String groupId) throws NotFoundException {
+    JpaGroup group = jpaGroupRoleProvider.getGroup(groupId);
+
+    if (group == null) {
       throw new NotFoundException("Group " + groupId + " does not exist.");
+    }
 
-    Group group = groupOpt.get();
-    Iterator<User> users = userDirectoryService.loadUsers(group.getMembers());
-    return RestUtils.okJson(obj(f("id", v(group.getIdentifier())), f("name", v(group.getName(), Jsons.BLANK)),
-      f("description", v(group.getDescription(), Jsons.BLANK)), f("role", v(group.getRole(), Jsons.BLANK)),
-      f("roles", rolesToJSON(group.getRoles())), f("users", membersToJSON(users))));
-  }
-
-  /**
-   * Generate a JSON array based on the given set of roles
-   *
-   * @param roles
-   *          the roles source
-   * @return a JSON array ({@link JValue}) with the given roles
-   */
-  private JValue rolesToJSON(Set<String> roles) {
+    // convert roles
     List<JValue> rolesJSON = new ArrayList<>();
-
-    for (String role : roles) {
+    for (String role : group.getRoleNames()) {
       rolesJSON.add(v(role));
     }
-    return arr(rolesJSON);
+
+    Iterator<User> users = userDirectoryService.loadUsers(group.getMembers());
+    return RestUtils.okJson(obj(f("id", v(group.getGroupId())), f("name", v(group.getName(), Jsons.BLANK)),
+      f("description", v(group.getDescription(), Jsons.BLANK)), f("role", v(group.getRole(), Jsons.BLANK)),
+      f("roles", arr(rolesJSON)), f("users", membersToJSON(users))));
   }
 
   /**

@@ -349,8 +349,20 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
    *          the organization id
    * @return the loaded group or <code>null</code> if not found
    */
-  public Group loadGroup(String groupId, String orgId) {
+  public JpaGroup loadGroup(String groupId, String orgId) {
     return UserDirectoryPersistenceUtil.findGroup(groupId, orgId, emf);
+  }
+
+  /**
+   * Get group.
+   *
+   * @param groupId
+   *
+   * @return the group
+   */
+  public JpaGroup getGroup(String groupId) {
+    String orgId = securityService.getOrganization().getId();
+    return loadGroup(groupId, orgId);
   }
 
   /**

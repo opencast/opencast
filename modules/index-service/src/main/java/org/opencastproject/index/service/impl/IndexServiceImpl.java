@@ -1457,20 +1457,6 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Opt<Group> getGroup(String id, AbstractSearchIndex index) throws SearchIndexException {
-    SearchResult<Group> result = index
-            .getByQuery(new GroupSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
-                    .withIdentifier(id));
-
-    // If the results list if empty, we return already a response.
-    if (result.getPageSize() == 0) {
-      logger.debug("Didn't find event with id {}", id);
-      return Opt.none();
-    }
-    return Opt.some(result.getItems()[0].getSource());
-  }
-
-  @Override
   public Opt<Event> getEvent(String id, AbstractSearchIndex index) throws SearchIndexException {
     SearchResult<Event> result = index
             .getByQuery(new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())

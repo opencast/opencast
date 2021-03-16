@@ -71,19 +71,6 @@ public interface IndexService {
           AbstractSearchIndex index) throws SearchIndexException, IllegalArgumentException;
 
   /**
-   * Get a single group
-   *
-   * @param id
-   *          the group id
-   * @param index
-   *          the index to search
-   * @return a group or none if not found wrapped in an option
-   * @throws SearchIndexException
-   *           Thrown if the index cannot be read
-   */
-  Opt<Group> getGroup(String id, AbstractSearchIndex index) throws SearchIndexException;
-
-  /**
    * Get a single event
    *
    * @param id
