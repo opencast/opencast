@@ -57,8 +57,8 @@ Configuration
 The following configuration files allow customization of the editor:
 
 - Backend (track selection, …)
-    - `etc/org.opencastproject.organization-mh_default_org.cfg`
-- User interface (which tools to show, …))
     - `etc/org.opencastproject.editor.EditorServiceImpl.cfg`
+- User interface (which tools to show, …))
+    - `etc/ui-config/mh_default_org/editor/editor-settings.toml`
 - Admin interface integration
     - `etc/org.opencastproject.organization-mh_default_org.cfg`
