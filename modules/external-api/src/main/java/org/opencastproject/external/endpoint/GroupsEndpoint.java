@@ -231,10 +231,6 @@ public class GroupsEndpoint {
           @FormParam("description") String description, @FormParam("roles") String roles,
           @FormParam("members") String members) {
     try {
-      if (StringUtils.isEmpty(roles))
-        roles = "";
-      if (StringUtils.isEmpty(members))
-        members = "";
       jpaGroupRoleProvider.createGroup(name, description, roles, members);
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to create group {}: {}", name, e.getMessage());
