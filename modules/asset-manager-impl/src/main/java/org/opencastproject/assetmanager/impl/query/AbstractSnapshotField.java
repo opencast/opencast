@@ -144,7 +144,9 @@ public abstract class AbstractSnapshotField<A, B extends Comparable> implements 
             if (from instanceof QSnapshotDto) {
               return where;
             } else if (from instanceof QPropertyDto) {
-              return new JPASubQuery().from(Q_SNAPSHOT).where(Q_SNAPSHOT.mediaPackageId.eq(Q_PROPERTY.mediaPackageId).and(where)).exists();
+              return new JPASubQuery().from(Q_SNAPSHOT)
+                  .where(Q_SNAPSHOT.mediaPackageId.eq(Q_PROPERTY.mediaPackageId).and(where))
+                  .exists();
             } else {
               throw new RuntimeException("BUG");
             }

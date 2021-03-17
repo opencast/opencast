@@ -7,7 +7,6 @@
 <suppressions>
     <suppress checks="LineLength" files="modules/admin-ui/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/annotation-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/asset-manager-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/authorization-xacml/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/capture-admin-service-impl/.+\.(java|properties)"/>
@@ -109,7 +108,6 @@
     <suppress checks="Indentation" files="modules/admin-ui-index/.+\.java"/>
     <suppress checks="Indentation" files="modules/animate-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/annotation-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/asset-manager-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/authorization-xacml/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/common/.+\.java"/>
@@ -183,7 +181,6 @@
 
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/admin-ui/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/annotation-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/asset-manager-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/authorization-xacml/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/caption-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/capture-admin-service-impl/.+\.java"/>

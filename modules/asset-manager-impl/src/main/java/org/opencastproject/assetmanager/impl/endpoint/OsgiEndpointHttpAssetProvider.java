@@ -59,12 +59,12 @@ import java.net.URI;
  * Because of its tight coupling to the OSGi runtime, the implementation goes without an abstract base class.
  */
 @Component(
-  property = {
+    property = {
     "service.description=HttpAssetProvider for the AssetManager",
     "assetmanager.service.path=/assets"
-  },
-  immediate = true,
-  service = { HttpAssetProvider.class }
+    },
+    immediate = true,
+    service = { HttpAssetProvider.class }
 )
 public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   private static final Logger logger = LoggerFactory.getLogger(OsgiEndpointHttpAssetProvider.class);

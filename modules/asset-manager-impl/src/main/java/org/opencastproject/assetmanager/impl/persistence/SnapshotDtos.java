@@ -52,7 +52,13 @@ public final class SnapshotDtos {
     private final String organizationId;
     private final String owner;
 
-    public Medium(SnapshotDto snapshotDto, Availability availability, String storageId, String organizationId, String owner) {
+    public Medium(
+        SnapshotDto snapshotDto,
+        Availability availability,
+        String storageId,
+        String organizationId,
+        String owner
+    ) {
       this.snapshotDto = snapshotDto;
       this.availability = availability.name();
       this.storageId = storageId;
@@ -99,7 +105,11 @@ public final class SnapshotDtos {
      * {@link com.mysema.query.jpa.impl.JPAQuery#singleResult(com.mysema.query.types.Expression[])} or
      * {@link com.mysema.query.jpa.impl.JPAQuery#list(Expression[])}.
      */
-    public static final Expression<?>[] select =
-            new Expression[]{QSnapshotDto.snapshotDto, QSnapshotDto.snapshotDto.storageId, QSnapshotDto.snapshotDto.availability, QSnapshotDto.snapshotDto.organizationId};
+    public static final Expression<?>[] select = new Expression[] {
+        QSnapshotDto.snapshotDto,
+        QSnapshotDto.snapshotDto.storageId,
+        QSnapshotDto.snapshotDto.availability,
+        QSnapshotDto.snapshotDto.organizationId
+    };
   }
 }

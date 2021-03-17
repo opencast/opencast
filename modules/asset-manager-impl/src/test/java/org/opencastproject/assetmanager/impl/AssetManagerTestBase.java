@@ -81,8 +81,9 @@ import javax.persistence.EntityManager;
 /**
  * Base class for {@link AssetManager} tests.
  * <p>
- * See {@link org.opencastproject.util.persistencefn.PersistenceUtil#mkTestEntityManagerFactoryFromSystemProperties(String)}
- * for command line configuration options.
+ * See {@link org.opencastproject.util.persistencefn.PersistenceUtil
+ * #mkTestEntityManagerFactoryFromSystemProperties(String)} for command line
+ * configuration options.
  * <p>
  * Implementations of this class need to call {@link #setUp(AssetManager)} to setup the necessary variables prior to
  * running a test. You may implement a {@link org.junit.Before} annotated method like this:
@@ -134,7 +135,10 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
   }
 
   public static Catalog mkCatalog() throws Exception {
-    final Catalog mpe = (Catalog) MediaPackageElementBuilderFactory.newInstance().newElementBuilder().newElement(Type.Catalog, MediaPackageElements.EPISODE);
+    final Catalog mpe = (Catalog) MediaPackageElementBuilderFactory
+        .newInstance()
+        .newElementBuilder()
+        .newElement(Type.Catalog, MediaPackageElements.EPISODE);
     mpe.setURI(new URI("http://dummy.org"));
     mpe.setMimeType(MimeTypes.XML);
     return mpe;
@@ -164,10 +168,13 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
   }
 
   /**
-   * Create a number of media packages with one catalog each and add it to the AssetManager. Return the media package IDs as an array.
+   * Create a number of media packages with one catalog each and add it to the
+   * AssetManager. Return the media package IDs as an array.
    * <p>
-   * Please note that each media package creates two assets in the store--the catalog and the manifest--but only one asset
-   * in the database which is the catalog. The manifest is represented in the snapshot table, not the asset table.
+   * Please note that each media package creates two assets in the store--the
+   * catalog and the manifest--but only one asset in the database which is the
+   * catalog. The manifest is represented in the snapshot table, not the asset
+   * table.
    *
    * @param amount
    *         the amount of media packages to create
@@ -178,8 +185,16 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
    * @param seriesId
    *         an optional series ID
    */
-  protected String[] createAndAddMediaPackagesSimple(int amount, final int minVersions, final int maxVersions, final Opt<String> seriesId) {
-    return $(createAndAddMediaPackages(amount, minVersions, maxVersions, seriesId)).map(Snapshots.getMediaPackageId).toSet().toArray(new String[]{});
+  protected String[] createAndAddMediaPackagesSimple(
+      int amount,
+      final int minVersions,
+      final int maxVersions,
+      final Opt<String> seriesId
+  ) {
+    return $(createAndAddMediaPackages(amount, minVersions, maxVersions, seriesId))
+        .map(Snapshots.getMediaPackageId)
+        .toSet()
+        .toArray(new String[]{});
   }
 
   /**
@@ -234,7 +249,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
     return Collections.toArray(Snapshot.class, inserts.toList());
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * A property schema definition.
@@ -288,10 +303,10 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
             .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
-        File tmp = tempFolder.newFile();
-        FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
-        return tmp;
-      }).anyTimes();
+      File tmp = tempFolder.newFile();
+      FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
+      return tmp;
+    }).anyTimes();
     EasyMock.replay(workspace);
     //
     final AssetStore assetStore = mkAssetStore("test-store-type");
@@ -388,7 +403,9 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
         return Option.some((long) store.size());
       }
 
-      @Override public String getStoreType() { return storeType; }
+      @Override public String getStoreType() {
+        return storeType;
+      }
     };
   }
 

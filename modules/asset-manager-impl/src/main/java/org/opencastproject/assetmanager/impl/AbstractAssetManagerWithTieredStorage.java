@@ -63,10 +63,15 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAssetManager implements TieredStorageAssetManager {
+public abstract class AbstractAssetManagerWithTieredStorage
+    extends AbstractAssetManager
+    implements TieredStorageAssetManager {
 
-  public static final Set<MediaPackageElement.Type> MOVABLE_TYPES =
-          Sets.newHashSet(MediaPackageElement.Type.Attachment, MediaPackageElement.Type.Catalog, MediaPackageElement.Type.Track);
+  public static final Set<MediaPackageElement.Type> MOVABLE_TYPES = Sets.newHashSet(
+      MediaPackageElement.Type.Attachment,
+      MediaPackageElement.Type.Catalog,
+      MediaPackageElement.Type.Track
+  );
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractAssetManagerWithTieredStorage.class);
@@ -232,7 +237,12 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
   }
 
   /** Returns a query to find remotely stored snapshots in a specific store */
-  private ASelectQuery getStoredInStore(final AQueryBuilder q, final Version version, final String mpId, final String storeId) {
+  private ASelectQuery getStoredInStore(
+      final AQueryBuilder q,
+      final Version version,
+      final String mpId,
+      final String storeId
+  ) {
     return baseQuery(q, version, mpId).where(q.storage(storeId));
   }
 
@@ -327,7 +337,8 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
     for (final AssetDtos.Medium asset : getDb().getAsset(RuntimeTypes.convert(version), mpId, mpeId)) {
       for (final String storageId : getSnapshotStorageLocation(version, mpId)) {
         for (final AssetStore store : getAssetStore(storageId)) {
-          for (final InputStream assetStream : store.get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpeId))) {
+          for (final InputStream assetStream
+              : store.get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpeId))) {
 
             Checksum checksum = null;
             try {
@@ -372,15 +383,18 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
                 store.getStoreType());
         continue;
       }
-      final Opt<StoragePath> existingAssetOpt = findAssetInVersionsAndStores(e.getChecksum().toString(), store.getStoreType());
+      final Opt<StoragePath> existingAssetOpt
+          = findAssetInVersionsAndStores(e.getChecksum().toString(), store.getStoreType());
       if (existingAssetOpt.isSome()) {
         final StoragePath existingAsset = existingAssetOpt.get();
         logger.debug("Content of asset {} with checksum {} already exists in {}",
                 existingAsset.getMediaPackageElementId(), e.getChecksum(), store.getStoreType());
         if (!store.copy(existingAsset, storagePath)) {
-          throw new AssetManagerException(
-                  format("An asset with checksum %s has already been archived but trying to copy or link asset %s to it failed",
-                          e.getChecksum(), existingAsset));
+          throw new AssetManagerException(format(
+              "An asset with checksum %s has already been archived but trying to copy or link asset %s to it failed",
+              e.getChecksum(),
+              existingAsset
+          ));
         }
       } else {
         final Opt<Long> size = e.getSize() > 0 ? Opt.some(e.getSize()) : Opt.<Long>none();
@@ -392,14 +406,23 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
 
   /** Deletes the content of a snapshot from a store */
   private void deleteAssetsFromStore(Snapshot snap, AssetStore store) {
-    store.delete(DeletionSelector.delete(snap.getOrganizationId(), snap.getMediaPackage().getIdentifier().toString(), snap.getVersion()));
+    store.delete(DeletionSelector.delete(
+        snap.getOrganizationId(),
+        snap.getMediaPackage().getIdentifier().toString(),
+        snap.getVersion()
+    ));
   }
 
   /** Check if element <code>e</code> is already part of the history and in a specific store */
   private Opt<StoragePath> findAssetInVersionsAndStores(final String checksum, final String storeId) throws Exception {
     return getDb().findAssetByChecksumAndStore(checksum, storeId).map(new Fn<AssetDtos.Full, StoragePath>() {
       @Override public StoragePath apply(AssetDtos.Full dto) {
-        return StoragePath.mk(dto.getOrganizationId(), dto.getMediaPackageId(), dto.getVersion(), dto.getAssetDto().getMediaPackageElementId());
+        return StoragePath.mk(
+            dto.getOrganizationId(),
+            dto.getMediaPackageId(),
+            dto.getVersion(),
+            dto.getAssetDto().getMediaPackageElementId()
+        );
       }
     });
   }
@@ -437,8 +460,9 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
 
     AssetStore currentStore = getAssetStore(snap.getStorageId()).get();
     Opt<String> manifestOpt = findManifestBaseName(snap, MANIFEST_DEFAULT_NAME, currentStore);
-    if (manifestOpt.isNone())
+    if (manifestOpt.isNone()) {
       return; // Nothing to do, already moved to long-term storage
+    }
 
     // Copy the manifest file
     String manifestBaseName = manifestOpt.get();
@@ -451,9 +475,10 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
       String manifestFileName = null;
       try {
         inputStreamOpt = currentStore.get(pathToManifest);
-        if (inputStreamOpt.isNone()) // This should never happen because it has been tested before
+        if (inputStreamOpt.isNone()) { // This should never happen because it has been tested before
           throw new NotFoundException(
-                  String.format("Unexpected error. Manifest %s not found in current asset store", manifestBaseName));
+              String.format("Unexpected error. Manifest %s not found in current asset store", manifestBaseName));
+        }
 
         inputStream = inputStreamOpt.get();
         manifestFileName = UUID.randomUUID().toString() + ".xml";
@@ -487,10 +512,11 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
     // If manifest_.xml, etc not found, return previous name (copied from the EpsiodeServiceImpl logic)
     if (!store.contains(path)) {
       // If first call, manifest is not found, which probably means it has already been moved
-      if (MANIFEST_DEFAULT_NAME.equals(manifestName))
+      if (MANIFEST_DEFAULT_NAME.equals(manifestName)) {
         return Opt.none(); // No manifest found in current store
-      else
+      } else {
         return Opt.some(manifestName.substring(0, manifestName.length() - 1));
+      }
     }
     // This is the same logic as when building the manifest name: manifest, manifest_, manifest__, etc
     return findManifestBaseName(snap, manifestName + "_", store);
