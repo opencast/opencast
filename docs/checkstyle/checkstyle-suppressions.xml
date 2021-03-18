@@ -51,9 +51,6 @@
     <suppress checks="LineLength" files="modules/search-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/search-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/search-service-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/series-service-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/series-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/series-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/shared-filesystem-utils/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/silencedetection-impl/.+\.(java|properties)"/>
@@ -155,8 +152,6 @@
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/search-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/security-aai/.+\.java"/>
-    <suppress checks="Indentation" files="modules/series-service-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/series-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="Indentation" files="modules/silencedetection-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/smil-impl/.+\.java"/>
@@ -232,8 +227,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/search/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/security-aai/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/security-shibboleth/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/series-service-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/series-service-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/silencedetection-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/smil-workflowoperation/.+\.java"/>
