@@ -168,6 +168,9 @@ angular.module('adminNg.controllers')
         },
         changePolicies = function (access, loading) {
           var newPolicies = {};
+          if (!Array.isArray(access)) {
+            access = [access];
+          }
           angular.forEach(access, function (acl) {
             var policy = newPolicies[acl.role];
 
