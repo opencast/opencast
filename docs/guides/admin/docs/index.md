@@ -35,6 +35,7 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     * [Media Module](modules/mediamodule.configuration.md)
     * [Metrics (OpenMetrics, Prometheus)](modules/metrics.md)
     * [Stream Security](modules/stream-security.md)
+    * [Stand-alone Video Editor](modules/editor.md)
     * [Studio](modules/studio.md)
     * [Text Extraction](modules/textextraction.md)
     * [Video Segmentation](modules/videosegmentation.md)
