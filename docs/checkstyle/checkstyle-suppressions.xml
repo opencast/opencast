@@ -10,7 +10,6 @@
     <suppress checks="LineLength" files="modules/authorization-xacml/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/capture-admin-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/comments-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/common/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/common-jpa-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-ffmpeg/.+\.(java|properties)"/>
@@ -18,7 +17,6 @@
     <suppress checks="LineLength" files="modules/composer-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/dublincore/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/email-template-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/engage-theodul-core/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/event-comment/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/execute-impl/.+\.(java|properties)"/>
@@ -38,7 +36,6 @@
     <suppress checks="LineLength" files="modules/notification-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh-persistence/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/presets/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/runtime-info/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-remote/.+\.(java|properties)"/>
@@ -47,7 +44,6 @@
     <suppress checks="LineLength" files="modules/search-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/search-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/shared-filesystem-utils/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/silencedetection-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/smil-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/sox-impl/.+\.(java|properties)"/>
@@ -61,8 +57,6 @@
     <suppress checks="LineLength" files="modules/termination-state-aws/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/textanalyzer-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/themes/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/themes-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/timelinepreviews-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/timelinepreviews-ffmpeg/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/timelinepreviews-workflowoperation/.+\.(java|properties)"/>
@@ -72,7 +66,6 @@
     <suppress checks="LineLength" files="modules/transcription-service-persistence/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/urlsigning-common/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/urlsigning-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/urlsigning-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/urlsigning-verifier-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory/.+\.(java|properties)"/>
@@ -89,7 +82,6 @@
     <suppress checks="LineLength" files="modules/videogrid-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videosegmenter-ffmpeg/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/waveform-ffmpeg/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/waveform-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/waveform-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-condition-parser/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-service-api/.+\.(java|properties)"/>
@@ -100,8 +92,6 @@
     <suppress checks="LineLength" files="modules/workspace-impl/.+\.(java|properties)"/>
 
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
-    <suppress checks="Indentation" files="modules/admin-ui-index/.+\.java"/>
-    <suppress checks="Indentation" files="modules/animate-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/annotation-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/authorization-xacml/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
@@ -123,20 +113,15 @@
     <suppress checks="Indentation" files="modules/engage-theodul-plugin-tab-slidetext/.+\.java"/>
     <suppress checks="Indentation" files="modules/engage-theodul-plugin-timeline-statistics/.+\.java"/>
     <suppress checks="Indentation" files="modules/engage-theodul-plugin-video-videojs/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-ui/.+\.java"/>
     <suppress checks="Indentation" files="modules/execute-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/external-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/fileupload/.+\.java"/>
-    <suppress checks="Indentation" files="modules/hello-world-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/index-service/.+\.java"/>
     <suppress checks="Indentation" files="modules/ingest-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/inspection-service-ffmpeg/.+\.java"/>
-    <suppress checks="Indentation" files="modules/inspection-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/kernel/.+\.java"/>
-    <suppress checks="Indentation" files="modules/logging-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/message-broker-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/metadata/.+\.java"/>
-    <suppress checks="Indentation" files="modules/metrics-exporter/.+\.java"/>
     <suppress checks="Indentation" files="modules/notification-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
@@ -193,14 +178,10 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/ingest-download-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/ingest-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/inspection-service-ffmpeg/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/inspection-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/kernel/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/list-providers-service/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/live-schedule-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/message-broker-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/message-broker-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/metadata-api/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/metadata/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/mpeg7/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/notification-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh-persistence/.+\.java"/>
@@ -213,18 +194,13 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/search-service-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/search/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/security-aai/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/security-shibboleth/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/silencedetection-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/smil-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/sox-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/sox-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/static/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/textanalyzer-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/themes-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/themes/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/timelinepreviews-ffmpeg/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-ibm-watson-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-workflowoperation/.+\.java"/>

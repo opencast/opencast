@@ -107,7 +107,12 @@ public final class DistributionPathUtils {
    *          URI to the asset
    * @return Local file
    */
-  public static File getLocalFile(final String localPath, final String downloadUrl, final String organizationId, final URI uri) {
+  public static File getLocalFile(
+      final String localPath,
+      final String downloadUrl,
+      final String organizationId,
+      final URI uri
+  ) {
     if (localPath == null
             || organizationId == null
             || !uri.toString().startsWith(downloadUrl)) {

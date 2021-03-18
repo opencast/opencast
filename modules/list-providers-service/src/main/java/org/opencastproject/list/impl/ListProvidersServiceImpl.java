@@ -65,7 +65,10 @@ public class ListProvidersServiceImpl implements ListProvidersService {
 
     @Override
     public boolean equals(Object o) {
-      if (this == o) return true;
+      if (this == o) {
+        return true;
+      }
+
       return o instanceof ResourceTuple
               && Objects.equals(resourceName, ((ResourceTuple) o).resourceName)
               && Objects.equals(organizationId, ((ResourceTuple) o).organizationId);
@@ -110,16 +113,21 @@ public class ListProvidersServiceImpl implements ListProvidersService {
     if (securityService.getOrganization() != null) {
       organizationId = securityService.getOrganization().getId();
       provider = providers.get(new ResourceTuple(resourceName, organizationId));
-      if (provider != null) return provider;
+      if (provider != null) {
+        return provider;
+      }
       // use default if no specific provider is set
       provider = providers.get(new ResourceTuple(resourceName, ALL_ORGANIZATIONS));
     } else {
       organizationId = ALL_ORGANIZATIONS;
       provider = providers.get(new ResourceTuple(resourceName, ALL_ORGANIZATIONS));
     }
-    if (provider != null) return provider;
-    else throw new ListProviderNotFoundException("No provider found for organisation <"
+    if (provider != null) {
+      return provider;
+    } else {
+      throw new ListProviderNotFoundException("No provider found for organisation <"
             + organizationId + "> with the name " + resourceName);
+    }
   }
 
   @Override
