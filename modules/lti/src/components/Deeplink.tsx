@@ -156,7 +156,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
 
     hasSeriesParameters() {
         const qs = parsedQueryString();
-        return qs.series !== undefined || qs.series_name !== undefined;
+        return qs.series !== '' || qs.series_name !== '';
     }
 
     populateData(title: string, image: string, created: string, tool: string) {
@@ -198,7 +198,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
         });
     }
 
-    generateSeriesColor(id: string) {
+    generateSeriesColor(id?: string) {
         if (id == null) {
             return '#fff';
         }
