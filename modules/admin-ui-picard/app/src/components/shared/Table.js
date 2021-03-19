@@ -7,6 +7,8 @@ import {changeAllSelected, changeRowSelection, goToPage, updatePages} from "../.
 import {connect} from "react-redux";
 import cn from 'classnames';
 
+import EditTableViewModal from "../shared/EditTableViewModal";
+
 import sortIcon from '../../img/tbl-sort.png';
 import sortUpIcon from '../../img/tbl-sort-up.png';
 import sortDownIcon from '../../img/tbl-sort-down.png';
@@ -48,6 +50,7 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
 
     // State of dropdown menu
     const [showPageSizes, setShowPageSizes] = useState(false);
+    const [displayEditTableViewModal, setEditTableViewModal] = useState(false);
 
     const {resources, requestSort, sortConfig } = useSortRows(table.rows);
 
@@ -118,15 +121,31 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
 
     }
 
+    const showEditTableViewModal = async () => {
+        setEditTableViewModal(true);
+    }
+
+    const hideEditTableViewModal = () => {
+        setEditTableViewModal(false);
+    }
+
 
     return (
         <>
             <div className="action-bar">
               <ul>
-                  {/* todo: look what data-open-modal and data-table is */}
-                  <li><a>{t('TABLE_EDIT')}</a></li>
+                  <li>
+                      <a onClick={() => showEditTableViewModal()}>
+                          {t('TABLE_EDIT')}
+                      </a>
+                  </li>
               </ul>
             </div>
+
+            {/* Display modal for editing table view if table edit button is clicked */}
+            <EditTableViewModal showModal={displayEditTableViewModal}
+                                handleClose={hideEditTableViewModal}/>
+
             <div id="length-div" style={lengthDivStyle}>
             </div>
             <table className={'main-tbl highlight-hover'}>
@@ -142,27 +161,31 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
 
                         {/* todo: if not column.deactivated*/}
                         {table.columns.map((column, key) => (
-                            // Check if column is sortable and render accordingly
-                            column.sortable ? (
-                            <th key={key}
-                                className={cn({ 'col-sort': !!sortConfig && column.name === sortConfig.key, 'sortable': true })}
-                                onClick={() => sortByColumn(column.name)}>
+                            column.deactivated ?
+                                null :
+                                (
+                                    // Check if column is sortable and render accordingly
+                                    column.sortable ? (
+                                        <th key={key}
+                                            className={cn({ 'col-sort': !!sortConfig && column.name === sortConfig.key, 'sortable': true })}
+                                            onClick={() => sortByColumn(column.name)}>
                                 <span>
                                     <span>{t(column.label)}</span>
                                     {(!!sortConfig && column.name === sortConfig.key) ? (
-                                            <SortActiveIcon order={sortConfig.direction} />
-                                        ) : (
-                                            <SortIcon />
-                                        )}
+                                        <SortActiveIcon order={sortConfig.direction} />
+                                    ) : (
+                                        <SortIcon />
+                                    )}
                                 </span>
-                            </th>
-                            ) : (
-                                <th key={key} className={cn({'sortable': false})}>
+                                        </th>
+                                    ) : (
+                                        <th key={key} className={cn({'sortable': false})}>
                                     <span>
                                         {t(column.label)}
                                     </span>
-                            </th>
-                            )
+                                        </th>
+                                    )
+                                )
                         )) }
 
                     </tr>
@@ -200,12 +223,12 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
                                         <td key={key}>
                                             {t(row[column.name])}
                                         </td>
-                                        : (!!column.template) ?
+                                        : (!!column.template && !column.deactivated) ?
                                             // if column has a template then apply it
                                             <td key={key}>
                                                 {applyColumnTemplate(row, column)}
                                             </td>
-                                            : <td/>
+                                            : null //vorher: <td/>
                                 ))}
                             </tr>
                         ))

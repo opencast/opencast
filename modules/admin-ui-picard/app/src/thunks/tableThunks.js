@@ -15,7 +15,8 @@ import {
     selectRow,
     setOffset,
     setPageActive,
-    setPages
+    setPages,
+    loadColumns
 } from "../actions/tableActions";
 import {showActions as showEventsActions} from "../actions/eventActions";
 import {showActions as showSeriesActions} from "../actions/seriesActions";
@@ -511,6 +512,34 @@ export const changeAllSelected = selected => (dispatch, getState) => {
             }
         }
         dispatch(deselectAll());
+    }
+}
+
+// Select certain columns
+export const changeColumnSelection = (id, selected) => (dispatch, getState) => {
+
+    dispatch(loadColumns(id, selected));
+
+    const state = getState();
+
+    // eslint-disable-next-line default-case
+    switch (getResourceType(state)) {
+        case 'events': {
+            if (getSelectedRows(state).length > 0) {
+                dispatch(showEventsActions(true));
+            } else {
+                dispatch(showEventsActions(false));
+            }
+            break;
+        }
+        case 'series': {
+            if (getSelectedRows(state).length > 0) {
+                dispatch(showSeriesActions(true));
+            } else {
+                dispatch(showSeriesActions(false));
+            }
+            break;
+        }
     }
 }
 
