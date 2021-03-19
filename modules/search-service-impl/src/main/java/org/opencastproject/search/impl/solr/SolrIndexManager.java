@@ -327,6 +327,8 @@ public class SolrIndexManager {
    *          the media package to post
    * @param acl
    *          the access control list for this mediapackage
+   * @param seriesAcl
+   *          the access control list for the series
    * @param deletionDate
    *          the deletion date
    * @param modificationDate
@@ -335,12 +337,14 @@ public class SolrIndexManager {
    * @throws SolrServerException
    *           if an errors occurs while talking to solr
    */
-  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Date deletionDate, Date modificationDate)
+  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl,
+      AccessControlList seriesAcl, Date deletionDate,
+      Date modificationDate)
           throws SolrServerException {
     try {
       SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl);
 
-      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), acl);
+      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), seriesAcl);
       if (seriesDocument != null)
         Schema.enrich(episodeDocument, seriesDocument);
 

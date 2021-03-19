@@ -560,11 +560,11 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
       while (mediaPackages.hasNext()) {
         current++;
         try {
-          Tuple<MediaPackage, String> mediaPackage = mediaPackages.next();
+          final Tuple<MediaPackage, String> episode = mediaPackages.next();
+          final MediaPackage mediaPackage = episode.getA();
+          final String mediaPackageId = mediaPackage.getIdentifier().toString();
+          final Organization organization = organizationDirectory.getOrganization(episode.getB());
 
-          String mediaPackageId = mediaPackage.getA().getIdentifier().toString();
-
-          Organization organization = organizationDirectory.getOrganization(mediaPackage.getB());
           securityService.setOrganization(organization);
           securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
 
@@ -572,9 +572,14 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           Date modificationDate = persistence.getModificationDate(mediaPackageId);
           Date deletionDate = persistence.getDeletionDate(mediaPackageId);
 
-          indexManager.add(mediaPackage.getA(), acl, deletionDate, modificationDate);
+
+          AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId).stream()
+              .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
+          logger.debug("Updating series with merged access control list: {}", seriesAcl);
+
+          indexManager.add(episode.getA(), acl, seriesAcl, deletionDate, modificationDate);
         } catch (Exception e) {
-          logger.error("Unable to index search instances:", e);
+          logger.error("Unable to index search instances", e);
           if (retryToPopulateIndex(systemUserName)) {
             logger.warn("Trying to re-index search index later. Aborting for now.");
             return;
