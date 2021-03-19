@@ -17,7 +17,7 @@
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.8.10",
     "react-js-pagination": "^3.0.2",
-    "react-scripts": "^3.2.0",
+    "react-scripts": "^4.0.3",
     "react-select": "^4.2.1",
     "typescript": "3.9.9"
   },

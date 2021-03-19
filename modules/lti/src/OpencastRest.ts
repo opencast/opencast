@@ -16,7 +16,7 @@ export interface MediaPackage {
 }
 
 export interface SearchEpisodeResult {
-    readonly dcCreator: string;
+    readonly dcCreator?: string;
     readonly id: string;
     readonly dcTitle: string;
     readonly dcCreated: string;
