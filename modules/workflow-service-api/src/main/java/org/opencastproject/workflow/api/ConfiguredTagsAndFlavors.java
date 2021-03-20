@@ -85,6 +85,9 @@ public class ConfiguredTagsAndFlavors {
         if (this.srcTags.isEmpty()) {
             throw new IllegalStateException("No source-tag was configured!");
         }
+        if (this.srcTags.size() > 1) {
+            throw new IllegalStateException("More than one source-tag was configured!");
+        }
         return this.srcTags.get(0);
     }
 
@@ -94,6 +97,9 @@ public class ConfiguredTagsAndFlavors {
     public String getSingleTargetTag() {
         if (this.targetTags.isEmpty()) {
             throw new IllegalStateException("No target-tag was configured!");
+        }
+        if (this.targetTags.size() > 1) {
+            throw new IllegalStateException("More than one target-tag was configured!");
         }
         return this.targetTags.get(0);
     }
@@ -105,6 +111,9 @@ public class ConfiguredTagsAndFlavors {
         if (this.srcFlavors.isEmpty()) {
             throw new IllegalStateException("No source-flavor was configured!");
         }
+        if (this.srcFlavors.size() > 1) {
+            throw new IllegalStateException("More than one source-flavor was configured!");
+        }
         return this.srcFlavors.get(0);
     }
 
@@ -115,6 +124,9 @@ public class ConfiguredTagsAndFlavors {
         if (this.targetFlavors.isEmpty()) {
             throw new IllegalStateException("No target-flavor was configured!");
         }
+        if (this.targetFlavors.size() > 1) {
+            throw new IllegalStateException("More than one target-flavor was configured!");
+        }
         return this.targetFlavors.get(0);
     }
 
@@ -123,7 +135,7 @@ public class ConfiguredTagsAndFlavors {
      */
     protected void setSrcTags(List<String> srcTags) {
         this.srcTags = srcTags;
-        logger.info("Added " + srcTags.size() + " elements to srcTags list");
+        logger.debug("Added " + srcTags.size() + " elements to srcTags list");
     }
 
     /**
@@ -131,7 +143,7 @@ public class ConfiguredTagsAndFlavors {
      */
     protected void setTargetTags(List<String> targetTags) {
         this.targetTags = targetTags;
-        logger.info("Added " + targetTags.size() + " elements to targetTags list");
+        logger.debug("Added " + targetTags.size() + " elements to targetTags list");
     }
 
     /**
@@ -139,7 +151,7 @@ public class ConfiguredTagsAndFlavors {
      */
     protected void setSrcFlavors(List<MediaPackageElementFlavor> srcFlavors) {
         this.srcFlavors = srcFlavors;
-        logger.info("Added " + srcFlavors.size() + " elements to srcFlavors list");
+        logger.debug("Added " + srcFlavors.size() + " elements to srcFlavors list");
     }
 
     /**
@@ -147,6 +159,6 @@ public class ConfiguredTagsAndFlavors {
      */
     protected void setTargetFlavors(List<MediaPackageElementFlavor> targetFlavors) {
         this.targetFlavors = targetFlavors;
-        logger.info("Added " + targetFlavors.size() + " elements to targetFlavors list");
+        logger.debug("Added " + targetFlavors.size() + " elements to targetFlavors list");
     }
 }
