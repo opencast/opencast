@@ -98,6 +98,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -228,9 +229,12 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       }
 
       tmpPath = Paths.get(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_TEMP_DIR);
-      try { // clean up old data and delete directory if it exists
-        Files.walk(tmpPath).map(Path::toFile).sorted(Comparator.reverseOrder()).forEach(File::delete);
+
+      // clean up old data and delete directory if it exists
+      try (Stream<Path> walk = Files.walk(tmpPath)) {
+        walk.map(Path::toFile).sorted(Comparator.reverseOrder()).forEach(File::delete);
       } catch (IOException e) {
+        logger.warn("Unable to delete {}", tmpPath, e);
       }
       logger.info("AWS S3 Distribution uses temp storage in {}", tmpPath);
       try { // create a new temp directory
@@ -856,6 +860,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
             // and put them into a temporary directory
             List<Track> tmpTracks = new ArrayList<Track>();
             for (Track t : tracks) {
+
               Track tcopy = (Track) t.clone();
               String newName = "./" + t.getURI().getPath();
               Path newPath = tmpDir.resolve(newName).normalize();
@@ -901,11 +906,11 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     } catch (IOException e2) {
       throw new DistributionException("Cannot create tmp dir to process HLS:" + mediapackage + e2.getMessage());
     } finally {
-      try {
-        // Clean up temp dir
-        Files.walk(tmpDir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-      } catch (IOException e1) {
-        throw new DistributionException("Cannot delete tmp dir for processing HLS" + mediapackage + e1.getMessage());
+      // Clean up temp dir
+      try (Stream<Path> walk = Files.walk(tmpDir)) {
+        walk.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+      } catch (IOException e) {
+        logger.warn("Cannot delete tmp dir for processing HLS mp {}, path {}", mediapackage, tmpPath, e);
       }
     }
     return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
