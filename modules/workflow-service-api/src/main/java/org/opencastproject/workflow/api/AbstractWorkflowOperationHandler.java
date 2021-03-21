@@ -381,6 +381,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * Returns a ConfiguredTagsAndFlavors instance, which includes all specified source/target tags and flavors if they are valid
    * Lists can be empty, if no values were specified! This is to enable WOHs to individually check if a given tag/flavor was set.
+   * This also means that you should use Configuration.many as parameter, if a tag/flavor is optional.
    * @param srcTags none, one or many
    * @param srcFlavors none, one or many
    * @param targetFlavors none, one or many
