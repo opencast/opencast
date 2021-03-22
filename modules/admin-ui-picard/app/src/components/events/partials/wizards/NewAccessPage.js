@@ -8,13 +8,12 @@ import RenderMultiField from "./RenderMultiField";
 import {connect} from "react-redux";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/wizard/newEventWizardConfig";
-import {removeNotificationEventsAccess} from "../../../../actions/notificationActions";
+import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
 
 /**
  * This component renders the access page for new events and series in the wizards.
  */
-const NewAccessPage = ({ previousPage, nextPage, formik, addNotification,
-                            removeNotificationEventsAccess }) => {
+const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess }) => {
     const { t } = useTranslation();
 
     // States containing response from server concerning acl templates, actions and roles
@@ -52,7 +51,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification,
 
         // Remove old notifications of context event-access
         // Helps to prevent multiple notifications for same problem
-        removeNotificationEventsAccess();
+        removeNotificationWizardAccess();
 
         const policies = formik.values.policies;
         let check = true;
@@ -292,7 +291,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification,
 
 const mapDispatchToProps = dispatch => ({
     addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
-    removeNotificationEventsAccess: () => dispatch(removeNotificationEventsAccess())
+    removeNotificationWizardAccess: () => dispatch(removeNotificationWizardAccess())
 });
 
 export default connect(null, mapDispatchToProps)(NewAccessPage);

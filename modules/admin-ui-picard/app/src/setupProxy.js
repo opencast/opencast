@@ -112,6 +112,13 @@ module.exports = function (app) {
         })
     );
     app.use(
+        '/staticfiles',
+        createProxyMiddleware({
+            target: 'http://localhost:5000',
+            changeOrigin: true,
+        })
+    );
+    app.use(
         '/public',
         createProxyMiddleware({
             target: 'http://localhost:5000',

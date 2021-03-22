@@ -1,7 +1,7 @@
 import {
     CREATE_NOTIFICATION,
-    REMOVE_NOTIFICATION, REMOVE_NOTIFICATION_EVENTS_ACCESS,
-    REMOVE_NOTIFICATION_EVENTS_FORM,
+    REMOVE_NOTIFICATION, REMOVE_NOTIFICATION_WIZARD_ACCESS,
+    REMOVE_NOTIFICATION_WIZARD_FORM,
     SET_HIDDEN
 } from "../actions/notificationActions";
 
@@ -64,16 +64,16 @@ export const notifications = (state=initialState, action) => {
                 notifications: state.notifications.filter(notification => notification.id !== idToRemove)
             }
         }
-        case REMOVE_NOTIFICATION_EVENTS_FORM: {
+        case REMOVE_NOTIFICATION_WIZARD_FORM: {
             return {
                 ...state,
-                notifications: state.notifications.filter(notification => notification.context !== 'events-form')
+                notifications: state.notifications.filter(notification => notification.context !== 'wizard-form')
             }
         }
-        case REMOVE_NOTIFICATION_EVENTS_ACCESS: {
+        case REMOVE_NOTIFICATION_WIZARD_ACCESS: {
             return {
                 ...state,
-                notifications: state.notifications.filter(notification => notification.context !== 'events-access')
+                notifications: state.notifications.filter(notification => notification.context !== 'wizard-access')
             }
         }
         case SET_HIDDEN: {
