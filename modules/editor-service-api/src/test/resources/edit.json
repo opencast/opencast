@@ -1,0 +1,71 @@
+{
+  "date": "2021-01-13T12:34:35Z",
+  "duration": 30000,
+  "series": {
+    "id": "c60d6a65-2948-489d-95a4-894422b4f59d",
+    "title": "Test-Series"
+  },
+  "workflows": [
+    {
+      "name": "Cleanup and publish placeholder video",
+      "displayOrder": 0,
+      "description": "\n    Publish a placeholder video for corrupt videos.\n    Delete and cleanup corrupt videos and old snapshots, but keep the metadata.\n  ",
+      "id": "placeholdervideo"
+    },
+    {
+      "name": "Publish",
+      "displayOrder": 0,
+      "description": "",
+      "id": "publish-after-cutting"
+    }
+  ],
+  "title": "Test",
+  "tracks": [
+    {
+      "flavor": {
+        "subtype": "prepared",
+        "type": "presenter"
+      },
+      "video_stream": {
+        "available": true,
+        "thumbnail_uri": "http://localhost:8082/static/mh_default_org/internal/8543da8a-905d-433c-9c36-9bc4bfe38608/9b357f72-dc48-4a70-ba26-afb96a6b5d29/blue_50_0p_preview.jpg",
+        "enabled": true
+      },
+      "audio_stream": {
+        "available": false
+      },
+      "id": "d82c929f-529d-4f74-bad7-9420cf8aa6d3",
+      "uri": "http://localhost:8082/static/mh_default_org/internal/8543da8a-905d-433c-9c36-9bc4bfe38608/d82c929f-529d-4f74-bad7-9420cf8aa6d3/blue.mp4"
+    },
+    {
+      "flavor": {
+        "subtype": "prepared",
+        "type": "presentation"
+      },
+      "video_stream": {
+        "available": true,
+        "thumbnail_uri": "http://localhost:8082/static/mh_default_org/internal/8543da8a-905d-433c-9c36-9bc4bfe38608/f0e0424c-3884-4468-b039-0ecc4bf7a782/red_50_0p_preview.jpg",
+        "enabled": true
+      },
+      "audio_stream": {
+        "available": false
+      },
+      "id": "1ff2ccf8-c8ec-44df-9f92-135869abc013",
+      "uri": "http://localhost:8082/static/mh_default_org/internal/8543da8a-905d-433c-9c36-9bc4bfe38608/1ff2ccf8-c8ec-44df-9f92-135869abc013/red.mp4"
+    }
+  ],
+  "segments": [
+    {
+      "deleted": false,
+      "start": 0,
+      "end": 20000,
+      "selected": false
+    },
+    {
+      "deleted": true,
+      "start": 20000,
+      "end": 30000,
+      "selected": false
+    }
+  ]
+}
