@@ -7,7 +7,7 @@ import {connect} from "react-redux";
 
 
 /**
- * This component renders the modal for adding new resources
+ * This component renders the modal for editing which columns are shown in the table
  */
 const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, deactivatedColumns, changeSelectedColumns }) => {
     const { t } = useTranslation();
@@ -23,10 +23,12 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
         setDeactivatedColumns(deactivatedColumns);
     }, [activeColumns, deactivatedColumns]);
 
+    // closes this modal
     const close = () => {
         handleClose();
     };
 
+    // set deactivated property of column to true (deactivate = true) or false (deactivate = false) and move to corresponding list
     const changeColumn = (column, deactivate) => {
         if (deactivate) {
             setActiveColumns(activeCols.filter(col => col !== column));
@@ -41,17 +43,19 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
         }
     };
 
+    // save new values of which columns are active or deactivated and apply changes to table
     const save = () => {
         const settings = activeCols.concat(deactivatedCols);
-        console.log(settings);
         changeSelectedColumns({columns: settings});
     };
 
+    // reset active and deactivated columns to how they were when the dialogue was opened (used when closing without saving)
     const clearData = () => {
         setActiveColumns(originalActiveColumns);
         setDeactivatedColumns(originalDeactivatedColumns);
     };
 
+    // change column order based on where column was dragged and dropped
     const onDrop = ({ removedIndex, addedIndex }) => {
         setActiveColumns(columns => arrayMove(columns, removedIndex, addedIndex));
     };
@@ -60,8 +64,7 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
         // todo: add hotkeys
         <>
         {showModal && (
-            <section className="modal active modal-animation" id="edit-table-view-modal">{/*ng-keyup="keyUp($event)"  */}
-            {/*scheinbar hier nicht class="" direkt in*/}
+            <section className="modal active modal-animation" id="edit-table-view-modal">
                 <header>
                     <a className="fa fa-times close-modal" onClick={() => {clearData(); close();}}/>
                     <h2>{t('PREFERENCES.TABLE.CAPTION') /* Edit Table View */}</h2>
@@ -84,7 +87,6 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
                                     <ul className="drag-drop-items">
                                         {
                                             deactivatedCols.map( (column, key) =>
-                                            //table.columns.filter(column => column.deactivated).map( (column, key) =>
                                                 column ?
                                                     <li className="drag-item" key={key}>
                                                         <div
@@ -106,14 +108,13 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
                                         <h2>{t('PREFERENCES.TABLE.SELECTED_COLUMNS') /* Selected Columns */}</h2>
                                     </header>
                                     <ul className="drag-drop-items">
-                                        <li>{/*ui-sortable ng-model="activeColumns"*/}
+                                        <li>
                                             <Container dragHandleSelector=".drag-handle" lockAxis="y" onDrop={onDrop}>
                                                 {
                                                     activeCols.map( (column, key) =>
-                                                    //table.columns.filter(column => !column.deactivated).map( (column, key) =>
                                                         column ?
                                                             <Draggable className="drag-item" key={key}>
-                                                                <div className="drag-handle"> {/*ng-repeat="column in activeColumns"*/}
+                                                                <div className="drag-handle">
                                                                     <div className="title">{t(column.label)}</div>
                                                                     <a className="move-item remove"
                                                                         onClick={() => changeColumn(column, true)}/>
@@ -132,8 +133,8 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
 
                         <div className="tab-description for-footer">
                             <p>
-                                {/*<!-- The order and selection will be saved automatically.
-                                Press "Reset" to restore the default view. -->*/}
+                                {/* The order and selection will be saved automatically.
+                                Press "Reset" to restore the default view. */}
                                 {t('PREFERENCES.TABLE.FOOTER_TEXT', { resetTranslation: t('RESET') })}
                             </p>
                         </div>
@@ -149,11 +150,11 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
                         }} className="cancel active">{t('CANCEL')/*<!--Cancel-->*/}</button>
                     </div>
                     <div className="pull-right">
-                        {/*<!-- <a ng-click="initialize()" class="cancel" translate="RESET">Reset</a> -->*/}
+                        {/* <a ng-click="initialize()" class="cancel" translate="RESET">Reset</a> */}
                         <button onClick={() => {
                             save();
                             close();
-                        }} className="submit active">{t('SAVE')/*<!-- Save As Default -->*/}</button>
+                        }} className="submit active">{t('SAVE')/* Save As Default */}</button>
                     </div>
                 </footer>
             </section>
