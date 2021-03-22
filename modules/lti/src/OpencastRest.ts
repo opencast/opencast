@@ -5,6 +5,12 @@ export interface Attachment {
     readonly url: string;
 }
 
+export interface Track {
+    readonly type: string;
+    readonly url: string;
+    readonly resolution: string;
+}
+
 export interface JobResult {
     readonly title: string;
     readonly status: string;
@@ -13,6 +19,7 @@ export interface JobResult {
 export interface MediaPackage {
     readonly attachments: Attachment[];
     readonly creators: string[];
+    readonly tracks: Track[];
 }
 
 export interface SearchEpisodeResult {
@@ -128,6 +135,29 @@ export async function copyEventToSeries(eventId: string, targetSeries: string): 
     return axios.post(hostAndPort() + "/lti-service-gui/" + eventId + "/copy?target_series=" + targetSeries);
 }
 
+/**
+ * Tracks is not guaranteed to be an array, so we need to handle different cases
+ * @param result a result from the search query
+ */
+const parseTracksFromResult = (result: any) => {
+  if (Array.isArray(result.mediapackage.media.track)) {
+    return (
+      result.mediapackage.media.track.map((track: any) => ({
+        type: track.type,
+        url: track.url,
+        resolution: track.video.resolution
+      }))
+    )
+  } else if (result.mediapackage.media.track !== null) {
+    return {
+      type: result.mediapackage.media.track.type,
+      url: result.mediapackage.media.track.url,
+      resolution: result.mediapackage.media.track.video.resolution,
+    }
+  }
+  return undefined;
+}
+
 export async function searchEpisode(
     limit: number,
     offset: number,
@@ -157,7 +187,8 @@ export async function searchEpisode(
                 attachments: result.mediapackage.attachments.attachment.map((attachment: any) => ({
                     type: attachment.type,
                     url: attachment.url
-                }))
+                })),
+                tracks: parseTracksFromResult(result)
             }
         })),
         total: response.data["search-results"].total,
