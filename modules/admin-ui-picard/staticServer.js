@@ -81,5 +81,19 @@ app.post("/*", (req, res) => {
 
 });
 
+app.delete("/*", (req, res) => {
+    let filePath = path.join(__dirname, 'test/app/' + req.method + req.url);
+    setTimeout(function() {
+        res.sendFile(filePath);
+    }, 1000);
+});
+
+app.put("/*", (req, res) => {
+    let filePath = path.join(__dirname, 'test/app/' + req.method + req.url);
+    setTimeout(function () {
+        res.send(filePath);
+    }, 1000);
+});
+
 app.listen(port, () => console.log(`Listing on port ${port}`));
 
