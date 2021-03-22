@@ -37,7 +37,6 @@ interface UploadState {
     readonly captionFile?: Blob;
     readonly copyState: "success" | "error" | "pending" | "none";
     readonly copySeries?: OptionType;
-    readonly refreshTimerId?: ReturnType<typeof setTimeout>;
     readonly uploadProgress: number;
 }
 
@@ -109,11 +108,6 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             ...this.state,
             metadata: "error"
         }));
-    }
-
-    componentWillUnmount() {
-        if (this.state.refreshTimerId !== undefined)
-            clearInterval(this.state.refreshTimerId);
     }
 
     refreshTimer() {
