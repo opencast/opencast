@@ -33,8 +33,6 @@
     <suppress checks="LineLength" files="modules/inspection-service-ffmpeg/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/kernel/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/live-schedule-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/lti/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/lti-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/message-broker-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/mpeg7/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/notification-workflowoperation/.+\.(java|properties)"/>
@@ -204,7 +202,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/kernel/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/list-providers-service/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/live-schedule-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/lti-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/message-broker-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/message-broker-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/metadata-api/.+\.java"/>

@@ -252,7 +252,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       }
       if (captions != null) {
         final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor("captions", "vtt+en");
-        final MediaPackageElementBuilder elementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+        final MediaPackageElementBuilder elementBuilder
+            = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         final MediaPackageElement captionsMpe = elementBuilder
                 .newElement(MediaPackageElement.Type.Attachment, captionsFlavor);
         captionsMpe.setMimeType(mimeType("text", "vtt"));
@@ -319,7 +320,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     try {
       final WorkflowDefinition wfd = workflowService.getWorkflowDefinitionById(workflowId);
       final Workflows workflows = new Workflows(assetManager, workflowService);
-      final ConfiguredWorkflow workflow = workflow(wfd, createCopyWorkflowConfig(seriesId, UUID.randomUUID().toString()));
+      final ConfiguredWorkflow workflow
+          = workflow(wfd, createCopyWorkflowConfig(seriesId, UUID.randomUUID().toString()));
       final List<WorkflowInstance> workflowInstances = workflows
               .applyWorkflowToLatestVersion(Collections.singleton(eventId), workflow).toList();
       if (workflowInstances.isEmpty()) {
@@ -333,8 +335,10 @@ public class LtiServiceImpl implements LtiService, ManagedService {
 
   private EventCatalogUIAdapter getEventCatalogUIAdapter() {
     final MediaPackageElementFlavor flavor = new MediaPackageElementFlavor("dublincore", "episode");
-    final EventCatalogUIAdapter adapter = catalogUIAdapters.stream().filter(e -> e.getFlavor().equals(flavor)).findAny()
-            .orElse(null);
+    final EventCatalogUIAdapter adapter = catalogUIAdapters.stream()
+        .filter(e -> e.getFlavor().equals(flavor))
+        .findAny()
+        .orElse(null);
     if (adapter == null) {
       throw new RuntimeException("no adapter found");
     }
@@ -380,8 +384,9 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       throw new RuntimeException(e);
     }
 
-    if (optEvent.isNone())
+    if (optEvent.isNone()) {
       throw new NotFoundException("cannot find event with id '" + eventId + "'");
+    }
 
     final Event event = optEvent.get();
 
@@ -412,8 +417,9 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     metadataList.add(this.indexService.getCommonEventCatalogUIAdapter(), metadataCollection);
 
     final String wfState = event.getWorkflowState();
-    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState)))
+    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
       metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
+    }
     return new SimpleSerializer().toJson(MetadataJson.listToJson(metadataList, true));
   }
 
@@ -423,24 +429,33 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     final DublinCoreMetadataCollection collection = metadataList
             .getMetadataByAdapter(this.indexService.getCommonEventCatalogUIAdapter());
     if (collection != null) {
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
+      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName())) {
         collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
-      if (collection.getOutputFields().containsKey("duration"))
+      }
+      if (collection.getOutputFields().containsKey("duration")) {
         collection.removeField(collection.getOutputFields().get("duration"));
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName()))
+      }
+      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName())) {
         collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName()));
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName()))
+      }
+      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName())) {
         collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName()));
-      if (collection.getOutputFields().containsKey("startDate"))
+      }
+      if (collection.getOutputFields().containsKey("startDate")) {
         collection.removeField(collection.getOutputFields().get("startDate"));
-      if (collection.getOutputFields().containsKey("startTime"))
+      }
+      if (collection.getOutputFields().containsKey("startTime")) {
         collection.removeField(collection.getOutputFields().get("startTime"));
-      if (collection.getOutputFields().containsKey("location"))
+      }
+      if (collection.getOutputFields().containsKey("location")) {
         collection.removeField(collection.getOutputFields().get("location"));
+      }
 
       if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
-        final MetadataField publisher = collection.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
-        final Map<String, String> users = publisher.getCollection() == null ? new HashMap<>() : publisher.getCollection();
+        final MetadataField publisher
+            = collection.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
+        final Map<String, String> users
+            = publisher.getCollection() == null ? new HashMap<>() : publisher.getCollection();
         final String loggedInUser = this.securityService.getUser().getName();
         if (!users.containsKey(loggedInUser)) {
           users.put(loggedInUser, loggedInUser);
