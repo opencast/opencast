@@ -85,7 +85,11 @@ const table = (state=initialState, action) => {
             }
         }
         case LOAD_COLUMNS: {
-            return state;
+            const { columns } = payload;
+            return {
+                ...state,
+                columns: columns
+            };
         }
         case SELECT_ROW: {
             const { id } = payload;
