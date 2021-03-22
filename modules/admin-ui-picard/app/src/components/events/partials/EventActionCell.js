@@ -11,27 +11,26 @@ const EventActionCell = ({ row })  => {
     return (
         <>
             {/* Open event details */}
-            {/*TODO: When event details are implemented, remove placeholder */}
+            {/*TODO: implement and properly call function */}
             {/*TODO: with-Role ROLE_UI_EVENTS_DETAILS_VIEW*/}
-            <a onClick={() => onClickPlaceholder()}
+            <a onClick={() => onClickEventDetails()}
                className="more"
                title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DETAILS')}/>
 
             {/* If event belongs to a series then the corresponding series details can be opened */}
             {!!row.series && (
-                //{/*TODO: When series details are implemented, remove placeholder
+                //{/*TODO: implement and properly call function
                 //{/*TODO: with-Role ROLE_UI_SERIES_DETAILS_VIEW
-                <a onClick={() => onClickPlaceholder()}
+                <a onClick={() => onClickSeriesDetails()}
                    className="more-series"
                    title={t('EVENTS.SERIES.TABLE.TOOLTIP.DETAILS')}/>
 
             )}
 
             {/* Delete an event */}
-            {/*TODO: When event action for deleting an event is implemented, remove placeholder,
-            needs to be checked if event is published */}
+            {/*TODO: implement and properly call function, needs to be checked if event is published */}
             {/*TODO: with-Role ROLE_UI_EVENTS_DELETE*/}
-            <a onClick={() => onClickPlaceholder()}
+            <a onClick={() => onClickDelete()}
                className="remove"
                title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DELETE')}/>
 
@@ -51,16 +50,16 @@ const EventActionCell = ({ row })  => {
 
             {/* If the event has comments and no open comments then the comment tab of event details can be opened directly */}
             {(row.has_comments && !row.has_open_comments) && (
-                //todo: when eventDetails are implemented, remove placeholder (opens comment-tab)
-                <a onClick={() => onClickPlaceholder()}
+                //todo: implement and properly call function, what data does the comments-tab need? (opens comment-tab)
+                <a onClick={() => onClickComments()}
                    title={t('EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS')}
                    className="comments" />
             )}
 
             {/* If the event has comments and open comments then the comment tab of event details can be opened directly */}
             {(row.has_comments && row.has_open_comments) && (
-                //todo: when eventDetails are implemented, remove placeholder (opens comment-tab)
-                <a onClick={() => onClickPlaceholder()}
+                //todo: implement and properly call function, what data does the comments-tab need? (opens comment-tab)
+                <a onClick={() => onClickComments()}
                    title={t('EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS')}
                    className="comments-open" />
             )}
@@ -68,32 +67,62 @@ const EventActionCell = ({ row })  => {
             {/*If the event is in in a paused workflow state then a warning icon is shown and workflow tab of event
                 details can be opened directly */}
             {row.workflow_state === 'PAUSED' && (
-                //todo: when eventDetails are implemented, remove placeholder (opens workflow-tab)
+                //todo: implement and properly call function, what data does the workflow-tab need? (opens workflow-tab)
                 //todo: with role ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT
                 <a title={t('EVENTS.EVENTS.TABLE.TOOLTIP.PAUSED_WORKFLOW')}
-                   onClick={() => onClickPlaceholder()}
+                   onClick={() => onClickWorkflow()}
                    className="fa fa-warning"/>
             )}
 
             {/* Open assets tab of event details directly*/}
-            {/*Todo: when eventDetails are implemented, remove placeholder (opens asset-tab)*/}
+            {/*Todo: implement and properly call function, what data does the assets-tab need? (opens asset-tab)*/}
             {/*todo: with-role ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW*/}
-            <a onClick={() => onClickPlaceholder()}
+            <a onClick={() => onClickAssets()}
                title={t('EVENTS.EVENTS.TABLE.TOOLTIP.ASSETS')}
                className="fa fa-folder-open"/>
 
            {/* Open dialog for embedded code*/}
            {/*todo: with-role ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW*/}
-           <a onClick={() => onClickPlaceholder()}
+           <a onClick={() => onClickEmbeddedCode()}
               title={t('EVENTS.EVENTS.TABLE.TOOLTIP.EMBEDDING_CODE')}
               className="fa fa-link"/>
         </>
     );
 };
 
-//todo: remove if not needed anymore
-const onClickPlaceholder = () => {
-    console.log("In the Future here opens an other component, which is not implemented yet");
+//todo: implement!
+const onClickEventDetails = () => {
+    console.log("Should open event-details.");
+}
+
+//todo: implement!
+const onClickSeriesDetails = () => {
+    console.log("Should open series-details.");
+}
+
+//todo: implement!
+const onClickDelete = () => {
+    console.log("Should delete the event.");
+}
+
+//todo: implement!
+const onClickComments = () => {
+    console.log("Should open comments-tab (event-details).");
+}
+
+//todo: implement!
+const onClickWorkflow = () => {
+    console.log("Should open workflow-tab (event-details).");
+}
+
+//todo: implement!
+const onClickAssets = () => {
+    console.log("Should open assets-tab (event-details).");
+}
+
+//todo: implement!
+const onClickEmbeddedCode = () => {
+    console.log("Should open dialog for embedded code.");
 }
 
 
