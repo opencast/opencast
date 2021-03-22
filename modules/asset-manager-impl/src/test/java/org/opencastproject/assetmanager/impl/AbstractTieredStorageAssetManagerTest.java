@@ -54,7 +54,8 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 
-public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetManager> extends AssetManagerTestBase<A> {
+public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetManager>
+    extends AssetManagerTestBase<A> {
   public static final String LOCAL_STORE_ID = "local-test";
   public static final String REMOTE_STORE_1_ID = "remote-1-test";
   public static final String REMOTE_STORE_2_ID = "remote-2-test";
@@ -224,7 +225,9 @@ public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetM
         return Option.some((long) store.size());
       }
 
-      @Override public String getStoreType() { return storeType; }
+      @Override public String getStoreType() {
+        return storeType;
+      }
     };
   }
 
@@ -326,7 +329,9 @@ public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetM
         return Option.some((long) store.size());
       }
 
-      @Override public String getStoreType() { return storeType; }
+      @Override public String getStoreType() {
+        return storeType;
+      }
     };
   }
 }

@@ -44,18 +44,41 @@ import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlAttribute;
 
 @Entity(name = "AwsAssetMapping")
-@Table(name = "oc_aws_asset_mapping", uniqueConstraints = @UniqueConstraint(
-    name = "UNQ_aws_archive_mapping_0",
-    columnNames = {"organization", "mediapackage", "mediapackage_element", "version"}
-))
+@Table(
+    name = "oc_aws_asset_mapping",
+    uniqueConstraints = @UniqueConstraint(
+        name = "UNQ_aws_archive_mapping_0",
+        columnNames = {"organization", "mediapackage", "mediapackage_element", "version"}
+    )
+)
 @NamedQueries({
     // These exclude deleted mappings!
-    @NamedQuery(name = "AwsAssetMapping.findActiveMapping", query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND m.mediaPackageId = :mediaPackageId AND m.mediaPackageElementId = :mediaPackageElementId AND m.version = :version AND m.deletionDate IS NULL"),
-    @NamedQuery(name = "AwsAssetMapping.findAllActiveByObjectKey", query = "SELECT m FROM AwsAssetMapping m WHERE m.objectKey = :objectKey AND m.deletionDate IS NULL"),
-    @NamedQuery(name = "AwsAssetMapping.findAllActiveByMediaPackage", query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND m.mediaPackageId = :mediaPackageId  AND m.deletionDate IS NULL"),
-    @NamedQuery(name = "AwsAssetMapping.findAllActiveByMediaPackageAndVersion", query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND m.mediaPackageId = :mediaPackageId AND m.version = :version AND m.deletionDate IS NULL"),
+    @NamedQuery(
+        name = "AwsAssetMapping.findActiveMapping",
+        query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND "
+            + "m.mediaPackageId = :mediaPackageId AND m.mediaPackageElementId = :mediaPackageElementId AND "
+            + "m.version = :version AND m.deletionDate IS NULL"
+    ),
+    @NamedQuery(
+        name = "AwsAssetMapping.findAllActiveByObjectKey",
+        query = "SELECT m FROM AwsAssetMapping m WHERE m.objectKey = :objectKey AND m.deletionDate IS NULL"
+    ),
+    @NamedQuery(
+        name = "AwsAssetMapping.findAllActiveByMediaPackage",
+        query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND "
+            + "m.mediaPackageId = :mediaPackageId  AND m.deletionDate IS NULL"
+    ),
+    @NamedQuery(
+        name = "AwsAssetMapping.findAllActiveByMediaPackageAndVersion",
+        query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND "
+            + "m.mediaPackageId = :mediaPackageId AND m.version = :version AND m.deletionDate IS NULL"
+    ),
     // This is to be used when restoring/re-ingesting mps so includes deleted mapings!
-    @NamedQuery(name = "AwsAssetMapping.findAllByMediaPackage", query = "SELECT m FROM AwsAssetMapping m WHERE m.mediaPackageId = :mediaPackageId ORDER BY m.version DESC") })
+    @NamedQuery(
+        name = "AwsAssetMapping.findAllByMediaPackage",
+        query = "SELECT m FROM AwsAssetMapping m WHERE m.mediaPackageId = :mediaPackageId ORDER BY m.version DESC"
+    )
+})
 public final class AwsAssetMappingDto {
 
   @Id
@@ -132,7 +155,7 @@ public final class AwsAssetMappingDto {
     } catch (Exception e) {
       if (tx.isActive()) {
         tx.rollback();
-    }
+      }
       throw new AwsAssetDatabaseException(String.format("Could not store mapping for path %s", path), e);
     } finally {
       em.close();
@@ -181,8 +204,9 @@ public final class AwsAssetMappingDto {
       if (path.getVersion() != null) {
         query = em.createNamedQuery("AwsAssetMapping.findAllActiveByMediaPackageAndVersion");
         query.setParameter("version", Long.valueOf(path.getVersion().toString()));
-      } else
+      } else {
         query = em.createNamedQuery("AwsAssetMapping.findAllActiveByMediaPackage");
+      }
 
       query.setParameter("organizationId", path.getOrganizationId());
       query.setParameter("mediaPackageId", path.getMediaPackageId());
@@ -198,8 +222,9 @@ public final class AwsAssetMappingDto {
    */
   public static void deleteMappping(EntityManager em, StoragePath path) throws AwsAssetDatabaseException {
     AwsAssetMappingDto mapDto = findMapping(em, path);
-    if (mapDto == null)
+    if (mapDto == null) {
       return;
+    }
 
     EntityTransaction tx = em.getTransaction();
     try {

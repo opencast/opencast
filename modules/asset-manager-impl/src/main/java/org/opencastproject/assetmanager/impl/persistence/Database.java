@@ -198,7 +198,11 @@ public class Database implements EntityPaths {
   }
 
   public void setStorageLocation(Snapshot snapshot, final String storageId) {
-    setStorageLocation(VersionImpl.mk(snapshot.getVersion()), snapshot.getMediaPackage().getIdentifier().toString(), storageId);
+    setStorageLocation(
+        VersionImpl.mk(snapshot.getVersion()),
+        snapshot.getMediaPackage().getIdentifier().toString(),
+        storageId
+    );
   }
 
   public void setStorageLocation(final VersionImpl version, final String mpId, final String storageId) {
@@ -242,9 +246,9 @@ public class Database implements EntityPaths {
       @Override public void apply(EntityManager em) {
         final QSnapshotDto q = QSnapshotDto.snapshotDto;
         new JPAUpdateClause(em, q, TEMPLATES)
-        .where(q.version.eq(version.value()).and(q.mediaPackageId.eq(mpId)))
-        .set(q.availability, availability.name())
-        .execute();
+            .where(q.version.eq(version.value()).and(q.mediaPackageId.eq(mpId)))
+            .set(q.availability, availability.name())
+            .execute();
       }
     }.toFn());
   }
@@ -288,7 +292,9 @@ public class Database implements EntityPaths {
   public Opt<AssetDtos.Full> findAssetByChecksum(final String checksum) {
     return penv.tx(new Fn<EntityManager, Opt<AssetDtos.Full>>() {
       @Override public Opt<AssetDtos.Full> apply(EntityManager em) {
-        final Tuple result = AssetDtos.baseJoin(em).where(QAssetDto.assetDto.checksum.eq(checksum)).singleResult(Full.select);
+        final Tuple result = AssetDtos.baseJoin(em)
+            .where(QAssetDto.assetDto.checksum.eq(checksum))
+            .singleResult(Full.select);
         return Opt.nul(result).map(Full.fromTuple);
       }
     });
@@ -389,7 +395,8 @@ public class Database implements EntityPaths {
     if (a != null) {
       return a;
     } else {
-      throw new RuntimeException("Used DTO outside of a persistence context or the DTO has not been assigned an ID yet.");
+      throw new RuntimeException(
+          "Used DTO outside of a persistence context or the DTO has not been assigned an ID yet.");
     }
   }
 }

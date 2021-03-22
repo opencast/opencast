@@ -76,7 +76,9 @@ public class AssetImpl implements Asset {
     return availability;
   }
 
-  @Override public String getStorageId() { return storageId; }
+  @Override public String getStorageId() {
+    return storageId;
+  }
 
   @Override
   public Checksum getChecksum() {
