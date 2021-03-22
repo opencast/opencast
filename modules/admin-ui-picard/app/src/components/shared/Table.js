@@ -228,7 +228,9 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
                                             <td key={key}>
                                                 {applyColumnTemplate(row, column)}
                                             </td>
-                                            : null //vorher: <td/>
+                                            : (!column.deactivated) ?
+                                                <td/> :
+                                                null
                                 ))}
                             </tr>
                         ))

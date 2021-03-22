@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from "react";
+import { Container, Draggable } from "react-smooth-dnd";
+import arrayMove from "array-move";
 import {useTranslation} from "react-i18next";
 import {changeColumnSelection} from "../../thunks/tableThunks";
 import {connect} from "react-redux";
@@ -48,6 +50,10 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
     const clearData = () => {
         setActiveColumns(originalActiveColumns);
         setDeactivatedColumns(originalDeactivatedColumns);
+    };
+
+    const onDrop = ({ removedIndex, addedIndex }) => {
+        setActiveColumns(columns => arrayMove(columns, removedIndex, addedIndex));
     };
 
     return (
@@ -101,20 +107,22 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
                                     </header>
                                     <ul className="drag-drop-items">
                                         <li>{/*ui-sortable ng-model="activeColumns"*/}
-                                            {
-                                                activeCols.map( (column, key) =>
-                                                //table.columns.filter(column => !column.deactivated).map( (column, key) =>
-                                                    column ?
-                                                        <div className="drag-item"
-                                                             key={key}> {/*ng-repeat="column in activeColumns"*/}
-                                                             <div
-                                                                 className="title">{t(column.label)}</div>
-                                                             <a className="move-item remove"
-                                                                 onClick={() => changeColumn(column, true)}></a>
-                                                        </div> :
-                                                        null
-                                                )
-                                            }
+                                            <Container dragHandleSelector=".drag-handle" lockAxis="y" onDrop={onDrop}>
+                                                {
+                                                    activeCols.map( (column, key) =>
+                                                    //table.columns.filter(column => !column.deactivated).map( (column, key) =>
+                                                        column ?
+                                                            <Draggable className="drag-item" key={key}>
+                                                                <div className="drag-handle"> {/*ng-repeat="column in activeColumns"*/}
+                                                                    <div className="title">{t(column.label)}</div>
+                                                                    <a className="move-item remove"
+                                                                        onClick={() => changeColumn(column, true)}/>
+                                                                </div>
+                                                            </Draggable> :
+                                                            null
+                                                    )
+                                                }
+                                            </Container>
                                         </li>
                                     </ul>
                                 </div>

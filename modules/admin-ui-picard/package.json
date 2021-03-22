@@ -10,10 +10,13 @@
     "proxy-server": "nodemon proxyServer.js $npm_config_host $npm_config_username $npm_config_password"
   },
   "dependencies": {
+    "array-move": "^3.0.1",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "http-proxy-middleware": "^1.0.5",
     "nodemon": "^2.0.3",
+    "react-app-rewired": "^2.1.8",
+    "react-smooth-dnd": "^0.11.1",
     "request-digest": "^1.0.13"
   },
   "devDependencies": {
