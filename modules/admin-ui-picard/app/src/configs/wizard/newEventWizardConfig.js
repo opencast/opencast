@@ -60,11 +60,11 @@ export const weekdays = [
     }
 ];
 
-// Context for notifications shown in events-form
-export const NOTIFICATION_CONTEXT = 'events-form';
+// Context for notifications shown in events wizard
+export const NOTIFICATION_CONTEXT = 'wizard-form';
 
 // Context for notifications shown in access page
-export const NOTIFICATION_CONTEXT_ACCESS = 'events-access';
+export const NOTIFICATION_CONTEXT_ACCESS = 'wizard-access';
 
 // Workflow applied to upload assets that are not tracks
 export const WORKFLOW_UPLOAD_ASSETS_NON_TRACK = 'publish-uploaded-assets';

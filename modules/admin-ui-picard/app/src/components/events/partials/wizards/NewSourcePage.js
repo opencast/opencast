@@ -13,7 +13,7 @@ import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../../../thunks/recordingThunks";
 import {connect} from "react-redux";
 import {addNotification} from "../../../../thunks/notificationThunks";
-import {removeNotificationEventsForm} from "../../../../actions/notificationActions";
+import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {checkForConflicts} from "../../../../thunks/eventThunks";
 
 
@@ -32,7 +32,7 @@ const theme = createMuiTheme({
  * This component renders the source page for new events in the new event wizard.
  */
 const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices, addNotification,
-                            removeNotificationEventsForm }) => {
+                            removeNotificationWizardForm }) => {
     const { t } = useTranslation();
 
 
@@ -102,7 +102,7 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
     // Remove old notifications of context event-form
     // Helps to prevent multiple notifications for same problem
     const removeOldNotifications = () => {
-        removeNotificationEventsForm();
+        removeNotificationWizardForm();
     }
 
 
@@ -490,7 +490,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     loadingInputDevices: () => dispatch(fetchRecordings("inputs")),
     addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
-    removeNotificationEventsForm: () => dispatch(removeNotificationEventsForm())
+    removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
 });
 
 
