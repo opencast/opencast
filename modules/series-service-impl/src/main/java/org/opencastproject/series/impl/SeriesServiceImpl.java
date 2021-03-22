@@ -85,11 +85,11 @@ import javax.xml.parsers.ParserConfigurationException;
  * {@link SeriesServiceIndex} for searching.
  */
 @Component(
-  property = {
-    "service.description=Series Service"
-  },
-  immediate = true,
-  service = { SeriesService.class }
+    property = {
+        "service.description=Series Service"
+    },
+    immediate = true,
+    service = { SeriesService.class }
 )
 public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesService {
 
@@ -154,9 +154,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Activates Series Service. Checks whether we are using synchronous or asynchronous indexing. If asynchronous is
-   * used, Executor service is set. If index is empty, persistent storage is queried if it contains any series. If that
-   * is the case, series are retrieved and indexed.
+   * Activates Series Service. Checks whether we are using synchronous or asynchronous indexing. If
+   * asynchronous is used, Executor service is set. If index is empty, persistent storage is queried
+   * if it contains any series. If that is the case, series are retrieved and indexed.
    */
   @Activate
   public void activate(ComponentContext cc) throws Exception {
@@ -478,8 +478,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     final Map<EName, List<DublinCoreValue>> bv = b.getValues();
     if (av.size() == bv.size()) {
       for (Map.Entry<EName, List<DublinCoreValue>> ave : av.entrySet()) {
-        if (!eqListSorted(ave.getValue(), bv.get(ave.getKey())))
+        if (!eqListSorted(ave.getValue(), bv.get(ave.getKey()))) {
           return false;
+        }
       }
       return true;
     } else {
@@ -583,9 +584,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                   String aclStr = series.getAccessControl();
                   if (StringUtils.isNotBlank(aclStr)) {
                     try {
-                        AccessControlList acl = AccessControlParser.parseAcl(aclStr);
-                        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                                SeriesItem.updateAcl(id, acl, false));
+                      AccessControlList acl = AccessControlParser.parseAcl(aclStr);
+                      messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                              SeriesItem.updateAcl(id, acl, false));
                     } catch (Exception ex) {
                       logger.error("Unable to parse series {} access control list", id, ex);
                     }
