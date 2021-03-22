@@ -32,6 +32,8 @@ interface EditFormProps extends WithTranslation {
 
 interface MetadataFieldProps {
     readonly field: EventMetadataField;
+    // ESlint false positive.
+    // eslint-disable-next-line react/no-unused-prop-types
     readonly valueChange: (id: string, newValue: string | string[]) => void;
     readonly t: i18next.TFunction;
 }

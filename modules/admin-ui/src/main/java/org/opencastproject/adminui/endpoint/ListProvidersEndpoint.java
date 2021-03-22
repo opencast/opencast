@@ -88,8 +88,13 @@ public class ListProvidersEndpoint {
   private ListProvidersService listProvidersService;
   private SeriesEndpoint seriesEndpoint;
 
+  /** This regex is used to reduce the users in the filter selectbox.
+   * The filter is located in the top right corner in the admin ui. */
+  private static final String PROP_KEY_USER_FILTER_REGEX = "org.opencastproject.adminui.filter.user.regex";
+
   protected void activate(BundleContext bundleContext) {
     logger.info("Activate list provider service");
+    JSONUtils.setUserRegex(bundleContext.getProperty(PROP_KEY_USER_FILTER_REGEX));
   }
 
   /** OSGi callback for series services. */

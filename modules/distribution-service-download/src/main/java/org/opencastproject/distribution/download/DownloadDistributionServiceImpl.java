@@ -21,6 +21,7 @@
 package org.opencastproject.distribution.download;
 
 import static java.lang.String.format;
+import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.HttpUtil.waitForResource;
 import static org.opencastproject.util.PathSupport.path;
@@ -39,6 +40,9 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
@@ -128,6 +132,8 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   private Gson gson = new Gson();
 
+  private String systemUserName = null;
+
   /**
    * Creates a new instance of the download distribution service.
    */
@@ -157,6 +163,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     this.distributionDirectory = new File(ccDistributionDirectory);
     logger.info("Download distribution directory is {}", distributionDirectory);
     this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
+    systemUserName = cc.getBundleContext().getProperty(DIGEST_USER_PROPERTY);
   }
 
   @Override
@@ -341,16 +348,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       final URI uri = distributedElement.getURI();
       if (checkAvailability) {
         logger.debug("Checking availability of distributed artifact {} at {}", distributedElement, uri);
-        waitForResource(trustedHttpClient, uri, HttpServletResponse.SC_OK, TIMEOUT, INTERVAL)
-                .fold(Misc.<Exception, Void> chuck(), new Effect.X<Integer>() {
-                  @Override
-                  public void xrun(Integer status) throws Exception {
-                    if (ne(status, HttpServletResponse.SC_OK)) {
-                      logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
-                      throw new DistributionException("Unable to load distributed file " + uri.toString());
-                    }
-                  }
-                });
+        checkAvailability(uri);
       }
       return distributedElement;
     } catch (Exception e) {
@@ -486,18 +484,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     try {
       if (checkAvailability) {
         logger.debug("Checking availability of distributed artifact {} at {}", element, uri);
-        waitForResource(trustedHttpClient, uri, HttpServletResponse.SC_OK, TIMEOUT, INTERVAL)
-            .fold(
-                Misc.<Exception, Void> chuck(),
-                new Effect.X<Integer>() {
-                  @Override
-                  public void xrun(Integer status) throws Exception {
-                    if (ne(status, HttpServletResponse.SC_OK)) {
-                      logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
-                      throw new DistributionException("Unable to load distributed file " + uri.toString());
-                    }
-                  }
-                });
+        checkAvailability(uri);
       }
       return element;
     } catch (Exception e) {
@@ -858,6 +845,28 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
             DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
     retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD,
             serviceRegistry);
+  }
+
+  /**
+   * Checks whether requesting the given HTTP URI results in 200 OK. If not, a
+   * `DistributionException` is thrown. The HTTP request is done with the system
+   * user to ensure our request is properly authorized.
+   */
+  private void checkAvailability(URI uri) {
+    final Organization organization = getSecurityService().getOrganization();
+    final User systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
+    SecurityUtil.runAs(getSecurityService(), organization, systemUser, () -> {
+      waitForResource(trustedHttpClient, uri, HttpServletResponse.SC_OK, TIMEOUT, INTERVAL)
+          .fold(Misc.chuck(), new Effect.X<Integer>() {
+            @Override
+            public void xrun(Integer status) throws Exception {
+              if (ne(status, HttpServletResponse.SC_OK)) {
+                logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
+                throw new DistributionException("Unable to load distributed file " + uri.toString());
+              }
+            }
+          });
+    });
   }
 
 }
