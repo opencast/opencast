@@ -4,11 +4,16 @@ import Notifications from "../../../shared/Notifications";
 import {Field} from "formik";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 
+/**
+ * This component renders the general page for new themes in the new themes wizard.
+ * Here, additional information, like name, for themes can be provided.
+ */
 const GeneralPage = ({ formik, nextPage }) => {
     const { t } = useTranslation();
 
     return (
         <>
+            {/* Fields for name and description */}
             <div className="modal-content">
                 <div className="modal-body">
                     <div className="full-col">
@@ -39,6 +44,6 @@ const GeneralPage = ({ formik, nextPage }) => {
                                      nextPage={nextPage}/>
         </>
     );
-}
+};
 
 export default GeneralPage;

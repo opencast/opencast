@@ -59,6 +59,9 @@ app.use("/i18n",
 app.use("/public",
     express.static(path.join(__dirname, "app/public"))
 );
+app.use("/staticfiles",
+    express.static(path.join(__dirname, "test/app/POST"))
+);
 app.use("/modules",
     express.static(path.join(__dirname, "app/src/components"))
 );
@@ -68,6 +71,29 @@ app.use("/shared",
 app.use("/img",
     express.static(path.join(__dirname, "app/src/img"))
 );
+
+app.post("/*", (req, res) => {
+    let filePath = path.join(__dirname,'test/app/' + req.method + req.url);
+    setTimeout(function () {
+        res.status(201);
+        res.sendFile(filePath);
+    }, 1000);
+
+});
+
+app.delete("/*", (req, res) => {
+    let filePath = path.join(__dirname, 'test/app/' + req.method + req.url);
+    setTimeout(function() {
+        res.sendFile(filePath);
+    }, 1000);
+});
+
+app.put("/*", (req, res) => {
+    let filePath = path.join(__dirname, 'test/app/' + req.method + req.url);
+    setTimeout(function () {
+        res.send(filePath);
+    }, 1000);
+});
 
 app.listen(port, () => console.log(`Listing on port ${port}`));
 

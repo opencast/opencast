@@ -8,7 +8,11 @@ import TitleSlidePage from "./TitleSlidePage";
 import WatermarkPage from "./WatermarkPage";
 import ThemeSummaryPage from "./ThemeSummaryPage";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
+import {postNewTheme} from "../../../../thunks/themeThunks";
 
+/**
+ * This component manages the pages of the new theme wizard and the submission of values
+ */
 const NewThemeWizard = ({ close }) => {
 
     const initialValues = initialFormValuesNewThemes;
@@ -16,6 +20,7 @@ const NewThemeWizard = ({ close }) => {
     const [page, setPage] = useState(0);
     const [snapshot, setSnapshot] = useState(initialValues);
 
+    // Caption of steps used by Stepper
     const steps = [
         {
             name: 'generalForm',
@@ -43,6 +48,7 @@ const NewThemeWizard = ({ close }) => {
         }
     ];
 
+    // Validation schema of current page
     const currentValidationSchema = NewThemeSchema[page];
 
     const nextPage = values => {
@@ -56,8 +62,8 @@ const NewThemeWizard = ({ close }) => {
     }
 
     const handleSubmit = values => {
-        console.log('To be implemented!!!');
-        console.log(values);
+        const response = postNewTheme(values);
+        close();
     }
 
     return (
@@ -65,9 +71,11 @@ const NewThemeWizard = ({ close }) => {
             {/* Stepper that shows each step of wizard as header */}
             <WizardStepper steps={steps} page={page}/>
 
+            {/* Initialize overall form */}
             <Formik initialValues={snapshot}
                     validationSchema={currentValidationSchema}
                     onSubmit={values => handleSubmit(values)}>
+                {/* Render wizard pages depending on current value of page variable */}
                 {formik => (
                     <div>
                         {page === 0 && (
@@ -82,7 +90,8 @@ const NewThemeWizard = ({ close }) => {
                         {page === 2 && (
                             <BumperPage formik={formik}
                                         nextPage={nextPage}
-                                        previousPage={previousPage}/>
+                                        previousPage={previousPage}
+                                        isTrailer/>
                         )}
                         {page === 3 && (
                             <TitleSlidePage formik={formik}
