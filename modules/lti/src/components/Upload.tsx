@@ -139,8 +139,7 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         });
     }
 
-    setUploadPogress(progress: number) {
-        console.log(progress)
+    setUploadProgress(progress: number) {
         this.setState({
             ...this.state,
             uploadProgress: progress
@@ -163,7 +162,7 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             this.state.eventId,
             this.state.presenterFile,
             this.state.captionFile,
-            this.setUploadPogress = this.setUploadPogress.bind(this)
+            this.setUploadProgress = this.setUploadProgress.bind(this)
         ).then((_) => {
             if (!isMetadata(this.state.metadata))
                 return;
