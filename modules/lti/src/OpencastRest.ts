@@ -144,7 +144,7 @@ const parseTracksFromResult = (result: any) => {
     return (
       result.mediapackage.media.track.reduce((res: Track[], track: any) => {
         // Avoid tracks that belong to an adaptive streaming publication
-        if(!('logicalname' in track)) {
+        if(!('logicalname' in track) && 'video' in track && 'resolution' in track.video) {
           res.push({
             type: track.type,
             url: track.url,
@@ -156,7 +156,8 @@ const parseTracksFromResult = (result: any) => {
     )
   } else if (result.mediapackage.media.track !== null) {
     // Avoid tracks that belong to an adaptive streaming publication
-    if ('logicalname' in result.mediapackage.media.track) {
+    if ('logicalname' in result.mediapackage.media.track ||
+        !('video' in result.mediapackage.media.track && 'resolution' in result.mediapackage.media.track.video)) {
       return undefined;
     }
     return {
