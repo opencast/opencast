@@ -22,10 +22,8 @@
 package org.opencastproject.index.service.api;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.group.Group;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.service.exception.IndexServiceException;
@@ -66,9 +64,6 @@ public interface IndexService {
   enum EventRemovalResult {
     SUCCESS, GENERAL_FAILURE, NOT_FOUND, RETRACTING
   }
-
-  SearchResult<Group> getGroups(String filter, Opt<Integer> limit, Opt<Integer> offset, Opt<String> sort,
-          AbstractSearchIndex index) throws SearchIndexException, IllegalArgumentException;
 
   /**
    * Get a single event

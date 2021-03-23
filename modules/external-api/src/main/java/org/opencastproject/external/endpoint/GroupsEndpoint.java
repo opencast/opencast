@@ -39,11 +39,16 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.elasticsearch.index.group.Group;
+import org.opencastproject.elasticsearch.index.group.GroupIndexSchema;
+import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.index.ExternalIndex;
-import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
+import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.userdirectory.ConflictException;
@@ -65,6 +70,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -91,17 +97,17 @@ public class GroupsEndpoint {
 
   /* OSGi service references */
   private ExternalIndex externalIndex;
-  private IndexService indexService;
   private JpaGroupRoleProvider jpaGroupRoleProvider;
+  private SecurityService securityService;
 
   /** OSGi DI */
   void setExternalIndex(ExternalIndex externalIndex) {
     this.externalIndex = externalIndex;
   }
 
-  /** OSGi DI */
-  void setIndexService(IndexService indexService) {
-    this.indexService = indexService;
+  /** OSGi DI. */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /** OSGi DI */
@@ -130,11 +136,60 @@ public class GroupsEndpoint {
     Opt<Integer> optOffset = Opt.nul(offset);
     if (optOffset.isSome() && offset < 0)
       optOffset = Opt.none();
+    Opt<String> optSort = Opt.nul(StringUtils.trimToNull(sort));
 
     SearchResult<Group> results;
     try {
-      results = indexService.getGroups(filter, optLimit, optOffset, Opt.nul(StringUtils.trimToNull(sort)),
-              externalIndex);
+      GroupSearchQuery query = new GroupSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
+
+      // Parse the filters
+      if (StringUtils.isNotBlank(filter)) {
+        for (String f : filter.split(",")) {
+          String[] filterTuple = f.split(":");
+          if (filterTuple.length < 2) {
+            logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
+            continue;
+          }
+
+          String name = filterTuple[0];
+          String value = filterTuple[1];
+
+          if (GroupsListQuery.FILTER_NAME_NAME.equals(name))
+            query.withName(value);
+        }
+      }
+
+      if (optSort.isSome()) {
+        Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+        for (SortCriterion criterion : sortCriteria) {
+          switch (criterion.getFieldName()) {
+            case GroupIndexSchema.NAME:
+              query.sortByName(criterion.getOrder());
+              break;
+            case GroupIndexSchema.DESCRIPTION:
+              query.sortByDescription(criterion.getOrder());
+              break;
+            case GroupIndexSchema.ROLE:
+              query.sortByRole(criterion.getOrder());
+              break;
+            case GroupIndexSchema.MEMBERS:
+              query.sortByMembers(criterion.getOrder());
+              break;
+            case GroupIndexSchema.ROLES:
+              query.sortByRoles(criterion.getOrder());
+              break;
+            default:
+              throw new IllegalArgumentException("Unknown group index " + criterion.getFieldName());
+          }
+        }
+      }
+
+      if (optLimit.isSome())
+        query.withLimit(optLimit.get());
+      if (optOffset.isSome())
+        query.withOffset(optOffset.get());
+
+      results = externalIndex.getByQuery(query);
     } catch (SearchIndexException e) {
       logger.error("The External Search Index was not able to get the groups list:", e);
       return ApiResponses.serverError("Could not retrieve groups, reason: '%s'", getMessage(e));
