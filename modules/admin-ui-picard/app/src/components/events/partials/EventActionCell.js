@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from "react-i18next";
-
+import EventDetailsModal from "./modals/EventDetailsModal";
 
 
 /**
@@ -8,8 +8,54 @@ import {useTranslation} from "react-i18next";
  */
 const EventActionCell = ({ row })  => {
     const { t } = useTranslation();
+
+    const [displayEventDetailsModal, setEventDetailsModal] = useState(false);
+    const [eventDetailsTabIndex, setEventDetailsTabIndex] = useState(0);
+
+    const showEventDetailsModal = () => {
+        setEventDetailsModal(true);
+    }
+
+    const hideEventDetailsModal = () => {
+        setEventDetailsModal(false);
+    }
+
+    //todo: implement!
+    const onClickEventDetails = () => {
+        console.log("Should open event-details.");
+        setEventDetailsTabIndex(0);
+        showEventDetailsModal();
+    }
+
+    //todo: implement!
+    const onClickComments = () => {
+        console.log("Should open comments-tab (event-details).");
+        setEventDetailsTabIndex(7);
+        showEventDetailsModal();
+    }
+
+    //todo: implement!
+    const onClickWorkflow = () => {
+        console.log("Should open workflow-tab (event-details).");
+        setEventDetailsTabIndex(5);
+        showEventDetailsModal();
+    }
+
+    //todo: implement!
+    const onClickAssets = () => {
+        console.log("Should open assets-tab (event-details).");
+        setEventDetailsTabIndex(3);
+        showEventDetailsModal();
+    }
+
     return (
         <>
+
+            {/* Display modal for editing table view if table edit button is clicked */}
+            <EventDetailsModal showModal={displayEventDetailsModal}
+                               handleClose={hideEventDetailsModal}
+                               tabIndex={eventDetailsTabIndex}/>
+
             {/* Open event details */}
             {/*TODO: implement and properly call function */}
             {/*TODO: with-Role ROLE_UI_EVENTS_DETAILS_VIEW*/}
@@ -91,11 +137,6 @@ const EventActionCell = ({ row })  => {
 };
 
 //todo: implement!
-const onClickEventDetails = () => {
-    console.log("Should open event-details.");
-}
-
-//todo: implement!
 const onClickSeriesDetails = () => {
     console.log("Should open series-details.");
 }
@@ -103,21 +144,6 @@ const onClickSeriesDetails = () => {
 //todo: implement!
 const onClickDelete = () => {
     console.log("Should delete the event.");
-}
-
-//todo: implement!
-const onClickComments = () => {
-    console.log("Should open comments-tab (event-details).");
-}
-
-//todo: implement!
-const onClickWorkflow = () => {
-    console.log("Should open workflow-tab (event-details).");
-}
-
-//todo: implement!
-const onClickAssets = () => {
-    console.log("Should open assets-tab (event-details).");
 }
 
 //todo: implement!
