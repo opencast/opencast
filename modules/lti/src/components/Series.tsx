@@ -78,14 +78,14 @@ const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, delete
                     <button onClick={(e) => { editCallback(episode.id); e.stopPropagation(); }}>
                         <FontAwesomeIcon icon={faEdit} />
                     </button>}
-                {downloadCallback !== undefined && Array.isArray(episode.mediapackage.tracks) &&
+                {downloadCallback !== undefined && Array.isArray(episode.mediapackage.tracks) && episode.mediapackage.tracks.length > 0 &&
                   <Dropdown style={{display: 'inline-block'}}>
                     <Dropdown.Toggle as={dropdownCustomToggle} >
                       <FontAwesomeIcon icon={faDownload}/>
                     </Dropdown.Toggle>
                     <DropdownMenu>
                       {sortByType(episode.mediapackage.tracks).map((track) => {
-                          if (track !== undefined) {
+                          if (track !== undefined && (track.url.endsWith('mp4') || track.url.endsWith('webm'))) {
                             return (
                               <Dropdown.Item onClick={(e) => { downloadCallback(track); e.stopPropagation(); }} >
                                 {capitalize(track.type.split('/')[0])} <br/> {track.resolution}

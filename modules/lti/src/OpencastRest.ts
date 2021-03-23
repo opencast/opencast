@@ -8,7 +8,7 @@ export interface Attachment {
 export interface Track {
     readonly type: string;
     readonly url: string;
-    readonly resolution: string;
+    readonly resolution: string | undefined;
 }
 
 export interface JobResult {
@@ -19,7 +19,7 @@ export interface JobResult {
 export interface MediaPackage {
     readonly attachments: Attachment[];
     readonly creators: string[];
-    readonly tracks: Track[];
+    readonly tracks: Track[] | undefined;
 }
 
 export interface SearchEpisodeResult {
@@ -136,19 +136,29 @@ export async function copyEventToSeries(eventId: string, targetSeries: string): 
 }
 
 /**
- * Tracks is not guaranteed to be an array, so we need to handle different cases
+ * Track is not guaranteed to be an array or even exist at all, so we need to handle different cases
  * @param result a result from the search query
  */
 const parseTracksFromResult = (result: any) => {
   if (Array.isArray(result.mediapackage.media.track)) {
     return (
-      result.mediapackage.media.track.map((track: any) => ({
-        type: track.type,
-        url: track.url,
-        resolution: track.video.resolution
-      }))
+      result.mediapackage.media.track.reduce((res: Track[], track: any) => {
+        // Avoid tracks that belong to an adaptive streaming publication
+        if(!('logicalname' in track)) {
+          res.push({
+            type: track.type,
+            url: track.url,
+            resolution: track.video.resolution
+          })
+        }
+        return res;
+      }, [])
     )
   } else if (result.mediapackage.media.track !== null) {
+    // Avoid tracks that belong to an adaptive streaming publication
+    if ('logicalname' in result.mediapackage.media.track) {
+      return undefined;
+    }
     return {
       type: result.mediapackage.media.track.type,
       url: result.mediapackage.media.track.url,

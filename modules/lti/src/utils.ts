@@ -36,7 +36,11 @@ export const sortByType = (tracks: Track[]) => {
       return -1;
     }
 
+    if (descA === undefined || descB === undefined) {
+      return 0;
+    } // Else
     return sortResolutions(descA, descB);
+
   })
   return tracks;
 }
