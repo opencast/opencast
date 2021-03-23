@@ -82,11 +82,13 @@ public class EmailTemplateServiceImplTest {
                     + "title: ${mediaPackage.title}, series title: ${mediaPackage.seriesTitle}, "
                     + "date: ${mediaPackage.date?datetime?iso_utc}");
     EasyMock.expect(templateScanner.getTemplate("templateCatalog"))
-            .andReturn(
-                    "EPISODE creator: ${catalogs[\"episode\"][\"creator\"]}, isPartOf: ${catalogs[\"episode\"][\"isPartOf\"]}, "
-                            + "title: ${catalogs[\"episode\"][\"title\"]}, created: ${catalogs[\"episode\"][\"created\"]}, "
-                            + "SERIES creator: ${catalogs[\"series\"][\"creator\"]}, description: ${catalogs[\"series\"][\"description\"]}, "
-                            + "subject: ${catalogs[\"series\"][\"subject\"]}");
+        .andReturn(
+            "EPISODE creator: ${catalogs[\"episode\"][\"creator\"]}, "
+                + "isPartOf: ${catalogs[\"episode\"][\"isPartOf\"]}, "
+                + "title: ${catalogs[\"episode\"][\"title\"]}, created: ${catalogs[\"episode\"][\"created\"]}, "
+                + "SERIES creator: ${catalogs[\"series\"][\"creator\"]}, "
+                + "description: ${catalogs[\"series\"][\"description\"]}, "
+                + "subject: ${catalogs[\"series\"][\"subject\"]}");
     EasyMock.expect(templateScanner.getTemplate("templateFailed")).andReturn(
             "<#if failedOperation?has_content>Workflow failed in operation: ${failedOperation.template}</#if>, "
                     + "Workflow errors: <#list incident as inc><#list inc.details as de>${de.b} </#list></#list>");

@@ -91,7 +91,8 @@ public class Workflows {
   private final Fn<String, Iterable<Snapshot>> findLatest = new Fn<String, Iterable<Snapshot>>() {
     @Override public Iterable<Snapshot> apply(String mpId) {
       AQueryBuilder q = am.createQuery();
-      return enrich(q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run()).getSnapshots();
+      return enrich(q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run())
+          .getSnapshots();
     }
   };
 }
