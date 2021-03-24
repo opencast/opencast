@@ -1,14 +1,13 @@
 import React from "react";
-import cn from "classnames";
 import {useTranslation} from "react-i18next";
 import {getEventMetadata} from "../../../../selectors/eventSelectors";
 import {connect} from "react-redux";
-import {uploadAssetOptions} from "../../../../configs/wizard/sourceConfig";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import MetadataSummaryTable from "./summaryTables/MetadataSummaryTable";
 import MetadataExtendedSummaryTable from "./summaryTables/MetadataExtendedSummaryTable";
 import AccessSummaryTable from "./summaryTables/AccessSummaryTable";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
+import {uploadAssetOptions} from "../../../../configs/sourceConfig";
 
 /**
  * This component renders the summary page for new events in the new event wizard.

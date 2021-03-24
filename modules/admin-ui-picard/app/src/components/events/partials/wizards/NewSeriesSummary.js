@@ -5,7 +5,6 @@ import {getSeriesMetadata, getSeriesThemes} from "../../../../selectors/seriesSe
 import MetadataSummaryTable from "./summaryTables/MetadataSummaryTable";
 import MetadataExtendedSummaryTable from "./summaryTables/MetadataExtendedSummaryTable";
 import AccessSummaryTable from "./summaryTables/AccessSummaryTable";
-import cn from "classnames";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 
 /**

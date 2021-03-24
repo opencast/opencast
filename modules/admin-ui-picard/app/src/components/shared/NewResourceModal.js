@@ -3,6 +3,7 @@ import {useTranslation} from "react-i18next";
 import NewEventWizard from "../events/partials/wizards/NewEventWizard";
 import NewSeriesWizard from "../events/partials/wizards/NewSeriesWizard";
 import NewThemeWizard from "../configuration/partials/wizard/NewThemeWizard";
+import NewAclWizard from "../users/partials/wizard/NewAclWizard";
 
 
 /**
@@ -30,6 +31,9 @@ const NewResourceModal = ({ handleClose, showModal, resource }) => {
                     {resource === 'themes' && (
                         <h2>{t('CONFIGURATION.THEMES.DETAILS.NEWCAPTION')}</h2>
                     )}
+                    {resource === 'acl' && (
+                        <h2>{t('USERS.ACLS.NEW.CAPTION')}</h2>
+                    )}
                 </header>
                 {resource === 'events' && (
                     //New Event Wizard
@@ -42,6 +46,9 @@ const NewResourceModal = ({ handleClose, showModal, resource }) => {
                 {resource === 'themes' && (
                     // New Theme Wizard
                     <NewThemeWizard close={close}/>
+                )}
+                {resource === 'acl' && (
+                    <NewAclWizard close={close} />
                 )}
             </section>
         )

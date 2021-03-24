@@ -7,10 +7,10 @@ import {connect} from "react-redux";
 import NewMetadataPage from "./NewMetadataPage";
 import NewMetadataExtendedPage from "./NewMetadataExtendedPage";
 import NewAccessPage from "./NewAccessPage";
-import {initialFormValuesNewSeries} from "../../../../configs/wizard/newSeriesWizardConfig";
 import {postNewSeries} from "../../../../thunks/seriesThunks";
 import {NewSeriesSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
+import {initialFormValuesNewSeries} from "../../../../configs/wizardConfig";
 
 
 /**

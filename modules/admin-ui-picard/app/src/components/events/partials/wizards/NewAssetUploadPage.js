@@ -1,8 +1,7 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import cn from "classnames";
-import {uploadAssetOptions} from "../../../../configs/wizard/sourceConfig";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
+import {uploadAssetOptions} from "../../../../configs/sourceConfig";
 
 /**
  * This component renders the asset upload page of the new event wizard
@@ -88,19 +87,6 @@ const NewAssetUploadPage = ({ previousPage, nextPage , formik }) => {
                                      nextPage={nextPage}
                                      previousPage={previousPage}
                                      formik={formik}/>
-            {/*<footer>
-                <button type="submit"
-                        className={cn("submit")}
-                        onClick={() => {
-                            nextPage(formik.values);
-                        }}
-                        tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
-                <button className="cancel"
-                        onClick={() => previousPage(formik.values, false)}
-                        tabIndex="101">{t('WIZARD.BACK')}</button>
-            </footer>
-
-            <div className="btm-spacer"/>*/}
         </>
     );
 

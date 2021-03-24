@@ -13,9 +13,9 @@ import {
     transformMetadataCollection
 } from "../utils/resourceUtils";
 import axios from "axios";
-import {sourceMetadata, uploadAssetOptions} from "../configs/wizard/sourceConfig";
-import {WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizard/newEventWizardConfig";
 import {getTimezoneOffset} from "../utils/utils";
+import {sourceMetadata, uploadAssetOptions} from "../configs/sourceConfig";
+import {WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizardConfig";
 
 // fetch events from server
 export const fetchEvents = () => async (dispatch, getState) => {

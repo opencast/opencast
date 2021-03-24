@@ -15,6 +15,7 @@ import {aclsTemplateMap} from "../../configs/tableConfigs/aclsTableConfig";
 import {fetchAcls} from "../../thunks/aclThunks";
 import {getAcls} from "../../selectors/aclSelectors";
 import Notifications from "../shared/Notifications";
+import NewResourceModal from "../shared/NewResourceModal";
 
 /**
  * This component renders the table view of acls
@@ -24,6 +25,7 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                     loadingGroupsIntoTable }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
+    const [displayNewAclModal, setNewAclModal] = useState(false);
 
     const loadAcls = async () => {
         // Fetching acls from server
@@ -62,8 +64,12 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
         setNavigation(!displayNavigation);
     };
 
-    const placeholder = () => {
-        console.log("To be implemented");
+    const showNewAclModal = () => {
+        setNewAclModal(true);
+    }
+
+    const hideNewAclModal = () => {
+        setNewAclModal(false);
     }
 
     const styleNavOpen = {
@@ -80,11 +86,16 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                 {/* Add acl button */}
                 <div className="btn-group">
                     {/*todo: implement onClick and with role*/}
-                    <button className="add" onClick={() => placeholder()}>
+                    <button className="add" onClick={() => showNewAclModal()}>
                         <i className="fa fa-plus"/>
                         <span>{t('USERS.ACTIONS.ADD_ACL')}</span>
                     </button>
                 </div>
+
+                {/* Display modal for new acl if add acl button is clicked */}
+                <NewResourceModal showModal={displayNewAclModal}
+                                  handleClose={hideNewAclModal}
+                                  resource="acl"/>
 
                 {/* Include Burger-button menu*/}
                 <MainNav isOpen={displayNavigation}

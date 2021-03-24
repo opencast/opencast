@@ -101,3 +101,11 @@ export const NewThemeSchema = [Yup.object().shape({
         })
     })
 })];
+
+export const NewAclSchema = [
+    Yup.object().shape({
+        name: Yup.string().required('Required')
+    })
+];
+
+

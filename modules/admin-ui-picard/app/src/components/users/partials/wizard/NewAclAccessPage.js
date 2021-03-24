@@ -1,22 +1,19 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
-import Notifications from "../../../shared/Notifications";
-import {fetchAclActions, fetchAclTemplateById, fetchAclTemplates, fetchRoles} from "../../../../thunks/aclThunks";
-import {FieldArray, Field} from "formik";
 import {connect} from "react-redux";
+import {FieldArray, Field} from "formik";
+import {fetchAclActions, fetchAclTemplateById, fetchAclTemplates, fetchRoles} from "../../../../thunks/aclThunks";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
+import Notifications from "../../../shared/Notifications";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/wizardConfig";
 
-/**
- * This component renders the access page for new events and series in the wizards.
- */
-const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess }) => {
+
+const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess }) => {
     const { t } = useTranslation();
 
-    // States containing response from server concerning acl templates, actions and roles
     const [aclTemplates, setAclTemplates] = useState([]);
     const [aclActions, setAclActions] = useState([]);
     const [roles, setRoles] = useState([]);
@@ -42,34 +39,34 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
         // fetch information about chosen template from backend
         const template =  await fetchAclTemplateById(e.target.value);
 
-        formik.setFieldValue('policies', template);
-        checkPolicies();
+        formik.setFieldValue('acls', template);
+        checkAcls();
     }
 
-    // check if all policies provided by the user have valid read/write rights
-    const checkPolicies = () => {
+    // check if all acls provided by the user have valid read/write rights
+    const checkAcls = () => {
 
         // Remove old notifications of context event-access
         // Helps to prevent multiple notifications for same problem
         removeNotificationWizardAccess();
 
-        const policies = formik.values.policies;
+        const acls = formik.values.acls;
         let check = true;
         let bothRights = false;
 
-        for (let i = 0; policies.length > i; i++) {
+        for (let i = 0; acls.length > i; i++) {
             // check if a role is chosen
-            if (policies[i].role === '') {
+            if (acls[i].role === '') {
                 check = false;
             }
 
             // check if there is at least one policy with read and write rights
-            if (policies[i].read && policies[i].write) {
+            if (acls[i].read && acls[i].write) {
                 bothRights = true;
             }
 
             // check if each policy has read or write right (at least one checkbox should be checked)
-            if (!policies[i].read && !policies[i].write) {
+            if (!acls[i].read && !acls[i].write) {
                 check = false;
             }
         }
@@ -86,32 +83,27 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
         return check;
     }
 
-
     return (
         <>
             <div className="modal-content">
                 <div className="modal-body">
                     <div className="full-col">
-                        {/* Notifications */}
                         <Notifications context="not_corner"/>
                         {!loading && (
                             <ul>
                                 <li>
                                     <div className="obj list-obj">
                                         <header className="no-expand">
-                                            {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.TITLE')}
+                                            {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.TITLE')}
                                         </header>
                                         <div className="obj-container">
-                                            <p>
-                                                {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
-                                            </p>
 
-                                            {/* Template selection*/}
+                                            {/* Template selection */}
                                             <div className="obj tbl-list">
                                                 <table className="main-tbl">
                                                     <thead>
                                                         <tr>
-                                                            <th>{t('EVENTS.SERIES.NEW.ACCESS.TEMPLATES.TITLE')}</th>
+                                                            <th>{t('USERS.ACLS.NEW.ACCESS.TEMPLATES.TITLE')}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -119,98 +111,102 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                             {aclTemplates.length > 0 ? (
                                                                 <td>
                                                                     <div className="obj-container padded">
+                                                                        <p>
+                                                                            {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
+                                                                        </p>
                                                                         <select tabIndex="1"
                                                                                 autoFocus
                                                                                 style={{width: '200px'}}
                                                                                 onChange={e => handleTemplateChange(e)}
-                                                                                placeholder={t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL')}>
+                                                                                placeholder={t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL')}>
                                                                             <option value=""/>
                                                                             {aclTemplates.map((template, key) => (
                                                                                 <option value={template.id}
-                                                                                        key={key}>{template.value}</option>
+                                                                                        key={key}>
+                                                                                    {template.value}
+                                                                                </option>
                                                                             ))}
                                                                         </select>
                                                                     </div>
                                                                 </td>
                                                             ) : (
-                                                                //Show if no option is available
+                                                                // Show if no option is available
                                                                 <td>
                                                                     <div className="obj-container padded">
-                                                                        {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY')}
+                                                                        <p>
+                                                                            {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
+                                                                        </p>
+                                                                        {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.EMPTY')}
                                                                     </div>
                                                                 </td>
                                                             )}
-
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
-                                        </div>
 
-                                        {/* Area for editing policies */}
-                                        <div className="obj-container">
-                                            <div className="obj tbl-list">
-                                                <header>
-                                                    {t('EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS')}
-                                                </header>
-                                                <div className="obj-container">
-                                                    <table className="main-tbl">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>
-                                                                    {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE')}
-                                                                </th>
-                                                                <th className="fit">
-                                                                    {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ')}
-                                                                </th>
-                                                                <th className="fit">
-                                                                    {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE')}
-                                                                </th>
-                                                                <th className="fit">
-                                                                    {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS')}
-                                                                </th>
-                                                                <th className="fit">
-                                                                    {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ACTION')}
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {/*Add fieldArray/row for each policy in policies field*/}
-                                                            <FieldArray name="policies">
-                                                                {({ insert, remove, push }) => (
-                                                                    <>
-                                                                        {roles.length > 0 ? (
-                                                                            formik.values.policies.length > 0 &&
-                                                                                    formik.values.policies.map((policy, index) => (
+                                            <div className="obj-container">
+                                                <div className="obj tbl-list">
+                                                    <header>
+                                                        {t('')}
+                                                    </header>
+                                                    <div className="obj-container">
+                                                        <table className="main-tbl">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>
+                                                                        {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ROLE')}
+                                                                    </th>
+                                                                    <th className="fit">
+                                                                        {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.READ')}
+                                                                    </th>
+                                                                    <th className="fit">
+                                                                        {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE')}
+                                                                    </th>
+                                                                    <th className="fit">
+                                                                        {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS')}
+                                                                    </th>
+                                                                    <th className="fit">
+                                                                        {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ACTION')}
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <FieldArray name="acls">
+                                                                    {({ insert, remove, push }) => (
+                                                                        <>
+                                                                            {roles.length > 0 ? (
+                                                                                formik.values.acls.length > 0 &&
+                                                                                    formik.values.acls.map((acl, index) => (
                                                                                         <tr key={index}>
-
                                                                                             <td>
                                                                                                 <Field style={{width: '360px'}}
-                                                                                                       name={`policies.${index}.role`}
+                                                                                                       name={`acls.${index}.role`}
                                                                                                        as="select"
-                                                                                                       placeholder={t('EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL')}>
+                                                                                                       placeholder={t('USERS.ACLS.NEW.ACCESS.ROLES.LABEL')}>
                                                                                                     {roles.length > 0 && (
                                                                                                         <>
-                                                                                                            <option value="" />
+                                                                                                            <option  value="" />
                                                                                                             {roles.map((role, key) => (
                                                                                                                 <option value={role.id}
                                                                                                                         key={key}>{role.id}</option>
                                                                                                             ))}
                                                                                                         </>
                                                                                                     )}
-
                                                                                                 </Field>
                                                                                             </td>
-                                                                                            {/* Checkboxes for  policy.read and policy.write*/}
-                                                                                            <td className="fit text-center"><Field type="checkbox" name={`policies.${index}.read`}/></td>
-                                                                                            <td className="fit text-center"><Field type="checkbox" name={`policies.${index}.write`}/></td>
-                                                                                            {/* Show only if policy has actions*/}
+                                                                                            <td className="fit text-center">
+                                                                                                <Field type="checkbox" name={`acls.${index}.read`}/>
+                                                                                            </td>
+                                                                                            <td className="fit text-center">
+                                                                                                <Field type="checkbox" name={`acls.${index}.write`}/>
+                                                                                            </td>
                                                                                             {aclActions.length > 0 && (
                                                                                                 <td className="fit editable">
                                                                                                     <div>
                                                                                                         <RenderMultiField fieldInformation={
                                                                                                             {
-                                                                                                                id: `policies.${index}.actions`,
+                                                                                                                id: `acls.${index}.actions`,
                                                                                                                 type: 'mixed_text',
                                                                                                                 collection: aclActions
                                                                                                             }
@@ -221,38 +217,37 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                             {/*Remove policy*/}
                                                                                             <td>
                                                                                                 <a onClick={() => remove(index)}
-                                                                                                   className="remove" />
+                                                                                                   className="remove"/>
                                                                                             </td>
                                                                                         </tr>
                                                                                     ))
-                                                                        ) : (
-                                                                            <tr>
-                                                                                <td>{t('EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY')}</td>
-                                                                            </tr>
-                                                                        )}
+                                                                            ) : (
+                                                                                <tr>
+                                                                                    <td>{t('USERS.ACLS.NEW.ACCESS.ROLES.EMPTY')}</td>
+                                                                                </tr>
+                                                                            )}
 
-                                                                        {/*Todo: show only if user has role ROLE_UI_SERIES_DETAILS_ACL_EDIT */}
-                                                                        <tr>
-                                                                            {/*Add additional policy row*/}
-                                                                            <td colSpan="5">
-                                                                                <a onClick={() => {
-                                                                                    push({
-                                                                                        role: '',
-                                                                                        read: false,
-                                                                                        write: false,
-                                                                                        actions: []
-                                                                                    });
-                                                                                    checkPolicies();
-                                                                                }}>
-                                                                                    + {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.NEW')}
-                                                                                </a>
-                                                                            </td>
-                                                                        </tr>
-                                                                    </>
-                                                                )}
-                                                            </FieldArray>
-                                                        </tbody>
-                                                    </table>
+                                                                            {/*Todo: show only if user has role ROLE_UI_SERIES_DETAILS_ACL_EDIT */}
+                                                                            <tr>
+                                                                                {/*Add additional policy row*/}
+                                                                                <td colSpan="5">
+                                                                                    <a onClick={() => {
+                                                                                        push({
+                                                                                            role: '',
+                                                                                            read: false,
+                                                                                            write: false,
+                                                                                            actions: []
+                                                                                        });
+                                                                                        checkAcls();
+                                                                                    }}> + {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.NEW')}</a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </>
+                                                                    )}
+                                                                </FieldArray>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -273,7 +268,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                             })}
                         disabled={!(formik.dirty && formik.isValid)}
                         onClick={() => {
-                            if(checkPolicies()) {
+                            if(checkAcls()) {
                                 nextPage(formik.values);
                             }
                         }}
@@ -285,13 +280,12 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
 
             <div className="btm-spacer"/>
         </>
-    )
-}
-
+    );
+};
 
 const mapDispatchToProps = dispatch => ({
     addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
     removeNotificationWizardAccess: () => dispatch(removeNotificationWizardAccess())
 });
 
-export default connect(null, mapDispatchToProps)(NewAccessPage);
+export default connect(null, mapDispatchToProps)(NewAclAccessPage);

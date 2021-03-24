@@ -1,7 +1,13 @@
-import {initArray} from "../../utils/utils";
-
 // All fields for new event form that are fix and not depending on response of backend
 // InitialValues of Formik form (others computed dynamically depending on responses from backend)
+import {initArray} from "../utils/utils";
+
+// Context for notifications shown in wizards
+export const NOTIFICATION_CONTEXT = 'wizard-form';
+
+// Context for notifications shown in access page
+export const NOTIFICATION_CONTEXT_ACCESS = 'wizard-access';
+
 export const initialFormValuesNewEvents = {
     sourceMode: 'UPLOAD',
     scheduleStartDate: new Date().toISOString(),
@@ -60,11 +66,44 @@ export const weekdays = [
     }
 ];
 
-// Context for notifications shown in events wizard
-export const NOTIFICATION_CONTEXT = 'wizard-form';
-
-// Context for notifications shown in access page
-export const NOTIFICATION_CONTEXT_ACCESS = 'wizard-access';
-
 // Workflow applied to upload assets that are not tracks
 export const WORKFLOW_UPLOAD_ASSETS_NON_TRACK = 'publish-uploaded-assets';
+
+
+// All fields for new series form that are fix and not depending on response of backend
+// InitialValues of Formik form (others computed dynamically depending on responses from backend)
+export const initialFormValuesNewSeries = {
+    policies: [{
+        role: 'ROLE_USER_ADMIN',
+        read: true,
+        write: true,
+        actions: []
+    }],
+    theme: ''
+};
+
+// All fields for new theme form that are fix and not depending on response of backend
+// InitialValues of Formik form (others computed dynamically depending on responses from backend)
+export const initialFormValuesNewThemes = {
+    name: '',
+    description: '',
+    bumperActive: false,
+    bumperFile: {},
+    trailerActive: false,
+    trailerFile: {},
+    titleSlideActive: false,
+    titleSlideMode: 'extract',
+    titleSlideBackground: {},
+    licenseSlideActive: false,
+    watermarkActive: false,
+    watermarkFile: {},
+    watermarkPosition: 'topRight'
+};
+
+
+// All fields for new acl form that are fix and not depending on response of backend
+// InitialValues of Formik form (others computed dynamically depending on responses from backend)
+export const initialFormValuesNewAcl = {
+    name: '',
+    acls: []
+};
