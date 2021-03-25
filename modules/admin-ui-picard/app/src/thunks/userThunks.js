@@ -1,6 +1,7 @@
 import {loadUsersFailure, loadUsersInProgress, loadUsersSuccess} from "../actions/userActions";
 import {getURLParams} from "../utils/resourceUtils";
 import axios from "axios";
+import {transformToIdValueArray} from "../utils/utils";
 
 // fetch users from server
 export const fetchUsers = () => async (dispatch, getState) => {
@@ -19,4 +20,13 @@ export const fetchUsers = () => async (dispatch, getState) => {
     } catch (e) {
         dispatch(loadUsersFailure());
     }
+};
+
+export const fetchUsersAndUsernames = async () => {
+
+    let data = await axios.get('/admin-ng/resources/USERS.NAME.AND.USERNAME.json');
+
+    const response = await data.data;
+
+    return transformToIdValueArray(response);
 };

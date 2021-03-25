@@ -107,3 +107,12 @@ export const initialFormValuesNewAcl = {
     name: '',
     acls: []
 };
+
+// All fields for new group form that are fix and not depending on response of backend
+// InitialValues of Formik form (others computed dynamically depending on responses from backend)
+export const initialFormValuesNewGroup = {
+    name: '',
+    description: '',
+    roles: [],
+    users: []
+};

@@ -15,6 +15,7 @@ import {groupsTemplateMap} from "../../configs/tableConfigs/groupsTableConfig";
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
 import Notifications from "../shared/Notifications";
+import NewResourceModal from "../shared/NewResourceModal";
 
 /**
  * This component renders the table view of groups
@@ -24,6 +25,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
                     loadingAclsIntoTable }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
+    const [displayNewGroupModal, setNewGroupModal] = useState(false);
 
     const loadGroups = async () => {
         // Fetching groups from server
@@ -60,11 +62,15 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
 
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
-    }
+    };
 
-    const placeholder = () => {
-        console.log("To be implemented");
-    }
+    const showNewGroupModal = () => {
+        setNewGroupModal(true);
+    };
+
+    const hideNewGroupModal = () => {
+        setNewGroupModal(false);
+    };
 
     const styleNavOpen = {
         marginLeft: '130px',
@@ -80,11 +86,16 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
                 {/* Add group button */}
                 <div className="btn-group">
                     {/*todo: implement onClick and with role*/}
-                    <button className="add" onClick={() => placeholder()}>
+                    <button className="add" onClick={() => showNewGroupModal()}>
                         <i className="fa fa-plus"/>
                         <span>{t('USERS.ACTIONS.ADD_GROUP')}</span>
                     </button>
                 </div>
+
+                {/* Display modal for new acl if add acl button is clicked */}
+                <NewResourceModal showModal={displayNewGroupModal}
+                                  handleClose={hideNewGroupModal}
+                                  resource="group"/>
 
                 {/* Include Burger-button menu*/}
                 <MainNav isOpen={displayNavigation}

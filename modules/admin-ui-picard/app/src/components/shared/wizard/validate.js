@@ -108,4 +108,10 @@ export const NewAclSchema = [
     })
 ];
 
+export const NewGroupSchema = [
+    Yup.object().shape({
+        name: Yup.string().required('Required')
+    })
+];
+
 

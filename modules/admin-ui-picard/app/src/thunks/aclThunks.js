@@ -130,6 +130,21 @@ export const fetchAclTemplateById = async (id) => {
 
 };
 
+// fetch roles for select dialog in new group and new users wizard
+export const fetchRolesTargetingUsers = async () => {
+
+    let params = {
+        limit: -1,
+        target: 'USER'
+    };
+
+    let data = await axios.get('/admin-ng/acl/roles.json', {params: params});
+
+    return await data.data;
+
+};
+
+
 // post new acl to backend
 export const postNewAcl = values => {
 

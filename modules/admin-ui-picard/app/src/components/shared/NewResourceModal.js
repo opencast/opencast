@@ -4,6 +4,7 @@ import NewEventWizard from "../events/partials/wizards/NewEventWizard";
 import NewSeriesWizard from "../events/partials/wizards/NewSeriesWizard";
 import NewThemeWizard from "../configuration/partials/wizard/NewThemeWizard";
 import NewAclWizard from "../users/partials/wizard/NewAclWizard";
+import NewGroupWizard from "../users/partials/wizard/NewGroupWizard";
 
 
 /**
@@ -34,6 +35,9 @@ const NewResourceModal = ({ handleClose, showModal, resource }) => {
                     {resource === 'acl' && (
                         <h2>{t('USERS.ACLS.NEW.CAPTION')}</h2>
                     )}
+                    {resource === 'group' && (
+                        <h2>{t('USERS.GROUPS.NEW.CAPTION')}</h2>
+                    )}
                 </header>
                 {resource === 'events' && (
                     //New Event Wizard
@@ -48,7 +52,11 @@ const NewResourceModal = ({ handleClose, showModal, resource }) => {
                     <NewThemeWizard close={close}/>
                 )}
                 {resource === 'acl' && (
-                    <NewAclWizard close={close} />
+                    // New ACL Wizard
+                    <NewAclWizard close={close}/>
+                )}
+                {resource === 'group' && (
+                    <NewGroupWizard close={close}/>
                 )}
             </section>
         )

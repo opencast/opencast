@@ -20,3 +20,30 @@ export const fetchGroups = () => async (dispatch, getState) => {
         dispatch(loadGroupsFailure());
     }
 };
+
+// post new group to backend
+export const postNewGroup = async values => {
+    let roles = [], users = [];
+
+    // fill form data depending on user inputs
+    let data = new FormData();
+    data.append('name', values.name);
+    data.append('description', values.description);
+
+    for(let i = 0 ; i < values.roles.length; i++) {
+        roles.push(values.roles[i].name);
+    }
+    for(let i = 0 ; i < values.users.length; i++) {
+        users.push(values.users[i].name);
+    }
+    data.append('roles', roles.join(','));
+    data.append('users', users.join(','));
+
+    // POST request
+    // todo: notification
+    axios.post('/admin-ng/groups', data, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    }).then(response => console.log(response)).catch(response => console.log(response));
+};
