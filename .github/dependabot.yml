@@ -40,18 +40,8 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: paellaplayer
-    versions:
-    - ">= 6.3.a"
-    - "< 6.4"
 - package-ecosystem: npm
   directory: "/modules/admin-ui-frontend"
   schedule:
     interval: daily
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: chromedriver
-    versions:
-    - "> 80.0.1"
-    - "< 80.1"
