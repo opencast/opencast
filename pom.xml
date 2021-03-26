@@ -27,10 +27,11 @@
     <commons-text.version>1.9</commons-text.version>
     <cxf.version>3.3.3</cxf.version>
     <eclipselink.version>2.7.5</eclipselink.version>
+    <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.30</freemarker.version>
     <functional.version>1.4.2</functional.version>
     <gson.version>2.8.5</gson.version>
-    <guava.version>24.1.1-jre</guava.version>
+    <guava.version>30.1.1-jre</guava.version>
     <httpcomponents-httpclient.version>4.5.12</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.13</httpcomponents-httpcore.version>
     <jackson.version>2.11.2</jackson.version>
@@ -914,6 +915,11 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>failureaccess</artifactId>
+        <version>${failureaccess.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mnode.ical4j</groupId>
