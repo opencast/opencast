@@ -1,0 +1,89 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/docs/guides"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+- package-ecosystem: npm
+  directory: "/modules/engage-theodul-core"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: eslint
+    versions:
+    - ">= 7.0.a"
+    - "< 7.1"
+- package-ecosystem: npm
+  directory: "/modules/engage-ui"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: eslint
+    versions:
+    - ">= 7.0.a"
+    - "< 7.1"
+- package-ecosystem: npm
+  directory: "/modules/lti"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: eslint
+    versions:
+    - ">= 7.0.a"
+    - "< 7.1"
+  - dependency-name: typescript
+    versions:
+    - ">= 4.a"
+    - "< 5"
+- package-ecosystem: npm
+  directory: "/modules/runtime-info-ui-ng"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: eslint
+    versions:
+    - ">= 7.0.a"
+    - "< 7.1"
+- package-ecosystem: npm
+  directory: "/modules/runtime-info-ui"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: eslint
+    versions:
+    - ">= 7.0.a"
+    - "< 7.1"
+- package-ecosystem: npm
+  directory: "/modules/engage-paella-player"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: eslint
+    versions:
+    - ">= 7.0.a"
+    - "< 7.1"
+  - dependency-name: eslint
+    versions:
+    - ">= 7.1.a"
+    - "< 7.2"
+  - dependency-name: paellaplayer
+    versions:
+    - ">= 6.3.a"
+    - "< 6.4"
+- package-ecosystem: npm
+  directory: "/modules/admin-ui-frontend"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: chromedriver
+    versions:
+    - "> 80.0.1"
+    - "< 80.1"
