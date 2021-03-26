@@ -199,7 +199,7 @@
       exception-handler-workflow="partial-error"
       description="Publish to preview publication channel">
       <configurations>
-        <configuration key="source-flavors">*/delivery</configuration>
+        <configuration key="download-source-flavors">*/delivery</configuration>
         <configuration key="channel-id">internal</configuration>
         <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
         <configuration key="check-availability">true</configuration>
