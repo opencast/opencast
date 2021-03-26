@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import {getUsernames} from "../../../selectors/userSelectors";
 
 /**
  * This File contains all schemas used for validation with yup in the context of events and series
@@ -6,6 +7,7 @@ import * as Yup from 'yup';
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
+
 
 // Validation Schema used in new event wizard (each step has its own yup validation object)
 export const NewEventSchema = [Yup.object().shape({
@@ -102,16 +104,29 @@ export const NewThemeSchema = [Yup.object().shape({
     })
 })];
 
+// Validation Schema used in new ACL wizard (each step has its own yup validation object)
 export const NewAclSchema = [
     Yup.object().shape({
         name: Yup.string().required('Required')
     })
 ];
 
+// Validation Schema used in new groups wizard (each step has its own yup validation object)
 export const NewGroupSchema = [
     Yup.object().shape({
         name: Yup.string().required('Required')
     })
 ];
+
+// Validation Schema used in new user wizard
+export const NewUserSchema = usernames => (
+        Yup.object().shape({
+        username: Yup.string().required('Required').notOneOf(usernames, 'not unique'),
+        name: Yup.string().required('Required'),
+        email: Yup.string().email().required('Required'),
+        password: Yup.string().required('Required'),
+        passwordConfirmation: Yup.string()
+            .oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required')
+}));
 
 
