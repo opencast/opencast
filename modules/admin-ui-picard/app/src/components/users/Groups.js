@@ -56,6 +56,11 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
         // Load filters
         loadingFilters('groups');
 
+        // Fetch groups every minute
+        let fetchGroupsInterval = setInterval(loadGroups, 100000);
+
+        return () => clearInterval(fetchGroupsInterval);
+
     }, []);
 
     const toggleNavigation = () => {

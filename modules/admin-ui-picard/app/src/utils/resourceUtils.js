@@ -1,4 +1,4 @@
-import {getFilters} from "../selectors/tableFilterSelectors";
+import {getFilters, getTextFilter} from "../selectors/tableFilterSelectors";
 import {getPageLimit, getPageOffset, getTableDirection, getTableSorting} from "../selectors/tableSelectors";
 
 /**
@@ -11,10 +11,15 @@ export const getURLParams = state => {
     // get filter map from state
     let filters = [];
     let filterMap = getFilters(state);
+    let textFilter = getTextFilter(state);
+    // check if textFilter has value and transform for use as URL param
+    if (textFilter !== '') {
+        filters.push('textFilter:' + textFilter);
+    }
     // transform filters for use as URL param
     for (let key in filterMap) {
         if (!!filterMap[key].value) {
-            filters.push(filterMap[key].name + ':' + filterMap[key].value);
+            filters.push(filterMap[key].name + ':' + filterMap[key].value.toString());
         }
     }
 

@@ -58,6 +58,11 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
         // Load filters
         loadingFilters('users');
 
+        // Fetch users every minute
+        let fetchUsersInterval = setInterval(loadUsers, 100000);
+
+        return () => clearInterval(fetchUsersInterval);
+
     }, []);
 
     const toggleNavigation = () => {

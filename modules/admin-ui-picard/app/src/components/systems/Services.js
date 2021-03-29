@@ -56,6 +56,11 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
         // Load filters
         loadingFilters('services');
 
+        // Fetch services every minute
+        let fetchServicesInterval = setInterval(loadServices, 100000);
+
+        return () => clearInterval(fetchServicesInterval);
+
     }, []);
 
     const toggleNavigation = () => {

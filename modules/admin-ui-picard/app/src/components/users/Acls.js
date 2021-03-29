@@ -56,6 +56,11 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
         // Load filters
         loadingFilters('acls');
 
+        // Fetch ACLs every minute
+        let fetchAclInterval = setInterval(loadAcls, 100000);
+
+        return () => clearInterval(fetchAclInterval);
+
     }, []);
 
     const toggleNavigation = () => {
