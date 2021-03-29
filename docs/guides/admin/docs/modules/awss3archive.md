@@ -1,6 +1,8 @@
 AWS S3 Archive Configuration
 =================================
 This page documents the configuration for the AWS S3 components in the Opencast module **asset-manager-storage-aws**.
+
+<!-- _Add "Note: " here? -->
 This configuration is only required on the admin node, and only if you are using Amazon S3 as an archive repository.
 
 Amazon User Configuration

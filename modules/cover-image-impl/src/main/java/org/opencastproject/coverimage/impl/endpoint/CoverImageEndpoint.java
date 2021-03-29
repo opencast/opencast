@@ -50,13 +50,19 @@ import javax.ws.rs.core.Response;
  * REST endpoint for {@link CoverImageService}
  */
 @Path("/")
-@RestService(name = "coverimage", title = "Cover Image Service", abstractText = "This endpoint triggers generation of cover images", notes = {
+@RestService(
+    name = "coverimage",
+    title = "Cover Image Service",
+    abstractText = "This endpoint triggers generation of cover images",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
+            + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+            + "other words, there is a bug! You should file an error report with your server logs from the time when "
+            + "the error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
 public class CoverImageEndpoint extends AbstractJobProducerEndpoint {
 
   /** Reference to the service registry service */
@@ -70,10 +76,11 @@ public class CoverImageEndpoint extends AbstractJobProducerEndpoint {
 
   @Override
   public JobProducer getService() {
-    if (coverImageService instanceof JobProducer)
+    if (coverImageService instanceof JobProducer) {
       return (JobProducer) coverImageService;
-    else
+    } else {
       return null;
+    }
   }
 
   @Override
@@ -84,18 +91,58 @@ public class CoverImageEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Path("generate")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "generate", description = "Generates a cover image based on the given metadata", restParameters = {
+  @RestQuery(
+      name = "generate",
+      description = "Generates a cover image based on the given metadata",
+      restParameters = {
           @RestParameter(description = "Metadata XML", isRequired = false, name = "xml", type = Type.TEXT),
           @RestParameter(description = "XSLT stylesheet", isRequired = true, name = "xsl", type = Type.TEXT),
-          @RestParameter(description = "Width of the cover image", isRequired = true, name = "width", type = Type.INTEGER, defaultValue = "1600"),
-          @RestParameter(description = "Height of the cover image", isRequired = true, name = "height", type = Type.INTEGER, defaultValue = "900"),
-          @RestParameter(description = "URI of poster image", isRequired = false, name = "posterimage", type = Type.STRING),
-          @RestParameter(description = "Flavor of target cover image", isRequired = true, name = "targetflavor", type = Type.STRING, defaultValue = "image/cover") }, responses = {
-          @RestResponse(description = "Results in an xml document containing the job for the cover image generation task", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "If required parameters aren't set or not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
-  public Response generateCoverImage(@FormParam("xml") String xml, @FormParam("xsl") String xsl,
-          @FormParam("width") String width, @FormParam("height") String height,
-          @FormParam("posterimage") String posterFlavor, @FormParam("targetflavor") String targetFlavor) {
+          @RestParameter(
+              description = "Width of the cover image",
+              isRequired = true,
+              name = "width", type = Type.INTEGER, defaultValue = "1600"
+          ),
+          @RestParameter(
+              description = "Height of the cover image",
+              isRequired = true,
+              name = "height",
+              type = Type.INTEGER,
+              defaultValue = "900"
+          ),
+          @RestParameter(
+              description = "URI of poster image",
+              isRequired = false,
+              name = "posterimage",
+              type = Type.STRING
+          ),
+          @RestParameter(
+              description = "Flavor of target cover image",
+              isRequired = true,
+              name = "targetflavor",
+              type = Type.STRING,
+              defaultValue = "image/cover"
+          )
+      },
+      responses = {
+          @RestResponse(
+              description = "Results in an xml document containing the job for the cover image generation task",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "If required parameters aren't set or not valid",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST
+          )
+      },
+      returnDescription = ""
+  )
+  public Response generateCoverImage(
+      @FormParam("xml") String xml,
+      @FormParam("xsl") String xsl,
+      @FormParam("width") String width,
+      @FormParam("height") String height,
+      @FormParam("posterimage") String posterFlavor,
+      @FormParam("targetflavor") String targetFlavor
+  ) {
     try {
       Job job = coverImageService.generateCoverImage(xml, xsl, width, height, posterFlavor, targetFlavor);
       return Response.ok().entity(new JaxbJob(job)).build();

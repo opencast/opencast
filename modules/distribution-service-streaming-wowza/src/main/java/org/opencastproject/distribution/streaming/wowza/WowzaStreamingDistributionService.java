@@ -214,10 +214,12 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
       Map streamingUrlConfiguration = new ConcurrentHashMap<>();
 
       // Streaming directory
-      String distributionDirectoryPath = StringUtils.trimToNull(bundleContext.getProperty(STREAMING_DIRECTORY_KEY));
+      String distributionDirectoryPath = StringUtils.trimToNull((String) properties.get(STREAMING_DIRECTORY_KEY));
+
       if (distributionDirectoryPath == null) {
         // set default streaming directory to ${org.opencastproject.storage.dir}/streams
-        distributionDirectoryPath = StringUtils.trimToNull(bundleContext.getProperty("org.opencastproject.storage.dir"));
+        distributionDirectoryPath
+            = StringUtils.trimToNull(bundleContext.getProperty("org.opencastproject.storage.dir"));
         if (distributionDirectoryPath != null) {
           distributionDirectoryPath += "/streams";
         }
@@ -376,10 +378,11 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     }
 
     if (!validSchemes.contains(scheme)) {
-      if (scheme == null)
+      if (scheme == null) {
         uriBuilder.scheme(defaultScheme);
-      else
+      } else {
         throw new URISyntaxException(inputUri, "Provided URI has an illegal scheme");
+      }
     }
 
     if ((port != null) && (!port.equals(defaultProtocolPorts.get(uriBuilder.build().getScheme())))) {
@@ -403,12 +406,14 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
 
-    if (getStreamingURLforCurrentOrg() == null)
+    if (getStreamingURLforCurrentOrg() == null) {
       throw new IllegalStateException(
               String.format("No streaming url or port set for tenant %s", securityService.getOrganization().getId()));
-    if (distributionDirectory == null)
+    }
+    if (distributionDirectory == null) {
       throw new IllegalStateException(
               "Streaming distribution directory must be set (org.opencastproject.streaming.directory)");
+    }
 
     try {
       return serviceRegistry.createJob(
@@ -647,8 +652,9 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
   private void addElementToSmil(Document doc, String channelId, MediaPackage mediapackage, MediaPackageElement element)
           throws DOMException, URISyntaxException {
-    if (!(element instanceof TrackImpl))
+    if (!(element instanceof TrackImpl)) {
       return;
+    }
     TrackImpl track = (TrackImpl) element;
     NodeList switchElementsList = doc.getElementsByTagName("switch");
     Node switchElement = null;
@@ -658,10 +664,12 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     if (switchElementsList.getLength() > 0) {
       switchElement = switchElementsList.item(0);
     } else {
-      if (doc.getElementsByTagName("head").getLength() < 1)
+      if (doc.getElementsByTagName("head").getLength() < 1) {
         doc.appendChild(doc.createElement("head"));
-      if (doc.getElementsByTagName("body").getLength() < 1)
+      }
+      if (doc.getElementsByTagName("body").getLength() < 1) {
         doc.appendChild(doc.createElement("body"));
+      }
       switchElement = doc.createElement("switch");
       doc.getElementsByTagName("body").item(0).appendChild(switchElement);
     }
@@ -792,7 +800,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
   @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
-      throws DistributionException {
+          throws DistributionException {
 
     if (getStreamingURLforCurrentOrg() == null) {
       logger.warn(String.format("Trying to distribute to streaming from tenant where streaming url or port aren't set.",
@@ -811,7 +819,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
   @Override
   public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
-      throws DistributionException {
+          throws DistributionException {
 
     if (getStreamingURLforCurrentOrg() == null) {
       logger.warn(String.format("Trying to retract from streaming from tenant where streaming url or port aren't set.",
@@ -899,10 +907,12 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
         if (videoList.item(i) instanceof Element) {
           String smilPathStr = ((Element) videoList.item(i)).getAttribute("src");
           // Patch the streaming tags
-          if (smilPathStr.contains("mp4:"))
+          if (smilPathStr.contains("mp4:")) {
             smilPathStr = smilPathStr.replace("mp4:", "");
-          if (!smilPathStr.endsWith(".mp4"))
+          }
+          if (!smilPathStr.endsWith(".mp4")) {
             smilPathStr += ".mp4";
+          }
 
           deleteElementFile(smilFile.toPath().resolveSibling(smilPathStr).toFile());
         }
@@ -928,8 +938,9 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
     // Try to remove the element file
     if (elementFile.exists()) {
-      if (!elementFile.delete())
+      if (!elementFile.delete()) {
         logger.warn("Could not properly delete element file: {}", elementFile);
+      }
     } else {
       logger.warn("Tried to delete non-existent element file. Perhaps was already deleted?: {}", elementFile);
     }
@@ -938,8 +949,9 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     File elementDir = elementFile.getParentFile();
     if (elementDir != null && elementDir.exists()) {
       if (elementDir.list().length == 0) {
-        if (!elementDir.delete())
+        if (!elementDir.delete()) {
           logger.warn("Could not properly delete element directory: {}", elementDir);
+        }
       } else {
         logger.warn("Element directory was not empty after deleting element. Skipping deletion: {}", elementDir);
       }
@@ -950,8 +962,9 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     File mediapackageDir = elementDir.getParentFile();
     if (mediapackageDir != null && mediapackageDir.exists()) {
       if (mediapackageDir.list().length == 0) {
-        if (!mediapackageDir.delete())
+        if (!mediapackageDir.delete()) {
           logger.warn("Could not properly delete mediapackage directory: {}", mediapackageDir);
+        }
       } else {
         logger.debug("Mediapackage directory was not empty after deleting element. Skipping deletion: {}",
                 mediapackageDir);
@@ -982,15 +995,16 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
       uriPath = uriPath.substring(0, uriPath.lastIndexOf('/'));
       // Remove the "smil:" tags, if any, and set the right extension if needed
       uriPath = uriPath.replace("smil:", "");
-      if (!uriPath.endsWith(".smil"))
+      if (!uriPath.endsWith(".smil")) {
         uriPath += ".smil";
+      }
 
       String[] uriPathParts = uriPath.split("/");
 
       if (uriPathParts.length > 1) {
         logger.warn(
-                "Malformed URI path \"{}\". The SMIL files must be at the streaming application's root. Trying anyway...",
-                uriPath);
+            "Malformed URI path \"{}\". The SMIL files must be at the streaming application's root. Trying anyway...",
+            uriPath);
       }
       return distributionPath.resolve(uriPath).toFile();
     }
@@ -1031,8 +1045,9 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     String tag = FilenameUtils.getExtension(element.getURI().toString()) + ":";
 
     // removes the tag for flv files, but keeps it for all others (mp4 needs it)
-    if ("flv:".equals(tag))
+    if ("flv:".equals(tag)) {
       tag = "";
+    }
     return tag + channelId + "/" + mp.getIdentifier().toString() + "/" + elementId + "/" + fileName;
   }
 
@@ -1055,8 +1070,8 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
       URI streamingUrl = getStreamingURLforCurrentOrg();
       if (streamingUrl == null) {
-        logger.warn(String.format("Trying to distribute to or retract from streaming from tenant where streaming url or "
-                        + "port aren't set.", securityService.getOrganization().getId()));
+        logger.warn(String.format("Trying to distribute to or retract from streaming from tenant where "
+            + "streaming url or port aren't set.", securityService.getOrganization().getId()));
         return null;
       }
 
@@ -1091,13 +1106,17 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
           throws IllegalStateException {
     final Set<MediaPackageElement> elements = new HashSet<>();
     for (String elementId : elementIds) {
-       final MediaPackageElement element = mediapackage.getElementById(elementId);
-       if (element != null) {
-         elements.add(element);
-       } else {
-         logger.debug("No element " + elementId + " found in media package " + mediapackage.getIdentifier());
-       }
+      final MediaPackageElement element = mediapackage.getElementById(elementId);
+      if (element != null) {
+        elements.add(element);
+      } else {
+        logger.debug("No element " + elementId + " found in media package " + mediapackage.getIdentifier());
+      }
     }
     return elements;
+  }
+
+  public File getDistributionDirectory() {
+    return distributionDirectory;
   }
 }

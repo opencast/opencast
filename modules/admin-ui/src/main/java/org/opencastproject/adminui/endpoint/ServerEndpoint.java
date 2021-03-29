@@ -28,11 +28,11 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.elasticsearch.api.SearchQuery;
+import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.index.service.resources.list.provider.ServersListProvider;
 import org.opencastproject.index.service.resources.list.query.ServersListQuery;
 import org.opencastproject.index.service.util.RestUtils;
-import org.opencastproject.matterhorn.search.SearchQuery;
-import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;

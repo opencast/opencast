@@ -22,8 +22,6 @@
   <service>
     <provide interface="org.opencastproject.index.service.message.AssetManagerMessageReceiverImpl"/>
   </service>
-  <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
-             cardinality="1..1" policy="static" bind="setMessageSender"/>
   <reference name="message-broker-receiver" cardinality="1..1"
              interface="org.opencastproject.message.broker.api.MessageReceiver" policy="static"
              bind="setMessageReceiver"/>

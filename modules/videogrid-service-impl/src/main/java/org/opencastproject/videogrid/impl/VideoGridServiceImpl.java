@@ -23,6 +23,9 @@ package org.opencastproject.videogrid.impl;
 
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -31,6 +34,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.LoadUtil;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videogrid.api.VideoGridService;
 import org.opencastproject.videogrid.api.VideoGridServiceException;
 import org.opencastproject.workspace.api.Workspace;
@@ -40,6 +44,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -125,6 +130,10 @@ public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGr
     // Parse arguments
     List<String> arguments = job.getArguments();
     List<List<String>> commands = gson.fromJson(arguments.get(0), stringListOfListType);
+    List<Track> tracks = new ArrayList<>();
+    for (int i = 1; i < arguments.size(); i++) {
+      tracks.add(i - 1, (Track) MediaPackageElementParser.getFromXml(arguments.get(i)));
+    }
 
     String outputDirPath = String.format("%s/videogrid/%d/", workspace.rootDirectory(), job.getId());
     FileUtils.forceMkdir(new File(outputDirPath));
@@ -132,9 +141,26 @@ public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGr
     // Execute all commands
     List<String> outputPaths = new ArrayList<>();
     int index = 0;
+
     for (List<String> command : commands) {
+      // Replace placeholders in command with track paths
+      for (int i = 0; i < command.size(); i++) {
+        String[] trackIds = StringUtils.substringsBetween(command.get(i), "#{","}");
+        if (trackIds != null) {
+          for (String trackId: trackIds) {
+            Track replaceTrack = tracks.stream()
+                    .filter(track -> track.getIdentifier().equals(trackId))
+                    .findAny()
+                    .orElse(null);
+            if (replaceTrack == null)
+              throw new VideoGridServiceException(String.format("Track with id %s could not be found!", trackId));
+            command.set(i, command.get(i).replaceAll("#\\{" + trackId + "\\}", getTrackPath(replaceTrack)));
+          }
+        }
+      }
+
       // Add output path to command
-      String outputFile = outputDirPath + "videogrid_part_" + index + ".mp4";
+      String outputFile = outputDirPath + "videogrid_part_" + index + "_" + job.getId() + ".mp4";
       outputPaths.add(outputFile);
       command.add(outputFile);
       index++;
@@ -204,19 +230,47 @@ public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGr
       }
     }
 
+    FileUtils.deleteQuietly(new File(workspace.rootDirectory(), String.format("videogrid/%d", job.getId())));
+
     // Return URIs to the videos;
     return gson.toJson(uris);
   }
 
   @Override
-  public Job createPartialTracks(List<List<String>> commands) throws VideoGridServiceException {
-    List<String> jobArguments = Arrays.asList(gson.toJson(commands));
+  public Job createPartialTracks(List<List<String>> commands, Track... tracks)
+          throws VideoGridServiceException, MediaPackageException {
+    List<String> jobArguments = new ArrayList<>(Arrays.asList(gson.toJson(commands)));
+    for (int i = 0; i < tracks.length; i++) {
+      jobArguments.add(i + 1, MediaPackageElementParser.getAsXml(tracks[i]));
+    }
     try {
       logger.debug("Create videogrid service job");
       return serviceRegistry.createJob(JOB_TYPE, OPERATION, jobArguments, jobLoad);
     } catch (ServiceRegistryException e) {
       throw new VideoGridServiceException(e);
     }
+  }
+
+  /**
+   * Returns the absolute path of the track
+   *
+   * @param track
+   *          Track whose path you want
+   * @return {@String} containing the absolute path of the given track
+   * @throws VideoGridServiceException
+   */
+  private String getTrackPath(Track track) throws VideoGridServiceException {
+    File mediaFile;
+    try {
+      mediaFile = workspace.get(track.getURI());
+    } catch (NotFoundException e) {
+      throw new VideoGridServiceException(
+              "Error finding the media file in the workspace", e);
+    } catch (IOException e) {
+      throw new VideoGridServiceException(
+              "Error reading the media file in the workspace", e);
+    }
+    return mediaFile.getAbsolutePath();
   }
 
   @Override

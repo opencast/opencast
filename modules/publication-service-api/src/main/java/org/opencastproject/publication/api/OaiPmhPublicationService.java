@@ -53,7 +53,7 @@ public interface OaiPmhPublicationService {
 
   /**
    * Publishes some media package elements.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param repository
@@ -70,13 +70,17 @@ public interface OaiPmhPublicationService {
    * @throws MediaPackageException
    *           if there was a problem with the mediapackage element
    */
-  Job publish(MediaPackage mediaPackage, String repository, Set<String> downloadElementIds,
-      Set<String> streamingElementIds, boolean checkAvailability) throws PublicationException,
-      MediaPackageException;
+  Job publish(
+      MediaPackage mediaPackage,
+      String repository,
+      Set<String> downloadElementIds,
+      Set<String> streamingElementIds,
+      boolean checkAvailability
+  ) throws PublicationException, MediaPackageException;
 
   /**
-   * Updates the given media package in the Oai-Pmh storage incrementally, i.e. without retracting the whole media
-   * package.
+   * Updates the given media package in the Oai-Pmh storage incrementally, i.e. without retracting
+   * the whole media package.
    *
    * @param mediaPackage
    *          The media package to publish the element for
@@ -95,20 +99,26 @@ public interface OaiPmhPublicationService {
    * @param checkAvailability
    *          whether to check the distributed download artifacts are available at their URLs
    *
-   * @return The job which performs the operation (The job payload will hold the publication with the updated media
-   *         package).
+   * @return The job which performs the operation (The job payload will hold the publication with
+   *         the updated media package).
    *
    * @throws PublicationException
    *           if the job could not be created.
    */
-  Job replace(MediaPackage mediaPackage, String repository, Set<? extends MediaPackageElement> downloadElements,
-      Set<? extends MediaPackageElement> streamingElements, Set<MediaPackageElementFlavor> retractDownloadFlavors,
-      Set<MediaPackageElementFlavor> retractStreamingFlavors, Set<? extends Publication> publications,
-      boolean checkAvailability) throws PublicationException;
+  Job replace(
+      MediaPackage mediaPackage,
+      String repository,
+      Set<? extends MediaPackageElement> downloadElements,
+      Set<? extends MediaPackageElement> streamingElements,
+      Set<MediaPackageElementFlavor> retractDownloadFlavors,
+      Set<MediaPackageElementFlavor> retractStreamingFlavors,
+      Set<? extends Publication> publications,
+      boolean checkAvailability
+  ) throws PublicationException;
 
   /**
-   * Synchronously updates the given media package in the Oai-Pmh storage incrementally, i.e. without retracting the whole media
-   * package.
+   * Synchronously updates the given media package in the Oai-Pmh storage incrementally,
+   * i.e. without retracting the whole media package.
    *
    * @param mediaPackage
    *          The media package to publish the element for
@@ -134,14 +144,20 @@ public interface OaiPmhPublicationService {
    * @throws MediaPackageException
    *           if distribution failed.
    */
-  Publication replaceSync(MediaPackage mediaPackage, String repository, Set<? extends MediaPackageElement> downloadElements,
-              Set<? extends MediaPackageElement> streamingElements, Set<MediaPackageElementFlavor> retractDownloadFlavors,
-              Set<MediaPackageElementFlavor> retractStreamingFlavors, Set<? extends Publication> publications,
-              boolean checkAvailability) throws PublicationException, MediaPackageException;
+  Publication replaceSync(
+      MediaPackage mediaPackage,
+      String repository,
+      Set<? extends MediaPackageElement> downloadElements,
+      Set<? extends MediaPackageElement> streamingElements,
+      Set<MediaPackageElementFlavor> retractDownloadFlavors,
+      Set<MediaPackageElementFlavor> retractStreamingFlavors,
+      Set<? extends Publication> publications,
+      boolean checkAvailability
+  ) throws PublicationException, MediaPackageException;
 
   /**
    * Retract a media package from the publication channel.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param repository
@@ -154,8 +170,8 @@ public interface OaiPmhPublicationService {
   Job retract(MediaPackage mediaPackage, String repository) throws PublicationException, NotFoundException;
 
   /**
-   * Update all media package elements that match the flavors and tags. Also update the media package in the given
-   * OAI-PMH repository.
+   * Update all media package elements that match the flavors and tags. Also update the media
+   * package in the given OAI-PMH repository.
    *
    * @param mediaPackage media package with updated elements
    * @param repository OAI-PMH repository where to update the media package
@@ -166,6 +182,11 @@ public interface OaiPmhPublicationService {
    * @throws PublicationException if there was a problem publishing the media
    * @throws MediaPackageException if there was a problem with the media package element
    */
-  Job updateMetadata(MediaPackage mediaPackage, String repository, Set<String> flavors, Set<String> tags,
-          boolean checkAvailability) throws PublicationException, MediaPackageException;
+  Job updateMetadata(
+      MediaPackage mediaPackage,
+      String repository,
+      Set<String> flavors,
+      Set<String> tags,
+      boolean checkAvailability
+  ) throws PublicationException, MediaPackageException;
 }

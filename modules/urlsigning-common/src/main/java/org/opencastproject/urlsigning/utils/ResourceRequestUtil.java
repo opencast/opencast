@@ -275,7 +275,7 @@ public final class ResourceRequestUtil {
       } catch (URISyntaxException e) {
         resourceRequest.setStatus(Status.Forbidden);
         resourceRequest
-        .setRejectionReason(String
+            .setRejectionReason(String
                 .format("Forbidden because either the policy or requested URI cannot be parsed. Policy Path: '%s' and Request Path: '%s'. Unable to sign policy because: %s",
                         policy.getResource(),
                         resourceUri, ExceptionUtils.getStackTrace(e)));

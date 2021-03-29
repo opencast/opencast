@@ -68,10 +68,10 @@ Your mediapackage has three audio tracks for english, spanish and german languag
 ```
 
 
-Selecting video canvas to use
------------------------------
+Selecting which video canvas to use
+-----------------------------------
 
-You can configure which canvas to use in order to render video files. This is usefull to enable 360 videos for example.
+You can configure which canvas to use in order to render video files. This is useful to enable 360 videos for example.
 
 Nowadays, paella has three video canvas you can use:
 
@@ -102,7 +102,7 @@ Examples
 --------
 
 An institution wants to play only `*/delivery` media tracks and has two audio tracks for 
-english and spanish languages
+English and Spanish languages
 
 ```json
 {
@@ -130,7 +130,7 @@ english and spanish languages
 }
 ```
 
-An institution whants to play `sidebyside/delivery` track on `Android` and `iOS` devices 
+An institution wants to play `sidebyside/delivery` track on `Android` and `iOS` devices, 
 and `presenter/delivery` and `presentation/delivery` on the other devices
 
 ```json

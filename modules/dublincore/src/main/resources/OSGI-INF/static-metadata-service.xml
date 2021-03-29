@@ -36,4 +36,7 @@
   </service>
   <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
              cardinality="1..1" policy="static" bind="setWorkspace"/>
+  <reference name="serailizer"
+             interface="org.opencastproject.mediapackage.MediaPackageSerializer"
+             cardinality="0..1" policy="dynamic" bind="setMediaPackageSerializer"/>
 </scr:component>

@@ -1,0 +1,23 @@
+name: Test configuration
+
+on:
+  pull_request:
+    paths:
+      - 'etc/**'
+      - 'docs/checkstyle/check-config.sh'
+      - '**/pom.xml'
+  push:
+    paths:
+      - 'etc/**'
+      - 'docs/checkstyle/check-config.sh'
+      - '**/pom.xml'
+
+jobs:
+  main:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: check configuration
+      run: ./docs/checkstyle/check-config.sh

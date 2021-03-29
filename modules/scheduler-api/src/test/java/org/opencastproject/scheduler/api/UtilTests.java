@@ -268,7 +268,11 @@ public class UtilTests {
       Calendar cal = Calendar.getInstance(d.getStart().getTimeZone());
       cal.setTimeInMillis(d.getStart().getTime());
       logger.debug("Date {} Instance {}, calendar hour {} (expected {}), zone {}",
-              d.getStart().toString(), simpleDateFormat.format(cal.getTime()), cal.get(Calendar.HOUR_OF_DAY), expectedHour, tz.getID());
+          d.getStart().toString(),
+          simpleDateFormat.format(cal.getTime()),
+          cal.get(Calendar.HOUR_OF_DAY),
+          expectedHour,
+          tz.getID());
       assertEquals(expectedHour, cal.get(Calendar.HOUR_OF_DAY));
     }
     logger.debug("= end ======================================================");
@@ -281,16 +285,16 @@ public class UtilTests {
 
     // Verify Dates are in TZ or 1 off ( DayLight TZ or Standard TZ)
     logger.debug("Period start {} end {}, Tz {}, local TimeZone {}", simpleDateFormat.format(startTz.getTime()),
-            simpleDateFormat.format(endTz.getTime()), tz.getID(),
-            TimeZone.getDefault().getID());
+        simpleDateFormat.format(endTz.getTime()), tz.getID(),
+        TimeZone.getDefault().getID());
     assertTrue(Math.abs(endTz.getTimeZone().getRawOffset() - tz.getRawOffset()) < 2);
     assertTrue(Math.abs(startTz.getTimeZone().getRawOffset() - tz.getRawOffset()) < 2);
 
     String rRuleStr = generateRule(days, startTz.get(Calendar.HOUR_OF_DAY), startTz.get(Calendar.MINUTE));
     simpleDateFormat.setTimeZone(tz);
     logger.debug("Period start {} end {}, Tz {}, local TimeZone {}", simpleDateFormat.format(startTz.getTime()),
-            simpleDateFormat.format(endTz.getTime()), tz.getID(),
-            TimeZone.getDefault().getID());
+        simpleDateFormat.format(endTz.getTime()), tz.getID(),
+        TimeZone.getDefault().getID());
     logger.debug(rRuleStr);
     return Util.calculatePeriods(startTz, endTz, duration, new Recur(rRuleStr), tz);
   }

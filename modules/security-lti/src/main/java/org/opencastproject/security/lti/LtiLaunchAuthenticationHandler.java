@@ -262,7 +262,8 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /**
    * {@inheritDoc}
    *
-   * @see org.springframework.security.oauth.provider.OAuthAuthenticationHandler#createAuthentication(javax.servlet.http.HttpServletRequest,
+   * @see org.springframework.security.oauth.provider.OAuthAuthenticationHandler#createAuthentication(
+   *      javax.servlet.http.HttpServletRequest,
    *      org.springframework.security.oauth.provider.ConsumerAuthentication,
    *      org.springframework.security.oauth.provider.token.OAuthAccessProviderToken)
    */
@@ -345,7 +346,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       String context = request.getParameter(CONTEXT_ID);
       enrichRoleGrants(roles, context, rolePrefix, userAuthorities);
 
-      logger.info("Returning user with {} authorities", userAuthorities.size());
+      logger.debug("Returning user with {} authorities", userAuthorities.size());
 
       userDetails = new User(username, "oauth", true, true, true, true, userAuthorities);
     }

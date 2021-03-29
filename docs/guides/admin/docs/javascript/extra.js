@@ -140,6 +140,7 @@ function createButton(id) {
     button.classList.add("glyphicon");
     button.classList.add("glyphicon-copy");
     button.classList.add("click-and-copy-button");
+    button.title = 'Copy to clipboard';
     return button;
 }
 

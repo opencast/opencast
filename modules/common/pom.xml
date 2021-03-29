@@ -185,6 +185,19 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <!-- provide a logger for tests -->
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+            <!-- probably needed for the module scheduler-api -->
+            <ignoredUnusedDeclaredDependency>org.mnode.ical4j:ical4j</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.pitest</groupId>
         <artifactId>pitest-maven</artifactId>
         <version>0.31</version>
@@ -257,7 +270,6 @@
             <Export-Package>
               org.opencastproject.util.*;version=${project.version};-split-package:=merge-first,
               org.opencastproject.capture;version=${project.version},
-              org.opencastproject.index;version=${project.version},
               org.opencastproject.mediapackage;version=${project.version},
               org.opencastproject.mediapackage.attachment;version=${project.version},
               org.opencastproject.mediapackage.track;version=${project.version},

@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+import requests
+import json
+
+from jinja2 import Template
+
+
+RELEASE_URL = 'https://api.github.com/repos/opencast/opencast/releases'
+BRANCH_URL = 'https://api.github.com/repos/opencast/opencast/branches'
+
+
+def main():
+    releases = requests.get(RELEASE_URL).json()
+    versions = map(lambda x: float(x['tag_name']), releases)
+    stable = int(max(versions))
+    stable_branch = f'r/{stable}.x'
+
+    branches = requests.get(BRANCH_URL).json()
+    branch_names = map(lambda x: x['name'], branches)
+    release_branchs = filter(lambda x: x.startswith('r/') and x.endswith('.x') and not x.startswith('r/1.'),
+                             branch_names)
+    release_branchs = sorted(release_branchs, reverse=True, key=lambda x: float(x.strip('r/.x')))
+
+    version_info = [{
+        'name': 'develop',
+        'branch': 'develop',
+        'attribute': ''}]
+    for branch in release_branchs:
+        name = branch.split('/')[-1]
+        attribute = None
+        if branch == stable_branch:
+            attribute = 'stable'
+        elif float(branch.strip('r/.x')) > stable:
+            attribute = 'pre release'
+
+        version_info.append({
+            'name': name,
+            'branch': branch,
+            'attribute': attribute})
+
+    with open('versions.js', 'w') as f:
+        f.write('var versions = ' + json.dumps(version_info))
+
+    with open('index.html.j2', 'r') as f:
+        langing_page = Template(f.read())
+    with open('index.html', 'w') as f:
+        f.write(langing_page.render(version_info=version_info))
+
+    with open('404.html.j2', 'r') as f:
+        error_page = Template(f.read())
+    with open('404.html', 'w') as f:
+        f.write(error_page.render(stable_branch=stable_branch))
+
+
+if __name__ == '__main__':
+    main()

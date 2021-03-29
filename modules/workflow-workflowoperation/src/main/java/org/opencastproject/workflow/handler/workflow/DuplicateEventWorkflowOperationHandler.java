@@ -30,13 +30,14 @@ import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.distribution.api.DistributionService;
-import org.opencastproject.ingest.api.IngestException;
-import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementBuilder;
+import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -69,11 +70,9 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -153,23 +152,12 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
   /** The authorization service */
   private AuthorizationService authorizationService;
 
-  /** The ingest service */
-  private IngestService ingestService;
-
   /**
    * OSGi setter
    * @param authorizationService
    */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
-  }
-
-  /**
-   * OSGi setter
-   * @param ingestService
-   */
-  public void setIngestService(IngestService ingestService) {
-    this.ingestService = ingestService;
   }
 
   /**
@@ -330,9 +318,18 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
         newMp = copyMediaPackage(mediaPackage, series, newMpId, noSuffix, i + 1, copyNumberPrefix);
 
         if (series != null) {
-          newMp = ingestService
-                  .addCatalog(new ByteArrayInputStream(series.dc.toXmlString().getBytes(StandardCharsets.UTF_8)),
-                          UUID.randomUUID().toString() + ".xml", MediaPackageElements.SERIES, newMp);
+          URI newSeriesURI = null;
+          String newSeriesId = UUID.randomUUID().toString();
+          try (InputStream seriesDCInputStream = IOUtils.toInputStream(series.dc.toXmlString(), "UTF-8")) {
+            newSeriesURI = workspace.put(newMpId, newSeriesId, "dublincore.xml", seriesDCInputStream);
+          }
+          MediaPackageElementBuilder elementBuilder = MediaPackageElementBuilderFactory.newInstance()
+                  .newElementBuilder();
+          MediaPackageElement newSeriesMpElement = elementBuilder.elementFromURI(newSeriesURI,
+                  Catalog.TYPE, MediaPackageElements.SERIES);
+          newSeriesMpElement.setIdentifier(newSeriesId);
+          newMp.add(newSeriesMpElement);
+
           if (seriesAccessControl != null) {
             newMp = authorizationService.setAcl(newMp, AclScope.Series, seriesAccessControl).getA();
             for (MediaPackageElement seriesAclMpe : newMp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
@@ -368,7 +365,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
         // Store media package ID as workflow property
         properties.put("duplicate_media_package_" + (i + 1) + "_id", newMp.getIdentifier().toString());
-      } catch (IngestException | IOException | MediaPackageException e) {
+      } catch (IOException | MediaPackageException e) {
         throw new WorkflowOperationException(e);
       } finally {
         cleanup(temporaryFiles, Optional.ofNullable(newMp));

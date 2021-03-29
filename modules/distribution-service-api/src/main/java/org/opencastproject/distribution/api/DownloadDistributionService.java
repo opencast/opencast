@@ -40,8 +40,13 @@ public interface DownloadDistributionService extends DistributionService {
   Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability)
           throws DistributionException, MediaPackageException;
 
-  Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds, boolean checkAvailability, boolean preserveReference)
-           throws DistributionException, MediaPackageException;
+  Job distribute(
+      String pubChannelId,
+      MediaPackage mediaPackage,
+      Set<String> downloadIds,
+      boolean checkAvailability,
+      boolean preserveReference
+  ) throws DistributionException, MediaPackageException;
 
   Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
           throws DistributionException;
@@ -60,8 +65,12 @@ public interface DownloadDistributionService extends DistributionService {
    * @return The distributed elements.
    * @throws DistributionException In case distribution fails.
    */
-  List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability)
-      throws DistributionException;
+  List<MediaPackageElement> distributeSync(
+      String channelId,
+      MediaPackage mediapackage,
+      Set<String> elementIds,
+      boolean checkAvailability
+  ) throws DistributionException;
 
   /**
    * Retracts the given elements synchronously. This should be used rarely since load balancing will be unavailable.
@@ -78,5 +87,5 @@ public interface DownloadDistributionService extends DistributionService {
    * @throws DistributionException In case retraction fails.
    */
   List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
-      throws DistributionException;
+          throws DistributionException;
 }

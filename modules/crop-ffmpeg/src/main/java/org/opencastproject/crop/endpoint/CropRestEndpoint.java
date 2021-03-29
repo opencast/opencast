@@ -53,7 +53,12 @@ import javax.ws.rs.core.Response;
  * The REST endpoint for the {@link CropService} service.
  */
 @Path("")
-@RestService(name = "crop", title = "Video CROP Service", abstractText = "This service is not ready", notes = "This is a note")
+@RestService(
+    name = "crop",
+    title = "Video CROP Service",
+    abstractText = "This service is not ready",
+    notes = "This is a note"
+)
 public class CropRestEndpoint extends AbstractJobProducerEndpoint {
   /**
    * The logger
@@ -96,19 +101,45 @@ public class CropRestEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Path("")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "crop", description = "Submit a track for cropping", restParameters = {
-          @RestParameter(description = "The track to crop.", isRequired = true, name = "track", type = RestParameter.Type.FILE) }, responses = {
-          @RestResponse(description = "The job ID to use when polling for the resulting mpeg7 catalog.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The \"crop\" is NULL or not a valid track type.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "The underlying service could not crop the video.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "The job ID to use when polling for the resulting mpeg7 catalog.")
+  @RestQuery(
+      name = "crop",
+      description = "Submit a track for cropping",
+      restParameters = {
+          @RestParameter(
+              description = "The track to crop.",
+              isRequired = true,
+              name = "track",
+              type = RestParameter.Type.FILE
+          )
+      },
+      responses = {
+          @RestResponse(
+              description = "The job ID to use when polling for the resulting mpeg7 catalog.",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "The \"crop\" is NULL or not a valid track type.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST
+          ),
+          @RestResponse(
+              description = "The underlying service could not crop the video.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+          )
+      },
+      returnDescription = "The job ID to use when polling for the resulting mpeg7 catalog."
+  )
   public Response crop(@FormParam("track") String trackAsXml) throws Exception {
     if (StringUtils.isBlank(trackAsXml)) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("track must not be null").build();
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("track must not be null")
+          .build();
     }
 
     MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(trackAsXml);
     if (!Track.TYPE.equals(sourceTrack.getElementType())) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("mediapackage element must be of type track").build();
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("mediapackage element must be of type track")
+          .build();
     }
 
     try {

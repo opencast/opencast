@@ -70,7 +70,7 @@ public class DictionaryServiceImplTest {
   public void testSpecialCharactersES() throws Exception {
     DictionaryServiceImpl service = new DictionaryServiceImpl();
     String in = "El veloz murciélago hindú comía feliz cardillo y kiwi. "
-      + "La cigüeña tocaba el saxofón detrás del palenque de paja.";
+        + "La cigüeña tocaba el saxofón detrás del palenque de paja.";
     /* This will match Spanish special characters and basic punctuation */
     service.setPattern("[¿¡(]*[\\wáéíóúÁÉÍÓÚüÜñÑ]+[)-.,:;!?]*");
     Assert.assertEquals(in, service.cleanUpText(in).getText());

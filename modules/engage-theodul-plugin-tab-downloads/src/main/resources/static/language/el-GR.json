@@ -1,7 +1,7 @@
 {
   "value_locale": "en",
-  "str_type": "Type",
-  "str_mimetype": "Mimetype",
-  "str_resolution": "Resolution",
-  "str_download": "Download"
+  "str_type": "Τύπος",
+  "str_mimetype": "Τύπος αρχείου",
+  "str_resolution": "Ανάλυση",
+  "str_download": "Λήψη"
 }

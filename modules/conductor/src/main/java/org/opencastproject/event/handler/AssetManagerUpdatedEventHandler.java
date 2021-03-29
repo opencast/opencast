@@ -230,8 +230,9 @@ public class AssetManagerUpdatedEventHandler {
           // we assume that all series catalog flavors have a fixed subtype: series
           MediaPackageElementFlavor seriesFlavor = MediaPackageElementFlavor.flavor("*", "series");
           for (Catalog catalog : mp.getCatalogs()) {
-            if (catalog.getFlavor().matches(seriesFlavor))
+            if (catalog.getFlavor().matches(seriesFlavor)) {
               mp.remove(catalog);
+            }
           }
         }
 

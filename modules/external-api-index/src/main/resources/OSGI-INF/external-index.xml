@@ -9,12 +9,7 @@
   <property name="service.description" value="org.opencastproject.external.index.ExternalIndex"/>
   <property name="service.pid" value="ch.entwine.matterhorn.external.search"/>
   <service>
-    <provide interface="org.opencastproject.matterhorn.search.SearchIndex"/>
+    <provide interface="org.opencastproject.elasticsearch.api.SearchIndex"/>
     <provide interface="org.opencastproject.external.index.ExternalIndex"/>
   </service>
-
-  <reference name="MessageSender" interface="org.opencastproject.message.broker.api.MessageSender"
-             cardinality="1..1" policy="static" bind="setMessageSender"/>
-  <reference name="MessageReceiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
-             cardinality="1..1" policy="static" bind="setMessageReceiver"/>
 </scr:component>

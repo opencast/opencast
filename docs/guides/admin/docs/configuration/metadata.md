@@ -32,7 +32,7 @@ described in the next section.
 
 ## Extended Metadata
 
-For both events and series, Opencast support an arbitrary number of customized metadata catalogs.
+For both events and series, Opencast supports an arbitrary number of customized metadata catalogs.
 
 To add extended metadata catalogs, create a configuration file with a valid filename of the form
 `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-<name>.cfg` in `etc/`. on the admin node.

@@ -146,8 +146,9 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
 
       logger.info("Retraction operations complete, republishing updated mediapackage");
 
-      if (!isPublishable(mediaPackage))
+      if (!isPublishable(mediaPackage)) {
         throw new WorkflowOperationException("Media package does not meet criteria for publication");
+      }
 
       // Adding media package to the search index
       Job publishJob = null;
@@ -185,15 +186,18 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
   }
 
   /** Media package must meet these criteria in order to be published. */
-  //TODO: Move this into some kind of abstract parent class since this is also used in PublishEngageWorkflowOperationHandler
+  //TODO: Move this into some kind of abstract parent class since this is also used in
+  //PublishEngageWorkflowOperationHandler
   private boolean isPublishable(MediaPackage mp) {
     boolean hasTitle = !isBlank(mp.getTitle());
-    if (!hasTitle)
+    if (!hasTitle) {
       logger.warn("Media package does not meet criteria for publication: There is no title");
+    }
 
     boolean hasTracks = mp.hasTracks();
-    if (!hasTracks)
+    if (!hasTracks) {
       logger.warn("Media package does not meet criteria for publication: There are no tracks");
+    }
 
     return hasTitle && hasTracks;
   }

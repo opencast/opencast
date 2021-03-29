@@ -50,6 +50,7 @@ import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.metadata.api.MetadataValue;
 import org.opencastproject.metadata.api.StaticMetadata;
 import org.opencastproject.metadata.api.StaticMetadataService;
@@ -66,6 +67,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -90,8 +92,14 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
 
   protected Workspace workspace = null;
 
+  protected MediaPackageSerializer serializer = null;
+
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  public void setMediaPackageSerializer(MediaPackageSerializer serializer) {
+    this.serializer = serializer;
   }
 
   public void activate(@SuppressWarnings("rawtypes") Map properties) {
@@ -386,7 +394,9 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
   private Option<DublinCoreCatalog> load(Catalog catalog) {
     InputStream in = null;
     try {
-      in = workspace.read(catalog.getURI());
+      URI uri = catalog.getURI();
+      if (serializer != null) uri = serializer.decodeURI(uri);
+      in = workspace.read(uri);
       return some((DublinCoreCatalog) DublinCores.read(in));
     } catch (Exception e) {
       logger.warn("Unable to load metadata from catalog '{}'", catalog);
