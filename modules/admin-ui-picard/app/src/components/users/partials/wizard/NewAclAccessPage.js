@@ -3,7 +3,12 @@ import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import {connect} from "react-redux";
 import {FieldArray, Field} from "formik";
-import {fetchAclActions, fetchAclTemplateById, fetchAclTemplates, fetchRoles} from "../../../../thunks/aclThunks";
+import {
+    fetchAclActions,
+    fetchAclTemplateById,
+    fetchAclTemplates,
+    fetchRolesWithTarget
+} from "../../../../thunks/aclThunks";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
 import Notifications from "../../../shared/Notifications";
@@ -27,7 +32,7 @@ const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, rem
             setAclTemplates(responseTemplates);
             const responseActions = await fetchAclActions();
             setAclActions(responseActions);
-            const responseRoles = await fetchRoles();
+            const responseRoles = await fetchRolesWithTarget('ACL');
             setRoles(responseRoles);
             setLoading(false);
         }
@@ -188,8 +193,8 @@ const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, rem
                                                                                                         <>
                                                                                                             <option  value="" />
                                                                                                             {roles.map((role, key) => (
-                                                                                                                <option value={role.id}
-                                                                                                                        key={key}>{role.id}</option>
+                                                                                                                <option value={role.name}
+                                                                                                                        key={key}>{role.name}</option>
                                                                                                             ))}
                                                                                                         </>
                                                                                                     )}

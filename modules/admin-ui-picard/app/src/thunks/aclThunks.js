@@ -43,21 +43,6 @@ export const fetchAclActions = async () => {
 
 };
 
-// fetch all possible roles a policy can have
-export const fetchRoles = async () => {
-    let params = {
-        filters: 'role_target:ACL',
-        limit: '100',
-        offset: '0'
-    };
-
-    let data = await axios.get('/admin-ng/resources/ROLES.json', {params: params});
-
-    const response = await data.data;
-
-    return transformToIdValueArray(response);
-};
-
 // fetch all policies of an certain acl template
 export const fetchAclTemplateById = async (id) => {
 
@@ -130,12 +115,12 @@ export const fetchAclTemplateById = async (id) => {
 
 };
 
-// fetch roles for select dialog in new group and new users wizard
-export const fetchRolesTargetingUsers = async () => {
+// fetch roles for select dialogs and access policy pages
+export const fetchRolesWithTarget = async target => {
 
     let params = {
         limit: -1,
-        target: 'USER'
+        target: target
     };
 
     let data = await axios.get('/admin-ng/acl/roles.json', {params: params});

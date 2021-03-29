@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 import SelectContainer from "../../../shared/wizard/SelectContainer";
-import {fetchRolesTargetingUsers} from "../../../../thunks/aclThunks";
+import {fetchRolesWithTarget} from "../../../../thunks/aclThunks";
 
 /**
  * This component renders the role selection page of the new group wizard
@@ -17,7 +17,7 @@ const NewGroupRolesPage = ({ previousPage, nextPage, formik }) => {
         async function fetchData() {
             // fetch information about roles
             setLoading(true);
-            const responseRoles = await fetchRolesTargetingUsers();
+            const responseRoles = await fetchRolesWithTarget('USER');
             let roleNames = [];
             for (let i = 0; i < responseRoles.length; i++) {
                 if (responseRoles[i].type !== "GROUP") {

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {fetchRolesTargetingUsers} from "../../../../thunks/aclThunks";
+import {fetchRolesWithTarget} from "../../../../thunks/aclThunks";
 import SelectContainer from "../../../shared/wizard/SelectContainer";
 
 /**
@@ -16,7 +16,7 @@ const NewUserRolesTab = ({ formik }) => {
         async function fetchData() {
             // fetch information about roles
             setLoading(true);
-            const responseRoles = await fetchRolesTargetingUsers();
+            const responseRoles = await fetchRolesWithTarget('USER');
             setRoles(responseRoles);
             setLoading(false);
         }
