@@ -54,9 +54,8 @@ function monitorService($http, $location, $translate, Storage) {
     $http.get(MY_VERSION_PATH).then(function(response_my_version) {
       $http.get(LATEST_VERSION_PATH).then(function(response_latest_version) {
         Monitoring.populateService(LATEST_VERSION_NAME);
-
         if (response_latest_version.status === 200 && response_my_version.status === 200
-        && response_my_version.data.consistent) {
+        && response_my_version.data.consistent && response_latest_version.data != '') {
           var my_version = response_my_version.data.version,
               latest_version = response_latest_version.data;
           services.service[LATEST_VERSION_NAME].docs_url =
@@ -82,7 +81,7 @@ function monitorService($http, $location, $translate, Storage) {
           }
         } else {
           $translate('UPDATE.UNDETERMINED').then(function(translation) {
-            Monitoring.setError(LATEST_VERSION_NAME, translation);
+            Monitoring.setWarning(LATEST_VERSION_NAME, translation);
           }).catch(angular.noop);
           services.service[LATEST_VERSION_NAME].docs_url = 'https://docs.opencast.org';
         }
@@ -106,6 +105,12 @@ function monitorService($http, $location, $translate, Storage) {
     }).catch(function(err) {
       Monitoring.setError(AMQ_NAME, err.statusText);
     });
+  };
+
+  Monitoring.setWarning = function(service, text) {
+    Monitoring.populateService(service);
+    services.service[service].status = text;
+    services.service[service].warning = true;
   };
 
   Monitoring.setError = function(service, text) {

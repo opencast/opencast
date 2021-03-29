@@ -27,15 +27,15 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
-import static org.opencastproject.matterhorn.search.SearchQuery.Order.Descending;
+import static org.opencastproject.elasticsearch.api.SearchQuery.Order.Descending;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.index.service.util.RestUtils;
-import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.doc.rest.RestParameter;

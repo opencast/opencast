@@ -98,7 +98,7 @@
       id="tag"
       description="Tagging captions for publication">
       <configurations>
-        <configuration key="source-flavors">*/captions</configuration>
+        <configuration key="source-flavors">captions/*</configuration>
         <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>

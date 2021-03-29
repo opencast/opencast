@@ -9,8 +9,6 @@
   <service>
     <provide interface="org.opencastproject.index.service.message.CommentMessageReceiverImpl"/>
   </service>
-  <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
-             cardinality="1..1" policy="static" bind="setMessageSender"/>
   <reference name="message-broker-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
              cardinality="1..1" policy="static" bind="setMessageReceiver"/>
   <reference name="message-receiver-lock-service"

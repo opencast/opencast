@@ -4,12 +4,375 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.3
+
+*Released on March 15th, 2021*
+
+- [[#2395](https://github.com/opencast/opencast/pull/2395)] -
+  Fix Hardcoded Dependency Version
+- [[#2394](https://github.com/opencast/opencast/pull/2394)] -
+  Editor Workflow Description
+- [[#2373](https://github.com/opencast/opencast/pull/2373)] -
+  Fix code formatting for aws s3 distribution
+- [[#2368](https://github.com/opencast/opencast/pull/2368)] -
+  Improve Email Workflow Operation
+- [[#2361](https://github.com/opencast/opencast/pull/2361)] -
+  Handle image extraction from very short videos
+- [[#2355](https://github.com/opencast/opencast/pull/2355)] -
+  Document and Test i18next in LTI Tools
+- [[#2353](https://github.com/opencast/opencast/pull/2353)] -
+  OAI-PMH Primary Key Length
+- [[#2343](https://github.com/opencast/opencast/pull/2343)] -
+  Fix LTI Tool Value Checks
+- [[#2340](https://github.com/opencast/opencast/pull/2340)] -
+  Fix checkstyle violations in 5 `distribution-*` modules
+- [[#2338](https://github.com/opencast/opencast/pull/2338)] -
+  Fix checkstyle violations in 5 `publications-service-*` modules
+- [[#2335](https://github.com/opencast/opencast/pull/2335)] -
+  Distinguish Between Documentation and Configuration Checks
+- [[#2331](https://github.com/opencast/opencast/pull/2331)] -
+  Simplify Conflict Check
+- [[#2330](https://github.com/opencast/opencast/pull/2330)] -
+  Fix Search Capability in Documentation
+- [[#2329](https://github.com/opencast/opencast/pull/2329)] -
+  Fixes Solr search failing when titles containing lots of upper case characters
+- [[#2328](https://github.com/opencast/opencast/pull/2328)] -
+  Document publish-configure changes from #1663 in upgrade guide
+- [[#2316](https://github.com/opencast/opencast/pull/2316)] -
+  Changed PartialImportWOH to ignore smil entries for tracks that don't exist
+- [[#2301](https://github.com/opencast/opencast/pull/2301)] -
+  Run Tests Only If Necessary
+- [[#2296](https://github.com/opencast/opencast/pull/2296)] -
+  Admin UI now shows a warning if it cannot reach Github
+- [[#2277](https://github.com/opencast/opencast/pull/2277)] -
+  Add Event Metrics
+- [[#2263](https://github.com/opencast/opencast/pull/2263)] -
+  Fix memory leak / performance in the LTI upload and job overview
+- [[#2260](https://github.com/opencast/opencast/pull/2260)] -
+  Stand-Alone Video Editor
+- [[#2248](https://github.com/opencast/opencast/pull/2248)] -
+  Selenium Tests for LTI Tools
+- [[#2026](https://github.com/opencast/opencast/pull/2026)] -
+  Fix Job Dispatching Test
+
+### Opencast 9.2
+
+*Released on February 15th, 2021*
+
+- [[GHSA-vpc2-3wcv-qj4w#1](https://github.com/opencast/opencast-ghsa-vpc2-3wcv-qj4w/pull/1)] -
+  Fix Engage Series Publication and Access
+- [[#2309](https://github.com/opencast/opencast/pull/2309)] -
+  HTTPS / Port
+- [[#2300](https://github.com/opencast/opencast/pull/2300)] -
+  Add Mermaid to Documentation
+- [[#2299](https://github.com/opencast/opencast/pull/2299)] -
+  Fix Total Search Results
+- [[#2295](https://github.com/opencast/opencast/pull/2295)] -
+  Limit Incident Text ID Text
+- [[#2292](https://github.com/opencast/opencast/pull/2292)] -
+  Fix Adopter Registration Configuration
+- [[#2291](https://github.com/opencast/opencast/pull/2291)] -
+  Shorten Adopter Registration Primary Key
+- [[#2290](https://github.com/opencast/opencast/pull/2290)] -
+  Fix Exception if GitHub is Unreachable
+- [[#2281](https://github.com/opencast/opencast/pull/2281)] -
+  Admin UI says current OC version unsupported when it can't reach GitHub
+- [[#2275](https://github.com/opencast/opencast/pull/2275)] -
+  Fixed possible typo in database grants statement
+- [[#2274](https://github.com/opencast/opencast/pull/2274)] -
+  Fix checkstyle violations for 7 modules
+- [[#2273](https://github.com/opencast/opencast/pull/2273)] -
+  Fix checkstyle violations for 9 modules
+- [[#2270](https://github.com/opencast/opencast/pull/2270)] -
+  Fix checkstyle violations for `authorization-manager`
+- [[#2259](https://github.com/opencast/opencast/pull/2259)] -
+  Enforce indentation checkstyle
+- [[#2258](https://github.com/opencast/opencast/pull/2258)] -
+  Fix Series Details
+- [[#2257](https://github.com/opencast/opencast/pull/2257)] -
+  Add syncronization to the access of the not thread safe xml marshaller.
+- [[#2249](https://github.com/opencast/opencast/pull/2249)] -
+  Test documentation only if necessary
+- [[#2247](https://github.com/opencast/opencast/pull/2247)] -
+  LTI Tools Mock Data and UI Server
+- [[#2245](https://github.com/opencast/opencast/pull/2245)] -
+  Default to server localhost also for multi tenancy
+- [[#2244](https://github.com/opencast/opencast/pull/2244)] -
+  Fix NullPointerException when accessing series details
+- [[#2243](https://github.com/opencast/opencast/pull/2243)] -
+  Fix Feeds REST Docs
+- [[#2237](https://github.com/opencast/opencast/pull/2237)] -
+  Add checkstyle-enforced rule about bracing style (K&R style, braces are mandatory)
+- [[#2216](https://github.com/opencast/opencast/pull/2216)] -
+  Add checkstyle-enforced line length limit (with most modules being excluded for now)
+- [[#2203](https://github.com/opencast/opencast/pull/2203)] -
+  Improved Development Runtime Dependency Containers
+- [[#2198](https://github.com/opencast/opencast/pull/2198)] -
+  List Upload Tool on LTI Landing Page
+- [[#2188](https://github.com/opencast/opencast/pull/2188)] -
+  Inspect Media Size
+- [[#2186](https://github.com/opencast/opencast/pull/2186)] -
+  No Decoration on Section Links
+- [[#2185](https://github.com/opencast/opencast/pull/2185)] -
+  Copy to Clipboard Tooltip
+- [[#2181](https://github.com/opencast/opencast/pull/2181)] -
+  Fix LTI Tool Documentation
+- [[#2169](https://github.com/opencast/opencast/pull/2169)] -
+  Better Port Randomization
+- [[#2168](https://github.com/opencast/opencast/pull/2168)] -
+  Fixes the lti captions upload together with the default ingest workflow #2167
+- [[#2166](https://github.com/opencast/opencast/pull/2166)] -
+  Add Firewall Documentation
+- [[#2134](https://github.com/opencast/opencast/pull/2134)] -
+  Addressing (most of) the missing ES config documentation
+- [[#2106](https://github.com/opencast/opencast/pull/2106)] -
+  Attempt to detect invalid DB credentials
+- [[#2078](https://github.com/opencast/opencast/pull/2078)] -
+  Setting appropriate defaults for AWS S3 dist config, matching the docs
+- [[#2055](https://github.com/opencast/opencast/pull/2055)] -
+  Metrics Exporter
+- [[#2042](https://github.com/opencast/opencast/pull/2042)] -
+  More efficient retrieval of active jobs
+- [[#1686](https://github.com/opencast/opencast/pull/1686)] -
+  Workflow Operation "CutMarksToSmil"
+- [[#1017](https://github.com/opencast/opencast/pull/1017)] -
+  Securing Static Files
+
+### Opencast 9.1
+
+*Released on December 16th, 2020*
+
+- [[#2150](https://github.com/opencast/opencast/pull/2150)] -
+  Add note about Studio config changes to the 8->9 update guide
+- [[#2133](https://github.com/opencast/opencast/pull/2133)] -
+  Update Debian install documentation
+- [[#2160](https://github.com/opencast/opencast/pull/2160)] -
+  Fix Ingest by Non-privileged User
+
 ### Opencast 9.0
 
-*To be released on December 15th, 2020*
+*Released on December 15th, 2020*
 
-Preliminary changelog as of 2020-09-08
-
+- [[#2133](https://github.com/opencast/opencast/pull/2133)] -
+  Update Debian install documentation
+- [[#2110](https://github.com/opencast/opencast/pull/2110)] -
+  Error Notification Style
+- [[#2109](https://github.com/opencast/opencast/pull/2109)] -
+  Fix apache-httpd doc
+- [[#2108](https://github.com/opencast/opencast/pull/2108)] -
+  Fix pagination for LTI series page
+- [[#2107](https://github.com/opencast/opencast/pull/2107)] -
+  Use series ACL as default ACL for events in LTI upload tool if available
+- [[#2086](https://github.com/opencast/opencast/pull/2086)] -
+  Move from Travis CI to GitHub Actions
+- [[#2084](https://github.com/opencast/opencast/pull/2084)] -
+  Add null checker when publishing to streaming service
+- [[#2083](https://github.com/opencast/opencast/pull/2083)] -
+  Reverting part of #1291 because this code is actually needed
+- [[#2082](https://github.com/opencast/opencast/pull/2082)] -
+  Fix Video Editor (Start Workflow)
+- [[#2077](https://github.com/opencast/opencast/pull/2077)] -
+  Fixing NPE exposed in PublishEngageWOH when publishing to AWS S3.
+- [[#2074](https://github.com/opencast/opencast/pull/2074)] -
+  #1907 Fix Start Task
+- [[#2056](https://github.com/opencast/opencast/pull/2056)] -
+  Add 'if-height-lt-' variable to resolution based encoding
+- [[#2054](https://github.com/opencast/opencast/pull/2054)] -
+  Add I18n translation sample file to Paella episodesFromSeries plugin
+- [[#2048](https://github.com/opencast/opencast/pull/2048)] -
+  Update lti landing page about series subtool
+- [[#2044](https://github.com/opencast/opencast/pull/2044)] -
+  Add S3 presigned URL support
+- [[#2043](https://github.com/opencast/opencast/pull/2043)] -
+  Add I18n support for text 'General' in 2 modals
+- [[#2041](https://github.com/opencast/opencast/pull/2041)] -
+  Update Node
+- [[#2039](https://github.com/opencast/opencast/pull/2039)] -
+  Show language of LTI tool depend on LTI param
+- [[#2038](https://github.com/opencast/opencast/pull/2038)] -
+  Load all supported languages in LTI tool
+- [[#2023](https://github.com/opencast/opencast/pull/2023)] -
+  Fix Broken Video Editor
+- [[#2022](https://github.com/opencast/opencast/pull/2022)] -
+  Long Labels in Segment List
+- [[#2009](https://github.com/opencast/opencast/pull/2009)] -
+  Fixing OpenJDK 11 builds by adding missing dependency.
+- [[#2007](https://github.com/opencast/opencast/pull/2007)] -
+  Fix Broken Admin Interface Sub-Tabs
+- [[#2006](https://github.com/opencast/opencast/pull/2006)] -
+  Update pull request to-do list
+- [[#2005](https://github.com/opencast/opencast/pull/2005)] -
+  Synchronize merge conflict check
+- [[#2000](https://github.com/opencast/opencast/pull/2000)] -
+  Better documentation for AAI DynamicLoginHandler
+- [[#1982](https://github.com/opencast/opencast/pull/1982)] -
+  Update Media Package POST Operation
+- [[#1981](https://github.com/opencast/opencast/pull/1981)] -
+  Remove Deprecated Process Executor
+- [[#1970](https://github.com/opencast/opencast/pull/1970)] -
+  Update cURL Commands
+- [[#1963](https://github.com/opencast/opencast/pull/1963)] -
+  Non-unique-files fix for Videogrid WOH
+- [[#1950](https://github.com/opencast/opencast/pull/1950)] -
+  Update documentation for the Docker images
+- [[#1939](https://github.com/opencast/opencast/pull/1939)] -
+  Update jakarta.xml.bind-api to 2.3.3
+- [[#1937](https://github.com/opencast/opencast/pull/1937)] -
+  Update adopter-registration-rest.xml to solve #1934 issue
+- [[#1931](https://github.com/opencast/opencast/pull/1931)] -
+  Make copy-event-to-series workflow id configurable
+- [[#1836](https://github.com/opencast/opencast/pull/1836)] -
+  Ensure User Roles
+- [[#1910](https://github.com/opencast/opencast/pull/1910)] -
+  Test admin frontend only once on CI
+- [[#1904](https://github.com/opencast/opencast/pull/1904)] -
+  Enforce Maven Dependency Checks on some more modules
+- [[#1901](https://github.com/opencast/opencast/pull/1901)] -
+  OSGi Annotations and Configuration
+- [[#1900](https://github.com/opencast/opencast/pull/1900)] -
+  Docs: admin-ui moved to admin-ui-frontend
+- [[#1898](https://github.com/opencast/opencast/pull/1898)] -
+  Add preencode option to partialImport WOH
+- [[#1897](https://github.com/opencast/opencast/pull/1897)] -
+  Bump markdownlint-cli from 0.23.2 to 0.24.0 in /docs/guides
+- [[#1896](https://github.com/opencast/opencast/pull/1896)] -
+  Bump @types/react from 16.9.2 to 16.9.50 in /modules/lti
+- [[#1895](https://github.com/opencast/opencast/pull/1895)] -
+  Development Runtime Dependency Containers
+- [[#1890](https://github.com/opencast/opencast/pull/1890)] -
+  Fix error while searching episode by browser
+- [[#1889](https://github.com/opencast/opencast/pull/1889)] -
+  Bump @types/react-select from 3.0.14 to 3.0.21 in /modules/lti
+- [[#1888](https://github.com/opencast/opencast/pull/1888)] -
+  Bump bootbox from 5.4.0 to 5.4.1 in /modules/engage-ui
+- [[#1886](https://github.com/opencast/opencast/pull/1886)] -
+  Remove Spring's Patched JDOM
+- [[#1884](https://github.com/opencast/opencast/pull/1884)] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/admin-ui-frontend
+- [[#1883](https://github.com/opencast/opencast/pull/1883)] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/engage-theodul-core
+- [[#1882](https://github.com/opencast/opencast/pull/1882)] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/runtime-info-ui
+- [[#1881](https://github.com/opencast/opencast/pull/1881)] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/engage-ui
+- [[#1880](https://github.com/opencast/opencast/pull/1880)] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/engage-paella-player
+- [[#1879](https://github.com/opencast/opencast/pull/1879)] -
+  Bump eslint from 7.9.0 to 7.10.0 in /modules/runtime-info-ui-ng
+- [[#1876](https://github.com/opencast/opencast/pull/1876)] -
+  OSGi Dependency Update
+- [[#1875](https://github.com/opencast/opencast/pull/1875)] -
+  Update NodeJS
+- [[#1874](https://github.com/opencast/opencast/pull/1874)] -
+  PostgreSQL and auto-generated databases
+- [[#1873](https://github.com/opencast/opencast/pull/1873)] -
+  Bump karma from 5.2.2 to 5.2.3 in /modules/admin-ui-frontend
+- [[#1872](https://github.com/opencast/opencast/pull/1872)] -
+  Fix Version Check
+- [[#1871](https://github.com/opencast/opencast/pull/1871)] -
+  Workflow conditioner to handle floats correctly
+- [[#1869](https://github.com/opencast/opencast/pull/1869)] -
+  Extend the documentation concerning multiple audio tracks
+- [[#1868](https://github.com/opencast/opencast/pull/1868)] -
+  Bump @types/node from 12.7.5 to 14.11.2 in /modules/lti
+- [[#1867](https://github.com/opencast/opencast/pull/1867)] -
+  Update Mock Data
+- [[#1866](https://github.com/opencast/opencast/pull/1866)] -
+  Update to AngularJS 1.8
+- [[#1858](https://github.com/opencast/opencast/pull/1858)] -
+  User and role provider for Canvas LMS
+- [[#1857](https://github.com/opencast/opencast/pull/1857)] -
+  Refactor Metadata classes (Updated version)
+- [[#1854](https://github.com/opencast/opencast/pull/1854)] -
+  Bump @types/jest from 24.0.18 to 26.0.14 in /modules/lti
+- [[#1844](https://github.com/opencast/opencast/pull/1844)] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/admin-ui-frontend
+- [[#1843](https://github.com/opencast/opencast/pull/1843)] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/engage-ui
+- [[#1841](https://github.com/opencast/opencast/pull/1841)] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/runtime-info-ui
+- [[#1840](https://github.com/opencast/opencast/pull/1840)] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/engage-paella-player
+- [[#1839](https://github.com/opencast/opencast/pull/1839)] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/runtime-info-ui-ng
+- [[#1838](https://github.com/opencast/opencast/pull/1838)] -
+  Bump eslint from 7.8.1 to 7.9.0 in /modules/engage-theodul-core
+- [[#1833](https://github.com/opencast/opencast/pull/1833)] -
+  Add Merge Conflict Check
+- [[#1831](https://github.com/opencast/opencast/pull/1831)] -
+  Clarify the documentation on when new source tracks can be added
+- [[#1830](https://github.com/opencast/opencast/pull/1830)] -
+  Bump karma from 5.2.1 to 5.2.2 in /modules/admin-ui-frontend
+- [[#1829](https://github.com/opencast/opencast/pull/1829)] -
+  Bump chromedriver from 85.0.0 to 85.0.1 in /modules/admin-ui-frontend
+- [[#1825](https://github.com/opencast/opencast/pull/1825)] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/admin-ui-frontend
+- [[#1824](https://github.com/opencast/opencast/pull/1824)] -
+  Bump karma from 5.1.1 to 5.2.1 in /modules/admin-ui-frontend
+- [[#1823](https://github.com/opencast/opencast/pull/1823)] -
+  Update Studio from 2020-06-25 to 2020-09-14
+- [[#1822](https://github.com/opencast/opencast/pull/1822)] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/runtime-info-ui-ng
+- [[#1819](https://github.com/opencast/opencast/pull/1819)] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-theodul-core
+- [[#1817](https://github.com/opencast/opencast/pull/1817)] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-paella-player
+- [[#1816](https://github.com/opencast/opencast/pull/1816)] -
+  Bump eslint from 7.7.0 to 7.8.1 in /modules/engage-ui
+- [[#1814](https://github.com/opencast/opencast/pull/1814)] -
+  Add a 'defaultValue' to getComponentContextProperty
+- [[#1808](https://github.com/opencast/opencast/pull/1808)] -
+  Bump underscore from 1.10.2 to 1.11.0 in /modules/engage-ui
+- [[#1801](https://github.com/opencast/opencast/pull/1801)] -
+  Remove Unused Servicewarnings Backend
+- [[#1800](https://github.com/opencast/opencast/pull/1800)] -
+  Adopter Registration
+- [[#1796](https://github.com/opencast/opencast/pull/1796)] -
+  Minimal message broker impl improvement
+- [[#1795](https://github.com/opencast/opencast/pull/1795)] -
+  Login Autocomplete Instructions
+- [[#1794](https://github.com/opencast/opencast/pull/1794)] -
+  Icon Cleanup
+- [[#1791](https://github.com/opencast/opencast/pull/1791)] -
+  Add with acl option to series api
+- [[#1790](https://github.com/opencast/opencast/pull/1790)] -
+  Request Lowercase Usernames in Moodle
+- [[#1789](https://github.com/opencast/opencast/pull/1789)] -
+  Remove JDOM From Ingest Service
+- [[#1788](https://github.com/opencast/opencast/pull/1788)] -
+  Properly parse boolean values
+- [[#1773](https://github.com/opencast/opencast/pull/1773)] -
+  Ingest Service Cleanup
+- [[#1772](https://github.com/opencast/opencast/pull/1772)] -
+  Role Prefix in Moodle User Provider
+- [[#1771](https://github.com/opencast/opencast/pull/1771)] -
+  OSGi Annotations for Engage UI
+- [[#1764](https://github.com/opencast/opencast/pull/1764)] -
+  LTI Context Role Prefix
+- [[#1750](https://github.com/opencast/opencast/pull/1750)] -
+  HTTPS with Apache httpd
+- [[#1746](https://github.com/opencast/opencast/pull/1746)] -
+  VideoGrid WOH
+- [[#1743](https://github.com/opencast/opencast/pull/1743)] -
+  Bump @types/react-helmet from 5.0.16 to 6.1.0 in /modules/lti
+- [[#1728](https://github.com/opencast/opencast/pull/1728)] -
+  Bump @types/react-dom from 16.9.0 to 16.9.8 in /modules/lti
+- [[#1727](https://github.com/opencast/opencast/pull/1727)] -
+  Bump react-helmet from 5.2.1 to 6.1.0 in /modules/lti
+- [[#1724](https://github.com/opencast/opencast/pull/1724)] -
+  Bump react-i18next from 10.13.2 to 11.0.0 in /modules/lti
+- [[#1719](https://github.com/opencast/opencast/pull/1719)] -
+  Download button in theodul player
+- [[#1684](https://github.com/opencast/opencast/pull/1684)] -
+  Partial Retract WOH
+- [[#1636](https://github.com/opencast/opencast/pull/1636)] -
+  Support Serverless HLS
+- [[#1615](https://github.com/opencast/opencast/pull/1615)] -
+  Aditive Filter for Api/events endpoint
+- [[#1607](https://github.com/opencast/opencast/pull/1607)] -
+  Shibboleth dynamic login handler
+- [[#1580](https://github.com/opencast/opencast/pull/1580)] -
+  TagWorkflowOperationHandler now allows wildcards in target flavor
 - [[#1825](https://github.com/opencast/opencast/pull/1825)] -
   Bump eslint from 7.7.0 to 7.8.1 in /modules/admin-ui-frontend
 - [[#1824](https://github.com/opencast/opencast/pull/1824)] -
@@ -658,6 +1021,62 @@ Preliminary changelog as of 2020-09-08
 Opencast 8
 ----------
 
+### Opencast 8.10
+
+*Released on December 23rd, 2020*
+
+- [[#2160](https://github.com/opencast/opencast/pull/2160)] -
+  Fix Ingest by Non-privileged User
+- [[#2049](https://github.com/opencast/opencast/pull/2049)] -
+  Endtime of segments fixed in the editor
+
+
+### Opencast 8.9
+
+*Released on December 8th, 2020*
+
+- [[#2099](https://github.com/opencast/opencast/pull/2099)] -
+  Support faster playback rates in paella video player
+- [[#2087](https://github.com/opencast/opencast/pull/2087)] -
+  Move from Travis CI to GitHub Actions (8.x)
+- [[#2075](https://github.com/opencast/opencast/pull/2075)] -
+  Reduce IO Load When Starting a Workflow
+- [[#2068](https://github.com/opencast/opencast/pull/2068)] -
+  JDK Support proposal (2020-11-11) documentation for 8.x
+- [[#1988](https://github.com/opencast/opencast/pull/1988)] -
+  #1987 Admin UI event start filter datepicker timezone patch
+
+
+### Opencast 8.8
+
+*Released on November 19th, 2020*
+
+- [[#2075](https://github.com/opencast/opencast/pull/2075)] -
+  Reduce IO Load When Starting a Workflow
+- [[#2072](https://github.com/opencast/opencast/pull/2072)] -
+  Update player.matomo.tracking.md
+- [[#2067](https://github.com/opencast/opencast/pull/2067)] -
+  Solves #2034 (Execute-once subprocess issue)
+- [[#2051](https://github.com/opencast/opencast/pull/2051)] -
+  Limit OpenMP Threads to Prevent Tesseract Blocking the System
+- [[#2040](https://github.com/opencast/opencast/pull/2040)] -
+  Drop user login log level
+- [[#2020](https://github.com/opencast/opencast/pull/2020)] -
+  Set the RFC 822 "Date" header field when sending an email (r/8.x)
+- [[#2008](https://github.com/opencast/opencast/pull/2008)] -
+  Speed up preview encoding
+- [[#1988](https://github.com/opencast/opencast/pull/1988)] -
+  #1987 Admin UI event start filter datepicker timezone patch
+- [[#1954](https://github.com/opencast/opencast/pull/1954)] -
+  Fix Paella Player assuming track is audio-only when it's actually video and audio
+- [[#1894](https://github.com/opencast/opencast/pull/1894)] -
+  Remove references to removed modules
+- [[#1891](https://github.com/opencast/opencast/pull/1891)] -
+  Creating a new series doesn't send user collections anymore
+- [[#1887](https://github.com/opencast/opencast/pull/1887)] -
+  Remove Dead OpenID Module
+
+
 ### Opencast 8.7
 
 *Released on September 27th, 2020*
@@ -1265,16 +1684,28 @@ Opencast 8
 
 Opencast 7
 ----------
+
+### Opencast 7.9
+
+*Released on December 8, 2020*
+
+- [[GHSA-44cw-p2hm-gpf6](https://github.com/opencast/opencast/security/advisories/GHSA-44cw-p2hm-gpf6)]
+  Security: Disabled Hostname Verification
+- [[#1964](https://github.com/opencast/opencast/pull/1964)] -
+  Docs: When the sidebar is hidden, the navigation links are disabled now
+- [[#1922](https://github.com/opencast/opencast/pull/1922)] -
+  Remove Spring snapshot repository from main pom
+
 ### Opencast 7.8
 
 *Released on August 17, 2020*
 
 - [[#1667](https://github.com/opencast/opencast/pull/1667)] -
-  Fix managed acl filter in api
+  Fix managed ACL filter in API
 - [[#1659](https://github.com/opencast/opencast/pull/1659)] -
   Updating Guava version
 - [[#1657](https://github.com/opencast/opencast/pull/1657)] -
-  Fixed the video outline in the theodul player
+  Fixed the video outline in the Theodul Player
 - [[#1641](https://github.com/opencast/opencast/pull/1641)] -
   Capture Agent Authentication Method
 - [[#1595](https://github.com/opencast/opencast/pull/1595)] -
@@ -1297,13 +1728,13 @@ Opencast 7
 - [[#1427](https://github.com/opencast/opencast/pull/1427)] -
   1281: Ignoring test which randomly fails in CI testing
 - [[#1426](https://github.com/opencast/opencast/pull/1426)] -
-  Autodetect browsers for admin ui tests, fix phantomJS openssl issue
+  Autodetect browsers for Admin UI tests, fix phantomJS OpenSSL issue
 - [[#1425](https://github.com/opencast/opencast/pull/1425)] -
   Don't duplicate publications
 - [[#1380](https://github.com/opencast/opencast/pull/1380)] -
-  In fast, don't cleanup acls (see other workflows)
+  In fast, don't cleanup ACLs (see other workflows)
 - [[#1379](https://github.com/opencast/opencast/pull/1379)] -
-  Use active, not episode acl in scheduler service
+  Use active, not episode ACL in scheduler service
 
 ### Opencast 7.6
 
@@ -1326,13 +1757,13 @@ Opencast 7
 - [[#1352](https://github.com/opencast/opencast/pull/1352)] -
   Remove unsafe option in ffmpeg command for SMIL processing
 - [[#1343](https://github.com/opencast/opencast/pull/1343)] -
-  ] Fixes Admin-UI Presenter's column
+  Fixes Admin-UI Presenter's column
 - [[#1333](https://github.com/opencast/opencast/pull/1333)] -
   Switch to mvn.opencast.org
 - [[#1329](https://github.com/opencast/opencast/pull/1329)] -
   Remove Spring Request Logger Configuration
 - [[#1325](https://github.com/opencast/opencast/pull/1325)] -
-  Secure FPS For Smil Processing
+  Secure FPS For SMIL Processing
 - [[#1318](https://github.com/opencast/opencast/pull/1318)] -
   Remove Custom Plugin Repositories
 - [[#1315](https://github.com/opencast/opencast/pull/1315)] -
@@ -1372,7 +1803,7 @@ Opencast 7
 *Released on October 02, 2019*
 
 - [[MH-13517](https://opencast.jira.com/browse/MH-13517)][[#1092](https://github.com/opencast/opencast/pull/1092)] -
-  Set an absolute limit on solr query size
+  Set an absolute limit on Solr query size
 - [[MH-13476](https://opencast.jira.com/browse/MH-13476)][[#1088](https://github.com/opencast/opencast/pull/1088)] -
   Filter capture agent roles for ACLs
 - [[#1087](https://github.com/opencast/opencast/pull/1087)] -

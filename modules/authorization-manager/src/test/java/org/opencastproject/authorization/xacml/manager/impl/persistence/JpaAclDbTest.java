@@ -69,10 +69,14 @@ public final class JpaAclDbTest {
     // update
     final ManagedAcl org1Acl = acl.get();
     // update with new ACL
-    assertTrue(p.updateAcl(new ManagedAclImpl(org1Acl.getId(), org1Acl.getName(), org1Acl.getOrganizationId(), acl(entry("anonymous", "write", true)))));
+    assertTrue(p.updateAcl(
+        new ManagedAclImpl(org1Acl.getId(), org1Acl.getName(), org1Acl.getOrganizationId(),
+            acl(entry("anonymous", "write", true)))
+    ));
     assertEquals("write", p.getAcl(org1, org1Acl.getId()).get().getAcl().getEntries().get(0).getAction());
     // update with new name
-    final ManagedAcl org1AclUpdated = new ManagedAclImpl(org1Acl.getId(), "public2", org1Acl.getOrganizationId(), org1Acl.getAcl());
+    final ManagedAcl org1AclUpdated
+        = new ManagedAclImpl(org1Acl.getId(), "public2", org1Acl.getOrganizationId(), org1Acl.getAcl());
     assertTrue(p.updateAcl(org1AclUpdated));
     assertEquals("public2", p.getAcl(org1, org1AclUpdated.getId()).get().getName());
     // try to update a non-existing ACL
@@ -94,7 +98,8 @@ public final class JpaAclDbTest {
     assertEquals(1, p.getAcls(org2).size());
   }
 
-  private static final JpaAclDb p = new JpaAclDb(PersistenceUtil.newTestPersistenceEnv("org.opencastproject.authorization.xacml.manager"));
+  private static final JpaAclDb p
+      = new JpaAclDb(PersistenceUtil.newTestPersistenceEnv("org.opencastproject.authorization.xacml.manager"));
 
   private static final Organization org1 = new DefaultOrganization();
   private static final Organization org2 = new JaxbOrganization("Entwine");

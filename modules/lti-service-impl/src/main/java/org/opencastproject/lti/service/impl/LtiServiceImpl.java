@@ -26,19 +26,19 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SU
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.Workflows;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
-import org.opencastproject.index.service.impl.index.event.Event;
-import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
-import org.opencastproject.index.service.impl.index.event.EventUtils;
+import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.lti.service.api.LtiFileUpload;
 import org.opencastproject.lti.service.api.LtiJob;
 import org.opencastproject.lti.service.api.LtiService;
-import org.opencastproject.matterhorn.search.SearchIndexException;
-import org.opencastproject.matterhorn.search.SearchResult;
-import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
@@ -58,6 +58,7 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
@@ -95,6 +96,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -105,7 +107,6 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private static final Logger logger = LoggerFactory.getLogger(LtiServiceImpl.class);
 
   private static final Gson gson = new Gson();
-  private static final String COPY_EVENT_TO_SERIES_WORKFLOW = "copy-event-to-series";
   private static final String NEW_MP_ID_KEY = "newMpId";
   private IndexService indexService;
   private IngestService ingestService;
@@ -115,14 +116,21 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private Workspace workspace;
   private AbstractSearchIndex searchIndex;
   private AuthorizationService authorizationService;
+  private SeriesService seriesService;
   private String workflow;
   private String workflowConfiguration;
   private String retractWorkflowId;
+  private String copyWorkflowId;
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
 
   /** OSGi DI */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
+  }
+
+  /** OSGI DI */
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
   }
 
   /** OSGi DI */
@@ -174,7 +182,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     workflowService.addWorkflowListener(new WorkflowListener() {
       @Override
       public void stateChanged(WorkflowInstance workflow) {
-        if (!workflow.getTemplate().equals(COPY_EVENT_TO_SERIES_WORKFLOW)) {
+        if (!workflow.getTemplate().equals(copyWorkflowId)) {
           return;
         }
 
@@ -243,7 +251,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         throw new RuntimeException("Unable to create media package for event");
       }
       if (captions != null) {
-        final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor("vtt+en", "captions");
+        final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor("captions", "vtt+en");
         final MediaPackageElementBuilder elementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         final MediaPackageElement captionsMpe = elementBuilder
                 .newElement(MediaPackageElement.Type.Attachment, captionsFlavor);
@@ -270,11 +278,21 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       replaceField(collection, "isPartOf", seriesId);
       adapter.storeFields(mp, collection);
 
-      final AccessControlList accessControlList = new AccessControlList(
-              new AccessControlEntry("ROLE_ADMIN", "write", true),
-              new AccessControlEntry("ROLE_ADMIN", "read", true),
-              new AccessControlEntry("ROLE_OAUTH_USER", "write", true),
-              new AccessControlEntry("ROLE_OAUTH_USER", "read", true));
+      AccessControlList accessControlList = null;
+
+      // If series is set and it's ACL is not empty, use series' ACL as default
+      if (StringUtils.isNotBlank(seriesId)) {
+        accessControlList = seriesService.getSeriesAccessControl(seriesId);
+      }
+
+      if (accessControlList == null || accessControlList.getEntries().isEmpty()) {
+        accessControlList = new AccessControlList(
+          new AccessControlEntry("ROLE_ADMIN", "write", true),
+          new AccessControlEntry("ROLE_ADMIN", "read", true),
+          new AccessControlEntry("ROLE_OAUTH_USER", "write", true),
+          new AccessControlEntry("ROLE_OAUTH_USER", "read", true));
+      }
+
       this.authorizationService.setAcl(mp, AclScope.Episode, accessControlList);
       mp = ingestService.addTrack(file.getStream(), file.getSourceName(), MediaPackageElements.PRESENTER_SOURCE, mp);
 
@@ -297,7 +315,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
 
   @Override
   public void copyEventToSeries(final String eventId, final String seriesId) {
-    final String workflowId = COPY_EVENT_TO_SERIES_WORKFLOW;
+    final String workflowId = copyWorkflowId;
     try {
       final WorkflowDefinition wfd = workflowService.getWorkflowDefinitionById(workflowId);
       final Workflows workflows = new Workflows(assetManager, workflowService);
@@ -487,12 +505,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       gson.fromJson(workflowConfigurationStr, Map.class);
       workflowConfiguration = workflowConfigurationStr;
       workflow = workflowStr;
-      final String retractWorkflowId = (String) properties.get("retract-workflow-id");
-      if (retractWorkflowId == null) {
-        this.retractWorkflowId = "retract";
-      } else {
-        this.retractWorkflowId = retractWorkflowId;
-      }
+      this.retractWorkflowId = Objects.toString(properties.get("retract-workflow-id"), "retract");
+      this.copyWorkflowId = Objects.toString(properties.get("copy-workflow-id"), "copy-event-to-series");
     } catch (JsonSyntaxException e) {
       throw new IllegalArgumentException("Invalid JSON specified for workflow configuration");
     }

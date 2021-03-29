@@ -47,13 +47,13 @@ This section will help you to understand how you can modify an existing profile 
 Creating a new encoding profile is a matter of creating a configuration file and placing it in the encoding profiles
 watch folder.
 
-### Encoding Profile Folder
+### Step 1: Encoding Profile Folder
 
 The `<config_dir>/encoding` folder allows you to quickly augment Opencast's existing behavior, simply by modifying or
 adding new configuration files. The file names should follow the pattern `*.properties`.
 
 
-### The Encoding Profile
+### Step 2: The Encoding Profile
 
 Encoding profiles consist of a set of key-value pairs that conform to the following pattern:
 
@@ -84,7 +84,7 @@ The most important part of this profile is the `ffmpeg.command`. This line speci
 `#{expression}` for string replacement.
 
 
-### FFmpeg
+### Step 3: FFmpeg
 
 To create a new profile you have basically one task to do: Find an appropriate FFmpeg command line for whatever you want
 to do. For more information about FFmpeg, its options and how you can build FFmpeg with additional functionality have a

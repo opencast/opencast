@@ -65,7 +65,7 @@ public class WaveformServiceRemote extends RemoteBase implements WaveformService
    */
   @Override
   public Job createWaveformImage(Track sourceTrack, int pixelsPerMinute, int minWidth, int maxWidth, int height, String color)
-    throws MediaPackageException, WaveformServiceException {
+          throws MediaPackageException, WaveformServiceException {
     HttpPost post = new HttpPost("/create");
     try {
       List<BasicNameValuePair> params = new ArrayList<>();

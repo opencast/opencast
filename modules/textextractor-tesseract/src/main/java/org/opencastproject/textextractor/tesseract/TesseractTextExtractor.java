@@ -58,13 +58,13 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
   /** Configuration property that defines the path to the tesseract binary */
   public static final String TESSERACT_BINARY_CONFIG_KEY =
-    "org.opencastproject.textanalyzer.tesseract.path";
+      "org.opencastproject.textanalyzer.tesseract.path";
 
   /** Configuration property that defines additional tesseract options like the
    * language or the pagesegmode to use. This is just appended to the command
    * line when tesseract is called. */
   public static final String TESSERACT_OPTS_CONFIG_KEY =
-    "org.opencastproject.textanalyzer.tesseract.options";
+      "org.opencastproject.textanalyzer.tesseract.options";
 
   /** Binary of the tesseract command */
   private String binary;
@@ -121,8 +121,9 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
    */
   @Override
   public List<String> extract(File image) throws TextExtractorException {
-    if (binary == null)
+    if (binary == null) {
       throw new IllegalStateException("Binary is not set");
+    }
 
     File outputFile = null;
     File outputFileBase = new File(image.getParentFile(), FilenameUtils.getBaseName(image.getName()));

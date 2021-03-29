@@ -7,7 +7,7 @@ import {
     collectionToPairs
 } from "../OpencastRest";
 import Select from "react-select";
-import i18next from "i18next";
+import * as i18next from "i18next";
 import { ValueType } from "react-select/src/types"; // tslint:disable-line no-submodule-imports
 
 import CreatableSelect from "react-select/creatable";
@@ -32,6 +32,8 @@ interface EditFormProps extends WithTranslation {
 
 interface MetadataFieldProps {
     readonly field: EventMetadataField;
+    // ESlint false positive.
+    // eslint-disable-next-line react/no-unused-prop-types
     readonly valueChange: (id: string, newValue: string | string[]) => void;
     readonly t: i18next.TFunction;
 }
@@ -88,7 +90,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
             value={field.value}
             onChange={(e) => valueChange(field.id, e.currentTarget.value)} />;
 
-    if (field.collection !== undefined && field.type === "mixed_text")
+    if (field.collection !== undefined && field.type === "mixed_text") {
         return <CreatableSelect
             isMulti={true}
             isClearable={true}
@@ -98,7 +100,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
                 valueChange(
                     field.id,
                     value === undefined || value === null || !Array.isArray(value) ? [] : (value as OptionType[]).map((v) => v.value))} />;
-
+    }
     if (field.collection !== undefined) {
         const options: OptionType[] = collectionToOptions(field.collection, field.translatable, t);
         const currentValue = options.find((o: OptionType) => o.value === field.value);

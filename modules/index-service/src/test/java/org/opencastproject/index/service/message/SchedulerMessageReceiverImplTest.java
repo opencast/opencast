@@ -23,7 +23,7 @@ package org.opencastproject.index.service.message;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.opencastproject.index.service.impl.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;

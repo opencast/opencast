@@ -23,8 +23,8 @@ package org.opencastproject.index.service.util;
 
 import static org.junit.Assert.assertTrue;
 
-import org.opencastproject.matterhorn.search.SearchQuery.Order;
-import org.opencastproject.matterhorn.search.impl.SortCriterionImpl;
+import org.opencastproject.elasticsearch.api.SearchQuery.Order;
+import org.opencastproject.elasticsearch.impl.SortCriterionImpl;
 
 import org.junit.Test;
 

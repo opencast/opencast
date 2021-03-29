@@ -37,6 +37,45 @@ Amazon CloudFront provides an *optional* way to better handle distributing your 
 configuring CloudFront is outside the scope of this documentation, we wish to note that this does affect one of the keys
 described below.  Please ensure you use the correct distribution base format depending on which service you are using!
 
+Presigned URL
+-------------
+
+S3 and Cloudfront work together to speed delivery of your content, but if your media URLs leak then anyone can
+download your recordings.  S3 allows you to create **Presigned URL**s, which are only valid for a limited time.  This
+means that even if your media URLs leak, they will only be valid for a configurable duration.
+
+Set `org.opencastproject.distribution.aws.s3.presigned.url` to `true` to enable this feature.
+
+Note: **CloudFront** and **Presigned URL** can be used together. 
+
+Note: Opencast's distribution files can be quite large depending on your settings, and some of your users may not be
+able to complete the download within the time limit.  While AWS should not stop a download currently in progress, some
+players may not completely download the media if playback is stopped.  If you are experiencing complaints about
+playback breaking and have presigned URLs enabled, try lengthening the timeout.
+
+Service Default Security Note
+-----------------------------
+
+On startup, Opencast checks to see if the S3 bucket exists, and if it does not it creates it.  This bucket has default
+permissions allowing anyone to read the full contents of the bucket.  This may not be what you want, depending on your
+institutional priorites.  If you wish to protect the files with presigned URLs, then please create the bucket in advance,
+with the appropriate security settings.
+
+S3 Compatible Service
+----------------------
+The S3 API has become the de facto standard interface for almost all storage providers.
+This module also supports S3 compatible service.
+In this case, `org.opencastproject.distribution.aws.s3.endpoint` should be set to the endpoint of the S3 service.
+Meanwhile, `org.opencastproject.distribution.aws.s3.region` should not be set.
+Note: only one of these two configuration keys may be set.
+
+There are [two access](https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingBucket.html) style for bucket, virtual hosted style (default) and path style.
+- Virtual hosted style sample: `https://bucketname.s3.service.com/`
+- Path style sample: `https://s3.service.com/bucketname`
+
+AWS use virtual hosted style by default, and will deprecate path style. Yet, for self hosted s3 compatible service, path style URL is useful.  
+Set `org.opencastproject.distribution.aws.s3.path.style` to `true` to enable this feature.
+
 Opencast Service Configuration
 ------------------------------
 
@@ -47,10 +86,14 @@ The Opencast AWS S3 Distribution service has five configuration keys, which can 
 |--------|-----|-------|
 |org.opencastproject.distribution.aws.s3.distribution.enable|True to enable S3 distribution, false otherwise|true|
 |org.opencastproject.distribution.aws.s3.region|The AWS region to set|us-west-2|
+|org.opencastproject.distribution.aws.s3.endpoint|The endpoint of AWS S3 service. Only used with S3 compatible service|https://s3.service.com|
+|org.opencastproject.distribution.aws.s3.path.style|True to enable path style access URL for bucket, false otherwise|false|
 |org.opencastproject.distribution.aws.s3.bucket|The S3 bucket name|example-org-dist|
 |org.opencastproject.distribution.aws.s3.distribution.base|Where the S3 files are available from.  This value can be derived from the bucket and region values, or is set by CloudFront.|http://s3-us-west-2.amazonaws.com/example-org-dist, or DOMAIN_NAME.cloudfront.net|
 |org.opencastproject.distribution.aws.s3.access.id|Your access ID|20 alphanumeric characters|
 |org.opencastproject.distribution.aws.s3.secret.key|Your secret key|40 characters|
+|org.opencastproject.distribution.aws.s3.presigned.url|True to enable presigned URL, false otherwise|false|
+|org.opencastproject.distribution.aws.s3.presigned.url.valid.duration|Valid duration for presigned URL in milliseconds|14400000|
 
 If *org.opencastproject.distribution.aws.s3.access.id* and *org.opencastproject.distribution.aws.s3.secret.key* are
  not *explicitly* provided, search for credentials will be performed in the order specified by the

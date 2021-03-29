@@ -116,24 +116,6 @@ public final class IoSupport {
   }
 
   /**
-   * Closes a <code>StreamHelper</code> quietly so that no exceptions are thrown.
-   *
-   * @param s
-   *          maybe null
-   */
-  public static boolean closeQuietly(final StreamHelper s) {
-    if (s == null) {
-      return false;
-    }
-    try {
-      s.stopReading();
-    } catch (InterruptedException e) {
-      logger.warn("Interrupted while waiting for stream helper to stop reading");
-    }
-    return true;
-  }
-
-  /**
    * Closes the processes input, output and error streams.
    *
    * @param process
@@ -260,9 +242,11 @@ public final class IoSupport {
     } finally {
       IOUtils.closeQuietly(in);
 
-      if (response != null && trustedClient != null) {
-        trustedClient.close(response);
-        response = null;
+      if (response != null) {
+        try {
+          trustedClient.close(response);
+        } catch (IOException e) {
+        }
       }
     }
 

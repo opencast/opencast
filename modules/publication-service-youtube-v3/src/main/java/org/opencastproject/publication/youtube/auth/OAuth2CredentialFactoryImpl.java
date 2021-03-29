@@ -61,13 +61,16 @@ public final class OAuth2CredentialFactoryImpl implements OAuth2CredentialFactor
   }
 
   @Override
-  public DataStore<StoredCredential> getDataStore(final String id, final String dataStoreDirectory) throws IOException {
+  public DataStore<StoredCredential> getDataStore(final String id, final String dataStoreDirectory)
+          throws IOException {
     return new FileDataStoreFactory(new File(dataStoreDirectory)).getDataStore(id);
   }
 
   @Override
-  public GoogleCredential getGoogleCredential(final DataStore<StoredCredential> datastore, final ClientCredentials authContext)
-          throws IOException {
+  public GoogleCredential getGoogleCredential(
+      final DataStore<StoredCredential> datastore,
+      final ClientCredentials authContext
+  ) throws IOException {
     final GoogleCredential gCred;
     final LocalServerReceiver localReceiver = new LocalServerReceiver();
     final String accessToken;
@@ -84,23 +87,30 @@ public final class OAuth2CredentialFactoryImpl implements OAuth2CredentialFactor
       if (sCred != null) {
         accessToken = sCred.getAccessToken();
         refreshToken = sCred.getRefreshToken();
-        logger.debug(MessageFormat.format("Found credential for client {0} in data store {1}", authContext.getClientId(), datastore.getId()));
+        logger.debug(MessageFormat.format(
+            "Found credential for client {0} in data store {1}", authContext.getClientId(), datastore.getId()));
       } else {
         // This flow supports installed applications
-        final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(new NetHttpTransport(), new JacksonFactory(),
-                gClientSecrets, authContext.getScopes()).setCredentialDataStore(datastore).setApprovalPrompt("auto")
-                .setAccessType("offline").build();
-        final Credential cred = new AuthorizationCodeInstalledApp(flow, localReceiver).authorize(authContext.getClientId());
+        final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+                new NetHttpTransport(), new JacksonFactory(), gClientSecrets, authContext.getScopes())
+            .setCredentialDataStore(datastore)
+            .setApprovalPrompt("auto")
+            .setAccessType("offline")
+            .build();
+        final Credential cred = new AuthorizationCodeInstalledApp(flow, localReceiver)
+            .authorize(authContext.getClientId());
         accessToken = cred.getAccessToken();
         refreshToken = cred.getRefreshToken();
-        logger.debug(MessageFormat.format("Created new credential for client {0} in data store {1}", authContext.getClientId(), datastore.getId()));
+        logger.debug(MessageFormat.format(
+            "Created new credential for client {0} in data store {1}", authContext.getClientId(), datastore.getId()));
       }
       gCred = new GoogleCredential.Builder()
           .setClientSecrets(gClientSecrets).setJsonFactory(new JacksonFactory())
           .setTransport(new NetHttpTransport()).build();
       gCred.setAccessToken(accessToken);
       gCred.setRefreshToken(refreshToken);
-      logger.debug(MessageFormat.format("Found credential {0} using {1}", gCred.getRefreshToken(), authContext.toString()));
+      logger.debug(MessageFormat.format(
+          "Found credential {0} using {1}", gCred.getRefreshToken(), authContext.toString()));
     } finally {
       localReceiver.stop();
     }

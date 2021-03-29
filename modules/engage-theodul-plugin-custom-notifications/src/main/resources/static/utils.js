@@ -18,32 +18,32 @@
  * the License.
  *
  */
-/*jslint browser: true, nomen: true*/
-/*global define, CustomEvent*/
-define(["jquery", "moment"], function($, Moment) {
-    "use strict";
+/*global define*/
+/*global dateFormat*/ // dateFormat relies on glocal state set in main *sigh*
+define(['jquery', 'moment'], function($, Moment) {
+  'use strict';
 
-    function Utils() {
-        // nothing to see here
-    }
+  function Utils() {
+    // nothing to see here
+  }
 
-    /**
+  /**
      * Format the current date and time
      *
      * @return a formatted current date and time string
      */
-    Utils.prototype.getCurrentDateTime = function(locale) {
-        var date = new Date();
-        Moment.locale(locale, {
-            // customizations
-        });
+  Utils.prototype.getCurrentDateTime = function(locale) {
+    var date = new Date();
+    Moment.locale(locale, {
+      // customizations
+    });
 
-        // try to format the date
-        if (Moment(date) != null) {
-            date = Moment(new Date()).format(dateFormat);
-        }
-        return date;
+    // try to format the date
+    if (Moment(date) != null) {
+      date = Moment(new Date()).format(dateFormat);
     }
+    return date;
+  };
 
-    return Utils;
+  return Utils;
 });

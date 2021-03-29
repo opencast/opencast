@@ -26,6 +26,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-index-rebuild</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
     </dependency>
@@ -44,10 +49,6 @@
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>jakarta.persistence</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>

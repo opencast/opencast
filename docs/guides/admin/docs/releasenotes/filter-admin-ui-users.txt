@@ -1,0 +1,1 @@
+- [#2019](https://github.com/opencast/opencast/pull/2019): The full list of Opencast users can now be reduced in the admin UI's filtering tool using a regular expression

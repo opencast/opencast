@@ -36,7 +36,7 @@ public interface ConfigurablePublicationService {
 
   /**
    * Replaces media package elements.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param channelId
@@ -51,8 +51,12 @@ public interface ConfigurablePublicationService {
    * @throws MediaPackageException
    *           if there was a problem with the mediapackage element
    */
-  Job replace(MediaPackage mediaPackage, String channelId, Collection<? extends MediaPackageElement> addElements,
-          Set<String> retractElementIds) throws PublicationException, MediaPackageException;
+  Job replace(
+      MediaPackage mediaPackage,
+      String channelId,
+      Collection<? extends MediaPackageElement> addElements,
+      Set<String> retractElementIds
+  ) throws PublicationException, MediaPackageException;
 
   /**
    * Synchronously replaces media package elements.
@@ -71,6 +75,9 @@ public interface ConfigurablePublicationService {
    * @throws MediaPackageException
    *           if there was a problem with the mediapackage element
    */
-  Publication replaceSync(MediaPackage mediaPackage, String channelId, Collection<? extends MediaPackageElement> addElements,
-                  Set<String> retractElementIds) throws PublicationException, MediaPackageException;
+  Publication replaceSync(
+      MediaPackage mediaPackage,
+      String channelId, Collection<? extends MediaPackageElement> addElements,
+      Set<String> retractElementIds
+  ) throws PublicationException, MediaPackageException;
 }

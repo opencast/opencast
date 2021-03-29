@@ -23,12 +23,15 @@ package org.opencastproject.videogrid.remote;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.videogrid.api.VideoGridService;
 import org.opencastproject.videogrid.api.VideoGridServiceException;
 
 import com.google.gson.Gson;
 
+import org.apache.commons.codec.EncoderException;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -39,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class VideoGridServiceRemoteImpl extends RemoteBase implements VideoGridService {
@@ -53,15 +57,21 @@ public class VideoGridServiceRemoteImpl extends RemoteBase implements VideoGridS
   }
 
   @Override
-  public Job createPartialTracks(List<List<String>> commands)
-          throws VideoGridServiceException {
+  public Job createPartialTracks(List<List<String>> commands, Track... tracks)
+          throws VideoGridServiceException, EncoderException {
 
     // serialize arguments and metadata
     String commandsJson = gson.toJson(commands);
 
     // Build form parameters
     List<NameValuePair> params = new ArrayList<>();
-    params.add(new BasicNameValuePair("commands", commandsJson));
+    try {
+      params.add(new BasicNameValuePair("commands", commandsJson));
+      params.add(
+              new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(Arrays.asList(tracks))));
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    }
 
     logger.info("Video-gridding {}", commandsJson);
     HttpResponse response = null;

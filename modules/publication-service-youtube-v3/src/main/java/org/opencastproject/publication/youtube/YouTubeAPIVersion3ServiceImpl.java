@@ -89,7 +89,8 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
     final InputStreamContent mediaContent = new InputStreamContent("video/*", inputStream);
     mediaContent.setLength(videoFile.length());
 
-    final YouTube.Videos.Insert videoInsert = youTube.videos().insert("snippet,statistics,status", videoObjectDefiningMetadata, mediaContent);
+    final YouTube.Videos.Insert videoInsert = youTube.videos()
+        .insert("snippet,statistics,status", videoObjectDefiningMetadata, mediaContent);
     final MediaHttpUploader uploader = videoInsert.getMediaHttpUploader();
 
     uploader.setDirectUploadEnabled(false);
@@ -98,7 +99,8 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   }
 
   @Override
-  public Playlist createPlaylist(final String title, final String description, final String... tags) throws IOException {
+  public Playlist createPlaylist(final String title, final String description, final String... tags)
+          throws IOException {
     final PlaylistSnippet playlistSnippet = new PlaylistSnippet();
     playlistSnippet.setTitle(title);
     playlistSnippet.setDescription(description);
@@ -137,7 +139,8 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
     playlistItem.setSnippet(playlistItemSnippet);
 
     // The first argument tells the API what to return when a successful insert has been executed.
-    final YouTube.PlaylistItems.Insert playlistItemsInsertCommand = youTube.playlistItems().insert("snippet,contentDetails", playlistItem);
+    final YouTube.PlaylistItems.Insert playlistItemsInsertCommand
+        = youTube.playlistItems().insert("snippet,contentDetails", playlistItem);
     return execute(playlistItemsInsertCommand);
   }
 
@@ -161,7 +164,8 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   }
 
   @Override
-  public SearchListResponse searchMyVideos(final String queryTerm, final String pageToken, final long maxResults) throws IOException {
+  public SearchListResponse searchMyVideos(final String queryTerm, final String pageToken, final long maxResults)
+          throws IOException {
     final YouTube.Search.List search = youTube.search().list("id,snippet");
     if (pageToken != null) {
       search.set("pageToken", pageToken);
@@ -216,7 +220,11 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   }
 
   @Override
-  public PlaylistItemListResponse getPlaylistItems(final String playlistId, final String pageToken, final long maxResults) throws IOException {
+  public PlaylistItemListResponse getPlaylistItems(
+      final String playlistId,
+      final String pageToken,
+      final long maxResults
+  ) throws IOException {
     final YouTube.PlaylistItems.List search = youTube.playlistItems().list("id,snippet");
     search.setPlaylistId(playlistId);
     search.setPageToken(pageToken);

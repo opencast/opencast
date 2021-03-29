@@ -121,6 +121,7 @@ public class JSONUtilsTest {
   @Test
   public void testFiltersToJSON() throws Exception {
     String expectedJSON = IOUtils.toString(getClass().getResource("/filters.json"));
+    String expectedJSONreduced = IOUtils.toString(getClass().getResource("/filters_reduced.json"));
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     Organization organization = EasyMock.createNiceMock(Organization.class);
@@ -175,6 +176,7 @@ public class JSONUtilsTest {
     EasyMock.expect(query.getOffset()).andReturn(Option.<Integer> none()).anyTimes();
     EasyMock.replay(query);
 
+    JSONUtils.setUserRegex(".*"); //allow all users
     JValue result = JSONUtils.filtersToJSON(query, listProvidersService, organization);
 
     StreamingOutput stream = RestUtils.stream(serializer.fn.toJson(result));
@@ -182,6 +184,18 @@ public class JSONUtilsTest {
     try {
       stream.write(resultStream);
       assertThat(expectedJSON, SameJSONAs.sameJSONAs(resultStream.toString()));
+    } finally {
+      IOUtils.closeQuietly(resultStream);
+    }
+
+    JSONUtils.setUserRegex("contributor2"); //allow just one user
+    result = JSONUtils.filtersToJSON(query, listProvidersService, organization);
+
+    stream = RestUtils.stream(serializer.fn.toJson(result));
+    resultStream = new ByteArrayOutputStream();
+    try {
+      stream.write(resultStream);
+      assertThat(expectedJSONreduced, SameJSONAs.sameJSONAs(resultStream.toString()));
     } finally {
       IOUtils.closeQuietly(resultStream);
     }

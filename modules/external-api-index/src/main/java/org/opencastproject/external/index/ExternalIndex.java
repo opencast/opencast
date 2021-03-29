@@ -21,11 +21,12 @@
 
 package org.opencastproject.external.index;
 
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
-import org.opencastproject.index.service.impl.index.event.Event;
-import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
-import org.opencastproject.index.service.impl.index.group.Group;
-import org.opencastproject.index.service.impl.index.series.Series;
+import org.opencastproject.elasticsearch.impl.AbstractElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
+import org.opencastproject.elasticsearch.index.group.Group;
+import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.util.data.Option;
 
 import org.osgi.service.component.ComponentContext;
@@ -46,8 +47,12 @@ public class ExternalIndex extends AbstractSearchIndex {
   private static final int INDEX_VERSION = 101;
 
   /** The document types */
-  private static final String[] DOCUMENT_TYPES = new String[] { Event.DOCUMENT_TYPE, Group.DOCUMENT_TYPE,
-          Series.DOCUMENT_TYPE, "version" };
+  private static final String[] DOCUMENT_TYPES = new String[] {
+      Event.DOCUMENT_TYPE,
+      Group.DOCUMENT_TYPE,
+      Series.DOCUMENT_TYPE,
+      "version"
+  };
 
   /**
    * OSGi callback to activate this component instance.
@@ -84,7 +89,7 @@ public class ExternalIndex extends AbstractSearchIndex {
   }
 
   /**
-   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchIndex#getDocumentTypes()
+   * @see AbstractElasticsearchIndex#getDocumentTypes()
    */
   @Override
   public String[] getDocumentTypes() {

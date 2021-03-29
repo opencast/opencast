@@ -42,7 +42,6 @@ import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -86,11 +85,6 @@ public class JpaGroupRoleProviderTest {
     provider.setEntityManagerFactory(newTestEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
     provider.activate(null);
 
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    provider.deactivate();
   }
 
   @Test

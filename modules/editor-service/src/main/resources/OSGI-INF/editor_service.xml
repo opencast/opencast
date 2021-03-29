@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.editor.EditorServiceImpl"
+               immediate="true">
+  <property name="service.description" value="Editor Service" />
+  <implementation class="org.opencastproject.editor.EditorServiceImpl"/>
+
+  <service>
+    <provide interface="org.opencastproject.editor.api.EditorService" />
+  </service>
+
+  <reference bind="setAdminUISearchIndex"
+             cardinality="1..1"
+             interface="org.opencastproject.adminui.index.AdminUISearchIndex"
+             name="AdminUISearchIndex"
+             policy="static"/>
+  <reference bind="setIndexService"
+             cardinality="1..1"
+             interface="org.opencastproject.index.service.api.IndexService"
+             name="IndexService"
+             policy="static"/>
+  <reference bind="setSmilService"
+             cardinality="1..1"
+             interface="org.opencastproject.smil.api.SmilService"
+             name="SmilService"
+             policy="static"/>
+  <reference name="SecurityService"
+             interface="org.opencastproject.security.api.SecurityService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSecurityService"/>
+  <reference bind="setWorkspace"
+             cardinality="1..1"
+             interface="org.opencastproject.workspace.api.Workspace"
+             name="Workspace"
+             policy="static"/>
+  <reference bind="setAssetManager"
+             cardinality="1..1"
+             interface="org.opencastproject.assetmanager.api.AssetManager"
+             name="AssetManager"
+             policy="static"/>
+  <reference bind="setUrlSigningService"
+             cardinality="1..1"
+             interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
+             name="UrlSigningService"
+             policy="static"/>
+  <reference bind="setWorkflowService"
+             cardinality="1..1"
+             interface="org.opencastproject.workflow.api.WorkflowService"
+             name="WorkflowService"
+             policy="static"/>
+</scr:component>

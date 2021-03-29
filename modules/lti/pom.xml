@@ -151,7 +151,6 @@
                 </goals>
                 <configuration>
                   <nodeVersion>${node.version}</nodeVersion>
-                  <npmVersion>${npm.version}</npmVersion>
                 </configuration>
               </execution>
 
@@ -185,9 +184,6 @@
                 </goals>
                 <configuration>
                   <arguments>run build</arguments>
-                  <environmentVariables>
-                    <EXTEND_ESLINT>true</EXTEND_ESLINT>
-                  </environmentVariables>
                 </configuration>
               </execution>
             </executions>

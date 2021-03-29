@@ -46,5 +46,5 @@ public interface WaveformService {
    * @throws WaveformServiceException if the job can't be created for any reason
    */
   Job createWaveformImage(Track sourceTrack, int pixelPerMinute, int minWidth, int maxWidth, int height, String color)
-    throws MediaPackageException, WaveformServiceException;
+          throws MediaPackageException, WaveformServiceException;
 }

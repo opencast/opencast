@@ -30,19 +30,19 @@ import org.opencastproject.mediapackage.Track;
  * Api for cropping implementations.
  */
 public interface CropService {
-    /** Job type */
-    String JOB_TYPE = "org.opencastproject.crop";
+  /** Job type */
+  String JOB_TYPE = "org.opencastproject.crop";
 
-    /**
-     * Takes the given track and returns the job that can be used to get the resulting mpeg7 catalog
-     *
-     * @param track
-     *          track to crop
-     * @return the job with which we can obtain the extracted metadata
-     * @throws CropException
-     *              if the track could not be cropped
-     * @throws MediaPackageException
-     *              if the track is invalid
-     */
-    Job crop(Track track) throws CropException, MediaPackageException;
+  /**
+   * Takes the given track and returns the job that can be used to get the resulting mpeg7 catalog
+   *
+   * @param track
+   *          track to crop
+   * @return the job with which we can obtain the extracted metadata
+   * @throws CropException
+   *              if the track could not be cropped
+   * @throws MediaPackageException
+   *              if the track is invalid
+   */
+  Job crop(Track track) throws CropException, MediaPackageException;
 }

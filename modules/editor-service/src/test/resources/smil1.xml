@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<smil baseProfile="Language" version="3.0" xml:id="s-afe311c6-9161-41f4-98d0-e951fe66d89e" xmlns="http://www.w3.org/ns/SMIL">
+
+  <head xml:id="h-c911bce2-60ec-4d1b-b06e-32d41a5547ef">
+    <meta name="media-package-id" content="0f2a2ada-0584-4d4d-a248-111f654aa217" xml:id="meta-a3a23cbf-0916-40ac-9d19-f7b1f9e39e85" />
+    <meta name="track-duration" content="20132ms" xml:id="meta-2b0f5667-e00c-444f-b530-81ce5461c90f" />
+    <paramGroup xml:id="pg-a9f8e8ec-9b25-4603-817a-6d99a1d431e0">
+      <param value="6ec443e7-b097-4470-a618-5e0d848f5252" name="track-id" valuetype="data" xml:id="param-2c6bd8a3-9f88-43de-a197-b368c4420b7d" />
+      <param value="http://mh-allinone.localdomain/archive/archive/mediapackage/0f2a2ada-0584-4d4d-a248-111f654aa217/6ec443e7-b097-4470-a618-5e0d848f5252/0/track.mp4" name="track-src" valuetype="data" xml:id="param-bf98a329-1e06-4e06-9590-31facb176dae"/>
+      <param value="presenter/work" name="track-flavor" valuetype="data" xml:id="param-348a26a3-cbb6-4e3f-83b3-cb59de6d8051" />
+    </paramGroup>
+  </head>
+
+  <body xml:id="b-7c3f94f6-08db-4bce-930c-31dd2c7a83a5">
+    <par xml:id="par-8c636a2f-79e9-4e7e-896e-dc6133bf2294">
+      <video src="http://mh-allinone.localdomain/archive/archive/mediapackage/0f2a2ada-0584-4d4d-a248-111f654aa217/6ec443e7-b097-4470-a618-5e0d848f5252/1/track.mp4" paramGroup="pg-a9f8e8ec-9b25-4603-817a-6d99a1d431e0" clipEnd="2449ms" clipBegin="0ms" xml:id="v-3fd8e946-13a2-4b27-86f7-336be1a316f6" />
+    </par>
+    <par xml:id="par-5727100c-238b-4d0d-b97f-571938eb9eb6">
+      <video src="http://mh-allinone.localdomain/archive/archive/mediapackage/0f2a2ada-0584-4d4d-a248-111f654aa217/6ec443e7-b097-4470-a618-5e0d848f5252/1/track.mp4" paramGroup="pg-a9f8e8ec-9b25-4603-817a-6d99a1d431e0" clipEnd="11284ms" clipBegin="4922ms" xml:id="v-d9f2bace-a401-4c9b-9c4c-9c3f5cdf968f" />
+    </par>
+    <par xml:id="par-f6d1f047-4963-463b-a9a0-c5bd9a424c7c">
+      <video src="http://mh-allinone.localdomain/archive/archive/mediapackage/0f2a2ada-0584-4d4d-a248-111f654aa217/6ec443e7-b097-4470-a618-5e0d848f5252/1/track.mp4" paramGroup="pg-a9f8e8ec-9b25-4603-817a-6d99a1d431e0" clipEnd="15963ms" clipBegin="14721ms" xml:id="v-564e2474-e19d-4141-8a52-f01708e11482" />
+    </par>
+    <par xml:id="par-3148c199-a514-4821-b13d-a066d199c86d">
+      <video src="http://mh-allinone.localdomain/archive/archive/mediapackage/0f2a2ada-0584-4d4d-a248-111f654aa217/6ec443e7-b097-4470-a618-5e0d848f5252/1/track.mp4" paramGroup="pg-a9f8e8ec-9b25-4603-817a-6d99a1d431e0" clipEnd="20132ms" clipBegin="15963ms" xml:id="v-491f9cb3-ead2-45d6-90d8-4ed850035592" />
+    </par>
+  </body>
+</smil>

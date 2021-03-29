@@ -93,8 +93,12 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
    * @throws WorkflowOperationException
    *           Thrown if unable to retract the {@link MediaPackageElement}s.
    */
-  private int retractPublicationElements(String channelId, Publication publication, MediaPackage mp, boolean retractStreaming)
-          throws WorkflowOperationException {
+  private int retractPublicationElements(
+      String channelId,
+      Publication publication,
+      MediaPackage mp,
+      boolean retractStreaming
+  ) throws WorkflowOperationException {
     assert ((channelId != null) && (publication != null) && (mp != null));
     MediaPackage mediapackageWithPublicationElements = (MediaPackage) mp.clone();
 
@@ -118,7 +122,8 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
       logger.info("Retracting {} elements of media package {} from publication channel {}", elementIds.size(), mp,
               channelId);
       try {
-        Job  retractDownloadDistributionJob = getDownloadDistributionService().retract(channelId, mediapackageWithPublicationElements, elementIds);
+        Job retractDownloadDistributionJob = getDownloadDistributionService()
+            .retract(channelId, mediapackageWithPublicationElements, elementIds);
         if (retractDownloadDistributionJob != null) {
           jobs.add(retractDownloadDistributionJob);
         }
@@ -130,7 +135,8 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
 
       if (retractStreaming) {
         try {
-          Job retractStreamingJob = getStreamingDistributionService().retract(channelId, mediapackageWithPublicationElements, elementIds);
+          Job retractStreamingJob = getStreamingDistributionService()
+              .retract(channelId, mediapackageWithPublicationElements, elementIds);
           if (retractStreamingJob != null) {
             jobs.add(retractStreamingJob);
           }
@@ -164,7 +170,8 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
     return publications;
   }
 
-  public void retract(MediaPackage mp, final String channelId, boolean retractStreaming) throws WorkflowOperationException {
+  public void retract(MediaPackage mp, final String channelId, boolean retractStreaming)
+          throws WorkflowOperationException {
     assert ((mp != null) && (channelId != null));
 
     final List<Publication> publications = getPublications(mp, channelId);

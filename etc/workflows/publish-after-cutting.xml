@@ -6,7 +6,10 @@
   <tags>
     <tag>editor</tag>
   </tags>
-  <description/>
+  <displayOrder>1000</displayOrder>
+  <description>
+    Process and publish media.
+  </description>
   <configuration_panel/>
 
   <operations>

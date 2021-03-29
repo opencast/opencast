@@ -28,22 +28,23 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchQuery.Order;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.theme.Theme;
+import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.impl.IndexServiceImpl;
-import org.opencastproject.index.service.impl.index.event.Event;
-import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
-import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
-import org.opencastproject.index.service.impl.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.resources.list.provider.UsersListProvider;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.impl.ListProvidersServiceImpl;
-import org.opencastproject.matterhorn.search.SearchIndexException;
-import org.opencastproject.matterhorn.search.SearchQuery.Order;
-import org.opencastproject.matterhorn.search.SearchResult;
-import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -280,7 +281,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     time = DateTimeSupport.fromUTC("2014-04-29T14:35:50Z");
     Series series3 = createSeries("3", "title 3", "contributor 3", "organizer 3", time, null);
 
-    org.opencastproject.index.service.impl.index.theme.Theme theme1 = new org.opencastproject.index.service.impl.index.theme.Theme(
+    Theme theme1 = new Theme(
             1L, new DefaultOrganization().getId());
     theme1.setName("theme-1-name");
     theme1.setDescription("theme-1-description");
@@ -313,7 +314,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     // Setup the events for series 3
     final SearchResultItem<Event>[] eventItems3 = createEvents(0);
 
-    final SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> themeItem1 = EasyMock
+    final SearchResultItem<Theme> themeItem1 = EasyMock
             .createMock(SearchResultItem.class);
     EasyMock.expect(themeItem1.getSource()).andReturn(theme1);
 
@@ -453,11 +454,11 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
             }).anyTimes();
 
     EasyMock.expect(adminuiSearchIndex.getByQuery(EasyMock.capture(captureThemeSearchQuery)))
-            .andAnswer(new IAnswer<SearchResult<org.opencastproject.index.service.impl.index.theme.Theme>>() {
+            .andAnswer(new IAnswer<SearchResult<Theme>>() {
 
               @Override
-              public SearchResult<org.opencastproject.index.service.impl.index.theme.Theme> answer() throws Throwable {
-                SearchResult<org.opencastproject.index.service.impl.index.theme.Theme> themeSearchResult = EasyMock
+              public SearchResult<Theme> answer() throws Throwable {
+                SearchResult<Theme> themeSearchResult = EasyMock
                         .createMock(SearchResult.class);
                 // Setup theme search results
                 EasyMock.expect(themeSearchResult.getPageSize()).andReturn(1L).anyTimes();

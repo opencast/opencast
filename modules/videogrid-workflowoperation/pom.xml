@@ -69,6 +69,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -89,7 +93,11 @@
           <ignoredUnusedDeclaredDependencies>
             <!-- provide a logger for tests -->
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.glassfish.jaxb:jaxb-runtime</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
+          <ignoredUsedUndeclaredDependencies>
+            <ignoredUsedUndeclaredDependency>org.apache.httpcomponents:httpclient-osgi:jar</ignoredUsedUndeclaredDependency>
+          </ignoredUsedUndeclaredDependencies>
         </configuration>
       </plugin>
       <plugin>
