@@ -3,6 +3,9 @@ import {useTranslation} from "react-i18next";
 import NewEventWizard from "../events/partials/wizards/NewEventWizard";
 import NewSeriesWizard from "../events/partials/wizards/NewSeriesWizard";
 import NewThemeWizard from "../configuration/partials/wizard/NewThemeWizard";
+import NewAclWizard from "../users/partials/wizard/NewAclWizard";
+import NewGroupWizard from "../users/partials/wizard/NewGroupWizard";
+import NewUserWizard from "../users/partials/wizard/NewUserWizard";
 
 
 /**
@@ -18,7 +21,7 @@ const NewResourceModal = ({ handleClose, showModal, resource }) => {
     return (
         // todo: add hotkeys
         showModal && (
-            <section id="add-event-modal" tabIndex="1" className="modal wizard modal-animation">
+            <section tabIndex="1" className="modal wizard modal-animation">
                 <header>
                     <a className="fa fa-times close-modal" onClick={() => close()}/>
                     {resource === 'events' && (
@@ -29,6 +32,15 @@ const NewResourceModal = ({ handleClose, showModal, resource }) => {
                     )}
                     {resource === 'themes' && (
                         <h2>{t('CONFIGURATION.THEMES.DETAILS.NEWCAPTION')}</h2>
+                    )}
+                    {resource === 'acl' && (
+                        <h2>{t('USERS.ACLS.NEW.CAPTION')}</h2>
+                    )}
+                    {resource === 'group' && (
+                        <h2>{t('USERS.GROUPS.NEW.CAPTION')}</h2>
+                    )}
+                    {resource === 'user' && (
+                        <h2>{t('USERS.USERS.DETAILS.NEWCAPTION')}</h2>
                     )}
                 </header>
                 {resource === 'events' && (
@@ -42,6 +54,18 @@ const NewResourceModal = ({ handleClose, showModal, resource }) => {
                 {resource === 'themes' && (
                     // New Theme Wizard
                     <NewThemeWizard close={close}/>
+                )}
+                {resource === 'acl' && (
+                    // New ACL Wizard
+                    <NewAclWizard close={close}/>
+                )}
+                {resource === 'group' && (
+                    // New Group Wizard
+                    <NewGroupWizard close={close}/>
+                )}
+                {resource === 'user' && (
+                    // New User Wizard
+                    <NewUserWizard close={close}/>
                 )}
             </section>
         )

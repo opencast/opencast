@@ -6,15 +6,15 @@ import {DatePicker} from "@material-ui/pickers";
 import {getTimezoneOffset} from "../../../../utils/utils";
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import {Field, FieldArray} from "formik";
-import {sourceMetadata, uploadAssetOptions} from "../../../../configs/wizard/sourceConfig";
 import RenderField from "./RenderField";
-import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/wizard/newEventWizardConfig";
 import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../../../thunks/recordingThunks";
 import {connect} from "react-redux";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {checkForConflicts} from "../../../../thunks/eventThunks";
+import {sourceMetadata} from "../../../../configs/sourceConfig";
+import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/wizardConfig";
 
 
 // Style to bring date picker pop up to front

@@ -3,8 +3,6 @@ import {Formik} from "formik";
 import NewEventSummary from "./NewEventSummary";
 import {getEventMetadata} from "../../../../selectors/eventSelectors";
 import {connect} from "react-redux";
-import {sourceMetadata, uploadAssetOptions} from "../../../../configs/wizard/sourceConfig";
-import {initialFormValuesNewEvents} from "../../../../configs/wizard/newEventWizardConfig";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import {getCurrentLanguageInformation} from "../../../../utils/utils";
@@ -17,6 +15,8 @@ import NewProcessingPage from "./NewProcessingPage";
 import NewSourcePage from "./NewSourcePage";
 import {NewEventSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
+import {sourceMetadata, uploadAssetOptions} from "../../../../configs/sourceConfig";
+import {initialFormValuesNewEvents} from "../../../../configs/wizardConfig";
 
 
 // Get info about the current language and its date locale

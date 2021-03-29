@@ -1,5 +1,5 @@
 import {loadAclsFailure, loadAclsInProgress, loadAclsSuccess} from "../actions/aclActions";
-import {getURLParams} from "../utils/resourceUtils";
+import {getURLParams, prepareAccessPolicyRulesForPost} from "../utils/resourceUtils";
 import axios from "axios";
 import {transformToIdValueArray} from "../utils/utils";
 
@@ -127,5 +127,40 @@ export const fetchAclTemplateById = async (id) => {
         }
     }
     return template;
+
+};
+
+// fetch roles for select dialog in new group and new users wizard
+export const fetchRolesTargetingUsers = async () => {
+
+    let params = {
+        limit: -1,
+        target: 'USER'
+    };
+
+    let data = await axios.get('/admin-ng/acl/roles.json', {params: params});
+
+    return await data.data;
+
+};
+
+
+// post new acl to backend
+export const postNewAcl = values => {
+
+    let acls = prepareAccessPolicyRulesForPost(values.acls);
+
+    let data = new FormData();
+    data.append('name', values.name);
+    data.append('acl', JSON.stringify(acls));
+
+    // todo: notification if error occurs
+    axios.post('/admin-ng/acl', data,
+        {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ).then(response => console.log(response)).catch(response => console.log(response));
 
 };

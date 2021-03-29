@@ -15,6 +15,7 @@ import {loadAclsIntoTable, loadGroupsIntoTable, loadUsersIntoTable} from "../../
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
 import Notifications from "../shared/Notifications";
+import NewResourceModal from "../shared/NewResourceModal";
 
 /**
  * This component renders the table view of users
@@ -24,6 +25,7 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                    loadingAclsIntoTable }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
+    const [displayNewUserModal, setNewUserModal] = useState(false);
 
     const loadUsers = async () => {
         // Fetching users from server
@@ -31,7 +33,6 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
 
         // Load users into table
         loadingUsersIntoTable();
-
 
     }
 
@@ -67,11 +68,15 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
 
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
-    }
+    };
 
-    const placeholder = () => {
-        console.log("To be implemented");
-    }
+    const showNewUserModal = () => {
+        setNewUserModal(true);
+    };
+
+    const hideNewUserModal = () => {
+        setNewUserModal(false);
+    };
 
     const styleNavOpen = {
         marginLeft: '130px',
@@ -87,11 +92,16 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                 {/* Add user button */}
                 <div className="btn-group">
                     {/*todo: implement onClick and with role*/}
-                    <button className="add" onClick={() => placeholder()}>
+                    <button className="add" onClick={() => showNewUserModal()}>
                         <i className="fa fa-plus"/>
                         <span>{t('USERS.ACTIONS.ADD_USER')}</span>
                     </button>
                 </div>
+
+                {/* Display modal for new acl if add acl button is clicked */}
+                <NewResourceModal showModal={displayNewUserModal}
+                                  handleClose={hideNewUserModal}
+                                  resource="user"/>
 
                 {/* Include Burger-button menu*/}
                 <MainNav isOpen={displayNavigation}

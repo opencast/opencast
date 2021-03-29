@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import {Formik} from "formik";
 import {NewThemeSchema} from "../../../shared/wizard/validate";
-import {initialFormValuesNewThemes} from "../../../../configs/wizard/newThemesWizardConfig";
 import GeneralPage from "./GeneralPage";
 import BumperPage from "./BumperPage";
 import TitleSlidePage from "./TitleSlidePage";
@@ -9,6 +8,7 @@ import WatermarkPage from "./WatermarkPage";
 import ThemeSummaryPage from "./ThemeSummaryPage";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
 import {postNewTheme} from "../../../../thunks/themeThunks";
+import {initialFormValuesNewThemes} from "../../../../configs/wizardConfig";
 
 /**
  * This component manages the pages of the new theme wizard and the submission of values

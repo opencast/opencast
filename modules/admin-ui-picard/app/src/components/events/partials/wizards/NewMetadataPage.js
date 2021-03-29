@@ -1,10 +1,9 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import {Field} from "formik";
-import cn from 'classnames';
 import RenderField from "./RenderField";
-import RenderMultiField from "./RenderMultiField";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
+import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 
 /**
  * This component renders the metadata page for new events and series in the wizards.
