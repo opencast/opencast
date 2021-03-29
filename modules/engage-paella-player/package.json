@@ -7,7 +7,7 @@
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
   },
   "devDependencies": {
-    "eslint": "^7.22.0",
+    "eslint": "^7.23.0",
     "eslint-plugin-header": "^3.1.1",
     "express": "^4.17.1",
     "gulp": "^4.0.2",
