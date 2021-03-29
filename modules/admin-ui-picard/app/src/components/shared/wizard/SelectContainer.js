@@ -15,6 +15,7 @@ const SelectContainer = ({ resource, formikField }) => {
 
     // Search field for filter options/items
     const [searchField, setSearchField] = useState('');
+    const [defaultItems, setDefaultItems] = useState([]);
     // arrays an item can be part of depending on its state
     const [items, setItems] = useState([]);
     const [selectedItems, setSelectedItems] = useState(field.value);
@@ -29,20 +30,27 @@ const SelectContainer = ({ resource, formikField }) => {
         // no field value yet --> skip for loop and use all provided items for left
         if (selectedItems.length > 0) {
             for (let i = 0; i < selectedItems.length; i++) {
-                removeDouble(selectedItems[i].name, initialItems);
+                remove(selectedItems[i].name, initialItems);
             }
         }
 
         setItems(initialItems);
+        setDefaultItems(initialItems);
     }, []);
 
 
     const clearSearchField = () => {
         setSearchField('');
+        setItems(defaultItems);
     };
 
-    const handleChangeSearch = e => {
-        setSearchField(e.target.value);
+    const handleChangeSearch = async input => {
+        const filtered = defaultItems.filter(item => {
+            return item.name.toLowerCase().includes(input.toLowerCase());
+        });
+        setSearchField(input);
+        setItems(filtered);
+
     };
 
     const handleChangeAdd = e => {
@@ -78,34 +86,49 @@ const SelectContainer = ({ resource, formikField }) => {
     const handleClickAdd = () => {
         let editableItems = items;
         let editableSelectedItems = selectedItems;
+        let editableDefaultItems = defaultItems;
 
         // move marked items to selected items
         for (let i = 0; i < markedForAddition.length; i++) {
             move(markedForAddition[i], editableItems, editableSelectedItems);
+
+            // remove marked item from items considered for search bar
+            remove(markedForAddition[i], editableDefaultItems);
         }
 
         // update state with current values
         setSelectedItems(editableSelectedItems);
         setItems(editableItems);
         setMarkedForAddition([]);
+        // update items considered for search bar
+        setDefaultItems(editableDefaultItems);
         //update formik field
         helpers.setValue(selectedItems);
+
 
     };
 
     const handleClickRemove = () => {
         let editableItems = items;
         let editableSelectedItems = selectedItems;
+        let editableDefaultItems = defaultItems;
 
         // move marked items from selected items back to items
         for (let i = 0; i < markedForRemoval.length; i++) {
             move(markedForRemoval[i], editableSelectedItems, editableItems);
+
+            // add marked item to items considered for search bar if not already containing
+            if (!editableDefaultItems.some(item => item.name === markedForRemoval[i])) {
+                editableDefaultItems.push({name: markedForRemoval[i]});
+            }
         }
 
         // update state with current values
         setSelectedItems(editableSelectedItems);
         setItems(editableItems);
         setMarkedForRemoval([]);
+        // update items considered for search bar
+        setDefaultItems(editableDefaultItems);
         // update formik field
         helpers.setValue(selectedItems);
 
@@ -123,7 +146,7 @@ const SelectContainer = ({ resource, formikField }) => {
     };
 
     // remove item from array when matching key
-    const removeDouble = (key, compare) => {
+    const remove = (key, compare) => {
         for (let i = 0; i < compare.length; i++) {
             if (compare[i].name === key) {
                 compare.splice(i, 1);
@@ -141,13 +164,13 @@ const SelectContainer = ({ resource, formikField }) => {
                         {/*Search*/}
                         {resource.searchable && (
                             <>
-                                {/* todo: implement search */}
+                                {/* search bar */}
                                 <a className="clear" onClick={() => clearSearchField()}/>
                                 <input type="text"
                                        id="search"
                                        className="search"
                                        placeholder={t('TABLE_FILTERS.PLACEHOLDER')}
-                                       onChange={e => handleChangeSearch(e)}
+                                       onChange={e => handleChangeSearch(e.target.value)}
                                        value={searchField}/>
                             </>
 
