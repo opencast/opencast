@@ -52,8 +52,8 @@ public class EmbeddedSolrServerWrapper extends EmbeddedSolrServer {
    * Shuts down the embedded solr server by forwarding the shutdown command to the {@link CoreContainer}.
    */
   public void shutdown() {
-    if (coreContainer != null)
+    if (coreContainer != null) {
       coreContainer.shutdown();
+    }
   }
-
 }

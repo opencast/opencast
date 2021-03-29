@@ -26,6 +26,18 @@
       </configurations>
     </operation>
 
+    <operation
+     id="tag"
+     exception-handler-workflow="partial-error"
+     description="Tagging media package elements">
+     <configurations>
+       <configuration key="source-flavors">*/prepared</configuration>
+       <configuration key="target-tags">+editor</configuration>
+       <configuration key="copy">false</configuration>
+     </configurations>
+    </operation>
+
+
     <operation id="encode"
       description="Create single-stream video preview"
       if="NOT (${presenter_prepared_video} AND ${presentation_prepared_video})"
@@ -230,7 +242,7 @@
       exception-handler-workflow="partial-error"
       description="Publish to preview publication channel">
       <configurations>
-        <configuration key="download-source-tags">preview</configuration>
+        <configuration key="download-source-tags">preview,editor</configuration>
         <configuration key="channel-id">internal</configuration>
         <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
         <configuration key="check-availability">true</configuration>

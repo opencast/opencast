@@ -7,6 +7,7 @@
   <property name="service.description" value="Themes Database Service"/>
   <service>
     <provide interface="org.opencastproject.themes.ThemesServiceDatabase"/>
+    <provide interface="org.opencastproject.index.rebuild.IndexProducer"/>
   </service>
   <reference name="messageReceiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
              cardinality="1..1" policy="static" bind="setMessageReceiver"/>

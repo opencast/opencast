@@ -21,14 +21,12 @@
 
 package org.opencastproject.userdirectory;
 
-import org.opencastproject.index.IndexProducer;
+import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.group.GroupItem;
-import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.GroupProvider;
 import org.opencastproject.security.api.JaxbGroup;
@@ -81,9 +79,10 @@ import javax.persistence.EntityTransaction;
     "service.description=Provides a group role directory"
   },
   immediate = true,
-  service = { RoleProvider.class, JpaGroupRoleProvider.class }
+  service = { RoleProvider.class, JpaGroupRoleProvider.class, IndexProducer.class }
 )
-public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
+public class JpaGroupRoleProvider extends AbstractIndexProducer
+        implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);
@@ -175,9 +174,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
   public void activate(ComponentContext cc) {
     logger.debug("Activate group role provider");
     this.cc = cc;
-
-    // Set up persistence
-    super.activate();
   }
 
   /**
@@ -620,57 +616,20 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
       SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
         final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
         int total = groups.size();
-        final int responseInterval = (total < 100) ? 1 : (total / 100);
         int current = 1;
-        logger.info(
-                "Re-populating index '{}' with groups of organization {}. There are {} group(s) to add to the index.",
-                indexName, securityService.getOrganization().getId(), total);
+        logIndexRebuildBegin(logger, indexName, total, "groups", organization);
         for (JpaGroup group : groups) {
           messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                   GroupItem.update(JaxbGroup.fromGroup(group)));
-          if (((current % responseInterval) == 0) || (current == total)) {
-            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                  IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Groups, total, current));
-          }
+          logIndexRebuildProgress(logger, indexName, total, current);
           current++;
         }
       });
     }
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Groups));
-    });
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Groups;
   }
-
-  @Override
-  public Service getService() {
-    return Service.Groups;
-  }
-
-  @Override
-  public String getClassName() {
-    return JpaGroupRoleProvider.class.getName();
-  }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return SecurityUtil.getSystemUserName(cc);
-  }
-
 }

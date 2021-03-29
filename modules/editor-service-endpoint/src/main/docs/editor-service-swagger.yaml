@@ -1,0 +1,700 @@
+openapi: 3.0.1
+info:
+  title: Video-Editor
+  description: API for the new Opencast Video Editor
+  version: '1.0'
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /editor/{mediapackageId}/edit.json:
+    get:
+      tags:
+        - edit
+      description: Retrieve Information to edit the video
+      parameters:
+        - in: path
+          name: mediapackageId
+          schema:
+            type: string
+          required: true
+          description: ID of the mediapackage to edit
+      responses:
+        '404':
+          description: Mediapackage not found
+        '200':
+          description: Video edit information
+          headers:
+            Access-Control-Allow-Origin: 
+              schema:
+                type: string
+              example: "*"  
+            Access-Control-Allow-Credentials:
+              schema:
+                type: boolean
+              example: true  
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    description: Title of the video 
+                    type: string
+                    example: "Video title"
+                  date:
+                    description: Creation date 
+                    type: string
+                    example: "2020-10-27T12:27:00Z"
+                  duration:
+                    description: Duration of the video
+                    type: integer
+                    example: 107439
+                  series:
+                    description: Series information
+                    type: object
+                    properties:
+                      id:
+                        description: ID of the series
+                        type: string
+                        example: "myseries"
+                      title:
+                        description: Title of the Series
+                        type: string
+                        example: "Series Title"      
+                  workflows:
+                    description: Possible workflows to execute 
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          description: Name of the workflow
+                          type: string
+                          example: "Publish video"
+                        displayOrder: 
+                          description: Display position 
+                          type: integer
+                          example: 0
+                        id:
+                          description: Id of the workflow
+                          type: string
+                          example: "publish-after-cutting" 
+                  tracks:
+                    description: Tracks to edit
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          description: ID of the track
+                          type: string
+                          example: "e46c799e-e1a3-477c-ab09-356b222baf41"
+                        uri:
+                          description: URI of the track
+                          type: string
+                          example: "http://localhost:8080/static/mh_default_org/internal/b0d3df40-03a5-40c9-9257-32ddd8af2821/9bf8aec2-10f5-4c64-bfde-2752fa3a394d/f3cd3007-29a5-4b73-b149-132bb61ad18a.mp4"
+                        flavor: 
+                           description: "Flavor of the track"
+                           type: object 
+                           properties:
+                              type: 
+                                type: string
+                                example: "presenter"
+                              subtype: 
+                                type: string
+                                example: "standard"
+                        audio_stream:
+                          description: "Information about the audio stream"
+                          type: object
+                          properties:
+                            enabled:
+                              description: "Should the audio stream be enabled in the resulting video"
+                              type: boolean
+                              example: "true"
+                            available:
+                              description: "Is an audio stream available"
+                              type: boolean
+                              example: "true"
+                        video_stream:
+                          description: "Information about the video stream"
+                          type: object
+                          properties:
+                            thumbnail_uri: 
+                              description: "URI of the thumbnail image"
+                              type: string
+                              example: "http://localhost:8080/static/mh_default_org/internal/b0d3df40-03a5-40c9-9257-32ddd8af2821/9bf8aec2-10f5-4c64-bfde-2752fa3a394d/Muppet_2_000s_preview.jpg"
+                            enabled: 
+                              description: "Should the video stream be enabled in the resulting video"
+                              type: boolean
+                              example: "true"
+                            available:
+                              description: "Is a video stream available"
+                              type: boolean
+                              example: "true"
+                            framerate:
+                              description: "Framerate of the video stream"
+                              type: integer
+                              example: 24
+                  segments:
+                    description: "Segments to keep in the video"
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          description: "Start point of the segment in milliseconds"
+                          type: integer
+                          example: 0
+                        end:
+                          description: "End point of the segment in milliseconds"
+                          type: integer
+                          example: 7367
+                        deleted:
+                          description: "The segment is deleted"
+                          type: boolean
+                          example: true
+    options:
+      tags:
+        - edit     
+      responses:
+        '200': 
+          description: success
+          headers:
+            Access-Control-Allow-Origin: 
+              schema:
+                type: string
+              example: "*"  
+            Access-Control-Allow-Credentials:
+              schema:
+                type: boolean
+              example: true  
+      parameters:
+        - in: path
+          name: mediapackageId
+          schema:
+            type: string
+          required: true
+          description: ID of the mediapackage to edit    
+    post:
+      tags:
+        - edit
+      description: Update information about the mediapackage
+      parameters:
+        - in: path
+          name: mediapackageId
+          schema:
+            type: string
+          required: true
+          description: ID of the mediapackage to edit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required: 
+                - tracks
+                - segments
+              type: object
+              properties:
+                tracks:
+                  description: Tracks to edit
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        description: ID of the track
+                        type: string
+                        example: "e46c799e-e1a3-477c-ab09-356b222baf41"
+                      audio_stream:
+                        description: "Information about the audio stream"
+                        type: object
+                        properties:
+                          enabled:
+                            description: "Should the audio stream be enabled in the resulting video"
+                            type: boolean
+                            example: "true"
+                      video_stream:
+                        description: "Information about the video stream"
+                        type: object
+                        properties:
+                          enabled: 
+                            description: "Should the video stream be enabled in the resulting video"
+                            type: boolean
+                            example: "true"
+                segments:
+                  description: "Segments to keep in the video"
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      start:
+                        description: "Start point of the segment in milliseconds"
+                        type: integer
+                        example: 0
+                      end:
+                        description: "End point of the segment in milliseconds"
+                        type: integer
+                        example: 7367            
+                      deleted:
+                        description: "The segment is deleted"
+                        type: boolean
+                        example: true
+                workflows:
+                    description: Possible workflows to execute 
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          description: Id of the workflow
+                          type: string
+                          example: "publish-after-cutting"        
+      responses:
+        '200':
+          description: Success
+          headers:
+            Access-Control-Allow-Origin: 
+              schema:
+                type: string
+              example: "*"  
+            Access-Control-Allow-Credentials:
+              schema:
+                type: boolean
+              example: true  
+        '404':
+          description: Mediapackage not found    
+    servers:
+      - url: 'http://localhost:8080'
+  /editor/{mediapackageId}/metadata.json:
+    
+    get:
+      tags:
+        - metadata
+      description: Retrieve Video metadata
+      responses:
+        '404':
+          description: Mediapackage not found
+        '200':
+          description: Video metadata
+          headers:
+            Access-Control-Allow-Origin: 
+              schema:
+                type: string
+              example: "*"  
+            Access-Control-Allow-Credentials:
+              schema:
+                type: boolean
+              example: true  
+          content:
+            application/json:
+              schema:
+                type: object
+                example: [
+  {
+    "flavor": "dublincore/episode",
+    "title": "EVENTS.EVENTS.DETAILS.CATALOG.EPISODE",
+    "fields": [
+      {
+        "readOnly": false,
+        "id": "title",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+        "type": "text",
+        "value": "Test Stream",
+        "required": true
+      },
+      {
+        "readOnly": false,
+        "id": "subject",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "description",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.DESCRIPTION",
+        "type": "text_long",
+        "value": "",
+        "required": false
+      },
+      {
+        "translatable": true,
+        "readOnly": false,
+        "id": "language",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
+        "collection": {
+          "LANGUAGES.SLOVENIAN": "slv",
+          "LANGUAGES.PORTUGESE": "por",
+          "LANGUAGES.ROMANSH": "roh",
+          "LANGUAGES.ARABIC": "ara",
+          "LANGUAGES.POLISH": "pol",
+          "LANGUAGES.ITALIAN": "ita",
+          "LANGUAGES.CHINESE": "zho",
+          "LANGUAGES.FINNISH": "fin",
+          "LANGUAGES.DANISH": "dan",
+          "LANGUAGES.UKRAINIAN": "ukr",
+          "LANGUAGES.FRENCH": "fra",
+          "LANGUAGES.SPANISH": "spa",
+          "LANGUAGES.GERMAN_CH": "gsw",
+          "LANGUAGES.NORWEGIAN": "nor",
+          "LANGUAGES.RUSSIAN": "rus",
+          "LANGUAGES.JAPANESE": "jpx",
+          "LANGUAGES.DUTCH": "nld",
+          "LANGUAGES.TURKISH": "tur",
+          "LANGUAGES.HINDI": "hin",
+          "LANGUAGES.SWEDISH": "swa",
+          "LANGUAGES.ENGLISH": "eng",
+          "LANGUAGES.GERMAN": "deu"
+        },
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "rightsHolder",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.RIGHTS",
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "translatable": true,
+        "readOnly": false,
+        "id": "license",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
+        "collection": {
+          "{\"label\":\"EVENTS.LICENSE.CC0\", \"order\":8, \"selectable\": true}": "CC0",
+          "{\"label\":\"EVENTS.LICENSE.CCBYND\", \"order\":4, \"selectable\": true}": "CC-BY-ND",
+          "{\"label\":\"EVENTS.LICENSE.CCBYNCND\", \"order\":7, \"selectable\": true}": "CC-BY-NC-ND",
+          "{\"label\":\"EVENTS.LICENSE.CCBYNCSA\", \"order\":6, \"selectable\": true}": "CC-BY-NC-SA",
+          "{\"label\":\"EVENTS.LICENSE.ALLRIGHTS\", \"order\":1, \"selectable\": true}": "ALLRIGHTS",
+          "{\"label\":\"EVENTS.LICENSE.CCBYSA\", \"order\":3, \"selectable\": true}": "CC-BY-SA",
+          "{\"label\":\"EVENTS.LICENSE.CCBYNC\", \"order\":5, \"selectable\": true}": "CC-BY-NC",
+          "{\"label\":\"EVENTS.LICENSE.CCBY\", \"order\":2, \"selectable\": true}": "CC-BY"
+        },
+        "type": "ordered_text",
+        "value": "",
+        "required": false
+      },
+      {
+        "translatable": false,
+        "readOnly": false,
+        "id": "isPartOf",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+        "collection": {
+          "Test Series": "79bf744b-3d51-4230-a440-275d7bc3b199"
+        },
+        "type": "text",
+        "value": "79bf744b-3d51-4230-a440-275d7bc3b199",
+        "required": true
+      },
+      {
+        "readOnly": false,
+        "id": "creator",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS",
+        "type": "mixed_text",
+        "value": [],
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "contributor",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
+        "type": "mixed_text",
+        "value": [],
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "startDate",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+        "type": "date",
+        "value": "2020-11-06T13:00:00.000Z",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "duration",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.DURATION",
+        "type": "text",
+        "value": "00:00:00",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "location",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LOCATION",
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "source",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SOURCE",
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "readOnly": true,
+        "id": "created",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.CREATED",
+        "type": "date",
+        "value": "2020-11-06T13:00:00.000Z",
+        "required": false
+      },
+      {
+        "readOnly": true,
+        "id": "publisher",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLISHER",
+        "type": "text",
+        "value": "Opencast Project Administrator",
+        "required": false
+      },
+      {
+        "readOnly": true,
+        "id": "identifier",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.ID",
+        "type": "text",
+        "value": "905cf4e2-fa73-40ae-8fd0-d13f152b7860",
+        "required": false
+      }
+    ]
+  }
+]
+      parameters:
+        - in: path
+          name: mediapackageId
+          schema:
+            type: string
+          required: true
+          description: ID of the mediapackage 
+    post:
+      tags:
+        - metadata
+      responses:
+        '200':
+          description: success
+          headers:
+            Access-Control-Allow-Origin: 
+              schema:
+                type: string
+              example: "*"  
+            Access-Control-Allow-Credentials:
+              schema:
+                type: boolean
+              example: true  
+          content:
+            application/json:
+              schema:
+                type: object
+                example: [
+  {
+    "flavor": "dublincore/episode",
+    "title": "EVENTS.EVENTS.DETAILS.CATALOG.EPISODE",
+    "fields": [
+      {
+        "readOnly": false,
+        "id": "title",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+        "type": "text",
+        "value": "Test Stream",
+        "required": true
+      },
+      {
+        "readOnly": false,
+        "id": "subject",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "description",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.DESCRIPTION",
+        "type": "text_long",
+        "value": "",
+        "required": false
+      },
+      {
+        "translatable": true,
+        "readOnly": false,
+        "id": "language",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
+        "collection": {
+          "LANGUAGES.SLOVENIAN": "slv",
+          "LANGUAGES.PORTUGESE": "por",
+          "LANGUAGES.ROMANSH": "roh",
+          "LANGUAGES.ARABIC": "ara",
+          "LANGUAGES.POLISH": "pol",
+          "LANGUAGES.ITALIAN": "ita",
+          "LANGUAGES.CHINESE": "zho",
+          "LANGUAGES.FINNISH": "fin",
+          "LANGUAGES.DANISH": "dan",
+          "LANGUAGES.UKRAINIAN": "ukr",
+          "LANGUAGES.FRENCH": "fra",
+          "LANGUAGES.SPANISH": "spa",
+          "LANGUAGES.GERMAN_CH": "gsw",
+          "LANGUAGES.NORWEGIAN": "nor",
+          "LANGUAGES.RUSSIAN": "rus",
+          "LANGUAGES.JAPANESE": "jpx",
+          "LANGUAGES.DUTCH": "nld",
+          "LANGUAGES.TURKISH": "tur",
+          "LANGUAGES.HINDI": "hin",
+          "LANGUAGES.SWEDISH": "swa",
+          "LANGUAGES.ENGLISH": "eng",
+          "LANGUAGES.GERMAN": "deu"
+        },
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "rightsHolder",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.RIGHTS",
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "translatable": true,
+        "readOnly": false,
+        "id": "license",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
+        "collection": {
+          "{\"label\":\"EVENTS.LICENSE.CC0\", \"order\":8, \"selectable\": true}": "CC0",
+          "{\"label\":\"EVENTS.LICENSE.CCBYND\", \"order\":4, \"selectable\": true}": "CC-BY-ND",
+          "{\"label\":\"EVENTS.LICENSE.CCBYNCND\", \"order\":7, \"selectable\": true}": "CC-BY-NC-ND",
+          "{\"label\":\"EVENTS.LICENSE.CCBYNCSA\", \"order\":6, \"selectable\": true}": "CC-BY-NC-SA",
+          "{\"label\":\"EVENTS.LICENSE.ALLRIGHTS\", \"order\":1, \"selectable\": true}": "ALLRIGHTS",
+          "{\"label\":\"EVENTS.LICENSE.CCBYSA\", \"order\":3, \"selectable\": true}": "CC-BY-SA",
+          "{\"label\":\"EVENTS.LICENSE.CCBYNC\", \"order\":5, \"selectable\": true}": "CC-BY-NC",
+          "{\"label\":\"EVENTS.LICENSE.CCBY\", \"order\":2, \"selectable\": true}": "CC-BY"
+        },
+        "type": "ordered_text",
+        "value": "",
+        "required": false
+      },
+      {
+        "translatable": false,
+        "readOnly": false,
+        "id": "isPartOf",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+        "collection": {
+          "Test Series": "79bf744b-3d51-4230-a440-275d7bc3b199"
+        },
+        "type": "text",
+        "value": "79bf744b-3d51-4230-a440-275d7bc3b199",
+        "required": true
+      },
+      {
+        "readOnly": false,
+        "id": "creator",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS",
+        "type": "mixed_text",
+        "value": [],
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "contributor",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
+        "type": "mixed_text",
+        "value": [],
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "startDate",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+        "type": "date",
+        "value": "2020-11-06T13:00:00.000Z",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "duration",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.DURATION",
+        "type": "text",
+        "value": "00:00:00",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "location",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LOCATION",
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "source",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SOURCE",
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "readOnly": true,
+        "id": "created",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.CREATED",
+        "type": "date",
+        "value": "2020-11-06T13:00:00.000Z",
+        "required": false
+      },
+      {
+        "readOnly": true,
+        "id": "publisher",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLISHER",
+        "type": "text",
+        "value": "Opencast Project Administrator",
+        "required": false
+      },
+      {
+        "readOnly": true,
+        "id": "identifier",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.ID",
+        "type": "text",
+        "value": "905cf4e2-fa73-40ae-8fd0-d13f152b7860",
+        "required": false
+      }
+    ]
+  }
+  ]
+        '404':
+          description: Mediapackage not found  
+      parameters:
+        - in: path
+          name: mediapackageId
+          schema:
+            type: string
+          required: true
+          description: ID of the mediapackage
+    options:
+      tags:
+        - metadata     
+      responses:
+        '200': 
+          description: success
+          headers:
+            Access-Control-Allow-Origin: 
+              schema:
+                type: string
+              example: "*"  
+            Access-Control-Allow-Credentials:
+              schema:
+                type: boolean
+              example: true  
+      parameters:
+        - in: path
+          name: mediapackageId
+          description: ID of the mediapackage to edit
+          schema:
+            type: string
+          required: true

@@ -25,15 +25,12 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.index.IndexProducer;
+import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.acl.AclItem;
-import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -117,29 +114,16 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
         AclService aclService = serviceFor(organization);
         List<ManagedAcl> acls = aclService.getAcls();
         int total = aclService.getAcls().size();
-        logger.info("Re-populating index with acls. There are {} acls(s) to add to the index.", total);
+        logIndexRebuildBegin(logger, indexName, total, "ACLs", organization);
         int current = 1;
         for (ManagedAcl acl : acls) {
-          logger.trace("Adding acl '{}' for org '{}'", acl.getName(), organization.getId());
           messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                   AclItem.create(acl.getName()));
-          messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                  IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Acl, total, current));
+          logIndexRebuildProgress(logger, indexName, total, current);
           current++;
         }
       });
     }
-
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Acl));
-    });
-  }
-
-  @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
   }
 
   /**
@@ -150,31 +134,10 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
    */
   public void activate(ComponentContext cc) {
     this.cc = cc;
-    super.activate();
   }
 
   @Override
-  public Service getService() {
-    return Service.Acl;
-  }
-
-  @Override
-  public String getClassName() {
-    return OsgiAclServiceFactory.class.getName();
-  }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return SecurityUtil.getSystemUserName(cc);
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Acl;
   }
 }

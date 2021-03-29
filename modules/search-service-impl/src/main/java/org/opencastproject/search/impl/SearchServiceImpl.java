@@ -44,6 +44,7 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -56,6 +57,10 @@ import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -78,15 +83,20 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A Solr-based {@link SearchService} implementation.
  */
-public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, ManagedService {
+public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, ManagedService,
+    StaticFileAuthorization {
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
@@ -163,11 +173,25 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The optional Mediapackage serializer */
   protected MediaPackageSerializer serializer = null;
 
+  private LoadingCache<Tuple<User, String>, Boolean> cache = null;
+
+  private static final Pattern staticFilePattern = Pattern.compile("^/([^/]+)/engage-player/([^/]+)/.*$");
+
   /**
    * Creates a new instance of the search service.
    */
   public SearchServiceImpl() {
     super(JOB_TYPE);
+
+    cache = CacheBuilder.newBuilder()
+        .maximumSize(2048)
+        .expireAfterWrite(1, TimeUnit.MINUTES)
+        .build(new CacheLoader<Tuple<User, String>, Boolean>() {
+          @Override
+          public Boolean load(Tuple<User, String> key) {
+            return loadUrlAccess(key.getB());
+          }
+        });
   }
 
   /**
@@ -336,7 +360,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           UnauthorizedException, ServiceRegistryException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Add.toString(),
-              Arrays.asList(MediaPackageParser.getAsXml(mediaPackage)), addJobLoad);
+          Collections.singletonList(MediaPackageParser.getAsXml(mediaPackage)), addJobLoad);
     } catch (ServiceRegistryException e) {
       throw new SearchException(e);
     }
@@ -349,28 +373,32 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    *          the media package
    * @throws SearchException
    *           if the media package cannot be added to the search index
-   * @throws MediaPackageException
-   *           if the mediapckage is invalid
    * @throws IllegalArgumentException
    *           if the mediapackage is <code>null</code>
    * @throws UnauthorizedException
    *           if the user does not have the rights to add the mediapackage
    */
-  public void addSynchronously(MediaPackage mediaPackage) throws SearchException, MediaPackageException,
-          IllegalArgumentException, UnauthorizedException {
+  public void addSynchronously(MediaPackage mediaPackage)
+      throws SearchException, IllegalArgumentException, UnauthorizedException, NotFoundException,
+      SearchServiceDatabaseException {
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Unable to add a null mediapackage");
     }
-    logger.debug("Attempting to add mediapackage {} to search index", mediaPackage.getIdentifier());
+    final String mediaPackageId = mediaPackage.getIdentifier().toString();
+    logger.debug("Attempting to add media package {} to search index", mediaPackageId);
     AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
+
+    AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId).stream()
+        .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
+    logger.debug("Updating series with merged access control list: {}", seriesAcl);
 
     Date now = new Date();
 
     try {
-      if (indexManager.add(mediaPackage, acl, now)) {
-        logger.info("Added mediapackage `{}` to the search index, using ACL `{}`", mediaPackage, acl);
+      if (indexManager.add(mediaPackage, acl, seriesAcl, now)) {
+        logger.info("Added media package `{}` to the search index, using ACL `{}`", mediaPackageId, acl);
       } else {
-        logger.warn("Failed to add mediapackage {} to the search index", mediaPackage.getIdentifier());
+        logger.warn("Failed to add media package {} to the search index", mediaPackageId);
       }
     } catch (SolrServerException e) {
       throw new SearchException(e);
@@ -379,8 +407,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     try {
       persistence.storeMediaPackage(mediaPackage, acl, now);
     } catch (SearchServiceDatabaseException e) {
-      logger.error("Could not store media package to search database {}: {}", mediaPackage.getIdentifier(), e);
-      throw new SearchException(e);
+      throw new SearchException(
+          String.format("Could not store media package to search database %s", mediaPackageId), e);
     }
   }
 
@@ -405,23 +433,18 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @return <code>true</code> if the mediapackage was deleted
    * @throws SearchException
    *           if deletion failed
-   * @throws UnauthorizedException
-   *           if the user did not have access to the media package
-   * @throws NotFoundException
-   *           if the mediapackage did not exist
    */
-  public boolean deleteSynchronously(String mediaPackageId) throws SearchException, UnauthorizedException,
-          NotFoundException {
+  public boolean deleteSynchronously(final String mediaPackageId) throws SearchException {
     SearchResult result;
     try {
       result = solrRequester.getForWrite(new SearchQuery().withId(mediaPackageId));
       if (result.getItems().length == 0) {
-        logger.warn(
-                "Can not delete mediapackage {}, which is not available for the current user to delete from the search index.",
-                mediaPackageId);
+        logger.warn("Can not delete mediapackage {}, which is not available for the current user to delete from the "
+                    + "search index.", mediaPackageId);
         return false;
       }
-      logger.info("Removing mediapackage {} from search index", mediaPackageId);
+      final String seriesId = result.getItems()[0].getDcIsPartOf();
+      logger.info("Removing media package {} from search index", mediaPackageId);
 
       Date now = new Date();
       try {
@@ -429,15 +452,31 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         logger.info("Removed mediapackage {} from search persistence", mediaPackageId);
       } catch (NotFoundException e) {
         // even if mp not found in persistence, it might still exist in search index.
-        logger.info("Could not find mediapackage with id {} in persistence, but will try remove it from index, anyway.",
+        logger.info("Could not find mediapackage with id {} in persistence, but will try remove it from index anyway.",
                 mediaPackageId);
       } catch (SearchServiceDatabaseException e) {
-        logger.error("Could not delete media package with id {} from persistence storage", mediaPackageId);
-        throw new SearchException(e);
+        throw new SearchException(String.format("Could not delete mediapackage with id %s from persistence storage",
+            mediaPackageId), e);
       }
 
-      return indexManager.delete(mediaPackageId, now);
-    } catch (SolrServerException e) {
+      final boolean success = indexManager.delete(mediaPackageId, now);
+
+      // Update series
+      if (seriesId != null) {
+        if (persistence.getMediaPackages(seriesId).size() > 0) {
+          // Update series acl if there are still episodes in the series
+          final AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId).stream()
+              .reduce(new AccessControlList(), AccessControlList::mergeActions);
+          indexManager.addSeries(seriesId, seriesAcl);
+
+        } else {
+          // Remove series if there are no episodes in the series any longer
+          indexManager.delete(seriesId, now);
+        }
+      }
+
+      return success;
+    } catch (SolrServerException | SearchServiceDatabaseException e) {
       logger.info("Could not delete media package with id {} from search index", mediaPackageId);
       throw new SearchException(e);
     }
@@ -521,11 +560,11 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
       while (mediaPackages.hasNext()) {
         current++;
         try {
-          Tuple<MediaPackage, String> mediaPackage = mediaPackages.next();
+          final Tuple<MediaPackage, String> episode = mediaPackages.next();
+          final MediaPackage mediaPackage = episode.getA();
+          final String mediaPackageId = mediaPackage.getIdentifier().toString();
+          final Organization organization = organizationDirectory.getOrganization(episode.getB());
 
-          String mediaPackageId = mediaPackage.getA().getIdentifier().toString();
-
-          Organization organization = organizationDirectory.getOrganization(mediaPackage.getB());
           securityService.setOrganization(organization);
           securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
 
@@ -533,9 +572,14 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           Date modificationDate = persistence.getModificationDate(mediaPackageId);
           Date deletionDate = persistence.getDeletionDate(mediaPackageId);
 
-          indexManager.add(mediaPackage.getA(), acl, deletionDate, modificationDate);
+
+          AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId).stream()
+              .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
+          logger.debug("Updating series with merged access control list: {}", seriesAcl);
+
+          indexManager.add(episode.getA(), acl, seriesAcl, deletionDate, modificationDate);
         } catch (Exception e) {
-          logger.error("Unable to index search instances:", e);
+          logger.error("Unable to index search instances", e);
           if (retryToPopulateIndex(systemUserName)) {
             logger.warn("Trying to re-index search index later. Aborting for now.");
             return;
@@ -742,5 +786,49 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     addJobLoad = LoadUtil.getConfiguredLoadValue(properties, ADD_JOB_LOAD_KEY, DEFAULT_ADD_JOB_LOAD, serviceRegistry);
     deleteJobLoad = LoadUtil.getConfiguredLoadValue(properties, DELETE_JOB_LOAD_KEY, DEFAULT_DELETE_JOB_LOAD, serviceRegistry);
+  }
+
+  @Override
+  public List<Pattern> getProtectedUrlPattern() {
+    return Collections.singletonList(staticFilePattern);
+  }
+
+  private boolean loadUrlAccess(final String mediaPackageId) {
+    logger.debug("Check if user `{}` has access to media package `{}`", securityService.getUser(), mediaPackageId);
+    final SearchQuery query = new SearchQuery()
+        .withId(mediaPackageId)
+        .includeEpisodes(true)
+        .includeSeries(false);
+    return getByQuery(query).size() > 0;
+  }
+
+  @Override
+  public boolean verifyUrlAccess(final String path) {
+    // Always allow access for admin
+    final User user = securityService.getUser();
+    if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
+      logger.debug("Allow access for admin `{}`", user);
+      return true;
+    }
+
+    // Check pattern
+    final Matcher m = staticFilePattern.matcher(path);
+    if (!m.matches()) {
+      logger.debug("Path does not match pattern. Preventing access.");
+      return false;
+    }
+
+    // Check organization
+    final String organizationId = m.group(1);
+    if (!securityService.getOrganization().getId().equals(organizationId)) {
+      logger.debug("The user's organization does not match. Preventing access.");
+      return false;
+    }
+
+    // Check search index/cache
+    final String mediaPackageId = m.group(2);
+    final boolean access = cache.getUnchecked(Tuple.tuple(user, mediaPackageId));
+    logger.debug("Check if user `{}` has access to media package `{}` using cache: {}", user, mediaPackageId, access);
+    return access;
   }
 }

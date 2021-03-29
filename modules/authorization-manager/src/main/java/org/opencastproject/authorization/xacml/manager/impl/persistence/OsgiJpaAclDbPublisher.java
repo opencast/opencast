@@ -44,7 +44,8 @@ public class OsgiJpaAclDbPublisher extends SimpleServicePublisher {
     this.emf = emf;
   }
 
-  @Override public ServiceReg registerService(Dictionary properties, ComponentContext cc) throws ConfigurationException {
+  @Override public ServiceReg registerService(Dictionary properties, ComponentContext cc)
+          throws ConfigurationException {
     PersistenceEnv penv = persistenceEnvironment(emf);
     final JpaAclDb aclDb = new JpaAclDb(penv);
     return ServiceReg.reg(registerService(cc, aclDb, AclDb.class, "JPA based ACL Provider"), close(penv));

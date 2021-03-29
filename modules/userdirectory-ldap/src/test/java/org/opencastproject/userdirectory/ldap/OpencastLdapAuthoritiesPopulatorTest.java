@@ -102,8 +102,13 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   private static final String[] PREFIX_TESTS = new String[] { null, "", DEFAULT_PREFIX };
   private static final boolean[] UPPERCASE_TESTS = new boolean[] { true, false };
   private static final String[][] EXTRA_ROLES_TESTS = new String[][] { null, new String[] {}, DEFAULT_EXTRA_ROLES };
-  private static final String[][] EXCLUDE_PREFIXES_TESTS = new String[][] { null, new String[] {},
-          new String[] { "extra" }, new String[] { "ldap" }, DEFAULT_EXCLUDE_PREFIXES };
+  private static final String[][] EXCLUDE_PREFIXES_TESTS = new String[][] {
+      null,
+      new String[] {},
+      new String[] { "extra" },
+      new String[] { "ldap" },
+      DEFAULT_EXCLUDE_PREFIXES
+  };
   private final JpaGroupRoleProvider[] groupRoleProviderTests = new JpaGroupRoleProvider[] { null, groupRoleProvider };
 
   @Before

@@ -27,12 +27,15 @@ import static org.easymock.EasyMock.capture;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -42,6 +45,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +54,8 @@ public class VideoGridServiceImplTest {
 
   private VideoGridServiceImpl videoGridService;
   private ServiceRegistry serviceRegistry;
+
+  private Track sourceVideoTrack;
 
   @Rule
   public TemporaryFolder testFolder = new TemporaryFolder();
@@ -64,6 +70,9 @@ public class VideoGridServiceImplTest {
             anyString(), anyObject())).andReturn(uri).anyTimes();
     final String directory = testFolder.newFolder().getAbsolutePath();
     EasyMock.expect(workspace.rootDirectory()).andReturn(directory).anyTimes();
+
+    sourceVideoTrack = (Track) MediaPackageElementParser.getFromXml(IOUtils.toString(
+            VideoGridServiceImplTest.class.getResourceAsStream("/composer_test_source_track_video.xml"), Charset.defaultCharset()));
 
     serviceRegistry = EasyMock.createMock(ServiceRegistry.class);
     final Capture<String> type = EasyMock.newCapture();
@@ -96,7 +105,9 @@ public class VideoGridServiceImplTest {
     commands.add(command);
     commands.add(command);
 
-    Job job = videoGridService.createPartialTracks(commands);
+    Job job = videoGridService.createPartialTracks(
+            commands,
+            sourceVideoTrack);
     Gson gson = new Gson();
     List<URI> uris = gson.fromJson(job.getPayload(), new TypeToken<List<URI>>() { }.getType());
     Assert.assertEquals(2, uris.size());

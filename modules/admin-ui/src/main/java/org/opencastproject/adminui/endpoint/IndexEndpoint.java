@@ -22,6 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.util.RestUtil.R;
@@ -34,8 +35,6 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -70,11 +69,17 @@ public class IndexEndpoint {
   /** The security service */
   protected SecurityService securityService = null;
 
+  private IndexRebuildService indexRebuildService = null;
+
   /**
    * OSGI DI
    */
   public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
     this.adminUISearchIndex = adminUISearchIndex;
+  }
+
+  public void setIndexRebuildService(IndexRebuildService indexRebuildService) {
+    this.indexRebuildService = indexRebuildService;
   }
 
   /**
@@ -126,13 +131,7 @@ public class IndexEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
-        adminUISearchIndex.recreateIndex(service);
-      } catch (InterruptedException e) {
-        logger.error("Repopulating the index was interrupted", e);
-      } catch (CancellationException e) {
-        logger.trace("Listening for index messages has been cancelled.");
-      } catch (ExecutionException e) {
-        logger.error("Repopulating the index failed to execute", e);
+        indexRebuildService.rebuildIndex(adminUISearchIndex, service);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -151,13 +150,7 @@ public class IndexEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index");
-        adminUISearchIndex.recreateIndex();
-      } catch (InterruptedException e) {
-        logger.error("Repopulating the index was interrupted", e);
-      } catch (CancellationException e) {
-        logger.trace("Listening for index messages has been cancelled.");
-      } catch (ExecutionException e) {
-        logger.error("Repopulating the index failed to execute", e);
+        indexRebuildService.rebuildIndex(adminUISearchIndex);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }

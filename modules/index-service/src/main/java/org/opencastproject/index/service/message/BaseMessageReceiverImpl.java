@@ -21,14 +21,11 @@
 
 package org.opencastproject.index.service.message;
 
-import org.opencastproject.index.IndexProducer;
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Status;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Effect2;
@@ -51,7 +48,6 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
   private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 
   private SecurityService securityService;
-  private MessageSender messageSender;
   private MessageReceiver messageReceiver;
   private MessageWatcher messageWatcher;
   private AbstractSearchIndex index;
@@ -129,14 +125,7 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
           }
           securityService.setOrganization(baseMessage.getOrganization());
           securityService.setUser(baseMessage.getUser());
-          if (baseMessage.getObject() instanceof IndexRecreateObject) {
-            IndexRecreateObject obj = (IndexRecreateObject) baseMessage.getObject();
-            if (Status.End.equals(obj.getStatus()))
-              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                      IndexRecreateObject.end(obj.getIndexName(), obj.getService()));
-          } else {
-            lockService.synchronize(baseMessage.getId().get(), execute.curry(baseMessage.getObject()).toFn());
-          }
+          lockService.synchronize(baseMessage.getId().get(), execute.curry(baseMessage.getObject()).toFn());
         } catch (InterruptedException e) {
           logger.error("Problem while getting {} message events", clazzName, e);
         } catch (ExecutionException e) {
@@ -164,10 +153,6 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
 
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
   }
 
   public void setMessageReceiver(MessageReceiver messageReceiver) {

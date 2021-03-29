@@ -21,8 +21,6 @@
 
 package org.opencastproject.videoeditor.ffmpeg;
 
-import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.StreamHelper;
 import org.opencastproject.videoeditor.impl.VideoClip;
 
 import org.junit.Before;
@@ -49,38 +47,20 @@ public class FFmpegTest {
   protected String outputFilePath;
   protected static boolean ffmpegInstalled = true;
 
-  public FFmpegTest() {
-    try {
-      testForFFmpeg();
-      inputFilePath = new File(getClass().getResource("/testresources/testvideo_320x180.mp4").toURI()).getAbsolutePath();
-      outputFilePath = new File("target/testoutput/mux.mp4").getAbsolutePath();
-    } catch (URISyntaxException ex) {
-      logger.error(ex.getMessage());
-    }
+  public FFmpegTest() throws URISyntaxException {
+    inputFilePath = new File(getClass().getResource("/testresources/testvideo_320x180.mp4").toURI()).getAbsolutePath();
+    outputFilePath = new File("target/testoutput/mux.mp4").getAbsolutePath();
   }
 
   @BeforeClass
   public static void testForFFmpeg() {
-    StreamHelper stdout = null;
-    StreamHelper stderr = null;
-    Process p = null;
-    // Test that fmpeg exists
     try {
-      p = new ProcessBuilder(FFMPEG_BINARY, "-version").start();
-      stdout = new StreamHelper(p.getInputStream());
-      stderr = new StreamHelper(p.getErrorStream());
-      int status = p.waitFor();
-      stdout.stopReading();
-      stderr.stopReading();
-      if (status != 0)
+      Process p = new ProcessBuilder(FFMPEG_BINARY, "-version").start();
+      if (p.waitFor() != 0)
         throw new IllegalStateException();
     } catch (Throwable t) {
-      logger.warn("Skipping ffmpeg video editor service tests due to unsatisifed or erroneus ffmpeg installation");
+      logger.warn("Skipping composer tests due to missing FFmpeg");
       ffmpegInstalled = false;
-    } finally {
-      IoSupport.closeQuietly(stdout);
-      IoSupport.closeQuietly(stderr);
-      IoSupport.closeQuietly(p);
     }
   }
 

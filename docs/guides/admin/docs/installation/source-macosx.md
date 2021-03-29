@@ -1,10 +1,13 @@
-Install from Source (Mac OS X)
+Install from Source (macOS)
 ====================================
 
-These instructions outline how to install an all in one Opencast system on the Mac OS X operating system.
+These instructions outline how to install an all in one Opencast system on the macOS operating system.
 Tested on OS X 10.14.1 Mojave.
 
-> *The installation on Mac OS X is not officially supported. Use this at your own risk.*
+<div class=warn>
+The installation on macOS is not officially supported.
+Use this at your own risk.
+</div>
 
 
 Preparation
@@ -45,7 +48,7 @@ Please make sure to install the following dependencies.
 Required:
 
     Xcode
-    jdk 8
+    jdk 11
     ffmpeg >= 3.2.4
     maven >= 3.1
     python >= 2.6
@@ -56,6 +59,7 @@ Required:
 Required (not necessarily on the same machine):
 
     ActiveMQ >= 5.10 (older versions untested)
+    Elasticsearch 7.9.x
 
 Required for text extraction:
 
@@ -109,7 +113,7 @@ building opencast (depending on the folder permissions, you might need to start 
 
     mvn clean install -Pdev
 
-> *Please be patient, as building Opencast for the first time will take quite long.*
+Please be patient, as building Opencast for the first time will take quite long.
 
 Configure
 ---------
@@ -139,5 +143,5 @@ the start-opencast script:
     cd build/opencast-dist-allinone-[…]
     ./bin/start-opencast
 
-As soon as Opencast is completely started, browse to [http://localhost:8080](http://localhost:8080) to get to the
+As soon as Opencast is completely started, browse to [localhost:8080](http://localhost:8080) to get to the
 administration interface.

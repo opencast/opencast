@@ -51,7 +51,8 @@ public interface DistributionService {
    * @throws MediaPackageException
    *           if there was a problem with the mediapackage element
    */
-  Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException;
+  Job distribute(String channelId, MediaPackage mediapackage, String elementId)
+          throws DistributionException, MediaPackageException;
 
   /**
    * Retract a media package element from the distribution channel.

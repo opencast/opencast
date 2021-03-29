@@ -112,8 +112,9 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
 
   @Override
   public float getCacheHitRatio() {
-    if (loadUserRequests.get() == 0)
+    if (loadUserRequests.get() == 0) {
       return 0;
+    }
     return (float) (loadUserRequests.get() - brightspaceWebServiceRequests.get()) / loadUserRequests.get();
   }
 

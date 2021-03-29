@@ -284,14 +284,18 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
       response = client.execute(delete);
       int statusCode = response.getStatusLine().getStatusCode();
       if (statusCode == HttpStatus.SC_NO_CONTENT || statusCode == HttpStatus.SC_OK) {
-        logger.info("Sucessfully deleted external URI {}", delete.getURI());
+        logger.info("Successfully deleted external URI {}", delete.getURI());
       } else if (statusCode == HttpStatus.SC_NOT_FOUND) {
         logger.info("External URI {} has already been deleted", delete.getURI());
       } else {
         logger.info("Unable to delete external URI {}, status code '{}' returned", delete.getURI(), statusCode);
       }
     } finally {
-      client.close(response);
+      try {
+        client.close(response);
+      } catch (IOException e) {
+        // ignore
+      }
     }
   }
 }

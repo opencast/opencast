@@ -45,7 +45,9 @@ import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.index.IndexProducer;
+import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildException;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -57,9 +59,6 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -84,7 +83,6 @@ import org.opencastproject.scheduler.impl.persistence.ExtendedEventDto;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -340,16 +338,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @throws Exception
    */
   public void activate(ComponentContext cc) throws Exception {
-    super.activate();
     this.componentContext = cc;
     systemUserName = SecurityUtil.getSystemUserName(cc);
     logger.info("Activating Scheduler Service");
-  }
-
-  /** Callback from OSGi on service deactivation. */
-  @Override
-  public void deactivate() {
-    super.deactivate();
   }
 
   @Override
@@ -1538,15 +1529,18 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public void repopulate(final String indexName) throws SchedulerServiceDatabaseException {
-    notEmpty(indexName, "indexName");
-
+  public void repopulate(final String indexName) throws IndexRebuildException {
     final String destinationId = SchedulerItem.SCHEDULER_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
             + indexName.substring(1);
     final int[] current = {0};
-    final int total = persistence.countEvents();
-    logger.info("Re-populating {} index with {} scheduled events", indexName, total);
-    final int responseInterval = (total < 100) ? 1 : (total / 100);
+    final int total;
+    try {
+       total = persistence.countEvents();
+    } catch (SchedulerServiceDatabaseException e) {
+      logIndexRebuildError(logger, indexName, e);
+      throw new IndexRebuildException(indexName, getService(), e);
+    }
+    logIndexRebuildBegin(logger, indexName, total, "scheduled events");
 
     for (Organization organization: orgDirectoryService.getOrganizations()) {
       final User user = SecurityUtil.createSystemUser(systemUserName, organization);
@@ -1555,7 +1549,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         try {
           events = persistence.getEvents();
         } catch (SchedulerServiceDatabaseException e) {
-          logger.error("Failed to get scheduled events for organization {}", organization, e);
+          logIndexRebuildError(logger, indexName, e, organization);
           return;
         }
 
@@ -1586,52 +1580,25 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             }
             final Serializable message = new SchedulerItemList(event.getMediaPackageId(), schedulerItems);
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue, message);
-            if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
-              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                      IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Scheduler, total, current[0]));
-            }
+            logIndexRebuildProgress(logger, indexName, total, current[0]);
           } catch (Exception e) {
-            logger.error("Failed to send scheduler update for event {}. Skipping.", event.getMediaPackageId());
+            logSkippingElement(logger, "scheduled event", event.getMediaPackageId(), e);
           }
         }
       });
     }
-
-    final Serializable message = IndexRecreateObject.end(indexName, Service.Scheduler);
-    final Organization organization = new DefaultOrganization();
-    final User user = SecurityUtil.createSystemUser(componentContext, organization);
-    SecurityUtil.runAs(securityService, organization, user,
-            () -> messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue, message));
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Scheduler;
   }
 
-  @Override
-  public Service getService() {
-    return Service.Scheduler;
-  }
-
-  @Override
-  public String getClassName() {
-    return SchedulerServiceImpl.class.getName();
-  }
-
-  @Override
   public MessageSender getMessageSender() {
     return messageSender;
   }
 
-  @Override
   public SecurityService getSecurityService() {
     return securityService;
   }
-
-  @Override
-  public String getSystemUserName() {
-    return systemUserName;
-  }
-
 }

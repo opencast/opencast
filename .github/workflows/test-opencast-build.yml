@@ -1,0 +1,118 @@
+name: Test Opencast
+
+on:
+  pull_request:
+    paths:
+      - 'pom.xml'
+      - 'modules/**'
+      - 'docs/checkstyle/**'
+      - 'docs/log4j/**'
+      - 'assemblies/**'
+  push:
+    paths:
+      - 'pom.xml'
+      - 'modules/**'
+      - 'docs/checkstyle/**'
+      - 'docs/log4j/**'
+      - 'assemblies/**'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        java:
+          - 8
+          - 11
+    name: build (java ${{ matrix.java }})
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: cache local maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
+      - name: install dependencies
+        run: |
+          sudo apt update -q
+          sudo apt install -y -q \
+            bzip2 \
+            ffmpeg \
+            gzip \
+            hunspell \
+            hunspell-de-de \
+            procps \
+            s3cmd \
+            sox \
+            tar \
+            tesseract-ocr \
+            tesseract-ocr-deu \
+            unzip
+
+      - name: prepare build
+        run: |
+          sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
+
+      - name: build opencast
+        run: |
+          mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            clean install -Pnone
+
+      - name: build assemblies
+        working-directory: assemblies
+        if: >
+          github.event_name == 'push'
+          && matrix.java == 11
+          && github.repository == 'opencast/opencast'
+          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+        run: |
+          mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            clean install
+
+      - name: save version
+        working-directory: build
+        if: >
+          github.event_name == 'push'
+          && matrix.java == 11
+          && github.repository == 'opencast/opencast'
+          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+        run: |
+          git log -n1 > "$(echo "${GITHUB_REF#refs/heads/}" | sed 's#/#_#').commit"
+
+      - name: configure s3cmd
+        if: >
+          github.event_name == 'push'
+          && matrix.java == 11
+          && github.repository == 'opencast/opencast'
+          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+        env:
+          S3_HOST: ${{ secrets.S3_HOST }}
+          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+        run: |
+          echo "host_base = ${S3_HOST}" > "$HOME/.s3cfg"
+          echo "host_bucket = ${S3_HOST}" >> "$HOME/.s3cfg"
+          echo "bucket_location = us-east-1" >> "$HOME/.s3cfg"
+          echo "use_https = True" >> "$HOME/.s3cfg"
+          echo "access_key = ${S3_ACCESS_KEY}" >> "$HOME/.s3cfg"
+          echo "secret_key = ${S3_SECRET_KEY}" >> "$HOME/.s3cfg"
+          echo "signature_v2 = False" >> "$HOME/.s3cfg"
+
+      - name: upload assets
+        working-directory: build
+        if: >
+          github.event_name == 'push'
+          && matrix.java == 11
+          && github.repository == 'opencast/opencast'
+          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+        run: |
+          s3cmd put -P *.commit opencast-dist-allinone*tar.gz s3://opencast-daily/
