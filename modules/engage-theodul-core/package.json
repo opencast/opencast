@@ -5,7 +5,7 @@
     "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js --rule '{\"no-unused-vars\": \"off\"}' src/main/resources/ui/js/engage --resolve-plugins-relative-to ."
   },
   "devDependencies": {
-    "eslint": "^7.22.0",
+    "eslint": "^7.23.0",
     "eslint-plugin-header": "^3.1.1"
   }
 }
