@@ -16,6 +16,7 @@ import axios from "axios";
 import {getTimezoneOffset} from "../utils/utils";
 import {sourceMetadata, uploadAssetOptions} from "../configs/sourceConfig";
 import {WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizardConfig";
+import {addNotification} from "./notificationThunks";
 
 // fetch events from server
 export const fetchEvents = () => async (dispatch, getState) => {
@@ -232,5 +233,25 @@ export const postNewEvent = async (values, metadataInfo) => {
         }
     ).then(response => console.log(response)).catch(response => console.log(response));
 
-}
+};
 
+// delete event with provided id
+export const deleteEvent = id => async dispatch => {
+    // API call for deleting an event
+    axios.delete(`/admin-ng/event/${id}`).then(res => {
+        // add success notification depending on status code
+        if (res.status === 200) {
+            dispatch(addNotification('success', 'EVENT_DELETED'));
+        } else {
+            dispatch(addNotification('success', 'EVENT_WILL_BE_DELETED'));
+        }
+    }).catch(res => {
+        // add error notification depending on status code
+        if (res.status === 401) {
+            dispatch(addNotification('error', 'EVENTS_NOT_DELETED_NOT_AUTHORIZED'));
+        } else {
+            dispatch(addNotification('error', 'EVENTS_NOT_DELETED'));
+        }
+    });
+
+};

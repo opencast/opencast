@@ -1,13 +1,27 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from "react-i18next";
+import ConfirmModal from "../../shared/ConfirmModal";
+import {deleteEvent} from "../../../thunks/eventThunks";
+import {connect} from "react-redux";
 
 
 
 /**
  * This component renders the action cells of events in the table view
  */
-const EventActionCell = ({ row })  => {
+const EventActionCell = ({ row, deleteEvent })  => {
     const { t } = useTranslation();
+
+    const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
+
+    const hideDeleteConfirmation = () => {
+        setDeleteConfirmation(false);
+    };
+
+    const deletingEvent = id => {
+        deleteEvent(id);
+    };
+
     return (
         <>
             {/* Open event details */}
@@ -28,12 +42,20 @@ const EventActionCell = ({ row })  => {
             )}
 
             {/* Delete an event */}
-            {/*TODO: When event action for deleting an event is implemented, remove placeholder,
-            needs to be checked if event is published */}
+            {/*TODO: needs to be checked if event is published */}
             {/*TODO: with-Role ROLE_UI_EVENTS_DELETE*/}
-            <a onClick={() => onClickPlaceholder()}
+            <a onClick={() => setDeleteConfirmation(true)}
                className="remove"
                title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DELETE')}/>
+
+            {/* Confirmation for deleting an event*/}
+            {displayDeleteConfirmation && (
+                <ConfirmModal close={hideDeleteConfirmation}
+                              resourceName={row.title}
+                              resourceType="EVENT"
+                              resourceId={row.id}
+                              deleteMethod={deletingEvent}/>
+            )}
 
             {/* If the event has an preview then the editor can be opened and status if it needs to be cut is shown */}
             {!!row.has_preview && (
@@ -89,12 +111,16 @@ const EventActionCell = ({ row })  => {
               className="fa fa-link"/>
         </>
     );
-};
+}
 
 //todo: remove if not needed anymore
 const onClickPlaceholder = () => {
     console.log("In the Future here opens an other component, which is not implemented yet");
 }
 
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    deleteEvent: (id) => dispatch(deleteEvent(id))
+});
 
-export default EventActionCell;
+export default connect(null, mapDispatchToProps)(EventActionCell);

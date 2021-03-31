@@ -11,6 +11,7 @@ import {
 } from "../utils/resourceUtils";
 import {transformToObjectArray} from "../utils/utils";
 import axios from "axios";
+import {addNotification} from "./notificationThunks";
 
 
 // fetch series from server
@@ -105,4 +106,18 @@ export const postNewSeries = async (values, metadataInfo) => {
         }
     ).then(response => console.log(response)).catch(response => console.log(response));
 
-}
+};
+
+// delete series with provided id
+export const deleteSeries = id => async dispatch => {
+    // API call for deleting a series
+    axios.delete(`/admin-ng/series/${id}`).then(res => {
+        console.log(res);
+        // add success notification
+        dispatch(addNotification('success', 'SERIES_DELETED'));
+    }).catch(res => {
+        console.log(res);
+        // add error notification
+        dispatch(addNotification('error', 'SERIES_NOT_DELETED'));
+    });
+};
