@@ -81,8 +81,9 @@ public class ListProviderUtilTest {
     TreeSet<Object> sortedValues = new TreeSet<>((s1, s2) -> {
       if (s1 instanceof Comparable && s2 instanceof Comparable) {
         return ((Comparable) s1).compareTo(s2);
-      } else
+      } else {
         return -1;
+      }
     });
     sortedValues.addAll(testMap.values());
 

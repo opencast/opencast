@@ -148,7 +148,8 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
    * @return the workflow operation that failed
    */
   private WorkflowOperationInstance findFailedOperation(WorkflowInstance workflow) {
-    ArrayList<WorkflowOperationInstance> operations = new ArrayList<WorkflowOperationInstance>(workflow.getOperations());
+    ArrayList<WorkflowOperationInstance> operations
+        = new ArrayList<WorkflowOperationInstance>(workflow.getOperations());
     // Current operation is the email operation
     WorkflowOperationInstance emailOp = workflow.getCurrentOperation();
     // Look for the last operation that is in failed state and has failOnError true

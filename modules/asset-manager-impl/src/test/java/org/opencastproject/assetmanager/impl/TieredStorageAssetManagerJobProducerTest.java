@@ -41,7 +41,8 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 
 @RunWith(JUnitParamsRunner.class)
-public class TieredStorageAssetManagerJobProducerTest extends AbstractTieredStorageAssetManagerTest<AbstractAssetManagerWithTieredStorage> {
+public class TieredStorageAssetManagerJobProducerTest
+    extends AbstractTieredStorageAssetManagerTest<AbstractAssetManagerWithTieredStorage> {
 
   private TieredStorageAssetManagerJobProducer tsamjp = null;
   private ServiceRegistry sr = null;
@@ -77,7 +78,8 @@ public class TieredStorageAssetManagerJobProducerTest extends AbstractTieredStor
   @Test
   public void testInternalById() throws ServiceRegistryException {
     String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Opt.<String>none());
-    //Because this is the internal check, this is an id-and-version check since it's the terminal phase (ie, post process())
+    // Because this is the internal check, this is an id-and-version check since
+    // it's the terminal phase (ie, post process())
     createIdAndVersionExpectation(mp[1], 0, 2);
     EasyMock.replay(sr);
 
@@ -243,7 +245,11 @@ public class TieredStorageAssetManagerJobProducerTest extends AbstractTieredStor
     List<String> args = new LinkedList<String>();
     args.add(REMOTE_STORE_1_ID);
     args.add(mpId);
-    createExpectation(TieredStorageAssetManagerJobProducer.Operation.MoveById.toString(), args, TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD);
+    createExpectation(
+        TieredStorageAssetManagerJobProducer.Operation.MoveById.toString(),
+        args,
+        TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD
+    );
     return createTriggerJob(args, TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD);
   }
 
@@ -255,7 +261,11 @@ public class TieredStorageAssetManagerJobProducerTest extends AbstractTieredStor
       args.add(mpId);
       args.add(VersionImpl.mk(i).toString());
       jobs.add(createTriggerJob(args, TieredStorageAssetManagerJobProducer.JOB_LOAD));
-      createExpectation(TieredStorageAssetManagerJobProducer.Operation.MoveByIdAndVersion.toString(), args, TieredStorageAssetManagerJobProducer.JOB_LOAD);
+      createExpectation(
+          TieredStorageAssetManagerJobProducer.Operation.MoveByIdAndVersion.toString(),
+          args,
+          TieredStorageAssetManagerJobProducer.JOB_LOAD
+      );
     }
     return jobs;
   }
@@ -265,7 +275,11 @@ public class TieredStorageAssetManagerJobProducerTest extends AbstractTieredStor
     args.add(REMOTE_STORE_1_ID);
     args.add(Long.toString(start.getTime()));
     args.add(Long.toString(end.getTime()));
-    createExpectation(TieredStorageAssetManagerJobProducer.Operation.MoveByDate.toString(), args, TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD);
+    createExpectation(
+        TieredStorageAssetManagerJobProducer.Operation.MoveByDate.toString(),
+        args,
+        TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD
+    );
   }
 
   private void createIdAndDateExpectation(String mpId, Date start, Date end) throws ServiceRegistryException {
@@ -274,7 +288,11 @@ public class TieredStorageAssetManagerJobProducerTest extends AbstractTieredStor
     args.add(mpId);
     args.add(Long.toString(start.getTime()));
     args.add(Long.toString(end.getTime()));
-    createExpectation(TieredStorageAssetManagerJobProducer.Operation.MoveByIdAndDate.toString(), args, TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD);
+    createExpectation(
+        TieredStorageAssetManagerJobProducer.Operation.MoveByIdAndDate.toString(),
+        args,
+        TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD
+    );
   }
 
   /**
