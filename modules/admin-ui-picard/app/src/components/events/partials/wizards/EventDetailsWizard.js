@@ -161,7 +161,7 @@ const EventDetailsWizard = ({ tabIndex }) => {// metadataFields,
                                                  t={t}/>
                             )}
                             {page === 7 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
+                                <CommentsPage header={tabs[page].bodyHeaderTranslation}
                                                  t={t}/>
                             )}
                             {page === 8 && (
@@ -171,6 +171,132 @@ const EventDetailsWizard = ({ tabIndex }) => {// metadataFields,
                         </div>
         </>
 
+    );
+};
+
+const CommentsPage = ({ header, t }) => {
+
+    const reply = {
+        creationDate: "2021-04-01T13:00",
+        author: {
+            name: "Simone Reply"
+        },
+        reason: "test",
+        text: "This is an example for a comment reply"
+    };
+
+    const comment = {
+        creationDate: "2021-04-01T12:00",
+        author: {
+            name: "Simone"
+        },
+        reason: "test",
+        text: "This is an example for a comment",
+        resolvedStatus: "resolved"
+    };
+
+    const originalComment = {
+        creationDate: "2021-04-01T11:00",
+        author: {
+            name: "Simone Original"
+        },
+        reason: "test",
+        text: "This is an example for an original comment",
+        resolvedStatus: "open"
+    };
+
+    const localizeDate = false;
+
+    return (
+        <div className="modal-content">
+            <div className="modal-body">
+                <div data-admin-ng-notifications="" context="events-access"></div>
+                <div className="full-col">
+                    <div className="obj comments">
+                        <header className="no-expand">{t(header)}</header>
+                        {/* Table view containing input fields for metadata */}
+                        <div className="obj-container">
+                            <div className="comment-container">
+                                <div className="comment"> {/* ng-class="{ active : $parent.replyToId === comment.id }"
+                                     ng-repeat="comment in comments track by $index">*/}
+                                    <hr/>
+                                        <div className="date">{ comment.creationDate | localizeDate }</div> {/*: 'dateTime' : 'short'*/}
+                                        <h4>{ comment.author.name }</h4>
+                                        <span className="category">
+                                            <strong> {t("EVENTS.EVENTS.DETAILS.COMMENTS.REASON")} </strong>: { comment.reason /*| translate*/ }
+                                        </span>
+                                        <p>{ comment.text }</p>
+                                        <a onClick={() => console.log("Delete comment here.")/*deleteComment(comment.id)*/}
+                                           className="delete">
+                                            {t('EVENTS.EVENTS.DETAILS.COMMENTS.DELETE')}
+                                        </a>
+                                        <a onClick={() => console.log("Reply to comment here.")/*replyTo(comment)*/}
+                                           className="reply" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY">
+                                            {t('EVENTS.EVENTS.DETAILS.COMMENTS.REPLY')}
+                                        </a>
+                                        <span className="resolve" ng-class="{ resolved : comment.resolvedStatus }">
+                                            { t('EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED') }
+                                        </span>
+
+                                        <div className="comment is-reply"> {/* ng-repeat="reply in comment.replies track by $index">*/}
+                                            <hr/>
+                                            <div className="date">{ reply.creationDate | localizeDate }</div> {/*: 'dateTime' : 'short'*/}
+                                            <h4>{ reply.author.name }</h4>
+                                            <span className="category">
+                                                <strong> { t("EVENTS.EVENTS.DETAILS.COMMENTS.REASON")} </strong>: { comment.reason /*| translate */}
+                                            </span>
+                                            <p>
+                                                <span>@{ comment.author.name }</span> { reply.text }
+                                            </p>
+                                            <a onClick={ () => console.log("Delete comment reply here") /*deleteCommentReply(comment.id, reply.id)*/}
+                                               className="delete"
+                                               with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
+                                                <i className="fa fa-times-circle"></i> { t('EVENTS.EVENTS.DETAILS.COMMENTS.DELETE') }
+                                            </a>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form className="add-comment"> {/* ng-if="replyToId === null" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE">*/}
+                <textarea  placeholder={ t('EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER') }>{/*ng-model="myComment.text"*/}</textarea>
+                <div>
+                  <select chosen
+                          pre-select-from="components.eventCommentReasons"
+                          data-width="'200px'"
+
+                          placeholder-text-single={ t('EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER')}
+                          >{/*ng-model="myComment.reason"*/}
+                      {/*ng-options="value | translate for (id, value) in components.eventCommentReasons"*/}
+                          <option value=""></option>
+                  </select>
+                </div>
+                <button ng-class="{ disabled: !myComment.text.length || !myComment.reason.length || myComment.saving }" className="save green" onClick={ () => console.log("comment()")}> { t("SUBMIT") }
+                    {/*<!-- Submit -->*/}
+                </button>
+              </form>
+
+              <form className="add-comment reply"> {/* ng-if="replyToId !== null">*/}
+                <textarea
+                          placeholder={ t('EVENTS.EVENTS.DETAILS.COMMENTS.REPLY_TO') + "@" +  originalComment.author.name }>{/*ng-model="myComment.text"*/}</textarea>
+                <button
+                        className="save green"
+                        onClick={console.log("reply()")}>{/*ng-class="{ disabled: !myComment.text.length || myComment.saving }"*/}
+                    { t("EVENTS.EVENTS.DETAILS.COMMENTS.REPLY")}
+                  {/*<!-- Reply -->*/}
+                </button>
+                <button className="red" onClick={console.log("exitReplyMode()")} > { t("EVENTS.EVENTS.DETAILS.COMMENTS.CANCEL_REPLY")}
+                  {/*<!-- Cancel -->*/}
+                </button>
+                <input with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" type="checkbox"  id="resolved-checkbox" className="ios"/>{/*ng-model="myComment.resolved"*/}
+                <label with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" for="resolved-checkbox" > { t("EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED")}
+                  {/*<!-- Resolved -->*/}
+                </label>
+              </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 
