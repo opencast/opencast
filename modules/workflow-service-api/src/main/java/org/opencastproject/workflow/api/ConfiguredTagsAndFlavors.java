@@ -80,6 +80,7 @@ public class ConfiguredTagsAndFlavors {
 
     /**
      * Return a single source tag
+     * Only use this, if there should be exactly one source-tag
      */
     public String getSingleSrcTag() {
         if (this.srcTags.isEmpty()) {
@@ -93,6 +94,7 @@ public class ConfiguredTagsAndFlavors {
 
     /**
      * Return a single target tag
+     * Only use this, if there should be exactly one target-tag
      */
     public String getSingleTargetTag() {
         if (this.targetTags.isEmpty()) {
@@ -106,6 +108,7 @@ public class ConfiguredTagsAndFlavors {
 
     /**
      * Return a single source flavor
+     * Only use this, if there should be exactly one source-flavor
      */
     public MediaPackageElementFlavor getSingleSrcFlavor() {
         if (this.srcFlavors.isEmpty()) {
@@ -119,6 +122,7 @@ public class ConfiguredTagsAndFlavors {
 
     /**
      * Return a single target flavor
+     * Only use this, if there should be exactly one target-flavor
      */
     public MediaPackageElementFlavor getSingleTargetFlavor() {
         if (this.targetFlavors.isEmpty()) {

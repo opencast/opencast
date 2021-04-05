@@ -61,7 +61,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
   /** Workflow configuration option keys */
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
   static final String TARGET_FLAVOR = "target-flavor";
-  static final String TARGET_TAG = "target-tag";
+  static final String TARGET_TAG = "target-tags";
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
 
   private TranscriptionService service = null;
