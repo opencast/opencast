@@ -76,6 +76,18 @@ API changes
     - DELETE /workflow/definition/{id}
     - PUT /workflow/definition
 
+Additional Notes about 8.11
+---------------------------
+This release contains several bugfixes.
+- Gracefully handle missing Shibboleth User References
+- Handle broken encoding profiles without killing the ComposerService
+- Configure POST api/groups access correctly
+- Validate Ingested DublinCore Catalogs
+- Fix Sorting Series by Creators
+- Properly configure AWS S3 distribution on startup by default
+
+Please check the changelog for a complete overview.
+
 Additional Notes about 8.10
 ---------------------------
 

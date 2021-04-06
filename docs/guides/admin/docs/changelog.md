@@ -4,6 +4,34 @@ Changelog
 Opencast 8
 ----------
 
+### Opencast 8.11
+
+*Released on April 6th, 2021*
+
+- [[#2418](https://github.com/opencast/opencast/pull/2418)] -
+  Update Test Server Builds
+- [[#2416](https://github.com/opencast/opencast/pull/2416)] -
+  Restore "8.x specific fixes for the markdown generation code"
+- [[#2415](https://github.com/opencast/opencast/pull/2415)] -
+  Revert "8.x specific fixes for the markdown generation code"
+- [[#2409](https://github.com/opencast/opencast/pull/2409)] -
+  8.x specific fixes for the markdown generation code
+- [[#2310](https://github.com/opencast/opencast/pull/2310)] -
+  Gracefully handle missing Shibboleth User References
+- [[#2261](https://github.com/opencast/opencast/pull/2261)] -
+  Handle broken encoding profiles without killing the ComposerService
+- [[#2253](https://github.com/opencast/opencast/pull/2253)] -
+  Configure POST api/groups access correctly
+- [[#2239](https://github.com/opencast/opencast/pull/2239)] -
+  Fix Typo in Branding Properties
+- [[#2214](https://github.com/opencast/opencast/pull/2214)] -
+  Validate Ingested DublinCore Catalogs
+- [[#2177](https://github.com/opencast/opencast/pull/2177)] -
+  Fix Sorting Series by Creators
+- [[#2071](https://github.com/opencast/opencast/pull/2071)] -
+  Properly configure AWS S3 distribution on startup by default
+
+
 ### Opencast 8.10
 
 *Released on December 23rd, 2020*
