@@ -21,7 +21,7 @@ const NewResourceModal = ({ handleClose, showModal, resource }) => {
     return (
         // todo: add hotkeys
         showModal && (
-            <section tabIndex="1" className="modal wizard modal-animation">
+            <section tabIndex="1" className="modal wizard modal-animation" id="add-event-modal">
                 <header>
                     <a className="fa fa-times close-modal" onClick={() => close()}/>
                     {resource === 'events' && (
