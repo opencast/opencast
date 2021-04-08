@@ -64,101 +64,103 @@ const EditTableViewModal = ({  showModal, handleClose, resource, activeColumns, 
         // todo: add hotkeys
         <>
         {showModal && (
-            <section className="modal active modal-animation" id="edit-table-view-modal">
-                <header>
-                    <a className="fa fa-times close-modal" onClick={() => {clearData(); close();}}/>
-                    <h2>{t('PREFERENCES.TABLE.CAPTION') /* Edit Table View */}</h2>
-                </header>
+            <>
+                <div className="modal-animation modal-overlay"/>
+                <section className="modal active modal-animation" id="edit-table-view-modal">
+                    <header>
+                        <a className="fa fa-times close-modal" onClick={() => {clearData(); close();}}/>
+                        <h2>{t('PREFERENCES.TABLE.CAPTION') /* Edit Table View */}</h2>
+                    </header>
 
-                <div className="modal-content">
-                    <div className="modal-body">
+                    <div className="modal-content">
+                        <div className="modal-body">
 
-                        <div className="tab-description for-header">
-                            <p>{t('PREFERENCES.TABLE.SUBHEADING', { tableName: t('EVENTS.' + resource.toUpperCase() + '.TABLE.CAPTION') })}</p>
-                        </div>
-
-                        <div className="row">
-
-                            <div className="col">
-                                <div className="obj drag-available-column">
-                                    <header>
-                                        <h2>{t('PREFERENCES.TABLE.AVAILABLE_COLUMNS') /* Available Columns */}</h2>
-                                    </header>
-                                    <ul className="drag-drop-items">
-                                        {
-                                            deactivatedCols.map( (column, key) =>
-                                                column ?
-                                                    <li className="drag-item" key={key}>
-                                                        <div
-                                                            className="title">{t(column.label)}</div>
-                                                        <a className="move-item add"
-                                                           onClick={() => changeColumn(column, false)}></a>
-                                                    </li> :
-                                                    null
-                                            )
-                                        }
-
-                                    </ul>
-                                </div>
+                            <div className="tab-description for-header">
+                                <p>{t('PREFERENCES.TABLE.SUBHEADING', { tableName: t('EVENTS.' + resource.toUpperCase() + '.TABLE.CAPTION') })}</p>
                             </div>
 
-                            <div className="col">
-                                <div className="obj drag-selected-column">
-                                    <header>
-                                        <h2>{t('PREFERENCES.TABLE.SELECTED_COLUMNS') /* Selected Columns */}</h2>
-                                    </header>
-                                    <ul className="drag-drop-items">
-                                        <li>
-                                            <Container dragHandleSelector=".drag-handle" lockAxis="y" onDrop={onDrop}>
-                                                {
-                                                    activeCols.map( (column, key) =>
-                                                        column ?
-                                                            <Draggable className="drag-item" key={key}>
-                                                                <div className="drag-handle">
-                                                                    <div className="title">{t(column.label)}</div>
-                                                                    <a className="move-item remove"
-                                                                        onClick={() => changeColumn(column, true)}/>
-                                                                </div>
-                                                            </Draggable> :
-                                                            null
-                                                    )
-                                                }
-                                            </Container>
-                                        </li>
-                                    </ul>
+                            <div className="row">
+
+                                <div className="col">
+                                    <div className="obj drag-available-column">
+                                        <header>
+                                            <h2>{t('PREFERENCES.TABLE.AVAILABLE_COLUMNS') /* Available Columns */}</h2>
+                                        </header>
+                                        <ul className="drag-drop-items">
+                                            {
+                                                deactivatedCols.map( (column, key) =>
+                                                    column ?
+                                                        <li className="drag-item" key={key}>
+                                                            <div
+                                                                className="title">{t(column.label)}</div>
+                                                            <a className="move-item add"
+                                                               onClick={() => changeColumn(column, false)}></a>
+                                                        </li> :
+                                                        null
+                                                )
+                                            }
+
+                                        </ul>
+                                    </div>
                                 </div>
+
+                                <div className="col">
+                                    <div className="obj drag-selected-column">
+                                        <header>
+                                            <h2>{t('PREFERENCES.TABLE.SELECTED_COLUMNS') /* Selected Columns */}</h2>
+                                        </header>
+                                        <ul className="drag-drop-items">
+                                            <li>
+                                                <Container dragHandleSelector=".drag-handle" lockAxis="y" onDrop={onDrop}>
+                                                    {
+                                                        activeCols.map( (column, key) =>
+                                                            column ?
+                                                                <Draggable className="drag-item" key={key}>
+                                                                    <div className="drag-handle">
+                                                                        <div className="title">{t(column.label)}</div>
+                                                                        <a className="move-item remove"
+                                                                           onClick={() => changeColumn(column, true)}/>
+                                                                    </div>
+                                                                </Draggable> :
+                                                                null
+                                                        )
+                                                    }
+                                                </Container>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
                             </div>
 
-                        </div>
-
-                        <div className="tab-description for-footer">
-                            <p>
-                                {/* The order and selection will be saved automatically.
+                            <div className="tab-description for-footer">
+                                <p>
+                                    {/* The order and selection will be saved automatically.
                                 Press "Reset" to restore the default view. */}
-                                {t('PREFERENCES.TABLE.FOOTER_TEXT', { resetTranslation: t('RESET') })}
-                            </p>
+                                    {t('PREFERENCES.TABLE.FOOTER_TEXT', { resetTranslation: t('RESET') })}
+                                </p>
+                            </div>
+
                         </div>
-
                     </div>
-                </div>
 
-                <footer>
-                    <div className="pull-left">
-                        <button onClick={() => {
-                            clearData();
-                            close();
-                        }} className="cancel active">{t('CANCEL')/*<!--Cancel-->*/}</button>
-                    </div>
-                    <div className="pull-right">
-                        {/* <a ng-click="initialize()" class="cancel" translate="RESET">Reset</a> */}
-                        <button onClick={() => {
-                            save();
-                            close();
-                        }} className="submit active">{t('SAVE')/* Save As Default */}</button>
-                    </div>
-                </footer>
-            </section>
-
+                    <footer>
+                        <div className="pull-left">
+                            <button onClick={() => {
+                                clearData();
+                                close();
+                            }} className="cancel active">{t('CANCEL')/*<!--Cancel-->*/}</button>
+                        </div>
+                        <div className="pull-right">
+                            {/* <a ng-click="initialize()" class="cancel" translate="RESET">Reset</a> */}
+                            <button onClick={() => {
+                                save();
+                                close();
+                            }} className="submit active">{t('SAVE')/* Save As Default */}</button>
+                        </div>
+                    </footer>
+                </section>
+            </>
         )}
         </>
     );
