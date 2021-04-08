@@ -1,6 +1,11 @@
 Install Opencast
 ================
 
+Server requirements higly depend on on processed material.
+There are a few hints about a sensible machine setup to run Opencast on:
+
+- [Hardware requirements](server-requirements.md)
+
 
 Installation from Repository
 ----------------------------
