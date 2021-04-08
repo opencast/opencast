@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {useTranslation} from "react-i18next";
 import NewEventWizard from "../events/partials/wizards/NewEventWizard";
 import NewSeriesWizard from "../events/partials/wizards/NewSeriesWizard";
@@ -13,11 +13,6 @@ import NewUserWizard from "../users/partials/wizard/NewUserWizard";
  */
 const NewResourceModal = ({ handleClose, showModal, resource }) => {
     const { t } = useTranslation();
-
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => document.body.style.overflow = 'unset';
-    }, []);
 
     const close = () => {
         handleClose();

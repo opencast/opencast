@@ -29,18 +29,18 @@ const ThemeSummaryPage = ({ formik, previousPage }) => {
                                     )}
                                     {formik.values.trailerFile.id && (
                                         <li>
-                                            <h4>{t('CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION')}</h4>
+                                            <h4>{t('CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION')}</h4>
                                             <p>
-                                                <span>{t('CONFIGURATION.THEMES.DETAILS.TITLE.FILE_UPLOADED')}</span>
+                                                <span>{t('CONFIGURATION.THEMES.DETAILS.TRAILER.FILE_UPLOADED')}</span>
                                                 {formik.values.trailerFile.name}
                                             </p>
                                         </li>
                                     )}
                                     {(formik.values.titleSlideMode === 'upload' && formik.values.titleSlideBackground.id) && (
                                         <li>
-                                            <h4>{t('CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION')}</h4>
+                                            <h4>{t('CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION')}</h4>
                                             <p>
-                                                <span>{t('CONFIGURATION.THEMES.DETAILS.TRAILER.FILE_UPLOADED')}</span>
+                                                <span>{t('CONFIGURATION.THEMES.DETAILS.TITLE.FILE_UPLOADED')}</span>
                                                 {formik.values.titleSlideBackground.name}
                                             </p>
                                         </li>
