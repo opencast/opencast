@@ -58,39 +58,42 @@ const StartTaskModal = ({ close }) => {
     }
 
     return (
-        <section className="modal wizard modal-animation">
-            <header>
-                <a className="fa fa-times close-modal" onClick={() => close()}/>
-                <h2>{t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}</h2>
-            </header>
+        <>
+            <div className="modal-animation modal-overlay"/>
+            <section className="modal wizard modal-animation">
+                <header>
+                    <a className="fa fa-times close-modal" onClick={() => close()}/>
+                    <h2>{t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}</h2>
+                </header>
 
-            {/* Stepper that shows each step of wizard as header */}
-            <WizardStepper steps={steps} page={page}/>
+                {/* Stepper that shows each step of wizard as header */}
+                <WizardStepper steps={steps} page={page}/>
 
-            {/* Initialize overall form */}
-            <Formik initialValues={snapshot}
+                {/* Initialize overall form */}
+                <Formik initialValues={snapshot}
                     //validationSchema={currentValidationSchema}
-                    onSubmit={values => handleSubmit(values)}>
-                {formik => (
-                    <div>
-                        {page === 0 && (
-                            <StartTaskGeneralPage formik={formik}
-                                                  nextPage={nextPage}/>
-                        )}
-                        {page === 1 && (
-                            <StartTaskWorkflowPage formik={formik}
-                                                   nextPage={nextPage}
-                                                   previousPage={previousPage}/>
-                        )}
-                        {page === 2 && (
-                            <StartTaskSummaryPage formik={formik}
-                                                  previousPage={previousPage}/>
-                        )}
-                    </div>
-                )}
-            </Formik>
+                        onSubmit={values => handleSubmit(values)}>
+                    {formik => (
+                        <div>
+                            {page === 0 && (
+                                <StartTaskGeneralPage formik={formik}
+                                                      nextPage={nextPage}/>
+                            )}
+                            {page === 1 && (
+                                <StartTaskWorkflowPage formik={formik}
+                                                       nextPage={nextPage}
+                                                       previousPage={previousPage}/>
+                            )}
+                            {page === 2 && (
+                                <StartTaskSummaryPage formik={formik}
+                                                      previousPage={previousPage}/>
+                            )}
+                        </div>
+                    )}
+                </Formik>
 
-        </section>
+            </section>
+        </>
     );
 };
 

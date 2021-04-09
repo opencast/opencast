@@ -12,6 +12,7 @@ const DeleteEventsModal = ({ close }) => {
     }
     return (
         <>
+            <div className="modal-animation modal-overlay"/>
             <section className="modal active modal-open"
                      id="delete-events-status-modal"
                      style={{display: "block"}}>
