@@ -22,6 +22,7 @@
 package org.opencastproject.assetmanager.impl.storage;
 
 public interface RemoteAssetStore extends AssetStore {
-    //Defines the root directory to be used for any caching done by a remote asset store.  Caches should live as directories under this directory.
-    String ASSET_STORE_CACHE_ROOT = "org.opencastproject.assetmanager.storage.cache.rootdir";
+  // Defines the root directory to be used for any caching done by a remote
+  // asset store.  Caches should live as directories under this directory.
+  String ASSET_STORE_CACHE_ROOT = "org.opencastproject.assetmanager.storage.cache.rootdir";
 }

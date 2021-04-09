@@ -300,7 +300,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   @Override
   public boolean isActive() {
-   return WorkflowUtil.isActive(getState());
+    return WorkflowUtil.isActive(getState());
   }
 
   /**

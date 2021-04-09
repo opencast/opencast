@@ -223,16 +223,18 @@ HAVING v = (SELECT count(*)
                 .list(Q_PROPERTY.mediaPackageId)
 
              [2]
-             SELECT DISTINCT t1.mediapackage_id FROM oc_assets_snapshot t2, oc_assets_properties t1 WHERE (t2.organization_id = ?)
+             SELECT DISTINCT t1.mediapackage_id FROM oc_assets_snapshot t2, oc_assets_properties t1
+                 WHERE (t2.organization_id = ?)
            */
           where = Q_PROPERTY.mediaPackageId.in(
-                  new JPASubQuery()
-                          .from(Q_PROPERTY)
-                          .join(Q_SNAPSHOT)
-                          // move the join condition from the "ON" clause (mediapackage_id) to the where clause. Find an explanation above. */
-                          .where(Q_PROPERTY.mediaPackageId.eq(Q_SNAPSHOT.mediaPackageId).and(w))
-                          .distinct()
-                          .list(Q_PROPERTY.mediaPackageId));
+              new JPASubQuery()
+                  .from(Q_PROPERTY)
+                  .join(Q_SNAPSHOT)
+                  // move the join condition from the "ON" clause (mediapackage_id) to the
+                  // where clause. Find an explanation above.
+                  .where(Q_PROPERTY.mediaPackageId.eq(Q_SNAPSHOT.mediaPackageId).and(w))
+                  .distinct()
+                  .list(Q_PROPERTY.mediaPackageId));
         } else {
           where = null;
         }

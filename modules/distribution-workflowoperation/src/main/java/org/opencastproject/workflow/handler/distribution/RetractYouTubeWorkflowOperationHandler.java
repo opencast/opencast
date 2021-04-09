@@ -58,11 +58,6 @@ public class RetractYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
     this.publicationService = publicationService;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
-   */
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
@@ -81,8 +76,9 @@ public class RetractYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
       // Wait for youtube retraction to finish
       Job retractJob = publicationService.retract(mediaPackage);
-      if (!waitForStatus(retractJob).isSuccess())
+      if (!waitForStatus(retractJob).isSuccess()) {
         throw new WorkflowOperationException("The youtube retract job did not complete successfully");
+      }
 
       logger.debug("Retraction from youtube operation complete");
 

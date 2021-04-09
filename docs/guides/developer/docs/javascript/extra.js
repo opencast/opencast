@@ -27,6 +27,15 @@ $(document).ready(function () {
         ga('send', 'pageview');
     }
     tocPaneFix();
+
+    // Display a hint that the development docs are outdated unless we are on develop.
+    if (window.location.pathname.startsWith('/r/')) {
+        let path = window.location.pathname.replace(/^\/r\/[0-9]+\.*x/, '/develop')
+        let page_content = $('.wm-page-content').prepend(
+            `<div style="padding: 20px; border-left: 3px solid silver;">
+            This is an outdated version of the development documentation for Opencast.
+            The latest version of the docs can be found <a href="${path}">here</a>.</div>`)
+    }
 });
 
 
@@ -140,6 +149,7 @@ function createButton(id) {
     button.classList.add("glyphicon");
     button.classList.add("glyphicon-copy");
     button.classList.add("click-and-copy-button");
+    button.title = 'Copy to clipboard';
     return button;
 }
 

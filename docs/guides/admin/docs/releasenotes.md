@@ -1,8 +1,6 @@
 Opencast 9: Release Notes
 =========================
 
-**TODO** The following is as of 2020/08/26, and not finished, yet.
-
 Important Changes
 -----------------
 
@@ -11,13 +9,15 @@ Important Changes
 - The `encode` worfklow operation now completely replaces `compose`,
   which is dropped now
 - MariaDB JDBC driver
-    - TODO Where is this in the changelog?!
-- New LTI-Tools?
+- New LTI-Tools
+- A [completely new system for securing static file content](configuration/serving-static-files.md) has been integrated
+  into Opencast 9.2. While is is not active by default for compatibility to older 9.x releases, it can be easily enabled
+  and used to ensure access to static files has the same security checks you are already used to from the player and
+  from other user interfaces.
+
 
 Features
 --------
-
-- TODO Paella changes?!
 
 - Get notified when there is a new version of Opencast,
   and if your current version reached its end of life
@@ -42,11 +42,25 @@ Features
   or move them between series
 - Export statistics to CSV using a new External API endpoint
 - Edit event meta data in bulk with a new dialog in the admin UI
+- Create Shibboleth users dynamically using configuration
+- Support Serverless HLS
+- Retract only specific flavors/tags with a new WOH
+- New download button in the Theodul player
+- New VideoGrid-WOH to handle grids of videos as presented for example
+  by BigBlueButton
+- Allow specifying role prefixes in various user providers to better
+  distinguish users from different sources
+- Adopter registration
+- New version of Opencast Studio
+- User and role provider for the Canvas LMS
+- The partial import WOH can now do certain kinds of preprocessings
+  to simplify further processing down the line
+- Support for presigned S3 URLs
 
 Improvements
 ------------
 
-- Paella Player version **TODO**
+- New Paella Player version
 - Make the `partial-import` workflow operation more robust
   in the face of containers with multiple videos in them
 - Multiple workflows with the same ID no longer bring Opencast down
@@ -85,6 +99,8 @@ Improvements
   by loading them all at once
 - Improved compatibility with S3 compatibles/alternatives
 - Display notifications as overlay instead of as "flash messages"
+- The `tag` workflow operation now allows wildcards in the target flavor
+- Use series ACL as default ACL for events in LTI upload tool if available
 
 API changes
 -----------
@@ -93,12 +109,53 @@ API changes
   instead of the technical one
 - Allow updating processing information using the Events API
 - Export statistics to CSV
+- The filter in the Events API is "additive" now, allowing you to get
+  different types of events in one request
+- The Series API can now return ACLs within its response, if you tell it to
 
-Configuration changes
----------------------
+Additional Notes about 9.4
+--------------------------
+- [The standalone video editor](modules/editor.md) received an update, featuring optional metadata editing,
+hotkeys for the cutting controls and internationalization support.
 
-*TBD*
+Additional Notes about 9.3
+--------------------------
 
+Besides many fixes and improvements, Opencast 9.3 comes with the following new features:
+
+- The [metrics endpoint](modules/metrics.md) now provides information about the number of events per organization.
+- A first beta version of [the standalone video editor](modules/editor.md).
+
+Additional Notes about 9.2
+--------------------------
+
+Opencast 9.2 comes with a few new features, non of which require any migrations or change the default bohavior of
+Opencast 9.x.
+
+A [metrics endpoint has been added](modules/metrics.md). It supports the [OpenMetrics format](https://openmetrics.io)
+and can be used by tools like [Prometheus](https://prometheus.io). The endpoint is available at `/metrics`.
+
+A [completely new system for securing static file content](configuration/serving-static-files.md) has been integrated.
+While is is not active by default for compatibility to older 9.x releases, it can be easily enabled and used to ensure
+access to static files has the same security checks you are already used to from the player and from other user
+interfaces.
+
+A new [workflow operation `cut-marks-to-smil`](workflowoperationhandlers/cut-marks-to-smil-woh.md) has been added to
+allow a simpler specification of cutting information for the video editor. This was also the last piece missing from the
+[BigBlueButton recordings integration](https://github.com/elan-ev/opencast-bigbluebutton-integration) in Opencast.
+
+Some problems with the new adopter registration and update reporting have been resolved. If you stumbled over these
+before, this is the release to try again.
+
+A [security problem](https://github.com/opencast/opencast/security/advisories/GHSA-vpc2-3wcv-qj4w) where chaning access
+ights to an individual video lead to cooresponding changes to its entire series was fixed.
+
+
+Additional Notes about 9.1
+--------------------------
+
+This release contains an important bugfix where unprivileged users
+could not upload videos, before.
 
 Release Schedule
 ----------------

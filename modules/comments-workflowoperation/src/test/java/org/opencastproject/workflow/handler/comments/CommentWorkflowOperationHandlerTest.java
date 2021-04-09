@@ -112,7 +112,8 @@ public class CommentWorkflowOperationHandlerTest {
 
     // Test create
     EventCommentService eventCommentService = EasyMock.createMock(EventCommentService.class);
-    EasyMock.expect(eventCommentService.getComments(mediaPackageId)).andReturn(new ArrayList<EventComment>()).anyTimes();
+    EasyMock.expect(eventCommentService.getComments(mediaPackageId))
+        .andReturn(new ArrayList<EventComment>()).anyTimes();
     Capture<EventComment> comment = EasyMock.newCapture();
     EasyMock.expect(eventCommentService.updateComment(EasyMock.capture(comment)))
             .andReturn(EventComment.create(Option.option(15L), mediaPackageId, org.getId(), description, creator));
@@ -154,7 +155,8 @@ public class CommentWorkflowOperationHandlerTest {
 
     // Test resolve with no comment
     eventCommentService = EasyMock.createMock(EventCommentService.class);
-    EasyMock.expect(eventCommentService.getComments(mediaPackageId)).andReturn(new ArrayList<EventComment>()).anyTimes();
+    EasyMock.expect(eventCommentService.getComments(mediaPackageId))
+        .andReturn(new ArrayList<EventComment>()).anyTimes();
     EasyMock.replay(eventCommentService);
     commentWorkflowOperationHandler = new CommentWorkflowOperationHandler();
     commentWorkflowOperationHandler.setEventCommentService(eventCommentService);
@@ -164,7 +166,9 @@ public class CommentWorkflowOperationHandlerTest {
 
     // Test delete with no result, no delete
     eventCommentService = EasyMock.createMock(EventCommentService.class);
-    EasyMock.expect(eventCommentService.getComments(mediaPackageId)).andReturn(new ArrayList<EventComment>()).anyTimes();
+    EasyMock.expect(eventCommentService.getComments(mediaPackageId))
+        .andReturn(new ArrayList<EventComment>())
+        .anyTimes();
     EasyMock.replay(eventCommentService);
     commentWorkflowOperationHandler = new CommentWorkflowOperationHandler();
     commentWorkflowOperationHandler.setEventCommentService(eventCommentService);
@@ -174,8 +178,10 @@ public class CommentWorkflowOperationHandlerTest {
     // Test delete with result
     eventCommentService = EasyMock.createMock(EventCommentService.class);
     comments = new ArrayList<EventComment>();
-    comments.add(EventComment.create(Option.option(deleteCommentId), mediaPackageId, org.getId(), description, creator,
-            reason, false));
+    comments.add(EventComment.create(
+        Option.option(deleteCommentId),
+        mediaPackageId, org.getId(), description, creator,
+        reason, false));
     EasyMock.expect(eventCommentService.getComments(mediaPackageId)).andReturn(comments).anyTimes();
     eventCommentService.deleteComment(deleteCommentId);
     EasyMock.expectLastCall();
@@ -255,7 +261,9 @@ public class CommentWorkflowOperationHandlerTest {
 
     // Test no previous comments
     EventCommentService eventCommentService = EasyMock.createMock(EventCommentService.class);
-    EasyMock.expect(eventCommentService.getComments(mediaPackageId)).andReturn(new ArrayList<EventComment>()).anyTimes();
+    EasyMock.expect(eventCommentService.getComments(mediaPackageId))
+        .andReturn(new ArrayList<EventComment>())
+        .anyTimes();
     Capture<EventComment> comment = EasyMock.newCapture();
     EasyMock.expect(eventCommentService.updateComment(EasyMock.capture(comment)))
             .andReturn(EventComment.create(Option.option(15L), mediaPackageId, org.getId(), description, creator));
@@ -271,7 +279,9 @@ public class CommentWorkflowOperationHandlerTest {
     assertEquals(reason, comment.getValue().getReason());
 
     eventCommentService = EasyMock.createMock(EventCommentService.class);
-    EasyMock.expect(eventCommentService.getComments(mediaPackageId)).andReturn(new ArrayList<EventComment>()).anyTimes();
+    EasyMock.expect(eventCommentService.getComments(mediaPackageId))
+        .andReturn(new ArrayList<EventComment>())
+        .anyTimes();
     comment = EasyMock.newCapture();
     EasyMock.expect(eventCommentService.updateComment(EasyMock.capture(comment)))
             .andReturn(EventComment.create(Option.option(17L), mediaPackageId, org.getId(), description, creator));
@@ -287,7 +297,9 @@ public class CommentWorkflowOperationHandlerTest {
     assertEquals(reason, comment.getValue().getReason());
 
     eventCommentService = EasyMock.createMock(EventCommentService.class);
-    EasyMock.expect(eventCommentService.getComments(mediaPackageId)).andReturn(new ArrayList<EventComment>()).anyTimes();
+    EasyMock.expect(eventCommentService.getComments(mediaPackageId))
+        .andReturn(new ArrayList<EventComment>())
+        .anyTimes();
     comment = EasyMock.newCapture();
     EasyMock.expect(eventCommentService.updateComment(EasyMock.capture(comment)))
             .andReturn(EventComment.create(Option.option(19L), mediaPackageId, org.getId(), description, creator));
@@ -367,7 +379,8 @@ public class CommentWorkflowOperationHandlerTest {
 
     // Test previous comment with same reason and description
     List<EventComment> comments = new ArrayList<EventComment>();
-    comments.add(EventComment.create(Option.option(13L), mediaPackageId, org.getId(), description, creator, reason, true));
+    comments.add(EventComment.create(
+        Option.option(13L), mediaPackageId, org.getId(), description, creator, reason, true));
     eventCommentService = EasyMock.createMock(EventCommentService.class);
     EasyMock.expect(eventCommentService.getComments(mediaPackageId)).andReturn(comments);
     EasyMock.replay(eventCommentService);

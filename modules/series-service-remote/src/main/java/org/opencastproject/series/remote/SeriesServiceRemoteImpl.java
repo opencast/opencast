@@ -101,22 +101,29 @@ import javax.ws.rs.core.Response;
  * A proxy to a remote series service.
  */
 @Path("/")
-@RestService(name = "seriesservice", title = "Series Service Remote", abstractText = "This service creates, edits and retrieves and helps managing series.", notes = {
+@RestService(
+    name = "seriesservice",
+    title = "Series Service Remote",
+    abstractText = "This service creates, edits and retrieves and helps managing series.",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+        "If the service is down or not working it will return a status 503, this means the the "
+            + "underlying service is not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was "
+            + "not anticipated. In other words, there is a bug! You should file an error report "
+            + "with your server logs from the time when the error occurred: "
+            + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
 @Component(
-  property = {
+    property = {
     "service.description=Series Remote Service Proxy",
     "opencast.service.type=org.opencastproject.series",
     "opencast.service.path=/series",
     "opencast.service.publish=false"
-  },
-  immediate = true,
-  service = { SeriesService.class, SeriesServiceRemoteImpl.class }
+    },
+    immediate = true,
+    service = { SeriesService.class, SeriesServiceRemoteImpl.class }
 )
 public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService {
 
@@ -342,43 +349,167 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("series.json")
-  @RestQuery(name = "listSeriesAsJson", description = "Returns the series matching the query parameters", returnDescription = "Returns the series search results as JSON", restParameters = {
-          @RestParameter(name = "q", isRequired = false, description = "Free text search", type = STRING),
-          @RestParameter(name = "edit", isRequired = false, description = "Whether this query should return only series that are editable", type = BOOLEAN),
-          @RestParameter(name = "fuzzyMatch", isRequired = false, description = "Whether a partial match on series id is allowed, default is false", type = BOOLEAN),
-          @RestParameter(name = "seriesId", isRequired = false, description = "The series identifier", type = STRING),
-          @RestParameter(name = "seriesTitle", isRequired = false, description = "The series title", type = STRING),
-          @RestParameter(name = "creator", isRequired = false, description = "The series creator", type = STRING),
-          @RestParameter(name = "contributor", isRequired = false, description = "The series contributor", type = STRING),
-          @RestParameter(name = "publisher", isRequired = false, description = "The series publisher", type = STRING),
-          @RestParameter(name = "rightsholder", isRequired = false, description = "The series rights holder", type = STRING),
-          @RestParameter(name = "createdfrom", isRequired = false, description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')", type = STRING),
-          @RestParameter(name = "createdto", isRequired = false, description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')", type = STRING),
-          @RestParameter(name = "language", isRequired = false, description = "The series language", type = STRING),
-          @RestParameter(name = "license", isRequired = false, description = "The series license", type = STRING),
-          @RestParameter(name = "subject", isRequired = false, description = "The series subject", type = STRING),
-          @RestParameter(name = "abstract", isRequired = false, description = "The series abstract", type = STRING),
-          @RestParameter(name = "description", isRequired = false, description = "The series description", type = STRING),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any of the following: TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
-          @RestParameter(name = "startPage", isRequired = false, description = "The page offset", type = STRING),
-          @RestParameter(name = "count", isRequired = false, description = "Results per page (max 100)", type = STRING) }, responses = {
-          @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
-  // CHECKSTYLE:OFF
-  public Response getSeriesAsJson(@QueryParam("q") String text, @QueryParam("seriesId") String seriesId,
-          @QueryParam("edit") Boolean edit, @QueryParam("fuzzyMatch") Boolean fuzzyMatch, @QueryParam("seriesTitle") String seriesTitle,
-          @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
-          @QueryParam("publisher") String publisher, @QueryParam("rightsholder") String rightsHolder,
-          @QueryParam("createdfrom") String createdFrom, @QueryParam("createdto") String createdTo,
-          @QueryParam("language") String language, @QueryParam("license") String license,
-          @QueryParam("subject") String subject, @QueryParam("abstract") String seriesAbstract,
-          @QueryParam("description") String description, @QueryParam("sort") String sort,
-          @QueryParam("startPage") String startPage, @QueryParam("count") String count) throws UnauthorizedException {
-    // CHECKSTYLE:ON
+  @RestQuery(
+      name = "listSeriesAsJson",
+      description = "Returns the series matching the query parameters",
+      returnDescription = "Returns the series search results as JSON",
+      restParameters = {
+          @RestParameter(
+              name = "q",
+              isRequired = false,
+              description = "Free text search",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "edit",
+              isRequired = false,
+              description = "Whether this query should return only series that are editable",
+              type = BOOLEAN
+          ),
+          @RestParameter(
+              name = "fuzzyMatch",
+              isRequired = false,
+              description = "Whether a partial match on series id is allowed, default is false",
+              type = BOOLEAN
+          ),
+          @RestParameter(
+              name = "seriesId",
+              isRequired = false,
+              description = "The series identifier",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "seriesTitle",
+              isRequired = false,
+              description = "The series title",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "creator",
+              isRequired = false,
+              description = "The series creator",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "contributor",
+              isRequired = false,
+              description = "The series contributor",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "publisher",
+              isRequired = false,
+              description = "The series publisher",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "rightsholder",
+              isRequired = false,
+              description = "The series rights holder",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "createdfrom",
+              isRequired = false,
+              description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "createdto",
+              isRequired = false,
+              description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "language",
+              isRequired = false,
+              description = "The series language",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "license",
+              isRequired = false,
+              description = "The series license",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "subject",
+              isRequired = false,
+              description = "The series subject",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "abstract",
+              isRequired = false,
+              description = "The series abstract",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "description",
+              isRequired = false,
+              description = "The series description",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "sort",
+              isRequired = false,
+              description = "The sort order.  May include any of the following: TITLE, SUBJECT, "
+                  + "CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, "
+                  + "AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, "
+                  + "IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE.  Add '_DESC' to reverse the "
+                  + "sort order (e.g. TITLE_DESC).",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "startPage",
+              isRequired = false,
+              description = "The page offset",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "count",
+              isRequired = false,
+              description = "Results per page (max 100)",
+              type = STRING
+          )
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The access control list."
+          ),
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          )
+      }
+  )
+  public Response getSeriesAsJson(
+      @QueryParam("q") String text,
+      @QueryParam("seriesId") String seriesId,
+      @QueryParam("edit") Boolean edit,
+      @QueryParam("fuzzyMatch") Boolean fuzzyMatch,
+      @QueryParam("seriesTitle") String seriesTitle,
+      @QueryParam("creator") String creator,
+      @QueryParam("contributor") String contributor,
+      @QueryParam("publisher") String publisher,
+      @QueryParam("rightsholder") String rightsHolder,
+      @QueryParam("createdfrom") String createdFrom,
+      @QueryParam("createdto") String createdTo,
+      @QueryParam("language") String language,
+      @QueryParam("license") String license,
+      @QueryParam("subject") String subject,
+      @QueryParam("abstract") String seriesAbstract,
+      @QueryParam("description") String description,
+      @QueryParam("sort") String sort,
+      @QueryParam("startPage") String startPage,
+      @QueryParam("count") String count
+  ) throws UnauthorizedException {
     try {
-      SeriesQuery seriesQuery = getSeries(text, seriesId, edit, seriesTitle, creator, contributor, publisher,
-                      rightsHolder, createdFrom, createdTo, language, license, subject, seriesAbstract, description, sort,
-                      startPage, count, fuzzyMatch);
+      SeriesQuery seriesQuery = getSeries(
+          text, seriesId, edit, seriesTitle, creator, contributor, publisher,
+          rightsHolder, createdFrom, createdTo, language, license, subject, seriesAbstract, description, sort,
+          startPage, count, fuzzyMatch);
       DublinCoreCatalogList result = getSeries(seriesQuery);
       return Response.ok(result.getResultsAsJson()).build();
     } catch (UnauthorizedException e) {
@@ -397,7 +528,8 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       if (response != null) {
         int statusCode = response.getStatusLine().getStatusCode();
         if (SC_OK == statusCode) {
-          DublinCoreCatalogList list = DublinCoreCatalogList.parse(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
+          DublinCoreCatalogList list = DublinCoreCatalogList.parse(
+              EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
           logger.info("Successfully get series dublin core catalog list from the remote series index");
           return list;
         } else if (SC_UNAUTHORIZED == statusCode) {
@@ -436,8 +568,9 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
                 JSONObject seriesJsonObj = seriesJsonArr.getJSONObject(idx);
                 String seriesId = seriesJsonObj.optString("identifier");
                 String seriesTitle = seriesJsonObj.optString("title");
-                if (StringUtils.isNotBlank(seriesId) && StringUtils.isNotEmpty(seriesTitle))
+                if (StringUtils.isNotBlank(seriesId) && StringUtils.isNotEmpty(seriesTitle)) {
                   result.put(seriesId, seriesTitle);
+                }
               }
             }
             return result;
@@ -484,40 +617,55 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     url.append("/series.xml?");
 
     List<NameValuePair> queryStringParams = new ArrayList<>();
-    if (q.getText() != null)
+    if (q.getText() != null) {
       queryStringParams.add(new BasicNameValuePair("q", q.getText()));
-    if (q.getSeriesId() != null)
+    }
+    if (q.getSeriesId() != null) {
       queryStringParams.add(new BasicNameValuePair("seriesId", q.getSeriesId()));
+    }
     queryStringParams.add(new BasicNameValuePair("edit", Boolean.toString(q.isEdit())));
     queryStringParams.add(new BasicNameValuePair("fuzzyMatch", Boolean.toString(q.isFuzzyMatch())));
-    if (q.getSeriesTitle() != null)
+    if (q.getSeriesTitle() != null) {
       queryStringParams.add(new BasicNameValuePair("seriesTitle", q.getSeriesTitle()));
-    if (q.getCreator() != null)
+    }
+    if (q.getCreator() != null) {
       queryStringParams.add(new BasicNameValuePair("creator", q.getCreator()));
-    if (q.getContributor() != null)
+    }
+    if (q.getContributor() != null) {
       queryStringParams.add(new BasicNameValuePair("contributor", q.getContributor()));
-    if (q.getPublisher() != null)
+    }
+    if (q.getPublisher() != null) {
       queryStringParams.add(new BasicNameValuePair("publisher", q.getPublisher()));
-    if (q.getRightsHolder() != null)
+    }
+    if (q.getRightsHolder() != null) {
       queryStringParams.add(new BasicNameValuePair("rightsholder", q.getRightsHolder()));
-    if (q.getCreatedFrom() != null)
+    }
+    if (q.getCreatedFrom() != null) {
       queryStringParams.add(new BasicNameValuePair("createdfrom", SolrUtils.serializeDate(q.getCreatedFrom())));
-    if (q.getCreatedTo() != null)
+    }
+    if (q.getCreatedTo() != null) {
       queryStringParams.add(new BasicNameValuePair("createdto", SolrUtils.serializeDate(q.getCreatedTo())));
-    if (q.getLanguage() != null)
+    }
+    if (q.getLanguage() != null) {
       queryStringParams.add(new BasicNameValuePair("language", q.getLanguage()));
-    if (q.getLicense() != null)
+    }
+    if (q.getLicense() != null) {
       queryStringParams.add(new BasicNameValuePair("license", q.getLicense()));
-    if (q.getSubject() != null)
+    }
+    if (q.getSubject() != null) {
       queryStringParams.add(new BasicNameValuePair("subject", q.getSubject()));
-    if (q.getAbstract() != null)
+    }
+    if (q.getAbstract() != null) {
       queryStringParams.add(new BasicNameValuePair("abstract", q.getAbstract()));
-    if (q.getDescription() != null)
+    }
+    if (q.getDescription() != null) {
       queryStringParams.add(new BasicNameValuePair("description", q.getDescription()));
+    }
     if (q.getSort() != null) {
       String sortString = q.getSort().toString();
-      if (!q.isSortAscending())
+      if (!q.isSortAscending()) {
         sortString = sortString.concat("_DESC");
+      }
       queryStringParams.add(new BasicNameValuePair("sort", sortString));
     }
     queryStringParams.add(new BasicNameValuePair("startPage", Long.toString(q.getStartPage())));
@@ -784,10 +932,12 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
 
   @Override
   public boolean deleteSeriesElement(String seriesID, String type) throws SeriesException {
-    if (isBlank(seriesID))
+    if (isBlank(seriesID)) {
       throw new IllegalArgumentException("Series ID must not be blank");
-    if (isBlank(type))
+    }
+    if (isBlank(type)) {
       throw new IllegalArgumentException("Element type must not be blank");
+    }
 
     HttpDelete del = new HttpDelete("/" + seriesID + "/elements/" + type);
     HttpResponse response = getResponse(del, SC_NO_CONTENT, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR);
@@ -813,12 +963,27 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     }
   }
 
-  // CHECKSTYLE:OFF
-  private SeriesQuery getSeries(String text, String seriesId, Boolean edit, String seriesTitle,
-          String creator, String contributor, String publisher, String rightsHolder, String createdFrom,
-          String createdTo, String language, String license, String subject, String seriesAbstract, String description,
-          String sort, String startPageString, String countString, Boolean isFuzzyMatch) throws SeriesException, UnauthorizedException {
-    // CHECKSTYLE:ON
+  private SeriesQuery getSeries(
+      String text,
+      String seriesId,
+      Boolean edit,
+      String seriesTitle,
+      String creator,
+      String contributor,
+      String publisher,
+      String rightsHolder,
+      String createdFrom,
+      String createdTo,
+      String language,
+      String license,
+      String subject,
+      String seriesAbstract,
+      String description,
+      String sort,
+      String startPageString,
+      String countString,
+      Boolean isFuzzyMatch
+  ) throws SeriesException, UnauthorizedException {
     int startPage = 0;
     if (StringUtils.isNotEmpty(startPageString)) {
       try {
@@ -838,8 +1003,9 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       } catch (NumberFormatException e) {
         logger.warn("Bad count parameter");
       }
-      if (count < 1)
+      if (count < 1) {
         count = DEFAULT_LIMIT;
+      }
     }
 
     SeriesQuery q = new SeriesQuery();
@@ -849,40 +1015,40 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       q.setEdit(edit);
     }
     if (StringUtils.isNotEmpty(text)) {
-      q.setText(text.toLowerCase());
+      q.setText(text);
     }
     if (StringUtils.isNotEmpty(seriesId)) {
-      q.setSeriesId(seriesId.toLowerCase());
+      q.setSeriesId(seriesId);
     }
     if (StringUtils.isNotEmpty(seriesTitle)) {
-      q.setSeriesTitle(seriesTitle.toLowerCase());
+      q.setSeriesTitle(seriesTitle);
     }
     if (StringUtils.isNotEmpty(creator)) {
-      q.setCreator(creator.toLowerCase());
+      q.setCreator(creator);
     }
     if (StringUtils.isNotEmpty(contributor)) {
-      q.setContributor(contributor.toLowerCase());
+      q.setContributor(contributor);
     }
     if (StringUtils.isNotEmpty(language)) {
-      q.setLanguage(language.toLowerCase());
+      q.setLanguage(language);
     }
     if (StringUtils.isNotEmpty(license)) {
-      q.setLicense(license.toLowerCase());
+      q.setLicense(license);
     }
     if (StringUtils.isNotEmpty(subject)) {
-      q.setSubject(subject.toLowerCase());
+      q.setSubject(subject);
     }
     if (StringUtils.isNotEmpty(publisher)) {
-      q.setPublisher(publisher.toLowerCase());
+      q.setPublisher(publisher);
     }
     if (StringUtils.isNotEmpty(seriesAbstract)) {
-      q.setSeriesAbstract(seriesAbstract.toLowerCase());
+      q.setSeriesAbstract(seriesAbstract);
     }
     if (StringUtils.isNotEmpty(description)) {
-      q.setDescription(description.toLowerCase());
+      q.setDescription(description);
     }
     if (StringUtils.isNotEmpty(rightsHolder)) {
-      q.setRightsHolder(rightsHolder.toLowerCase());
+      q.setRightsHolder(rightsHolder);
     }
     // allow seriesId wild card search
     if (isFuzzyMatch != null) {

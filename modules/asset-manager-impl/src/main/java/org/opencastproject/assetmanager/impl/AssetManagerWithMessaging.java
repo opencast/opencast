@@ -147,8 +147,11 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
                 current += 1;
                 try {
                   TakeSnapshot takeSnapshot = mkTakeSnapshotMessage(snapshot, null);
-                  getMessageSender().sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName),
-                          MessageSender.DestinationType.Queue, takeSnapshot);
+                  getMessageSender().sendObjectMessage(
+                      AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName),
+                      MessageSender.DestinationType.Queue,
+                      takeSnapshot
+                  );
                 } catch (Throwable t) {
                   logger.error("Unable to recreate event {} from organization {}",
                           snapshot.getMediaPackage().getIdentifier().toString(), orgId, t);
@@ -186,12 +189,16 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
   @Override
   public Snapshot takeSnapshot(String owner, MediaPackage mp) {
     final Snapshot snapshot = super.takeSnapshot(owner, mp);
-    // We pass the original media package here, instead of using snapshot.getMediaPackage(), for security reasons.
-    // The original media package has elements with URLs of type http://.../files/... in it. These URLs will be pulled
-    // from the Workspace cache without a HTTP call.
-    // Were we to use snapshot.getMediaPackage(), we'd have a HTTP call on our hands that's secured via the asset
-    // manager security model. But the snapshot taken here doesn't have the necessary security properties installed (yet).
-    // This happens in AssetManagerWithSecurity, some layers higher up. So there's a weird loop in here.
+    // We pass the original media package here, instead of using
+    // snapshot.getMediaPackage(), for security reasons. The original media
+    // package has elements with URLs of type http://.../files/... in it. These
+    // URLs will be pulled from the Workspace cache without a HTTP call.
+    //
+    // Were we to use snapshot.getMediaPackage(), we'd have a HTTP call on our
+    // hands that's secured via the asset manager security model. But the
+    // snapshot taken here doesn't have the necessary security properties
+    // installed (yet). This happens in AssetManagerWithSecurity, some layers
+    // higher up. So there's a weird loop in here.
     notifyTakeSnapshot(snapshot, mp);
     return snapshot;
   }

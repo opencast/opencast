@@ -50,13 +50,13 @@ public class DictionaryServiceImpl implements DictionaryService {
 
   /** The logging facility */
   private static final Logger logger =
-    LoggerFactory.getLogger(DictionaryServiceImpl.class);
+      LoggerFactory.getLogger(DictionaryServiceImpl.class);
 
   public static final String HUNSPELL_BINARY_CONFIG_KEY =
-    "org.opencastproject.dictionary.hunspell.binary";
+      "org.opencastproject.dictionary.hunspell.binary";
 
   public static final String HUNSPELL_COMMAND_CONFIG_KEY =
-    "org.opencastproject.dictionary.hunspell.command";
+      "org.opencastproject.dictionary.hunspell.command";
 
   /* The hunspell binary to execute */
   private String binary = "hunspell";

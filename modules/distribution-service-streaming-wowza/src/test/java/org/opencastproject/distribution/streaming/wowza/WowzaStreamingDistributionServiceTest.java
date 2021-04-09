@@ -43,12 +43,9 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -81,8 +78,10 @@ public class WowzaStreamingDistributionServiceTest {
   private static UserDirectoryService userDirectoryService = null;
 
   private static final String defaultTenant = "mh_default_org";
-  private static final String defaultUrlProperty = format(WowzaStreamingDistributionService.WOWZA_URL_KEY, defaultTenant);
-  private static final String defaultPortProperty = format(WowzaStreamingDistributionService.WOWZA_PORT_KEY, defaultTenant);
+  private static final String defaultUrlProperty
+      = format(WowzaStreamingDistributionService.WOWZA_URL_KEY, defaultTenant);
+  private static final String defaultPortProperty
+      = format(WowzaStreamingDistributionService.WOWZA_PORT_KEY, defaultTenant);
 
   private static final String tenant1 = "tenant_1";
   private static final String tenant2 = "tenant_2";
@@ -145,14 +144,6 @@ public class WowzaStreamingDistributionServiceTest {
 
     final TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
     EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
-    EasyMock.expect(httpClient.run((HttpUriRequest) EasyMock.anyObject()))
-            .andAnswer(new IAnswer<Function<Function<HttpResponse, Object>, Either<Exception, Object>>>() {
-              @Override
-              public Function<Function<HttpResponse, Object>, Either<Exception, Object>> answer() throws Throwable {
-                HttpUriRequest req = (HttpUriRequest) EasyMock.getCurrentArguments()[0];
-                return StandAloneTrustedHttpClientImpl.run(httpClient, req);
-              }
-            }).anyTimes();
     EasyMock.replay(httpClient);
     streamingService.setTrustedHttpClient(httpClient);
 
@@ -251,23 +242,23 @@ public class WowzaStreamingDistributionServiceTest {
     setUpDefault();
 
     final String[] inputStreamingUrls = new String[] {
-            "incorrect url",
-            "noschema.myserver.com/my/path/to/server",
-            "http://withhttp.example.com/path",
-            "https://withhttps.testing.com/this/is/a/path",
-            "rtmp://withrtmp.test.ext/another/path",
-            "rtmps://withrtmps.anothertest.test/path/to/server",
-            "other://withotherschema.test/mypath"
+        "incorrect url",
+        "noschema.myserver.com/my/path/to/server",
+        "http://withhttp.example.com/path",
+        "https://withhttps.testing.com/this/is/a/path",
+        "rtmp://withrtmp.test.ext/another/path",
+        "rtmps://withrtmps.anothertest.test/path/to/server",
+        "other://withotherschema.test/mypath"
     };
 
     final String[] outputStreamingUrls = new String[] {
-            null,
-            "http://noschema.myserver.com:10/my/path/to/server",
-            "http://withhttp.example.com:10/path",
-            "https://withhttps.testing.com:10/this/is/a/path",
-            null,
-            null,
-            null
+        null,
+        "http://noschema.myserver.com:10/my/path/to/server",
+        "http://withhttp.example.com:10/path",
+        "https://withhttps.testing.com:10/this/is/a/path",
+        null,
+        null,
+        null
     };
 
     map.put(defaultPortProperty, port);

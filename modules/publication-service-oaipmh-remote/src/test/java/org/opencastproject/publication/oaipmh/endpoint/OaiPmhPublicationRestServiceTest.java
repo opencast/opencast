@@ -27,7 +27,6 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 import static org.opencastproject.util.UrlSupport.uri;
 
 import org.opencastproject.job.api.Job;
-import org.opencastproject.kernel.http.impl.HttpClientFactory;
 import org.opencastproject.kernel.security.TrustedHttpClientImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -80,9 +79,13 @@ public class OaiPmhPublicationRestServiceTest {
     //
     final ServiceRegistry registry = EasyMock.createNiceMock(ServiceRegistry.class);
     final ServiceRegistration registration = EasyMock.createNiceMock(ServiceRegistration.class);
-    EasyMock.expect(registration.getHost()).andReturn(url.getProtocol() + "://" + url.getHost() + ":" + url.getPort()).anyTimes();
+    EasyMock.expect(registration.getHost())
+        .andReturn(url.getProtocol() + "://" + url.getHost() + ":" + url.getPort())
+        .anyTimes();
     EasyMock.expect(registration.getPath()).andReturn(url.getPath()).anyTimes();
-    EasyMock.expect(registry.getServiceRegistrationsByLoad(EasyMock.anyString())).andReturn(ListBuilders.SIA.mk(registration)).anyTimes();
+    EasyMock.expect(registry.getServiceRegistrationsByLoad(EasyMock.anyString()))
+        .andReturn(ListBuilders.SIA.mk(registration))
+        .anyTimes();
     EasyMock.replay(registry, registration);
     final OaiPmhPublicationServiceRemoteImpl remote = new OaiPmhPublicationServiceRemoteImpl();
     remote.setTrustedHttpClient(new TestHttpClient());
@@ -99,7 +102,6 @@ public class OaiPmhPublicationRestServiceTest {
   private static final class TestHttpClient extends TrustedHttpClientImpl {
     TestHttpClient() {
       super("user", "pass");
-      setHttpClientFactory(new HttpClientFactory());
       setSecurityService(EasyMock.createNiceMock(SecurityService.class));
     }
 

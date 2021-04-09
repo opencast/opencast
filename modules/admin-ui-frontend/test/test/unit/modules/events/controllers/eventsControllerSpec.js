@@ -18,6 +18,7 @@ describe('Events controller', function () {
         EventsResource = _EventsResource_;
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('modules/events/partials/index.html').respond('');
+        $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
     }));
 
     it('instantiates', function () {

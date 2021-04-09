@@ -42,7 +42,7 @@
       "SELECT_OPTION": "选择选项",
       "JOB_TITLE": "标题",
       "JOB_STATUS": "状态",
-      "UPLOAD_SUCCESS": "Upload succeeded!",
+      "UPLOAD_SUCCESS": "上传成功！",
       "UPLOAD_FAILURE": "上传失败!",
       "UPLOAD_FAILURE_DESCRIPTION": "请稍后再试。",
       "EDIT_SUCCESS": "编辑成功，重新发布中。",

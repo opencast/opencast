@@ -15,6 +15,12 @@ export function Welcome() {
                 <li>Use the <code>?deletion=true</code> URL parameter to show a deletion button next to each episode.</li>
                 <li>Use the <code>?edit=true</code> URL parameter to show an edit button next to each episode.</li>
             </ul>
+            <li>For upload integration, use the <a href="index.html?subtool=upload">Upload LTI Tool</a>. Note that you can specify these parameters:</li>
+            <ul>
+                <li>Use the <code>?series=[series-id]</code> URL parameter to set the series ID the upload belongs to.</li>
+                <li>Use the <code>?series_name=[series-name]</code> URL parameter to set the series name the upload belongs to. The series name has to be unique.</li>
+                <li>Use the <code>?episode_id=[episode-id]</code> URL parameter to set an episode ID (do not use other than for testing).</li>
+            </ul>
         </ul>
     </>;
 }

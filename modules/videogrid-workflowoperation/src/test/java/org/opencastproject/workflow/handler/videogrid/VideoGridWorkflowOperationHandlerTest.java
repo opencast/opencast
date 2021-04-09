@@ -139,7 +139,7 @@ public class VideoGridWorkflowOperationHandlerTest {
     uris.add(trackURI);
     videoGridJob.setPayload(gson.toJson(uris));
     VideoGridService videoGridService = EasyMock.createMock(VideoGridService.class);
-    EasyMock.expect(videoGridService.createPartialTracks(anyObject())).andReturn(videoGridJob);
+    EasyMock.expect(videoGridService.createPartialTracks(anyObject(), anyObject())).andReturn(videoGridJob);
 
     Job inspectJob = new JobImpl(1);
     inspectTrack = new TrackImpl();

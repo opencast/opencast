@@ -47,6 +47,7 @@ import com.amazonaws.services.s3.model.SetBucketVersioningConfigurationRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -61,12 +62,12 @@ import java.io.InputStream;
 import java.util.Dictionary;
 
 @Component(
-  property = {
+    property = {
     "service.description=Amazon S3 based asset store",
     "store.type=aws-s3"
-  },
-  immediate = true,
-  service = { RemoteAssetStore.class, AwsS3AssetStore.class }
+    },
+    immediate = true,
+    service = { RemoteAssetStore.class, AwsS3AssetStore.class }
 )
 public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetStore {
 
@@ -143,10 +144,11 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       regionName = getAWSConfigKey(cc, AWS_S3_REGION_CONFIG);
       logger.info("AWS region is {}", regionName);
 
-      endpoint = getAWSConfigKey(cc, AWS_S3_ENDPOINT_CONFIG);
+      endpoint = OsgiUtil.getComponentContextProperty(
+          cc, AWS_S3_ENDPOINT_CONFIG, "s3." + regionName + ".amazonaws.com");
       logger.info("AWS endpoint is {}", endpoint);
 
-      pathStyle = Boolean.valueOf(getAWSConfigKey(cc, AWS_S3_PATH_STYLE_CONFIG));
+      pathStyle = BooleanUtils.toBoolean(OsgiUtil.getComponentContextProperty(cc, AWS_S3_PATH_STYLE_CONFIG, "false"));
       logger.info("AWS path style is {}", pathStyle);
 
 
@@ -158,11 +160,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       // Keys not informed so use default credentials provider chain, which
       // will look at the environment variables, java system props, credential files, and instance
       // profile credentials
-      if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone())
+      if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone()) {
         provider = new DefaultAWSCredentialsProviderChain();
-      else
+      } else {
         provider = new AWSStaticCredentialsProvider(
                 new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
+      }
 
       // Create AWS client.
       s3 = AmazonS3ClientBuilder.standard()
@@ -198,7 +201,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
           s3.setBucketVersioningConfiguration(configRequest);
           logger.info("AWS S3 ARCHIVE bucket {} created and versioning enabled", bucketName);
         } catch (Exception e2) {
-          throw new IllegalStateException("ARCHIVE bucket " + bucketName + " cannot be created: " + e2.getMessage(), e2);
+          throw new IllegalStateException(
+              "ARCHIVE bucket " + bucketName + " cannot be created: " + e2.getMessage(), e2);
         }
       } else {
         throw new IllegalStateException("ARCHIVE bucket " + bucketName + " exists, but we can't access it: "
@@ -214,8 +218,9 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    */
   protected AwsUploadOperationResult uploadObject(File origin, String objectName) throws AssetStoreException {
     // Check first if bucket is there.
-    if (!bucketCreated)
+    if (!bucketCreated) {
       createAWSBucket();
+    }
 
     // Upload file to AWS S3
     // Use TransferManager to take advantage of multipart upload.

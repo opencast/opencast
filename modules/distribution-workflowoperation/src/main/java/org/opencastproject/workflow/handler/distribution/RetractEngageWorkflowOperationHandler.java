@@ -97,11 +97,6 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     this.searchService = searchService;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
-   */
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
@@ -115,10 +110,11 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @throws DistributionException
    */
   protected List<Job> retractElements(Set<String> retractElementIds, MediaPackage searchMediaPackage) throws
-    DistributionException {
+          DistributionException {
     List<Job> jobs = new ArrayList<Job>();
     if (retractElementIds.size() > 0) {
-      Job retractDownloadDistributionJob = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds);
+      Job retractDownloadDistributionJob
+          = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds);
       if (retractDownloadDistributionJob != null) {
         jobs.add(retractDownloadDistributionJob);
       }
@@ -174,8 +170,9 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
       logger.info("Removing media package {} from the search index", mediaPackage);
       Job deleteFromSearch = searchService.delete(mediaPackage.getIdentifier().toString());
-      if (!waitForStatus(deleteFromSearch).isSuccess())
+      if (!waitForStatus(deleteFromSearch).isSuccess()) {
         throw new WorkflowOperationException("Removing media package from search did not complete successfully");
+      }
 
       logger.debug("Remove from search operation complete");
 

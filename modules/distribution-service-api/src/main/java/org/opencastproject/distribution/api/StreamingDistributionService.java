@@ -61,7 +61,7 @@ public interface StreamingDistributionService extends DistributionService {
    * @throws DistributionException In case distribution fails.
    */
   List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds)
-      throws DistributionException;
+          throws DistributionException;
 
   /**
    * Retracts the given elements synchronously. This should be used rarely since load balancing will be unavailable.
@@ -78,5 +78,5 @@ public interface StreamingDistributionService extends DistributionService {
    * @throws DistributionException In case retraction fails.
    */
   List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
-      throws DistributionException;
+          throws DistributionException;
 }

@@ -168,6 +168,9 @@ angular.module('adminNg.controllers')
         },
         changePolicies = function (access, loading) {
           var newPolicies = {};
+          if (!Array.isArray(access)) {
+            access = [access];
+          }
           angular.forEach(access, function (acl) {
             var policy = newPolicies[acl.role];
 
@@ -431,7 +434,7 @@ angular.module('adminNg.controllers')
           //to resolve before we can add the roles that are present in the series but not in the system
           $scope.access.$promise.then(function () {
             $scope.roles.$promise.then(function() {
-              angular.forEach($scope.access.episode_access.privileges, function(newRole) {
+              angular.forEach(Object.keys($scope.access.episode_access.privileges), function(newRole) {
                 if ($scope.roles.indexOf(newRole) == -1) {
                   $scope.roles.push(newRole);
                 }

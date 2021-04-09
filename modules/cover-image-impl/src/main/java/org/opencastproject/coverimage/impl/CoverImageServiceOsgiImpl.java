@@ -67,8 +67,10 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
   @Override
   public void activate(ComponentContext cc) {
     super.activate(cc);
+    // CHECKSTYLE:OFF
     // See
     // http://www.stichlberger.com/software/workaround-for-batiks-noclassdeffounderrorclassnotfoundexception-truncatedfileexception/
+    // CHECKSTYLE:ON
     // ---------------
     // add this code before you use batik (make sure is runs only once)
     // via the lower priority this subclass is registered before JPEGRegistryEntry

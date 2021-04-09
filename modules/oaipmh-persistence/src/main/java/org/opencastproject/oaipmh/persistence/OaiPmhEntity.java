@@ -58,17 +58,17 @@ public class OaiPmhEntity {
 
   /** media package id, primary key */
   @Id
-  @Column(name = "mp_id", length = 128)
+  @Column(name = "mp_id", length = 64)
   private String mediaPackageId;
 
   /** Organization id */
   @Id
-  @Column(name = "organization", length = 128)
+  @Column(name = "organization", length = 96)
   protected String organization;
 
   /** Repository id */
   @Id
-  @Column(name = "repo_id")
+  @Column(name = "repo_id", length = 12)
   private String repositoryId;
 
   /** Series id */

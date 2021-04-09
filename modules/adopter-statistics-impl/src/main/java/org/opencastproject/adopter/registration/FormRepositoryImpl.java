@@ -83,8 +83,9 @@ public class FormRepositoryImpl implements FormRepository {
       }
       throw new FormRepositoryException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -102,8 +103,9 @@ public class FormRepositoryImpl implements FormRepository {
       logger.error("Error occurred while deleting the adopter registration table. {}", e.getMessage());
       throw new RuntimeException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -116,8 +118,9 @@ public class FormRepositoryImpl implements FormRepository {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 

@@ -70,7 +70,8 @@ public class AwsAssetDatabaseImplTest {
     EasyMock.replay(bc, cc);
 
     database = new AwsAssetDatabaseImpl();
-    database.setEntityManagerFactory(PersistenceUtil.newTestEntityManagerFactory(AwsAssetDatabaseImpl.PERSISTENCE_UNIT));
+    database.setEntityManagerFactory(
+        PersistenceUtil.newTestEntityManagerFactory(AwsAssetDatabaseImpl.PERSISTENCE_UNIT));
     database.activate(cc);
   }
 
@@ -135,7 +136,8 @@ public class AwsAssetDatabaseImplTest {
     Assert.assertEquals(2, mappings.size());
     AwsAssetMapping m1 = mappings.get(0);
     AwsAssetMapping m2 = mappings.get(1);
-    Assert.assertTrue((ASSET1_ID.equals(m1.getMediaPackageElementId()) && ASSET2_ID.equals(m2.getMediaPackageElementId()))
+    Assert.assertTrue(
+        (ASSET1_ID.equals(m1.getMediaPackageElementId()) && ASSET2_ID.equals(m2.getMediaPackageElementId()))
             || (ASSET2_ID.equals(m1.getMediaPackageElementId()) && ASSET1_ID.equals(m2.getMediaPackageElementId())));
   }
 

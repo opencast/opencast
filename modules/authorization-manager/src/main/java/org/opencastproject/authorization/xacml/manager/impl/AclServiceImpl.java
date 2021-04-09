@@ -75,8 +75,9 @@ public final class AclServiceImpl implements AclService {
   public boolean applyAclToEpisode(String episodeId, AccessControlList acl) throws AclServiceException {
     try {
       Opt<MediaPackage> mediaPackage = Opt.none();
-      if (assetManager != null)
+      if (assetManager != null) {
         mediaPackage = assetManager.getMediaPackage(episodeId);
+      }
 
       Option<AccessControlList> aclOpt = Option.option(acl);
       // the episode service is the source of authority for the retrieval of media packages
@@ -89,8 +90,9 @@ public final class AclServiceImpl implements AclService {
             // update in episode service
             try {
               MediaPackage mp = authorizationService.setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
-              if (assetManager != null)
+              if (assetManager != null) {
                 assetManager.takeSnapshot(mp);
+              }
             } catch (MediaPackageException e) {
               logger.error("Error getting ACL from media package", e);
             }
@@ -101,8 +103,9 @@ public final class AclServiceImpl implements AclService {
           public void enone() {
             // update in episode service
             MediaPackage mp = authorizationService.removeAcl(episodeSvcMp, AclScope.Episode);
-            if (assetManager != null)
+            if (assetManager != null) {
               assetManager.takeSnapshot(mp);
+            }
           }
 
         });
@@ -122,7 +125,7 @@ public final class AclServiceImpl implements AclService {
 
   @Override
   public boolean applyAclToSeries(String seriesId, AccessControlList acl, boolean override)
-      throws AclServiceException {
+          throws AclServiceException {
     try {
       // update in series service
       // this will in turn update the search service by the SeriesUpdatedEventHandler
@@ -141,7 +144,7 @@ public final class AclServiceImpl implements AclService {
 
   @Override
   public boolean applyAclToSeries(String seriesId, ManagedAcl managedAcl, boolean override)
-      throws AclServiceException {
+          throws AclServiceException {
     return applyAclToSeries(seriesId, managedAcl.getAcl(), override);
   }
 

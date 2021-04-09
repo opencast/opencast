@@ -38,13 +38,11 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -57,14 +55,10 @@ public class ScheduledDataCollector extends TimerTask {
   private static final Logger logger = LoggerFactory.getLogger(ScheduledDataCollector.class);
 
   /** The property key containing the address of the external server where the statistic data will be send to. */
-  private static final String PROP_KEY_STATISTIC_SERVER_ADDRESS = "org.opencastproject.adopter.statistic.server.url";
-
-  /** The property key containing the time when the gathered data shall be sent. It uses the 24 hours format (0-23). */
-  private static final String PROP_KEY_STATISTIC_SEND_TIME = "org.opencastproject.adopter.scheduler.time";
+  private static final String PROP_KEY_STATISTIC_SERVER_ADDRESS = "org.opencastproject.adopter.registration.server.url";
+  private static final String DEFAULT_STATISTIC_SERVER_ADDRESS = "https://register.opencast.org";
 
   private static final int ONE_DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
-  private static final int ONE_HOUR_IN_MILLISECONDS = 1000 * 60 * 60;
-
 
   //================================================================================
   // OSGi properties
@@ -117,23 +111,17 @@ public class ScheduledDataCollector extends TimerTask {
     this.defaultOrganization = new DefaultOrganization();
     String systemAdminUserName = ctx.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
     this.systemAdminUser = SecurityUtil.createSystemUser(systemAdminUserName, defaultOrganization);
-    String statisticServerBaseUrl = ctx.getProperty(PROP_KEY_STATISTIC_SERVER_ADDRESS);
-    this.sender = new Sender(statisticServerBaseUrl);
 
-    // The following code calculates the delay for the scheduler, so the task can
-    // be executed at the time, that has been set in the 'custom.properties' file
-    String sendTimeStr = ctx.getProperty(PROP_KEY_STATISTIC_SEND_TIME); // scheduler execution time
-    int timeToSend = NumberUtils.createInteger(sendTimeStr);
-    if (timeToSend < 0 || timeToSend > 23) {
-      throw new NumberFormatException("The number should be between 0 and 23 inclusive.");
+    // We read this key for testing but don't ever expect this to be set.
+    final String serverBaseUrl = ctx.getProperty(PROP_KEY_STATISTIC_SERVER_ADDRESS);
+    if (serverBaseUrl != null) {
+      logger.error("\nAdopter registration information are sent to a server other than register.opencast.org.\n"
+          + "We cannot take any responsibility for what is done with the data.");
     }
-    int currentHour = NumberUtils.createInteger(new SimpleDateFormat("H").format(new Date()));
-    if (currentHour > timeToSend) timeToSend += 24;
-    int schedulerDelay = timeToSend - currentHour;
-    logger.info("Starting the adopter statistic scheduler task in {} hours. "
-            + "After then, it will repeat the task every 24 hours.", schedulerDelay);
-    schedulerDelay *= ONE_HOUR_IN_MILLISECONDS; //convert the delay from hours to milliseconds
-    new Timer().schedule(this, schedulerDelay, ONE_DAY_IN_MILLISECONDS);
+    this.sender = new Sender(Objects.toString(serverBaseUrl, DEFAULT_STATISTIC_SERVER_ADDRESS));
+
+    // Send data now. Repeat every 24h.
+    new Timer().schedule(this, 0, ONE_DAY_IN_MILLISECONDS);
   }
 
   /**

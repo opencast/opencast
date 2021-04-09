@@ -68,7 +68,9 @@ import java.util.UUID;
 /**
  * Publishes media to a Youtube play list.
  */
-public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer implements YouTubePublicationService, ManagedService {
+public class YouTubeV3PublicationServiceImpl
+    extends AbstractJobProducer
+    implements YouTubePublicationService, ManagedService {
 
   /** The load on the system introduced by creating a publish job */
   public static final float DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD = 0.1f;
@@ -203,8 +205,10 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
       throw new ConfigurationException("Failed to load YouTube v3 properties", dataStore, e);
     }
 
-    youtubePublishJobLoad = LoadUtil.getConfiguredLoadValue(properties, YOUTUBE_PUBLISH_LOAD_KEY, DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD, serviceRegistry);
-    youtubeRetractJobLoad = LoadUtil.getConfiguredLoadValue(properties, YOUTUBE_RETRACT_LOAD_KEY, DEFAULT_YOUTUBE_RETRACT_JOB_LOAD, serviceRegistry);
+    youtubePublishJobLoad = LoadUtil.getConfiguredLoadValue(
+        properties, YOUTUBE_PUBLISH_LOAD_KEY, DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD, serviceRegistry);
+    youtubeRetractJobLoad = LoadUtil.getConfiguredLoadValue(
+        properties, YOUTUBE_RETRACT_LOAD_KEY, DEFAULT_YOUTUBE_RETRACT_JOB_LOAD, serviceRegistry);
   }
 
   @Override
@@ -235,7 +239,8 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
    * @throws PublicationException
    *           if publication fails
    */
-  private Publication publish(final Job job, final MediaPackage mediaPackage, final String elementId) throws PublicationException {
+  private Publication publish(final Job job, final MediaPackage mediaPackage, final String elementId)
+          throws PublicationException {
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Mediapackage must be specified");
     } else if (elementId == null) {
@@ -258,7 +263,10 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
       final String episodeName = c.getEpisodeName();
       final UploadProgressListener operationProgressListener = new UploadProgressListener(mediaPackage, file);
       final String privacyStatus = makeVideosPrivate ? "private" : "public";
-      final VideoUpload videoUpload = new VideoUpload(truncateTitleToMaxFieldLength(episodeName, false), c.getEpisodeDescription(), privacyStatus, file, operationProgressListener, tags);
+      final VideoUpload videoUpload = new VideoUpload(
+          truncateTitleToMaxFieldLength(episodeName, false),
+          c.getEpisodeDescription(), privacyStatus,
+          file, operationProgressListener, tags);
       final Video video = youTubeService.addVideoToMyChannel(videoUpload);
       final int timeoutMinutes = 60;
       final long startUploadMilliseconds = new Date().getTime();
@@ -266,7 +274,8 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
         Thread.sleep(POLL_MILLISECONDS);
         final long howLongWaitingMinutes = (new Date().getTime() - startUploadMilliseconds) / 60000;
         if (howLongWaitingMinutes > timeoutMinutes) {
-          throw new PublicationException("Upload to YouTube exceeded " + timeoutMinutes + " minutes for episode " + episodeName);
+          throw new PublicationException(
+              "Upload to YouTube exceeded " + timeoutMinutes + " minutes for episode " + episodeName);
         }
       }
       String playlistName = StringUtils.trimToNull(truncateTitleToMaxFieldLength(mediaPackage.getSeriesTitle(), true));
@@ -281,14 +290,18 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
       youTubeService.addPlaylistItem(playlist.getId(), video.getId());
       // Create new publication element
       final URL url = new URL("http://www.youtube.com/watch?v=" + video.getId());
-      return PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_NAME, url.toURI(), MimeTypes.parseMimeType(MIME_TYPE));
+      return PublicationImpl.publication(
+          UUID.randomUUID().toString(), CHANNEL_NAME, url.toURI(), MimeTypes.parseMimeType(MIME_TYPE));
     } catch (Exception e) {
       logger.error("failed publishing to Youtube", e);
       logger.warn("Error publishing {}, {}", element, e.getMessage());
       if (e instanceof PublicationException) {
         throw (PublicationException) e;
       } else {
-        throw new PublicationException("YouTube publish failed on job: " + ToStringBuilder.reflectionToString(job, ToStringStyle.MULTI_LINE_STYLE), e);
+        throw new PublicationException(
+            "YouTube publish failed on job: "
+                + ToStringBuilder.reflectionToString(job, ToStringStyle.MULTI_LINE_STYLE),
+            e);
       }
     }
   }
@@ -342,7 +355,8 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
   }
 
   private void retract(final String seriesTitle, final String episodeName) throws Exception {
-    final List<SearchResult> items = youTubeService.searchMyVideos(truncateTitleToMaxFieldLength(episodeName, false), null, 1).getItems();
+    final List<SearchResult> items = youTubeService.searchMyVideos(
+        truncateTitleToMaxFieldLength(episodeName, false), null, 1).getItems();
     if (!items.isEmpty()) {
       final String videoId = items.get(0).getId().getVideoId();
       if (seriesTitle != null) {

@@ -247,10 +247,14 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       throw new IllegalArgumentException("Unknown value for configuration key mode");
     }
 
-    final String[] downloadSourceFlavors = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(DOWNLOAD_SOURCE_FLAVORS)), ",");
-    final String[] downloadSourceTags = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(DOWNLOAD_SOURCE_TAGS)), ",");
-    final String[] streamingSourceFlavors = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS)), ",");
-    final String[] streamingSourceTags = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_TAGS)), ",");
+    final String[] downloadSourceFlavors
+        = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(DOWNLOAD_SOURCE_FLAVORS)), ",");
+    final String[] downloadSourceTags
+        = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(DOWNLOAD_SOURCE_TAGS)), ",");
+    final String[] streamingSourceFlavors
+        = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS)), ",");
+    final String[] streamingSourceTags
+        = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_TAGS)), ",");
 
     String publicationUUID = UUID.randomUUID().toString();
     Publication publication = PublicationImpl.publication(publicationUUID, channelId, null, null);
@@ -339,8 +343,14 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     return true;
   }
 
-  private Set<MediaPackageElement> distribute(Collection<MediaPackageElement> elements, MediaPackage mediapackage,
-          String channelId, String mode, boolean checkAvailability, boolean streaming) throws WorkflowOperationException {
+  private Set<MediaPackageElement> distribute(
+      Collection<MediaPackageElement> elements,
+      MediaPackage mediapackage,
+      String channelId,
+      String mode,
+      boolean checkAvailability,
+      boolean streaming
+  ) throws WorkflowOperationException {
 
     Set<MediaPackageElement> result = new HashSet<>();
 

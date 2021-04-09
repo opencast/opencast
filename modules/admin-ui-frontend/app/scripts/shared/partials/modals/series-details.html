@@ -284,7 +284,7 @@
   <div class="modal-content" data-modal-tab-content="statistics">
     <div class="modal-body">
       <div class="full-col">
-        <div class="modal-alert danger" ng-if="statReusable.error" translate="STATISTICS.NOT_AVAILABLE"/>
+        <div class="modal-alert danger" ng-if="statReusable.error" translate="STATISTICS.NOT_AVAILABLE"></div>
         <div class="obj" ng-repeat="data in statReusable.statProviderData" ng-if="!statReusable.error">
           <header class="no-expand" translate="{{ data.title }}">
             <!-- Statistics -->
@@ -307,7 +307,10 @@
               >
             </statistics-graph>
           </div>
-          <div class="modal-alert danger" ng-if="data.providerType != 'timeSeries'" translate="STATISTICS.UNSUPPORTED_TYPE"/>
+          <div class="modal-alert danger"
+               ng-if="data.providerType != 'timeSeries'"
+               translate="STATISTICS.UNSUPPORTED_TYPE">
+          </div>
         </div>
       </div>
     </div>

@@ -59,9 +59,10 @@
           <span id="error-count" class="badge" ng-show="services.error">{{ services.numErr }}</span>
           <ul class="dropdown-ul">
             <li ng-repeat="(key, value) in services.service"><!-- service directive -->
-              <a ng-if="key == 'Latest Version' && value.error" href="{{ value.docs_url }}" service-name="{{ key }}">
+              <a ng-if="key == 'Latest Version' && (value.error || value.warning)" href="{{ value.docs_url }}" service-name="{{ key }}">
                 <span>Opencast</span>
-                <span class="ng-multi-value ng-multi-value-red">{{ value.status }}</span>
+                <span ng-if="value.error" class="ng-multi-value ng-multi-value-red">{{ value.status }}</span>
+                <span ng-if="value.warning" class="ng-multi-value ng-multi-value-orange">{{ value.status }}</span>
               </a>
               <a ng-if="key != 'Latest Version'" ng-click="toServices($event)" service-name="{{ key }}">
                 <span>{{ key }}</span>

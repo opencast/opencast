@@ -1,0 +1,21 @@
+#### Values pertaining to accessing opencast
+[opencast]
+# URL of the opencast server on which we are editing events.
+# Should be deleted when deployed in Opencast, as the editor can then
+# figure out the correct URL by itself.
+#url = 'https://pyca.opencast.org'
+# Opencast username. Used for Http basic authentication.
+#name = "admin"
+# Password belonging to the above username
+# WARNING: When run in Opencast, this file is publicly accessibly
+#password = "opencast"
+
+### Settings of the metadata tab
+[metadata]
+# If false, the metadata button is not displayed in the main menu
+show = true
+
+### Settings of the thumbnail tab
+[thumbnail]
+# If false, the thumbnail tab is not displayed in the main menu
+show = false

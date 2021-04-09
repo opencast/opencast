@@ -21,6 +21,8 @@
 
 package org.opencastproject.distribution.download;
 
+import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
+
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
@@ -37,14 +39,11 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -103,14 +102,6 @@ public class DownloadDistributionServiceImplTest {
 
     final TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
     EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
-    EasyMock.expect(httpClient.run((HttpUriRequest) EasyMock.anyObject()))
-            .andAnswer(new IAnswer<Function<Function<HttpResponse, Object>, Either<Exception, Object>>>() {
-              @Override
-              public Function<Function<HttpResponse, Object>, Either<Exception, Object>> answer() throws Throwable {
-                HttpUriRequest req = (HttpUriRequest) EasyMock.getCurrentArguments()[0];
-                return StandAloneTrustedHttpClientImpl.run(httpClient, req);
-              }
-            }).anyTimes();
     EasyMock.replay(httpClient);
 
     defaultOrganization = new DefaultOrganization();
@@ -169,8 +160,12 @@ public class DownloadDistributionServiceImplTest {
     EasyMock.replay(workspace);
 
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-    EasyMock.expect(bc.getProperty("org.opencastproject.download.directory")).andReturn(distributionRoot.toString()).anyTimes();
-    EasyMock.expect(bc.getProperty("org.opencastproject.download.url")).andReturn(UrlSupport.DEFAULT_BASE_URL).anyTimes();
+    EasyMock.expect(bc.getProperty("org.opencastproject.download.directory"))
+        .andReturn(distributionRoot.toString()).anyTimes();
+    EasyMock.expect(bc.getProperty("org.opencastproject.download.url"))
+        .andReturn(UrlSupport.DEFAULT_BASE_URL).anyTimes();
+    EasyMock.expect(bc.getProperty(DIGEST_USER_PROPERTY))
+        .andReturn("opencast_system_account").anyTimes();
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     Dictionary<String, Object> p = new Hashtable<String, Object>();
     p.put(DistributionService.CONFIG_KEY_STORE_TYPE, "download");

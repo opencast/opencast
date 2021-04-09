@@ -87,8 +87,9 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
                                                      deleteExternal, tagsAndFlavor);
 
       // Wait for all jobs to be finished
-      if (!waitForStatus(job).isSuccess())
+      if (!waitForStatus(job).isSuccess()) {
         throw new WorkflowOperationException("Execute operation failed");
+      }
 
       final MediaPackage mediaPackage = MediaPackageParser.getFromXml(job.getPayload());
       return createResult(mediaPackage, Action.CONTINUE, job.getQueueTime());

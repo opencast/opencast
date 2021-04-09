@@ -172,6 +172,9 @@ angular.module('adminNg.directives')
              */
         scope.setHumanReadableTimes = function () {
           angular.forEach(scope.video.segments, function(segment, key) {
+            if (segment.end > scope.video.duration) {
+              segment.end = scope.video.duration;
+            }
             segment.startTime = scope.formatMilliseconds(segment.start);
             segment.endTime = scope.formatMilliseconds(segment.end);
           });

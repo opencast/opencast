@@ -53,7 +53,8 @@ public final class Properties {
 
   /**
    * Extract all properties contained in a result.
-   * They'll appear in the order of the returned {@linkplain org.opencastproject.assetmanager.api.query.ARecord records}.
+   * They'll appear in the order of the returned
+   * {@linkplain org.opencastproject.assetmanager.api.query.ARecord records}.
    */
   public static Stream<Property> getProperties(AResult result) {
     return result.getRecords().bind(ARecords.getProperties);
@@ -110,7 +111,8 @@ public final class Properties {
   /**
    * Set a string property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema} instead of creating property IDs manually
+   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
+   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, String value) {
     return setProperty(am, mpId, namespace, propertyName, Value.mk(value));
@@ -119,7 +121,8 @@ public final class Properties {
   /**
    * Set a date property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema} instead of creating property IDs manually
+   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
+   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, Date value) {
     return setProperty(am, mpId, namespace, propertyName, Value.mk(value));
@@ -128,7 +131,8 @@ public final class Properties {
   /**
    * Set a long property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema} instead of creating property IDs manually
+   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
+   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, Long value) {
     return setProperty(am, mpId, namespace, propertyName, Value.mk(value));
@@ -137,16 +141,19 @@ public final class Properties {
   /**
    * Set a boolean property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema} instead of creating property IDs manually
+   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
+   * instead of creating property IDs manually
    */
-  public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, boolean value) {
+  public static boolean setProperty(
+      AssetManager am, String mpId, String namespace, String propertyName, boolean value) {
     return setProperty(am, mpId, namespace, propertyName, Value.mk(value));
   }
 
   /**
    * Set a property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema} instead of creating property IDs manually
+   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
+   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, Value value) {
     return am.setProperty(Property.mk(PropertyId.mk(mpId, namespace, propertyName), value));
@@ -200,7 +207,8 @@ public final class Properties {
   }
 
   /**
-   * Create a stream fold to find the first property whose {@linkplain PropertyId#getFqn() full qualified name} matches the given one
+   * Create a stream fold to find the first property whose
+   * {@linkplain PropertyId#getFqn() full qualified name} matches the given one
    * and extract its value.
    *
    * @param ev the expected value type
@@ -223,7 +231,8 @@ public final class Properties {
   }
 
   /**
-   * Create a stream fold to find the first property whose {@linkplain PropertyId#getFqn() full qualified name} matches the given one
+   * Create a stream fold to find the first property whose
+   * {@linkplain PropertyId#getFqn() full qualified name} matches the given one
    * and extract their values, wrapped in an {@link Opt}.
    *
    * @param ev the expected value type
@@ -271,7 +280,7 @@ public final class Properties {
     return Property.mk(PropertyId.mk(mpId, namespace, name), value);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Get a boolean value. Uses the first property with the given name.
@@ -293,7 +302,7 @@ public final class Properties {
     return getValue(Value.BOOLEAN, name);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Get a string value. Uses the first property with the given name.
@@ -343,7 +352,7 @@ public final class Properties {
     };
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Get a date value. Uses the first property with the given name.
@@ -365,7 +374,7 @@ public final class Properties {
     return getValue(Value.DATE, name);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Get a long value. Uses the first property with the given name.
@@ -387,7 +396,7 @@ public final class Properties {
     return getValue(Value.LONG, name);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Get a string value. Uses the first property with the given name.
@@ -409,7 +418,7 @@ public final class Properties {
     return getValueOpt(Value.STRING, name);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Get a date value. Uses the first property with the given name.
@@ -431,7 +440,7 @@ public final class Properties {
     return getValueOpt(Value.DATE, name);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Get a long value. Uses the first property with the given name.
@@ -453,7 +462,7 @@ public final class Properties {
     return getValueOpt(Value.LONG, name);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   private static <A, B> Fn<Opt<A>, Opt<B>> lift(final Fn<? super A, ? extends B> f) {
     return new Fn<Opt<A>, Opt<B>>() {

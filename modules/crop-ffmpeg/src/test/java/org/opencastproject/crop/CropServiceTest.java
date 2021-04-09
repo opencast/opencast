@@ -98,7 +98,9 @@ public class CropServiceTest {
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
-    EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject())).andReturn(organization).anyTimes();
+    EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
+        .andReturn(organization)
+        .anyTimes();
     EasyMock.replay(organizationDirectoryService);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -197,10 +199,10 @@ public class CropServiceTest {
 
     EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(),
             EasyMock.anyObject(InputStream.class))).andAnswer(() -> {
-      InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
-      IOUtils.copy(in, new FileOutputStream(tempFile));
-      return tempFile.toURI();
-    });
+              InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
+              IOUtils.copy(in, new FileOutputStream(tempFile));
+              return tempFile.toURI();
+            });
     EasyMock.replay(workspace);
 
     return workspace;
