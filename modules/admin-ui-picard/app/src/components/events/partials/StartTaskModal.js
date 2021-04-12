@@ -7,6 +7,7 @@ import WizardStepper from "../../shared/wizard/WizardStepper";
 import StartTaskGeneralPage from "./wizards/StartTaskGeneralPage";
 import StartTaskWorkflowPage from "./wizards/StartTaskWorkflowPage";
 import StartTaskSummaryPage from "./wizards/StartTaskSummaryPage";
+import {postTasks} from "../../../thunks/taskThunks";
 
 const StartTaskModal = ({ close }) => {
     const { t } = useTranslation();
@@ -50,10 +51,8 @@ const StartTaskModal = ({ close }) => {
         }
     }
 
-    const currentValidationSchema = StartTaskSchema[page];
-
     const handleSubmit = values => {
-        console.log('to be implemented');
+        const response = postTasks(values);
         close();
     }
 
@@ -71,7 +70,6 @@ const StartTaskModal = ({ close }) => {
 
                 {/* Initialize overall form */}
                 <Formik initialValues={snapshot}
-                    //validationSchema={currentValidationSchema}
                         onSubmit={values => handleSubmit(values)}>
                     {formik => (
                         <div>

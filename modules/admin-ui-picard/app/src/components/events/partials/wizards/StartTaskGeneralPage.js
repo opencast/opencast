@@ -1,10 +1,8 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import Notifications from "../../../shared/Notifications";
 import {connect} from "react-redux";
 import cn from 'classnames';
-import {Field} from "formik";
-import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 import {getSelectedRows} from "../../../../selectors/tableSelectors";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {getNotifications} from "../../../../selectors/notificationSelector";
@@ -12,17 +10,19 @@ import {getNotifications} from "../../../../selectors/notificationSelector";
 const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
     const { t } = useTranslation();
 
-    const [allChecked, setAllChecked] = useState(false);
+    const [allChecked, setAllChecked] = useState(true);
     const [selectedEvents, setSelectedEvents] = useState(selectedRows);
 
+    useEffect(() => {
+        // set field value for formik on mount, because initially all events are selected
+        formik.setFieldValue('events', selectedEvents);
+    }, []);
+
+
     const isStartable = event => {
-        if (event.event_status.toUpperCase().indexOf('PROCESSED') > -1
+        return event.event_status.toUpperCase().indexOf('PROCESSED') > -1
             || event.event_status.toUpperCase().indexOf('PROCESSING_FAILURE') > -1
-            || event.event_status.toUpperCase().indexOf('PROCESSING_CANCELED') > -1 || !event.selected) {
-            return true;
-        } else {
-            return false;
-        }
+            || event.event_status.toUpperCase().indexOf('PROCESSING_CANCELED') > -1 || !event.selected;
     };
 
     const isTaskStartable = events => {
@@ -39,12 +39,27 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
         const selected = e.target.checked;
         setAllChecked(selected);
         if (selected) {
-            formik.setFieldValue('eventIds', selectedEvents);
+            let changedSelection = selectedEvents.map(event => {
+                return {
+                    ...event,
+                    selected: true
+                }
+            });
+            setSelectedEvents(changedSelection);
+            formik.setFieldValue('events', changedSelection);
         } else {
-            formik.setFieldValue('eventIds',  []);
+            let changedSelection = selectedEvents.map(event => {
+                return {
+                    ...event,
+                    selected: false
+                }
+            });
+            setSelectedEvents(changedSelection);
+            formik.setFieldValue('events',  changedSelection);
         }
     };
 
+    // handle change of checkboxes indicating which events to consider further
     const onChangeSelected = (e, id) => {
         const selected = e.target.checked;
         let changedEvents = selectedEvents.map(event => {
@@ -58,18 +73,31 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
             }
         });
         setSelectedEvents(changedEvents);
+        formik.setFieldValue('events', changedEvents);
 
         if (!selected) {
             setAllChecked(false);
         }
     };
 
+    const checkValidity = () => {
+        if (formik.values.events.length > 0) {
+            if (isTaskStartable(formik.values.events) && formik.isValid) {
+                return formik.values.events.some(event => event.selected === true);
+
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
     return (
         <>
             <div className="modal-content active">
                 <div className="modal-body">
                     <div className="row">
-                        {/*todo: only show if task not startable*/}
+                        {/* Show only if task not startable */}
                         {!isTaskStartable(selectedEvents) && (
                             <div className="alert sticky warning">
                                 <p>{t('BULK_ACTIONS.SCHEDULE_TASK.GENERAL.CANNOTSTART')}</p>
@@ -83,7 +111,8 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
                                 {t('BULK_ACTIONS.SCHEDULE_TASK.GENERAL.CAPTION')}
                                 {/*todo: add translation parameter rows.length*/}
                                 <span className="header-value">
-                                    {t('BULK_ACTIONS.SCHEDULE_TASK.GENERAL.SUMMARY')}
+                                    {t('BULK_ACTIONS.SCHEDULE_TASK.GENERAL.SUMMARY',
+                                        { count: selectedEvents.filter(e => e.selected === true).length })}
                                 </span>
                             </header>
                             <div className="obj-container">
@@ -106,10 +135,10 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
                                         {selectedEvents.map((event, key) => (
                                             <tr key={key} className={cn({error: !isStartable(event)})}>
                                                 <td>
-                                                    <Field name="eventIds"
+                                                    <input name="events"
                                                            type="checkbox"
-                                                           value={event} />
-                                                           {/*checked={event.selected} />*/}
+                                                           onChange={e => onChangeSelected(e, event.id)}
+                                                           checked={event.selected} />
                                                 </td>
                                                 <td>{event.title}</td>
                                                 <td className="nowrap">{event.series ? event.series.title : ''}</td>
@@ -124,9 +153,22 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
                 </div>
             </div>
 
-            <WizardNavigationButtons isFirst
-                                     formik={formik}
-                                     nextPage={nextPage}/>
+            {/* Button for navigation to next page and previous page */}
+            <footer>
+                <button type="submit"
+                        className={cn("submit",
+                            {
+                                active: checkValidity(),
+                                inactive: !checkValidity()
+                            })}
+                        disabled={!checkValidity()}
+                        onClick={() => {
+                            nextPage(formik.values);
+                        }}
+                        tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
+            </footer>
+
+            <div className="btm-spacer"/>
         </>
     );
 };

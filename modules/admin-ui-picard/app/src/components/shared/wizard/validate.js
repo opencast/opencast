@@ -129,13 +129,5 @@ export const NewUserSchema = usernames => (
             .oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required')
 }));
 
-// Validation Schema used in start task wizard
-export const StartTaskSchema = [
-    Yup.object().shape({
-        eventIds: Yup.array().min(1).required('Required')
-    }), Yup.object().shape({
-        workflow: Yup.string().required('Required')
-    })
-];
 
 
