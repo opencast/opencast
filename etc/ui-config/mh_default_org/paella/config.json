@@ -375,13 +375,13 @@
         "enabled": true
       },
       "es.upv.paella.opencast.downloadsPlugin": {
-        "enabled": false
+        "enabled": true
       },
       "es.upv.paella.opencast.downloadsButtonPlugin": {
-        "enabled": true,
+        "enabled": false,
         "tags": ["engage-download"],
         "flavors": [],
-        "tags_and_flavors": false
+        "tagsAndFlavors": false
       },
       "es.upv.paella.opencast.episodesFromSeries": {
         "enabled": true

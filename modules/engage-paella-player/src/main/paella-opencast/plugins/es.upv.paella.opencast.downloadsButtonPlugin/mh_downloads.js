@@ -20,22 +20,21 @@
  */
 
 class DownloadTrack {
-  constructor(oc_track) {
-    if (oc_track.audio == undefined && oc_track.video == undefined) {
+  constructor(ocTrack) {
+    if (ocTrack.audio == undefined && ocTrack.video == undefined) {
       throw 'No audio and video';
     }
-    this.flavor = oc_track.type;
-    this.mimetype = paella.dictionary.translate(oc_track.mimetype);
-    this.url = oc_track.url;
-    if (oc_track.audio) {
+    this.flavor = ocTrack.type;
+    this.mimetype = paella.dictionary.translate(ocTrack.mimetype);
+    this.url = ocTrack.url;
+    if (ocTrack.audio) {
       this.type = 'audio';
-      this.audio_bitrate = oc_track.audio.bitrate;
+      this.audioBitrate = ocTrack.audio.bitrate;
     }
-    if (oc_track.video) {
+    if (ocTrack.video) {
       this.type = 'video';
-      this.video_resolution = oc_track.video.resolution;
-      //this.video_quality = oc_track.video.resolution.split('x', 2)[1] + 'p';
-      this.video_framerate = oc_track.video.framerate;
+      this.videoResolution = ocTrack.video.resolution;
+      this.videoFramerate = ocTrack.video.framerate;
     }
   }
 }
@@ -48,7 +47,7 @@ paella.addPlugin(function() {
       super();
       this._tags = [];
       this._flavors = [];
-      this._tags_and_flavors = false;
+      this._tagsAndFlavors = false;
       this._episode = undefined;
       this._tracks = [];
     }
@@ -72,9 +71,9 @@ paella.addPlugin(function() {
         if (self.config.flavors) {
           self._flavors = self.config.flavors;
         }
-        self._tags_and_flavors = false;
-        if (self.config.tags_and_flavors) {
-          self._tags_and_flavors = self.config.tags_and_flavors;
+        self._tagsAndFlavors = false;
+        if (self.config.tagsAndFlavors) {
+          self._tagsAndFlavors = self.config.tagsAndFlavors;
         }
       }
     }
@@ -112,8 +111,7 @@ paella.addPlugin(function() {
       if (!(tracks instanceof Array)) { tracks = [tracks]; }
 
       var parsedTracks = [];
-      for (var tracksIndex = 0; tracksIndex < tracks.length; tracksIndex++) {
-        var track = tracks[tracksIndex];
+      for (const track of tracks) {
         // only show static file content over http
         // skip streaming tracks
         if (track.url.startsWith('http')
@@ -125,38 +123,22 @@ paella.addPlugin(function() {
           }
 
           // skip and tags
-          if (self._tags.length > 0 && (track.tags == undefined || track.tags.tag == undefined
+          if (self._tags.length > 0 && (track.tags == undefined || track.tags.tag === undefined
                 || track.tags.tag.length < 1)) {
             continue;
           }
-
-          var match_tags = false;
-          for (var tagsIndex = 0; tagsIndex < self._tags.length; tagsIndex++) {
-            var tag = self._tags[tagsIndex];
-            if (track.tags.tag.indexOf(tag) >= 0) {
-              match_tags = true;
-              break;
-            }
-          }
+          var tagsMatched = self._tags.find(tag => track.tags.tag.indexOf(tag) >= 0) !== undefined;
           // skip by flavor
-          var match_flavors = false;
-          for (var flavorsIndex = 0; flavorsIndex < self._flavors.length; flavorsIndex++) {
-            var flavor = self._flavors[flavorsIndex];
-            if (track.type === flavor) {
-              match_flavors = true;
-              break;
-            }
-          }
-
+          var flavorMatched = self._flavors.find(flavor => flavor == track.type) !== undefined;
           if (self._tags.length > 0 && self._flavors.length > 0) {
-            if (self._tags_and_flavors) {
-              if (!(match_tags && match_flavors)) { continue; }
+            if (self._tagsAndFlavors) {
+              if (!(tagsMatched && flavorMatched)) { continue; }
             } else {
-              if (!(match_tags || match_flavors)) { continue; }
+              if (!(tagsMatched || flavorMatched)) { continue; }
             }
           } else {
-            if (self._tags.length > 0 && !match_tags) { continue; }
-            if (self._flavors.length > 0 && !match_flavors) { continue; }
+            if (self._tags.length > 0 && !tagsMatched) { continue; }
+            if (self._flavors.length > 0 && !flavorMatched) { continue; }
           }
 
           var parsedTrack = new DownloadTrack(track);
@@ -176,16 +158,10 @@ paella.addPlugin(function() {
                                 + paella.dictionary.translate('No downloads available') + '</p></div';
       } else {
         let trackTypes = ['video', 'audio'];
-        let flavors = self._tracks.reduce(function(result, track) {
-          if (result.indexOf(track.flavor) < 0) {
-            result.push(track.flavor);
-          }
-          return result;
-        }, []);
+        let flavors = new Set(self._tracks.map(track => track.flavor));
 
         // group by flavor
-        for (let flavorsIndex = 0; flavorsIndex < flavors.length; flavorsIndex++) {
-          let flavor = flavors[flavorsIndex];
+        for (const flavor of flavors) {
           let flavorContainer = document.createElement('div');
           flavorContainer.className = 'downloadsButtonItemContainer';
 
@@ -194,38 +170,25 @@ paella.addPlugin(function() {
           flavorContainer.appendChild(flavorNameContainer);
 
           // order by type (audio or video)
-          for (let trackTypesIndex = 0; trackTypesIndex < trackTypes.length; trackTypesIndex++) {
-            let trackType = trackTypes[trackTypesIndex];
-            let tracks = self._tracks.filter(function(track) {
-              return this === track.type;
-            }, trackType);
+          for (const trackType of trackTypes) {
+            let tracks = self._tracks.filter(_track => _track.type === trackType);
 
             // order by mimetype
-            let trackMimetypes = tracks.reduce(function(result, track) {
-              if (result.indexOf(track.mimetype) < 0) {
-                result.push(track.mimetype);
-              }
-              return result;
-            }, []);
-
-            trackMimetypes.sort(function(f1, f2) {
-              return f1 === f2 ? 0 : f1 > f2 ? 1 : -1;
-            });
+            let trackMimetypes = Array.from(new Set(tracks.map(_track => _track.mimetype)));
+            trackMimetypes.sort();
 
             // order by video resolution or audio bitrate
-            for (let trackMimetypesIndex = 0; trackMimetypesIndex < trackMimetypes.length; trackMimetypesIndex++) {
-              let mimetype = trackMimetypes[trackMimetypesIndex];
-              let filteredTracks = tracks.filter(function(track) {
-                return track.flavor === this.flavor && track.mimetype === this.mimetype;
-              }, { 'flavor': flavor, 'mimetype': mimetype });
+            for (const mimetype of trackMimetypes) {
+              let filteredTracks = tracks.filter(_track => _track.flavor === flavor)
+                .filter(track => track.mimetype === mimetype);
               filteredTracks.sort(function(t1, t2) {
                 if (t1.type === t2.type) {
                   if ('video' === t1.type) {
-                    let t1_height = t1.video_resolution.split('x')[1];
-                    let t2_height = t2.video_resolution.split('x')[1];
-                    return parseInt(t2_height) - parseInt(t1_height);
+                    let t1Height = t1.videoResolution.split('x')[1];
+                    let t2Height = t2.videoResolution.split('x')[1];
+                    return parseInt(t2Height) - parseInt(t1Height);
                   } else if ('audio' === t1.type) {
-                    return parseInt(t2.audio_bitrate) - parseInt(t1.audio_bitrate);
+                    return parseInt(t2.audioBitrate) - parseInt(t1.audioBitrate);
                   }
                 }
                 // this case shouldn't happen
@@ -233,10 +196,10 @@ paella.addPlugin(function() {
               });
 
               // render download links
-              for (let filteredTracksIndex = 0; filteredTracksIndex < filteredTracks.length; filteredTracksIndex++) {
-                let track = filteredTracks[filteredTracksIndex];
+              for (const track of filteredTracks) {
                 let a = document.createElement('a');
                 a.href = track.url;
+                a.setAttribute('download', '');
 
                 if ('video' === track.type) {
                   let videoFormatElement = document.createElement('span');
@@ -246,7 +209,7 @@ paella.addPlugin(function() {
 
                   let videoResolutionElement = document.createElement('span');
                   videoResolutionElement.className = 'downloadsButtonItemLinkSpanResolution';
-                  videoResolutionElement.innerText = `${track.video_resolution}@${track.video_framerate}`;
+                  videoResolutionElement.innerText = `${track.videoResolution}@${track.videoFramerate}`;
                   a.appendChild(videoResolutionElement);
                 } else if ('audio' === track.type) {
                   let audioFormatElement = document.createElement('span');
@@ -256,7 +219,7 @@ paella.addPlugin(function() {
 
                   let audioBitrateElement = document.createElement('span');
                   audioBitrateElement.className = 'downloadsButtonItemLinkSpanAudioBitrate';
-                  audioBitrateElement.innerText = `${Math.floor(track.audio_bitrate / 1000)}kbps`;
+                  audioBitrateElement.innerText = `${Math.floor(track.audioBitrate / 1000)}kbps`;
                   a.appendChild(audioBitrateElement);
                 }
                 flavorContainer.appendChild(a);
