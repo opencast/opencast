@@ -23,7 +23,6 @@ export interface MediaPackage {
 }
 
 export interface SearchEpisodeResult {
-    readonly dcCreator: string;
     readonly id: string;
     readonly dcTitle: string;
     readonly dcCreated: string;
@@ -202,18 +201,21 @@ export async function searchEpisode(
     const results = Array.isArray(resultsRaw) ? resultsRaw : resultsRaw !== undefined ? [resultsRaw] : [];
     return {
         results: results.map((result: any) => ({
-            dcCreator: result.dcCreator,
             id: result.id,
             dcTitle: result.dcTitle,
             dcCreated: result.dcCreated,
             languageShortCode: result.dcLanguage,
             licenseKey: result.dcLicense,
             mediapackage: {
-                creators: result.mediapackage.creators !== undefined ? result.mediapackage.creators.creator : [],
+                creators: result.mediapackage.creators !== undefined
+                    ? Array.isArray(result.mediapackage.creators.creator)
+                        ? result.mediapackage.creators.creator
+                        : [result.mediapackage.creators.creator]
+                    : [],
                 attachments: Array.from(
-                    Array.isArray(result.mediapackage.attachments.attachment) ?
-                        result.mediapackage.attachments.attachment :
-                        Array.of(result.mediapackage.attachments.attachment),
+                    Array.isArray(result.mediapackage.attachments.attachment)
+                        ? result.mediapackage.attachments.attachment
+                        : Array.of(result.mediapackage.attachments.attachment),
                     (attachment: any) => ({
                         type: attachment.type,
                         url: attachment.url
