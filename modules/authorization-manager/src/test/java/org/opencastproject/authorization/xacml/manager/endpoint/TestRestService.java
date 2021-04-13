@@ -150,11 +150,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     AccessControlList acl = new AccessControlList();
     Attachment attachment = new AttachmentImpl();
     MediaPackage mediapackage;
-    try {
-      mediapackage = new MediaPackageBuilderImpl().createNew();
-    } catch (MediaPackageException e) {
-      throw new RuntimeException(e);
-    }
+    mediapackage = new MediaPackageBuilderImpl().createNew();
     AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authorizationService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
             .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
@@ -174,11 +170,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
 
   private static AssetManager newAssetManager() {
     Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
-    try {
-      EasyMock.expect(snapshot.getMediaPackage()).andReturn(new MediaPackageBuilderImpl().createNew()).anyTimes();
-    } catch (MediaPackageException e) {
-      throw new RuntimeException(e);
-    }
+    EasyMock.expect(snapshot.getMediaPackage()).andReturn(new MediaPackageBuilderImpl().createNew()).anyTimes();
     ARecord record = EasyMock.createNiceMock(ARecord.class);
     EasyMock.expect(record.getSnapshot()).andReturn(Opt.some(snapshot)).anyTimes();
 
@@ -201,12 +193,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(select).anyTimes();
 
     AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
-    try {
     EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.some(new MediaPackageBuilderImpl()
             .createNew())).anyTimes();
-    } catch (MediaPackageException e) {
-      throw new RuntimeException(e);
-    }
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
     EasyMock.replay(assetManager, version, query, predicate, select, result, record, snapshot);
     return assetManager;

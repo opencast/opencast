@@ -239,8 +239,9 @@ public class AwsS3DistributionServiceImplTest {
     MediaPackageElement mpe = mpes[0];
 
     Assert.assertEquals(new URI(
-                    "http://XYZ.cloudfront.net/channelId/efd6e4df-63b6-49af-be5f-15f598778877/presenter-delivery/video-presenter-delivery.mp4"),
-            mpe.getURI());
+        "http://XYZ.cloudfront.net/channelId/efd6e4df-63b6-49af-be5f-15f598778877/"
+            + "presenter-delivery/video-presenter-delivery.mp4"),
+        mpe.getURI());
   }
 
   @Test
@@ -279,8 +280,9 @@ public class AwsS3DistributionServiceImplTest {
     MediaPackageElement mpe = mpes[0];
 
     Assert.assertEquals(new URI(
-            "http://XYZ.cloudfront.net/channelId/efd6e4df-63b6-49af-be5f-15f598778877/presenter-mp4/video-presenter-delivery.mp4"),
-            mpe.getURI());
+        "http://XYZ.cloudfront.net/channelId/efd6e4df-63b6-49af-be5f-15f598778877/"
+            + "presenter-mp4/video-presenter-delivery.mp4"),
+        mpe.getURI());
     // Test that temp directory is removed
     Path tempfile = storageDir.toPath().resolve(mp.getIdentifier().toString());
     Assert.assertFalse(Files.exists(tempfile));
@@ -297,8 +299,10 @@ public class AwsS3DistributionServiceImplTest {
   @Test
   public void testGetDistributionUri() throws Exception {
     Assert.assertEquals(new URI(
-                    "http://XYZ.cloudfront.net/channelId/efd6e4df-63b6-49af-be5f-15f598778877/presenter-delivery/video-presenter-delivery.mp4"),
-            service.getDistributionUri("channelId/efd6e4df-63b6-49af-be5f-15f598778877/presenter-delivery/video-presenter-delivery.mp4"));
+        "http://XYZ.cloudfront.net/channelId/efd6e4df-63b6-49af-be5f-15f598778877/"
+            + "presenter-delivery/video-presenter-delivery.mp4"),
+        service.getDistributionUri("channelId/efd6e4df-63b6-49af-be5f-15f598778877/"
+            + "presenter-delivery/video-presenter-delivery.mp4"));
   }
 
   @Test

@@ -81,11 +81,14 @@ public final class GoogleAPICredentialRequestor {
       c.setClientSecrets(clientSecrets);
       c.setCredentialDatastore(credentialDataStore);
       c.setDataStoreDirectory(dataStoreDirectory);
-      final OAuth2CredentialFactory factory = (credentialFactory == null) ? new OAuth2CredentialFactoryImpl() : credentialFactory;
-      final DataStore<StoredCredential> dataStore = factory.getDataStore(c.getCredentialDatastore(), c.getDataStoreDirectory());
+      final OAuth2CredentialFactory factory
+          = (credentialFactory == null) ? new OAuth2CredentialFactoryImpl() : credentialFactory;
+      final DataStore<StoredCredential> dataStore
+          = factory.getDataStore(c.getCredentialDatastore(), c.getDataStoreDirectory());
       factory.getGoogleCredential(dataStore, c);
     } else {
-      throw new IllegalArgumentException("The client-secrets file (YouTube OAuth) was not found: " + clientSecrets.getAbsolutePath());
+      throw new IllegalArgumentException(
+          "The client-secrets file (YouTube OAuth) was not found: " + clientSecrets.getAbsolutePath());
     }
   }
 

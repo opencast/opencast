@@ -12,22 +12,25 @@
       <div class='segment-remove'>
         <a title="{{segment.deleted ? 'VIDEO_TOOL.SEGMENTS.SHOW_SEGMENT' : 'VIDEO_TOOL.SEGMENTS.HIDE_SEGMENT' | translate}}"
            ng-class="{ unused: segment.deleted, used: !segment.deleted }"
-           ng-click="toggleSegment($event, segment)" />
+           ng-click="toggleSegment($event, segment)"></a>
       </div>
       <div class="segment-start segment-start-end"> {{'VIDEO_TOOL.SEGMENTS.START' | translate}}:
-        <input type="text" ng-model="segment.startTime" ng-change="updateStartTime(segment)"
-                                                        ng-disabled="segment.start === 0"/>
+        <input type="text"
+               ng-model="segment.startTime"
+               ng-change="updateStartTime(segment)"
+               ng-disabled="segment.start === 0"/>
       </div>
       <div class="segment-end segment-start-end"> {{'VIDEO_TOOL.SEGMENTS.END' | translate}}:
-        <input type="text" ng-model="segment.endTime" ng-change="updateEndTime(segment)"
-                                                      ng-disabled="segment.end === video.duration"/>
+        <input type="text"
+               ng-model="segment.endTime"
+               ng-change="updateEndTime(segment)"
+               ng-disabled="segment.end === video.duration"/>
       </div>
-      <a title="{{'VIDEO_TOOL.SEGMENTS.REMOVE_SEGMENT' | translate}}" class="remove"
-                                                                      ng-if="video.segments.length > 1"
-                                                                      ng-class="{ disabled: !isRemovalAllowed(segment) }"
-                                                                      ng-click="mergeSegment($event, segment)"/>
-
+      <a title="{{'VIDEO_TOOL.SEGMENTS.REMOVE_SEGMENT' | translate}}"
+         class="remove"
+         ng-if="video.segments.length > 1"
+         ng-class="{ disabled: !isRemovalAllowed(segment) }"
+         ng-click="mergeSegment($event, segment)"></a>
     </div>
   </div>
-
 </div>

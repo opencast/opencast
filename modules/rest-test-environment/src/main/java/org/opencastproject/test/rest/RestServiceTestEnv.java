@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Helper environment for creating REST service unit tests.
@@ -115,16 +115,21 @@ public final class RestServiceTestEnv {
    * Return a localhost base URL with a random port between 8081 and 9000. The method features a port usage detection to
    * ensure it returns a free port.
    */
-  public static URL localhostRandomPort() {
+  public static synchronized URL localhostRandomPort() {
     for (int tries = 100; tries > 0; tries--) {
-      final URL url = UrlSupport.url("http", "localhost", 8081 + new Random(System.currentTimeMillis()).nextInt(919));
+      final int random = ThreadLocalRandom.current().nextInt(62000);
+      final URL url = UrlSupport.url("http", "127.0.0.1", 3000 + random);
       try {
         final URLConnection con = url.openConnection();
         con.setConnectTimeout(1000);
         con.setReadTimeout(1000);
         con.getInputStream();
+        Thread.sleep(100);
       } catch (IOException e) {
+        logger.debug("Selected URL: {}", url);
         return url;
+      } catch (InterruptedException e) {
+        // ignore sleep interruption
       }
     }
     throw new RuntimeException("Cannot find free port. Giving up.");

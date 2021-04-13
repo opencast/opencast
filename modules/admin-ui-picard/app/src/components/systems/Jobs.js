@@ -56,6 +56,11 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
         // Load filters
         loadingFilters('jobs');
 
+        // Fetch jobs every minute
+        let fetchJobInterval = setInterval(loadJobs, 100000);
+
+        return () => clearInterval(fetchJobInterval);
+
     }, []);
 
     const toggleNavigation = () => {

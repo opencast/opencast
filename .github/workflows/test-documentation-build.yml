@@ -1,0 +1,38 @@
+name: Test documentation
+
+on:
+  pull_request:
+    paths:
+      - 'docs/guides/**'
+      - 'docs/checkstyle/check-docs.sh'
+      - '**.md'
+  push:
+    paths:
+      - 'docs/guides/**'
+      - 'docs/checkstyle/check-docs.sh'
+      - '**.md'
+
+jobs:
+
+  # Check documentation with markdownlint and build it using mkdocs
+  documentation:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: set up python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: install mkdocs
+      working-directory: docs/guides
+      run: pip install -q -r requirements.txt
+
+    - name: install javascript dependencies
+      working-directory: docs/guides
+      run: npm ci
+
+    - name: check documentation
+      run: ./docs/checkstyle/check-docs.sh

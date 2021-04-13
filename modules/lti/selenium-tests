@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+
+import os
+import signal
+import subprocess
+import sys
+import urllib3
+
+from selenium import webdriver
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+
+
+BASE_URL = 'http://127.0.0.1:7878'
+
+proc = []
+driver = None
+
+def header(message):
+    print()
+    print('#' * 72)
+    message = '### ' + message + ' '
+    print(message + '#' * (72 - len(message)))
+    print('#' * 72)
+    print()
+    sys.stdout.flush()
+
+
+def react_start():
+    header('Starting React App')
+    env = os.environ.copy()
+    env['BROWSER'] = 'none'
+    env['CI'] = 'true'
+    proc.append(subprocess.Popen(
+        ['npm', 'run', 'start'],
+        stdout=subprocess.DEVNULL,
+        env=env))
+
+    # Wait for server
+    http = urllib3.PoolManager()
+    retries = urllib3.Retry(10, backoff_factor=0.2)
+    request = http.request('GET', 'http://127.0.0.1:3000/', retries=retries)
+    if request.status != 200:
+        raise Exception('Server not ready after wait')
+
+
+def mock_proxy_start():
+    header('Starting Mock Proxy')
+    proc.append(subprocess.Popen(['npm', 'run', 'mock-proxy']))
+
+    # Wait for server
+    http = urllib3.PoolManager()
+    retries = urllib3.Retry(10, backoff_factor=0.2)
+    request = http.request('GET', 'http://127.0.0.1:7878/', retries=retries)
+    if request.status != 200:
+        raise Exception('Server not ready after wait')
+
+
+def navigate(path):
+    driver.get(f'{BASE_URL}{path}')
+
+
+def wait_for(driver, element, timeout=20):
+    WebDriverWait(driver, timeout).until(
+            expected_conditions.presence_of_element_located(element))
+
+
+def check_overview_page():
+    header('Testing Overview Page')
+    navigate('/ltitools')
+    elem = driver.find_element(By.TAG_NAME, 'h1')
+    assert 'Welcome to the LTI Module' == elem.text
+
+
+def check_series_tool(edit=False, deletion=False):
+    header('Testing Series Tools')
+    n_opts = int(edit) + int(deletion)
+    edit = str(edit).lower()
+    deletion = str(deletion).lower()
+
+    params = '&'.join(['subtool=series',
+                       f'edit={edit}',
+                       f'deletion={deletion}'])
+    navigate(f'/ltitools/index.html?{params}')
+    wait_for(driver, (By.TAG_NAME, 'header'))
+
+    # Check for results in series
+    elem = driver.find_element(By.TAG_NAME, 'header')
+    assert elem.text.startswith('Results 1-')
+
+    # Get first result
+    elem = driver.find_elements(By.CSS_SELECTOR, '.list-group-item')[0]
+
+    # Assert number of modification options
+    assert len(elem.find_elements(By.TAG_NAME, 'button')) == n_opts
+
+    # test player link
+    elem.click()
+    assert driver.current_url.startswith(f'{BASE_URL}/play/')
+
+
+def check_upload_tool(edit=False, deletion=False):
+    header('Testing Upload Tools')
+    navigate('/ltitools/index.html?subtool=upload&series=')
+    wait_for(driver, (By.TAG_NAME, 'form'))
+
+    # Check that header is present
+    elem = driver.find_element(By.TAG_NAME, 'h2')
+    assert elem.text.startswith('Upload new event')
+
+    # Click upload with no fields filled out should not yield success message
+    elem = driver.find_element(By.CSS_SELECTOR, '.btn-primary')
+    elem.click()
+    try:
+        wait_for(driver, (By.CSS_SELECTOR, '.alert-success'), timeout=0.2)
+        assert False
+    except TimeoutException:
+        pass
+
+
+def check_i18next():
+    header('Testing Internationalization')
+
+    # Probe German translation of the series tool
+    navigate(f'/ltitools/index.html?subtool=series&lng=de')
+    wait_for(driver, (By.TAG_NAME, 'header'))
+
+    # Check for a translated results header
+    elem = driver.find_element(By.TAG_NAME, 'header')
+    assert not elem.text.startswith('Results')
+
+
+def main():
+    os.setpgrp()
+    try:
+        react_start()
+        mock_proxy_start()
+        check_overview_page()
+        check_series_tool()
+        check_series_tool(True, True)
+        check_upload_tool()
+        check_i18next()
+        driver.close()
+    finally:
+        try:
+            os.killpg(0, signal.SIGINT)
+        except KeyboardInterrupt:
+            pass
+
+
+if __name__ == '__main__':
+    options = webdriver.FirefoxOptions()
+    if sys.argv[-1] != 'gui':
+        options.headless = True
+    driver = webdriver.Firefox(options=options)
+    main()

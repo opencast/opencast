@@ -113,3 +113,4 @@ There are currently two resolution based conditionally set variables supported:
 |------------------------------------------|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
 |`if-height-geq-<height>`                  |`if-height-geq-720`                |The value is set if the height of the video is greater or equal to `<height>` pixels.                                           |
 |`if-width-or-height-geq-<width>-<height>` |`if-width-or-height-geq-1280-720`  |The value is set if the width of the video is greater or equal to `<width>` or if the height is greater or equal to `<height>`. |
+|`if-height-lt-<height>`                   |`if-height-lt-480`                 |The value is set if the height of the video is less than `<height>` pixels.                                                     |

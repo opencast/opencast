@@ -29,7 +29,6 @@ import static org.xmlmatchers.transform.XmlConverters.the;
 import org.opencastproject.coverimage.CoverImageException;
 
 import org.apache.commons.io.IOUtils;
-import org.dom4j.dom.DOMDocument;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xmlmatchers.namespace.SimpleNamespaceContext;
@@ -89,7 +88,8 @@ public class CoverImageServiceTest {
     NamespaceContext usingNamespaces = new SimpleNamespaceContext().withBinding("xsl",
             "http://www.w3.org/1999/XSL/Transform").withBinding("svg", "http://www.w3.org/2000/svg");
     assertThat(the(xslDoc),
-            hasXPath("/xsl:stylesheet/xsl:template/svg:svg/svg:defs/svg:linearGradient[@id='lgGray']", usingNamespaces));
+            hasXPath("/xsl:stylesheet/xsl:template/svg:svg/svg:defs/svg:linearGradient[@id='lgGray']",
+              usingNamespaces));
   }
 
   /**
@@ -97,7 +97,8 @@ public class CoverImageServiceTest {
    */
   @Test(expected = IllegalArgumentException.class)
   public void testTransformSvgNullSvg() throws Exception {
-    AbstractCoverImageService.transformSvg(null, new StreamSource(), new DOMDocument(), 0, 0, null);
+    Document doc = AbstractCoverImageService.parseXsl("");
+    AbstractCoverImageService.transformSvg(null, new StreamSource(), doc, 0, 0, null);
   }
 
   /**
@@ -105,7 +106,8 @@ public class CoverImageServiceTest {
    */
   @Test(expected = IllegalArgumentException.class)
   public void testTransformSvgNullXmlSource() throws Exception {
-    AbstractCoverImageService.transformSvg(new StreamResult(), null, new DOMDocument(), 0, 0, null);
+    Document doc = AbstractCoverImageService.parseXsl("");
+    AbstractCoverImageService.transformSvg(new StreamResult(), null, doc, 0, 0, null);
   }
 
   /**

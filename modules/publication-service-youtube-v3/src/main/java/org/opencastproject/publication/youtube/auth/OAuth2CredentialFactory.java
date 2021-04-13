@@ -59,7 +59,8 @@ public interface OAuth2CredentialFactory {
    * @return Google-specific subclass of <code>Credential</code>
    * @throws IOException if the default data store is not available
    */
-  GoogleCredential getGoogleCredential(DataStore<StoredCredential> datastore, ClientCredentials authContext) throws IOException;
+  GoogleCredential getGoogleCredential(DataStore<StoredCredential> datastore, ClientCredentials authContext)
+          throws IOException;
 
   /**
    * Returns a <code>GoogleCredential</code> from the default data store. If one

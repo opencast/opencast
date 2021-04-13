@@ -1,5 +1,5 @@
 import {loadAclsFailure, loadAclsInProgress, loadAclsSuccess} from "../actions/aclActions";
-import {getURLParams} from "../utils/resourceUtils";
+import {getURLParams, prepareAccessPolicyRulesForPost} from "../utils/resourceUtils";
 import axios from "axios";
 import {transformToIdValueArray} from "../utils/utils";
 
@@ -41,21 +41,6 @@ export const fetchAclActions = async () => {
 
     return transformToIdValueArray(response);
 
-};
-
-// fetch all possible roles a policy can have
-export const fetchRoles = async () => {
-    let params = {
-        filters: 'role_target:ACL',
-        limit: '100',
-        offset: '0'
-    };
-
-    let data = await axios.get('/admin-ng/resources/ROLES.json', {params: params});
-
-    const response = await data.data;
-
-    return transformToIdValueArray(response);
 };
 
 // fetch all policies of an certain acl template
@@ -127,5 +112,40 @@ export const fetchAclTemplateById = async (id) => {
         }
     }
     return template;
+
+};
+
+// fetch roles for select dialogs and access policy pages
+export const fetchRolesWithTarget = async target => {
+
+    let params = {
+        limit: -1,
+        target: target
+    };
+
+    let data = await axios.get('/admin-ng/acl/roles.json', {params: params});
+
+    return await data.data;
+
+};
+
+
+// post new acl to backend
+export const postNewAcl = values => {
+
+    let acls = prepareAccessPolicyRulesForPost(values.acls);
+
+    let data = new FormData();
+    data.append('name', values.name);
+    data.append('acl', JSON.stringify(acls));
+
+    // todo: notification if error occurs
+    axios.post('/admin-ng/acl', data,
+        {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }
+    ).then(response => console.log(response)).catch(response => console.log(response));
 
 };

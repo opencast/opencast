@@ -21,6 +21,8 @@
 package org.opencastproject.assetmanager.util;
 
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
+import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
+import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
 import static org.opencastproject.systems.OpencastConstants.WORKFLOW_PROPERTIES_NAMESPACE;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -30,7 +32,10 @@ import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.mediapackage.Attachment;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -96,8 +101,19 @@ public final class WorkflowPropertiesUtil {
           final Map<String, String> properties) {
 
     // Properties can only be created if a snapshot exists. Hence, we create a snapshot if there is none right now.
+    // Although, to avoid lots of potentially slow IO operations, we archive an empty media package.
     if (!assetManager.snapshotExists(mediaPackage.getIdentifier().toString())) {
-      assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+      MediaPackage simplifiedMediaPackage = new MediaPackageBuilderImpl().createNew(mediaPackage.getIdentifier());
+      for (Catalog catalog: mediaPackage.getCatalogs()) {
+        simplifiedMediaPackage.add(catalog);
+      }
+      for (Attachment attachment: mediaPackage.getAttachments(XACML_POLICY_EPISODE)) {
+        simplifiedMediaPackage.add(attachment);
+      }
+      for (Attachment attachment: mediaPackage.getAttachments(XACML_POLICY_SERIES)) {
+        simplifiedMediaPackage.add(attachment);
+      }
+      assetManager.takeSnapshot(DEFAULT_OWNER, simplifiedMediaPackage);
     }
 
     // Store all properties

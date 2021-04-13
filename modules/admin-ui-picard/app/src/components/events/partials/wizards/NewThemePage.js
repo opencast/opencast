@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import {Field} from "formik";
-import cn from "classnames";
 import {getSeriesThemes} from "../../../../selectors/seriesSeletctor";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 

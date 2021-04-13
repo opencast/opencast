@@ -38,6 +38,11 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters 
         // Load filters
         loadingFilters('themes');
 
+        // Fetch themes every minute
+        let fetchThemesInterval = setInterval(loadThemes, 100000);
+
+        return () => clearInterval(fetchThemesInterval);
+
     }, []);
 
     const toggleNavigation = () => {

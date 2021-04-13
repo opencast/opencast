@@ -55,7 +55,7 @@ public class Form implements IForm {
   //================================================================================
 
   @Id
-  @Column(name = "adopter_key")
+  @Column(name = "adopter_key", length = 64)
   private String adopterKey;
 
   @Column(name = "statistic_key")
@@ -151,8 +151,9 @@ public class Form implements IForm {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Organization))
+    if (!(obj instanceof Organization)) {
       return false;
+    }
     return ((Form) obj).adopterKey.equals(adopterKey);
   }
 

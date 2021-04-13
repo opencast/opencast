@@ -22,7 +22,7 @@
 </a>
 
 <a ng-if="row.has_preview"
-   href="#!/events/events/{{row.id}}/tools/editor"
+   href="{{ row.editorUrl }}"
    class="cut"
    title="{{ row.needs_cutting ? 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR_NEEDS_CUTTING' : 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR' | translate }}"
    with-role="ROLE_UI_EVENTS_EDITOR_VIEW">

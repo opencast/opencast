@@ -2,13 +2,18 @@ import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import Notifications from "../../../shared/Notifications";
-import {fetchAclActions, fetchAclTemplateById, fetchAclTemplates, fetchRoles} from "../../../../thunks/aclThunks";
+import {
+    fetchAclActions,
+    fetchAclTemplateById,
+    fetchAclTemplates,
+    fetchRolesWithTarget
+} from "../../../../thunks/aclThunks";
 import {FieldArray, Field} from "formik";
-import RenderMultiField from "./RenderMultiField";
 import {connect} from "react-redux";
 import {addNotification} from "../../../../thunks/notificationThunks";
-import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/wizard/newEventWizardConfig";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
+import RenderMultiField from "../../../shared/wizard/RenderMultiField";
+import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/wizardConfig";
 
 /**
  * This component renders the access page for new events and series in the wizards.
@@ -30,7 +35,7 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
             setAclTemplates(responseTemplates);
             const responseActions = await fetchAclActions();
             setAclActions(responseActions);
-            const responseRoles = await fetchRoles();
+            const responseRoles = await fetchRolesWithTarget('ACL');
             setRoles(responseRoles);
             setLoading(false);
         }
@@ -193,8 +198,8 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                                         <>
                                                                                                             <option value="" />
                                                                                                             {roles.map((role, key) => (
-                                                                                                                <option value={role.id}
-                                                                                                                        key={key}>{role.id}</option>
+                                                                                                                <option value={role.name}
+                                                                                                                        key={key}>{role.name}</option>
                                                                                                             ))}
                                                                                                         </>
                                                                                                     )}

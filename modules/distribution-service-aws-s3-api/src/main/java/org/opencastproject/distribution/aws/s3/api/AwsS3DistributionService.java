@@ -28,5 +28,6 @@ import org.opencastproject.mediapackage.MediaPackage;
 public interface AwsS3DistributionService extends DownloadDistributionService {
 
   Job restore(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException;
-  Job restore(String channelId, MediaPackage mediaPackage, String elementId, String filename) throws DistributionException;
+  Job restore(String channelId, MediaPackage mediaPackage, String elementId, String filename)
+          throws DistributionException;
 }

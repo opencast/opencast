@@ -36,10 +36,10 @@ import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.TextFilter;
+import org.opencastproject.elasticsearch.api.SearchQuery.Order;
+import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.index.service.resources.list.query.UsersListQuery;
 import org.opencastproject.index.service.util.RestUtils;
-import org.opencastproject.matterhorn.search.SearchQuery.Order;
-import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
@@ -291,7 +291,9 @@ public class UsersEndpoint {
           @RestParameter(description = "The password.", isRequired = true, name = "password", type = STRING),
           @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, responses = {
+          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array, e.g. <br>"
+                  + "[{'name': 'ROLE_ADMIN', 'type': 'INTERNAL'}, {'name': 'ROLE_XY', 'type': 'INTERNAL'}]") },
+          responses = {
           @RestResponse(responseCode = SC_CREATED, description = "User has been created."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a user with a admin role."),
           @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.")})

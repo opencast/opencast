@@ -59,7 +59,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -96,7 +95,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -1512,32 +1518,29 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (!workingFileRepository.delete(mediaPackageId, element.getIdentifier()))
         logger.warn("Unable to find (and hence, delete), this mediapackage element");
     }
-    logger.info("Sucessful discarded mediapackage {}", mp);
-  }
-
-  /**
-   * Creates a StandAloneTrustedHttpClientImpl
-   *
-   * @param user the username
-   * @param password the password
-   * @return the trusted client
-   */
-  protected TrustedHttpClient createStandaloneHttpClient(String user, String password) {
-    return new StandAloneTrustedHttpClientImpl(this.downloadUser, this.downloadPassword, none(), none(), none());
+    logger.info("Successfully discarded media package {}", mp);
   }
 
   protected URI addContentToRepo(MediaPackage mp, String elementId, URI uri) throws IOException {
     InputStream in = null;
     HttpResponse response = null;
-    TrustedHttpClient httpClientStandAlone = httpClient;
+    CloseableHttpClient externalHttpClient = null;
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
 
-        if (uri.getHost().matches(this.downloadSource)) {
-          httpClientStandAlone = this.createStandaloneHttpClient(downloadUser,downloadPassword);
+        if (uri.getHost().matches(downloadSource)) {
+          CredentialsProvider provider = new BasicCredentialsProvider();
+          provider.setCredentials(
+              new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
+              new UsernamePasswordCredentials(downloadUser, downloadPassword));
+           externalHttpClient = HttpClientBuilder.create()
+              .setDefaultCredentialsProvider(provider)
+              .build();
+          response = externalHttpClient.execute(get);
+        } else {
+          response = httpClient.execute(get);
         }
-        response = httpClientStandAlone.execute(get);
 
         int httpStatusCode = response.getStatusLine().getStatusCode();
         if (httpStatusCode != 200) {
@@ -1555,8 +1558,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         throw new IOException("No filename extension found: " + fileName);
       return addContentToRepo(mp, elementId, fileName, in);
     } finally {
-      IOUtils.closeQuietly(in);
-      httpClientStandAlone.close(response);
+      if (in != null) {
+        in.close();
+      }
+      if (externalHttpClient != null) {
+        externalHttpClient.close();
+      }
+      httpClient.close(response);
     }
   }
 

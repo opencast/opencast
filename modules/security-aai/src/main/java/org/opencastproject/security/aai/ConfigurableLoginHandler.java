@@ -43,6 +43,7 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -382,7 +383,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
     // Load the user reference
     JpaUserReference userReference = userReferenceProvider.findUserReference(id, organization.getId());
     if (userReference == null) {
-      throw new IllegalStateException("User reference '" + id + "' was not found");
+      throw new UsernameNotFoundException("User reference '" + id + "' was not found");
     }
 
     // Update the reference

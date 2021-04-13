@@ -214,7 +214,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     }
   }
 
-  private UserSession populateSession(EntityManager em, UserSession session) {
+  private synchronized UserSession populateSession(EntityManager em, UserSession session) {
     //Try and find the session.  If not found, persist it
     Query q = em.createNamedQuery("findUserSessionBySessionId");
     q.setMaxResults(1);
@@ -225,6 +225,10 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     } catch (NoResultException n) {
       userSession = session;
       em.persist(userSession);
+      // Commit the session object so that it's immediately found by other threads
+      EntityTransaction tx = em.getTransaction();
+      tx.commit();
+      tx.begin();
     }
     return userSession;
   }

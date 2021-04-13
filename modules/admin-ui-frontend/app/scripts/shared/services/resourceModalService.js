@@ -163,6 +163,11 @@ angular.module('adminNg.services.modal')
           apiService = breadcrumb.api;
           previousBreadcrumb = breadcrumb;
         });
+
+        // bail out if no api service is defined
+        if (apiService === undefined) {
+          return;
+        }
         apiService = $injector.get(apiService);
 
         params = params.reduce(function (prevValue, currentValue, index) {

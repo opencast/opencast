@@ -38,7 +38,8 @@ public interface AnnotationService {
   Annotation addAnnotation(Annotation a);
 
   /**
-   * Changes an annotation in the database it uses the annotationId to overwrite the value. It returns the event with an updated annotation.
+   * Changes an annotation in the database it uses the annotationId to overwrite the value. It
+   * returns the event with an updated annotation.
    *
    * @param a
    *          The Annotation that will be changed in the database
