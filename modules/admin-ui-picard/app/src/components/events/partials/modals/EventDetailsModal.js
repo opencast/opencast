@@ -1,6 +1,6 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import EventDetailsWizard from "../wizards/EventDetailsWizard";
+import EventDetails from "./EventDetails";
 
 
 /**
@@ -16,16 +16,19 @@ const EventDetailsModal = ({ handleClose, showModal, tabIndex }) => {
     return (
         // todo: add hotkeys
         showModal && (
-            <section id="event-details-modal" tabIndex={tabIndex} className="modal wizard modal-animation">
-                <header>
-                    <a className="fa fa-times close-modal" onClick={() => close()}/>
-                    <h2>{t('EVENTS.EVENTS.DETAILS.HEADER',
-                        { resourceId: "Beispiel Event ID" /*todo: find real value*/} ) /*Event details - {{resourceId}}*/} </h2>
-                </header>
+            <>
+                <div className="modal-animation modal-overlay"/>
+                <section id="event-details-modal" tabIndex={tabIndex} className="modal wizard modal-animation">
+                    <header>
+                        <a className="fa fa-times close-modal" onClick={() => close()}/>
+                        <h2>{t('EVENTS.EVENTS.DETAILS.HEADER',
+                            { resourceId: "Beispiel Event ID" /*todo: find real value*/} ) /*Event details - {{resourceId}}*/} </h2>
+                    </header>
 
-                <EventDetailsWizard tabIndex={tabIndex}
+                    <EventDetails tabIndex={tabIndex}
                                     close={close}/>
-            </section>
+                </section>
+            </>
         )
     )
 }

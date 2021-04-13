@@ -20,30 +20,22 @@ const EventActionCell = ({ row })  => {
         setEventDetailsModal(false);
     }
 
-    //todo: implement!
     const onClickEventDetails = () => {
-        console.log("Should open event-details.");
         setEventDetailsTabIndex(0);
         showEventDetailsModal();
     }
 
-    //todo: implement!
     const onClickComments = () => {
-        console.log("Should open comments-tab (event-details).");
         setEventDetailsTabIndex(7);
         showEventDetailsModal();
     }
 
-    //todo: implement!
     const onClickWorkflow = () => {
-        console.log("Should open workflow-tab (event-details).");
         setEventDetailsTabIndex(5);
         showEventDetailsModal();
     }
 
-    //todo: implement!
     const onClickAssets = () => {
-        console.log("Should open assets-tab (event-details).");
         setEventDetailsTabIndex(3);
         showEventDetailsModal();
     }
