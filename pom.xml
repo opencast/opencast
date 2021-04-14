@@ -108,6 +108,7 @@
     <module>modules/editor-service-api</module>
     <module>modules/editor-service-remote</module>
     <module>modules/editor-service-endpoint</module>
+    <module>modules/editor-service-endpoint-remote</module>
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
     <module>modules/event-comment</module>

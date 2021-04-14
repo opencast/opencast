@@ -495,8 +495,16 @@ public final class WorkspaceImpl implements Workspace {
     while (true) {
       // run the http request and handle its response
       try {
-        final Either<String, Option<File>> result = handleDownloadResponse(
-            trustedHttpClient.execute(get), src, dst);
+        HttpResponse response = null;
+        final Either<String, Option<File>> result;
+        try {
+          response = trustedHttpClient.execute(get);
+          result = handleDownloadResponse(response, src, dst);
+        } finally {
+          if (response != null) {
+            trustedHttpClient.close(response);
+          }
+        }
         for (Option<File> ff : result.right()) {
           for (File f : ff) {
             return f;
