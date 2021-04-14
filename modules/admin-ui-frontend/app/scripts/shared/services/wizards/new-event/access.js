@@ -75,7 +75,7 @@ angular.module('adminNg.services')
             foundUserRole = true;
           }
 
-          if (!me.roles.indexOf(acl.role) == -1) {
+          if (me.roles.indexOf(acl.role) == -1) {
             me.roles.push(acl.role);
           }
         });
