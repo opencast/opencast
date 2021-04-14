@@ -30,11 +30,13 @@ import java.util.List;
 /**
  * The AssetManager stores versioned {@linkplain Snapshot snapshots} of media packages.
  * <p>
- * It also supports the association of {@linkplain Property properties} to a history of snapshots which is called an episode.
+ * It also supports the association of {@linkplain Property properties} to a
+ * history of snapshots which is called an episode.
  *
  * <h1>Terms</h1>
  * <h2>Snapshot</h2>
- * A snapshot saves a particular version of a media package. Snapshots are immutable and can only be deleted.
+ * A snapshot saves a particular version of a media package. Snapshots are
+ * immutable and can only be deleted.
  *
  * <h2>Episode</h2>
  * An episode is the set of snapshots of a media package.
@@ -42,7 +44,8 @@ import java.util.List;
  * <h2>Properties</h2>
  * Properties are associated with an episode and have a volatile character.
  * They support the quick and easy storage of meta data.
- * This removes the need for services to create their own persistence layer if they want to associate metadata with a media package.
+ * This removes the need for services to create their own persistence layer if
+ * they want to associate metadata with a media package.
  *
  * <h1>Notes</h1>
  * Media package IDs are considered to be unique throughout the whole system.
@@ -72,8 +75,8 @@ public interface AssetManager {
   Snapshot takeSnapshot(String owner, MediaPackage mp);
 
   /**
-   * Take a versioned snapshot of a media package using the owner of the last snapshot or the default owner if it
-   * does not exist.
+   * Take a versioned snapshot of a media package using the owner of the last
+   * snapshot or the default owner if it does not exist.
    *
    * @param mediaPackage
    *          The media package to snapshot
@@ -166,4 +169,13 @@ public interface AssetManager {
    * @return a version or none, if no version can be archived from the given string
    */
   Opt<Version> toVersion(String version);
+
+  /**
+   * Count the number of events stored for a given organization.
+   *
+   * @param organization
+   *          The organization to check
+   * @return Number of events
+   */
+  long countEvents(String organization);
 }

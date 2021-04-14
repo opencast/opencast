@@ -7,9 +7,8 @@ on:
       - 'r/*.x'
 
 jobs:
-
-  # Check documentation with markdownlint and build it using mkdocs
   deploy-translation-keys:
+    if: github.repository_owner == 'opencast'
     runs-on: ubuntu-20.04
     env:
       CROWDIN_API_KEY: ${{ secrets.CROWDIN_API_KEY }}
@@ -24,8 +23,4 @@ jobs:
 
     - name: upload translation source
       run: |
-        if [ -z "${CROWDIN_API_KEY}" ]; then
-          echo Skipping deployment without secret
-        else
-          crowdin --config .crowdin.yaml upload sources -b "${GITHUB_REF##*/}"
-        fi
+        crowdin --config .crowdin.yaml upload sources -b "${GITHUB_REF##*/}"

@@ -39,11 +39,12 @@ public final class PropertyPredicates implements EntityPaths {
   private static final QPropertyDto Q_PROPERTY_ALIAS = new QPropertyDto("p");
 
   public static final Opt NONE = Opt.none();
-  public static final Fn<QPropertyDto, Opt<BooleanExpression>> NO_VALUE = new Fn<QPropertyDto, Opt<BooleanExpression>>() {
-    @Override public Opt<BooleanExpression> apply(QPropertyDto qPropertyDto) {
-      return NONE;
-    }
-  };
+  public static final Fn<QPropertyDto, Opt<BooleanExpression>> NO_VALUE =
+      new Fn<QPropertyDto, Opt<BooleanExpression>>() {
+        @Override public Opt<BooleanExpression> apply(QPropertyDto qPropertyDto) {
+          return NONE;
+        }
+      };
 
   private PropertyPredicates() {
   }
@@ -52,7 +53,8 @@ public final class PropertyPredicates implements EntityPaths {
    * Create a 'where' expression for queries that filter by some property based criteria.
    *
    * @param propertyName the full qualified name of the property
-   * @param mkValueExpression a function to create a property value expression; use the passed property DTO to create the expression
+   * @param mkValueExpression a function to create a property value expression;
+   *        use the passed property DTO to create the expression
    */
   public static BooleanExpression mkWhereSelect(
           PropertyName propertyName,

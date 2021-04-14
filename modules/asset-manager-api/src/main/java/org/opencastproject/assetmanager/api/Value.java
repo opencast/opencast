@@ -37,7 +37,8 @@ import javax.annotation.concurrent.Immutable;
 /**
  * A property value.
  * <p>
- * The wrapped type is not exposed as a generic type parameter since {@link Value}s appear in contexts like lists where this type information cannot be preserved.
+ * The wrapped type is not exposed as a generic type parameter since {@link Value}s appear in
+ * contexts like lists where this type information cannot be preserved.
  * To access the wrapped type one can choose between two options.
  * If the type is known, use {@link #get(ValueType)}.
  * If the type is not known, safely decompose the value with {@link #decompose(Fn, Fn, Fn, Fn, Fn)}.
@@ -157,7 +158,7 @@ public abstract class Value {
     };
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   //
   // Type evidence and factory classes
@@ -278,7 +279,7 @@ public abstract class Value {
     }
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   //
   // Value classes
@@ -367,7 +368,7 @@ public abstract class Value {
     }
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   //
   // constructor methods

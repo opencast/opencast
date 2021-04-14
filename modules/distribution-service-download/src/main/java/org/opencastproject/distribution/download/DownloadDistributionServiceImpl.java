@@ -21,6 +21,7 @@
 package org.opencastproject.distribution.download;
 
 import static java.lang.String.format;
+import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.HttpUtil.waitForResource;
 import static org.opencastproject.util.PathSupport.path;
@@ -39,6 +40,9 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
@@ -128,6 +132,8 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   private Gson gson = new Gson();
 
+  private String systemUserName = null;
+
   /**
    * Creates a new instance of the download distribution service.
    */
@@ -145,16 +151,19 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   public void activate(ComponentContext cc) {
     super.activate(cc);
     serviceUrl = cc.getBundleContext().getProperty("org.opencastproject.download.url");
-    if (serviceUrl == null)
+    if (serviceUrl == null) {
       throw new IllegalStateException("Download url must be set (org.opencastproject.download.url)");
+    }
     logger.info("Download url is {}", serviceUrl);
 
     String ccDistributionDirectory = cc.getBundleContext().getProperty("org.opencastproject.download.directory");
-    if (ccDistributionDirectory == null)
+    if (ccDistributionDirectory == null) {
       throw new IllegalStateException("Distribution directory must be set (org.opencastproject.download.directory)");
+    }
     this.distributionDirectory = new File(ccDistributionDirectory);
     logger.info("Download distribution directory is {}", distributionDirectory);
     this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
+    systemUserName = cc.getBundleContext().getProperty(DIGEST_USER_PROPERTY);
   }
 
   @Override
@@ -183,8 +192,13 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   }
 
   @Override
-  public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability, boolean preserveReference)
-          throws DistributionException, MediaPackageException {
+  public Job distribute(
+      String channelId,
+      MediaPackage mediapackage,
+      Set<String> elementIds,
+      boolean checkAvailability,
+      boolean preserveReference
+  ) throws DistributionException, MediaPackageException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
@@ -249,12 +263,13 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
     if (AdaptivePlaylist.hasHLSPlaylist(elements)) {
       return distributeHLSElements(channelId, mediapackage, elements, checkAvailability, preserveReference);
-    } else
+    } else {
       for (MediaPackageElement element : elements) {
         MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element, checkAvailability,
                 preserveReference);
         distributedElements.add(distributedElement);
       }
+    }
     return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
   }
 
@@ -333,16 +348,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       final URI uri = distributedElement.getURI();
       if (checkAvailability) {
         logger.debug("Checking availability of distributed artifact {} at {}", distributedElement, uri);
-        waitForResource(trustedHttpClient, uri, HttpServletResponse.SC_OK, TIMEOUT, INTERVAL)
-                .fold(Misc.<Exception, Void> chuck(), new Effect.X<Integer>() {
-                  @Override
-                  public void xrun(Integer status) throws Exception {
-                    if (ne(status, HttpServletResponse.SC_OK)) {
-                      logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
-                      throw new DistributionException("Unable to load distributed file " + uri.toString());
-                    }
-                  }
-                });
+        checkAvailability(uri);
       }
       return distributedElement;
     } catch (Exception e) {
@@ -373,14 +379,16 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     List<Track> trackElements = elements.stream()
             .filter(e -> e.getElementType() == MediaPackageElement.Type.Track).map(e -> (Track) e)
             .collect(Collectors.toList());
-    HashMap<MediaPackageElementFlavor, List<Track>> trackElementsMap = new HashMap<MediaPackageElementFlavor, List<Track>>();
+    HashMap<MediaPackageElementFlavor, List<Track>> trackElementsMap
+        = new HashMap<MediaPackageElementFlavor, List<Track>>();
     // sort into one track list for each flavor - one video
     for (Track element : trackElements) {
       // clone track to destination mp and put into mediapackage
       Track t = setUpHLSElementforDistribution(channelId, mediapackage, element, preserveReference);
       List<Track> l = trackElementsMap.get(t.getFlavor());
-      if (l == null)
+      if (l == null) {
         l = new ArrayList<Track>();
+      }
       l.add(t);
       trackElementsMap.put(t.getFlavor(), l);
     }
@@ -390,8 +398,9 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       try {
         List<Track> tracks = elementSet.getValue();
         // If this flavor is a HLS playlist and therefore has internal references
-        if (tracks.stream().anyMatch(AdaptivePlaylist.isHLSTrackPred))
+        if (tracks.stream().anyMatch(AdaptivePlaylist.isHLSTrackPred)) {
           tracks = AdaptivePlaylist.fixReferences(tracks, distributionDir); // replace with fixed elements
+        }
         for (Track track : tracks) {
           MediaPackageElement distributedElement = checkDistributeHLSElement(track, checkAvailability);
           distributedElements.add(distributedElement);
@@ -475,16 +484,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     try {
       if (checkAvailability) {
         logger.debug("Checking availability of distributed artifact {} at {}", element, uri);
-        waitForResource(trustedHttpClient, uri, HttpServletResponse.SC_OK, TIMEOUT, INTERVAL)
-        .fold(Misc.<Exception, Void> chuck(), new Effect.X<Integer>() {
-          @Override
-          public void xrun(Integer status) throws Exception {
-            if (ne(status, HttpServletResponse.SC_OK)) {
-              logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
-              throw new DistributionException("Unable to load distributed file " + uri.toString());
-            }
-          }
-        });
+        checkAvailability(uri);
       }
       return element;
     } catch (Exception e) {
@@ -506,7 +506,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job retract(String channelId, MediaPackage mediapackage, Set<String> elementIds)
-        throws DistributionException {
+          throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
@@ -529,7 +529,8 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
               JOB_TYPE, Operation.Distribute.toString(), null, null, false, distributeJobLoad);
       job.setStatus(Job.Status.RUNNING);
       job = serviceRegistry.updateJob(job);
-      final MediaPackageElement[] mediaPackageElements = this.distributeElements(channelId, mediapackage, elementIds, checkAvailability);
+      final MediaPackageElement[] mediaPackageElements
+          = this.distributeElements(channelId, mediapackage, elementIds, checkAvailability);
       job.setStatus(Job.Status.FINISHED);
       return Arrays.asList(mediaPackageElements);
     } catch (ServiceRegistryException e) {
@@ -543,7 +544,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
-      throws DistributionException {
+          throws DistributionException {
     Job job = null;
     try {
       job = serviceRegistry
@@ -637,8 +638,9 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
         logger.debug("Unable to delete folder {}", elementFile.getParentFile().getAbsolutePath());
       }
 
-      if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0)
+      if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0) {
         FileSupport.delete(mediapackageDir);
+      }
 
       logger.debug("Finished retracting element {} of media package {} from publication channel {}", elementId,
           mediapackageId, channelId);
@@ -698,11 +700,11 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
           throws IllegalStateException {
     final Set<MediaPackageElement> elements = new HashSet<MediaPackageElement>();
     for (String elementId : elementIds) {
-       MediaPackageElement element = mediapackage.getElementById(elementId);
-       if (element != null) {
-         elements.add(element);
-       } else {
-         element = Arrays.stream(mediapackage.getPublications())
+      MediaPackageElement element = mediapackage.getElementById(elementId);
+      if (element != null) {
+        elements.add(element);
+      } else {
+        element = Arrays.stream(mediapackage.getPublications())
                .filter(p -> p.getChannel().equals(channelId))
                .flatMap(p -> Arrays.stream(p.getAttachments())
                .filter(a -> a.getIdentifier().equals(elementId)))
@@ -710,8 +712,8 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
                .orElseThrow(() ->
                        new IllegalStateException(format("No element %s found in mediapackage %s", elementId,
                            mediapackage.getIdentifier())));
-         elements.add(element);
-       }
+        elements.add(element);
+      }
     }
     return elements;
   }
@@ -731,8 +733,9 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     String orgId = securityService.getOrganization().getId();
     final Path rootPath = Paths.get(distributionDirectory.getAbsolutePath(), orgId);
 
-    if (!Files.exists(rootPath))
+    if (!Files.exists(rootPath)) {
       return source;
+    }
 
     List<Path> mediaPackageDirectories = new ArrayList<>();
     try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(rootPath)) {
@@ -744,8 +747,9 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       }
     }
 
-    if (mediaPackageDirectories.isEmpty())
+    if (mediaPackageDirectories.isEmpty()) {
       return source;
+    }
 
     final long size = Files.size(source.toPath());
 
@@ -754,25 +758,30 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       Files.walkFileTree(p, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          if (attrs.isDirectory())
+          if (attrs.isDirectory()) {
             return FileVisitResult.CONTINUE;
+          }
 
-          if (size != attrs.size())
+          if (size != attrs.size()) {
             return FileVisitResult.CONTINUE;
+          }
 
           try (InputStream is1 = Files.newInputStream(source.toPath()); InputStream is2 = Files.newInputStream(file)) {
-            if (!IOUtils.contentEquals(is1, is2))
+            if (!IOUtils.contentEquals(is1, is2)) {
               return FileVisitResult.CONTINUE;
+            }
           }
           result[0] = file.toFile();
           return FileVisitResult.TERMINATE;
         }
       });
-      if (result[0] != null)
+      if (result[0] != null) {
         break;
+      }
     }
-    if (result[0] != null)
+    if (result[0] != null) {
       return result[0];
+    }
 
     return source;
   }
@@ -836,6 +845,28 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
             DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
     retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD,
             serviceRegistry);
+  }
+
+  /**
+   * Checks whether requesting the given HTTP URI results in 200 OK. If not, a
+   * `DistributionException` is thrown. The HTTP request is done with the system
+   * user to ensure our request is properly authorized.
+   */
+  private void checkAvailability(URI uri) {
+    final Organization organization = getSecurityService().getOrganization();
+    final User systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
+    SecurityUtil.runAs(getSecurityService(), organization, systemUser, () -> {
+      waitForResource(trustedHttpClient, uri, HttpServletResponse.SC_OK, TIMEOUT, INTERVAL)
+          .fold(Misc.chuck(), new Effect.X<Integer>() {
+            @Override
+            public void xrun(Integer status) throws Exception {
+              if (ne(status, HttpServletResponse.SC_OK)) {
+                logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
+                throw new DistributionException("Unable to load distributed file " + uri.toString());
+              }
+            }
+          });
+    });
   }
 
 }

@@ -51,6 +51,11 @@
       <artifactId>opencast-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-index-rebuild</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- -->
     <dependency>
       <groupId>com.entwinemedia.common</groupId>

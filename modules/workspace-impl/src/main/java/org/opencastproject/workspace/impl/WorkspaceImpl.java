@@ -34,13 +34,13 @@ import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Prelude.sleep;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.util.AssetPathUtils;
 import org.opencastproject.assetmanager.util.DistributionPathUtils;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.IoSupport;
@@ -50,7 +50,6 @@ import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
@@ -86,7 +85,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -352,7 +353,7 @@ public final class WorkspaceImpl implements Workspace {
         // does the file exist and is it up to date?
         logger.trace("Looking up {} at {}", uri.toString(), wfrCopy.getAbsolutePath());
         if (wfrCopy.isFile()) {
-          final Long workspaceFileLastModified = inWs.isFile() ? inWs.lastModified() : 0L;
+          final long workspaceFileLastModified = inWs.isFile() ? inWs.lastModified() : 0L;
           // if the file exists in the workspace, but is older than the wfr copy, replace it
           if (workspaceFileLastModified < wfrCopy.lastModified()) {
             logger.debug("Replacing {} with an updated version from the file repository", inWs.getAbsolutePath());
@@ -465,25 +466,12 @@ public final class WorkspaceImpl implements Workspace {
     }
   }
 
-  /**
-   * {@link #handleDownloadResponse(org.apache.http.HttpResponse, java.net.URI, java.io.File)} as a function.
-   * <code>(URI, dst_file) -> HttpResponse -> Either token (Option File)</code>
-   */
-  private Function<HttpResponse, Either<String, Option<File>>> handleDownloadResponse(final URI src, final File dst) {
-    return new Function.X<HttpResponse, Either<String, Option<File>>>() {
-      @Override
-      public Either<String, Option<File>> xapply(HttpResponse response) throws Exception {
-        return handleDownloadResponse(response, src, dst);
-      }
-    };
-  }
-
   /** Create a get request to the given URI. */
-  private HttpGet createGetRequest(final URI src, final File dst, Tuple<String, String>... params) throws IOException {
+  private HttpGet createGetRequest(final URI src, final File dst, final Map<String, String> params) throws IOException {
     try {
       URIBuilder builder = new URIBuilder(src.toString());
-      for (final Tuple<String, String> a : params) {
-        builder.setParameter(a.getA(), a.getB());
+      for (Map.Entry<String, String> param : params.entrySet()) {
+        builder.setParameter(param.getKey(), param.getValue());
       }
       final HttpGet get = new HttpGet(builder.build());
       // if the destination file already exists add the If-None-Match header
@@ -503,16 +491,13 @@ public final class WorkspaceImpl implements Workspace {
    * @return the file
    */
   private File downloadIfNecessary(final URI src, final File dst) throws IOException, NotFoundException {
-    HttpGet get = createGetRequest(src, dst);
+    HttpGet get = createGetRequest(src, dst, Collections.emptyMap());
     while (true) {
       // run the http request and handle its response
-      final Either<Exception, Either<String, Option<File>>> result = trustedHttpClient
-              .<Either<String, Option<File>>> runner(get).run(handleDownloadResponse(src, dst));
-      // handle to result of response processing
-      // right: there's an expected result
-      for (Either<String, Option<File>> a : result.right()) {
-        // right: either a file could be found or not
-        for (Option<File> ff : a.right()) {
+      try {
+        final Either<String, Option<File>> result = handleDownloadResponse(
+            trustedHttpClient.execute(get), src, dst);
+        for (Option<File> ff : result.right()) {
           for (File f : ff) {
             return f;
           }
@@ -521,16 +506,13 @@ public final class WorkspaceImpl implements Workspace {
           throw new NotFoundException();
         }
         // left: file will be ready later
-        for (String token : a.left()) {
-          get = createGetRequest(src, dst, tuple("token", token));
+        for (String token : result.left()) {
+          get = createGetRequest(src, dst, Collections.singletonMap("token", token));
           sleep(60000);
         }
-      }
-      // left: an exception occurred
-      for (Exception e : result.left()) {
-        logger.warn("Could not copy {} to {}: {}", src.toString(), dst.getAbsolutePath(), e.getMessage());
+      } catch (TrustedHttpClientException e) {
         FileUtils.deleteQuietly(dst);
-        throw new NotFoundException(e);
+        throw new NotFoundException(String.format("Could not copy %s to %s", src, dst.getAbsolutePath()), e);
       }
     }
   }

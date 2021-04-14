@@ -170,8 +170,9 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
         Job timelinepreviewsJob = timelinePreviewsService.createTimelinePreviewImages(sourceTrack, imageSize);
         timelinepreviewsJobs.add(timelinepreviewsJob);
 
-        if (processOnlyOne)
-            break;
+        if (processOnlyOne) {
+          break;
+        }
 
       } catch (MediaPackageException | TimelinePreviewsException ex) {
         logger.error("Creating timeline previews job for track '{}' in media package '{}' failed with error {}",

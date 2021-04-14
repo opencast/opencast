@@ -137,19 +137,20 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
           String targetFlavor) throws CoverImageException {
 
     // Null values are not passed to the arguments list
-    if (posterImageUri == null)
+    if (posterImageUri == null) {
       posterImageUri = "";
+    }
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Generate.toString(),
-              Arrays.asList(xml, xsl, width, height, posterImageUri, targetFlavor));
+          Arrays.asList(xml, xsl, width, height, posterImageUri, targetFlavor));
     } catch (ServiceRegistryException e) {
       throw new CoverImageException("Unable to create a job", e);
     }
   }
 
   protected Attachment generateCoverImageInternal(Job job, String xml, String xsl, int width, int height,
-          String posterImage, String targetFlavor) throws CoverImageException {
+      String posterImage, String targetFlavor) throws CoverImageException {
 
     URI result;
     File tempSvg = null;
@@ -198,12 +199,13 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
     }
 
     return (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-            .elementFromURI(result, Type.Attachment, MediaPackageElementFlavor.parseFlavor(targetFlavor));
+        .elementFromURI(result, Type.Attachment, MediaPackageElementFlavor.parseFlavor(targetFlavor));
   }
 
   protected static Document parseXsl(String xsl) throws CoverImageException {
-    if (StringUtils.isBlank(xsl))
+    if (StringUtils.isBlank(xsl)) {
       throw new IllegalArgumentException("XSL string must not be empty");
+    }
 
     DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
     dbFactory.setNamespaceAware(true);
@@ -226,9 +228,10 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
   }
 
   protected static void transformSvg(Result svg, Source xmlSource, Document xslDoc, int width, int height,
-          String posterImage) throws TransformerFactoryConfigurationError, CoverImageException {
-    if (svg == null || xmlSource == null || xslDoc == null)
+      String posterImage) throws TransformerFactoryConfigurationError, CoverImageException {
+    if (svg == null || xmlSource == null || xslDoc == null) {
       throw new IllegalArgumentException("Neither svg nor xmlSource nor xslDoc must be null");
+    }
 
     TransformerFactory factory = TransformerFactory.newInstance();
     Transformer transformer;
@@ -240,8 +243,9 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
     }
     transformer.setParameter("width", width);
     transformer.setParameter("height", height);
-    if (isNotBlank(posterImage))
+    if (isNotBlank(posterImage)) {
       transformer.setParameter("posterimage", posterImage);
+    }
 
     Thread thread = Thread.currentThread();
     ClassLoader loader = thread.getContextClassLoader();

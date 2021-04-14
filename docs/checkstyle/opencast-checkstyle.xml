@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN" "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 <module name="Checker">
+  <!-- Define some exceptions for a gradual rollout of new style rules -->
+  <module name="SuppressionFilter">
+    <property name="file" value="${checkstyle.suppressions.file}" />
+  </module>
 
   <!-- Check for license header                                 -->
   <!-- See http://checkstyle.sourceforge.net/config_header.html -->
@@ -14,6 +18,16 @@
   <!-- Checks whether spaces are used as opposed to tabs                    -->
   <!-- See http://checkstyle.sf.net/config_whitespace.html#FileTabCharacter -->
   <module name="FileTabCharacter"/>
+
+  <!-- Makes sure lines are not longer than 120 chars -->
+  <module name="LineLength">
+    <property name="max" value="120"/>
+  </module>
+
+  <!-- Allow to disable checkstyle for sections of the code with `// CHECKSTYLE:OFF`
+       and `// CHECKSTYLE:ON`. Unlike `SuppressionCommentFilter` below, this
+       also works for checks not in "TreeWalker" -->
+  <module name="SuppressWithPlainTextCommentFilter"/>
 
   <!-- Checks whether files end with a new line.                        -->
   <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
@@ -29,6 +43,21 @@
   <module name="TreeWalker">
     <!-- Allow Java code to suppress checkstyle audits via CHECKSTYLE:OFF and CHECKSTYLE:ON comments -->
     <module name="SuppressionCommentFilter"/>
+
+    <!-- Indentation -->
+    <module name="Indentation">
+      <property name="basicOffset" value="2"/>
+      <property name="caseIndent" value="2"/>
+      <property name="throwsIndent" value="8"/>
+      <property name="lineWrappingIndentation" value="4"/>
+      <property name="forceStrictCondition" value="false"/>
+    </module>
+
+    <!-- Bracing style: opening brace on same line, braces are mandatory -->
+    <module name="NeedBraces"/>
+    <module name="LeftCurly">
+      <property name="ignoreEnums" value="false"/>
+    </module>
 
     <!-- Checks for Naming Conventions.                  -->
     <!-- See http://checkstyle.sf.net/config_naming.html -->

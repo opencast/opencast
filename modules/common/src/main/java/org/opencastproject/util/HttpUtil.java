@@ -21,7 +21,6 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
@@ -116,19 +115,18 @@ public final class HttpUtil {
     long now = 0L;
     while (true) {
       final HttpHead head = new HttpHead(resourceUri);
-      final Either<Exception, Integer> result = http.<Integer> run(head).apply(getStatusCode);
-      for (final Integer status : result.right()) {
-        if (eq(status, expectedStatus) || now >= timeout) {
+      try {
+        final int status = http.execute(head).getStatusLine().getStatusCode();
+        if (status == expectedStatus || now >= timeout) {
           return right(status);
-        } else if (now < timeout) {
+        } else {
           if (!sleep(pollingInterval)) {
             return left(new Exception("Interrupted"));
           } else {
             now = now + pollingInterval;
           }
         }
-      }
-      for (Exception e : result.left()) {
+      } catch (Exception e) {
         return left(e);
       }
     }

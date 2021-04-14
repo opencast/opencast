@@ -18,7 +18,7 @@ General Mode
 
 This will re-encode the videos first to the same format (framerate/timebase/codec, etc) before concatenation.
 
-{% dot concat.svg
+```graphviz dot concat.png
 
 /**
 Input                                                   Output
@@ -68,7 +68,7 @@ digraph G {
 
   concat -> o_intro [lhead=cluster_output];
 }
-%}
+```
 
 The internal FFmpeg command for re-encoding is using the following filters: fps, scale, pad and setdar for scaling all
 videos to a similar size including letterboxing, aevalsrc for creating silent audio streams and of course the concat for

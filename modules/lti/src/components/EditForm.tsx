@@ -6,11 +6,9 @@ import {
     EventMetadataCollection,
     collectionToPairs
 } from "../OpencastRest";
-import Select from "react-select";
-import i18next from "i18next";
-import { ValueType } from "react-select/src/types"; // tslint:disable-line no-submodule-imports
-
+import Select, { ValueType } from "react-select";
 import CreatableSelect from "react-select/creatable";
+import * as i18next from "i18next";
 
 const allowedFields = ["title", "language", "license", "creator"];
 
@@ -32,6 +30,8 @@ interface EditFormProps extends WithTranslation {
 
 interface MetadataFieldProps {
     readonly field: EventMetadataField;
+    // ESlint false positive.
+    // eslint-disable-next-line react/no-unused-prop-types
     readonly valueChange: (id: string, newValue: string | string[]) => void;
     readonly t: i18next.TFunction;
 }
@@ -88,26 +88,23 @@ function MetadataFieldInner(props: MetadataFieldProps) {
             value={field.value}
             onChange={(e) => valueChange(field.id, e.currentTarget.value)} />;
 
-    if (field.collection !== undefined && field.type === "mixed_text")
+    if (field.collection !== undefined && field.type === "mixed_text") {
         return <CreatableSelect
             isMulti={true}
             isClearable={true}
             id={field.id}
             value={(field.value as string[]).map((e) => ({ value: e, label: e }))}
-            onChange={(value: ValueType<OptionType>) =>
-                valueChange(
-                    field.id,
-                    value === undefined || value === null || !Array.isArray(value) ? [] : (value as OptionType[]).map((v) => v.value))} />;
-
+            onChange={(value: ValueType<OptionType, true>) =>
+                valueChange(field.id, value.map(v => v.value))}
+            />;
+    }
     if (field.collection !== undefined) {
         const options: OptionType[] = collectionToOptions(field.collection, field.translatable, t);
         const currentValue = options.find((o: OptionType) => o.value === field.value);
         return <Select
             id={field.id}
-            onChange={(value: ValueType<OptionType>) =>
-                valueChange(
-                    field.id,
-                    value === undefined || value === null || Array.isArray(value) ? "" : (value as OptionType).value)}
+            onChange={(value: ValueType<OptionType, false>) =>
+                valueChange(field.id, value === null || Array.isArray(value) ? "" : value.value)}
             value={currentValue}
             options={options}
             placeholder={t("LTI.SELECT_OPTION")} />

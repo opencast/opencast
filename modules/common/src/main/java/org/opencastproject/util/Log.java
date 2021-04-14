@@ -79,6 +79,15 @@ public final class Log {
   }
 
   /**
+   * Return the slf4j logger.
+   *
+   * @return logger
+   */
+  public Logger getSlf4jLogger() {
+    return this.logger;
+  }
+
+  /**
    * Create a new log instance based on an slf4j logger for class <code>clazz</code>.
    *
    * @see org.slf4j.LoggerFactory#getLogger(Class)

@@ -2,14 +2,15 @@
 <definition xmlns="http://workflow.opencastproject.org">
 
   <id>placeholdervideo</id>
-  <title>Cleanup and publish placeholder video</title>
-    <tags>
-      <tag>archive</tag>
-      <tag>editor</tag>
-    </tags>
+  <title>Delete event, publish a placeholder instead</title>
+  <tags>
+    <tag>archive</tag>
+    <tag>editor</tag>
+  </tags>
+  <displayOrder>2000</displayOrder>
   <description>
-    Publish a placeholder video for corrupt videos.
-    Delete and cleanup corrupt videos and old snapshots, but keep the metadata.
+    Delete all media related to this event, keeping the metadata and publishing a placeholder video instead.
+    The original media will be unrecoverable.
   </description>
   <configuration_panel/>
 

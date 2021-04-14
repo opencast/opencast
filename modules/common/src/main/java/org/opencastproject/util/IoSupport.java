@@ -242,9 +242,11 @@ public final class IoSupport {
     } finally {
       IOUtils.closeQuietly(in);
 
-      if (response != null && trustedClient != null) {
-        trustedClient.close(response);
-        response = null;
+      if (response != null) {
+        try {
+          trustedClient.close(response);
+        } catch (IOException e) {
+        }
       }
     }
 

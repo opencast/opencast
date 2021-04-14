@@ -67,7 +67,8 @@ public class VideoGridServiceRemoteImpl extends RemoteBase implements VideoGridS
     List<NameValuePair> params = new ArrayList<>();
     try {
       params.add(new BasicNameValuePair("commands", commandsJson));
-      params.add(new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(Arrays.asList(tracks))));
+      params.add(
+              new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(Arrays.asList(tracks))));
     } catch (Exception e) {
       throw new EncoderException(e);
     }

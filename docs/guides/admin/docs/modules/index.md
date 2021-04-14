@@ -10,18 +10,19 @@ Documentation for modules included in Opencast.
 * [Live  Schedule](liveschedule.md)
 * [LTI Module](ltimodule.md)
 * [Media Module](mediamodule.configuration.md)
+* [Metrics (OpenMetrics, Prometheus)](metrics.md)
 * Player
     * [Configuration](player.configuration.md)
     * [URL Parameter](player.url.parameter.md)
 * [Search Indexes](searchindex/index.md)
     * [Solr](searchindex/solr.md)
-    * [Elasticsearch](searchindex/elasticsearch.md)
 * [Stream Security](stream-security.md)
 * [Studio](studio.md)
 * [Text Extraction](textextraction.md)
-* Video Editor
+* Internal Video Editor
     * [Setup](videoeditor.setup.md)
     * [Architecture](videoeditor.architecture.md)
+* [Stand-alone Video Editor](editor.md)
 * [Video Segmentation](videosegmentation.md)
 * Termination State
     * [Basic](terminationstate.md)

@@ -90,8 +90,9 @@ public final class UrlSigningServiceOsgiUtil {
       }
     } else {
       logger.debug(
-              "For the class {} the property '{}' has not been configured, so the default is being used to expire signed URLs in {} seconds.",
-              className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, expireSeconds);
+          "For the class {} the property '{}' has not been configured, so the default is being "
+              + "used to expire signed URLs in {} seconds.",
+          className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, expireSeconds);
     }
     return expireSeconds;
   }
@@ -139,8 +140,9 @@ public final class UrlSigningServiceOsgiUtil {
       }
     } else {
       logger.debug(
-              "For the class {} the property '{}' has not been configured, so the default of signing urls with the client ip is {}.",
-              className, URL_SIGNING_USE_CLIENT_IP, signWithClientIP);
+          "For the class {} the property '{}' has not been configured, so the default of signing "
+              + "urls with the client ip is {}.",
+          className, URL_SIGNING_USE_CLIENT_IP, signWithClientIP);
     }
     return signWithClientIP;
   }

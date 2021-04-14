@@ -24,12 +24,12 @@ package org.opencastproject.adminui.endpoint;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
-import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
-import org.opencastproject.index.service.impl.index.theme.ThemeSearchQuery;
-import org.opencastproject.matterhorn.search.SearchResult;
-import org.opencastproject.matterhorn.search.SearchResultItem;
-import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.impl.SearchResultImpl;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbUser;
@@ -150,23 +150,23 @@ public class TestThemesEndpoint extends ThemesEndpoint {
     this.setIndex(adminUISearchIndex);
   }
 
-  private SearchResult<org.opencastproject.index.service.impl.index.theme.Theme> createThemeCaptureResult(
+  private SearchResult<org.opencastproject.elasticsearch.index.theme.Theme> createThemeCaptureResult(
           final Capture<ThemeSearchQuery> myCapture) {
-    SearchResultImpl<org.opencastproject.index.service.impl.index.theme.Theme> searchResults = new SearchResultImpl<org.opencastproject.index.service.impl.index.theme.Theme>(
+    SearchResultImpl<org.opencastproject.elasticsearch.index.theme.Theme> searchResults = new SearchResultImpl<org.opencastproject.elasticsearch.index.theme.Theme>(
             myCapture.getValue(), 0, 0);
     if (myCapture.hasCaptured()) {
       if (myCapture.getValue().getIdentifiers().length == 1 && myCapture.getValue().getIdentifiers()[0] == theme1Id) {
-        SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> searchResultItem = getThemeSearchResultItem(
+        SearchResultItem<org.opencastproject.elasticsearch.index.theme.Theme> searchResultItem = getThemeSearchResultItem(
                 theme1Id, "theme-1-name");
         searchResults.addResultItem(searchResultItem);
       } else if (myCapture.getValue().getIdentifiers().length == 0) {
-        SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> searchResultItem1 = getThemeSearchResultItem(
+        SearchResultItem<org.opencastproject.elasticsearch.index.theme.Theme> searchResultItem1 = getThemeSearchResultItem(
                 theme1Id, "theme-1-name");
         searchResults.addResultItem(searchResultItem1);
-        SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> searchResultItem2 = getThemeSearchResultItem(
+        SearchResultItem<org.opencastproject.elasticsearch.index.theme.Theme> searchResultItem2 = getThemeSearchResultItem(
                 theme2Id, "theme-2-name");
         searchResults.addResultItem(searchResultItem2);
-        SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> searchResultItem3 = getThemeSearchResultItem(
+        SearchResultItem<org.opencastproject.elasticsearch.index.theme.Theme> searchResultItem3 = getThemeSearchResultItem(
                 theme3Id, "theme-3-name");
         searchResults.addResultItem(searchResultItem3);
       }
@@ -175,16 +175,16 @@ public class TestThemesEndpoint extends ThemesEndpoint {
   }
 
   @SuppressWarnings("unchecked")
-  private SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> getThemeSearchResultItem(Long id,
+  private SearchResultItem<org.opencastproject.elasticsearch.index.theme.Theme> getThemeSearchResultItem(Long id,
           String name) {
-    org.opencastproject.index.service.impl.index.theme.Theme theme = new org.opencastproject.index.service.impl.index.theme.Theme(
+    org.opencastproject.elasticsearch.index.theme.Theme theme = new org.opencastproject.elasticsearch.index.theme.Theme(
             id, defaultOrg.getId());
     theme.setCreationDate(creationDate);
     theme.setName(name);
     theme.setCreator("Test User");
     theme.setBumperFile("uuid1");
     theme.setWatermarkFile("uuid2");
-    SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> searchResultItem = EasyMock
+    SearchResultItem<org.opencastproject.elasticsearch.index.theme.Theme> searchResultItem = EasyMock
             .createMock(SearchResultItem.class);
     EasyMock.expect(searchResultItem.getSource()).andReturn(theme);
     EasyMock.expect(searchResultItem.compareTo(EasyMock.anyObject(SearchResultItem.class))).andReturn(1);

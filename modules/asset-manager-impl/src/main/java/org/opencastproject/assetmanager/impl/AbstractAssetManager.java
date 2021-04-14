@@ -89,7 +89,7 @@ public abstract class AbstractAssetManager implements AssetManager {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractAssetManager.class);
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
   //
   // Dependencies
   //
@@ -106,7 +106,7 @@ public abstract class AbstractAssetManager implements AssetManager {
   /** Return the organization ID of the currently executing thread. */
   protected abstract String getCurrentOrgId();
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   @Override
   public Opt<MediaPackage> getMediaPackage(String mediaPackageId) {
@@ -122,8 +122,9 @@ public abstract class AbstractAssetManager implements AssetManager {
 
   @Override
   public Snapshot takeSnapshot(final String owner, final MediaPackage mp) {
-    if (owner == null)
+    if (owner == null) {
       return takeSnapshot(mp);
+    }
 
     return handleException(new P1Lazy<Snapshot>() {
       @Override public Snapshot get1() {
@@ -172,6 +173,11 @@ public abstract class AbstractAssetManager implements AssetManager {
   }
 
   @Override
+  public long countEvents(final String organization) {
+    return getDb().countEvents(organization);
+  }
+
+  @Override
   public boolean snapshotExists(final String mediaPackageId) {
     return getDb().snapshotExists(mediaPackageId);
   }
@@ -193,7 +199,8 @@ public abstract class AbstractAssetManager implements AssetManager {
   @Override public Opt<Asset> getAsset(Version version, final String mpId, final String mpeId) {
     // try to fetch the asset
     for (final AssetDtos.Medium asset : getDb().getAsset(RuntimeTypes.convert(version), mpId, mpeId)) {
-      for (final InputStream assetStream : getLocalAssetStore().get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpeId))) {
+      for (final InputStream assetStream
+          : getLocalAssetStore().get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpeId))) {
 
         Checksum checksum = null;
         try {
@@ -203,13 +210,13 @@ public abstract class AbstractAssetManager implements AssetManager {
         }
 
         final Asset a = new AssetImpl(
-                AssetId.mk(version, mpId, mpeId),
-                assetStream,
-                asset.getAssetDto().getMimeType(),
-                asset.getAssetDto().getSize(),
-                asset.getStorageId(),
-                asset.getAvailability(),
-                checksum);
+            AssetId.mk(version, mpId, mpeId),
+            assetStream,
+            asset.getAssetDto().getMimeType(),
+            asset.getAssetDto().getSize(),
+            asset.getStorageId(),
+            asset.getAvailability(),
+            checksum);
         return Opt.some(a);
       }
     }
@@ -224,7 +231,7 @@ public abstract class AbstractAssetManager implements AssetManager {
     }
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Make sure each of the elements has a checksum.
@@ -249,7 +256,10 @@ public abstract class AbstractAssetManager implements AssetManager {
     final SnapshotDto snapshotDto;
     try {
       rewriteUrisForArchival(pmp, version);
-      snapshotDto = getDb().saveSnapshot(getCurrentOrgId(), pmp, now, version, Availability.ONLINE, getLocalAssetStore().getStoreType(), owner);
+      snapshotDto = getDb().saveSnapshot(
+          getCurrentOrgId(), pmp, now, version,
+          Availability.ONLINE, getLocalAssetStore().getStoreType(), owner
+      );
     } catch (AssetManagerException e) {
       logger.error("Could not take snapshot {}: {}", mpId, e);
       throw new AssetManagerException(e);
@@ -268,7 +278,10 @@ public abstract class AbstractAssetManager implements AssetManager {
         file = getWorkspace().get(mpe.getURI(), true);
         mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
       } catch (IOException | NotFoundException e) {
-        throw new AssetManagerException(format("Cannot calculate checksum for media package element %s", mpe.getURI()), e);
+        throw new AssetManagerException(format(
+            "Cannot calculate checksum for media package element %s",
+            mpe.getURI()
+        ), e);
       } finally {
         if (file != null) {
           FileUtils.deleteQuietly(file);
@@ -292,9 +305,11 @@ public abstract class AbstractAssetManager implements AssetManager {
         logger.debug("Content of asset {} with checksum {} has been archived before",
                     existingAsset.getMediaPackageElementId(), e.getChecksum());
         if (!getLocalAssetStore().copy(existingAsset, storagePath)) {
-          throw new AssetManagerException(
-                  format("An asset with checksum %s has already been archived but trying to copy or link asset %s to it failed",
-                         e.getChecksum(), existingAsset));
+          throw new AssetManagerException(format(
+              "An asset with checksum %s has already been archived but trying to copy or link asset %s to it failed",
+              e.getChecksum(),
+              existingAsset
+          ));
         }
       } else {
         final Opt<Long> size = e.getSize() > 0 ? Opt.some(e.getSize()) : Opt.<Long>none();
@@ -306,11 +321,16 @@ public abstract class AbstractAssetManager implements AssetManager {
   /** Check if element <code>e</code> is already part of the history. */
   private Opt<StoragePath> findAssetInVersions(final String checksum) throws Exception {
     return getDb().findAssetByChecksumAndStore(checksum, getLocalAssetStore().getStoreType())
-            .map(new Fn<AssetDtos.Full, StoragePath>() {
-      @Override public StoragePath apply(AssetDtos.Full dto) {
-        return StoragePath.mk(dto.getOrganizationId(), dto.getMediaPackageId(), dto.getVersion(), dto.getAssetDto().getMediaPackageElementId());
-      }
-    });
+        .map(new Fn<AssetDtos.Full, StoragePath>() {
+          @Override public StoragePath apply(AssetDtos.Full dto) {
+            return StoragePath.mk(
+                dto.getOrganizationId(),
+                dto.getMediaPackageId(),
+                dto.getVersion(),
+                dto.getAssetDto().getMediaPackageElementId()
+            );
+          }
+        });
   }
 
   private void storeManifest(final PartialMediaPackage pmp, final Version version) throws Exception {
@@ -337,8 +357,10 @@ public abstract class AbstractAssetManager implements AssetManager {
   }
 
   /**
-   * Create a unique id for the manifest xml. This is to avoid an id collision in the rare case that the media package
-   * contains an XML element with the id used for the manifest. A UUID could also be used but this is far less readable.
+   * Create a unique id for the manifest xml. This is to avoid an id collision
+   * in the rare case that the media package contains an XML element with the id
+   * used for the manifest. A UUID could also be used but this is far less
+   * readable.
    *
    * @param seedId
    *          the id to start with
@@ -351,7 +373,7 @@ public abstract class AbstractAssetManager implements AssetManager {
     }
   }
 
-  /* ---------------------------------------------------------------------------------------------------------------- */
+  /* --------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Unify exception handling by wrapping any occurring exception in an
@@ -400,7 +422,11 @@ public abstract class AbstractAssetManager implements AssetManager {
       public URI apply(MediaPackageElement mpe) {
         try {
           String fileName = getFileName(mpe).getOr("unknown");
-          return new URI("urn", "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName, null);
+          return new URI(
+              "urn",
+              "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName,
+              null
+          );
         } catch (URISyntaxException e) {
           throw new AssetManagerException(e);
         }
@@ -415,8 +441,9 @@ public abstract class AbstractAssetManager implements AssetManager {
    */
   public static Opt<String> getFileNameFromUrn(MediaPackageElement mpe) {
     Opt<URI> uri = Opt.nul(mpe.getURI());
-    if (uri.isSome() && "urn".equals(uri.get().getScheme()))
+    if (uri.isSome() && "urn".equals(uri.get().getScheme())) {
       return uri.toStream().map(toString).bind(Strings.split(":")).drop(1).reverse().head();
+    }
     return Opt.none();
   }
 
@@ -444,7 +471,7 @@ public abstract class AbstractAssetManager implements AssetManager {
     }
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Rewrite URIs of all asset elements of a snapshot's media package.

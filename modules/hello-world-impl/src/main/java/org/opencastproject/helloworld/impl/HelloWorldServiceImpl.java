@@ -31,11 +31,11 @@ import org.slf4j.LoggerFactory;
  * A simple tutorial class to learn about Opencast Services
  */
 @Component(
-  property = {
-    "service.description=Hello World Service"
-  },
-  immediate = true,
-  service = HelloWorldService.class
+    property = {
+        "service.description=Hello World Service"
+    },
+    immediate = true,
+    service = HelloWorldService.class
 )
 public class HelloWorldServiceImpl implements HelloWorldService {
 

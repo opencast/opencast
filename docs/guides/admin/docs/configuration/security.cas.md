@@ -7,14 +7,14 @@ Authentication
 Many campuses use some kind of single sign on, such as JASIG's Central Authentication Service, or CAS. This guide
 describes how to integrate Opencast into such a system.
 
-### Enable Opencast CAS feature 
+### Step 1: Enable Opencast CAS feature 
 
 First, you need to edit the file `etc/org.apache.karaf.features.cfg` and add the `opencast-security-cas` to the
 `featuresBoot` variable.
 
     featuresBoot = ..., opencast-security-cas
 
-### Security Configuration
+### Step 2: Security Configuration
 
 Edit the security configuration file at `etc/security/mh_default_org.xml`. In a multi-tenant set-up, you will have one
 configuration file for each tenant at `etc/security/<organization_id>.xml`.
@@ -66,9 +66,9 @@ You will need to configure a [UserProvider](security.md) to look up users as ide
 * [Brightspace D2L User Provider](security.user.brightspace.md)
 * [Canvas LMS User Provider](security.user.canvas.md)
 
-
-Original documentation from University of Saskatchewan
-------------------------------------------------------
-
+Further Information
+-------------------
+<!-- _This leads to Atlassian/Confluence which needs to be joined first, assuming the user already has an account. Is this necessary to include here? -->
+Original documentation from University of Saskatchewan:
 [University of Saskatchewan CAS and LDAP
 integration](https://opencast.jira.com/wiki/display/MH/University+of+Saskatchewan+CAS+and+LDAP+integration)

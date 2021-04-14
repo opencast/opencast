@@ -68,7 +68,15 @@ public final class SelectQueryContribution {
 
   /** Create a new, empty contribution. */
   public static SelectQueryContribution mk() {
-    return new SelectQueryContribution(Stream.<Expression<?>>empty(), Stream.<EntityPath<?>>empty(), Stream.<Join>empty(), Opt.<BooleanExpression>none(), Opt.<Integer>none(), Opt.<Integer>none(), Stream.<OrderSpecifier<?>>empty());
+    return new SelectQueryContribution(
+        Stream.<Expression<?>>empty(),
+        Stream.<EntityPath<?>>empty(),
+        Stream.<Join>empty(),
+        Opt.<BooleanExpression>none(),
+        Opt.<Integer>none(),
+        Opt.<Integer>none(),
+        Stream.<OrderSpecifier<?>>empty()
+    );
   }
 
   /** Set the `fetch` contribution. */
@@ -111,7 +119,7 @@ public final class SelectQueryContribution {
     return addJoin($(join));
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /** Set the `where` contribution. */
   SelectQueryContribution where(Opt<BooleanExpression> where) {
@@ -133,7 +141,7 @@ public final class SelectQueryContribution {
     return andWhere(Opt.nul(where));
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /** Set the `offset` contribution. */
   SelectQueryContribution offset(Opt<Integer> offset) {
@@ -165,33 +173,38 @@ public final class SelectQueryContribution {
     return new SelectQueryContribution(fetch, from, join, where, offset, limit, this.order.append(order));
   }
 
-  static final Fn<SelectQueryContribution, Stream<Expression<?>>> getFetch = new Fn<SelectQueryContribution, Stream<Expression<?>>>() {
-    @Override public Stream<Expression<?>> apply(SelectQueryContribution c) {
-      return c.fetch;
-    }
-  };
+  static final Fn<SelectQueryContribution, Stream<Expression<?>>> getFetch
+      = new Fn<SelectQueryContribution, Stream<Expression<?>>>() {
+        @Override public Stream<Expression<?>> apply(SelectQueryContribution c) {
+          return c.fetch;
+        }
+      };
 
-  static final Fn<SelectQueryContribution, Stream<EntityPath<?>>> getFrom = new Fn<SelectQueryContribution, Stream<EntityPath<?>>>() {
-    @Override public Stream<EntityPath<?>> apply(SelectQueryContribution c) {
-      return c.from;
-    }
-  };
+  static final Fn<SelectQueryContribution, Stream<EntityPath<?>>> getFrom
+      = new Fn<SelectQueryContribution, Stream<EntityPath<?>>>() {
+        @Override public Stream<EntityPath<?>> apply(SelectQueryContribution c) {
+          return c.from;
+        }
+      };
 
-  static final Fn<SelectQueryContribution, Stream<Join>> getJoin = new Fn<SelectQueryContribution, Stream<Join>>() {
-    @Override public Stream<Join> apply(SelectQueryContribution c) {
-      return c.join;
-    }
-  };
+  static final Fn<SelectQueryContribution, Stream<Join>> getJoin
+      = new Fn<SelectQueryContribution, Stream<Join>>() {
+        @Override public Stream<Join> apply(SelectQueryContribution c) {
+          return c.join;
+        }
+      };
 
-  static final Fn<SelectQueryContribution, Opt<BooleanExpression>> getWhere = new Fn<SelectQueryContribution, Opt<BooleanExpression>>() {
-    @Override public Opt<BooleanExpression> apply(SelectQueryContribution c) {
-      return c.where;
-    }
-  };
+  static final Fn<SelectQueryContribution, Opt<BooleanExpression>> getWhere
+      = new Fn<SelectQueryContribution, Opt<BooleanExpression>>() {
+        @Override public Opt<BooleanExpression> apply(SelectQueryContribution c) {
+          return c.where;
+        }
+      };
 
-  static final Fn<SelectQueryContribution, Stream<OrderSpecifier<?>>> getOrder = new Fn<SelectQueryContribution, Stream<OrderSpecifier<?>>>() {
-    @Override public Stream<OrderSpecifier<?>> apply(SelectQueryContribution c) {
-      return c.order;
-    }
-  };
+  static final Fn<SelectQueryContribution, Stream<OrderSpecifier<?>>> getOrder
+      = new Fn<SelectQueryContribution, Stream<OrderSpecifier<?>>>() {
+        @Override public Stream<OrderSpecifier<?>> apply(SelectQueryContribution c) {
+          return c.order;
+        }
+      };
 }

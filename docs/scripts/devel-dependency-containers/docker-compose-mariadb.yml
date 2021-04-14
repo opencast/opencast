@@ -24,4 +24,4 @@ services:
       MYSQL_ROOT_PASSWORD: opencast
       MYSQL_DATABASE: opencast
       MYSQL_USER: opencast
-      MYSQL_PASSWORD: opencast
+      MYSQL_PASSWORD: dbpassword

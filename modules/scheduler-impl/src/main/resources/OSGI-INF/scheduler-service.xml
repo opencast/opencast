@@ -8,6 +8,7 @@
   <service>
     <provide interface="org.osgi.service.cm.ManagedService"/>
     <provide interface="org.opencastproject.scheduler.api.SchedulerService"/>
+    <provide interface="org.opencastproject.index.rebuild.IndexProducer"/>
   </service>
   <reference name="message-broker-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
              cardinality="1..1" policy="static" bind="setMessageReceiver"/>

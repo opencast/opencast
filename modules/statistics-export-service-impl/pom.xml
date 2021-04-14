@@ -37,12 +37,17 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search-api</artifactId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search</artifactId>
+      <artifactId>opencast-elasticsearch-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-elasticsearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -103,7 +108,7 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <!-- we need this, but the dependency plugin doesn't recognize it -->
-            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-search</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

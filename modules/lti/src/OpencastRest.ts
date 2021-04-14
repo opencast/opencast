@@ -16,7 +16,7 @@ export interface MediaPackage {
 }
 
 export interface SearchEpisodeResult {
-    readonly dcCreator: string;
+    readonly dcCreator?: string;
     readonly id: string;
     readonly dcTitle: string;
     readonly dcCreated: string;
@@ -83,11 +83,11 @@ export function findFieldSingleValue(
 }
 
 export function isMultiValue(v: string | string[]): v is string[] {
-    return v.length !== undefined;
+    return typeof v === 'object';
 }
 
 export function isSingleValue(v: string | string[]): v is string {
-    return v.length === undefined;
+    return typeof v === 'string';
 }
 
 export function findFieldMultiValue(

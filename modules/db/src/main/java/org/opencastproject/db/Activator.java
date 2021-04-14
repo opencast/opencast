@@ -32,7 +32,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Hashtable;
 
 import javax.sql.DataSource;
@@ -57,9 +59,9 @@ public class Activator implements BundleActivator {
 
     // Register the data source, defaulting to an embedded H2 database if DB configurations are not specified
     String jdbcDriver = getConfigProperty(bundleContext.getProperty("org.opencastproject.db.jdbc.driver"),
-            "org.h2.Driver");
+        "org.h2.Driver");
     String jdbcUrl = getConfigProperty(bundleContext.getProperty("org.opencastproject.db.jdbc.url"),
-            "jdbc:h2:" + rootDir);
+        "jdbc:h2:" + rootDir);
     if ("org.h2.Driver".equals(jdbcDriver)) {
       logger.warn("\n"
           + "######################################################\n"
@@ -80,43 +82,49 @@ public class Activator implements BundleActivator {
     Integer maxPoolSize = getConfigProperty(bundleContext.getProperty("org.opencastproject.db.jdbc.pool.max.size"));
     Integer minPoolSize = getConfigProperty(bundleContext.getProperty("org.opencastproject.db.jdbc.pool.min.size"));
     Integer acquireIncrement = getConfigProperty(
-            bundleContext.getProperty("org.opencastproject.db.jdbc.pool.acquire.increment"));
+        bundleContext.getProperty("org.opencastproject.db.jdbc.pool.acquire.increment"));
     Integer maxStatements = getConfigProperty(
-            bundleContext.getProperty("org.opencastproject.db.jdbc.pool.max.statements"));
+        bundleContext.getProperty("org.opencastproject.db.jdbc.pool.max.statements"));
     Integer loginTimeout = getConfigProperty(
-            bundleContext.getProperty("org.opencastproject.db.jdbc.pool.login.timeout"));
+        bundleContext.getProperty("org.opencastproject.db.jdbc.pool.login.timeout"));
     Integer maxIdleTime = getConfigProperty(
-            bundleContext.getProperty("org.opencastproject.db.jdbc.pool.max.idle.time"));
+        bundleContext.getProperty("org.opencastproject.db.jdbc.pool.max.idle.time"));
     Integer maxConnectionAge = getConfigProperty(
-            bundleContext.getProperty("org.opencastproject.db.jdbc.pool.max.connection.age"));
+        bundleContext.getProperty("org.opencastproject.db.jdbc.pool.max.connection.age"));
 
     pooledDataSource = new ComboPooledDataSource();
     pooledDataSource.setDriverClass(jdbcDriver);
     pooledDataSource.setJdbcUrl(jdbcUrl);
     pooledDataSource.setUser(jdbcUser);
     pooledDataSource.setPassword(jdbcPass);
-    if (minPoolSize != null)
+    if (minPoolSize != null) {
       pooledDataSource.setMinPoolSize(minPoolSize);
-    if (maxPoolSize != null)
+    }
+    if (maxPoolSize != null) {
       pooledDataSource.setMaxPoolSize(maxPoolSize);
-    if (acquireIncrement != null)
+    }
+    if (acquireIncrement != null) {
       pooledDataSource.setAcquireIncrement(acquireIncrement);
-    if (maxStatements != null)
+    }
+    if (maxStatements != null) {
       pooledDataSource.setMaxStatements(maxStatements);
-    if (loginTimeout != null)
+    }
+    if (loginTimeout != null) {
       pooledDataSource.setLoginTimeout(loginTimeout);
+    }
 
     // maxIdleTime should not be zero, otherwise the connection pool will hold on to stale connections
     // that have been closed by the database.
-    if (maxIdleTime != null)
+    if (maxIdleTime != null) {
       pooledDataSource.setMaxIdleTime(maxIdleTime);
-    else if (pooledDataSource.getMaxIdleTime() == 0) {
-        logger.debug("Setting database connection pool max.idle.time to default of {}", DEFAULT_MAX_IDLE_TIME);
-        pooledDataSource.setMaxIdleTime(DEFAULT_MAX_IDLE_TIME);
+    } else if (pooledDataSource.getMaxIdleTime() == 0) {
+      logger.debug("Setting database connection pool max.idle.time to default of {}", DEFAULT_MAX_IDLE_TIME);
+      pooledDataSource.setMaxIdleTime(DEFAULT_MAX_IDLE_TIME);
     }
 
-    if (maxConnectionAge != null)
+    if (maxConnectionAge != null) {
       pooledDataSource.setMaxConnectionAge(maxConnectionAge);
+    }
 
     Connection connection = null;
     try {
@@ -129,20 +137,58 @@ public class Activator implements BundleActivator {
       logger.error("Connection attempt to {} failed", jdbcUrl, e);
       throw e;
     } finally {
-      if (connection != null)
+      if (connection != null) {
         connection.close();
+      }
     }
 
     logger.info("Database connection pool established at {}", jdbcUrl);
     logger.info("Database connection pool parameters: max.size={}, min.size={}, max.idle.time={}",
-      pooledDataSource.getMaxPoolSize(), pooledDataSource.getMinPoolSize(), pooledDataSource.getMaxIdleTime());
+        pooledDataSource.getMaxPoolSize(), pooledDataSource.getMinPoolSize(), pooledDataSource.getMaxIdleTime());
+    Statement statement = pooledDataSource.getConnection().createStatement();
+
+    long random = Math.round(Math.random() * 1000000);
+    String tableName = "oc_temp_" + random;
+    try {
+      statement.executeUpdate("CREATE TABLE " + tableName + " ( id BIGINT NOT NULL, test BIGINT, PRIMARY KEY (id) );");
+      runUpdate(statement, "INSERT INTO " + tableName + " VALUES (" + random + ", 0);");
+      runUpdate(statement, "UPDATE " + tableName + " SET test = " + random + ";");
+      ResultSet rs = statement.executeQuery("SELECT * FROM " + tableName + ";");
+      while (rs.next()) {
+        long id = rs.getLong("id");
+        long test = rs.getLong("test");
+        if (id != random || test != random) {
+          throw new RuntimeException("Unable to verify updating a table functions correctly");
+        }
+      }
+      runUpdate(statement, "DELETE FROM " + tableName + " WHERE id = " + random + ";");
+      logger.info("Database credentials passed basic tests!");
+    } catch (Exception e) {
+      throw new RuntimeException("Unable to verify SQL credentials have required permissions!", e);
+    } finally {
+      try {
+        statement.executeQuery("DROP TABLE " + tableName + ";");
+      } catch (Exception e) {
+        logger.warn("Unable to delete temp table {}, please remove this yourself!", tableName);
+      }
+    }
+
+  }
+
+  private void runUpdate(Statement statement, String sql) throws RuntimeException, SQLException {
+    int affected = statement.executeUpdate(sql);
+    if (affected != 1) {
+      throw new RuntimeException(
+          "Unable to update on a testing table, check that your database user has the right permissions!");
+    }
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
     logger.info("Shutting down database");
-    if (datasourceRegistration != null)
+    if (datasourceRegistration != null) {
       datasourceRegistration.unregister();
+    }
     logger.info("Shutting down connection pool");
     DataSources.destroy(pooledDataSource);
   }

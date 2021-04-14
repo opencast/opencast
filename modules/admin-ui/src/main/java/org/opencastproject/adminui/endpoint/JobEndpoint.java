@@ -30,13 +30,13 @@ import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.exception.JobEndpointException;
+import org.opencastproject.elasticsearch.api.SearchQuery;
+import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.index.service.resources.list.query.JobsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.matterhorn.search.SearchQuery;
-import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;

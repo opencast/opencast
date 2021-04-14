@@ -256,9 +256,11 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   private void storeJob(FileUploadJob job) throws FileUploadException {
     try {
-      logger.debug("Attempting to store job {}", job.getId());
-      File jobFile = ensureExists(getJobFile(job.getId()));
-      jobMarshaller.marshal(job, jobFile);
+      synchronized (this) {
+          logger.debug("Attempting to store job {}", job.getId());
+          File jobFile = ensureExists(getJobFile(job.getId()));
+          jobMarshaller.marshal(job, jobFile);
+      }
     } catch (Exception e) {
       throw fileUploadException(Severity.error, "Failed to write job file.", e);
     }
@@ -541,8 +543,9 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
       List<Track> tracks = new ArrayList<Track>(Arrays.asList(mp.getTracks(flavor)));
       tracks.removeAll(excludeTracks);
-      if (tracks.size() != 1)
+      if (tracks.size() != 1) {
         throw new FileUploadException("Ingested track not found");
+      }
 
       return tracks.get(0).getURI().toURL();
     } catch (Exception e) {

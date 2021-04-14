@@ -103,13 +103,20 @@ import javax.ws.rs.core.Response;
  *
  */
 @Path("/")
-@RestService(name = "seriesservice", title = "Series Service", abstractText = "This service creates, edits and retrieves and helps managing series.", notes = {
+@RestService(
+    name = "seriesservice",
+    title = "Series Service",
+    abstractText = "This service creates, edits and retrieves and helps managing series.",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+        "If the service is down or not working it will return a status 503, this means the the "
+            + "underlying service is not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was "
+            + "not anticipated. In other words, there is a bug! You should file an error report "
+            + "with your server logs from the time when the error occurred: "
+            + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
 public class SeriesRestService {
 
   private static final String SERIES_ELEMENT_CONTENT_TYPE_PREFIX = "series/";
@@ -136,45 +143,45 @@ public class SeriesRestService {
   public static final String DESCENDING_SUFFIX = "_DESC";
 
   private static final String SAMPLE_DUBLIN_CORE = "<?xml version=\"1.0\"?>\n"
-          + "<dublincore xmlns=\"http://www.opencastproject.org/xsd/1.0/dublincore/\" "
-          + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-          + "    xsi:schemaLocation=\"http://www.opencastproject.org http://www.opencastproject.org/schema.xsd\" "
-          + "    xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
-          + "    xmlns:dcterms=\"http://purl.org/dc/terms/\" "
-          + "    xmlns:oc=\"http://www.opencastproject.org/matterhorn/\">\n\n"
-          + "  <dcterms:title xml:lang=\"en\">\n"
-          + "    Land and Vegetation: Key players on the Climate Scene\n"
-          + "  </dcterms:title>\n"
-          + "  <dcterms:subject>"
-          + "    climate, land, vegetation\n"
-          + "  </dcterms:subject>\n"
-          + "  <dcterms:description xml:lang=\"en\">\n"
-          + "    Introduction lecture from the Institute for\n"
-          + "    Atmospheric and Climate Science.\n"
-          + "  </dcterms:description>\n"
-          + "  <dcterms:publisher>\n"
-          + "    ETH Zurich, Switzerland\n"
-          + "  </dcterms:publisher>\n"
-          + "  <dcterms:identifier>\n"
-          + "    10.0000/5819\n"
-          + "  </dcterms:identifier>\n"
-          + "  <dcterms:modified xsi:type=\"dcterms:W3CDTF\">\n"
-          + "    2007-12-05\n"
-          + "  </dcterms:modified>\n"
-          + "  <dcterms:format xsi:type=\"dcterms:IMT\">\n"
-          + "    video/x-dv\n"
-          + "  </dcterms:format>\n"
-          + "</dublincore>";
+      + "<dublincore xmlns=\"http://www.opencastproject.org/xsd/1.0/dublincore/\" "
+      + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+      + "    xsi:schemaLocation=\"http://www.opencastproject.org http://www.opencastproject.org/schema.xsd\" "
+      + "    xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
+      + "    xmlns:dcterms=\"http://purl.org/dc/terms/\" "
+      + "    xmlns:oc=\"http://www.opencastproject.org/matterhorn/\">\n\n"
+      + "  <dcterms:title xml:lang=\"en\">\n"
+      + "    Land and Vegetation: Key players on the Climate Scene\n"
+      + "  </dcterms:title>\n"
+      + "  <dcterms:subject>"
+      + "    climate, land, vegetation\n"
+      + "  </dcterms:subject>\n"
+      + "  <dcterms:description xml:lang=\"en\">\n"
+      + "    Introduction lecture from the Institute for\n"
+      + "    Atmospheric and Climate Science.\n"
+      + "  </dcterms:description>\n"
+      + "  <dcterms:publisher>\n"
+      + "    ETH Zurich, Switzerland\n"
+      + "  </dcterms:publisher>\n"
+      + "  <dcterms:identifier>\n"
+      + "    10.0000/5819\n"
+      + "  </dcterms:identifier>\n"
+      + "  <dcterms:modified xsi:type=\"dcterms:W3CDTF\">\n"
+      + "    2007-12-05\n"
+      + "  </dcterms:modified>\n"
+      + "  <dcterms:format xsi:type=\"dcterms:IMT\">\n"
+      + "    video/x-dv\n"
+      + "  </dcterms:format>\n"
+      + "</dublincore>";
 
   private static final String SAMPLE_ACCESS_CONTROL_LIST =
-          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
-                  + "<acl xmlns=\"http://org.opencastproject.security\">\n"
-                  + "  <ace>\n"
-                  + "    <role>admin</role>\n"
-                  + "    <action>delete</action>\n"
-                  + "    <allow>true</allow>\n"
-                  + "  </ace>\n"
-                  + "</acl>";
+      "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+          + "<acl xmlns=\"http://org.opencastproject.security\">\n"
+          + "  <ace>\n"
+          + "    <role>admin</role>\n"
+          + "    <action>delete</action>\n"
+          + "    <allow>true</allow>\n"
+          + "  </ace>\n"
+          + "</acl>";
 
   /**
    * OSGi callback for setting series service.
@@ -206,9 +213,9 @@ public class SeriesRestService {
     } else {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
-      if (ccServerUrl == null)
+      if (ccServerUrl == null) {
         this.serverUrl = "http://localhost:8080";
-      else {
+      } else {
         this.serverUrl = ccServerUrl;
       }
     }
@@ -226,11 +233,23 @@ public class SeriesRestService {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("{seriesID:.+}.xml")
-  @RestQuery(name = "getAsXml", description = "Returns the series with the given identifier", returnDescription = "Returns the series dublin core XML document", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
+  @RestQuery(
+      name = "getAsXml",
+      description = "Returns the series with the given identifier",
+      returnDescription = "Returns the series dublin core XML document",
+      pathParameters = {
+          @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The series dublin core."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "You do not have permission to view this series."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to view this series. Maybe you need to authenticate.") })
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "You do not have permission to view this series. Maybe you need to authenticate."
+          )
+      }
+  )
   public Response getSeriesXml(@PathParam("seriesID") String seriesID) {
     logger.debug("Series Lookup: {}", seriesID);
     try {
@@ -251,10 +270,22 @@ public class SeriesRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{seriesID:.+}.json")
-  @RestQuery(name = "getAsJson", description = "Returns the series with the given identifier", returnDescription = "Returns the series dublin core JSON document", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
+  @RestQuery(
+      name = "getAsJson",
+      description = "Returns the series with the given identifier",
+      returnDescription = "Returns the series dublin core JSON document",
+      pathParameters = {
+          @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The series dublin core."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to view this series. Maybe you need to authenticate.") })
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "You do not have permission to view this series. Maybe you need to authenticate."
+          )
+      }
+  )
   public Response getSeriesJSON(@PathParam("seriesID") String seriesID) {
     logger.debug("Series Lookup: {}", seriesID);
     try {
@@ -275,9 +306,18 @@ public class SeriesRestService {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("/{seriesID:.+}/acl.xml")
-  @RestQuery(name = "getAclAsXml", description = "Returns the access control list for the series with the given identifier", returnDescription = "Returns the series ACL as XML", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
+  @RestQuery(
+      name = "getAclAsXml",
+      description = "Returns the access control list for the series with the given identifier",
+      returnDescription = "Returns the series ACL as XML",
+      pathParameters = {
+          @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found.") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found.")
+      }
+  )
   public Response getSeriesAccessControlListXml(@PathParam("seriesID") String seriesID) {
     return getSeriesAccessControlList(seriesID);
   }
@@ -285,9 +325,18 @@ public class SeriesRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/{seriesID:.+}/acl.json")
-  @RestQuery(name = "getAclAsJson", description = "Returns the access control list for the series with the given identifier", returnDescription = "Returns the series ACL as JSON", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
+  @RestQuery(
+      name = "getAclAsJson",
+      description = "Returns the access control list for the series with the given identifier",
+      returnDescription = "Returns the series ACL as JSON",
+      pathParameters = {
+          @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found.") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found.")
+      }
+  )
   public Response getSeriesAccessControlListJson(@PathParam("seriesID") String seriesID) {
     return getSeriesAccessControlList(seriesID);
   }
@@ -314,19 +363,57 @@ public class SeriesRestService {
 
   @POST
   @Path("/")
-  @RestQuery(name = "updateSeries", description = "Updates a series", returnDescription = "No content.", restParameters = {
-          @RestParameter(name = "series", isRequired = true, defaultValue = SAMPLE_DUBLIN_CORE, description = "The series document", type = TEXT),
-          @RestParameter(name = "acl", isRequired = false, defaultValue = SAMPLE_ACCESS_CONTROL_LIST,
-                         description = "The access control list for the series", type = TEXT),
-          @RestParameter(name = "override", isRequired = false, defaultValue = "false",
-                         description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)}, responses = {
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
-          @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
-          @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created.") })
-  public Response addOrUpdateSeries(@FormParam("series") String series, @FormParam("acl") String accessControl,
-          @DefaultValue("false") @FormParam("override") boolean override)
-          throws UnauthorizedException {
+  @RestQuery(
+      name = "updateSeries",
+      description = "Updates a series",
+      returnDescription = "No content.",
+      restParameters = {
+          @RestParameter(
+              name = "series",
+              isRequired = true,
+              defaultValue = SAMPLE_DUBLIN_CORE,
+              description = "The series document",
+              type = TEXT
+          ),
+          @RestParameter(
+              name = "acl",
+              isRequired = false,
+              defaultValue = SAMPLE_ACCESS_CONTROL_LIST,
+              description = "The access control list for the series",
+              type = TEXT
+          ),
+          @RestParameter(
+              name = "override",
+              isRequired = false,
+              defaultValue = "false",
+              description = "If true the series ACL will take precedence over any existing episode ACL",
+              type = STRING
+          )
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "The required form params were missing in the request."
+          ),
+          @RestResponse(
+              responseCode = SC_NO_CONTENT,
+              description = "The access control list has been updated."
+          ),
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          ),
+          @RestResponse(
+              responseCode = SC_CREATED,
+              description = "The access control list has been created."
+          )
+      }
+  )
+  public Response addOrUpdateSeries(
+      @FormParam("series") String series,
+      @FormParam("acl") String accessControl,
+      @DefaultValue("false") @FormParam("override") boolean override
+  ) throws UnauthorizedException {
     if (series == null) {
       logger.warn("series that should be added is null");
       return Response.status(BAD_REQUEST).build();
@@ -371,24 +458,57 @@ public class SeriesRestService {
 
   @POST
   @Path("/{seriesID:.+}/accesscontrol")
-  @RestQuery(name = "updateAcl", description = "Updates the access control list for a series",
-          returnDescription = "No content.",
-    restParameters = {
-      @RestParameter(name = "acl", isRequired = true, defaultValue = SAMPLE_ACCESS_CONTROL_LIST,
-                     description = "The access control list for the series", type = TEXT),
-      @RestParameter(name = "override", isRequired = false, defaultValue = "false",
-                     description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)
-    }, pathParameters = {
-      @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING)
-  }, responses = {
-      @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
-      @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
-      @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created."),
-      @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
-      @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing in the request.") })
-  public Response updateAccessControl(@PathParam("seriesID") String seriesID, @FormParam("acl") String accessControl,
-          @DefaultValue("false") @FormParam("override") boolean override)
-          throws UnauthorizedException {
+  @RestQuery(
+      name = "updateAcl",
+      description = "Updates the access control list for a series",
+      returnDescription = "No content.",
+      restParameters = {
+          @RestParameter(
+              name = "acl",
+              isRequired = true,
+              defaultValue = SAMPLE_ACCESS_CONTROL_LIST,
+              description = "The access control list for the series",
+              type = TEXT
+          ),
+          @RestParameter(
+              name = "override",
+              isRequired = false,
+              defaultValue = "false",
+              description = "If true the series ACL will take precedence over any existing episode ACL",
+              type = STRING
+          )
+      },
+      pathParameters = {
+          @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "No series with this identifier was found."
+          ),
+          @RestResponse(
+              responseCode = SC_NO_CONTENT,
+              description = "The access control list has been updated."
+          ),
+          @RestResponse(
+              responseCode = SC_CREATED,
+              description = "The access control list has been created."
+          ),
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          ),
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "The required path or form params were missing in the request."
+          )
+      }
+  )
+  public Response updateAccessControl(
+      @PathParam("seriesID") String seriesID,
+      @FormParam("acl") String accessControl,
+      @DefaultValue("false") @FormParam("override") boolean override
+  ) throws UnauthorizedException {
     if (accessControl == null) {
       logger.warn("Access control parameter is null.");
       return Response.status(BAD_REQUEST).build();
@@ -416,10 +536,28 @@ public class SeriesRestService {
 
   @DELETE
   @Path("/{seriesID:.+}")
-  @RestQuery(name = "delete", description = "Delete a series", returnDescription = "No content.", pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
-          @RestResponse(responseCode = SC_NO_CONTENT, description = "The series was deleted.") })
+  @RestQuery(
+      name = "delete",
+      description = "Delete a series",
+      returnDescription = "No content.",
+      pathParameters = {
+          @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "No series with this identifier was found."
+          ),
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          ),
+          @RestResponse(
+              responseCode = SC_NO_CONTENT,
+              description = "The series was deleted."
+          )
+      }
+  )
   public Response deleteSeries(@PathParam("seriesID") String seriesID) throws UnauthorizedException {
     try {
       this.seriesService.deleteSeries(seriesID);
@@ -435,7 +573,14 @@ public class SeriesRestService {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("/count")
-  @RestQuery(name = "count", description = "Returns the number of series", returnDescription = "Returns the number of series", responses = { @RestResponse(responseCode = SC_OK, description = "The number of series") })
+  @RestQuery(
+      name = "count",
+      description = "Returns the number of series",
+      returnDescription = "Returns the number of series",
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The number of series")
+      }
+  )
   public Response getCount() throws UnauthorizedException {
     try {
       int count = seriesService.getSeriesCount();
@@ -449,39 +594,159 @@ public class SeriesRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("series.json")
-  @RestQuery(name = "listSeriesAsJson", description = "Returns the series matching the query parameters", returnDescription = "Returns the series search results as JSON", restParameters = {
-          @RestParameter(name = "q", isRequired = false, description = "Free text search", type = STRING),
-          @RestParameter(name = "edit", isRequired = false, description = "Whether this query should return only series that are editable", type = BOOLEAN),
-          @RestParameter(name = "fuzzyMatch", isRequired = false, description = "Whether the seriesId can be used for a partial match. The default is an exact match", type = BOOLEAN),
-          @RestParameter(name = "seriesId", isRequired = false, description = "The series identifier", type = STRING),
-          @RestParameter(name = "seriesTitle", isRequired = false, description = "The series title", type = STRING),
-          @RestParameter(name = "creator", isRequired = false, description = "The series creator", type = STRING),
-          @RestParameter(name = "contributor", isRequired = false, description = "The series contributor", type = STRING),
-          @RestParameter(name = "publisher", isRequired = false, description = "The series publisher", type = STRING),
-          @RestParameter(name = "rightsholder", isRequired = false, description = "The series rights holder", type = STRING),
-          @RestParameter(name = "createdfrom", isRequired = false, description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')", type = STRING),
-          @RestParameter(name = "createdto", isRequired = false, description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')", type = STRING),
-          @RestParameter(name = "language", isRequired = false, description = "The series language", type = STRING),
-          @RestParameter(name = "license", isRequired = false, description = "The series license", type = STRING),
-          @RestParameter(name = "subject", isRequired = false, description = "The series subject", type = STRING),
-          @RestParameter(name = "abstract", isRequired = false, description = "The series abstract", type = STRING),
-          @RestParameter(name = "description", isRequired = false, description = "The series description", type = STRING),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any of the following: TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
-          @RestParameter(name = "startPage", isRequired = false, description = "The page offset", type = STRING),
-          @RestParameter(name = "count", isRequired = false, description = "Results per page (max 100)", type = STRING) }, responses = {
+  @RestQuery(
+      name = "listSeriesAsJson",
+      description = "Returns the series matching the query parameters",
+      returnDescription = "Returns the series search results as JSON",
+      restParameters = {
+          @RestParameter(
+              name = "q",
+              isRequired = false,
+              description = "Free text search",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "edit",
+              isRequired = false,
+              description = "Whether this query should return only series that are editable",
+              type = BOOLEAN
+          ),
+          @RestParameter(
+              name = "fuzzyMatch",
+              isRequired = false,
+              description = "Whether the seriesId can be used for a partial match. The default is an exact match",
+              type = BOOLEAN
+          ),
+          @RestParameter(
+              name = "seriesId",
+              isRequired = false,
+              description = "The series identifier",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "seriesTitle",
+              isRequired = false,
+              description = "The series title",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "creator",
+              isRequired = false,
+              description = "The series creator",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "contributor",
+              isRequired = false,
+              description = "The series contributor",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "publisher",
+              isRequired = false,
+              description = "The series publisher",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "rightsholder",
+              isRequired = false,
+              description = "The series rights holder",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "createdfrom",
+              isRequired = false,
+              description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "createdto",
+              isRequired = false,
+              description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "language",
+              isRequired = false,
+              description = "The series language",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "license",
+              isRequired = false,
+              description = "The series license",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "subject",
+              isRequired = false,
+              description = "The series subject",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "abstract",
+              isRequired = false,
+              description = "The series abstract",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "description",
+              isRequired = false,
+              description = "The series description",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "sort",
+              isRequired = false,
+              description = "The sort order. May include any of the following: TITLE, SUBJECT, "
+                  + "CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, "
+                  + "AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, "
+                  + "IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE.  Add '_DESC' to reverse the "
+                  + "sort order (e.g. TITLE_DESC).",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "startPage",
+              isRequired = false,
+              description = "The page offset",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "count",
+              isRequired = false,
+              description = "Results per page (max 100)",
+              type = STRING
+          )
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
-  // CHECKSTYLE:OFF
-  public Response getSeriesAsJson(@QueryParam("q") String text, @QueryParam("seriesId") String seriesId,
-          @QueryParam("edit") Boolean edit, @QueryParam("fuzzyMatch") Boolean fuzzyMatch, @QueryParam("seriesTitle") String seriesTitle,
-          @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
-          @QueryParam("publisher") String publisher, @QueryParam("rightsholder") String rightsHolder,
-          @QueryParam("createdfrom") String createdFrom, @QueryParam("createdto") String createdTo,
-          @QueryParam("language") String language, @QueryParam("license") String license,
-          @QueryParam("subject") String subject, @QueryParam("abstract") String seriesAbstract,
-          @QueryParam("description") String description, @QueryParam("sort") String sort,
-          @QueryParam("startPage") String startPage, @QueryParam("count") String count) throws UnauthorizedException {
-    // CHECKSTYLE:ON
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          )
+      }
+  )
+  public Response getSeriesAsJson(
+      @QueryParam("q") String text,
+      @QueryParam("seriesId") String seriesId,
+      @QueryParam("edit") Boolean edit,
+      @QueryParam("fuzzyMatch") Boolean fuzzyMatch,
+      @QueryParam("seriesTitle") String seriesTitle,
+      @QueryParam("creator") String creator,
+      @QueryParam("contributor") String contributor,
+      @QueryParam("publisher") String publisher,
+      @QueryParam("rightsholder") String rightsHolder,
+      @QueryParam("createdfrom") String createdFrom,
+      @QueryParam("createdto") String createdTo,
+      @QueryParam("language") String language,
+      @QueryParam("license") String license,
+      @QueryParam("subject") String subject,
+      @QueryParam("abstract") String seriesAbstract,
+      @QueryParam("description") String description,
+      @QueryParam("sort") String sort,
+      @QueryParam("startPage") String startPage,
+      @QueryParam("count") String count
+  ) throws UnauthorizedException {
     try {
       DublinCoreCatalogList result = getSeries(text, seriesId, edit, seriesTitle, creator, contributor, publisher,
               rightsHolder, createdFrom, createdTo, language, license, subject, seriesAbstract, description, sort,
@@ -498,39 +763,162 @@ public class SeriesRestService {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("series.xml")
-  @RestQuery(name = "listSeriesAsXml", description = "Returns the series matching the query parameters", returnDescription = "Returns the series search results as XML", restParameters = {
-          @RestParameter(name = "q", isRequired = false, description = "Free text search", type = STRING),
-          @RestParameter(name = "edit", isRequired = false, description = "Whether this query should return only series that are editable", type = BOOLEAN),
-          @RestParameter(name = "fuzzyMatch", isRequired = false, description = "Whether the seriesId can be used for a partial match. The default is an exact match", type = BOOLEAN),
-          @RestParameter(name = "seriesId", isRequired = false, description = "The series identifier", type = STRING),
-          @RestParameter(name = "seriesTitle", isRequired = false, description = "The series title", type = STRING),
-          @RestParameter(name = "creator", isRequired = false, description = "The series creator", type = STRING),
-          @RestParameter(name = "contributor", isRequired = false, description = "The series contributor", type = STRING),
-          @RestParameter(name = "publisher", isRequired = false, description = "The series publisher", type = STRING),
-          @RestParameter(name = "rightsholder", isRequired = false, description = "The series rights holder", type = STRING),
-          @RestParameter(name = "createdfrom", isRequired = false, description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')", type = STRING),
-          @RestParameter(name = "createdto", isRequired = false, description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')", type = STRING),
-          @RestParameter(name = "language", isRequired = false, description = "The series language", type = STRING),
-          @RestParameter(name = "license", isRequired = false, description = "The series license", type = STRING),
-          @RestParameter(name = "subject", isRequired = false, description = "The series subject", type = STRING),
-          @RestParameter(name = "abstract", isRequired = false, description = "The series abstract", type = STRING),
-          @RestParameter(name = "description", isRequired = false, description = "The series description", type = STRING),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any of the following: TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING),
-          @RestParameter(name = "startPage", isRequired = false, description = "The page offset", type = STRING),
-          @RestParameter(name = "count", isRequired = false, description = "Results per page (max 100)", type = STRING) }, responses = {
-          @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
-  // CHECKSTYLE:OFF
-  public Response getSeriesAsXml(@QueryParam("q") String text, @QueryParam("seriesId") String seriesId,
-          @QueryParam("edit") Boolean edit, @QueryParam("fuzzyMatch") Boolean fuzzyMatch, @QueryParam("seriesTitle") String seriesTitle,
-          @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
-          @QueryParam("publisher") String publisher, @QueryParam("rightsholder") String rightsHolder,
-          @QueryParam("createdfrom") String createdFrom, @QueryParam("createdto") String createdTo,
-          @QueryParam("language") String language, @QueryParam("license") String license,
-          @QueryParam("subject") String subject, @QueryParam("abstract") String seriesAbstract,
-          @QueryParam("description") String description, @QueryParam("sort") String sort,
-          @QueryParam("startPage") String startPage, @QueryParam("count") String count) throws UnauthorizedException {
-    // CHECKSTYLE:ON
+  @RestQuery(
+      name = "listSeriesAsXml",
+      description = "Returns the series matching the query parameters",
+      returnDescription = "Returns the series search results as XML",
+      restParameters = {
+          @RestParameter(
+              name = "q",
+              isRequired = false,
+              description = "Free text search",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "edit",
+              isRequired = false,
+              description = "Whether this query should return only series that are editable",
+              type = BOOLEAN
+          ),
+          @RestParameter(
+              name = "fuzzyMatch",
+              isRequired = false,
+              description = "Whether the seriesId can be used for a partial match. The default is an exact match",
+              type = BOOLEAN
+          ),
+          @RestParameter(
+              name = "seriesId",
+              isRequired = false,
+              description = "The series identifier",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "seriesTitle",
+              isRequired = false,
+              description = "The series title",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "creator",
+              isRequired = false,
+              description = "The series creator",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "contributor",
+              isRequired = false,
+              description = "The series contributor",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "publisher",
+              isRequired = false,
+              description = "The series publisher",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "rightsholder",
+              isRequired = false,
+              description = "The series rights holder",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "createdfrom",
+              isRequired = false,
+              description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "createdto",
+              isRequired = false,
+              description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "language",
+              isRequired = false,
+              description = "The series language",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "license",
+              isRequired = false,
+              description = "The series license",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "subject",
+              isRequired = false,
+              description = "The series subject",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "abstract",
+              isRequired = false,
+              description = "The series abstract",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "description",
+              isRequired = false,
+              description = "The series description",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "sort",
+              isRequired = false,
+              description = "The sort order.  May include any of the following: TITLE, SUBJECT, "
+                  + "CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, "
+                  + "AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, "
+                  + "IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE.  Add '_DESC' to reverse the "
+                  + "sort order (e.g. TITLE_DESC).",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "startPage",
+              isRequired = false,
+              description = "The page offset",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "count",
+              isRequired = false,
+              description = "Results per page (max 100)",
+              type = STRING
+          )
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The access control list."
+          ),
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          )
+      }
+  )
+  public Response getSeriesAsXml(
+      @QueryParam("q") String text,
+      @QueryParam("seriesId") String seriesId,
+      @QueryParam("edit") Boolean edit,
+      @QueryParam("fuzzyMatch") Boolean fuzzyMatch,
+      @QueryParam("seriesTitle") String seriesTitle,
+      @QueryParam("creator") String creator,
+      @QueryParam("contributor") String contributor,
+      @QueryParam("publisher") String publisher,
+      @QueryParam("rightsholder") String rightsHolder,
+      @QueryParam("createdfrom") String createdFrom,
+      @QueryParam("createdto") String createdTo,
+      @QueryParam("language") String language,
+      @QueryParam("license") String license,
+      @QueryParam("subject") String subject,
+      @QueryParam("abstract") String seriesAbstract,
+      @QueryParam("description") String description,
+      @QueryParam("sort") String sort,
+      @QueryParam("startPage") String startPage,
+      @QueryParam("count") String count
+  ) throws UnauthorizedException {
     try {
       DublinCoreCatalogList result = getSeries(text, seriesId, edit, seriesTitle, creator, contributor, publisher,
               rightsHolder, createdFrom, createdTo, language, license, subject, seriesAbstract, description, sort,
@@ -548,11 +936,26 @@ public class SeriesRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{id}/properties.json")
-  @RestQuery(name = "getSeriesProperties", description = "Returns the series properties", returnDescription = "Returns the series properties as JSON", pathParameters = { @RestParameter(name = "id", description = "ID of series", isRequired = true, type = Type.STRING) }, responses = {
-          @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
-  public Response getSeriesPropertiesAsJson(@PathParam("id") String seriesId) throws UnauthorizedException,
-          NotFoundException {
+  @RestQuery(
+      name = "getSeriesProperties",
+      description = "Returns the series properties",
+      returnDescription = "Returns the series properties as JSON",
+      pathParameters = {
+          @RestParameter(name = "id", description = "ID of series", isRequired = true, type = Type.STRING)
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The access control list."
+          ),
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          )
+      }
+  )
+  public Response getSeriesPropertiesAsJson(@PathParam("id") String seriesId)
+          throws UnauthorizedException, NotFoundException {
     if (StringUtils.isBlank(seriesId)) {
       logger.warn("Series id parameter is blank '{}'.", seriesId);
       return Response.status(BAD_REQUEST).build();
@@ -579,11 +982,35 @@ public class SeriesRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{seriesId}/property/{propertyName}.json")
-  @RestQuery(name = "getSeriesProperty", description = "Returns a series property value", returnDescription = "Returns the series property value", pathParameters = {
-          @RestParameter(name = "seriesId", description = "ID of series", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true, type = Type.STRING) }, responses = {
-          @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+  @RestQuery(
+      name = "getSeriesProperty",
+      description = "Returns a series property value",
+      returnDescription = "Returns the series property value",
+      pathParameters = {
+          @RestParameter(
+              name = "seriesId",
+              description = "ID of series",
+              isRequired = true,
+              type = Type.STRING
+          ),
+          @RestParameter(
+              name = "propertyName",
+              description = "Name of series property",
+              isRequired = true,
+              type = Type.STRING
+          )
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The access control list."
+          ),
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          )
+      }
+  )
   public Response getSeriesProperty(@PathParam("seriesId") String seriesId,
           @PathParam("propertyName") String propertyName) throws UnauthorizedException, NotFoundException {
     if (StringUtils.isBlank(seriesId)) {
@@ -609,15 +1036,41 @@ public class SeriesRestService {
 
   @POST
   @Path("/{seriesId}/property")
-  @RestQuery(name = "updateSeriesProperty", description = "Updates a series property", returnDescription = "No content.", restParameters = {
+  @RestQuery(
+      name = "updateSeriesProperty",
+      description = "Updates a series property",
+      returnDescription = "No content.",
+      restParameters = {
           @RestParameter(name = "name", isRequired = true, description = "The property's name", type = TEXT),
-          @RestParameter(name = "value", isRequired = true, description = "The property's value", type = TEXT) }, pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
-          @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing in the request.") })
-  public Response updateSeriesProperty(@PathParam("seriesId") String seriesId, @FormParam("name") String name,
-          @FormParam("value") String value) throws UnauthorizedException {
+          @RestParameter(name = "value", isRequired = true, description = "The property's value", type = TEXT)
+      },
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "No series with this identifier was found."
+          ),
+          @RestResponse(
+              responseCode = SC_NO_CONTENT,
+              description = "The access control list has been updated."
+          ),
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          ),
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "The required path or form params were missing in the request."
+          )
+      }
+  )
+  public Response updateSeriesProperty(
+      @PathParam("seriesId") String seriesId,
+      @FormParam("name") String name,
+      @FormParam("value") String value
+  ) throws UnauthorizedException {
     if (StringUtils.isBlank(seriesId)) {
       logger.warn("Series id parameter is blank '{}'.", seriesId);
       return Response.status(BAD_REQUEST).build();
@@ -643,14 +1096,43 @@ public class SeriesRestService {
 
   @DELETE
   @Path("{seriesId}/property/{propertyName}")
-  @RestQuery(name = "deleteSeriesProperty", description = "Deletes a series property", returnDescription = "No Content", pathParameters = {
-          @RestParameter(name = "seriesId", description = "ID of series", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true, type = Type.STRING) }, responses = {
-          @RestResponse(responseCode = SC_NO_CONTENT, description = "The series property has been deleted."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "The series or property has not been found."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
-  public Response deleteSeriesProperty(@PathParam("seriesId") String seriesId,
-          @PathParam("propertyName") String propertyName) throws UnauthorizedException, NotFoundException {
+  @RestQuery(
+      name = "deleteSeriesProperty",
+      description = "Deletes a series property",
+      returnDescription = "No Content",
+      pathParameters = {
+          @RestParameter(
+              name = "seriesId",
+              description = "ID of series",
+              isRequired = true,
+              type = Type.STRING
+          ),
+          @RestParameter(
+              name = "propertyName",
+              description = "Name of series property",
+              isRequired = true,
+              type = Type.STRING
+          )
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_NO_CONTENT,
+              description = "The series property has been deleted."
+          ),
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "The series or property has not been found."
+          ),
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          )
+      }
+  )
+  public Response deleteSeriesProperty(
+      @PathParam("seriesId") String seriesId,
+      @PathParam("propertyName") String propertyName
+  ) throws UnauthorizedException, NotFoundException {
     if (StringUtils.isBlank(seriesId)) {
       logger.warn("Series id parameter is blank '{}'.", seriesId);
       return Response.status(BAD_REQUEST).build();
@@ -672,12 +1154,27 @@ public class SeriesRestService {
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
 
-  // CHECKSTYLE:OFF
-  private DublinCoreCatalogList getSeries(String text, String seriesId, Boolean edit, String seriesTitle,
-          String creator, String contributor, String publisher, String rightsHolder, String createdFrom,
-          String createdTo, String language, String license, String subject, String seriesAbstract, String description,
-          String sort, String startPageString, String countString, Boolean fuzzyMatch) throws SeriesException, UnauthorizedException {
-    // CHECKSTYLE:ON
+  private DublinCoreCatalogList getSeries(
+      String text,
+      String seriesId,
+      Boolean edit,
+      String seriesTitle,
+      String creator,
+      String contributor,
+      String publisher,
+      String rightsHolder,
+      String createdFrom,
+      String createdTo,
+      String language,
+      String license,
+      String subject,
+      String seriesAbstract,
+      String description,
+      String sort,
+      String startPageString,
+      String countString,
+      Boolean fuzzyMatch
+  ) throws SeriesException, UnauthorizedException {
     int startPage = 0;
     if (StringUtils.isNotEmpty(startPageString)) {
       try {
@@ -697,8 +1194,9 @@ public class SeriesRestService {
       } catch (NumberFormatException e) {
         logger.warn("Bad count parameter");
       }
-      if (count < 1)
+      if (count < 1) {
         count = DEFAULT_LIMIT;
+      }
     }
 
     SeriesQuery q = new SeriesQuery();
@@ -708,40 +1206,40 @@ public class SeriesRestService {
       q.setEdit(edit);
     }
     if (StringUtils.isNotEmpty(text)) {
-      q.setText(text.toLowerCase());
+      q.setText(text);
     }
     if (StringUtils.isNotEmpty(seriesId)) {
-      q.setSeriesId(seriesId.toLowerCase());
+      q.setSeriesId(seriesId);
     }
     if (StringUtils.isNotEmpty(seriesTitle)) {
-      q.setSeriesTitle(seriesTitle.toLowerCase());
+      q.setSeriesTitle(seriesTitle);
     }
     if (StringUtils.isNotEmpty(creator)) {
-      q.setCreator(creator.toLowerCase());
+      q.setCreator(creator);
     }
     if (StringUtils.isNotEmpty(contributor)) {
-      q.setContributor(contributor.toLowerCase());
+      q.setContributor(contributor);
     }
     if (StringUtils.isNotEmpty(language)) {
-      q.setLanguage(language.toLowerCase());
+      q.setLanguage(language);
     }
     if (StringUtils.isNotEmpty(license)) {
-      q.setLicense(license.toLowerCase());
+      q.setLicense(license);
     }
     if (StringUtils.isNotEmpty(subject)) {
-      q.setSubject(subject.toLowerCase());
+      q.setSubject(subject);
     }
     if (StringUtils.isNotEmpty(publisher)) {
-      q.setPublisher(publisher.toLowerCase());
+      q.setPublisher(publisher);
     }
     if (StringUtils.isNotEmpty(seriesAbstract)) {
-      q.setSeriesAbstract(seriesAbstract.toLowerCase());
+      q.setSeriesAbstract(seriesAbstract);
     }
     if (StringUtils.isNotEmpty(description)) {
-      q.setDescription(description.toLowerCase());
+      q.setDescription(description);
     }
     if (StringUtils.isNotEmpty(rightsHolder)) {
-      q.setRightsHolder(rightsHolder.toLowerCase());
+      q.setRightsHolder(rightsHolder);
     }
     if (fuzzyMatch != null) {
       q.setFuzzyMatch(fuzzyMatch.booleanValue());
@@ -783,11 +1281,16 @@ public class SeriesRestService {
   @GET
   @Path("allSeriesIdTitle.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getAll", description = "Returns a list of identifier and title of all series",
-          returnDescription = "Json list of identifier and title of all series", responses = {
-            @RestResponse(responseCode = SC_OK, description = "A list with series"),
-            @RestResponse(responseCode = SC_FORBIDDEN, description = "A user is not allowed to list all series"),
-            @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request") })
+  @RestQuery(
+      name = "getAll",
+      description = "Returns a list of identifier and title of all series",
+      returnDescription = "Json list of identifier and title of all series",
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "A list with series"),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "A user is not allowed to list all series"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request")
+      }
+  )
   public Response getAllSeriesIdTitle() {
     try {
       Map<String, String> allSeries = seriesService.getIdTitleMapOfAllSeries();
@@ -811,10 +1314,19 @@ public class SeriesRestService {
   @GET
   @Path("{seriesId}/elements.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getSeriesElements", description = "Returns all the element types of a series", returnDescription = "Returns a JSON array with all the types of elements of the given series.", pathParameters = { @RestParameter(name = "seriesId", description = "The series identifier", type = STRING, isRequired = true) }, responses = {
+  @RestQuery(
+      name = "getSeriesElements",
+      description = "Returns all the element types of a series",
+      returnDescription = "Returns a JSON array with all the types of elements of the given series.",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series identifier", type = STRING, isRequired = true)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "Series found"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Series not found"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request") })
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request")
+      }
+  )
   public Response getSeriesElements(@PathParam("seriesId") String seriesId) {
     try {
       Opt<Map<String, byte[]>> optSeriesElements = seriesService.getSeriesElements(seriesId);
@@ -833,13 +1345,35 @@ public class SeriesRestService {
 
   @GET
   @Path("{seriesId}/elements/{elementType}")
-  @RestQuery(name = "getSeriesElement", description = "Returns the series element", returnDescription = "The data of the series element", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series identifier", type = STRING, isRequired = true),
-          @RestParameter(name = "elementType", description = "The element type. This is equal to the subtype of the media type of this element: series/<elementtype>", type = STRING, isRequired = true) }, responses = {
+  @RestQuery(
+      name = "getSeriesElement",
+      description = "Returns the series element",
+      returnDescription = "The data of the series element",
+      pathParameters = {
+          @RestParameter(
+              name = "seriesId",
+              description = "The series identifier",
+              type = STRING,
+              isRequired = true
+          ),
+          @RestParameter(
+              name = "elementType",
+              description = "The element type. This is equal to the subtype of the media type of "
+                  + "this element: series/<elementtype>",
+              type = STRING,
+              isRequired = true
+          )
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "Series element found"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Series element not found"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request") })
-  public Response getSeriesElement(@PathParam("seriesId") String seriesId, @PathParam("elementType") String elementType) {
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request")
+      }
+  )
+  public Response getSeriesElement(
+      @PathParam("seriesId") String seriesId,
+      @PathParam("elementType") String elementType
+  ) {
     try {
       Opt<byte[]> data = seriesService.getSeriesElementData(seriesId, elementType);
       if (data.isSome()) {
@@ -856,14 +1390,25 @@ public class SeriesRestService {
 
   @PUT
   @Path("{seriesId}/elements/{elementType}")
-  @RestQuery(name = "updateSeriesElement", description = "Updates an existing series element", returnDescription = "An empty response", pathParameters = {
+  @RestQuery(
+      name = "updateSeriesElement",
+      description = "Updates an existing series element",
+      returnDescription = "An empty response",
+      pathParameters = {
           @RestParameter(name = "seriesId", description = "The series identifier", type = STRING, isRequired = true),
-          @RestParameter(name = "elementType", description = "The element type", type = STRING, isRequired = true) }, responses = {
+          @RestParameter(name = "elementType", description = "The element type", type = STRING, isRequired = true)
+      },
+      responses = {
           @RestResponse(responseCode = SC_NO_CONTENT, description = "Series element updated"),
           @RestResponse(responseCode = SC_CREATED, description = "Series element created"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request") })
-  public Response putSeriesElement(@Context HttpServletRequest request, @PathParam("seriesId") String seriesId,
-          @PathParam("elementType") String elementType) {
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request")
+      }
+  )
+  public Response putSeriesElement(
+      @Context HttpServletRequest request,
+      @PathParam("seriesId") String seriesId,
+      @PathParam("elementType") String elementType
+  ) {
     InputStream is = null;
     try {
       is = request.getInputStream();
@@ -894,15 +1439,24 @@ public class SeriesRestService {
 
   @DELETE
   @Path("{seriesId}/elements/{elementType}")
-  @RestQuery(name = "deleteSeriesElement", description = "Deletes a series element", returnDescription = "An empty response", pathParameters = {
+  @RestQuery(
+      name = "deleteSeriesElement",
+      description = "Deletes a series element",
+      returnDescription = "An empty response",
+      pathParameters = {
           @RestParameter(name = "seriesId", description = "The series identifier", type = STRING, isRequired = true),
-          @RestParameter(name = "elementType", description = "The element type", type = STRING, isRequired = true) }, responses = {
+          @RestParameter(name = "elementType", description = "The element type", type = STRING, isRequired = true)
+      },
+      responses = {
           @RestResponse(responseCode = SC_NO_CONTENT, description = "Series element deleted"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Series element not found"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request") })
-  public Response deleteSeriesElement(@PathParam("seriesId") String seriesId,
-          @PathParam("elementType") String elementType) {
-
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request")
+      }
+  )
+  public Response deleteSeriesElement(
+      @PathParam("seriesId") String seriesId,
+      @PathParam("elementType") String elementType
+  ) {
     try {
       if (seriesService.deleteSeriesElement(seriesId, elementType)) {
         return R.noContent();

@@ -146,12 +146,15 @@ public class MediaInspector {
           throw new MediaInspectionException("Unable to extract audio metadata from " + file, e);
         }
 
-        // Videometadata
+        // Video metadata
         try {
           addVideoStreamMetadata(track, metadata);
         } catch (Exception e) {
           throw new MediaInspectionException("Unable to extract video metadata from " + file, e);
         }
+
+        // File size
+        track.setSize(file.length());
 
         return track;
       }

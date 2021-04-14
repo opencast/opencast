@@ -23,14 +23,12 @@ package org.opencastproject.event.comment.persistence;
 import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
 import org.opencastproject.event.comment.EventComment;
-import org.opencastproject.index.IndexProducer;
+import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildException;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.comments.CommentItem;
-import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -46,7 +44,6 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.lang3.text.WordUtils;
-import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +98,6 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for event comments");
     this.cc = cc;
-    super.activate();
   }
 
   /** OSGi DI */
@@ -402,15 +398,13 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   };
 
   @Override
-  public void repopulate(final String indexName) throws Exception {
+  public void repopulate(final String indexName) throws IndexRebuildException {
     final String destinationId = CommentItem.COMMENT_QUEUE_PREFIX + WordUtils.capitalize(indexName);
     try {
       final int total = countComments();
       final int[] current = new int[1];
       current[0] = 0;
-      logger.info("Re-populating index '{}' with comments for events. There are {} events with comments to add",
-              indexName, total);
-      final int responseInterval = (total < 100) ? 1 : (total / 100);
+      logIndexRebuildBegin(logger, indexName, total, "events with comment");
       final Map<String, List<String>> eventsWithComments = getEventsWithComments();
       for (String orgId : eventsWithComments.keySet()) {
         Organization organization = organizationDirectoryService.getOrganization(orgId);
@@ -425,60 +419,21 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                               CommentItem.update(eventId, !comments.isEmpty(), hasOpenComments, needsCutting));
 
                       current[0] += comments.size();
-                      if (responseInterval == 1 || comments.size() > responseInterval || current[0] == total
-                              || current[0] % responseInterval < comments.size()) {
-                        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
-                                MessageSender.DestinationType.Queue, IndexRecreateObject
-                                        .update(indexName, IndexRecreateObject.Service.Comments, total, current[0]));
-                      }
-                    } catch (EventCommentDatabaseException e) {
-                      logger.error("Unable to retrieve event comments for organization {}", orgId, e);
+                      logIndexRebuildProgress(logger, indexName, total, current[0]);
                     } catch (Throwable t) {
-                      logger.error("Unable to update comment on event {} for organization {}", eventId, orgId, t);
+                      logSkippingElement(logger, "comment of event", eventId, organization, t);
                     }
                   }
                 });
       }
     } catch (Exception e) {
-      logger.warn("Unable to index event comments", e);
-      throw new ServiceException(e.getMessage());
+      logIndexRebuildError(logger, indexName, e);
+      throw new IndexRebuildException(indexName, getService(), e);
     }
-
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Comments));
-    });
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Comments;
   }
-
-  @Override
-  public Service getService() {
-    return Service.Comments;
-  }
-
-  @Override
-  public String getClassName() {
-    return EventCommentDatabaseServiceImpl.class.getName();
-  }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return SecurityUtil.getSystemUserName(cc);
-  }
-
 }

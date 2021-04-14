@@ -1,0 +1,27 @@
+{
+  "port": "7878",
+  "latency": 50,
+  "mockDirectory": "./mock-server-api-data/",
+  "webServices": {
+    "search/episode.json": {
+      "mockFile": "search/episode.json",
+      "verbs": ["get"]
+    },
+    "lti": {
+      "mockFile": "lti",
+      "verbs": ["get"]
+    },
+    "lti-service-gui/jobs": {
+      "mockFile": "lti-service-gui/jobs",
+      "verbs": ["get"]
+    },
+    "lti-service-gui/new/metadata": {
+      "mockFile": "lti-service-gui/new/metadata",
+      "verbs": ["get"]
+    },
+    "lti-service-gui/existing-event/metadata": {
+      "mockFile": "lti-service-gui/existing-event/metadata",
+      "verbs": ["get"]
+    }
+  }
+}

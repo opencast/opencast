@@ -168,8 +168,11 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    *  The string "OK"
    * @throws NotFoundException
    */
-  protected String internalMoveByIdAndVersion(final VersionImpl version, final String mpId, final String targetStorage) throws
-          NotFoundException {
+  protected String internalMoveByIdAndVersion(
+      final VersionImpl version,
+      final String mpId,
+      final String targetStorage
+  ) throws NotFoundException {
     tsam.moveSnapshotToStore(version, mpId, targetStorage);
     return OK;
   }
@@ -216,7 +219,8 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
 
 
   /**
-   * Spawns a job to move a all snapshots taken between two points from their current storage to a new target storage location
+   * Spawns a job to move a all snapshots taken between two points from their
+   * current storage to a new target storage location
    *
    * @param start
    *  The start {@link Date}
@@ -237,7 +241,8 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
     args.add(Long.toString(end.getTime()));
 
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.MoveByDate.toString(), args, null, true, NONTERMINAL_JOB_LOAD);
+      return serviceRegistry.createJob(
+          JOB_TYPE, Operation.MoveByDate.toString(), args, null, true, NONTERMINAL_JOB_LOAD);
     } catch (ServiceRegistryException e) {
       throw new AssetManagerException("Unable to create a job", e);
     }
@@ -262,7 +267,8 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
   }
 
   /**
-   * Spawns a job to move a all snapshots of a given mediapackage taken between two points from their current storage to a new target storage location
+   * Spawns a job to move a all snapshots of a given mediapackage taken between
+   * two points from their current storage to a new target storage location
    *
    * @param mpId
    *  The mediapackage ID of the snapshot to move
@@ -287,7 +293,8 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
     args.add(Long.toString(end.getTime()));
 
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.MoveByIdAndDate.toString(), args, null, true, NONTERMINAL_JOB_LOAD);
+      return serviceRegistry.createJob(
+          JOB_TYPE, Operation.MoveByIdAndDate.toString(), args, null, true, NONTERMINAL_JOB_LOAD);
     } catch (ServiceRegistryException e) {
       throw new AssetManagerException("Unable to create a job", e);
     }
@@ -307,7 +314,12 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    * @return
    *  The number of subjobs spawned
    */
-  protected String internalMoveByIdAndDate(final String mpId, final Date start, final Date end, final String targetStorage) {
+  protected String internalMoveByIdAndDate(
+      final String mpId,
+      final Date start,
+      final Date end,
+      final String targetStorage
+  ) {
     RichAResult results = tsam.getSnapshotsByIdAndDate(mpId, start, end);
     List<Job> subjobs = spawnSubjobs(results, targetStorage);
     return Integer.toString(subjobs.size());
@@ -329,7 +341,11 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
       @Override
       public void accept(ARecord record) {
         Snapshot snap = record.getSnapshot().get();
-        jobs.add(moveByIdAndVersion(snap.getVersion(), snap.getMediaPackage().getIdentifier().toString(), targetStorage));
+        jobs.add(moveByIdAndVersion(
+            snap.getVersion(),
+            snap.getMediaPackage().getIdentifier().toString(),
+            targetStorage
+        ));
       }
     });
     return jobs;

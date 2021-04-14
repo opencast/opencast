@@ -206,11 +206,15 @@ public class LtiServlet extends HttpServlet {
     try {
       String customTool = URLDecoder
               .decode(StringUtils.trimToEmpty(req.getParameter(LTI_CUSTOM_TOOL)), StandardCharsets.UTF_8.displayName());
-      customTool = customTool.replaceAll("/?ltitools/(?<tool>[^/]*)/index.html\\??", "/ltitools/index.html?subtool=${tool}&");
+      customTool = customTool.replaceAll(
+          "/?ltitools/(?<tool>[^/]*)/index.html\\??",
+          "/ltitools/index.html?subtool=${tool}&"
+      );
       URI toolUri = new URI(customTool);
 
-      if (toolUri.getPath().isEmpty())
+      if (toolUri.getPath().isEmpty()) {
         throw new URISyntaxException(toolUri.toString(), "Provided 'custom_tool' has an empty path");
+      }
 
       // Make sure that the URI path starts with '/'. Otherwise, UriBuilder handles URIs incorrectly
       if (!toolUri.isOpaque() && !toolUri.getPath().startsWith("/")) {

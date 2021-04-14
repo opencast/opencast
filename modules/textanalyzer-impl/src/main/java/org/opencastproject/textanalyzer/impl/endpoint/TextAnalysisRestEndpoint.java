@@ -54,8 +54,8 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("")
 @RestService(name = "textanalysis", title = "Text Analysis Service",
-  abstractText = "This service enables conversion from one caption format to another.",
-  notes = {
+    abstractText = "This service enables conversion from one caption format to another.",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
         + "not working and is either restarting or has failed",
@@ -86,17 +86,41 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("")
-  @RestQuery(name = "analyze", description = "Submit a track for analysis.", restParameters = { @RestParameter(description = "The image to analyze for text.", isRequired = true, name = "image", type = RestParameter.Type.FILE) }, responses = {
-          @RestResponse(description = "OK, The receipt to use when polling for the resulting mpeg7 catalog.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The argument cannot be parsed into a media package element.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "The service is unavailable at the moment.", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "The receipt to use when polling for the resulting mpeg7 catalog.")
+  @RestQuery(
+      name = "analyze",
+      description = "Submit a track for analysis.",
+      restParameters = {
+          @RestParameter(
+              description = "The image to analyze for text.",
+              isRequired = true,
+              name = "image",
+              type = RestParameter.Type.FILE)
+      },
+      responses = {
+          @RestResponse(
+              description = "OK, The receipt to use when polling for the resulting mpeg7 catalog.",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "The argument cannot be parsed into a media package element.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST
+          ),
+          @RestResponse(
+              description = "The service is unavailable at the moment.",
+              responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE
+          )
+      },
+      returnDescription = "The receipt to use when polling for the resulting mpeg7 catalog."
+  )
   public Response analyze(@FormParam("image") String image) {
-    if (service == null)
+    if (service == null) {
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+    }
     try {
       MediaPackageElement element = MediaPackageElementParser.getFromXml(image);
-      if (!(element instanceof Attachment))
+      if (!(element instanceof Attachment)) {
         throw new WebApplicationException(Status.BAD_REQUEST);
+      }
       Job job = service.extract((Attachment) element);
       return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
@@ -132,10 +156,11 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
    */
   @Override
   public JobProducer getService() {
-    if (service instanceof JobProducer)
+    if (service instanceof JobProducer) {
       return (JobProducer) service;
-    else
+    } else {
       return null;
+    }
   }
 
   /**

@@ -118,10 +118,9 @@ public class AttributeMapper implements InitializingBean {
         .notNull(
             aaiAttributes,
             "aaiAttributes must be set. Did you forget to configure <util:list id=\"aaiAttribute\"?");
-    Assert
-        .isTrue(
-            aaiAttributes.size() > 0,
-            "At least one aaiAttribute must be set. Did you forget to configure some in  <util:list id=\"aaiAttribute\"?");
+    Assert.isTrue(aaiAttributes.size() > 0,
+            "At least one aaiAttribute must be set. Did you forget to configure some in "
+                    + "<util:list id=\"aaiAttribute\"?");
 
     Map<String, List<String>> sourceAttributes = new HashMap<String, List<String>>();
 

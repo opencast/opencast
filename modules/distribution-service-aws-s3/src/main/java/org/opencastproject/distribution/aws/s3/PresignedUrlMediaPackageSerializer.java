@@ -34,51 +34,51 @@ import java.net.URISyntaxException;
  */
 public class PresignedUrlMediaPackageSerializer implements MediaPackageSerializer {
 
-    private static final Logger logger = LoggerFactory.getLogger(PresignedUrlMediaPackageSerializer.class);
+  private static final Logger logger = LoggerFactory.getLogger(PresignedUrlMediaPackageSerializer.class);
 
-    public static final int RANKING = 10;
+  public static final int RANKING = 10;
 
     /** S3 distribution service used for generate presigned URL */
-    private AwsS3DistributionService service;
+  private AwsS3DistributionService service;
 
-    public PresignedUrlMediaPackageSerializer() {
-        logger.info("Init PresignedUrlMediaPackageSerializer");
-    }
+  public PresignedUrlMediaPackageSerializer() {
+    logger.info("Init PresignedUrlMediaPackageSerializer");
+  }
 
-    public void setService(AwsS3DistributionService service) {
-        this.service = service;
-    }
+  public void setService(AwsS3DistributionService service) {
+    this.service = service;
+  }
 
     /**
      * {@inheritDoc}
      *
      * Generate a presigned URI for the given URI if AwsS3DistributionService is enabled.
      */
-    @Override
+  @Override
     public URI decodeURI(URI uri) throws URISyntaxException {
-        URI presignedURI = null;
-        if (service instanceof AwsS3DistributionServiceImpl) {
-            presignedURI = ((AwsS3DistributionServiceImpl)service).presignedURI(uri);
-        }
-        logger.debug("Decode in presigned URL serializer: {} -> {}", uri, presignedURI);
-        return presignedURI;
+    URI presignedURI = null;
+    if (service instanceof AwsS3DistributionServiceImpl) {
+      presignedURI = ((AwsS3DistributionServiceImpl)service).presignedURI(uri);
     }
+    logger.debug("Decode in presigned URL serializer: {} -> {}", uri, presignedURI);
+    return presignedURI;
+  }
 
     /**
      * {@inheritDoc}
      */
-    @Override
+  @Override
     public URI encodeURI(URI uri) throws URISyntaxException {
-        URI encodedUri = null;
-        logger.debug("Encode in presigned URL serializer: {} -> {}", uri, encodedUri);
-        return uri;
-    }
+    URI encodedUri = null;
+    logger.debug("Encode in presigned URL serializer: {} -> {}", uri, encodedUri);
+    return uri;
+  }
 
     /**
      * {@inheritDoc}
      */
-    @Override
+  @Override
     public int getRanking() {
-        return RANKING;
-    }
+    return RANKING;
+  }
 }

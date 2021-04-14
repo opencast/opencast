@@ -1,93 +1,22 @@
 name: Test Opencast
 
 on:
-  - push
-  - pull_request
+  pull_request:
+    paths:
+      - 'pom.xml'
+      - 'modules/**'
+      - 'docs/checkstyle/**'
+      - 'docs/log4j/**'
+      - 'assemblies/**'
+  push:
+    paths:
+      - 'pom.xml'
+      - 'modules/**'
+      - 'docs/checkstyle/**'
+      - 'docs/log4j/**'
+      - 'assemblies/**'
 
 jobs:
-
-  # Check documentation with markdownlint and build it using mkdocs
-  documentation:
-    runs-on: ubuntu-20.04
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: set up python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-
-    - name: install dependencies
-      run: |
-        pip install -q mkdocs markdown_inline_graphviz_extension mkdocs-windmill
-        cd docs/guides
-        npm ci
-
-    - name: check documentation
-      run: bash ./.style-and-markdown-build.sh
-
-
-  # Test database upgrade path.
-  # For this, we initialize a 2.2 database and upgrade all the way to the latest version
-  database:
-    strategy:
-      matrix:
-        db:
-          - 'mysql:8'
-          - 'mariadb:10'
-    runs-on: ubuntu-20.04
-    container: ubuntu
-    services:
-      mydb:
-        image: ${{ matrix.db }}
-        env:
-          MYSQL_ROOT_PASSWORD: password
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: initialize database
-      run: |
-        apt update -q
-        apt install -q -y mysql-client curl bc
-        mysql --host mydb -uroot -ppassword -e 'select version()'
-
-    - name: check upgrade path
-      run: |
-        sed -i 's_remote=""_remote="--host mydb -ppassword"_' docs/upgrade/.test.sh
-        ./docs/upgrade/.test.sh
-
-
-  # Run admin interface browser tests
-  frontend:
-    strategy:
-      matrix:
-        browser:
-          - chrome
-          - firefox
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: use node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
-
-    - name: install dependencies
-      run: |
-        cd modules/admin-ui-frontend
-        npm ci
-        ./node_modules/.bin/bower install
-
-    - name: run front-end tests
-      run: |
-        cd modules/admin-ui-frontend
-        npm run test-${{ matrix.browser }}
-
-
-  # Build Opencast
   build:
     strategy:
       matrix:
@@ -122,6 +51,7 @@ jobs:
             hunspell \
             hunspell-de-de \
             procps \
+            s3cmd \
             sox \
             tar \
             tesseract-ocr \
@@ -136,3 +66,53 @@ jobs:
         run: |
           mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
             clean install -Pnone
+
+      - name: build assemblies
+        working-directory: assemblies
+        if: >
+          github.event_name == 'push'
+          && matrix.java == 11
+          && github.repository == 'opencast/opencast'
+          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+        run: |
+          mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            clean install
+
+      - name: save version
+        working-directory: build
+        if: >
+          github.event_name == 'push'
+          && matrix.java == 11
+          && github.repository == 'opencast/opencast'
+          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+        run: |
+          git log -n1 > "$(echo "${GITHUB_REF#refs/heads/}" | sed 's#/#_#').commit"
+
+      - name: configure s3cmd
+        if: >
+          github.event_name == 'push'
+          && matrix.java == 11
+          && github.repository == 'opencast/opencast'
+          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+        env:
+          S3_HOST: ${{ secrets.S3_HOST }}
+          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+        run: |
+          echo "host_base = ${S3_HOST}" > "$HOME/.s3cfg"
+          echo "host_bucket = ${S3_HOST}" >> "$HOME/.s3cfg"
+          echo "bucket_location = us-east-1" >> "$HOME/.s3cfg"
+          echo "use_https = True" >> "$HOME/.s3cfg"
+          echo "access_key = ${S3_ACCESS_KEY}" >> "$HOME/.s3cfg"
+          echo "secret_key = ${S3_SECRET_KEY}" >> "$HOME/.s3cfg"
+          echo "signature_v2 = False" >> "$HOME/.s3cfg"
+
+      - name: upload assets
+        working-directory: build
+        if: >
+          github.event_name == 'push'
+          && matrix.java == 11
+          && github.repository == 'opencast/opencast'
+          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+        run: |
+          s3cmd put -P *.commit opencast-dist-allinone*tar.gz s3://opencast-daily/

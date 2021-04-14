@@ -292,7 +292,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    * @throws MessagingException
    *           if sending the message failed
    */
-  public void send(String[] to, String[] cc, String[] bcc, String subject, String body, Boolean isHTML) throws MessagingException {
+  public void send(String[] to, String[] cc, String[] bcc, String subject, String body, boolean isHTML) throws MessagingException {
     MimeMessage message = createMessage();
     addRecipients(message, RecipientType.TO, to);
     addRecipients(message, RecipientType.CC, cc);

@@ -86,7 +86,8 @@ public class AwsS3AssetStoreTest {
     EasyMock.replay(bc, cc);
 
     database = new AwsAssetDatabaseImpl();
-    database.setEntityManagerFactory(PersistenceUtil.newTestEntityManagerFactory(AwsAssetDatabaseImpl.PERSISTENCE_UNIT));
+    database.setEntityManagerFactory(
+        PersistenceUtil.newTestEntityManagerFactory(AwsAssetDatabaseImpl.PERSISTENCE_UNIT));
     database.activate(cc);
 
     uri = getClass().getClassLoader().getResource(FILE_NAME).toURI();

@@ -64,6 +64,7 @@
     <module>modules/asset-manager-workflowoperation</module>
     <module>modules/asset-manager-storage-aws</module>
     <module>modules/asset-manager-storage-fs</module>
+    <module>modules/asset-manager-static-file-authorization</module>
     <module>modules/shared-filesystem-utils</module>
     <module>modules/authorization-manager</module>
     <module>modules/authorization-xacml</module>
@@ -103,6 +104,10 @@
     <module>modules/distribution-service-streaming-remote</module>
     <module>modules/distribution-workflowoperation</module>
     <module>modules/dublincore</module>
+    <module>modules/editor-service</module>
+    <module>modules/editor-service-api</module>
+    <module>modules/editor-service-remote</module>
+    <module>modules/editor-service-endpoint</module>
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
     <module>modules/event-comment</module>
@@ -113,14 +118,12 @@
     <module>modules/engage-theodul-plugin-controls</module>
     <module>modules/engage-theodul-plugin-custom-mhConnection</module>
     <module>modules/engage-theodul-plugin-custom-notifications</module>
-    <module>modules/engage-theodul-plugin-custom-usertracking</module>
     <module>modules/engage-theodul-plugin-custom-matomo</module>
     <module>modules/engage-theodul-plugin-description</module>
     <module>modules/engage-theodul-plugin-tab-description</module>
     <module>modules/engage-theodul-plugin-tab-shortcuts</module>
     <module>modules/engage-theodul-plugin-tab-slidetext</module>
     <module>modules/engage-theodul-plugin-tab-downloads</module>
-    <module>modules/engage-theodul-plugin-timeline-statistics</module>
     <module>modules/engage-theodul-plugin-video-videojs</module>
     <module>modules/engage-ui</module>
     <module>modules/execute-api</module>
@@ -136,6 +139,7 @@
     <module>modules/adopter-statistics-impl</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
+    <module>modules/index-rebuild</module>
     <module>modules/ingest-download-service-api</module>
     <module>modules/ingest-download-service-impl</module>
     <module>modules/ingest-download-service-remote</module>
@@ -148,6 +152,7 @@
     <module>modules/inspection-workflowoperation</module>
     <module>modules/statistics-writer-workflowoperation</module>
     <module>modules/kernel</module>
+    <module>modules/editor</module>
     <module>modules/list-providers-service</module>
     <module>modules/live-schedule-api</module>
     <module>modules/live-schedule-impl</module>
@@ -161,6 +166,7 @@
     <module>modules/message-broker-impl</module>
     <module>modules/metadata</module>
     <module>modules/metadata-api</module>
+    <module>modules/metrics-exporter</module>
     <module>modules/mpeg7</module>
     <module>modules/notification-workflowoperation</module>
     <module>modules/oaipmh</module>
@@ -183,8 +189,9 @@
     <module>modules/scheduler-impl</module>
     <module>modules/scheduler-remote</module>
     <module>modules/schema</module>
-    <module>modules/search</module>
-    <module>modules/search-api</module>
+    <module>modules/elasticsearch-impl</module>
+    <module>modules/elasticsearch-api</module>
+    <module>modules/elasticsearch-index</module>
     <module>modules/search-service-api</module>
     <module>modules/search-service-feeds</module>
     <module>modules/search-service-impl</module>
@@ -204,6 +211,7 @@
     <module>modules/silencedetection-remote</module>
     <module>modules/smil-api</module>
     <module>modules/smil-impl</module>
+    <module>modules/smil-workflowoperation</module>
     <module>modules/solr</module>
     <module>modules/sox-api</module>
     <module>modules/sox-impl</module>
@@ -281,6 +289,7 @@
     <module>modules/workspace-api</module>
     <module>modules/workspace-impl</module>
     <module>assemblies</module>
+
   </modules>
   <build>
     <defaultGoal>install</defaultGoal>
@@ -389,6 +398,7 @@
           <skip>${checkstyle.skip}</skip>
           <configLocation>${opencast.basedir}/docs/checkstyle/opencast-checkstyle.xml</configLocation>
           <headerLocation>${opencast.basedir}/docs/checkstyle/opencast-header.txt</headerLocation>
+          <suppressionsLocation>${opencast.basedir}/docs/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <consoleOutput>true</consoleOutput>
           <logViolationsToConsole>true</logViolationsToConsole>
@@ -1174,6 +1184,11 @@
         <artifactId>xmlunit</artifactId>
         <version>1.6</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>xml-apis</groupId>
+        <artifactId>xml-apis</artifactId>
+        <version>2.0.2</version>
       </dependency>
       <!-- logging -->
       <dependency>

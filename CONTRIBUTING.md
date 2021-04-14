@@ -7,20 +7,19 @@ at [the development process documentation](https://docs.opencast.org/develop/dev
 guide should suffice for most contributions.
 
 
-Bug Fixes and Feature
----------------------
+Accepting Criteria for Patches in Different Versions
+----------------------------------------------------
 
-Opencast distinguishes between bug fix and feature pull requests.
+Updates between minor versions should be as smooth as possible and should usually not need manual intervention.
+That is why patches may only be accepted into releases branches (`r/?.x`) if they meet the following criteria:
 
-- Features are only allowed to be merged into `develop`, which will let them automatically become part of the next
-  major release if they are merged before that releases feature freeze.
+- Patches must not modify existing database tables
+- Patches must not modify the indexes or otherwise cause re-indexing
+- Patches must not require a different ActiveMQ configuration
+- Patches must not modify existing translation keys
+- Patches must work with the same configuration within a major version
 
-- Bug fixes can also go into release branches (named `r/_.x`). Once merged, they will automatically be part of the next
-  maintenance release and will be merged down towards `develop` (e.g. `r/4.x` → `r/5.x` → … → `develop`).
-
-Please carefully consider if a patch really needs to be applied to older versions. Making unnecessary changes in
-maintenance releases can easily cause problems for adopters. Disruptive changes (database changes, index changes,
-breaking configuration) should never go into maintenance releases.
+Patches which do not meet these criteria should target the branch `develop` to become part of the next major version.
 
 
 Tests
