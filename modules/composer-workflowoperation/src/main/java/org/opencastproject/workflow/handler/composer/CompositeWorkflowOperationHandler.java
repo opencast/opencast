@@ -324,6 +324,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
       targetTagsOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS));
       targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
+
       encodingProfile = StringUtils.trimToNull(operation.getConfiguration(ENCODING_PROFILE));
 
       layoutMultipleString = StringUtils.trimToNull(operation.getConfiguration(LAYOUT_MULTIPLE));

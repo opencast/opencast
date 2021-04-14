@@ -35,6 +35,7 @@ import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSele
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -99,7 +100,7 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
     logger.debug("Running demux workflow operation on workflow {}", workflowInstance.getId());
 
     try {
-      return demux(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());
+      return demux(workflowInstance.getMediaPackage(), workflowInstance);
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
@@ -110,8 +111,8 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
    *
    * @param src
    *          The source media package
-   * @param operation
-   *          the current workflow operation
+   * @param workflowInstance
+   *          the current workflow instance
    * @return the operation result containing the updated media package
    * @throws EncoderException
    *           if encoding fails
@@ -122,42 +123,38 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @throws NotFoundException
    *           if the workspace doesn't contain the requested file
    */
-  private WorkflowOperationResult demux(MediaPackage src, WorkflowOperationInstance operation)
+  private WorkflowOperationResult demux(MediaPackage src, WorkflowInstance workflowInstance)
           throws EncoderException, IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
     MediaPackage mediaPackage = (MediaPackage) src.clone();
+    WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     final String sectionSeparator = ";";
     // Check which tags have been configured
-    String sourceTagsOption = StringUtils.trimToNull(operation.getConfiguration("source-tags"));
-    String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("source-flavors"));
-    if (sourceFlavorsOption == null)
-      sourceFlavorsOption = StringUtils.trimToEmpty(operation.getConfiguration("source-flavor"));
-    String targetFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("target-flavors"));
-    if (targetFlavorsOption == null)
-      targetFlavorsOption = StringUtils.trimToEmpty(operation.getConfiguration("target-flavor"));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many, Configuration.many, Configuration.many, Configuration.many);
+
+    List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
+    List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
+    //get target tags directly from operation since we need a list separated by a semicolon
     String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration("target-tags"));
+    List<MediaPackageElementFlavor> targetFlavorsOption = tagsAndFlavors.getTargetFlavors();
     String encodingProfile = StringUtils.trimToEmpty(operation.getConfiguration("encoding-profile"));
 
     // Make sure either one of tags or flavors are provided
-    if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorsOption)) {
+    if (sourceTagsOption.isEmpty() && sourceFlavorsOption.isEmpty()) {
       logger.info("No source tags or flavors have been specified, not matching anything");
       return createResult(mediaPackage, Action.CONTINUE);
     }
 
-    List<String> targetFlavors = asList(targetFlavorsOption);
+    List<MediaPackageElementFlavor> targetFlavors = targetFlavorsOption;
     String[] targetTags = StringUtils.split(targetTagsOption, sectionSeparator);
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Select the source flavors
-    for (String flavor : asList(sourceFlavorsOption)) {
-      try {
-        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException(String.format("Source flavor '%s' is malformed", flavor));
-      }
+    for (MediaPackageElementFlavor flavor : sourceFlavorsOption) {
+      elementSelector.addFlavor(flavor);
     }
 
     // Select the source tags
-    for (String tag : asList(sourceTagsOption)) {
+    for (String tag : sourceTagsOption) {
       elementSelector.addTag(tag);
     }
 
@@ -215,7 +212,7 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
       int tagsIndex = 0;
       for (Track composedTrack : composedTracks) {
         // set flavor to the matching flavor in the order listed
-        composedTrack.setFlavor(newFlavor(sourceTrack, targetFlavors.get(flavorIndex)));
+        composedTrack.setFlavor(newFlavor(sourceTrack, targetFlavors.get(flavorIndex).toString()));
         if (targetFlavors.size() > 1) {
           flavorIndex++;
         }
