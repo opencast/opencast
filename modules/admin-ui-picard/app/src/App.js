@@ -30,8 +30,8 @@ function App() {
               <Header />
               <Switch>
                   <Route exact path={"/"}>
-                      {/*<Login />*/}
-                      <Events />
+                      <Login />
+                      {/*<Events />*/}
                   </Route>
                   <Route exact path={"/events/events"}>
                       <Events />
