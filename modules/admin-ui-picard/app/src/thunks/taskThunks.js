@@ -5,9 +5,11 @@ export const postTasks = async values => {
 
     // todo: implement config when backend is updated
     for (let i = 0; i < values.events.length; i++) {
-        let eventId = values.events[i].id;
-        configuration[eventId] = {
-            configuration: 'to be Implemented'
+        if (values.events[i].selected) {
+            let eventId = values.events[i].id;
+            configuration[eventId] = {
+                configuration: 'to be Implemented'
+            }
         }
     }
 

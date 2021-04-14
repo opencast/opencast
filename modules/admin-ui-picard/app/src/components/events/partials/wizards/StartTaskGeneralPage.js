@@ -4,8 +4,6 @@ import Notifications from "../../../shared/Notifications";
 import {connect} from "react-redux";
 import cn from 'classnames';
 import {getSelectedRows} from "../../../../selectors/tableSelectors";
-import {addNotification} from "../../../../thunks/notificationThunks";
-import {getNotifications} from "../../../../selectors/notificationSelector";
 
 const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
     const { t } = useTranslation();
@@ -38,25 +36,14 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
     const onChangeAllSelected = e => {
         const selected = e.target.checked;
         setAllChecked(selected);
-        if (selected) {
-            let changedSelection = selectedEvents.map(event => {
-                return {
-                    ...event,
-                    selected: true
-                }
-            });
-            setSelectedEvents(changedSelection);
-            formik.setFieldValue('events', changedSelection);
-        } else {
-            let changedSelection = selectedEvents.map(event => {
-                return {
-                    ...event,
-                    selected: false
-                }
-            });
-            setSelectedEvents(changedSelection);
-            formik.setFieldValue('events',  changedSelection);
-        }
+        let changedSelection = selectedEvents.map(event => {
+            return {
+                ...event,
+                selected: selected
+            }
+        });
+        setSelectedEvents(changedSelection);
+        formik.setFieldValue('events', changedSelection);
     };
 
     // handle change of checkboxes indicating which events to consider further
@@ -131,7 +118,7 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {/*todo: repeat for each event chosen (error: ...)*/}
+                                        {/* Repeat for each event chosen */}
                                         {selectedEvents.map((event, key) => (
                                             <tr key={key} className={cn({error: !isStartable(event)})}>
                                                 <td>
@@ -175,11 +162,8 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
 
 const mapStateToProps = state => ({
     selectedRows: getSelectedRows(state),
-    notifications: getNotifications(state)
 });
 
-const mapDispatchToProps = dispatch => ({
-    addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context))
-})
 
-export default connect(mapStateToProps, mapDispatchToProps)(StartTaskGeneralPage);
+
+export default connect(mapStateToProps)(StartTaskGeneralPage);

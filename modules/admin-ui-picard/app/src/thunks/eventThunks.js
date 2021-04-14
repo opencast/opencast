@@ -253,5 +253,19 @@ export const deleteEvent = id => async dispatch => {
             dispatch(addNotification('error', 'EVENTS_NOT_DELETED'));
         }
     });
+};
+
+export const deleteMultipleEvent = async events => {
+
+    let data = [];
+
+    for (let i = 0; i < events.length; i++) {
+        if (events[i].selected) {
+            data.push(events[i].id);
+        }
+    }
+
+    axios.post('/admin-ng/event/deleteEvents', data)
+        .then(res => console.log(res)).catch(res => console.log(res));
 
 };
