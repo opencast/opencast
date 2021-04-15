@@ -24,7 +24,6 @@ package org.opencastproject.mediapackage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.opencastproject.mediapackage.MediaPackageSupport.MergeMode;
@@ -40,7 +39,6 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -192,15 +190,11 @@ public class MediaPackageMergeTest {
    * @throws MediaPackageException
    */
   private void testMediaPackageConsistency(MediaPackage mediaPackage) throws MediaPackageException {
-    List<String> ids = new ArrayList<String>();
-    List<URI> files = new ArrayList<URI>();
+    List<String> ids = new ArrayList<>();
     for (MediaPackageElement e : mediaPackage.elements()) {
       if (ids.contains(e.getIdentifier()))
         throw new MediaPackageException("Duplicate id " + e.getIdentifier() + "' found");
       ids.add(e.getIdentifier());
-      if (files.contains(e.getURI()))
-        throw new MediaPackageException("Duplicate filename " + e.getURI() + "' found");
-      files.add(e.getURI());
     }
   }
 
@@ -208,9 +202,9 @@ public class MediaPackageMergeTest {
   public void testMergeByMerging() {
     try {
       MediaPackage mediaPackage = MediaPackageSupport.merge(targetPackage, sourcePackage, MergeMode.Merge);
-      assertTrue(mediaPackage.getTracks().length == 5);
-      assertTrue(mediaPackage.getCatalogs().length == 6);
-      assertTrue(mediaPackage.getAttachments().length == 3);
+      assertEquals(5, mediaPackage.getTracks().length);
+      assertEquals(6, mediaPackage.getCatalogs().length);
+      assertEquals(3, mediaPackage.getAttachments().length);
       testMediaPackageConsistency(mediaPackage);
     } catch (MediaPackageException e) {
       fail(e.getMessage());
