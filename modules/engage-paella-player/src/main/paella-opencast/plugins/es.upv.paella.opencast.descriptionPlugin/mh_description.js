@@ -61,7 +61,12 @@ paella.addPlugin(function() {
       var thisClass = this;
 
       if (thisClass._episode.dcTitle) { this.desc.title = thisClass._episode.dcTitle; }
-      if (thisClass._episode.dcCreator) { this.desc.presenter = thisClass._episode.dcCreator; }
+      if (thisClass._episode.mediapackage.creators) {
+        this.desc.presenter = (Array.isArray(thisClass._episode.mediapackage.creators.creator)
+          ? thisClass._episode.mediapackage.creators.creator
+          : [thisClass._episode.mediapackage.creators.creator])
+          .join(', ');
+      }
       if (thisClass._episode.dcContributor) { this.desc.contributor = thisClass._episode.dcContributor; }
       if (thisClass._episode.dcDescription) { this.desc.description = thisClass._episode.dcDescription; }
       if (thisClass._episode.dcLanguage) { this.desc.language = thisClass._episode.dcLanguage; }
