@@ -218,10 +218,6 @@ public class DublinCoreCatalogTest {
         map(),
         map(tuple(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de"))));
     assertEquals(dc1.toXmlString(), dc2.toXmlString());
-    //
-    assertEquals(
-        read("/sorting/dublincore2-1.xml").toXmlString().trim(),
-        IoSupport.loadTxtFromClassPath("/sorting/dublincore2-2.xml", this.getClass()).get().trim());
   }
 
   @Test
