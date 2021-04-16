@@ -17,7 +17,6 @@
     <suppress checks="LineLength" files="modules/composer-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/dublincore/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-core/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/event-comment/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/execute-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/execute-remote/.+\.(java|properties)"/>
@@ -93,18 +92,6 @@
     <suppress checks="Indentation" files="modules/composer-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/dublincore/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-core/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-controls/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-custom-matomo/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-custom-mhConnection/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-custom-notifications/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-custom-usertracking/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-description/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-tab-description/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-tab-shortcuts/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-tab-slidetext/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-timeline-statistics/.+\.java"/>
-    <suppress checks="Indentation" files="modules/engage-theodul-plugin-video-videojs/.+\.java"/>
     <suppress checks="Indentation" files="modules/execute-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/external-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/fileupload/.+\.java"/>
