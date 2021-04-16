@@ -32,9 +32,9 @@ import javax.ws.rs.Path;
 @Path("/")
 public class EngagePluginTabSlidetext extends AbstractEngagePlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(EngagePluginTabSlidetext.class);
+  private static final Logger log = LoggerFactory.getLogger(EngagePluginTabSlidetext.class);
 
-    protected void activate(ComponentContext cc) {
-        log.info("Activated engage plugin: SlideText.");
-    }
+  protected void activate(ComponentContext cc) {
+    log.info("Activated engage plugin: SlideText.");
+  }
 }

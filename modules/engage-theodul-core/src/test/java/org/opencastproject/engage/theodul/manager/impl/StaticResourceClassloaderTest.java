@@ -46,237 +46,237 @@ import java.util.Enumeration;
 import java.util.Map;
 
 public class StaticResourceClassloaderTest {
-    private static final Logger logger = LoggerFactory.getLogger(StaticResourceClassloaderTest.class);
-    private final String overrideDirName = "theodul.override.test";
-    private final String resourceFilename = "test.resource";
-    private final String genuineResourceName = "other.resource";
-    private final String bundlePath = "ui/";
-    private final String bundleURLPrefix = "http://localhost/";
-    private final String overriddenBundleResource = bundlePath + resourceFilename;
-    private final String overriddenResourceURL = bundleURLPrefix + bundlePath + resourceFilename;
-    private final String genuineBundleResource = bundlePath + genuineResourceName;
-    private final String genuineResourceURL = bundleURLPrefix + bundlePath + genuineResourceName;
+  private static final Logger logger = LoggerFactory.getLogger(StaticResourceClassloaderTest.class);
+  private final String overrideDirName = "theodul.override.test";
+  private final String resourceFilename = "test.resource";
+  private final String genuineResourceName = "other.resource";
+  private final String bundlePath = "ui/";
+  private final String bundleURLPrefix = "http://localhost/";
+  private final String overriddenBundleResource = bundlePath + resourceFilename;
+  private final String overriddenResourceURL = bundleURLPrefix + bundlePath + resourceFilename;
+  private final String genuineBundleResource = bundlePath + genuineResourceName;
+  private final String genuineResourceURL = bundleURLPrefix + bundlePath + genuineResourceName;
 
-    private File overrideDir;
-    private File overrideResource;
+  private File overrideDir;
+  private File overrideResource;
 
-    @Rule
+  @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    @Before
+  @Before
     public void setUp() throws Exception {
         // create override directory and resource
-        try {
-            File tempFolder = testFolder.newFolder("folder");
-            overrideDir = new File(tempFolder, overrideDirName);
-            overrideResource = new File(overrideDir, resourceFilename);
-            overrideDir.mkdir();
-            logger.info("Creating {}", overrideResource);
-            if (overrideResource.createNewFile()) {
+    try {
+      File tempFolder = testFolder.newFolder("folder");
+      overrideDir = new File(tempFolder, overrideDirName);
+      overrideResource = new File(overrideDir, resourceFilename);
+      overrideDir.mkdir();
+      logger.info("Creating {}", overrideResource);
+      if (overrideResource.createNewFile()) {
                 // write something to ensure file existence
-                PrintWriter writer = new PrintWriter(overrideResource);
-                writer.print("Override Test Resource");
-                writer.flush();
-                writer.close();
-            } else {
-                throw new IOException("Failed to create " + overrideResource.getAbsolutePath());
-            }
-        } catch (IOException ex) {
-            throw new RuntimeException("Failed to properly set up override direcory. ", ex);
-        }
+        PrintWriter writer = new PrintWriter(overrideResource);
+        writer.print("Override Test Resource");
+        writer.flush();
+        writer.close();
+      } else {
+        throw new IOException("Failed to create " + overrideResource.getAbsolutePath());
+      }
+    } catch (IOException ex) {
+      throw new RuntimeException("Failed to properly set up override direcory. ", ex);
     }
+  }
 
-    @Test
+  @Test
     public void testBundleResourceLoading() throws Exception {
-        StaticResourceClassloader klas = new StaticResourceClassloader(new MockBundle(), overrideDir, bundlePath);
-        URL result = klas.getResource(genuineBundleResource);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(new URL(genuineResourceURL), result);
-    }
+    StaticResourceClassloader klas = new StaticResourceClassloader(new MockBundle(), overrideDir, bundlePath);
+    URL result = klas.getResource(genuineBundleResource);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(new URL(genuineResourceURL), result);
+  }
 
-    @Test
+  @Test
     public void testFielesystemResourceOverriding() throws Exception {
-        StaticResourceClassloader klas = new StaticResourceClassloader(new MockBundle(), overrideDir, bundlePath);
-        URL result = klas.getResource(overriddenBundleResource);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(overrideResource.toURI().toURL(), result);
-    }
+    StaticResourceClassloader klas = new StaticResourceClassloader(new MockBundle(), overrideDir, bundlePath);
+    URL result = klas.getResource(overriddenBundleResource);
+    Assert.assertNotNull(result);
+    Assert.assertEquals(overrideResource.toURI().toURL(), result);
+  }
 
-    @Test
+  @Test
     public void testMaliciousPath() {
         // test if absolut paths are not working
-        StaticResourceClassloader klas = new StaticResourceClassloader(new MockBundle(), overrideDir, bundlePath);
-        URL result = klas.getResource("/etc/hostname");
-        Assert.assertNull(result);
+    StaticResourceClassloader klas = new StaticResourceClassloader(new MockBundle(), overrideDir, bundlePath);
+    URL result = klas.getResource("/etc/hostname");
+    Assert.assertNull(result);
 
         // test if relative ascending paths are not working
-        result = klas.getResource("../../etc/hostname");
-        Assert.assertNull(result);
-    }
+    result = klas.getResource("../../etc/hostname");
+    Assert.assertNull(result);
+  }
 
-    @After
+  @After
     public void cleanUp() throws Exception {
-        overrideResource.delete();
-        overrideDir.delete();
+    overrideResource.delete();
+    overrideDir.delete();
+  }
+
+  class MockBundle implements Bundle {
+
+    @Override
+        public String getSymbolicName() {
+      return MockBundle.class.getSimpleName();
     }
 
-    class MockBundle implements Bundle {
-
-        @Override
-        public String getSymbolicName() {
-            return MockBundle.class.getSimpleName();
-        }
-
-        @Override
+    @Override
         public URL getResource(String path) {
-            try {
-                if (path.endsWith(genuineBundleResource)) {
-                    return new URL(genuineResourceURL);
-                } else if (path.endsWith(overriddenBundleResource)) {
-                    return new URL(overriddenResourceURL);
-                }
-            } catch (MalformedURLException ex) {
-                throw new RuntimeException("Could not instantiate URL object.", ex);
-            }
-            return null;
+      try {
+        if (path.endsWith(genuineBundleResource)) {
+          return new URL(genuineResourceURL);
+        } else if (path.endsWith(overriddenBundleResource)) {
+          return new URL(overriddenResourceURL);
         }
+      } catch (MalformedURLException ex) {
+        throw new RuntimeException("Could not instantiate URL object.", ex);
+      }
+      return null;
+    }
 
 //<editor-fold defaultstate="collapsed" desc="Unused methods from Bundle interface.">
-        @Override
+    @Override
         public int getState() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public void start(int i) throws BundleException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public void start() throws BundleException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public void stop(int i) throws BundleException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public void stop() throws BundleException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public void update(InputStream in) throws BundleException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public void update() throws BundleException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public void uninstall() throws BundleException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public Dictionary getHeaders() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public long getBundleId() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public String getLocation() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public ServiceReference[] getRegisteredServices() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public ServiceReference[] getServicesInUse() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public boolean hasPermission(Object o) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public Dictionary getHeaders(String string) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public Class loadClass(String string) throws ClassNotFoundException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public Enumeration getResources(String string) throws IOException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public Enumeration getEntryPaths(String string) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public URL getEntry(String string) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public long getLastModified() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public Enumeration findEntries(String string, String string1, boolean bln) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public BundleContext getBundleContext() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public Map getSignerCertificates(int i) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public Version getVersion() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
 
-        @Override
+    @Override
         public int compareTo(Bundle o) {
-          return 0;
-        }
+      return 0;
+    }
 
-        @Override
+    @Override
         public <A> A adapt(Class<A> type) {
-          return null;
-        }
+      return null;
+    }
 
-        @Override
+    @Override
         public File getDataFile(String filename) {
-          return null;
-        }
+      return null;
+    }
 
 //</editor-fold>
-    }
+  }
 }

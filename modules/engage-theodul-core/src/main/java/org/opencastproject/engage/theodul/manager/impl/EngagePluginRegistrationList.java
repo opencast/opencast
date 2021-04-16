@@ -42,20 +42,20 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EngagePluginRegistrationList {
 
-    @XmlElement(name = "plugins")
+  @XmlElement(name = "plugins")
     private List<EngagePluginRegistrationImpl> plugins = new ArrayList<EngagePluginRegistrationImpl>();
 
-    public EngagePluginRegistrationList() {
-        plugins = new ArrayList<EngagePluginRegistrationImpl>();
-    }
+  public EngagePluginRegistrationList() {
+    plugins = new ArrayList<EngagePluginRegistrationImpl>();
+  }
 
-    public EngagePluginRegistrationList(List<EngagePluginRegistration> plugins) {
-        for (EngagePluginRegistration reg : plugins) {
-            this.plugins.add((EngagePluginRegistrationImpl) reg);
-        }
+  public EngagePluginRegistrationList(List<EngagePluginRegistration> plugins) {
+    for (EngagePluginRegistration reg : plugins) {
+      this.plugins.add((EngagePluginRegistrationImpl) reg);
     }
+  }
 
-    public List<EngagePluginRegistrationImpl> getPlugins() {
-        return plugins;
-    }
+  public List<EngagePluginRegistrationImpl> getPlugins() {
+    return plugins;
+  }
 }
