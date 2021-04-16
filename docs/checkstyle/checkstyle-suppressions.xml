@@ -53,9 +53,6 @@
     <suppress checks="LineLength" files="modules/statistics-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-aws/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/timelinepreviews-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/timelinepreviews-ffmpeg/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/timelinepreviews-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-amberscript/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-google-speech-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-ibm-watson-impl/.+\.(java|properties)"/>
@@ -111,8 +108,6 @@
     <suppress checks="Indentation" files="modules/static-file-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-export-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-service-api/.+\.java"/>
-    <suppress checks="Indentation" files="modules/timelinepreviews-ffmpeg/.+\.java"/>
-    <suppress checks="Indentation" files="modules/timelinepreviews-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-amberscript/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-google-speech-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-persistence/.+\.java"/>
@@ -169,7 +164,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/sox-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/timelinepreviews-ffmpeg/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-ibm-watson-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/urlsigning-service-impl/.+\.java"/>
