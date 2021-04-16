@@ -41,7 +41,7 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /**
    * Creates a list of search terms, to be queried using the given quantifier.
-   * 
+   *
    * @param quantifier
    *          the quantifier
    * @param values
@@ -50,25 +50,27 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
   public SearchTermsImpl(Quantifier quantifier, T... values) {
     this.quantifier = quantifier;
     for (T value : values) {
-      if (!this.terms.contains(value))
+      if (!this.terms.contains(value)) {
         this.terms.add(value);
+      }
     }
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchTerms#add(java.lang.Object)
    */
   @Override
   public void add(T term) {
-    if (!this.terms.contains(term))
+    if (!this.terms.contains(term)) {
       this.terms.add(term);
+    }
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchTerms#getTerms()
    */
   @Override
@@ -78,7 +80,7 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchTerms#contains(java.lang.Object)
    */
   @Override
@@ -88,7 +90,7 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchTerms#size()
    */
   @Override
@@ -98,7 +100,7 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchTerms#getQuantifier()
    */
   @Override

@@ -37,10 +37,11 @@ public interface Feed {
   enum Type {
     RSS, Atom;
     public static Type parseString(String type) {
-      if (RSS.toString().equalsIgnoreCase(type))
+      if (RSS.toString().equalsIgnoreCase(type)) {
         return RSS;
-      else
+      } else {
         return Atom;
+      }
     }
   };
 
