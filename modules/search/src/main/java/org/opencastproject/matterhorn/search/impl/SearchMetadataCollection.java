@@ -54,7 +54,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
    * Creates a new resource metadata collection for the given document type.
    * <p>
    * Make sure to set the identifier after the fact using {@link #setIdentifier(String)}.
-   * 
+   *
    * @param documentType
    *          the document type
    */
@@ -64,7 +64,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * Creates a new resource metadata collection for the given document type.
-   * 
+   *
    * @param identifier
    *          the document identifier
    * @param documentType
@@ -77,7 +77,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * Sets the document identifier.
-   * 
+   *
    * @param identifier
    *          the identifier
    */
@@ -87,7 +87,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * Returns the document identifier.
-   * 
+   *
    * @return the identifier
    */
   public String getIdentifier() {
@@ -96,7 +96,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * Returns the document type that determines where the document is posted to the index.
-   * 
+   *
    * @return the document type
    */
   public String getDocumentType() {
@@ -105,7 +105,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * Adds the field and its value to the search index.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param fieldValue
@@ -115,12 +115,15 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
    */
   @SuppressWarnings("unchecked")
   public void addField(String fieldName, Object fieldValue, boolean addToText) {
-    if (fieldName == null)
+    if (fieldName == null) {
       throw new IllegalArgumentException("Field name cannot be null");
-    if (fieldName.contains("."))
+    }
+    if (fieldName.contains(".")) {
       throw new IllegalArgumentException("Field name may not contain '.'");
-    if (fieldValue == null)
+    }
+    if (fieldValue == null) {
       return;
+    }
 
     SearchMetadata<Object> m = (SearchMetadata<Object>) metadata.get(fieldName);
     if (m == null) {
@@ -143,7 +146,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
   /**
    * Returns the localized field name, which is the original field name extended by an underscore and the language
    * identifier.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param language
@@ -156,7 +159,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * Returns the metadata as a list of {@link SearchMetadata} items.
-   * 
+   *
    * @return the metadata items
    */
   public List<SearchMetadata<?>> getMetadata() {
@@ -165,7 +168,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#add(java.lang.Object)
    */
   public boolean add(SearchMetadata<?> e) {
@@ -174,7 +177,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#addAll(java.util.Collection)
    */
   public boolean addAll(Collection<? extends SearchMetadata<?>> c) {
@@ -186,7 +189,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#clear()
    */
   public void clear() {
@@ -195,7 +198,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#contains(java.lang.Object)
    */
   public boolean contains(Object o) {
@@ -204,20 +207,21 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#containsAll(java.util.Collection)
    */
   public boolean containsAll(Collection<?> c) {
     for (Object o : c) {
-      if (!metadata.values().contains(o))
+      if (!metadata.values().contains(o)) {
         return false;
+      }
     }
     return true;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#isEmpty()
    */
   public boolean isEmpty() {
@@ -226,7 +230,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#iterator()
    */
   public Iterator<SearchMetadata<?>> iterator() {
@@ -237,7 +241,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#remove(java.lang.Object)
    */
   public boolean remove(Object o) {
@@ -246,19 +250,20 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#removeAll(java.util.Collection)
    */
   public boolean removeAll(Collection<?> c) {
     boolean removed = false;
-    for (Object o : c)
+    for (Object o : c) {
       removed |= metadata.remove(o) != null;
+    }
     return removed;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#retainAll(java.util.Collection)
    */
   public boolean retainAll(Collection<?> c) {
@@ -274,7 +279,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#size()
    */
   public int size() {
@@ -283,7 +288,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.util.Collection#toArray()
    */
   public Object[] toArray() {
@@ -292,7 +297,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /**
    * Returns the metadata keys and the metadata items as a map for convenient access of search metadata by key.
-   * 
+   *
    * @return the map
    */
   public Map<String, SearchMetadata<?>> toMap() {

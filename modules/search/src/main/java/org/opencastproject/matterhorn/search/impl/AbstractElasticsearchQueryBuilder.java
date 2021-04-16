@@ -212,8 +212,9 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
     fieldName = StringUtils.trim(fieldName);
 
     // Make sure the data structures are set up accordingly
-    if (dateRanges == null)
+    if (dateRanges == null) {
       dateRanges = new HashSet<>();
+    }
 
     // Add the term
     dateRanges.add(new DateRange(fieldName, startDate, endDate));
@@ -312,10 +313,12 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
      */
     QueryBuilder getQueryBuilder() {
       RangeQueryBuilder rqb = new RangeQueryBuilder(field);
-      if (startDate != null)
+      if (startDate != null) {
         rqb.from(DateTimeSupport.toUTC(startDate.getTime()));
-      if (endDate != null)
+      }
+      if (endDate != null) {
         rqb.to(DateTimeSupport.toUTC(endDate.getTime()));
+      }
       return rqb;
     }
 

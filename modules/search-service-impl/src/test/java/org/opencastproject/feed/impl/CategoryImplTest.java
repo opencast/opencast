@@ -30,55 +30,55 @@ import org.junit.Test;
 
 public class CategoryImplTest {
 
-    private static CategoryImpl instance;
-    @Before
+  private static CategoryImpl instance;
+  @Before
     public void setUp() {
     instance  = new CategoryImpl("name", "uri");
 
-    }
+  }
 
-    @After
+  @After
     public void tearDown() {
-    }
+  }
 
     /**
      * Test of getName method, of class CategoryImpl.
      */
-    @Test
+  @Test
     public void testGetName() {
-        String expResult = "name";
-        String result = instance.getName();
-        assertEquals(expResult, result);
+    String expResult = "name";
+    String result = instance.getName();
+    assertEquals(expResult, result);
 
-    }
+  }
 
     /**
      * Test of getTaxonomyUri method, of class CategoryImpl.
      */
-    @Test
+  @Test
     public void testGetTaxonomyUri() {
-        String expResult = "uri";
-        String result = instance.getTaxonomyUri();
-        assertEquals(expResult, result);
-    }
+    String expResult = "uri";
+    String result = instance.getTaxonomyUri();
+    assertEquals(expResult, result);
+  }
 
     /**
      * Test of setName method, of class CategoryImpl.
      */
-    @Test
+  @Test
     public void testSetName() {
-        String name = "name";
-        instance.setName(name);
-        assertEquals(instance.getName(),name);
-    }
+    String name = "name";
+    instance.setName(name);
+    assertEquals(instance.getName(),name);
+  }
 
     /**
      * Test of setTaxonomyUri method, of class CategoryImpl.
      */
-    @Test
+  @Test
     public void testSetTaxonomyUri() {
-        String taxonomyUri = "uri";
-        instance.setTaxonomyUri(taxonomyUri);
-        assertEquals(instance.getTaxonomyUri(), taxonomyUri);
-    }
+    String taxonomyUri = "uri";
+    instance.setTaxonomyUri(taxonomyUri);
+    assertEquals(instance.getTaxonomyUri(), taxonomyUri);
+  }
 }

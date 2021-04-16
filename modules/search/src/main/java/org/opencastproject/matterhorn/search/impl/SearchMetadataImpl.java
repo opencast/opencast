@@ -50,7 +50,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * Creates a new metadata item with the given name.
-   * 
+   *
    * @param name
    *          the name
    */
@@ -60,7 +60,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchMetadata#getName()
    */
   public String getName() {
@@ -69,7 +69,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchMetadata#isLocalized()
    */
   public boolean isLocalized() {
@@ -78,72 +78,80 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * Adds <code>value</code> to the list of language neutral values.
-   * 
+   *
    * @param language
    *          the language
    * @param v
    *          the value
    */
   public void addLocalizedValue(Language language, T v) {
-    if (localizedValues == null)
+    if (localizedValues == null) {
       localizedValues = new HashMap<Language, List<T>>();
+    }
     List<T> values = localizedValues.get(language);
-    if (values == null)
+    if (values == null) {
       values = new ArrayList<T>();
-    if (!values.contains(v))
+    }
+    if (!values.contains(v)) {
       values.add(v);
+    }
     localizedValues.put(language, values);
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchMetadata#getLocalizedValues()
    */
   public Map<Language, List<T>> getLocalizedValues() {
-    if (localizedValues == null)
+    if (localizedValues == null) {
       return Collections.emptyMap();
+    }
     return localizedValues;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchMetadata#addValue(java.lang.Object)
    */
   public void addValue(T v) {
-    if (values == null)
+    if (values == null) {
       values = new ArrayList<T>();
-    if (!values.contains(v))
+    }
+    if (!values.contains(v)) {
       values.add(v);
+    }
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchMetadata#getValues()
    */
   public List<T> getValues() {
-    if (values == null)
+    if (values == null) {
       return Collections.emptyList();
+    }
     return values;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchMetadata#getValue()
    */
   @Override
   public T getValue() {
-    if (values == null || values.size() == 0)
+    if (values == null || values.size() == 0) {
       return null;
+    }
     return values.get(0);
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchMetadata#setAddToText(boolean)
    */
   public void setAddToText(boolean addToText) {
@@ -159,19 +167,21 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchMetadata#clear()
    */
   public void clear() {
-    if (values != null)
+    if (values != null) {
       values.clear();
-    if (localizedValues != null)
+    }
+    if (localizedValues != null) {
       localizedValues.clear();
+    }
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -181,19 +191,20 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof SearchMetadata<?>))
+    if (!(obj instanceof SearchMetadata<?>)) {
       return false;
+    }
     return name.equals(((SearchMetadata<?>) obj).getName());
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

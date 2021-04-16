@@ -123,7 +123,8 @@ public interface FeedGenerator {
    * <li><code>feed.cover</code> - url of the feed's cover image</li>
    * <li><code>feed.entry</code> - template to create a link to a feed entry</li>
    * <li><code>feed.rssflavor</code> - media package flavor identifying rss feed media package elements</li>
-   * <li><code>feed.atomflavors</code> - comma separated list of flavors identifying atom feed media package elements</li>
+   * <li><code>feed.atomflavors</code> - comma separated list of flavors identifying atom
+     feed media package elements</li>
    * <li><code>feed.rsstags</code> - tags identifying rss feed media package elements</li>
    * <li><code>feed.atomtags</code> - comma separated list of tags identifying atom feed media package elements</li>
    * <li><code>org.opencastproject.server.url</code> - this server's base URL</li>

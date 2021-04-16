@@ -40,9 +40,6 @@
     <suppress checks="LineLength" files="modules/scheduler-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/search-service-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/search-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/search-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/silencedetection-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/smil-impl/.+\.(java|properties)"/>
@@ -127,7 +124,6 @@
     <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
     <suppress checks="Indentation" files="modules/runtime-info/.+\.java"/>
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/search-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/security-aai/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="Indentation" files="modules/silencedetection-impl/.+\.java"/>
@@ -189,10 +185,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/schema/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/search-service-api/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/search-service-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/search-service-remote/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/search/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/security-aai/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/silencedetection-impl/.+\.java"/>
