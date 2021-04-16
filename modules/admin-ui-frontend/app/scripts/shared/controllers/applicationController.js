@@ -102,6 +102,9 @@ angular.module('adminNg.controllers')
 
     if (angular.isUndefined($rootScope.version)) {
       VersionResource.query(function(response) {
+        if (response['last-modified']) {
+          response['last-modified'] = new Date(response['last-modified']).toISOString().substr(0, 10);
+        }
         $rootScope.version = response.version
           ? response
           : (angular.isArray(response.versions) ? response.versions[0] : {});
