@@ -80,16 +80,12 @@
     <suppress checks="LineLength" files="modules/videoeditor-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videogrid-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videogrid-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videosegmenter-ffmpeg/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/waveform-ffmpeg/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/waveform-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-condition-parser/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/working-file-repository-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/workspace-impl/.+\.(java|properties)"/>
 
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
     <suppress checks="Indentation" files="modules/annotation-impl/.+\.java"/>
@@ -147,15 +143,11 @@
     <suppress checks="Indentation" files="modules/userdirectory-sakai/.+\.java"/>
     <suppress checks="Indentation" files="modules/videoeditor-ffmpeg-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/videogrid-workflowoperation/.+\.java"/>
-    <suppress checks="Indentation" files="modules/videosegmenter-ffmpeg/.+\.java"/>
-    <suppress checks="Indentation" files="modules/waveform-ffmpeg/.+\.java"/>
-    <suppress checks="Indentation" files="modules/waveform-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/working-file-repository-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/working-file-repository-service-remote/.+\.java"/>
-    <suppress checks="Indentation" files="modules/workspace-impl/.+\.java"/>
 
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/admin-ui/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/annotation-impl/.+\.java"/>
@@ -215,8 +207,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/videoeditor-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/videogrid-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/videogrid-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/videosegmenter-ffmpeg/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/waveform-ffmpeg/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-condition-parser/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-service-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-service-impl/.+\.java"/>
@@ -224,5 +214,4 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/working-file-repository-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/working-file-repository-service-remote/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/workspace-impl/.+\.java"/>
 </suppressions>
