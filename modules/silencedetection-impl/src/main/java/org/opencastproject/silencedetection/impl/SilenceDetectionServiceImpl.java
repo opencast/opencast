@@ -65,11 +65,11 @@ import java.util.Properties;
  * Implementation of SilenceDetectionService using FFmpeg.
  */
 @Component(
-  property = {
-    "service.description=Silence Detection Service"
-  },
-  immediate = true,
-  service = SilenceDetectionService.class
+    property = {
+        "service.description=Silence Detection Service"
+    },
+    immediate = true,
+    service = SilenceDetectionService.class
 )
 public class SilenceDetectionServiceImpl extends AbstractJobProducer implements SilenceDetectionService {
 

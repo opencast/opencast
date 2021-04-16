@@ -282,7 +282,8 @@ public class EmailWorkflowOperationHandlerTest {
   @Test
   public void testSeparators() throws Exception {
     final String separator = "~|~";
-    operation.setConfiguration(EmailWorkflowOperationHandler.TO_PROPERTY, USER_NAME_EMAIL + separator + USER_NAME_EMAIL);
+    operation.setConfiguration(EmailWorkflowOperationHandler.TO_PROPERTY, USER_NAME_EMAIL
+        + separator + USER_NAME_EMAIL);
     operation.setConfiguration(EmailWorkflowOperationHandler.ADDRESS_SEPARATOR_PROPERTY, separator);
 
     operationHandler.start(workflowInstance, null);

@@ -139,8 +139,10 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     return createResult(srcPackage, Action.CONTINUE);
   }
 
-  private String[] processDestination(final WorkflowInstance workflowInstance, final WorkflowOperationInstance operation,
-          final String emailHeader) throws WorkflowOperationException {
+  private String[] processDestination(
+      final WorkflowInstance workflowInstance,
+      final WorkflowOperationInstance operation,
+      final String emailHeader) throws WorkflowOperationException {
     final String separator = Objects.toString(
         operation.getConfiguration(ADDRESS_SEPARATOR_PROPERTY),
         ADDRESS_SEPARATOR_DEFAULT);

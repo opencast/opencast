@@ -33,7 +33,6 @@
     <suppress checks="LineLength" files="modules/live-schedule-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/message-broker-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/mpeg7/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/notification-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh-persistence/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/runtime-info/.+\.(java|properties)"/>
@@ -44,7 +43,6 @@
     <suppress checks="LineLength" files="modules/search-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/search-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/silencedetection-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/smil-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/sox-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/sox-workflowoperation/.+\.(java|properties)"/>
@@ -56,7 +54,6 @@
     <suppress checks="LineLength" files="modules/statistics-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-aws/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/textanalyzer-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/timelinepreviews-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/timelinepreviews-ffmpeg/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/timelinepreviews-workflowoperation/.+\.(java|properties)"/>
@@ -74,7 +71,6 @@
     <suppress checks="LineLength" files="modules/userdirectory-ldap/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-moodle/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-sakai/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/user-interface-configuration/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videoeditor-ffmpeg-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videoeditor-workflowoperation/.+\.(java|properties)"/>
@@ -118,15 +114,12 @@
     <suppress checks="Indentation" files="modules/kernel/.+\.java"/>
     <suppress checks="Indentation" files="modules/message-broker-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/metadata/.+\.java"/>
-    <suppress checks="Indentation" files="modules/notification-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
     <suppress checks="Indentation" files="modules/runtime-info/.+\.java"/>
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/search-service-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/security-aai/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="Indentation" files="modules/silencedetection-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/smil-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/static-file-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-export-service-impl/.+\.java"/>
@@ -175,7 +168,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/message-broker-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/message-broker-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/mpeg7/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/notification-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh-persistence/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-impl/.+\.java"/>
@@ -185,19 +177,15 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/search-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/search-service-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/search/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/security-aai/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/silencedetection-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/sox-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/sox-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/textanalyzer-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/timelinepreviews-ffmpeg/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-ibm-watson-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/urlsigning-service-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/user-interface-configuration/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-ldap/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-moodle/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-sakai/.+\.java"/>

@@ -69,14 +69,8 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
     this.searchService = searchService;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
-    throws WorkflowOperationException {
+          throws WorkflowOperationException {
 
     // get configuration
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
@@ -92,14 +86,15 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       searchQuery.withId(mp.getIdentifier().toString());
       SearchResult result = searchService.getByQuery(searchQuery);
       if (result.size() != 1) {
-          throw new WorkflowOperationException("Received multiple results for identifier"
-              + "\"" + mp.getIdentifier().toString() + "\" from search service. ");
+        throw new WorkflowOperationException("Received multiple results for identifier"
+            + "\"" + mp.getIdentifier().toString() + "\" from search service. ");
       }
       logger.info("Getting media package from search service");
       mp = result.getItems()[0].getMediaPackage();
     }
 
-    logger.info("Submitting {} ({}) as {} to {}", mp.getTitle(), mp.getIdentifier(), config.getFormat().name(), config.getUrl());
+    logger.info("Submitting {} ({}) as {} to {}",
+        mp.getTitle(), mp.getIdentifier(), config.getFormat().name(), config.getUrl());
 
     try {
       // serialize MediaPackage to target format
@@ -229,15 +224,13 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
         }
 
         // Configure debug mode
-        if (keys.contains(PROPERTY_DEBUG))
-        {
+        if (keys.contains(PROPERTY_DEBUG)) {
           String debugstr = operation.getConfiguration(PROPERTY_DEBUG).trim().toUpperCase();
           debug = "YES".equals(debugstr) || "TRUE".equals(debugstr);
         }
 
         // Configure debug mode
-        if (keys.contains(PROPERTY_MEDIAPACKAGE_TYPE))
-        {
+        if (keys.contains(PROPERTY_MEDIAPACKAGE_TYPE)) {
           String cfgval = operation.getConfiguration(PROPERTY_MEDIAPACKAGE_TYPE).trim().toUpperCase();
           mpFromSearch = "SEARCH".equals(cfgval);
         }
