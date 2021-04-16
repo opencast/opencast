@@ -98,5 +98,7 @@ public class SnapshotImpl implements Snapshot {
     return owner;
   }
 
-  @Override public String getStorageId() { return storageId; }
+  @Override public String getStorageId() {
+    return storageId;
+  }
 }

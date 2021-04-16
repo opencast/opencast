@@ -466,17 +466,20 @@ public class StaticResourceServlet extends HttpServlet {
           // This test could actually be "if (len != -1)"
           ostream.write(buffer, 0, len);
           bytesToRead -= len;
-          if (bytesToRead == 0)
+          if (bytesToRead == 0) {
             return null;
-        } else
+          }
+        } else {
           return null;
+        }
       }
 
       for (len = istream.read(buffer); len > 0; len = istream.read(buffer)) {
         ostream.write(buffer, 0, len);
         bytesToRead -= len;
-        if (bytesToRead < 1)
+        if (bytesToRead < 1) {
           break;
+        }
       }
     } catch (IOException e) {
       logger.trace("IOException after starting the byte copy, current length {}, buffer {}."

@@ -119,11 +119,17 @@ public class AbstractAssetManagerDeletePropertyTest extends AbstractAssetManager
     assertTotals(6, 6, 3);
     if (RUN_RAW_QUERIES) {
       assertEquals(2, delete(
-              Q_PROPERTY,
-              Q_PROPERTY.mediaPackageId.in(
-                      new JPASubQuery().from(Q_SNAPSHOT).where(Q_SNAPSHOT.seriesId.eq("123")).list(Q_SNAPSHOT.mediaPackageId))));
+          Q_PROPERTY,
+          Q_PROPERTY.mediaPackageId.in(
+              new JPASubQuery().from(Q_SNAPSHOT)
+                  .where(Q_SNAPSHOT.seriesId.eq("123"))
+                  .list(Q_SNAPSHOT.mediaPackageId))));
     } else {
-      assertEquals("Two properties should be deleted", 2, q.delete(OWNER, q.properties()).where(q.seriesId().eq("123")).run());
+      assertEquals(
+          "Two properties should be deleted",
+          2,
+          q.delete(OWNER, q.properties()).where(q.seriesId().eq("123")).run()
+      );
     }
     assertTotals(6, 6, 1);
     assertEquals(Value.mk("agent-5"), enrich(q.select(p.agent.target()).run()).getProperties().head2().getValue());
@@ -140,8 +146,14 @@ public class AbstractAssetManagerDeletePropertyTest extends AbstractAssetManager
     assertEquals("One property should be deleted",
                  1, q.delete(OWNER, q.properties()).where(q.seriesId().eq("series-1")).run());
     assertTotals(12, 12, 2);
-    assertEquals("One property should be deleted",
-                 1, q.delete(OWNER, q.properties()).where(q.seriesId().eq("series-2").and(q.mediaPackageId(mp2[1].getMediaPackage().getIdentifier().toString()))).run());
+    assertEquals(
+        "One property should be deleted",
+        1,
+        q.delete(OWNER, q.properties()).where(
+            q.seriesId().eq("series-2")
+                .and(q.mediaPackageId(mp2[1].getMediaPackage().getIdentifier().toString()))
+        ).run()
+    );
     assertTotals(12, 12, 1);
     assertEquals(Value.mk("agent-1"), enrich(q.select(p.agent.target()).run()).getProperties().head2().getValue());
   }
@@ -153,9 +165,17 @@ public class AbstractAssetManagerDeletePropertyTest extends AbstractAssetManager
     am.setProperty(p.agent.mk(mp[1], "agent-2"));
     am.setProperty(p.agent.mk(mp[2], "agent-5"));
     assertTotals(6, 6, 3);
-    assertEquals("One property should be deleted", 1, q.delete(OWNER, q.properties()).where(q.mediaPackageId(mp[0])).run());
+    assertEquals(
+        "One property should be deleted",
+        1,
+        q.delete(OWNER, q.properties()).where(q.mediaPackageId(mp[0])).run()
+    );
     assertTotals(6, 6, 2);
-    assertEquals("One property should be deleted", 1, q.delete(OWNER, q.properties()).where(q.mediaPackageId(mp[1])).run());
+    assertEquals(
+        "One property should be deleted",
+        1,
+        q.delete(OWNER, q.properties()).where(q.mediaPackageId(mp[1])).run()
+    );
     assertTotals(6, 6, 1);
     assertEquals(Value.mk("agent-5"), enrich(q.select(p.agent.target()).run()).getProperties().head2().getValue());
   }
@@ -168,8 +188,11 @@ public class AbstractAssetManagerDeletePropertyTest extends AbstractAssetManager
     am.setProperty(Properties.mkProperty(p.agent, mp2[1], "agent-2"));
     am.setProperty(Properties.mkProperty(p.agent, mp2[2], "agent-1"));
     assertTotals(12, 12, 3);
-    assertEquals("Three property should be deleted",
-                 3, q.delete(OWNER, q.properties()).where(q.organizationId(DefaultOrganization.DEFAULT_ORGANIZATION_ID)).run());
+    assertEquals(
+        "Three property should be deleted",
+        3,
+        q.delete(OWNER, q.properties()).where(q.organizationId(DefaultOrganization.DEFAULT_ORGANIZATION_ID)).run()
+    );
     assertTotals(12, 12, 0);
   }
 
@@ -219,19 +242,27 @@ public class AbstractAssetManagerDeletePropertyTest extends AbstractAssetManager
     am.setProperty(p.legacyId.mk(mp[1], "id"));
     //
 //    if (true) return;
-    assertEquals("All properties of media package " + mp[1] + "should be deleted",
-                 3, q.delete(OWNER, q.propertiesOf(p.namespace()))
-                         .where(q.organizationId(DefaultOrganization.DEFAULT_ORGANIZATION_ID).and(p.agent.eq("agent")).and(p.count.notExists()))
-                         .name("by non existing property")
-                         .run());
+    assertEquals(
+        "All properties of media package " + mp[1] + "should be deleted",
+        3,
+        q.delete(OWNER, q.propertiesOf(p.namespace()))
+            .where(q.organizationId(DefaultOrganization.DEFAULT_ORGANIZATION_ID)
+                .and(p.agent.eq("agent"))
+                .and(p.count.notExists()))
+            .name("by non existing property")
+            .run()
+    );
     {
       final RichAResult r = enrich(q.select(q.properties()).where(q.mediaPackageId(mp[1])).run());
       assertEquals(0, r.countProperties());
     }
     {
       final RichAResult r = enrich(q.select(q.properties()).where(q.mediaPackageId(mp[0])).run());
-      assertEquals("No properties should have been deleted from the other media package since it has the 'count' property set",
-                   4, r.countProperties());
+      assertEquals(
+          "No properties should have been deleted from the other media package since it has the 'count' property set",
+          4,
+          r.countProperties()
+      );
     }
   }
 
@@ -247,11 +278,21 @@ public class AbstractAssetManagerDeletePropertyTest extends AbstractAssetManager
     am.setProperty(p.approved.mk(mp[1], true));
     am.setProperty(p.legacyId.mk(mp[1], "id"));
     assertEquals(0L, Properties.removeProperties(am, OWNER, "unknown_org", mp[0], p.namespace()));
-    assertEquals(0L, Properties.removeProperties(am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, "unknown-mp-id", p.namespace()));
-    assertEquals(0L, Properties.removeProperties(am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[0], "unknown-namespace"));
-    assertEquals(3L, Properties.removeProperties(am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[0], p.namespace()));
+    assertEquals(0L, Properties.removeProperties(
+        am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, "unknown-mp-id", p.namespace()
+    ));
+    assertEquals(0L, Properties.removeProperties(
+        am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[0], "unknown-namespace"
+    ));
+    assertEquals(3L, Properties.removeProperties(
+        am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[0], p.namespace()
+    ));
     assertEquals(1L, enrich(q.select(q.properties()).where(q.mediaPackageId(mp[0])).run()).countProperties());
-    assertEquals(1L, Properties.removeProperties(am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[0], p2.namespace()));
-    assertEquals(3L, Properties.removeProperties(am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[1], p.namespace()));
+    assertEquals(1L, Properties.removeProperties(
+        am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[0], p2.namespace()
+    ));
+    assertEquals(3L, Properties.removeProperties(
+        am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[1], p.namespace()
+    ));
   }
 }

@@ -47,7 +47,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * A workflow operation handler for creating, resolving and deleting comments automatically during the workflow process.
+ * A workflow operation handler for creating, resolving and deleting comments
+ * automatically during the workflow process.
  */
 public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   protected static final String ACTION = "action";
@@ -116,8 +117,9 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
         break;
       default:
         logger.warn(
-                "Unknown action '{}' for comment with description '{}' and reason '{}'. It should be one of the following: ",
-                inputAction, description, reason, StringUtils.join(Operation.values(), ","));
+            "Unknown action '{}' for comment with description '{}' and reason '{}'. It should be "
+                + "one of the following: ",
+            inputAction, description, reason, StringUtils.join(Operation.values(), ","));
     }
     WorkflowOperationResult result = createResult(workflowInstance.getMediaPackage(), Action.CONTINUE,
             (new Date().getTime()) - date.getTime());
@@ -142,8 +144,10 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
             description);
     if (optComment.isNone()) {
       final User user = userDirectoryService.loadUser(workflowInstance.getCreatorName());
-      EventComment comment = EventComment.create(Option.none(), workflowInstance.getMediaPackage().getIdentifier().toString(),
-              securityService.getOrganization().getId(), description, user, reason, false);
+      EventComment comment = EventComment.create(
+          Option.none(),
+          workflowInstance.getMediaPackage().getIdentifier().toString(),
+          securityService.getOrganization().getId(), description, user, reason, false);
       eventCommentService.updateComment(comment);
     } else {
       logger.debug("Not creating comment with '{}' text and '{}' reason as it already exists for this event.",
@@ -168,10 +172,12 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
     Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
             description);
     if (optComment.isSome()) {
-      EventComment comment = EventComment.create(optComment.get().getId(), workflowInstance.getMediaPackage().getIdentifier().toString(),
-              securityService.getOrganization().getId(), optComment.get().getText(),
-              optComment.get().getAuthor(), optComment.get().getReason(), true, optComment.get().getCreationDate(),
-              optComment.get().getModificationDate(), optComment.get().getReplies());
+      EventComment comment = EventComment.create(
+          optComment.get().getId(),
+          workflowInstance.getMediaPackage().getIdentifier().toString(),
+          securityService.getOrganization().getId(), optComment.get().getText(),
+          optComment.get().getAuthor(), optComment.get().getReason(), true, optComment.get().getCreationDate(),
+          optComment.get().getModificationDate(), optComment.get().getReplies());
       eventCommentService.updateComment(comment);
     } else {
       logger.debug("Not resolving comment with '{}' text and/or '{}' reason as it doesn't exist.", description, reason);
@@ -221,7 +227,8 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @throws EventCommentException
    *           Thrown if there was a problem finding the comment.
    */
-  private Opt<EventComment> findComment(String eventId, String reason, String description) throws EventCommentException {
+  private Opt<EventComment> findComment(String eventId, String reason, String description)
+          throws EventCommentException {
     Opt<EventComment> comment = Opt.none();
     List<EventComment> eventComments = eventCommentService.getComments(eventId);
 

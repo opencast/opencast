@@ -84,30 +84,30 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
   @Path("moveById")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "moveById", description = "Move a mediapackage based on its ID.",
-          restParameters = {
-                  @RestParameter(
-                          name = "id",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The mediapackage ID to move."),
-                  @RestParameter(
-                          name = "target",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The target storage to move the mediapackage to.")},
-          responses = {
-                  @RestResponse(
-                          description = "The job created to move the snapshot.",
-                          responseCode = SC_OK),
-                  @RestResponse(
-                          description = "Invalid parameters, and the job was not created",
-                          responseCode = SC_BAD_REQUEST),
-                  @RestResponse(
-                          description = "There has been an internal error, and the job was not created",
-                          responseCode = SC_INTERNAL_SERVER_ERROR)},
-          returnDescription = "The Job created")
+      restParameters = {
+          @RestParameter(
+              name = "id",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The mediapackage ID to move."),
+          @RestParameter(
+              name = "target",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The target storage to move the mediapackage to.")},
+      responses = {
+          @RestResponse(
+              description = "The job created to move the snapshot.",
+              responseCode = SC_OK),
+          @RestResponse(
+              description = "Invalid parameters, and the job was not created",
+              responseCode = SC_BAD_REQUEST),
+          @RestResponse(
+              description = "There has been an internal error, and the job was not created",
+              responseCode = SC_INTERNAL_SERVER_ERROR)},
+      returnDescription = "The Job created")
   public Response moveById(@FormParam("id") final String id, @FormParam("target") final String target) {
     String mpid = StringUtils.trimToNull(id);
     if (null == mpid) {
@@ -133,37 +133,41 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
   @Path("moveByIdAndVersion")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "moveByIdAndVersion", description = "Move a mediapackage based on its ID and version.",
-          restParameters = {
-                  @RestParameter(
-                          name = "id",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The mediapackage ID to move."),
-                  @RestParameter(
-                          name = "version",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The version to move."),
-                  @RestParameter(
-                          name = "target",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The target storage to move the mediapackage to.")},
-          responses = {
-                  @RestResponse(
-                          description = "The job created to move the snapshot.",
-                          responseCode = SC_OK),
-                  @RestResponse(
-                          description = "Invalid parameters, and the job was not created",
-                          responseCode = SC_BAD_REQUEST),
-                  @RestResponse(
-                          description = "There has been an internal error, and the job was not created",
-                          responseCode = SC_INTERNAL_SERVER_ERROR)},
-          returnDescription = "The Job created")
-  public Response moveByIdAndVersion(@FormParam("id") final String id, @FormParam("version") final String version, @FormParam("target") final String target) {
+      restParameters = {
+          @RestParameter(
+              name = "id",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The mediapackage ID to move."),
+          @RestParameter(
+              name = "version",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The version to move."),
+          @RestParameter(
+              name = "target",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The target storage to move the mediapackage to.")},
+      responses = {
+          @RestResponse(
+              description = "The job created to move the snapshot.",
+              responseCode = SC_OK),
+          @RestResponse(
+              description = "Invalid parameters, and the job was not created",
+              responseCode = SC_BAD_REQUEST),
+          @RestResponse(
+              description = "There has been an internal error, and the job was not created",
+              responseCode = SC_INTERNAL_SERVER_ERROR)},
+      returnDescription = "The Job created")
+  public Response moveByIdAndVersion(
+      @FormParam("id") final String id,
+      @FormParam("version") final String version,
+      @FormParam("target") final String target
+  ) {
     final String mpid = StringUtils.trimToNull(id);
     if (null == mpid) {
       return badRequest("Invalid mediapackage ID: " + mpid);
@@ -196,37 +200,41 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
   @Path("moveByDate")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "moveByDate", description = "Move all snapshots between two dates.",
-          restParameters = {
-                  @RestParameter(
-                          name = "start",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The start date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
-                  @RestParameter(
-                          name = "end",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The end date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
-                  @RestParameter(
-                          name = "target",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The target storage to move the mediapackage to.")},
-          responses = {
-                  @RestResponse(
-                          description = "The job created to move the snapshots.",
-                          responseCode = SC_OK),
-                  @RestResponse(
-                          description = "Invalid parameters, and the job was not created",
-                          responseCode = SC_BAD_REQUEST),
-                  @RestResponse(
-                          description = "There has been an internal error, and the job was not created",
-                          responseCode = SC_INTERNAL_SERVER_ERROR)},
-          returnDescription = "The Job created")
-  public Response moveByDate(@FormParam("start") final String startString, @FormParam("end") final String endString, @FormParam("target") final String target) {
+      restParameters = {
+          @RestParameter(
+              name = "start",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The start date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
+          @RestParameter(
+              name = "end",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The end date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
+          @RestParameter(
+              name = "target",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The target storage to move the mediapackage to.")},
+      responses = {
+          @RestResponse(
+              description = "The job created to move the snapshots.",
+              responseCode = SC_OK),
+          @RestResponse(
+              description = "Invalid parameters, and the job was not created",
+              responseCode = SC_BAD_REQUEST),
+          @RestResponse(
+              description = "There has been an internal error, and the job was not created",
+              responseCode = SC_INTERNAL_SERVER_ERROR)},
+      returnDescription = "The Job created")
+  public Response moveByDate(
+      @FormParam("start") final String startString,
+      @FormParam("end") final String endString,
+      @FormParam("target") final String target
+  ) {
     DateFormat sdf = new SimpleDateFormat(SDF_FORMAT);
     Date start;
     Date end;
@@ -259,44 +267,51 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
   @POST
   @Path("moveByIdAndDate")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "moveByIdAndDate", description = "Move all snapshots for a given mediapackage taken between two dates.",
-          restParameters = {
-                  @RestParameter(
-                          name = "id",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The mediapackage ID to move."),
-                  @RestParameter(
-                          name = "start",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The start date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
-                  @RestParameter(
-                          name = "end",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The end date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
-                  @RestParameter(
-                          name = "target",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "",
-                          description = "The target storage to move the mediapackage to.")},
-          responses = {
-                  @RestResponse(
-                          description = "The job created to move the snapshots.",
-                          responseCode = SC_OK),
-                  @RestResponse(
-                          description = "Invalid parameters, and the job was not created",
-                          responseCode = SC_BAD_REQUEST),
-                  @RestResponse(
-                          description = "There has been an internal error, and the job was not created",
-                          responseCode = SC_INTERNAL_SERVER_ERROR)},
-          returnDescription = "The Job created")
-  public Response moveByIdAndDate(@FormParam("id") final String id, @FormParam("start") final String startString, @FormParam("end") final String endString, @FormParam("target") final String target) {
+  @RestQuery(
+      name = "moveByIdAndDate",
+      description = "Move all snapshots for a given mediapackage taken between two dates.",
+      restParameters = {
+          @RestParameter(
+              name = "id",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The mediapackage ID to move."),
+          @RestParameter(
+              name = "start",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The start date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
+          @RestParameter(
+              name = "end",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The end date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
+          @RestParameter(
+              name = "target",
+              isRequired = true,
+              type = RestParameter.Type.STRING,
+              defaultValue = "",
+              description = "The target storage to move the mediapackage to.")},
+      responses = {
+          @RestResponse(
+              description = "The job created to move the snapshots.",
+              responseCode = SC_OK),
+          @RestResponse(
+              description = "Invalid parameters, and the job was not created",
+              responseCode = SC_BAD_REQUEST),
+          @RestResponse(
+              description = "There has been an internal error, and the job was not created",
+              responseCode = SC_INTERNAL_SERVER_ERROR)},
+      returnDescription = "The Job created")
+  public Response moveByIdAndDate(
+      @FormParam("id") final String id,
+      @FormParam("start") final String startString,
+      @FormParam("end") final String endString,
+      @FormParam("target") final String target
+  ) {
     DateFormat sdf = new SimpleDateFormat(SDF_FORMAT);
     final String mpid = StringUtils.trimToNull(id);
     if (null == mpid) {

@@ -75,25 +75,31 @@ public class AbstractAssetManagerPropertyRetrievalTest extends AbstractAssetMana
     final Stream<Property> props = $(mps).bind(new Fn<String, Stream<Property>>() {
       @Override public Stream<Property> apply(final String mp) {
         // create a random amount of random properties
-        return Stream.cont(inc()).take(random.nextInt(params.maxProps - params.minProps + 1) + params.minProps).map(new Fn<Integer, Property>() {
-          @Override public Property apply(Integer ignore) {
-            // try to pick a free property a 100 times
-            for (int i = 0; i < 100; i++) {
-              // randomly select a property name
-              final PropertyName pName = propertyNames[random.nextInt(propertyNames.length)];
-              // check if the selected property is already associated with the current media package
-              final ASelectQuery doesPropertyExist = q.select(q.properties(pName)).where(q.mediaPackageId(mp));
-              if (sizeOf(doesPropertyExist.run().getRecords().bind(ARecords.getProperties)) == 0) {
-                // create a property with a randomly picked value
-                final Property p = Property.mk(PropertyId.mk(mp, pName), params.values[random.nextInt(params.values.length)]);
-                if (am.setProperty(p))
-                  return p;
+        return Stream.cont(inc())
+            .take(random.nextInt(params.maxProps - params.minProps + 1) + params.minProps)
+            .map(new Fn<Integer, Property>() {
+              @Override public Property apply(Integer ignore) {
+                // try to pick a free property a 100 times
+                for (int i = 0; i < 100; i++) {
+                  // randomly select a property name
+                  final PropertyName pName = propertyNames[random.nextInt(propertyNames.length)];
+                  // check if the selected property is already associated with the current media package
+                  final ASelectQuery doesPropertyExist = q.select(q.properties(pName)).where(q.mediaPackageId(mp));
+                  if (sizeOf(doesPropertyExist.run().getRecords().bind(ARecords.getProperties)) == 0) {
+                    // create a property with a randomly picked value
+                    final Property p = Property.mk(
+                        PropertyId.mk(mp, pName),
+                        params.values[random.nextInt(params.values.length)]
+                    );
+                    if (am.setProperty(p)) {
+                      return p;
+                    }
+                  }
+                }
+                fail("Cannot pick another random property that has not been inserted yet");
+                return null;
               }
-            }
-            fail("Cannot pick another random property that has not been inserted yet");
-            return null;
-          }
-        });
+            });
       }
     }).eval(); // evaluate stream to fill the database, otherwise unexpected results will occur due to stream laziness
     assertThat("Number of generated properties",
@@ -107,9 +113,19 @@ public class AbstractAssetManagerPropertyRetrievalTest extends AbstractAssetMana
       // get all properties of the result records
       assertThat("Number of records", r.getSize(), params.expectRecords);
       final Stream<Property> allProps = r.getRecords().bind(ARecords.getProperties);
-      assertThat("Total number of properties: " + allProps.mkString(", "), sizeOf(allProps), params.expectPropertiesTotal);
-      assertThat("Total number of snapshots", sizeOf(r.getRecords().bind(ARecords.getSnapshot)), params.expectSnapshotsTotal);
-      final Stream<Property> findSavedProperty = r.getRecords().bind(ARecords.getProperties).filter(Booleans.eq(prop));
+      assertThat(
+          "Total number of properties: " + allProps.mkString(", "),
+          sizeOf(allProps),
+          params.expectPropertiesTotal
+      );
+      assertThat(
+          "Total number of snapshots",
+          sizeOf(r.getRecords().bind(ARecords.getSnapshot)),
+          params.expectSnapshotsTotal
+      );
+      final Stream<Property> findSavedProperty = r.getRecords()
+          .bind(ARecords.getProperties)
+          .filter(Booleans.eq(prop));
       if (params.expectContainsSavedProperty) {
         assertThat("Contains saved property", findSavedProperty, hasItem(prop));
       }
@@ -121,124 +137,124 @@ public class AbstractAssetManagerPropertyRetrievalTest extends AbstractAssetMana
     return $a(
             // Fetch one property of the latest version of a media package.
             new Params()
-                    .propertyNameSetSize(20000)
-                    .generateProperties(1, 10)
-                    .mkTarget(new Fn<Property, Target[]>() {
-                      @Override public Target[] apply(Property p) {
-                        return $a(q.properties(p.getId().getFqn()));
-                      }
-                    })
-                    .mkWhere(new Fn<Property, Predicate>() {
-                      @Override public Predicate apply(Property p) {
-                        return q.mediaPackageId(p.getId().getMediaPackageId()).and(q.version().isLatest());
-                      }
-                    })
-                    .expectRecords(equalTo(1L))
-                    .expectPropertiesTotal(equalTo(1))
-                    .expectSnapshotsTotal(equalTo(0))
-                    .expectContainsSavedProperty(true),
+                .propertyNameSetSize(20000)
+                .generateProperties(1, 10)
+                .mkTarget(new Fn<Property, Target[]>() {
+                  @Override public Target[] apply(Property p) {
+                    return $a(q.properties(p.getId().getFqn()));
+                  }
+                })
+                .mkWhere(new Fn<Property, Predicate>() {
+                  @Override public Predicate apply(Property p) {
+                    return q.mediaPackageId(p.getId().getMediaPackageId()).and(q.version().isLatest());
+                  }
+                })
+                .expectRecords(equalTo(1L))
+                .expectPropertiesTotal(equalTo(1))
+                .expectSnapshotsTotal(equalTo(0))
+                .expectContainsSavedProperty(true),
             //
             // The difference between this fixture and the above is only an additional property predicate which
             //   will not influence the result set.
             new Params()
-                    .propertyNameSetSize(10)
-                    .generateProperties(5, 5)
-                    .mkTarget(new Fn<Property, Target[]>() {
-                      @Override public Target[] apply(Property p) {
-                        return $a(q.properties(p.getId().getFqn()));
-                      }
-                    })
-                    .mkWhere(new Fn<Property, Predicate>() {
-                      @Override public Predicate apply(Property p) {
-                        return q.mediaPackageId(p.getId().getMediaPackageId())
-                                .and(q.version().isLatest())
-                                .and(q.property(Value.UNTYPED, p.getId().getFqn()).exists());
-                      }
-                    })
-                    .expectRecords(equalTo(1L))
-                    .expectPropertiesTotal(equalTo(1))
-                    .expectSnapshotsTotal(equalTo(0))
-                    .expectContainsSavedProperty(true),
+                .propertyNameSetSize(10)
+                .generateProperties(5, 5)
+                .mkTarget(new Fn<Property, Target[]>() {
+                  @Override public Target[] apply(Property p) {
+                    return $a(q.properties(p.getId().getFqn()));
+                  }
+                })
+                .mkWhere(new Fn<Property, Predicate>() {
+                  @Override public Predicate apply(Property p) {
+                    return q.mediaPackageId(p.getId().getMediaPackageId())
+                            .and(q.version().isLatest())
+                            .and(q.property(Value.UNTYPED, p.getId().getFqn()).exists());
+                  }
+                })
+                .expectRecords(equalTo(1L))
+                .expectPropertiesTotal(equalTo(1))
+                .expectSnapshotsTotal(equalTo(0))
+                .expectContainsSavedProperty(true),
             //
             // Fetch all properties of the matched records.
             new Params()
-                    .propertyNameSetSize(10)
-                    .generateProperties(5, 5)
-                    .mkTarget(new Fn<Property, Target[]>() {
-                      @Override public Target[] apply(Property p) {
-                        return $a(q.properties());
-                      }
-                    })
-                    .mkWhere(new Fn<Property, Predicate>() {
-                      @Override public Predicate apply(Property p) {
-                        final ValueType<Object> t = (ValueType<Object>) p.getValue().getType();
-                        return q.mediaPackageId(p.getId().getMediaPackageId())
-                                .and(q.version().isLatest())
-                                .and(q.property(t, p.getId().getFqn()).eq(Values.getValueUntyped(p.getValue())));
-                      }
-                    })
-                    .expectRecords(equalTo(1L))
-                    .expectPropertiesTotal(equalTo(5))
-                    .expectSnapshotsTotal(equalTo(0))
-                    .expectContainsSavedProperty(true),
+                .propertyNameSetSize(10)
+                .generateProperties(5, 5)
+                .mkTarget(new Fn<Property, Target[]>() {
+                  @Override public Target[] apply(Property p) {
+                    return $a(q.properties());
+                  }
+                })
+                .mkWhere(new Fn<Property, Predicate>() {
+                  @Override public Predicate apply(Property p) {
+                    final ValueType<Object> t = (ValueType<Object>) p.getValue().getType();
+                    return q.mediaPackageId(p.getId().getMediaPackageId())
+                            .and(q.version().isLatest())
+                            .and(q.property(t, p.getId().getFqn()).eq(Values.getValueUntyped(p.getValue())));
+                  }
+                })
+                .expectRecords(equalTo(1L))
+                .expectPropertiesTotal(equalTo(5))
+                .expectSnapshotsTotal(equalTo(0))
+                .expectContainsSavedProperty(true),
             //
             new Params()
-                    .propertyNameSetSize(20)
-                    .generateProperties(5, 5)
-                    .mkTarget(new Fn<Property, Target[]>() {
-                      @Override public Target[] apply(Property p) {
-                        return $a(q.snapshot());
-                      }
-                    })
-                    .mkWhere(new Fn<Property, Predicate>() {
-                      @Override public Predicate apply(Property p) {
-                        final ValueType<Object> t = (ValueType<Object>) p.getValue().getType();
-                        return q.mediaPackageId(p.getId().getMediaPackageId())
-                                .and(q.version().isLatest())
-                                .and(q.property(t, p.getId().getFqn()).eq(Values.getValueUntyped(p.getValue())));
-                      }
-                    })
-                    .expectRecords(equalTo(1L))
-                    .expectPropertiesTotal(equalTo(0))
-                    .expectSnapshotsTotal(equalTo(1))
-                    .expectContainsSavedProperty(false),
+                .propertyNameSetSize(20)
+                .generateProperties(5, 5)
+                .mkTarget(new Fn<Property, Target[]>() {
+                  @Override public Target[] apply(Property p) {
+                    return $a(q.snapshot());
+                  }
+                })
+                .mkWhere(new Fn<Property, Predicate>() {
+                  @Override public Predicate apply(Property p) {
+                    final ValueType<Object> t = (ValueType<Object>) p.getValue().getType();
+                    return q.mediaPackageId(p.getId().getMediaPackageId())
+                            .and(q.version().isLatest())
+                            .and(q.property(t, p.getId().getFqn()).eq(Values.getValueUntyped(p.getValue())));
+                  }
+                })
+                .expectRecords(equalTo(1L))
+                .expectPropertiesTotal(equalTo(0))
+                .expectSnapshotsTotal(equalTo(1))
+                .expectContainsSavedProperty(false),
             //
             // Fetch two times the same property of the latest version of a media package.
             new Params()
-                    .propertyNameSetSize(15)
-                    .generateProperties(1, 10)
-                    .mkTarget(new Fn<Property, Target[]>() {
-                      @Override public Target[] apply(Property p) {
-                        return $a(q.properties(p.getId().getFqn()), q.properties(p.getId().getFqn()));
-                      }
-                    })
-                    .mkWhere(new Fn<Property, Predicate>() {
-                      @Override public Predicate apply(Property p) {
-                        return q.mediaPackageId(p.getId().getMediaPackageId()).and(q.version().isLatest());
-                      }
-                    })
-                    .expectRecords(equalTo(1L))
-                    .expectPropertiesTotal(equalTo(1))
-                    .expectSnapshotsTotal(equalTo(0))
-                    .expectContainsSavedProperty(true),
+                .propertyNameSetSize(15)
+                .generateProperties(1, 10)
+                .mkTarget(new Fn<Property, Target[]>() {
+                  @Override public Target[] apply(Property p) {
+                    return $a(q.properties(p.getId().getFqn()), q.properties(p.getId().getFqn()));
+                  }
+                })
+                .mkWhere(new Fn<Property, Predicate>() {
+                  @Override public Predicate apply(Property p) {
+                    return q.mediaPackageId(p.getId().getMediaPackageId()).and(q.version().isLatest());
+                  }
+                })
+                .expectRecords(equalTo(1L))
+                .expectPropertiesTotal(equalTo(1))
+                .expectSnapshotsTotal(equalTo(0))
+                .expectContainsSavedProperty(true),
             //
             new Params()
-                    .propertyNameSetSize(50)
-                    .generateProperties(1, 10)
-                    .mkTarget(new Fn<Property, Target[]>() {
-                      @Override public Target[] apply(Property p) {
-                        return $a(q.properties(p.getId().getFqn()));
-                      }
-                    })
-                    .mkWhere(new Fn<Property, Predicate>() {
-                      @Override public Predicate apply(Property p) {
-                        return q.hasPropertiesOf(p.getId().getNamespace());
-                      }
-                    })
-                    .expectRecords(greaterThanOrEqualTo(1L))
-                    .expectPropertiesTotal(greaterThanOrEqualTo(1))
-                    .expectSnapshotsTotal(equalTo(0))
-                    .expectContainsSavedProperty(true)
+                .propertyNameSetSize(50)
+                .generateProperties(1, 10)
+                .mkTarget(new Fn<Property, Target[]>() {
+                  @Override public Target[] apply(Property p) {
+                    return $a(q.properties(p.getId().getFqn()));
+                  }
+                })
+                .mkWhere(new Fn<Property, Predicate>() {
+                  @Override public Predicate apply(Property p) {
+                    return q.hasPropertiesOf(p.getId().getNamespace());
+                  }
+                })
+                .expectRecords(greaterThanOrEqualTo(1L))
+                .expectPropertiesTotal(greaterThanOrEqualTo(1))
+                .expectSnapshotsTotal(equalTo(0))
+                .expectContainsSavedProperty(true)
     );
   }
 
@@ -335,7 +351,10 @@ public class AbstractAssetManagerPropertyRetrievalTest extends AbstractAssetMana
       return this;
     }
 
-    /** Set to true if the property passed to the target and where construction functions is expected in the total set of properties. */
+    /**
+     * Set to true if the property passed to the target and where construction
+     * functions is expected in the total set of properties.
+     */
     Params expectContainsSavedProperty(boolean a) {
       this.expectContainsSavedProperty = a;
       return this;

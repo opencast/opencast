@@ -108,6 +108,7 @@
     <module>modules/editor-service-api</module>
     <module>modules/editor-service-remote</module>
     <module>modules/editor-service-endpoint</module>
+    <module>modules/editor-service-endpoint-remote</module>
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
     <module>modules/event-comment</module>
@@ -1155,7 +1156,7 @@
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.xerces</artifactId>
-        <version>2.12.0_1</version>
+        <version>2.12.1_1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>

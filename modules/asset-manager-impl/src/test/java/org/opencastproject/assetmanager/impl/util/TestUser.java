@@ -76,7 +76,8 @@ public class TestUser implements User {
   }
 
   public static User mk(Organization organization) {
-    return new TestUser("user", "password", "name", "email", "provider", true, organization, Collections.<Role>emptySet());
+    return new TestUser("user", "password", "name", "email", "provider",
+        true, organization, Collections.<Role>emptySet());
   }
 
   public static User mk(Organization organization, Role... roles) {

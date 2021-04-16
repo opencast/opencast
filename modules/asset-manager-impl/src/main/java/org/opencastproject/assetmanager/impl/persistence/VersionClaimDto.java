@@ -40,8 +40,15 @@ import javax.persistence.Table;
 @Entity(name = "VersionClaim")
 @Table(name = "oc_assets_version_claim")
 @NamedQueries({
-        @NamedQuery(name = "VersionClaim.last", query = "select a from VersionClaim a where a.mediaPackageId = :mediaPackageId"),
-        @NamedQuery(name = "VersionClaim.update", query = "update VersionClaim a set a.lastClaimed = :lastClaimed where a.mediaPackageId = :mediaPackageId")})
+    @NamedQuery(
+        name = "VersionClaim.last",
+        query = "select a from VersionClaim a where a.mediaPackageId = :mediaPackageId"
+    ),
+    @NamedQuery(
+        name = "VersionClaim.update",
+        query = "update VersionClaim a set a.lastClaimed = :lastClaimed where a.mediaPackageId = :mediaPackageId"
+    )
+})
 public final class VersionClaimDto {
   private static final ProductBuilder p = Products.E;
 

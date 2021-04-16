@@ -65,11 +65,11 @@ import javax.persistence.Query;
  * Implements {@link SeriesServiceDatabase}. Defines permanent storage for series.
  */
 @Component(
-  property = {
-    "service.description=Series Service"
-  },
-  immediate = true,
-  service = { SeriesServiceDatabase.class }
+    property = {
+        "service.description=Series Service"
+    },
+    immediate = true,
+    service = { SeriesServiceDatabase.class }
 )
 public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
@@ -598,8 +598,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       logger.error("Couldn't update series {} with property: {}:{} because", seriesId, propertyName, propertyValue, e);
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -646,8 +647,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       }
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
     return success;
   }
@@ -680,8 +682,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       }
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
     return success;
   }
@@ -697,17 +700,18 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         data = Opt.none();
       } else {
         Map<String, byte[]> elements = series.getElements();
-        if (elements.containsKey(type))
+        if (elements.containsKey(type)) {
           data = Opt.some(elements.get(type));
-        else {
+        } else {
           data = Opt.none();
         }
       }
     } catch (Exception e) {
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
     return data;
   }
@@ -727,8 +731,9 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (Exception e) {
       throw new SeriesServiceDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
     return elements;
   }
