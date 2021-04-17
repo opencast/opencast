@@ -22,8 +22,8 @@ services:
       - 127.0.0.1:5432:5432
     environment:
       POSTGRES_USER: opencast
-      POSTGRES_PASSWORD: opencast
-      POSTGRES_DB: dbpassword
+      POSTGRES_PASSWORD: dbpassword
+      POSTGRES_DB: opencast
   mariadb:
     container_name: opencast-mariadb
     image: docker.io/library/mariadb:10.5.5
