@@ -13,7 +13,7 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <prometheus.version>0.9.0</prometheus.version>
+    <prometheus.version>0.10.0</prometheus.version>
   </properties>
   <dependencies>
     <!-- Opencast dependencies -->
