@@ -28,42 +28,42 @@ import org.junit.Test;
 
 public class EnclosureImplTest {
 
-    private static EnclosureImpl instance;
+  private static EnclosureImpl instance;
 
-    public EnclosureImplTest() {
-    }
+  public EnclosureImplTest() {
+  }
 
-    @Before
+  @Before
     public void setUp() {
-        instance = new EnclosureImpl(null, null, null, 2L);
-    }
+    instance = new EnclosureImpl(null, null, null, 2L);
+  }
 
-    @After
+  @After
     public void tearDown() {
-        instance = null;
-    }
+    instance = null;
+  }
 
     /**
      * Test of SetterAndGetter for EnclousureImol
      */
-    @Test
+  @Test
     public void testSetterAndGetter() {
 
-        String result = "item";
-        Assert.assertNull(instance.getFlavor());
-        instance.setFlavor(result);
-        Assert.assertEquals(instance.getFlavor(), result);
+    String result = "item";
+    Assert.assertNull(instance.getFlavor());
+    instance.setFlavor(result);
+    Assert.assertEquals(instance.getFlavor(), result);
 
-        Assert.assertNull(instance.getType());
-        instance.setType(result);
-        Assert.assertEquals(instance.getType(), result);
+    Assert.assertNull(instance.getType());
+    instance.setType(result);
+    Assert.assertEquals(instance.getType(), result);
 
-        Assert.assertNull(instance.getUrl());
-        instance.setUrl(result);
-        Assert.assertEquals(instance.getUrl(), result);
+    Assert.assertNull(instance.getUrl());
+    instance.setUrl(result);
+    Assert.assertEquals(instance.getUrl(), result);
 
-        Assert.assertEquals(instance.getLength(), 2L);
-        instance.setLength(4L);
-        Assert.assertEquals(instance.getLength(), 4L);
-    }
+    Assert.assertEquals(instance.getLength(), 2L);
+    instance.setLength(4L);
+    Assert.assertEquals(instance.getLength(), 4L);
+  }
 }

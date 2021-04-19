@@ -260,11 +260,12 @@ public class DynamicLoginHandler implements ShibbolethLoginHandler, AAIRoleProvi
    */
   @Override
   public List<Role> getRolesForUser(String userName) {
-      ArrayList<Role> roles = new ArrayList<Role>();
-      User user = userReferenceProvider.loadUser(userName);
-      if (user != null)
-        roles.addAll(user.getRoles());
-      return roles;
+    ArrayList<Role> roles = new ArrayList<Role>();
+    User user = userReferenceProvider.loadUser(userName);
+    if (user != null) {
+      roles.addAll(user.getRoles());
+    }
+    return roles;
   }
 
   /**
@@ -280,13 +281,15 @@ public class DynamicLoginHandler implements ShibbolethLoginHandler, AAIRoleProvi
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
     HashSet<Role> foundRoles = new HashSet<Role>();
     for (Iterator<Role> it = getRoles(); it.hasNext();) {
       Role role = it.next();
-      if (like(role.getName(), query) || like(role.getDescription(), query))
+      if (like(role.getName(), query) || like(role.getDescription(), query)) {
         foundRoles.add(role);
+      }
     }
     return offsetLimitCollection(offset, limit, foundRoles).iterator();
 
@@ -296,10 +299,12 @@ public class DynamicLoginHandler implements ShibbolethLoginHandler, AAIRoleProvi
     HashSet<T> result = new HashSet<T>();
     int i = 0;
     for (T entry : entries) {
-      if (limit != 0 && result.size() >= limit)
+      if (limit != 0 && result.size() >= limit) {
         break;
-      if (i >= offset)
+      }
+      if (i >= offset) {
         result.add(entry);
+      }
       i++;
     }
     return result;

@@ -515,8 +515,9 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
     JaxbOrganization organization = JaxbOrganization.fromOrganization(securityService.getOrganization());
     HashSet<Role> roles = new HashSet<>(2);
     final String[] roleNames = new String[] {roleFederationMember, organization.getAnonymousRole()};
@@ -532,10 +533,12 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
     HashSet<T> result = new HashSet<T>();
     int i = 0;
     for (T entry : entries) {
-      if (limit != 0 && result.size() >= limit)
+      if (limit != 0 && result.size() >= limit) {
         break;
-      if (i >= offset)
+      }
+      if (i >= offset) {
         result.add(entry);
+      }
       i++;
     }
     return result;
