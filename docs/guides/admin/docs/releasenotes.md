@@ -115,6 +115,9 @@ API changes
 
 Additional Notes about 9.4
 --------------------------
+
+Besides many fixes and improvements, Opencast 9.4 comes with the following new features:
+
 - [The standalone video editor](modules/editor.md) received an update, featuring optional metadata editing,
 hotkeys for the cutting controls and internationalization support.
 
