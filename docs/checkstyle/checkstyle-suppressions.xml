@@ -40,8 +40,6 @@
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/smil-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/sox-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/sox-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/static-file-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-export-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-provider-influx/.+\.(java|properties)"/>
@@ -142,8 +140,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/schema/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/sox-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/sox-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-ibm-watson-impl/.+\.java"/>

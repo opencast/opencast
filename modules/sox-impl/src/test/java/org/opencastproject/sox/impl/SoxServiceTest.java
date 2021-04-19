@@ -104,8 +104,9 @@ public class SoxServiceTest {
 
   @Before
   public void setUp() throws Exception {
-    if (!soxInstalled)
+    if (!soxInstalled) {
       return;
+    }
 
     // Copy an existing media file to a temp file
     File f = new File(getClass().getResource("/audio-test.wav").getFile());
@@ -177,8 +178,9 @@ public class SoxServiceTest {
 
   @Test
   public void testAnalyzeAudio() throws Exception {
-    if (!soxInstalled)
+    if (!soxInstalled) {
       return;
+    }
 
     assertTrue(source.isFile());
     Job job = soxService.analyze(sourceTrack);
@@ -191,8 +193,9 @@ public class SoxServiceTest {
 
   @Test
   public void testNormalizeIncreaseAudio() throws Exception {
-    if (!soxInstalled)
+    if (!soxInstalled) {
       return;
+    }
 
     assertTrue(source.isFile());
     Job job = soxService.normalize(sourceTrack, -25f);
@@ -203,8 +206,9 @@ public class SoxServiceTest {
 
   @Test
   public void testNormalizeDecreaseAudio() throws Exception {
-    if (!soxInstalled)
+    if (!soxInstalled) {
       return;
+    }
 
     assertTrue(source.isFile());
     Job job = soxService.normalize(sourceTrack, -30f);
