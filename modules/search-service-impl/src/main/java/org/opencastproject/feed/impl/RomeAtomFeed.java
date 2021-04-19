@@ -77,8 +77,9 @@ public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
    *          the feed info
    */
   private void init(Feed originalFeed, FeedInfo feedInfo) {
-    if (originalFeed == null)
+    if (originalFeed == null) {
       throw new IllegalArgumentException("Feed is null");
+    }
 
     // Create SyndFeed
     setEncoding(originalFeed.getEncoding());
@@ -135,9 +136,11 @@ public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
    * @return <code>ROME</code> category list
    */
   private List<com.rometools.rome.feed.atom.Category> toRomeAtomCategories(List<Category> categories) {
-    if (categories == null)
+    if (categories == null) {
       return Collections.emptyList();
-    List<com.rometools.rome.feed.atom.Category> romeCategories = new ArrayList<com.rometools.rome.feed.atom.Category>(categories.size());
+    }
+    List<com.rometools.rome.feed.atom.Category> romeCategories
+        = new ArrayList<com.rometools.rome.feed.atom.Category>(categories.size());
     for (Category category : categories) {
       com.rometools.rome.feed.atom.Category romeCategory = new com.rometools.rome.feed.atom.Category();
       romeCategory.setLabel(category.getName());
@@ -155,8 +158,9 @@ public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
    * @return <code>ROME</code> content object
    */
   private com.rometools.rome.feed.atom.Content toRomeAtomContent(Content content) {
-    if (content == null)
+    if (content == null) {
       return null;
+    }
     com.rometools.rome.feed.atom.Content romeContent = new com.rometools.rome.feed.atom.Content();
     romeContent.setMode(content.getMode().toString().toLowerCase());
     romeContent.setType(content.getType());
@@ -172,9 +176,11 @@ public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
    * @return <code>ROME</code> content list
    */
   private List<com.rometools.rome.feed.atom.Content> toRomeAtomContents(List<Content> contents) {
-    if (contents == null)
+    if (contents == null) {
       return Collections.emptyList();
-    List<com.rometools.rome.feed.atom.Content> romeContents = new ArrayList<com.rometools.rome.feed.atom.Content>(contents.size());
+    }
+    List<com.rometools.rome.feed.atom.Content> romeContents
+        = new ArrayList<com.rometools.rome.feed.atom.Content>(contents.size());
     for (Content content : contents) {
       romeContents.add(toRomeAtomContent(content));
     }
@@ -189,9 +195,11 @@ public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
    * @return <code>ROME</code> enclosure list
    */
   private List<com.rometools.rome.feed.atom.Link> toRomeAtomEnclosures(List<Enclosure> enclosures) {
-    if (enclosures == null)
+    if (enclosures == null) {
       return Collections.emptyList();
-    List<com.rometools.rome.feed.atom.Link> romeEnclosures = new ArrayList<com.rometools.rome.feed.atom.Link>(enclosures.size());
+    }
+    List<com.rometools.rome.feed.atom.Link> romeEnclosures
+        = new ArrayList<com.rometools.rome.feed.atom.Link>(enclosures.size());
     for (Enclosure enclosure : enclosures) {
       com.rometools.rome.feed.atom.Link romeEnclosure = new com.rometools.rome.feed.atom.Link();
       romeEnclosure.setLength(enclosure.getLength());
@@ -212,8 +220,9 @@ public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
    * @return <code>ROME</code> link list
    */
   private List<com.rometools.rome.feed.atom.Link> toRomeAtomLinks(List<Link> links) {
-    if (links == null)
+    if (links == null) {
       return Collections.emptyList();
+    }
     List<com.rometools.rome.feed.atom.Link> romeLinks = new ArrayList<com.rometools.rome.feed.atom.Link>(links.size());
     for (Link link : links) {
       com.rometools.rome.feed.atom.Link romeLink = new com.rometools.rome.feed.atom.Link();
@@ -238,8 +247,9 @@ public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
    * @return <code>ROME</code> person list
    */
   private List<SyndPerson> toRomeAtomPersons(List<Person> persons) {
-    if (persons == null)
+    if (persons == null) {
       return Collections.emptyList();
+    }
     List<SyndPerson> romePersons = new ArrayList<SyndPerson>(persons.size());
     for (Person person : persons) {
       com.rometools.rome.feed.atom.Person romePerson = new com.rometools.rome.feed.atom.Person();
@@ -259,16 +269,20 @@ public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
    * @return the rome feed extensions
    */
   private List<Module> toRomeModules(List<FeedExtension> modules) {
-    if (modules == null)
+    if (modules == null) {
       return null;
+    }
     List<Module> romeModules = new ArrayList<Module>();
     for (FeedExtension extension : modules) {
-      if (DublinCoreExtension.URI.equals(extension.getUri()))
+      if (DublinCoreExtension.URI.equals(extension.getUri())) {
         romeModules.add(toRomeModule((DublinCoreExtension) extension));
-      if (extension instanceof ITunesFeedExtension)
+      }
+      if (extension instanceof ITunesFeedExtension) {
         romeModules.add(toRomeModule((ITunesFeedExtension) extension));
-      if (extension instanceof ITunesFeedEntryExtension)
+      }
+      if (extension instanceof ITunesFeedEntryExtension) {
         romeModules.add(toRomeModule((ITunesFeedEntryExtension) extension));
+      }
     }
     return romeModules;
   }
@@ -320,8 +334,9 @@ public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
     m.setBlock(ext.isBlocked());
     m.setCategories(ext.getCategories());
     m.setExplicit(ext.isExplicit());
-    if (ext.getKeywords() != null)
+    if (ext.getKeywords() != null) {
       m.setKeywords(ext.getKeywords().toArray(new String[ext.getKeywords().size()]));
+    }
     m.setOwnerEmailAddress(ext.getOwnerEmail());
     m.setOwnerName(ext.getOwnerName());
     m.setSubtitle(ext.getSubtitle());

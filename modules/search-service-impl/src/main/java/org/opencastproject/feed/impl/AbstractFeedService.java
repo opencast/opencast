@@ -147,8 +147,9 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
 
   protected String extractId(String uri) {
     String id = uri.substring(uri.lastIndexOf("/") + 1);
-    if (id == null)
+    if (id == null) {
       return uri;
+    }
     return id;
   }
 
@@ -208,8 +209,9 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
    */
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof AbstractFeedService) || selector == null)
+    if (!(o instanceof AbstractFeedService) || selector == null) {
       return super.equals(o);
+    }
     return super.equals(o) && selector.equals(((AbstractFeedService) o).selector);
   }
 

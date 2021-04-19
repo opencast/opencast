@@ -146,8 +146,9 @@ public class FeedImpl implements Feed {
    * @see org.opencastproject.feed.api.Feed#addAuthor(org.opencastproject.feed.api.Person)
    */
   public void addAuthor(Person author) {
-    if (authors == null)
+    if (authors == null) {
       authors = new ArrayList<Person>();
+    }
     authors.add(author);
   }
 
@@ -157,8 +158,9 @@ public class FeedImpl implements Feed {
    * @see org.opencastproject.feed.api.Feed#addContributor(org.opencastproject.feed.api.Person)
    */
   public void addContributor(Person contributor) {
-    if (contributors == null)
+    if (contributors == null) {
       contributors = new ArrayList<Person>();
+    }
     contributors.add(contributor);
   }
 
@@ -168,8 +170,9 @@ public class FeedImpl implements Feed {
    * @see org.opencastproject.feed.api.Feed#addEntry(org.opencastproject.feed.api.FeedEntry)
    */
   public void addEntry(FeedEntry entry) {
-    if (entries == null)
+    if (entries == null) {
       entries = new ArrayList<FeedEntry>();
+    }
     entries.add(entry);
   }
 
@@ -179,8 +182,9 @@ public class FeedImpl implements Feed {
    * @see org.opencastproject.feed.api.Feed#addLink(org.opencastproject.feed.api.Link)
    */
   public void addLink(Link link) {
-    if (links == null)
+    if (links == null) {
       links = new ArrayList<Link>();
+    }
     links.add(link);
   }
 
@@ -190,8 +194,9 @@ public class FeedImpl implements Feed {
    * @see org.opencastproject.feed.api.Feed#addModule(org.opencastproject.feed.api.FeedExtension)
    */
   public void addModule(FeedExtension module) {
-    if (modules == null)
+    if (modules == null) {
       modules = new ArrayList<FeedExtension>();
+    }
     modules.add(module);
   }
 
@@ -291,11 +296,14 @@ public class FeedImpl implements Feed {
    * @see org.opencastproject.feed.api.Feed#getModule(java.lang.String)
    */
   public FeedExtension getModule(String uri) {
-    if (modules == null)
+    if (modules == null) {
       return null;
-    for (FeedExtension m : modules)
-      if (uri.equals(m.getUri()))
+    }
+    for (FeedExtension m : modules) {
+      if (uri.equals(m.getUri())) {
         return m;
+      }
+    }
     return null;
   }
 

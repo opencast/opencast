@@ -90,8 +90,9 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
    *          the feed info
    */
   private void init(Feed originalFeed, FeedInfo feedInfo) {
-    if (originalFeed == null)
+    if (originalFeed == null) {
       throw new IllegalArgumentException("Feed is null");
+    }
 
     // Create SyndFeed
     setEncoding(originalFeed.getEncoding());
@@ -131,8 +132,9 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
         List<SyndLink> links = toRomeLinks(entry.getLinks());
         e.setLinks(links);
         // todo this strategy seems to work but is unproven
-        if (links.size() > 0)
+        if (links.size() > 0) {
           e.setLink(links.get(0).getHref());
+        }
         romeEntries.add(e);
       }
       setEntries(romeEntries);
@@ -147,8 +149,9 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
    * @return <code>ROME</code> category list
    */
   private List<SyndCategory> toRomeCategories(List<Category> categories) {
-    if (categories == null)
+    if (categories == null) {
       return Collections.emptyList();
+    }
     List<SyndCategory> romeCategories = new ArrayList<SyndCategory>(categories.size());
     for (Category category : categories) {
       SyndCategoryImpl romeCategory = new SyndCategoryImpl();
@@ -167,8 +170,9 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
    * @return <code>ROME</code> content object
    */
   private SyndContent toRomeContent(Content content) {
-    if (content == null)
+    if (content == null) {
       return null;
+    }
     SyndContentImpl romeContent = new SyndContentImpl();
     romeContent.setMode(content.getMode().toString().toLowerCase());
     romeContent.setType(content.getType());
@@ -184,8 +188,9 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
    * @return <code>ROME</code> content list
    */
   private List<SyndContent> toRomeContents(List<Content> contents) {
-    if (contents == null)
+    if (contents == null) {
       return Collections.emptyList();
+    }
     List<SyndContent> romeContents = new ArrayList<SyndContent>(contents.size());
     for (Content content : contents) {
       romeContents.add(toRomeContent(content));
@@ -201,8 +206,9 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
    * @return <code>ROME</code> enclosure list
    */
   private List<SyndEnclosure> toRomeEnclosures(List<Enclosure> enclosures) {
-    if (enclosures == null)
+    if (enclosures == null) {
       return Collections.emptyList();
+    }
     List<SyndEnclosure> romeEnclosures = new ArrayList<SyndEnclosure>(enclosures.size());
     for (Enclosure enclosure : enclosures) {
       SyndEnclosureImpl romeEnclosure = new SyndEnclosureImpl();
@@ -222,8 +228,9 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
    * @return <code>ROME</code> image object
    */
   private SyndImage toRomeImage(Image image) {
-    if (image == null)
+    if (image == null) {
       return null;
+    }
     SyndImageImpl romeImage = new SyndImageImpl();
     romeImage.setDescription(image.getDescription());
     romeImage.setLink(image.getLink());
@@ -240,8 +247,9 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
    * @return <code>ROME</code> link list
    */
   private List<SyndLink> toRomeLinks(List<Link> links) {
-    if (links == null)
+    if (links == null) {
       return Collections.emptyList();
+    }
     List<SyndLink> romeLinks = new ArrayList<SyndLink>(links.size());
     for (Link link : links) {
       SyndLinkImpl romeLink = new SyndLinkImpl();
@@ -264,8 +272,9 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
    * @return <code>ROME</code> person list
    */
   private List<SyndPerson> toRomePersons(List<Person> persons) {
-    if (persons == null)
+    if (persons == null) {
       return Collections.emptyList();
+    }
     List<SyndPerson> romePersons = new ArrayList<SyndPerson>(persons.size());
     for (Person person : persons) {
       SyndPersonImpl romePerson = new SyndPersonImpl();
@@ -285,16 +294,20 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
    * @return the rome feed extensions
    */
   private List<Module> toRomeModules(List<FeedExtension> modules) {
-    if (modules == null)
+    if (modules == null) {
       return null;
+    }
     List<Module> romeModules = new ArrayList<Module>();
     for (FeedExtension extension : modules) {
-      if (DublinCoreExtension.URI.equals(extension.getUri()))
+      if (DublinCoreExtension.URI.equals(extension.getUri())) {
         romeModules.add(toRomeModule((DublinCoreExtension) extension));
-      if (extension instanceof ITunesFeedExtension)
+      }
+      if (extension instanceof ITunesFeedExtension) {
         romeModules.add(toRomeModule((ITunesFeedExtension) extension));
-      if (extension instanceof ITunesFeedEntryExtension)
+      }
+      if (extension instanceof ITunesFeedEntryExtension) {
         romeModules.add(toRomeModule((ITunesFeedEntryExtension) extension));
+      }
     }
     return romeModules;
   }
@@ -346,8 +359,9 @@ public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
     m.setBlock(ext.isBlocked());
     m.setCategories(ext.getCategories());
     m.setExplicit(ext.isExplicit());
-    if (ext.getKeywords() != null)
+    if (ext.getKeywords() != null) {
       m.setKeywords(ext.getKeywords().toArray(new String[ext.getKeywords().size()]));
+    }
     m.setOwnerEmailAddress(ext.getOwnerEmail());
     m.setOwnerName(ext.getOwnerName());
     m.setSubtitle(ext.getSubtitle());

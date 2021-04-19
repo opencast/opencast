@@ -32,9 +32,9 @@ import javax.ws.rs.Path;
 @Path("/")
 public class EngagePluginCustomMhConnection extends AbstractEngagePlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(EngagePluginCustomMhConnection.class);
+  private static final Logger log = LoggerFactory.getLogger(EngagePluginCustomMhConnection.class);
 
-    protected void activate(ComponentContext cc) {
-        log.info("Activated engage plugin: MHConnection.");
-    }
+  protected void activate(ComponentContext cc) {
+    log.info("Activated engage plugin: MHConnection.");
+  }
 }

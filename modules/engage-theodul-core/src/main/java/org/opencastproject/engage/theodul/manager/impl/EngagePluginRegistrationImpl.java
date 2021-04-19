@@ -35,76 +35,76 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.NONE)
 public class EngagePluginRegistrationImpl implements EngagePluginRegistration {
 
-    @XmlAttribute()
+  @XmlAttribute()
     private Integer id;
-    @XmlAttribute()
+  @XmlAttribute()
     private String name;
-    @XmlElement(name = "description")
+  @XmlElement(name = "description")
     private String description;
-    @XmlElement(name = "static-path")
+  @XmlElement(name = "static-path")
     private String staticPath = null;
-    @XmlElement(name = "rest-path")
+  @XmlElement(name = "rest-path")
     private String restPath = null;
-    private boolean hasStaticResources;
-    private boolean hasRestEndpoint;
+  private boolean hasStaticResources;
+  private boolean hasRestEndpoint;
 
-    public EngagePluginRegistrationImpl() {
-    }
+  public EngagePluginRegistrationImpl() {
+  }
 
-    public EngagePluginRegistrationImpl(Integer id, String name, String description, String staticPath, String restPath) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.staticPath = staticPath;
-        this.restPath = restPath;
-        this.hasStaticResources = (staticPath != null);
-        this.hasRestEndpoint = (restPath != null);
-    }
+  public EngagePluginRegistrationImpl(Integer id, String name, String description, String staticPath, String restPath) {
+    this.id = id;
+    this.name = name;
+    this.description = description;
+    this.staticPath = staticPath;
+    this.restPath = restPath;
+    this.hasStaticResources = (staticPath != null);
+    this.hasRestEndpoint = (restPath != null);
+  }
 
-    @Override
+  @Override
     public int getId() {
-        return id;
-    }
+    return id;
+  }
 
-    @Override
+  @Override
     public String getName() {
-        return name;
-    }
+    return name;
+  }
 
-    @Override
+  @Override
     public String getDescription() {
-        return description;
-    }
+    return description;
+  }
 
-    @Override
+  @Override
     public String getStaticPath() {
-        return staticPath;
-    }
+    return staticPath;
+  }
 
-    @Override
+  @Override
     public String getRestPath() {
-        return restPath;
-    }
+    return restPath;
+  }
 
-    @Override
+  @Override
     public boolean hasStaticResources() {
-        return hasStaticResources;
-    }
+    return hasStaticResources;
+  }
 
-    @Override
+  @Override
     public boolean hasRestEndpoint() {
-        return hasRestEndpoint;
-    }
+    return hasRestEndpoint;
+  }
 
-    @Override
+  @Override
     public boolean equals(Object other) {
-        return this.hashCode() == other.hashCode();
-    }
+    return this.hashCode() == other.hashCode();
+  }
 
-    @Override
+  @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 97 * hash + (this.getName() != null ? this.getName().hashCode() : 0);
-        return hash;
-    }
+    int hash = 5;
+    hash = 97 * hash + (this.getName() != null ? this.getName().hashCode() : 0);
+    return hash;
+  }
 }

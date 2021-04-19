@@ -104,7 +104,7 @@ public interface SearchServiceDatabase {
    *           if exception occurred
    */
   AccessControlList getAccessControlList(String mediaPackageId) throws NotFoundException,
-      SearchServiceDatabaseException;
+          SearchServiceDatabaseException;
 
   /**
    * Retrieves ACLs for series with given ID.
@@ -118,7 +118,7 @@ public interface SearchServiceDatabase {
    *           if exception occurred
    */
   Collection<AccessControlList> getAccessControlLists(String seriesId, String ... excludeIds)
-      throws SearchServiceDatabaseException;
+          throws SearchServiceDatabaseException;
 
   /**
    * Returns the modification date from the selected media package.

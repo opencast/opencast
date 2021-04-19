@@ -75,18 +75,27 @@ public class SilenceDetectionServiceEndpoint extends AbstractJobProducerEndpoint
   @POST
   @Path("/detect")
   @Produces({MediaType.APPLICATION_XML})
-  @RestQuery(name = "detect", description = "Create silence detection job.",
-          returnDescription = "Silence detection job.",
-          restParameters = {
-            @RestParameter(name = "track", type = RestParameter.Type.TEXT,
-                    description = "Track where to run silence detection.", isRequired = true),
-            @RestParameter(name = "referenceTracks", type = RestParameter.Type.TEXT,
-                    description = "Tracks referenced by resulting smil (as sources).", isRequired = false)
-          },
-          responses = {
-            @RestResponse(description = "Silence detection job created successfully.", responseCode = HttpServletResponse.SC_OK),
-            @RestResponse(description = "Create silence detection job failed.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-          })
+  @RestQuery(
+      name = "detect",
+      description = "Create silence detection job.",
+      returnDescription = "Silence detection job.",
+      restParameters = {
+          @RestParameter(name = "track", type = RestParameter.Type.TEXT,
+              description = "Track where to run silence detection.", isRequired = true),
+          @RestParameter(name = "referenceTracks", type = RestParameter.Type.TEXT,
+              description = "Tracks referenced by resulting smil (as sources).", isRequired = false)
+      },
+      responses = {
+          @RestResponse(
+              description = "Silence detection job created successfully.",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "Create silence detection job failed.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+          )
+      }
+  )
   public Response detect(@FormParam("track") String trackXml, @FormParam("referenceTracks") String referenceTracksXml) {
     try {
       Track track = (Track) MediaPackageElementParser.getFromXml(trackXml);
