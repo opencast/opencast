@@ -40,7 +40,6 @@
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/smil-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/static-file-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-export-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-provider-influx/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-service-api/.+\.(java|properties)"/>
@@ -92,7 +91,6 @@
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="Indentation" files="modules/smil-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/static-file-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-export-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-service-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-amberscript/.+\.java"/>
@@ -140,8 +138,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/schema/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-api/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-ibm-watson-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-ldap/.+\.java"/>
