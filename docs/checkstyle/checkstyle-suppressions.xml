@@ -62,8 +62,6 @@
     <suppress checks="LineLength" files="modules/userdirectory-moodle/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-sakai/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videoeditor-ffmpeg-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videoeditor-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videogrid-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videogrid-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-condition-parser/.+\.(java|properties)"/>
@@ -108,7 +106,6 @@
     <suppress checks="Indentation" files="modules/userdirectory/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory-canvas/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory-sakai/.+\.java"/>
-    <suppress checks="Indentation" files="modules/videoeditor-ffmpeg-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/videogrid-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-remote/.+\.java"/>
@@ -159,8 +156,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-sakai/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/usertracking-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/videoeditor-ffmpeg-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/videoeditor-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/videogrid-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/videogrid-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-condition-parser/.+\.java"/>
