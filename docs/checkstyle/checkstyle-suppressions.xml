@@ -55,9 +55,6 @@
     <suppress checks="LineLength" files="modules/transcription-service-ibm-watson-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-persistence/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/urlsigning-common/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/urlsigning-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/urlsigning-verifier-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-brightspace/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-canvas/.+\.(java|properties)"/>
@@ -108,7 +105,6 @@
     <suppress checks="Indentation" files="modules/transcription-service-google-speech-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-persistence/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-workflowoperation/.+\.java"/>
-    <suppress checks="Indentation" files="modules/urlsigning-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory-canvas/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory-sakai/.+\.java"/>
@@ -158,7 +154,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-ibm-watson-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/urlsigning-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-ldap/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-moodle/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-sakai/.+\.java"/>
