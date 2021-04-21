@@ -21,6 +21,7 @@
 
 package org.opencastproject.util;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -260,6 +261,40 @@ public class XmlSafeParserTest {
     InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
 
     Document d = XmlSafeParser.parse(xmlInput);
+  }
+
+  @Test
+  public void parseChain() throws SAXException, IOException {
+    InputStream xmlInputSafe1 = XmlSafeParserTest.class.getResourceAsStream("/dublincore-safe.xml");
+    InputStream xmlInputSafe2 = XmlSafeParserTest.class.getResourceAsStream("/dublincore-safe.xml");
+    InputStream xmlInputUnsafe1 = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
+    InputStream xmlInputUnsafe2 = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
+
+    int catched = 0;
+    Document d1;
+    Document d2;
+    Document d3;
+    Document d4;
+
+    try {
+      d1 = XmlSafeParser.parse(xmlInputUnsafe1);
+    }
+    catch(SAXParseException e) {
+      catched++;
+    };
+
+    d2 = XmlSafeParser.parse(xmlInputSafe1);
+
+    try {
+      d3 = XmlSafeParser.parse(xmlInputUnsafe2);
+    }
+    catch(SAXParseException e) {
+      catched++;
+    };
+
+    Assert.assertEquals(catched, 2);
+
+    d4 = XmlSafeParser.parse(xmlInputSafe2);
   }
 }
 
