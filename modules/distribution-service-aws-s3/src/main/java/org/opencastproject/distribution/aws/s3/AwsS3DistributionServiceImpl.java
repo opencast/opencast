@@ -45,6 +45,7 @@ import org.opencastproject.util.data.Option;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -117,30 +118,38 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   };
 
   // Service configuration
-  public static final String AWS_S3_DISTRIBUTION_ENABLE
-      = "org.opencastproject.distribution.aws.s3.distribution.enable";
+  public static final String AWS_S3_DISTRIBUTION_ENABLE = "org.opencastproject.distribution.aws.s3.distribution.enable";
   public static final String AWS_S3_DISTRIBUTION_BASE_CONFIG
-      = "org.opencastproject.distribution.aws.s3.distribution.base";
-  public static final String AWS_S3_ACCESS_KEY_ID_CONFIG
-      = "org.opencastproject.distribution.aws.s3.access.id";
-  public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG
-      = "org.opencastproject.distribution.aws.s3.secret.key";
-  public static final String AWS_S3_REGION_CONFIG
-      = "org.opencastproject.distribution.aws.s3.region";
-  public static final String AWS_S3_BUCKET_CONFIG
-      = "org.opencastproject.distribution.aws.s3.bucket";
-  public static final String AWS_S3_ENDPOINT_CONFIG
-      = "org.opencastproject.distribution.aws.s3.endpoint";
-  public static final String AWS_S3_PATH_STYLE_CONFIG
-      = "org.opencastproject.distribution.aws.s3.path.style";
-  public static final String AWS_S3_PRESIGNED_URL_CONFIG
-      = "org.opencastproject.distribution.aws.s3.presigned.url";
+          = "org.opencastproject.distribution.aws.s3.distribution.base";
+  public static final String AWS_S3_ACCESS_KEY_ID_CONFIG = "org.opencastproject.distribution.aws.s3.access.id";
+  public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG = "org.opencastproject.distribution.aws.s3.secret.key";
+  public static final String AWS_S3_REGION_CONFIG = "org.opencastproject.distribution.aws.s3.region";
+  public static final String AWS_S3_BUCKET_CONFIG = "org.opencastproject.distribution.aws.s3.bucket";
+  public static final String AWS_S3_ENDPOINT_CONFIG = "org.opencastproject.distribution.aws.s3.endpoint";
+  public static final String AWS_S3_PATH_STYLE_CONFIG = "org.opencastproject.distribution.aws.s3.path.style";
+  public static final String AWS_S3_PRESIGNED_URL_CONFIG = "org.opencastproject.distribution.aws.s3.presigned.url";
   public static final String AWS_S3_PRESIGNED_URL_VALID_DURATION_CONFIG
       = "org.opencastproject.distribution.aws.s3.presigned.url.valid.duration";
+  // S3 client configuration
+  public static final String AWS_S3_MAX_CONNECTIONS = "org.opencastproject.distribution.aws.s3.max.connections";
+  public static final String AWS_S3_CONNECTION_TIMEOUT = "org.opencastproject.distribution.aws.s3.connection.timeout";
+  public static final String AWS_S3_MAX_RETRIES = "org.opencastproject.distribution.aws.s3.max.retries";
+  // job loads
+  public static final String DISTRIBUTE_JOB_LOAD_KEY = "job.load.aws.s3.distribute";
+  public static final String RETRACT_JOB_LOAD_KEY = "job.load.aws.s3.retract";
+  public static final String RESTORE_JOB_LOAD_KEY = "job.load.aws.s3.restore";
+
   // config.properties
   public static final String OPENCAST_DOWNLOAD_URL = "org.opencastproject.download.url";
   public static final String OPENCAST_STORAGE_DIR = "org.opencastproject.storage.dir";
   public static final String DEFAULT_TEMP_DIR = "tmp/s3dist";
+
+  // Defaults
+
+  // S3 client config defaults
+  public static final int DEFAULT_MAX_CONNECTIONS = 50;
+  public static final int DEFAULT_CONNECTION_TIMEOUT = 10000;
+  public static final int DEFAULT_MAX_RETRIES = 100;
 
   /** The load on the system introduced by creating a distribute job */
   public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;
@@ -156,11 +165,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   /** Max expiration time for presigned URL in millis, 7 days */
   private static final int MAXIMUM_PRESIGNED_URL_EXPIRE_MILLIS = 7 * 24 * 60 * 60 * 1000;
-
-  /** The keys to look for in the service configuration file to override the defaults */
-  public static final String DISTRIBUTE_JOB_LOAD_KEY = "job.load.aws.s3.distribute";
-  public static final String RETRACT_JOB_LOAD_KEY = "job.load.aws.s3.retract";
-  public static final String RESTORE_JOB_LOAD_KEY = "job.load.aws.s3.restore";
 
   /** The load on the system introduced by creating a distribute job */
   private float distributeJobLoad = DEFAULT_DISTRIBUTE_JOB_LOAD;
@@ -304,10 +308,28 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
                 new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
       }
 
-      // Create AWS client
+      // S3 client configuration
+      ClientConfiguration clientConfiguration = new ClientConfiguration();
 
+      int maxConnections = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_CONNECTIONS)
+              .getOrElse(DEFAULT_MAX_CONNECTIONS);
+      logger.debug("Max Connections: {}", maxConnections);
+      clientConfiguration.setMaxConnections(maxConnections);
+
+      int connectionTimeout = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_CONNECTION_TIMEOUT)
+              .getOrElse(DEFAULT_CONNECTION_TIMEOUT);
+      logger.debug("Connection Output: {}", connectionTimeout);
+      clientConfiguration.setConnectionTimeout(connectionTimeout);
+
+      int maxRetries = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_RETRIES)
+              .getOrElse(DEFAULT_MAX_RETRIES);
+      logger.debug("Max Retry: {}", maxRetries);
+      clientConfiguration.setMaxErrorRetry(maxRetries);
+
+      // Create AWS client
       s3 = AmazonS3ClientBuilder.standard()
               .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, regionStr))
+              .withClientConfiguration(clientConfiguration)
               .withPathStyleAccessEnabled(pathStyle).withCredentials(provider).build();
 
       s3TransferManager = new TransferManager(s3);
