@@ -67,7 +67,12 @@ paella.addPlugin(function() {
           : [thisClass._episode.mediapackage.creators.creator])
           .join(', ');
       }
-      if (thisClass._episode.dcContributor) { this.desc.contributor = thisClass._episode.dcContributor; }
+      if (thisClass._episode.mediapackage.contributors) {
+        this.desc.contributor = (Array.isArray(thisClass._episode.mediapackage.contributors.contributor)
+          ? thisClass._episode.mediapackage.contributors.contributor
+          : [thisClass._episode.mediapackage.contributors.contributor])
+          .join(', ');
+      }
       if (thisClass._episode.dcDescription) { this.desc.description = thisClass._episode.dcDescription; }
       if (thisClass._episode.dcLanguage) { this.desc.language = thisClass._episode.dcLanguage; }
       if (thisClass._episode.dcSubject) { this.desc.subject = thisClass._episode.dcSubject; }
@@ -170,4 +175,3 @@ paella.addPlugin(function() {
     }
   };
 });
-
