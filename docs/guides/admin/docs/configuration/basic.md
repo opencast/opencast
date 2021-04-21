@@ -19,7 +19,7 @@ should be accessible within a network.
 First, find the property `org.opencastproject.server.url` in your `custom.properties` configuration file and set it to
 your own domain name:
 
-    org.opencastproject.server.url=http://example.com:8080
+    org.opencastproject.server.url=https://example.opencast.org
 
 *Note:* This value will be written to all generated mediapackages and thus cannot be changed easily for already
 processed media. At least not without an extra amount of work involving modifications to the database. That is why you

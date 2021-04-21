@@ -139,12 +139,6 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
     this.workspace = workspace;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -213,7 +207,9 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
       workflowInstance.setConfiguration(THEME_BUMPER_ACTIVE, Boolean.toString(theme.isBumperActive()));
       workflowInstance.setConfiguration(THEME_TRAILER_ACTIVE, Boolean.toString(theme.isTrailerActive()));
       workflowInstance.setConfiguration(THEME_TITLE_SLIDE_ACTIVE, Boolean.toString(theme.isTitleSlideActive()));
-      workflowInstance.setConfiguration(THEME_TITLE_SLIDE_UPLOADED, Boolean.toString(StringUtils.isNotBlank(theme.getTitleSlideBackground())));
+      workflowInstance.setConfiguration(
+          THEME_TITLE_SLIDE_UPLOADED,
+          Boolean.toString(StringUtils.isNotBlank(theme.getTitleSlideBackground())));
       workflowInstance.setConfiguration(THEME_WATERMARK_ACTIVE, Boolean.toString(theme.isWatermarkActive()));
 
       if (theme.isBumperActive() && StringUtils.isNotBlank(theme.getBumperFile())) {
@@ -274,17 +270,19 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
           logger.warn("Watermark file {} not found in static file service, skip applying it", theme.getWatermarkFile());
         }
 
-        if (layoutStringOpt.isNone() || watermarkLayoutVariable.isNone())
+        if (layoutStringOpt.isNone() || watermarkLayoutVariable.isNone()) {
           throw new WorkflowOperationException(format("Configuration key '%s' or '%s' is either missing or empty",
                   WATERMARK_LAYOUT, WATERMARK_LAYOUT_VARIABLE));
+        }
 
         AbsolutePositionLayoutSpec watermarkLayout = parseLayout(theme.getWatermarkPosition());
         layoutList.set(layoutList.size() - 1, Serializer.json(watermarkLayout).toJson());
         layoutStringOpt = Opt.some(Stream.$(layoutList).mkString(";"));
       }
 
-      if (watermarkLayoutVariable.isSome() && layoutStringOpt.isSome())
+      if (watermarkLayoutVariable.isSome() && layoutStringOpt.isSome()) {
         workflowInstance.setConfiguration(watermarkLayoutVariable.get(), layoutStringOpt.get());
+      }
 
       return createResult(mediaPackage, Action.CONTINUE);
     } catch (SeriesException | ThemesServiceDatabaseException | IllegalStateException | IllegalArgumentException
@@ -328,11 +326,12 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
     mediaPackage.add(element);
   }
 
-  private static Fn<String, MediaPackageElementFlavor> toMediaPackageElementFlavor = new Fn<String, MediaPackageElementFlavor>() {
-    @Override
-    public MediaPackageElementFlavor apply(String flavorString) {
-      return MediaPackageElementFlavor.parseFlavor(flavorString);
-    }
-  };
+  private static Fn<String, MediaPackageElementFlavor> toMediaPackageElementFlavor
+      = new Fn<String, MediaPackageElementFlavor>() {
+        @Override
+        public MediaPackageElementFlavor apply(String flavorString) {
+          return MediaPackageElementFlavor.parseFlavor(flavorString);
+        }
+      };
 
 }

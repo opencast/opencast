@@ -74,8 +74,9 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
     final String sourceFlavorsString = StringUtils.trimToEmpty(currentOperation.getConfiguration("source-flavors"));
 
     final String[] sourceFlavors = StringUtils.split(sourceFlavorsString, ",");
-    if (sourceFlavors.length < 1 && tags == null)
+    if (sourceFlavors.length < 1 && tags == null) {
       logger.debug("No source tags have been specified, so everything will be added to the AssetManager");
+    }
 
     final List<String> tagSet;
     // If a set of tags has been specified, use it
@@ -136,8 +137,9 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
     // Fix references and flavors
     for (MediaPackageElement element : mp.getElements()) {
 
-      if (removals.contains(element))
+      if (removals.contains(element)) {
         continue;
+      }
 
       // Is the element referencing anything?
       MediaPackageReference reference = element.getReference();
@@ -161,11 +163,11 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
           }
 
           // Done. Let's cut the path but keep references to the mediapackage itself
-          if (reference != null && reference.getType().equals(MediaPackageReference.TYPE_MEDIAPACKAGE))
+          if (reference != null && reference.getType().equals(MediaPackageReference.TYPE_MEDIAPACKAGE)) {
             element.setReference(reference);
-          else if (reference != null && (referenceProperties == null || referenceProperties.size() == 0))
+          } else if (reference != null && (referenceProperties == null || referenceProperties.size() == 0)) {
             element.clearReference();
-          else {
+          } else {
             // Ok, there is more to that reference than just pointing at an element. Let's keep the original,
             // you never know.
             removals.remove(referencedElement);

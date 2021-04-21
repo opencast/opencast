@@ -71,11 +71,11 @@ import javax.persistence.EntityManagerFactory;
  * implementations.
  */
 @Component(
-  property = {
+    property = {
     "service.description=Opencast Asset Manager"
-  },
-  immediate = true,
-  service = { AssetManager.class, TieredStorageAssetManager.class }
+    },
+    immediate = true,
+    service = { AssetManager.class, TieredStorageAssetManager.class }
 )
 public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager {
   /** Log facility */
@@ -170,7 +170,8 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
     boolean includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
     boolean includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     boolean includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
-    delegate = new AssetManagerWithSecurity(withMessaging, authSvc, secSvc, includeAPIRoles, includeCARoles, includeUIRoles);
+    delegate = new AssetManagerWithSecurity(
+        withMessaging, authSvc, secSvc, includeAPIRoles, includeCARoles, includeUIRoles);
     for (RemoteAssetStore ras : remotes) {
       delegate.addRemoteAssetStore(ras);
     }
@@ -235,6 +236,11 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   }
 
   @Override
+  public long countEvents(String organization) {
+    return delegate.countEvents(organization);
+  }
+
+  @Override
   public boolean snapshotExists(final String mediaPackageId) {
     return delegate.snapshotExists(mediaPackageId);
   }
@@ -293,7 +299,12 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
     this.assetStore = assetStore;
   }
 
-  @Reference(name = "remoteAssetStores", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, unbind = "removeRemoteAssetStore")
+  @Reference(
+      name = "remoteAssetStores",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeRemoteAssetStore"
+  )
   public synchronized void addRemoteAssetStore(RemoteAssetStore assetStore) {
     if (null == delegate) {
       remotes.add(assetStore);

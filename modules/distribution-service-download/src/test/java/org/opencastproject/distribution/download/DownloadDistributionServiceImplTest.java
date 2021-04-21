@@ -21,6 +21,8 @@
 
 package org.opencastproject.distribution.download;
 
+import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
+
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
@@ -158,8 +160,12 @@ public class DownloadDistributionServiceImplTest {
     EasyMock.replay(workspace);
 
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-    EasyMock.expect(bc.getProperty("org.opencastproject.download.directory")).andReturn(distributionRoot.toString()).anyTimes();
-    EasyMock.expect(bc.getProperty("org.opencastproject.download.url")).andReturn(UrlSupport.DEFAULT_BASE_URL).anyTimes();
+    EasyMock.expect(bc.getProperty("org.opencastproject.download.directory"))
+        .andReturn(distributionRoot.toString()).anyTimes();
+    EasyMock.expect(bc.getProperty("org.opencastproject.download.url"))
+        .andReturn(UrlSupport.DEFAULT_BASE_URL).anyTimes();
+    EasyMock.expect(bc.getProperty(DIGEST_USER_PROPERTY))
+        .andReturn("opencast_system_account").anyTimes();
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     Dictionary<String, Object> p = new Hashtable<String, Object>();
     p.put(DistributionService.CONFIG_KEY_STORE_TYPE, "download");

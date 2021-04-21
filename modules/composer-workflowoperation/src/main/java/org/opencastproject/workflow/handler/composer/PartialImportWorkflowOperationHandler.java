@@ -927,7 +927,13 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       } else {
         SMILMediaElement e = (SMILMediaElement) item;
         if (mediaType.equals(e.getNodeName())) {
-          Track track = getFromOriginal(e.getId(), originalTracks, type);
+          Track track;
+          try {
+            track = getFromOriginal(e.getId(), originalTracks, type);
+          } catch (IllegalStateException exception) {
+            logger.debug("Skipping smil entry, reason: " + exception.getMessage());
+            continue;
+          }
           double beginInSeconds = e.getBegin().item(0).getResolvedOffset();
           long beginInMs = Math.round(beginInSeconds * 1000d);
           // Fill out gaps with first or last frame from video

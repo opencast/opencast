@@ -57,8 +57,8 @@ public interface SeriesService {
 
 
   /**
-   * Updates access control rules for specified series. Not specifying series ID or trying to update series with null
-   * value will throw IllegalArgumentException.
+   * Updates access control rules for specified series. Not specifying series ID or trying to update
+   * series with null value will throw IllegalArgumentException.
    *
    * @param seriesID
    *          series to be updated
@@ -76,9 +76,10 @@ public interface SeriesService {
           SeriesException, UnauthorizedException;
 
   /**
-   * Updates access control rules for specified series. Allows to set the override parameter that controls whether the
-   * episode ACLs of the contained media packages will be removed on update. Not specifying series ID or trying to update series with null
-   * value will throw IllegalArgumentException.
+   * Updates access control rules for specified series. Allows to set the override parameter that
+   * controls whether the episode ACLs of the contained media packages will be removed on update.
+   * Not specifying series ID or trying to update series with null value will throw
+   * IllegalArgumentException.
    *
    * @param seriesID
    *          series to be updated
@@ -162,8 +163,9 @@ public interface SeriesService {
   Map<String, String> getIdTitleMapOfAllSeries() throws SeriesException, UnauthorizedException;
 
   /**
-   * Returns all the elements of a series in a map. The key of the map marks the element type. If the series does not
-   * contain any elements, an empty map is returned. If the series does not exist, {@code Opt.none()} is returned.
+   * Returns all the elements of a series in a map. The key of the map marks the element type. If
+   * the series does not contain any elements, an empty map is returned. If the series does not
+   * exist, {@code Opt.none()} is returned.
    *
    * @param seriesId
    *          the series identifier
@@ -174,8 +176,8 @@ public interface SeriesService {
   Opt<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesException;
 
   /**
-   * Returns the element data of the series with the given type. If the series or the element with the given type do not
-   * exist, {@code Opt.none()} is returned.
+   * Returns the element data of the series with the given type. If the series or the element with
+   * the given type do not exist, {@code Opt.none()} is returned.
    *
    * @param seriesId
    *          the series identifier

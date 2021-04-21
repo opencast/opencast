@@ -21,6 +21,7 @@
 
 package org.opencastproject.metrics.impl;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -61,21 +62,25 @@ import io.prometheus.client.exporter.common.TextFormat;
  * Opencast metrics endpoint
  */
 @Component(
-  property = {
-    "service.description=Metrics Endpoint",
-    "opencast.service.type=org.opencastproject.metrics",
-    "opencast.service.path=/metrics",
-    "opencast.service.jobproducer=false"
-  },
-  immediate = true,
-  service = MetricsExporter.class
+    property = {
+        "service.description=Metrics Endpoint",
+        "opencast.service.type=org.opencastproject.metrics",
+        "opencast.service.path=/metrics",
+        "opencast.service.jobproducer=false"
+    },
+    immediate = true,
+    service = MetricsExporter.class
 )
 @Path("")
-@RestService(name = "MetricsEndpoint",
+@RestService(
+    name = "MetricsEndpoint",
     title = "Metrics Endpoint",
     abstractText = "Opencast metrics endpoint.",
-    notes = { "The endpoints supports the <a href=https://openmetrics.io>OpenMetrics format</a>",
-              "This can be used by <a href=https://prometheus.io>Prometheus</a>"})
+    notes = {
+        "The endpoints supports the <a href=https://openmetrics.io>OpenMetrics format</a>",
+        "This can be used by <a href=https://prometheus.io>Prometheus</a>"
+    }
+)
 public class MetricsExporter {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(MetricsExporter.class);
@@ -117,10 +122,16 @@ public class MetricsExporter {
       .help("Version of Opencast (based on metrics module)")
       .labelNames("part")
       .register();
+  private final Gauge eventsInAssetManager = Gauge.build()
+      .name("opencast_asset_manager_events")
+      .help("Events in Asset Manager")
+      .labelNames("organization")
+      .register();
 
-  /** The service */
+  /** OSGi services */
   private ServiceRegistry serviceRegistry;
   private OrganizationDirectoryService organizationDirectoryService;
+  private AssetManager assetManager;
 
   @Activate
   public void activate(BundleContext bundleContext) {
@@ -192,6 +203,13 @@ public class MetricsExporter {
       }
     }
 
+    // Get numbers from asset manager
+    for (Organization organization: organizationDirectoryService.getOrganizations()) {
+      eventsInAssetManager
+          .labels(organization.getId())
+          .set(assetManager.countEvents(organization.getId()));
+    }
+
     // collect metrics
     final StringWriter writer = new StringWriter();
     TextFormat.write004(writer, registry.metricFamilySamples());
@@ -206,5 +224,10 @@ public class MetricsExporter {
   @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  @Reference
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 }

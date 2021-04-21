@@ -36,4 +36,20 @@ public interface EmailTemplateService {
    */
   String applyTemplate(String templateName, String templateContent, WorkflowInstance workflowInstance);
 
+  /**
+   * Apply the template to the workflow instance.
+   *
+   * @param templateName
+   *          template name
+   * @param templateContent
+   *          template content
+   * @param workflowInstance
+   *          workflow
+   * @param multiValueDelimiter
+   *          How to separate multi-value metadata fields
+   * @return text with applied template
+   */
+  String applyTemplate(String templateName, String templateContent, WorkflowInstance workflowInstance,
+      String multiValueDelimiter);
+
 }

@@ -85,7 +85,7 @@ The rights granted here are sufficient to run Opencast:
 
 ```sql
 GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER,DROP,INDEX,TRIGGER,CREATE TEMPORARY TABLES,REFERENCES ON opencast.*
-  TO 'admin'@'localhost' IDENTIFIED BY 'opencast_password';
+  TO 'opencast'@'localhost' IDENTIFIED BY 'opencast_password';
 ```
 </details>
 

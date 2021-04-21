@@ -180,27 +180,27 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
     return new Fn<QPropertyDto, Opt<BooleanExpression>>() {
       @Override public Opt<BooleanExpression> apply(final QPropertyDto dto) {
         final BooleanExpression expr = mkValue.mk(value).decompose(
-                new Fn<String, BooleanExpression>() {
-                  @Override public BooleanExpression apply(String a) {
-                    return BooleanOperation.create(op, dto.stringValue, ConstantImpl.create(a));
-                  }
-                }, new Fn<Date, BooleanExpression>() {
-                  @Override public BooleanExpression apply(Date a) {
-                    return BooleanOperation.create(op, dto.dateValue, ConstantImpl.create(a));
-                  }
-                }, new Fn<Long, BooleanExpression>() {
-                  @Override public BooleanExpression apply(Long a) {
-                    return BooleanOperation.create(op, dto.longValue, ConstantImpl.create(a));
-                  }
-                }, new Fn<Boolean, BooleanExpression>() {
-                  @Override public BooleanExpression apply(Boolean a) {
-                    return BooleanOperation.create(op, dto.boolValue, ConstantImpl.create(a));
-                  }
-                }, new Fn<Version, BooleanExpression>() {
-                  @Override public BooleanExpression apply(Version a) {
-                    return BooleanOperation.create(op, dto.longValue, ConstantImpl.create(RuntimeTypes.convert(a).value()));
-                  }
-                });
+            new Fn<String, BooleanExpression>() {
+              @Override public BooleanExpression apply(String a) {
+                return BooleanOperation.create(op, dto.stringValue, ConstantImpl.create(a));
+              }
+            }, new Fn<Date, BooleanExpression>() {
+              @Override public BooleanExpression apply(Date a) {
+                return BooleanOperation.create(op, dto.dateValue, ConstantImpl.create(a));
+              }
+            }, new Fn<Long, BooleanExpression>() {
+              @Override public BooleanExpression apply(Long a) {
+                return BooleanOperation.create(op, dto.longValue, ConstantImpl.create(a));
+              }
+            }, new Fn<Boolean, BooleanExpression>() {
+              @Override public BooleanExpression apply(Boolean a) {
+                return BooleanOperation.create(op, dto.boolValue, ConstantImpl.create(a));
+              }
+            }, new Fn<Version, BooleanExpression>() {
+              @Override public BooleanExpression apply(Version a) {
+                return BooleanOperation.create(op, dto.longValue, ConstantImpl.create(RuntimeTypes.convert(a).value()));
+              }
+            });
         return Opt.some(expr);
       }
     };
@@ -218,7 +218,9 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
 //  /**
 //   * Create a predicate to compare this field's value with the value of another property.
 //   */
-//  private Fn<QPropertyDto, Opt<BooleanExpression>> mkValuePredicate(final Operator<? super Boolean> op, final PropertyField<A> prop) {
+//  private Fn<QPropertyDto, Opt<BooleanExpression>> mkValuePredicate(
+//      final Operator<? super Boolean> op,
+//      final PropertyField<A> prop) {
 //    return new Fn<QPropertyDto, Opt<BooleanExpression>>() {
 //      @Override public Opt<BooleanExpression> apply(final QPropertyDto dto) {
 //        final BooleanExpression expr = mkValue.match(new Fn<StringType, BooleanExpression>() {
@@ -244,7 +246,7 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
 //  }
 
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Create a predicate that compares the property (of this field) with the given constant value.

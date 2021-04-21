@@ -235,9 +235,14 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
   }
 
   private File cropFFmpeg(File mediaFile) throws CropException {
-    String[] command = new String[] { binary, "-i", mediaFile.getAbsolutePath(), "-vf", "cropdetect="
-            + greyScaleLimit + ":" + round + ":" + reset,
-            additionalParameters, "-f", "null", "-"};
+    String[] command = new String[] {
+        binary,
+        "-i", mediaFile.getAbsolutePath(),
+        "-vf", "cropdetect=" + greyScaleLimit + ":" + round + ":" + reset,
+        additionalParameters,
+        "-f", "null",
+        "-"
+    };
     String commandline = StringUtils.join(command, " ");
     logger.info("Running {}", commandline);
 
@@ -255,12 +260,12 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
         while (null != (line = errStream.readLine())) {
           Matcher m = regexPattern.matcher(line);
           while (m.find()) {
-           widthVideo = Integer.valueOf(m.group("widthVideo"));
-           int x = Integer.valueOf(m.group("cropValue"));
-           if (cropValue == 0 || cropValue > x) {
-             cropValue = x;
-             crop = m.group("crop");
-           }
+            widthVideo = Integer.valueOf(m.group("widthVideo"));
+            int x = Integer.valueOf(m.group("cropValue"));
+            if (cropValue == 0 || cropValue > x) {
+              cropValue = x;
+              crop = m.group("crop");
+            }
           }
         }
       } catch (IllegalStateException | IllegalArgumentException e) {
@@ -280,7 +285,7 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
 
     if (cropValue > (widthVideo / maxCroppingRatio)) {
       logger.info("Black area in the video is considered too large for cropping. File: " + mediaFile.getAbsolutePath()
-        + " will be skipped");
+          + " will be skipped");
       return mediaFile;
     }
 
@@ -291,10 +296,15 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
 
     // FFmpeg command for cropping video
     logger.info("String for startCropping command: {}", crop);
-    String croppedOutputPath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath()).concat(RandomStringUtils
-            .randomAlphanumeric(8) + targetExtension);
-    String[] cropCommand = new String[] { binary, "-i", mediaFile.getAbsolutePath(), "-vf", crop,
-            additionalParameters, croppedOutputPath };
+    String croppedOutputPath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath())
+        .concat(RandomStringUtils.randomAlphanumeric(8) + targetExtension);
+    String[] cropCommand = new String[] {
+        binary,
+        "-i", mediaFile.getAbsolutePath(),
+        "-vf", crop,
+        additionalParameters,
+        croppedOutputPath
+    };
     String cropCommandline = StringUtils.join(cropCommand, " ");
 
     logger.info("Running {}", cropCommandline);
@@ -485,4 +495,3 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     this.securityService = securityService;
   }
 }
-

@@ -273,32 +273,47 @@ public class SolrIndexManager {
    * @throws SolrServerException
    *           if an errors occurs while talking to solr
    */
-  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Date now) throws SolrServerException,
-          UnauthorizedException {
+  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, AccessControlList seriesAcl, Date now)
+      throws SolrServerException, UnauthorizedException {
     try {
       SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl);
       Schema.setOcModified(episodeDocument, now);
 
-      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), acl);
+      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), seriesAcl);
       if (seriesDocument != null)
         Schema.enrich(episodeDocument, seriesDocument);
 
-      // If neither an episode nor a series was contained, there is no point in trying to update
-      if (episodeDocument == null && seriesDocument == null) {
-        logger.warn("Neither episode nor series metadata found");
-        return false;
-      }
-
       // Post everything to the search index
-      if (episodeDocument != null)
-        solrServer.add(episodeDocument);
+      solrServer.add(episodeDocument);
       if (seriesDocument != null)
         solrServer.add(seriesDocument);
       solrServer.commit();
       return true;
     } catch (Exception e) {
-      logger.error("Unable to add mediapackage {} to index", sourceMediaPackage.getIdentifier());
-      throw new SolrServerException(e);
+      throw new SolrServerException(
+          String.format("Unable to add media package %s to index", sourceMediaPackage.getIdentifier()), e);
+    }
+  }
+
+  /**
+   * Posts a series to Solr. If the entry already exists, this will update the series.
+   *
+   * @param seriesId
+   *          the series to post
+   * @param acl
+   *          the access control list for this series
+   * @throws SolrServerException
+   *           if an errors occurs while talking to solr
+   */
+  public void addSeries(final String seriesId, final AccessControlList acl) throws SolrServerException {
+    try {
+      SolrInputDocument seriesDocument = createSeriesInputDocument(seriesId, acl);
+      if (seriesDocument != null) {
+        solrServer.add(seriesDocument);
+        solrServer.commit();
+      }
+    } catch (Exception e) {
+      throw new SolrServerException(String.format("Unable to add series %s to index", seriesId), e);
     }
   }
 
@@ -312,6 +327,8 @@ public class SolrIndexManager {
    *          the media package to post
    * @param acl
    *          the access control list for this mediapackage
+   * @param seriesAcl
+   *          the access control list for the series
    * @param deletionDate
    *          the deletion date
    * @param modificationDate
@@ -320,12 +337,14 @@ public class SolrIndexManager {
    * @throws SolrServerException
    *           if an errors occurs while talking to solr
    */
-  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Date deletionDate, Date modificationDate)
+  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl,
+      AccessControlList seriesAcl, Date deletionDate,
+      Date modificationDate)
           throws SolrServerException {
     try {
       SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl);
 
-      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), acl);
+      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), seriesAcl);
       if (seriesDocument != null)
         Schema.enrich(episodeDocument, seriesDocument);
 
@@ -715,10 +734,7 @@ public class SolrIndexManager {
     DublinCoreCatalog dc = null;
     try {
       dc = seriesService.getSeries(seriesId);
-    } catch (SeriesException e) {
-      logger.debug("No series dublincore found for series id " + seriesId);
-      return null;
-    } catch (NotFoundException e) {
+    } catch (SeriesException | NotFoundException e) {
       logger.debug("No series dublincore found for series id " + seriesId);
       return null;
     }
@@ -727,9 +743,7 @@ public class SolrIndexManager {
 
     // Populate document with existing data
     try {
-      StringBuffer query = new StringBuffer("q=");
-      query = query.append(Schema.ID).append(":").append(SolrUtils.clean(seriesId));
-      SolrParams params = SolrRequestParsers.parseQueryString(query.toString());
+      SolrParams params = SolrRequestParsers.parseQueryString("q=" + Schema.ID + ":" + SolrUtils.clean(seriesId));
       QueryResponse solrResponse = solrServer.query(params);
       if (solrResponse.getResults().size() > 0) {
         SolrDocument existingSolrDocument = solrResponse.getResults().get(0);

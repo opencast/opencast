@@ -19,9 +19,10 @@ Documentation for modules included in Opencast.
 * [Stream Security](stream-security.md)
 * [Studio](studio.md)
 * [Text Extraction](textextraction.md)
-* Videoeditor
+* Internal Videoeditor
     * [Setup](videoeditor.setup.md)
     * [Architecture](videoeditor.architecture.md)
+* [Stand-alone Video Editor](editor.md)
 * [Video Segmentation](videosegmentation.md)
 * Termination State
     * [Basic](terminationstate.md)

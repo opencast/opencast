@@ -64,8 +64,14 @@ public class WaveformServiceRemote extends RemoteBase implements WaveformService
    * @throws WaveformServiceException if the job can't be created for any reason
    */
   @Override
-  public Job createWaveformImage(Track sourceTrack, int pixelsPerMinute, int minWidth, int maxWidth, int height, String color)
-    throws MediaPackageException, WaveformServiceException {
+  public Job createWaveformImage(
+      Track sourceTrack,
+      int pixelsPerMinute,
+      int minWidth,
+      int maxWidth,
+      int height,
+      String color
+  ) throws MediaPackageException, WaveformServiceException {
     HttpPost post = new HttpPost("/create");
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
@@ -95,7 +101,8 @@ public class WaveformServiceRemote extends RemoteBase implements WaveformService
     } finally {
       closeConnection(response);
     }
-    throw new WaveformServiceException("Unable to create waveform image from " + sourceTrack + " using a remote service");
+    throw new WaveformServiceException(
+        "Unable to create waveform image from " + sourceTrack + " using a remote service");
   }
 
 }

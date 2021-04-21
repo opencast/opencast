@@ -105,6 +105,10 @@
     <module>modules/distribution-service-streaming-remote</module>
     <module>modules/distribution-workflowoperation</module>
     <module>modules/dublincore</module>
+    <module>modules/editor-service</module>
+    <module>modules/editor-service-api</module>
+    <module>modules/editor-service-remote</module>
+    <module>modules/editor-service-endpoint</module>
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
     <module>modules/event-comment</module>
@@ -150,6 +154,7 @@
     <module>modules/inspection-workflowoperation</module>
     <module>modules/statistics-writer-workflowoperation</module>
     <module>modules/kernel</module>
+    <module>modules/editor</module>
     <module>modules/list-providers-service</module>
     <module>modules/live-schedule-api</module>
     <module>modules/live-schedule-impl</module>
@@ -207,6 +212,7 @@
     <module>modules/silencedetection-remote</module>
     <module>modules/smil-api</module>
     <module>modules/smil-impl</module>
+    <module>modules/smil-workflowoperation</module>
     <module>modules/solr</module>
     <module>modules/sox-api</module>
     <module>modules/sox-impl</module>
@@ -284,6 +290,7 @@
     <module>modules/workspace-api</module>
     <module>modules/workspace-impl</module>
     <module>assemblies</module>
+
   </modules>
   <build>
     <defaultGoal>install</defaultGoal>

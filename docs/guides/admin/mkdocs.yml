@@ -5,6 +5,12 @@ edit_uri: edit/develop/docs/guides/admin/docs/
 markdown_extensions:
   - markdown_inline_graphviz
 
+plugins:
+  - search:
+  - mermaid2:
+      arguments:
+        theme: neutral
+
 # Default theme used is windmill
 theme: windmill
 
@@ -35,6 +41,7 @@ nav:
 - Changelog: 'changelog.md'
 - Installation:
    - Overview: 'installation/index.md'
+   - Hardware Requirements: installation/server-requirements.md
    - Multiple Servers: 'installation/multiple-servers.md'
    - Installation from Source:
       - Linux: 'installation/source-linux.md'
@@ -127,6 +134,7 @@ nav:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'
       - Elasticsearch: 'configuration/elasticsearch.md'
+   - Stand-alone Video Editor: 'modules/editor.md'
    - Stream Security: 'modules/stream-security.md'
    - Studio: 'modules/studio.md'
    - Termination State:
@@ -165,6 +173,7 @@ nav:
    - Clone: 'workflowoperationhandlers/clone-woh.md'
    - Cover Image: 'workflowoperationhandlers/coverimage-woh.md'
    - Crop Video: 'workflowoperationhandlers/cropvideo-woh.md'
+   - Cut Marks To Smil: 'workflowoperationhandlers/cut-marks-to-smil-woh.md'
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
    - Demux: 'workflowoperationhandlers/demux-woh.md'
    - Duplicate Event: 'workflowoperationhandlers/duplicate-event-woh.md'

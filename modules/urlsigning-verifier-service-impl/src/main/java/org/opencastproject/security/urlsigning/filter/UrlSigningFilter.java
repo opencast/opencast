@@ -233,7 +233,9 @@ public class UrlSigningFilter implements Filter, ManagedService {
     Enumeration<String> propertyKeys = properties.keys();
     while (propertyKeys.hasMoreElements()) {
       String propertyKey = propertyKeys.nextElement();
-      if (!propertyKey.startsWith(URL_REGEX_PREFIX)) continue;
+      if (!propertyKey.startsWith(URL_REGEX_PREFIX)) {
+        continue;
+      }
 
       String urlRegularExpression = StringUtils.trimToNull((String) properties.get(propertyKey));
       logger.debug("Looking for configuration of {} and found '{}'", propertyKey, urlRegularExpression);

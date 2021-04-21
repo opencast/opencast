@@ -96,10 +96,19 @@ public abstract class AbstractAclServiceRestEndpoint {
   @GET
   @Path("/acl/{aclId}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getacl", description = "Return the ACL by the given id", returnDescription = "Return the ACL by the given id", pathParameters = { @RestParameter(name = "aclId", isRequired = true, description = "The ACL identifier", type = INTEGER) }, responses = {
+  @RestQuery(
+      name = "getacl",
+      description = "Return the ACL by the given id",
+      returnDescription = "Return the ACL by the given id",
+      pathParameters = {
+          @RestParameter(name = "aclId", isRequired = true, description = "The ACL identifier", type = INTEGER)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL has not been found"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the ACL") })
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the ACL")
+      }
+  )
   public String getAcl(@PathParam("aclId") long aclId) throws NotFoundException {
     final Option<ManagedAcl> managedAcl = aclService().getAcl(aclId);
     if (managedAcl.isNone()) {
@@ -112,16 +121,33 @@ public abstract class AbstractAclServiceRestEndpoint {
   @POST
   @Path("/acl/extend")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "extendacl", description = "Return the given ACL with a new role and action in JSON format", returnDescription = "Return the ACL with the new role and action in JSON format", restParameters = {
+  @RestQuery(
+      name = "extendacl",
+      description = "Return the given ACL with a new role and action in JSON format",
+      returnDescription = "Return the ACL with the new role and action in JSON format",
+      restParameters = {
           @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING),
           @RestParameter(name = "action", isRequired = true, description = "The action for the ACL", type = STRING),
           @RestParameter(name = "role", isRequired = true, description = "The role for the ACL", type = STRING),
-          @RestParameter(name = "allow", isRequired = true, description = "The allow status for the ACL", type = BOOLEAN) }, responses = {
+          @RestParameter(
+              name = "allow",
+              isRequired = true,
+              description = "The allow status for the ACL",
+              type = BOOLEAN
+          )
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been returned"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "The ACL, action or role was invalid or empty"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the ACL") })
-  public String extendAcl(@FormParam("acl") String accessControlList, @FormParam("action") String action,
-          @FormParam("role") String role, @FormParam("allow") boolean allow) {
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the ACL")
+      }
+  )
+  public String extendAcl(
+      @FormParam("acl") String accessControlList,
+      @FormParam("action") String action,
+      @FormParam("role") String role,
+      @FormParam("allow") boolean allow
+  ) {
     if (StringUtils.isBlank(accessControlList) || StringUtils.isBlank(action) || StringUtils.isBlank(role)) {
       throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
@@ -133,15 +159,25 @@ public abstract class AbstractAclServiceRestEndpoint {
   @POST
   @Path("/acl/reduce")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "reduceacl", description = "Return the given ACL without a role and action in JSON format", returnDescription = "Return the ACL without the role and action in JSON format", restParameters = {
+  @RestQuery(
+      name = "reduceacl",
+      description = "Return the given ACL without a role and action in JSON format",
+      returnDescription = "Return the ACL without the role and action in JSON format", restParameters = {
           @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING),
           @RestParameter(name = "action", isRequired = true, description = "The action for the ACL", type = STRING),
-          @RestParameter(name = "role", isRequired = true, description = "The role for the ACL", type = STRING) }, responses = {
+          @RestParameter(name = "role", isRequired = true, description = "The role for the ACL", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been returned"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "The ACL, role or action was invalid or empty"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the ACL") })
-  public String reduceAcl(@FormParam("acl") String accessControlList, @FormParam("action") String action,
-          @FormParam("role") String role) {
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the ACL")
+      }
+  )
+  public String reduceAcl(
+      @FormParam("acl") String accessControlList,
+      @FormParam("action") String action,
+      @FormParam("role") String role
+  ) {
     if (StringUtils.isBlank(accessControlList) || StringUtils.isBlank(action) || StringUtils.isBlank(role)) {
       throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
@@ -153,9 +189,18 @@ public abstract class AbstractAclServiceRestEndpoint {
   @GET
   @Path("/acl/acls.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getacls", description = "Lists the ACL's as JSON", returnDescription = "The list of ACL's as JSON", responses = {
+  @RestQuery(
+      name = "getacls",
+      description = "Lists the ACL's as JSON",
+      returnDescription = "The list of ACL's as JSON",
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The list of ACL's has successfully been returned"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the list of ACL's") })
+          @RestResponse(
+              responseCode = SC_INTERNAL_SERVER_ERROR,
+              description = "Error during returning the list of ACL's"
+          )
+      }
+  )
   public String getAcls() {
     return Jsons.arr(mlist(aclService().getAcls()).map(Functions.co(JsonConv.fullManagedAcl)))
             .toJson();
@@ -164,14 +209,25 @@ public abstract class AbstractAclServiceRestEndpoint {
   @POST
   @Path("/acl")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "createacl", description = "Create an ACL", returnDescription = "Create an ACL", restParameters = {
+  @RestQuery(
+      name = "createacl",
+      description = "Create an ACL",
+      returnDescription = "Create an ACL",
+      restParameters = {
           @RestParameter(name = "name", isRequired = true, description = "The ACL name", type = STRING),
-          @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING) }, responses = {
+          @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been added"),
           @RestResponse(responseCode = SC_CONFLICT, description = "An ACL with the same name already exists"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the ACL"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during adding the ACL") })
-  public String createAcl(@FormParam("name") String name, @FormParam("acl") String accessControlList) {
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during adding the ACL")
+      }
+  )
+  public String createAcl(
+      @FormParam("name") String name,
+      @FormParam("acl") String accessControlList
+  ) {
     final AccessControlList acl = parseAcl.apply(accessControlList);
     final Option<ManagedAcl> managedAcl = aclService().createAcl(acl, name);
     if (managedAcl.isNone()) {
@@ -184,15 +240,29 @@ public abstract class AbstractAclServiceRestEndpoint {
   @PUT
   @Path("/acl/{aclId}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "updateacl", description = "Update an ACL", returnDescription = "Update an ACL", pathParameters = { @RestParameter(name = "aclId", isRequired = true, description = "The ACL identifier", type = INTEGER) }, restParameters = {
+  @RestQuery(
+      name = "updateacl",
+      description = "Update an ACL",
+      returnDescription = "Update an ACL",
+      pathParameters = {
+          @RestParameter(name = "aclId", isRequired = true, description = "The ACL identifier", type = INTEGER)
+      },
+      restParameters = {
           @RestParameter(name = "name", isRequired = true, description = "The ACL name", type = STRING),
-          @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING) }, responses = {
+          @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been updated"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL has not been found"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the ACL"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during updating the ACL") })
-  public String updateAcl(@PathParam("aclId") long aclId, @FormParam("name") String name,
-          @FormParam("acl") String accessControlList) throws NotFoundException {
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during updating the ACL")
+      }
+  )
+  public String updateAcl(
+      @PathParam("aclId") long aclId,
+      @FormParam("name") String name,
+      @FormParam("acl") String accessControlList
+  ) throws NotFoundException {
     final Organization org = getSecurityService().getOrganization();
     final AccessControlList acl = parseAcl.apply(accessControlList);
     final ManagedAclImpl managedAcl = new ManagedAclImpl(aclId, name, org.getId(), acl);
@@ -205,15 +275,28 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   @DELETE
   @Path("/acl/{aclId}")
-  @RestQuery(name = "deleteacl", description = "Delete an ACL", returnDescription = "Delete an ACL", pathParameters = { @RestParameter(name = "aclId", isRequired = true, description = "The ACL identifier", type = INTEGER) }, responses = {
+  @RestQuery(
+      name = "deleteacl",
+      description = "Delete an ACL",
+      returnDescription = "Delete an ACL",
+      pathParameters = {
+          @RestParameter(name = "aclId", isRequired = true, description = "The ACL identifier", type = INTEGER)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been deleted"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL has not been found"),
-          @RestResponse(responseCode = SC_CONFLICT, description = "The ACL could not be deleted, there are still references on it"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during deleting the ACL") })
+          @RestResponse(
+              responseCode = SC_CONFLICT,
+              description = "The ACL could not be deleted, there are still references on it"
+          ),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during deleting the ACL")
+      }
+  )
   public Response deleteAcl(@PathParam("aclId") long aclId) throws NotFoundException {
     try {
-      if (!aclService().deleteAcl(aclId))
+      if (!aclService().deleteAcl(aclId)) {
         return conflict();
+      }
     } catch (AclServiceException e) {
       logger.warn("Error deleting manged acl with id '{}': {}", aclId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -223,21 +306,40 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   @POST
   @Path("/apply/episode/{episodeId}")
-  @RestQuery(name = "applyAclToEpisode", description = "Immediate application of an ACL to an episode", returnDescription = "Status code", pathParameters = { @RestParameter(name = "episodeId", isRequired = true, description = "The episode ID", type = STRING) }, restParameters = {
-          @RestParameter(name = "aclId", isRequired = false, description = "The ID of the ACL to apply. If missing the episode ACL will be deleted to fall back to the series ACL", type = INTEGER)}, responses = {
+  @RestQuery(
+      name = "applyAclToEpisode",
+      description = "Immediate application of an ACL to an episode",
+      returnDescription = "Status code",
+      pathParameters = {
+          @RestParameter(name = "episodeId", isRequired = true, description = "The episode ID", type = STRING)
+      },
+      restParameters = {
+          @RestParameter(
+              name = "aclId",
+              isRequired = false,
+              description = "The ID of the ACL to apply. If missing the episode ACL will be "
+                  + "deleted to fall back to the series ACL",
+              type = INTEGER
+          )
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL or the episode has not been found"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error") })
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error")
+      }
+  )
   public Response applyAclToEpisode(@PathParam("episodeId") String episodeId, @FormParam("aclId") Long aclId) {
     final AclService aclService = aclService();
     final Option<Option<ManagedAcl>> macl = option(aclId).map(getManagedAcl(aclService));
-    if (macl.isSome() && macl.get().isNone())
+    if (macl.isSome() && macl.get().isNone()) {
       return notFound();
+    }
     try {
-      if (aclService.applyAclToEpisode(episodeId, Options.join(macl)))
+      if (aclService.applyAclToEpisode(episodeId, Options.join(macl))) {
         return ok();
-      else
+      } else {
         return notFound();
+      }
     } catch (AclServiceException e) {
       logger.error("Error applying acl to episode {}", episodeId);
       return serverError();
@@ -246,21 +348,47 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   @POST
   @Path("/apply/series/{seriesId}")
-  @RestQuery(name = "applyAclToSeries", description = "Immediate application of an ACL to a series", returnDescription = "Status code", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series ID", type = STRING) }, restParameters = {
-          @RestParameter(name = "aclId", isRequired = true, description = "The ID of the ACL to apply", type = INTEGER),
-          @RestParameter(name = "override", isRequired = false, defaultValue = "false", description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)}, responses = {
+  @RestQuery(
+      name = "applyAclToSeries",
+      description = "Immediate application of an ACL to a series",
+      returnDescription = "Status code",
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series ID", type = STRING)
+      },
+      restParameters = {
+          @RestParameter(
+              name = "aclId",
+              isRequired = true,
+              description = "The ID of the ACL to apply",
+              type = INTEGER
+          ),
+          @RestParameter(
+              name = "override",
+              isRequired = false,
+              defaultValue = "false",
+              description = "If true the series ACL will take precedence over any existing episode ACL",
+              type = STRING
+          )
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL or the series has not been found"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error") })
-  public Response applyAclToSeries(@PathParam("seriesId") String seriesId, @FormParam("aclId") long aclId,
-          @DefaultValue("false") @FormParam("override") boolean override) {
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error")
+      }
+  )
+  public Response applyAclToSeries(
+      @PathParam("seriesId") String seriesId,
+      @FormParam("aclId") long aclId,
+      @DefaultValue("false") @FormParam("override") boolean override
+  ) {
     final AclService aclService = aclService();
     for (ManagedAcl macl : aclService.getAcl(aclId)) {
       try {
-        if (aclService.applyAclToSeries(seriesId, macl, override))
+        if (aclService.applyAclToSeries(seriesId, macl, override)) {
           return ok();
-        else
+        } else {
           return notFound();
+        }
       } catch (AclServiceException e) {
         logger.error("Error applying acl to series {}", seriesId);
         return serverError();

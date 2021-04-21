@@ -85,7 +85,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     return this.distributionChannel;
   }
 
- @Override
+  @Override
   public Job distribute(String channelId, MediaPackage mediaPackage, String elementId)
           throws DistributionException, MediaPackageException {
     Set<String> elementIds = new HashSet<String>();
@@ -153,7 +153,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
 
   @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds)
-      throws DistributionException {
+          throws DistributionException {
     logger.info("Distributing {} elements to {}@{}", elementIds.size(), channelId, distributionChannel);
     final HttpPost req = post("/distributesync", param(PARAM_CHANNEL_ID, channelId),
         param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediapackage)),
@@ -168,7 +168,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
 
   @Override
   public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
-      throws DistributionException {
+          throws DistributionException {
     logger.info("Retracting {} elements from {}@{}", elementIds.size(), channelId, distributionChannel);
     final HttpPost req = post("/retract",
         param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),

@@ -79,10 +79,10 @@ public class AbstractFileSystemAssetStoreTest {
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(asset);
     EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean())).andAnswer(() -> {
-        File tmp = tmpFolder.newFile();
-        FileUtils.copyFile(asset, tmp);
-        return tmp;
-      }).anyTimes();
+      File tmp = tmpFolder.newFile();
+      FileUtils.copyFile(asset, tmp);
+      return tmp;
+    }).anyTimes();
     EasyMock.replay(workspace);
 
     tmpRoot = tmpFolder.newFolder();
@@ -138,10 +138,12 @@ public class AbstractFileSystemAssetStoreTest {
     StoragePath to = new StoragePath(ORG_ID, MP_ID, VERSION_1, MP_ELEM_ID);
     assertTrue(repo.copy(from, to));
 
-    File srcFile = new File(PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString(),
-            MP_ELEM_ID + XML_EXTENSTION }));
-    File copyFile = new File(PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID, VERSION_1.toString(),
-            MP_ELEM_ID + XML_EXTENSTION }));
+    File srcFile = new File(PathSupport.concat(new String[] {
+        tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString(), MP_ELEM_ID + XML_EXTENSTION
+    }));
+    File copyFile = new File(PathSupport.concat(new String[] {
+        tmpRoot.toString(), ORG_ID, MP_ID, VERSION_1.toString(), MP_ELEM_ID + XML_EXTENSTION
+    }));
     assertTrue(srcFile.exists());
     assertTrue(copyFile.exists());
 

@@ -42,7 +42,7 @@ import javax.persistence.Table;
 @NamedQueries({@NamedQuery(name = "IncidentText.findAll", query = "select a from IncidentText a")})
 public class IncidentTextDto {
   @Id
-  @Column(name = "id")
+  @Column(name = "id", length = 128)
   private String id;
 
   @Column(name = "text", nullable = false, length = 2038)

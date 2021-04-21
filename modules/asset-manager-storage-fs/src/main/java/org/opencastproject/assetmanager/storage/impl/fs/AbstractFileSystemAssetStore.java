@@ -164,8 +164,9 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
    */
   private File getDeletionSelectorDir(DeletionSelector sel) {
     final String basePath = path(getRootDirectory(), sel.getOrganizationId(), sel.getMediaPackageId());
-    for (Version v : sel.getVersion())
+    for (Version v : sel.getVersion()) {
       return file(basePath, v.toString());
+    }
     return file(basePath);
   }
 
@@ -269,6 +270,8 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
   }
 
   @Override
-  public String getStoreType() { return storeType; }
+  public String getStoreType() {
+    return storeType;
+  }
 
 }

@@ -119,20 +119,24 @@ public class YouTubePublicationAdapter {
    * @return the description of the episode
    */
   public String getEpisodeDescription() {
-    if (dcEpisode == null)
+    if (dcEpisode == null) {
       return null;
+    }
 
     String description = "";
-    if (dcSeries != null)
+    if (dcSeries != null) {
       description = StringUtils.trimToEmpty(dcSeries.getFirst(DublinCore.PROPERTY_TITLE));
+    }
 
     String episodeDescription = dcEpisode.getFirst(DublinCore.PROPERTY_DESCRIPTION);
-    if (episodeDescription != null)
+    if (episodeDescription != null) {
       description += '\n' + episodeDescription;
+    }
 
     String episodeLicense = dcEpisode.getFirst(DublinCore.PROPERTY_LICENSE);
-    if (episodeLicense != null)
+    if (episodeLicense != null) {
       description += '\n' + episodeLicense;
+    }
 
     return description;
   }
