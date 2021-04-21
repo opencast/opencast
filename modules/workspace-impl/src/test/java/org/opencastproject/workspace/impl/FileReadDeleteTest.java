@@ -141,31 +141,33 @@ public class FileReadDeleteTest {
   }
 
   /** NIO based file reader. */
-  private Function<FileInputStream, Function<Long, Long>> readNio = new Function<FileInputStream, Function<Long, Long>>() {
-    @Override public Function<Long, Long> apply(final FileInputStream in) {
-      final FileChannel channel = in.getChannel();
-      final Sink sink = new Sink();
-      //
-      return new Function.X<Long, Long>() {
-        @Override public Long xapply(Long total) throws Exception {
-          return channel.transferTo(total, 1024, sink);
+  private Function<FileInputStream, Function<Long, Long>> readNio
+      = new Function<FileInputStream, Function<Long, Long>>() {
+        @Override public Function<Long, Long> apply(final FileInputStream in) {
+          final FileChannel channel = in.getChannel();
+          final Sink sink = new Sink();
+          //
+          return new Function.X<Long, Long>() {
+            @Override public Long xapply(Long total) throws Exception {
+              return channel.transferTo(total, 1024, sink);
+            }
+          };
         }
       };
-    }
-  };
 
   /** Normal IO based file reader. */
-  private Function<FileInputStream, Function<Long, Long>> readIo = new Function<FileInputStream, Function<Long, Long>>() {
-    @Override public Function<Long, Long> apply(final FileInputStream in) {
-      final byte[] buffer = new byte[1024];
-      //
-      return new Function.X<Long, Long>() {
-        @Override public Long xapply(Long total) throws Exception {
-          return (long) in.read(buffer);
+  private Function<FileInputStream, Function<Long, Long>> readIo
+      = new Function<FileInputStream, Function<Long, Long>>() {
+        @Override public Function<Long, Long> apply(final FileInputStream in) {
+          final byte[] buffer = new byte[1024];
+          //
+          return new Function.X<Long, Long>() {
+            @Override public Long xapply(Long total) throws Exception {
+              return (long) in.read(buffer);
+            }
+          };
         }
       };
-    }
-  };
 
   private File resourceAsFile(String resource) {
     try {

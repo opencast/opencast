@@ -84,6 +84,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -315,8 +316,11 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "count", isRequired = false, description = "The number of results to return.", type = INTEGER),
           @RestParameter(name = "compact", isRequired = false, description = "Whether to return a compact version of "
                   + "the workflow instance, with mediapackage elements, workflow and workflow operation configurations and "
-                  + "non-current operations removed.", type = STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow set.") })
-  // CHECKSTYLE:OFF
+                  + "non-current operations removed.", type = STRING)},
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow set."),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid data was provided in the request.") })
+// CHECKSTYLE:OFF
   // The number of method parameters is too large for checkstyle's taste, but we need to handle many potential query
   // parameters. CXF provides a bean approach to accepting many parameters, but it is not part of the JAX-RS spec.
   // So for now, we disable checkstyle here.
@@ -361,8 +365,15 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     q.withMediaPackage(mediapackageId);
     q.withCreator(creator);
     q.withContributor(contributor);
-    q.withDateAfter(SolrUtils.parseDate(fromDate));
-    q.withDateBefore(SolrUtils.parseDate(toDate));
+    try {
+      q.withDateAfter(SolrUtils.parseDate(fromDate));
+      q.withDateBefore(SolrUtils.parseDate(toDate));
+    } catch (ParseException e) {
+      return Response
+          .status(Status.BAD_REQUEST)
+          .entity("Invalid date format")
+          .build();
+    }
     q.withLanguage(language);
     q.withLicense(license);
     q.withTitle(title);

@@ -57,12 +57,16 @@ import javax.ws.rs.core.Response;
 @RestService(name = "UIConfigEndpoint",
     title = "UI Config Endpoint",
     abstractText = "Serves the configuration of the UI",
-    notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated."
-                + "In other words, there is a bug! You should file an error report with your server logs from the time"
-                + "when the error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+    notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "If the service is down or not working it will return a status 503, this means the the "
+            + "underlying service is not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was "
+            + "not anticipated.In other words, there is a bug! You should file an error report "
+            + "with your server logs from the timewhen the error occurred: "
+            + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
 public class UIConfigRest {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(UIConfigRest.class);
@@ -111,18 +115,25 @@ public class UIConfigRest {
   @Path("{component}/{filename}")
   @Produces(MediaType.WILDCARD)
   @RestQuery(name = "getConfigFile",
-             description = "Returns the requested configuration file (json, css, etc..)",
-             pathParameters = {
-               @RestParameter(description = "Name of the component, which the configuration file belongs to",
-                              isRequired = true, name = "component", type = RestParameter.Type.STRING),
-               @RestParameter(description = "Name of the configuration file", isRequired = true,
-                              name = "filename", type = RestParameter.Type.STRING)
-             },
-             responses = {
-               @RestResponse(description = "the requested configuration file", responseCode = HttpServletResponse.SC_OK),
-               @RestResponse(description = "if the configuration file doesn't exist", responseCode = HttpServletResponse.SC_NOT_FOUND),
-             },
-             returnDescription = "")
+      description = "Returns the requested configuration file (json, css, etc..)",
+      pathParameters = {
+          @RestParameter(description = "Name of the component, which the configuration file belongs to",
+              isRequired = true, name = "component", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Name of the configuration file", isRequired = true,
+              name = "filename", type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(
+              description = "the requested configuration file",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "if the configuration file doesn't exist",
+              responseCode = HttpServletResponse.SC_NOT_FOUND
+          ),
+      },
+      returnDescription = ""
+  )
   public Response getConfigFile(@PathParam("component") String component, @PathParam("filename") String filename)
           throws IOException, NotFoundException {
     final String orgId = securityService.getOrganization().getId();
@@ -133,8 +144,7 @@ public class UIConfigRest {
       String configFileCanPath = configFile.getCanonicalPath();
 
       // is configFile a subdirectory of basePath (additional directory traversal protection), if not stop
-      if (!configFileCanPath.startsWith(basePath))
-      {
+      if (!configFileCanPath.startsWith(basePath)) {
         logger.warn("Directory traversal prevented (trying to access '{}')", configFile.getPath());
         throw new AccessDeniedException(configFileCanPath);
       }
@@ -144,9 +154,7 @@ public class UIConfigRest {
               .header("Content-Length", configFile.length())
               .header("Content-Type", MimeTypes.getMimeType(filename))
               .build();
-    }
-    catch (FileNotFoundException e)
-    {
+    } catch (FileNotFoundException e) {
       logger.debug("Could not find requested configuration file '{}'", configFile.getPath(), e);
       throw new NotFoundException();
     }

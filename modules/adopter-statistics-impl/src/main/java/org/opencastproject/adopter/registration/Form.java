@@ -124,6 +124,25 @@ public class Form implements IForm {
 
   }
 
+  public Form(String organisationName, String departmentName, String firstName, String lastName, String email,
+          String country, String postalCode, String city, String street, String streetNo, boolean contactMe,
+          boolean allowsStatistics, boolean allowsErrorReports, boolean agreedToPolicy, boolean registered) {
+    this.organisationName = organisationName;
+    this.departmentName = departmentName;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.country = country;
+    this.postalCode = postalCode;
+    this.city = city;
+    this.street = street;
+    this.streetNo = streetNo;
+    this.contactMe = contactMe;
+    this.allowsStatistics = allowsStatistics;
+    this.allowsErrorReports = allowsErrorReports;
+    this.agreedToPolicy = agreedToPolicy;
+    this.registered = registered;
+  }
 
   public void merge(IForm form) {
     Form f = (Form) form;

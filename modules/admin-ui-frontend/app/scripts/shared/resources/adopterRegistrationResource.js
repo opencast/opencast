@@ -22,5 +22,41 @@
 
 angular.module('adminNg.resources')
 .factory('AdopterRegistrationResource', ['$resource', function ($resource) {
-  return $resource('/admin-ng/adopter/registration');
+  //return $resource('/admin-ng/adopter/registration');
+  return $resource('/admin-ng/adopter/registration/:target', {}, {
+    create: {
+      params : { target: '' },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      transformRequest: function (data) {
+        if (angular.isUndefined(data)) {
+          return data;
+        }
+
+        var parameters = {
+          contactMe          : data.contactMe,
+          allowsStatistics   : data.allowsStatistics,
+          allowsErrorReports : data.allowsErrorReports,
+          agreedToPolicy     : data.agreedToPolicy,
+          organisationName   : data.organisationName,
+          departmentName     : data.departmentName,
+          country            : data.country,
+          postalCode         : data.postalCode,
+          city               : data.city,
+          firstName          : data.firstName,
+          lastName           : data.lastName,
+          street             : data.street,
+          streetNo           : data.streetNo,
+          email              : data.email,
+          registered         : data.registered
+        };
+
+        if (angular.isDefined(data.roles)) {
+          parameters.roles = angular.toJson(data.roles);
+        }
+
+        return $.param(parameters);
+      }
+    }
+  });
 }]);

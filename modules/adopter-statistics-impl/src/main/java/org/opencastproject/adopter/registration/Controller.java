@@ -25,7 +25,10 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
@@ -36,8 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -90,17 +93,65 @@ public class Controller {
 
   @POST
   @Path("registration")
-  @Consumes({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "saveregistrationform", description = "Saves the adopter registration data.",
-             returnDescription = "Status", responses = {
-          @RestResponse(responseCode = SC_OK,
-                  description = "Adopter registration data saved."),
-          @RestResponse(responseCode = SC_BAD_REQUEST,
-                  description = "Couldn't save adopter registration data.")})
-  public Response register(String data) {
+  @RestQuery(name = "saveregistrationform",
+          description = "Saves the adopter registration data.",
+          returnDescription = "Status",
+          restParameters = {
+                  @RestParameter(description = "The Name of the organisation.",
+                          isRequired = false, name = "organisationName", type = STRING),
+                  @RestParameter(description = "The Name of the department.",
+                          isRequired = false, name = "departmentName", type = STRING),
+                  @RestParameter(description = "The First name.",
+                          isRequired = false, name = "firstName", type = STRING),
+                  @RestParameter(description = "The Last name.",
+                          isRequired = false, name = "lastName", type = STRING),
+                  @RestParameter(description = "The e-mail address.",
+                          isRequired = false, name = "email", type = STRING),
+                  @RestParameter(description = "The country.",
+                          isRequired = false, name = "country", type = STRING),
+                  @RestParameter(description = "The postal code.",
+                          isRequired = false, name = "postalCode", type = STRING),
+                  @RestParameter(description = "The city.",
+                          isRequired = false, name = "city", type = STRING),
+                  @RestParameter(description = "The street.",
+                          isRequired = false, name = "street", type = STRING),
+                  @RestParameter(description = "The street number.",
+                          isRequired = false, name = "streetNo", type = STRING),
+                  @RestParameter(description = "Does the adopter allows to be contacted.",
+                          isRequired = false, name = "contactMe", type = BOOLEAN),
+                  @RestParameter(description = "Does the adopter agreed to the policy.",
+                          isRequired = false, name = "agreedToPolicy", type = BOOLEAN),
+                  @RestParameter(description = "Does the adopter allow the gathering of error reports.",
+                          isRequired = false, name = "allowsErrorReports", type = BOOLEAN),
+                  @RestParameter(description = "Does the adopter allow the gathering of statistic data.",
+                          isRequired = false, name = "allowsStatistics", type = BOOLEAN),
+                  @RestParameter(description = "Is the adopter already registered.",
+                          isRequired = false, name = "registered", type = BOOLEAN)
+          },
+          responses = {
+          @RestResponse(responseCode = SC_OK, description = "Adopter registration data saved."),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Couldn't save adopter registration data.")})
+  public Response register(
+          @FormParam("organisationName") String organisationName,
+          @FormParam("departmentName") String departmentName,
+          @FormParam("firstName") String firstName,
+          @FormParam("lastName") String lastName,
+          @FormParam("email") String email,
+          @FormParam("country") String country,
+          @FormParam("postalCode") String postalCode,
+          @FormParam("city") String city,
+          @FormParam("street") String street,
+          @FormParam("streetNo") String streetNo,
+          @FormParam("contactMe") boolean contactMe,
+          @FormParam("agreedToPolicy") boolean agreedToPolicy,
+          @FormParam("allowsErrorReports") boolean allowsErrorReports,
+          @FormParam("allowsStatistics") boolean allowsStatistics,
+          @FormParam("registered") boolean registered) {
     logger.debug("Saving adopter registration data.");
-    Form form = gson.fromJson(data, Form.class);
+
+    Form form = new Form(organisationName, departmentName, firstName, lastName, email, country, postalCode, city,
+            street, streetNo, contactMe, agreedToPolicy, allowsErrorReports, allowsStatistics, registered
+    );
     try {
       registrationService.saveFormData(form);
     } catch (Exception e) {

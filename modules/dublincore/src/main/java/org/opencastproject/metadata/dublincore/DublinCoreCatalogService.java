@@ -49,11 +49,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 /**
  * Parses {@link DublinCoreCatalog}s from serialized DC representations.
  */
@@ -95,15 +90,9 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
   }
 
   public InputStream serialize(DublinCoreCatalog catalog) throws IOException {
-    try {
-      Transformer tf = TransformerFactory.newInstance().newTransformer();
-      DOMSource xmlSource = new DOMSource(catalog.toXml());
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      tf.transform(xmlSource, new StreamResult(out));
-      return new ByteArrayInputStream(out.toByteArray());
-    } catch (Exception e) {
-      throw new IOException(e);
-    }
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    catalog.toXml(out, true);
+    return new ByteArrayInputStream(out.toByteArray());
   }
 
   /**

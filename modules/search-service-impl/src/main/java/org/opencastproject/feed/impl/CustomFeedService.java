@@ -76,8 +76,9 @@ public class CustomFeedService extends AbstractFeedService implements FeedGenera
       String q = solrQuery;
       if (query != null && query.length > 1) {
         Object[] args = new Object[query.length - 1];
-        for (int i = 1; i < query.length; i++)
+        for (int i = 1; i < query.length; i++) {
           args[i - 1] = query[i];
+        }
         q = MessageFormat.format(solrQuery, args);
       }
 
