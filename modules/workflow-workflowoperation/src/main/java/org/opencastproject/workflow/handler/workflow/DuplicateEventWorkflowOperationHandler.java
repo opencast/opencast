@@ -57,6 +57,7 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -202,11 +203,13 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, final JobContext context)
       throws WorkflowOperationException {
 
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.many, Configuration.many, Configuration.many, Configuration.none);
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     final WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
-    final String configuredSourceFlavors = trimToEmpty(operation.getConfiguration(SOURCE_FLAVORS_PROPERTY));
-    final String configuredSourceTags = trimToEmpty(operation.getConfiguration(SOURCE_TAGS_PROPERTY));
-    final String configuredTargetTags = trimToEmpty(operation.getConfiguration(TARGET_TAGS_PROPERTY));
+    final List<MediaPackageElementFlavor> configuredSourceFlavors = tagsAndFlavors.getSrcFlavors();
+    final List<String> configuredSourceTags = tagsAndFlavors.getSrcTags();
+    final List<String> configuredTargetTags = tagsAndFlavors.getTargetTags();
     final boolean noSuffix = Boolean.parseBoolean(trimToEmpty(operation.getConfiguration(NO_SUFFIX)));
     final String seriesId = trimToEmpty(operation.getConfiguration(SET_SERIES_ID));
     final int numberOfEvents = Integer.parseInt(operation.getConfiguration(NUMBER_PROPERTY));
@@ -241,22 +244,19 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     logger.info("Creating {} new media packages from media package with id {}.", numberOfEvents,
         mediaPackage.getIdentifier());
 
-    final String[] sourceTags = split(configuredSourceTags, ",");
-    final String[] targetTags = split(configuredTargetTags, ",");
-    final String[] sourceFlavors = split(configuredSourceFlavors, ",");
     final String[] propertyNamespaces = split(configuredPropertyNamespaces, ",");
     final String copyNumberPrefix = trimToEmpty(operation.getConfiguration(COPY_NUMBER_PREFIX_PROPERTY));
 
     final SimpleElementSelector elementSelector = new SimpleElementSelector();
-    for (String flavor : sourceFlavors) {
-      elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
+    for (MediaPackageElementFlavor flavor : configuredSourceFlavors) {
+      elementSelector.addFlavor(flavor);
     }
 
     final List<String> removeTags = new ArrayList<>();
     final List<String> addTags = new ArrayList<>();
     final List<String> overrideTags = new ArrayList<>();
 
-    for (String tag : targetTags) {
+    for (String tag : configuredTargetTags) {
       if (tag.startsWith(MINUS)) {
         removeTags.add(tag);
       } else if (tag.startsWith(PLUS)) {
@@ -266,7 +266,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       }
     }
 
-    for (String tag : sourceTags) {
+    for (String tag : configuredSourceTags) {
       elementSelector.addTag(tag);
     }
 
