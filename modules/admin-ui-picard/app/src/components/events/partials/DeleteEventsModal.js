@@ -5,6 +5,9 @@ import {deleteMultipleEvent} from "../../../thunks/eventThunks";
 import {getSelectedRows} from "../../../selectors/tableSelectors";
 import {connect} from "react-redux";
 
+/**
+ * This component manages the delete bulk action
+ */
 const DeleteEventsModal = ({ close, selectedRows }) => {
     const { t } = useTranslation();
 
@@ -29,7 +32,7 @@ const DeleteEventsModal = ({ close, selectedRows }) => {
         setSelectedEvents(changedSelection);
     };
 
-    // handle change of checkboxes indicating which events to consider further
+    // Handle change of checkboxes indicating which events to consider further
     const onChangeSelected = (e, id) => {
         const selected = e.target.checked;
         let changedEvents = selectedEvents.map(event => {

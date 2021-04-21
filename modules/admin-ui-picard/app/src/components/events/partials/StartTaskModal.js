@@ -2,13 +2,15 @@ import React, {useState} from "react";
 import {Formik} from "formik";
 import {useTranslation} from "react-i18next";
 import {initialFormValuesStartTask} from "../../../configs/wizardConfig";
-import {StartTaskSchema} from "../../shared/wizard/validate";
 import WizardStepper from "../../shared/wizard/WizardStepper";
 import StartTaskGeneralPage from "./wizards/StartTaskGeneralPage";
 import StartTaskWorkflowPage from "./wizards/StartTaskWorkflowPage";
 import StartTaskSummaryPage from "./wizards/StartTaskSummaryPage";
 import {postTasks} from "../../../thunks/taskThunks";
 
+/**
+ * This component manages the pages of the task start bulk action
+ */
 const StartTaskModal = ({ close }) => {
     const { t } = useTranslation();
 
@@ -34,27 +36,18 @@ const StartTaskModal = ({ close }) => {
 
     const nextPage = values => {
         setSnapshot(values);
-        if (steps[page + 1].hidden) {
-            setPage(page + 2);
-        } else {
-            setPage(page + 1);
-        }
-    }
+        setPage(page + 1);
+    };
 
-    const previousPage = (values, twoPagesBack) => {
+    const previousPage = values => {
         setSnapshot(values);
-        // if previous page is hidden or not always shown, than go back two pages
-        if (steps[page - 1].hidden || twoPagesBack) {
-            setPage(page - 2);
-        } else {
-            setPage(page - 1);
-        }
-    }
+        setPage(page - 1);
+    };
 
     const handleSubmit = values => {
         const response = postTasks(values);
         close();
-    }
+    };
 
     return (
         <>
@@ -71,6 +64,7 @@ const StartTaskModal = ({ close }) => {
                 {/* Initialize overall form */}
                 <Formik initialValues={snapshot}
                         onSubmit={values => handleSubmit(values)}>
+                    {/* Render wizard pages depending on current value of page variable */}
                     {formik => (
                         <div>
                             {page === 0 && (

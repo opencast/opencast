@@ -5,6 +5,9 @@ import {connect} from "react-redux";
 import cn from 'classnames';
 import {getSelectedRows} from "../../../../selectors/tableSelectors";
 
+/**
+ * This component renders the table overview of selected events in start task bulk action
+ */
 const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
     const { t } = useTranslation();
 
@@ -12,17 +15,18 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
     const [selectedEvents, setSelectedEvents] = useState(selectedRows);
 
     useEffect(() => {
-        // set field value for formik on mount, because initially all events are selected
+        // Set field value for formik on mount, because initially all events are selected
         formik.setFieldValue('events', selectedEvents);
     }, []);
 
-
+    // Check if an event is in a state that a task on it can be started
     const isStartable = event => {
         return event.event_status.toUpperCase().indexOf('PROCESSED') > -1
             || event.event_status.toUpperCase().indexOf('PROCESSING_FAILURE') > -1
             || event.event_status.toUpperCase().indexOf('PROCESSING_CANCELED') > -1 || !event.selected;
     };
 
+    // Check if multiple event is in a state that a task on it can be started
     const isTaskStartable = events => {
         for (let i = 0; i < events.length; i++) {
             if (!isStartable(events[i])) {
@@ -46,7 +50,7 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
         formik.setFieldValue('events', changedSelection);
     };
 
-    // handle change of checkboxes indicating which events to consider further
+    // Handle change of checkboxes indicating which events to consider further
     const onChangeSelected = (e, id) => {
         const selected = e.target.checked;
         let changedEvents = selectedEvents.map(event => {
@@ -67,6 +71,7 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
         }
     };
 
+    // Check validity for activating next button
     const checkValidity = () => {
         if (formik.values.events.length > 0) {
             if (isTaskStartable(formik.values.events) && formik.isValid) {
@@ -78,7 +83,8 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
         } else {
             return false;
         }
-    }
+    };
+
     return (
         <>
             <div className="modal-content active">
@@ -96,7 +102,6 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
                         <div className="obj tbl-list">
                             <header>
                                 {t('BULK_ACTIONS.SCHEDULE_TASK.GENERAL.CAPTION')}
-                                {/*todo: add translation parameter rows.length*/}
                                 <span className="header-value">
                                     {t('BULK_ACTIONS.SCHEDULE_TASK.GENERAL.SUMMARY',
                                         { count: selectedEvents.filter(e => e.selected === true).length })}
@@ -160,6 +165,7 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
     );
 };
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     selectedRows: getSelectedRows(state),
 });

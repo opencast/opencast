@@ -2,6 +2,9 @@ import React from "react";
 import {useTranslation} from "react-i18next";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 
+/**
+ * This component renders the summary page of the start task bulk action
+ */
 const StartTaskSummaryPage = ({ formik, previousPage }) => {
     const { t } = useTranslation();
 
@@ -13,6 +16,7 @@ const StartTaskSummaryPage = ({ formik, previousPage }) => {
                         <div className="obj list-obj">
                             <header>{t('BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CAPTION')}</header>
                             <div className="obj-container">
+                                {/* List configuration for task to be started */}
                                 <ul>
                                     <li>
                                         <span>{t('BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.EVENTS')}</span>
@@ -35,6 +39,7 @@ const StartTaskSummaryPage = ({ formik, previousPage }) => {
                 </div>
             </div>
 
+            {/* Navigation buttons */}
             <WizardNavigationButtons isLast
                                      previousPage={previousPage}
                                      formik={formik}/>

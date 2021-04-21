@@ -6,9 +6,13 @@ import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import {connect} from "react-redux";
 import cn from 'classnames';
 
+/**
+ * This component renders the workflow selection for start task bulk action
+ */
 const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflowDef, workflowDef }) => {
     const { t } = useTranslation();
 
+    // Cache whole selected workflow definition for further use
     const [selectedWorkflow, setSelectedWorkflow] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -16,9 +20,6 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflow
         // Load workflow definitions for selecting
         loadingWorkflowDef();
         setLoading(false);
-        console.log('loading workflows');
-        console.log('current workflowDef');
-        console.log(workflowDef);
     }, []);
 
     const handleChange = e => {
@@ -49,7 +50,7 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflow
             <div className="modal-content">
                 <div className="modal-body">
                     <div className="full-col">
-
+                        {/* Workflow definition Selection*/}
                         <div className="obj list-obj">
                             <header>{t('BULK_ACTIONS.SCHEDULE_TASK.TASKS.SELECT')}</header>
                             <div className="obj-container">
@@ -71,6 +72,7 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflow
 
                                 {formik.values.workflow  && (
                                     <>
+                                        {/* Show description */}
                                         {selectedWorkflow.description.length > 0 && (
                                             <div className="collapsible-box" style={descriptionBoxStyle}>
                                                 <div style={descriptionTextStyle}>{selectedWorkflow.description}</div>
@@ -118,6 +120,7 @@ const mapStateToProps = state => ({
     workflowDef: getWorkflowDef(state)
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingWorkflowDef: () => dispatch(fetchWorkflowDef('tasks'))
 });

@@ -13,10 +13,12 @@ import {
     transformMetadataCollection
 } from "../utils/resourceUtils";
 import axios from "axios";
-import {getTimezoneOffset} from "../utils/utils";
+import {getTimezoneOffset, makeTwoDigest} from "../utils/utils";
 import {sourceMetadata, uploadAssetOptions} from "../configs/sourceConfig";
-import {WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizardConfig";
+import {NOTIFICATION_CONTEXT, weekdays, WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizardConfig";
 import {addNotification} from "./notificationThunks";
+import moment from "moment-timezone";
+
 
 // fetch events from server
 export const fetchEvents = () => async (dispatch, getState) => {
@@ -255,6 +257,7 @@ export const deleteEvent = id => async dispatch => {
     });
 };
 
+// delete multiple events
 export const deleteMultipleEvent = async events => {
 
     let data = [];
@@ -268,4 +271,158 @@ export const deleteMultipleEvent = async events => {
     axios.post('/admin-ng/event/deleteEvents', data)
         .then(res => console.log(res)).catch(res => console.log(res));
 
+};
+
+// fetch scheduling info for events
+export const fetchScheduling = async events => {
+    let formData = new FormData();
+
+    for (let i = 0; i < events.length; i++) {
+        if (events[i].selected) {
+            formData.append('eventIds', events[i].id);
+        }
+    }
+
+    formData.append('ignoreNonScheduled', true);
+
+    const response = await axios.post('/admin-ng/event/scheduling.json', formData);
+
+    let data = await response.data;
+
+    // transform data for further use
+    let editedEvents = [];
+    for (let i = 0; i < data.length; i++) {
+        let startDate = new Date(data[i].start);
+        let endDate = new Date(data[i].end);
+        let event = {
+            eventId: data[i].eventId,
+            title: data[i].agentConfiguration['event.title'],
+            changedTitle: data[i].agentConfiguration['event.title'],
+            series: data[i].agentConfiguration['event.series'],
+            changedSeries: data[i].agentConfiguration['event.series'],
+            location: data[i].agentConfiguration['event.location'],
+            changedLocation: data[i].agentConfiguration['event.location'],
+            deviceInputs: data[i].agentConfiguration['capture.device.names'],
+            changedDeviceInputs: [],
+            startTimeHour: makeTwoDigest(startDate.getHours()),
+            changedStartTimeHour: makeTwoDigest(startDate.getHours()),
+            startTimeMinutes: makeTwoDigest(startDate.getMinutes()),
+            changedStartTimeMinutes: makeTwoDigest(startDate.getMinutes()),
+            endTimeHour: makeTwoDigest(endDate.getHours()),
+            changedEndTimeHour: makeTwoDigest(endDate.getHours()),
+            endTimeMinutes: makeTwoDigest(endDate.getMinutes()),
+            changedEndTimeMinutes: makeTwoDigest(endDate.getMinutes()),
+            weekday: weekdays[startDate.getDay()].name,
+            changedWeekday: weekdays[startDate.getDay()].name
+        }
+        editedEvents.push(event);
+    }
+
+    return editedEvents;
+};
+
+// check if there are any scheduling conflicts with other events
+export const checkForSchedulingConflicts = events =>  async dispatch => {
+    const formData = new FormData();
+    let update = [];
+    let timezone = moment.tz.guess();
+    for (let i = 0; i < events.length; i++) {
+        update.push({
+            events: [events[i].eventId],
+            scheduling: {
+                timezone: timezone,
+                start: {
+                    hour: parseInt(events[i].changedStartTimeHour),
+                    minute: parseInt(events[i].changedStartTimeMinutes)
+                },
+                end: {
+                    hour: parseInt(events[i].changedEndTimeHour),
+                    minutes: parseInt(events[i].changedEndTimeMinutes)
+                },
+                weekday: events[i].changedWeekday,
+                agentId: events[i].changedLocation
+            }
+        });
+    }
+
+    formData.append('update', JSON.stringify(update));
+
+    let response = [];
+
+    axios.post('/admin-ng/event/bulk/conflicts', formData)
+        .then(res => console.log(res))
+        .catch(res => {
+            if (res.status === 409) {
+                dispatch(addNotification('error', 'CONFLICT_BULK_DETECTED', -1, null, NOTIFICATION_CONTEXT));
+                response = res.data;
+            }
+            console.log(res);
+        });
+
+    return response;
+};
+
+// update multiple scheduled events at once
+export const updateScheduledEventsBulk = values => async dispatch => {
+    let formData = new FormData();
+    let update = [];
+    let timezone = moment.tz.guess();
+
+    for (let i = 0; i < values.changedEvents.length; i++) {
+        let eventChanges = values.editedEvents.find(event => event.eventId === values.changedEvents[i]);
+        let originalEvent = values.events.find(event => event.id === values.changedEvents[i]);
+
+        if (!!eventChanges || !! originalEvent) {
+            dispatch(addNotification('error', 'EVENTS_NOT_UPDATED'));
+            return;
+        }
+
+        update.push({
+            events: [eventChanges.eventId],
+            metadata: {
+                flavor: originalEvent.flavor,
+                title: originalEvent.title,
+                fields: [
+                    {
+                        id: 'isPartOf',
+                        // todo: maybe change this; dunno if considered in backend
+                        collection: {},
+                        label: 'EVENTS.EVENTS.DETAILS.METADATA.SERIES',
+                        readOnly: false,
+                        required: false,
+                        translatable: false,
+                        type: 'text',
+                        value: eventChanges.changedSeries,
+                        // todo: what the hell is hashkey?
+                        $$hashKey: 'object:1589'
+                    }
+                ]
+            },
+            scheduling: {
+                timezone: timezone,
+                start: {
+                    hour: parseInt(eventChanges.changedStartTimeHour),
+                    minute: parseInt(eventChanges.changedStartTimeMinutes)
+                },
+                end: {
+                    hour: parseInt(eventChanges.changedEndTimeHour),
+                    minute: parseInt(eventChanges.changedEndTimeMinutes)
+                },
+                weekday: eventChanges.changedWeekday,
+                agentId: eventChanges.changedLocation
+            }
+        });
+    }
+
+    formData.append('update', JSON.stringify(update))
+
+    axios.put('/admin-ng/event/bulk/update', formData)
+        .then(res => {
+            console.log(res);
+            dispatch(addNotification('success', 'EVENTS_UPDATED_ALL'));
+        })
+        .catch(res => {
+            console.log(res);
+            dispatch(addNotification('error', 'EVENTS_NOT_UPDATED'));
+        });
 };

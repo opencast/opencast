@@ -19,6 +19,7 @@ import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
 import DeleteEventsModal from "./partials/DeleteEventsModal";
 import StartTaskModal from "./partials/StartTaskModal";
+import EditScheduledEventsModal from "./partials/EditScheduledEventsModal";
 
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
@@ -34,6 +35,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     const [displayNewEventModal, setNewEventModal] = useState(false);
     const [displayDeleteModal, setDeleteModal] = useState(false);
     const [displayStartTaskModal, setStartTaskModal] = useState(false);
+    const [displayEditScheduledEventsModal, setEditScheduledEventsModal] = useState(false);
 
     const loadEvents = async () => {
         // Fetching stats from server
@@ -112,6 +114,10 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         setStartTaskModal(false);
     };
 
+    const hideEditScheduledEventsModal = () => {
+        setEditScheduledEventsModal(false);
+    }
+
     const styleNavOpen = {
         marginLeft: '130px',
     };
@@ -140,6 +146,10 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
                 {displayStartTaskModal && (
                     <StartTaskModal close={hideStartTaskModal}/>
+                )}
+
+                {displayEditScheduledEventsModal && (
+                    <EditScheduledEventsModal  close={hideEditScheduledEventsModal}/>
                 )}
 
                 {/* Include Burger-button menu */}
@@ -195,7 +205,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                                     ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT and ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT */}
                                     <li>
                                         {/*todo: open overlay for edit events */}
-                                        <a>{t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}</a>
+                                        <a onClick={() => setEditScheduledEventsModal(true)}>
+                                            {t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}
+                                        </a>
                                     </li>
                                     {/*todo: show  user is admin with roles ROLE_UI_EVENTS_DETAILS_METADATA_EDIT*/}
                                     <li>
@@ -219,7 +231,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
             </div>
         </>
     );
-};
+}
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({

@@ -9,7 +9,7 @@ import {
     prepareMetadataFieldsForPost,
     transformMetadataCollection
 } from "../utils/resourceUtils";
-import {transformToObjectArray} from "../utils/utils";
+import {transformToIdValueArray, transformToObjectArray} from "../utils/utils";
 import axios from "axios";
 import {addNotification} from "./notificationThunks";
 
@@ -121,3 +121,12 @@ export const deleteSeries = id => async dispatch => {
         dispatch(addNotification('error', 'SERIES_NOT_DELETED'));
     });
 };
+
+// Get names and ids of selectable series
+export const fetchSeriesOptions = async () => {
+    let data = await axios.get('/admin-ng/resources/SERIES.json');
+
+    const response = await data.data;
+
+    return transformToIdValueArray(response);
+}

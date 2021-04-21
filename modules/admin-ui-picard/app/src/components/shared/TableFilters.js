@@ -128,7 +128,6 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
     return (
         <div className="filters-container">
             {/* Text filter - Search Query */}
-            {/* todo: Search icon is not showing yet*/}
             <input type="text"
                    className="search expand"
                    placeholder={t('TABLE_FILTERS.PLACEHOLDER')}

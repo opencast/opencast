@@ -134,3 +134,9 @@ export const initialFormValuesStartTask = {
     events: [],
     workflow: ''
 };
+
+export const initialFormValuesEditScheduledEvents = {
+    events: [],
+    editedEvents: [],
+    changedEvents: []
+};
