@@ -71,7 +71,8 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
     final WorkflowOperationInstance currentOperation = wi.getCurrentOperation();
 
     // Check which tags have been configured
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
+        Configuration.many, Configuration.many, Configuration.none, Configuration.none);
     List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
 
@@ -104,7 +105,8 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
     }
   }
 
-  protected MediaPackage getMediaPackageForArchival(MediaPackage current, List<String> tags, List<MediaPackageElementFlavor> sourceFlavors)
+  protected MediaPackage getMediaPackageForArchival(MediaPackage current, List<String> tags,
+                                                    List<MediaPackageElementFlavor> sourceFlavors)
           throws MediaPackageException {
     MediaPackage mp = (MediaPackage) current.clone();
 

@@ -167,11 +167,10 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
     long totalTimeInQueue = 0;
 
     WorkflowOperationInstance operation = wi.getCurrentOperation();
-    // Check which tags have been configured
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
-        Configuration.many, Configuration.one, Configuration.many, Configuration.one);
 
     // Read the configuration properties
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
+        Configuration.many, Configuration.one, Configuration.many, Configuration.one);
     MediaPackageElementFlavor sourceVideoFlavor = tagsAndFlavors.getSingleSrcFlavor();
     List<String> sourceTagSet = tagsAndFlavors.getSrcTags();
     List<String> targetImageTags = tagsAndFlavors.getTargetTags();

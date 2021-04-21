@@ -161,7 +161,8 @@ public class AnimateWorkflowOperationHandler extends AbstractWorkflowOperationHa
     }
     URI animation = animationFile.toURI();
 
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.none, Configuration.many, Configuration.one);
     final MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
 
     // Get optional options

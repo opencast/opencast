@@ -132,7 +132,8 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     }
 
     //Get tags and flavors
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.none, Configuration.many, Configuration.one);
 
     // Read target flavor
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
@@ -157,7 +158,6 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       coverImage.setMimeType(MimeTypes.PNG);
 
       // Add tags
-
       for (String tag : tagsAndFlavors.getTargetTags()) {
         logger.trace("Tagging image with '{}'", tag);
         coverImage.addTag(tag);
