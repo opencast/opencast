@@ -175,6 +175,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
                 new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
       }
 
+      // S3 client configuration
       ClientConfiguration clientConfiguration = new ClientConfiguration();
 
       int maxConnections = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_CONNECTIONS)

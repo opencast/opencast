@@ -33,11 +33,11 @@ The Opencast AWS S3 Archive service configuration can be found in the
 | Key                                                        | Description                    | Default                      | Example                    |
 |:-----------------------------------------------------------|:-------------------------------|:----------------------------:|:--------------------------:|
 | org.opencastproject.assetmanager.aws.s3.enabled            | Whether to enable this service | false                        |                            |
-| org.opencastproject.archive.aws.s3.region                  | The AWS region to set          | us-east-1                    |                            |
-| org.opencastproject.archive.aws.s3.bucket                  | The S3 bucket name             |                              | example-org-archive        |
-| org.opencastproject.archive.aws.s3.access.id               | Your access ID                 |                              | 20 alphanumeric characters |
-| org.opencastproject.archive.aws.s3.secret.key              | Your secret key                |                              | 40 characters              |
-| org.opencastproject.assetmanager.aws.s3.endpoint           | The endpoint to use            | Default AWS S3 endpoint      |                            |
+| org.opencastproject.assetmanager.aws.s3.region             | The AWS region to set          | us-east-1                    |                            |
+| org.opencastproject.assetmanager.aws.s3.bucket             | The S3 bucket name             |                              | example-org-archive        |
+| org.opencastproject.assetmanager.aws.s3.access.id          | Your access ID                 |                              | 20 alphanumeric characters |
+| org.opencastproject.assetmanager.aws.s3.secret.key         | Your secret key                |                              | 40 characters              |
+| org.opencastproject.assetmanager.aws.s3.endpoint           | The endpoint to use            | Default AWS S3 endpoint      | https://s3.service.com     |
 | org.opencastproject.assetmanager.aws.s3.path.style         | Whether to use path style      | false / Default AWS S3 style |                            |
 | org.opencastproject.assetmanager.aws.s3.max.connections    | Number of max connections      | 50                           |                            |
 | org.opencastproject.assetmanager.aws.s3.connection.timeout | Connection timeout in ms       | 10000                        |                            |
