@@ -168,6 +168,30 @@ public final class XmlSafeParser {
   }
 
   /**
+   * The DocumentBuilder for the parse methods.
+   * Creating a DocumentBuilder is quite expensive and DocumentBuilder is not thread-safe,
+   * therefore we create a DocumentBuilder for each Thread.
+   */
+  private static ThreadLocal<DocumentBuilder> db = new ThreadLocal<DocumentBuilder>() {
+          @Override
+          protected DocumentBuilder initialValue() {
+            DocumentBuilderFactory dbf = newDocumentBuilderFactory();
+            DocumentBuilder d = null;
+            try {
+              dbf.setNamespaceAware(true);
+              d = dbf.newDocumentBuilder();
+            }
+            catch (Exception e) {
+              // this shouldn't occur
+              logger.error("Failed to configure safe DocumentBuilder to prevent XXE.");
+              throw new AssertionError("Failed to configure safe DocumentBuilder to prevent XXE.", e);
+            }
+
+            return d;
+          }
+  };
+
+  /**
    * Parse a XML Document with a parser, which is guarded against XXE and billion laugh attacks.
    * The parsing is namespace aware.
    * Designed for checking documents for XXE and billion laugh attacks before further parsing
@@ -176,19 +200,8 @@ public final class XmlSafeParser {
    * @return the parsed document
    */
   public static Document parse(InputSource s) throws IOException, SAXException {
-    DocumentBuilderFactory dbf = newDocumentBuilderFactory();
-    DocumentBuilder d = null;
-    try {
-      dbf.setNamespaceAware(true);
-      d = dbf.newDocumentBuilder();
-    }
-    catch (Exception e) {
-      // this shouldn't occur
-      logger.error("Failed to configure safe DocumentBuilder to prevent XXE.");
-      throw new AssertionError("Failed to configure safe DocumentBuilder to prevent XXE.", e);
-    }
-
-    return d.parse(s);
+    // Use ThreadLocal DocumentBuilder to avoid building a new DocumentBuilder on each call.
+    return db.get().parse(s);
   }
 
 }
