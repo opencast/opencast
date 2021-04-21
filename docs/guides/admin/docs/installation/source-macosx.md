@@ -95,7 +95,7 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
     brew install sox
     brew install synfig
 
-#### Elastic search on macOS
+#### Elasticsearch on macOS
 
 If you want to install Elasticsearch in the same machine run Elasticsearch as a Docker container
 
