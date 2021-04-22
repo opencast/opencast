@@ -35,7 +35,7 @@ import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.theme.Theme;
+import org.opencastproject.elasticsearch.index.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.impl.IndexServiceImpl;
@@ -281,7 +281,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     time = DateTimeSupport.fromUTC("2014-04-29T14:35:50Z");
     Series series3 = createSeries("3", "title 3", "contributor 3", "organizer 3", time, null);
 
-    Theme theme1 = new Theme(
+    IndexTheme theme1 = new IndexTheme(
             1L, new DefaultOrganization().getId());
     theme1.setName("theme-1-name");
     theme1.setDescription("theme-1-description");
@@ -314,7 +314,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     // Setup the events for series 3
     final SearchResultItem<Event>[] eventItems3 = createEvents(0);
 
-    final SearchResultItem<Theme> themeItem1 = EasyMock
+    final SearchResultItem<IndexTheme> themeItem1 = EasyMock
             .createMock(SearchResultItem.class);
     EasyMock.expect(themeItem1.getSource()).andReturn(theme1);
 
@@ -454,11 +454,11 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
             }).anyTimes();
 
     EasyMock.expect(adminuiSearchIndex.getByQuery(EasyMock.capture(captureThemeSearchQuery)))
-            .andAnswer(new IAnswer<SearchResult<Theme>>() {
+            .andAnswer(new IAnswer<SearchResult<IndexTheme>>() {
 
               @Override
-              public SearchResult<Theme> answer() throws Throwable {
-                SearchResult<Theme> themeSearchResult = EasyMock
+              public SearchResult<IndexTheme> answer() throws Throwable {
+                SearchResult<IndexTheme> themeSearchResult = EasyMock
                         .createMock(SearchResult.class);
                 // Setup theme search results
                 EasyMock.expect(themeSearchResult.getPageSize()).andReturn(1L).anyTimes();

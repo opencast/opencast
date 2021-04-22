@@ -27,7 +27,7 @@ import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.theme.Theme;
+import org.opencastproject.elasticsearch.index.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.theme.ThemeIndexSchema;
 import org.opencastproject.index.service.api.EventIndex;
 import org.opencastproject.util.data.Option;
@@ -64,7 +64,7 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
   private static final String[] DOCUMENT_TYPES = new String[] {
       Event.DOCUMENT_TYPE,
       Series.DOCUMENT_TYPE,
-      Theme.DOCUMENT_TYPE,
+      IndexTheme.DOCUMENT_TYPE,
       "version"
   };
 
@@ -163,7 +163,7 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
    */
   @Override
   public List<String> getThemeNames() {
-    return getTermsForField(ThemeIndexSchema.NAME, Option.some(new String[] { Theme.DOCUMENT_TYPE }));
+    return getTermsForField(ThemeIndexSchema.NAME, Option.some(new String[] { IndexTheme.DOCUMENT_TYPE }));
   }
 
   /**

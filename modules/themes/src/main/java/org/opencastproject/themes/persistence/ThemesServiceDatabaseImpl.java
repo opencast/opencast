@@ -23,7 +23,7 @@ package org.opencastproject.themes.persistence;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.theme.ThemeIndexUtils;
+import org.opencastproject.elasticsearch.index.theme.IndexTheme;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.Organization;
@@ -37,13 +37,14 @@ import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -357,8 +358,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     logger.debug("Removing theme {} from the {} index.", themeId, index.getIndexName());
 
     try {
-      index.delete(org.opencastproject.elasticsearch.index.theme.Theme.DOCUMENT_TYPE, Long.toString(themeId)
-              .concat(orgId));
+      index.delete(IndexTheme.DOCUMENT_TYPE, Long.toString(themeId), orgId);
       logger.debug("Theme {} removed from the {} index", themeId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error deleting the theme {} from the {} index", themeId, index.getIndexName(), e);
@@ -381,31 +381,46 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
             theme.getId(), theme.getName(), theme.getDescription(),
             orgId, index.getIndexName());
     try {
-      Long id = theme.getId().getOrElse(NumberUtils.LONG_MINUS_ONE);
-      String creator = StringUtils.isNotBlank(theme.getCreator().getName())
-              ? theme.getCreator().getName() : theme.getCreator().getUsername();
+      if (theme.getId().isNone()) {
+        throw new IllegalArgumentException("Can't put theme in index without valid id!");
+      }
+      Long id = theme.getId().get();
 
-      org.opencastproject.elasticsearch.index.theme.Theme indexTheme = ThemeIndexUtils
-              .getOrCreate(id, orgId, user, index);
-      indexTheme.setCreationDate(theme.getCreationDate());
-      indexTheme.setDefault(theme.isDefault());
-      indexTheme.setName(theme.getName());
-      indexTheme.setDescription(theme.getDescription());
-      indexTheme.setCreator(creator);
-      indexTheme.setBumperActive(theme.isBumperActive());
-      indexTheme.setBumperFile(theme.getBumperFile());
-      indexTheme.setTrailerActive(theme.isTrailerActive());
-      indexTheme.setTrailerFile(theme.getTrailerFile());
-      indexTheme.setTitleSlideActive(theme.isTitleSlideActive());
-      indexTheme.setTitleSlideBackground(theme.getTitleSlideBackground());
-      indexTheme.setTitleSlideMetadata(theme.getTitleSlideMetadata());
-      indexTheme.setLicenseSlideActive(theme.isLicenseSlideActive());
-      indexTheme.setLicenseSlideBackground(theme.getLicenseSlideBackground());
-      indexTheme.setLicenseSlideDescription(theme.getLicenseSlideDescription());
-      indexTheme.setWatermarkActive(theme.isWatermarkActive());
-      indexTheme.setWatermarkFile(theme.getWatermarkFile());
-      indexTheme.setWatermarkPosition(theme.getWatermarkPosition());
-      index.addOrUpdate(indexTheme);
+      // the function to do the actual updating
+      Function<Optional<IndexTheme>, Optional<IndexTheme>> updateFunction
+              = (Optional<IndexTheme> indexThemeOpt) -> {
+
+        IndexTheme indexTheme;
+        if (indexThemeOpt.isPresent()) {
+          indexTheme = indexThemeOpt.get();
+        } else {
+          indexTheme = new IndexTheme(id, orgId);
+        }
+        String creator = StringUtils.isNotBlank(theme.getCreator().getName())
+                ? theme.getCreator().getName() : theme.getCreator().getUsername();
+
+        indexTheme.setCreationDate(theme.getCreationDate());
+        indexTheme.setDefault(theme.isDefault());
+        indexTheme.setName(theme.getName());
+        indexTheme.setDescription(theme.getDescription());
+        indexTheme.setCreator(creator);
+        indexTheme.setBumperActive(theme.isBumperActive());
+        indexTheme.setBumperFile(theme.getBumperFile());
+        indexTheme.setTrailerActive(theme.isTrailerActive());
+        indexTheme.setTrailerFile(theme.getTrailerFile());
+        indexTheme.setTitleSlideActive(theme.isTitleSlideActive());
+        indexTheme.setTitleSlideBackground(theme.getTitleSlideBackground());
+        indexTheme.setTitleSlideMetadata(theme.getTitleSlideMetadata());
+        indexTheme.setLicenseSlideActive(theme.isLicenseSlideActive());
+        indexTheme.setLicenseSlideBackground(theme.getLicenseSlideBackground());
+        indexTheme.setLicenseSlideDescription(theme.getLicenseSlideDescription());
+        indexTheme.setWatermarkActive(theme.isWatermarkActive());
+        indexTheme.setWatermarkFile(theme.getWatermarkFile());
+        indexTheme.setWatermarkPosition(theme.getWatermarkPosition());
+        return Optional.of(indexTheme);
+      };
+
+      index.addOrUpdateTheme(id, updateFunction, orgId, user);
       logger.debug("Updated the theme {} in the {} index", theme.getId(), index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error updating the theme {} in the {} index", theme.getId(), index.getIndexName(), e);

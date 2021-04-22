@@ -58,7 +58,7 @@ import javax.xml.transform.stream.StreamSource;
         "licenseSlideDescription", "licenseSlideBackground", "watermarkActive", "watermarkFile", "watermarkPosition" })
 @XmlRootElement(name = "theme", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
-public class Theme implements IndexObject {
+public class IndexTheme implements IndexObject {
 
   /** The document type */
   public static final String DOCUMENT_TYPE = "theme";
@@ -153,7 +153,7 @@ public class Theme implements IndexObject {
   /**
    * Required default no arg constructor for JAXB.
    */
-  public Theme() {
+  public IndexTheme() {
   }
 
   /**
@@ -162,7 +162,7 @@ public class Theme implements IndexObject {
    * @param organization
    *          the organization
    */
-  public Theme(long identifier, String organization) {
+  public IndexTheme(long identifier, String organization) {
     this.identifier = identifier;
     this.organization = organization;
   }
@@ -327,13 +327,13 @@ public class Theme implements IndexObject {
    * @return the deserialized theme
    * @throws IOException
    */
-  public static Theme valueOf(InputStream xml) throws IOException {
+  public static IndexTheme valueOf(InputStream xml) throws IOException {
     try {
       if (context == null) {
         createJAXBContext();
       }
       Unmarshaller unmarshaller = context.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(xml), Theme.class).getValue();
+      return unmarshaller.unmarshal(new StreamSource(xml), IndexTheme.class).getValue();
     } catch (JAXBException e) {
       throw new IOException(e.getLinkedException() != null ? e.getLinkedException() : e);
     } finally {
@@ -345,7 +345,7 @@ public class Theme implements IndexObject {
    * Initialize the JAXBContext.
    */
   private static void createJAXBContext() throws JAXBException {
-    context = JAXBContext.newInstance(Theme.class);
+    context = JAXBContext.newInstance(IndexTheme.class);
   }
 
   /**
@@ -359,7 +359,7 @@ public class Theme implements IndexObject {
         createJAXBContext();
       }
       StringWriter writer = new StringWriter();
-      Marshaller marshaller = Theme.context.createMarshaller();
+      Marshaller marshaller = IndexTheme.context.createMarshaller();
       marshaller.marshal(this, writer);
       return writer.toString();
     } catch (JAXBException e) {
@@ -376,10 +376,10 @@ public class Theme implements IndexObject {
    * @throws IOException
    *           if unmarshalling fails
    */
-  public static Theme fromSearchMetadata(SearchMetadataCollection metadata) throws IOException {
+  public static IndexTheme fromSearchMetadata(SearchMetadataCollection metadata) throws IOException {
     Map<String, SearchMetadata<?>> metadataMap = metadata.toMap();
     String themeXml = (String) metadataMap.get(ThemeIndexSchema.OBJECT).getValue();
-    return Theme.valueOf(IOUtils.toInputStream(themeXml));
+    return IndexTheme.valueOf(IOUtils.toInputStream(themeXml));
   }
 
   /**
@@ -389,7 +389,7 @@ public class Theme implements IndexObject {
    */
   public SearchMetadataCollection toSearchMetadata() {
     SearchMetadataCollection metadata = new SearchMetadataCollection(Long.toString(getIdentifier()).concat(
-            getOrganization()), Theme.DOCUMENT_TYPE);
+            getOrganization()), IndexTheme.DOCUMENT_TYPE);
     // Mandatory fields
     metadata.addField(ThemeIndexSchema.ID, getIdentifier(), true);
     metadata.addField(ThemeIndexSchema.ORGANIZATION, getOrganization(), false);
