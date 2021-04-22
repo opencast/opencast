@@ -47,7 +47,6 @@ import org.apache.commons.codec.EncoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -65,10 +64,10 @@ import javax.ws.rs.core.Response;
 @RestService(
         name = "videogrid",
         title = "VideoGrid Service",
-        abstractText = "The Video Grid Service offers a way to combine several, partially simultaneously\n"
-        + "playing videos into a single video file.",
-        notes = { "Does NOT return the URI to a single video file, but instead returns URIs to several"
-                + "videos which each make up a part of the final video." })
+        abstractText = "The Video Grid Service creates a section of the final video grid file for the "
+        + "Video Grid Workflow Operation Handler.",
+        notes = { "Only offers one service",
+                  "Only meant to be used with the VideoGridWorkflowOperationHandler"})
 public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -79,9 +78,6 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
 
   /** The service registry */
   private ServiceRegistry serviceRegistry = null;
-
-  /** For JSON serialization */
-  private static final Type stringListOfListType = new TypeToken<List<List<String>>>() { }.getType();
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
@@ -106,32 +102,32 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("videogrid")
-  @RestQuery(name = "videogrid", description = "Create video grid",
+  @RestQuery(name = "videogrid", description = "Create a section of the final video grid",
           restParameters = {
-                  @RestParameter(name = "commands", isRequired = true, type = STRING,
-                          description = "A list of ffmpeg commands, one for each part."),
+                  @RestParameter(name = "command", isRequired = true, type = STRING,
+                          description = "An ffmpeg command as a list. File paths are replaced by track identifiers."),
                   @RestParameter(name = "tracks", isRequired = true, type = RestParameter.Type.TEXT,
                           description = "The source tracks to concat as XML") },
           responses = {
-                  @RestResponse(description = "VideoGrid created successfully", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "Video created successfully", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "Invalid data", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "Internal error", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
-          returnDescription = "Returns the paths to the generated videos for the grid")
-  public Response createPartialTracks(
-          @FormParam("commands") String commandsString,
+          returnDescription = "Returns the path to the generated video for the grid")
+  public Response createPartialTrack(
+          @FormParam("command") String commandString,
           @FormParam("sourceTracks") String tracksXml) throws MediaPackageException, EncoderException {
     Gson gson = new Gson();
     try {
-      List<List<String>> commands = gson.fromJson(commandsString, stringListOfListType);
+      List<String> command = gson.fromJson(commandString, new TypeToken<List<String>>() { }.getType());
       List<? extends MediaPackageElement> tracks = MediaPackageElementParser.getArrayFromXml(tracksXml);
       logger.debug("Start videogrid");
-      Job job = videoGridService.createPartialTracks(commands, tracks.toArray(new Track[tracks.size()]));
+      Job job = videoGridService.createPartialTrack(command, tracks.toArray(new Track[tracks.size()]));
       return Response.ok(new JaxbJob(job)).build();
     } catch (JsonSyntaxException | NullPointerException e) {
-      logger.debug("Invalid data passed to REST endpoint:\ncommands: {}", commandsString);
+      logger.debug("Invalid data passed to REST endpoint:\ncommand: {}", commandString);
       return Response.status(Response.Status.BAD_REQUEST).build();
     } catch (VideoGridServiceException e) {
-      logger.error("Error generating videos {}", commandsString, e);
+      logger.error("Error generating videos {}", commandString, e);
       return Response.serverError().build();
     }
   }

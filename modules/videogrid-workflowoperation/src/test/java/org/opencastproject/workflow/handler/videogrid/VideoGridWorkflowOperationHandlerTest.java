@@ -58,9 +58,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class VideoGridWorkflowOperationHandlerTest {
 
@@ -135,30 +133,36 @@ public class VideoGridWorkflowOperationHandlerTest {
 
     /** Create Service Mocks **/
     Job videoGridJob = new JobImpl(0);
-    List<URI> uris = new ArrayList<URI>();
-    uris.add(trackURI);
-    videoGridJob.setPayload(gson.toJson(uris));
+    videoGridJob.setPayload(gson.toJson(trackURI));
     VideoGridService videoGridService = EasyMock.createMock(VideoGridService.class);
-    EasyMock.expect(videoGridService.createPartialTracks(anyObject(), anyObject())).andReturn(videoGridJob);
+    // Mocking the same function multiple times because of varargs
+    EasyMock.expect(videoGridService.createPartialTrack(anyObject())).andReturn(videoGridJob).anyTimes();
+    EasyMock.expect(videoGridService.createPartialTrack(anyObject(), anyObject())).andReturn(videoGridJob).anyTimes();
 
     Job inspectJob = new JobImpl(1);
     inspectTrack = new TrackImpl();
+    inspectTrack.setIdentifier("d79699b2-d683-4f0d-95ff-2dc4da3c9c40");
+    inspectTrack.setFlavor(MediaPackageElementFlavor.parseFlavor("source/presenter"));
+    inspectTrack.setURI(trackURI);
     inspectJob.setPayload(MediaPackageElementParser.getAsXml(inspectTrack));
     MediaInspectionService mediaInspectionService = EasyMock.createMock(MediaInspectionService.class);
-    EasyMock.expect(mediaInspectionService.enrich(anyObject(), anyBoolean())).andReturn(inspectJob);
+    EasyMock.expect(mediaInspectionService.enrich(anyObject(), anyBoolean())).andReturn(inspectJob).anyTimes();
 
     Job concatJob = new JobImpl(2);
     concatTrack = new TrackImpl();
     concatJob.setPayload(MediaPackageElementParser.getAsXml(concatTrack));
     profile = EasyMock.createNiceMock(EncodingProfile.class);
-    EasyMock.expect(profile.getIdentifier()).andReturn(ENCODING_PROFILE_ID);
-    EasyMock.expect(profile.getApplicableMediaType()).andReturn(EncodingProfile.MediaType.Stream);
-    EasyMock.expect(profile.getOutputType()).andReturn(EncodingProfile.MediaType.AudioVisual);
+    EasyMock.expect(profile.getIdentifier()).andReturn(ENCODING_PROFILE_ID).anyTimes();
+    EasyMock.expect(profile.getApplicableMediaType()).andReturn(EncodingProfile.MediaType.Stream).anyTimes();
+    EasyMock.expect(profile.getOutputType()).andReturn(EncodingProfile.MediaType.AudioVisual).anyTimes();
     EasyMock.replay(profile);
     ComposerService composerService = EasyMock.createMock(ComposerService.class);
     EasyMock.expect(composerService.getProfile(ENCODING_PROFILE_ID)).andReturn(profile).anyTimes();
     EasyMock.expect(composerService.getProfile("nothing")).andReturn(null).anyTimes();
-    EasyMock.expect(composerService.concat(anyString(), anyObject(), anyBoolean(), anyObject())).andReturn(concatJob);
+    // Mocking a function with varargs (triple dot notation) is not trivial
+    // So this will only works for exactly three tracks
+    // If it needs to work for another number of tracks, you'll have to mock the function again
+    EasyMock.expect(composerService.concat(anyString(), anyObject(), anyBoolean(), anyObject(), anyObject(), anyObject())).andReturn(concatJob).anyTimes();
 
     EasyMock.replay(videoGridService, workspace, workflow, mediaInspectionService, composerService);
 
