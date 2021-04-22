@@ -4,15 +4,65 @@
    "NAV_ABOUT": "Om",
    "NO": "Nej",
    "SUBMIT": "Indsend",
-   "UPDATE": "Opdatering",
+   "UPDATE": {
+      "MINOR": "Minor update available",
+      "MAJOR": "Major update available",
+      "UNSUPPORTED": "Version {{ version }} no longer supported",
+      "UNDETERMINED": "Indeterminable version"
+   },
    "CANCEL": "Annullér",
    "CONFIRM": "Bekræft",
    "SAVE": "Gem",
+   "CONTINUE": "Continue",
+   "CLOSE": "Close",
    "LOGOUT": "Log ud",
    "RESET": "Nulstil",
    "SELECT_NO_OPTION_SELECTED": "Ingen mulighed valgt",
    "SELECT_NO_OPTIONS_AVAILABLE": "Ingen tilgængelige muligheder",
    "YES": "Ja",
+   "COPY": "Copy to clipboard",
+   "LTI": {
+      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
+      "SERIES_TITLE": "View Series",
+      "UPLOAD_TITLE": "Upload event",
+      "LOADING": "Loading…",
+      "NEW_UPLOAD": "Upload new event",
+      "EDIT_UPLOAD": "Edit event",
+      "CURRENT_JOBS": "Today's jobs",
+      "PRESENTER": "Presenter",
+      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
+      "CAPTION": "Captions",
+      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+      "UPLOAD": "Upload",
+      "UPLOADING": "Uploading",
+      "EDIT": "Save",
+      "EDIT_TITLE": "Edit event",
+      "NO_OPTION_SELECTED": "No option selected",
+      "EDITING": "Saving…",
+      "SELECT_OPTION": "Select option",
+      "JOB_TITLE": "Title",
+      "JOB_STATUS": "Status",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
+      "UPLOAD_FAILURE": "Upload failed!",
+      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
+      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
+      "EDIT_FAILURE": "Edit failed!",
+      "COPY_SUCCESS": "Copying started…",
+      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
+      "GENERIC_ERROR": "Error: {{message}}",
+      "DELETION_SUCCESS": "Event deletion successful",
+      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
+      "DELETION_FAILURE": "Event deletion failed",
+      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
+      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
+      "CONFIRM_DELETION": "Really delete this event?",
+      "COPY_TO_SERIES": "Copy event to series",
+      "SELECT_COPY_TARGET": "Select destination series",
+      "COPY": "Copy",
+      "COPY_IN_PROGRESS": "Starting copy…",
+      "CREATOR": "by {{creator}}"
+   },
    "LANGUAGES": {
       "ARABIC": "Arabisk",
       "DANISH": "Dansk",
@@ -47,6 +97,7 @@
       }
    },
    "CONFIRMATIONS": {
+      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
       "CONTINUE_ACTION": "Sikker på, at du vil fortsætte?",
       "METADATA": {
          "NOTICE": {
@@ -62,7 +113,10 @@
          "NAME": "Navn"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Bekræftelse"
+         "CONFIRMATION": "Bekræftelse",
+         "SHOW": {
+            "EMBEDDING_CODE": "Embedding code"
+         }
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Denne serie indeholder begivenheder. Sletning af serien sletter ikke begivenhederne.",
@@ -80,7 +134,8 @@
       "USERS_GUIDE": "Brugerguide",
       "DOCUMENTATION": "Dokumentation",
       "REST_DOC": "RESTEN API-dokmenter",
-      "HOTKEY_CHEAT_SHEET": "Tastaturgenveje"
+      "HOTKEY_CHEAT_SHEET": "Tastaturgenveje",
+      "ADOPTER_REGISTRATION": "Adopter Registration"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Adgangspolitikken er blevet oprettet",
@@ -170,7 +225,17 @@
       "VIDEO_TOO_MANY_AUDIOS": "Du kan ikke have flere end én lyd-stream på en enkelt video-stream",
       "SERVER_UNRESPONSIVE": "Ups! Serveren lader ikke til at svare. Forsøg igen senere.",
       "SERVICE_UNAVAILABLE": "Ups! Serveren lader ikke til at svare. Forsøg igen senere.",
-      "ACTIVE_TRANSACTION": "Begivenheden kan ikke redigeres under en aktiv arbejdsgang eller overførsel."
+      "ACTIVE_TRANSACTION": "Begivenheden kan ikke redigeres under en aktiv arbejdsgang eller overførsel.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "NO_EVENTS_UPDATED": "All updates failed.",
+         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+      },
+      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
+      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
    },
    "BULK_ACTIONS": {
       "CAPTION": "Handlinger",
@@ -238,6 +303,36 @@
             "METADATA": "Metadata",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Edit the metadata of multiple events",
+         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
+            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "NOT_FOUND": "Not found",
+            "RUNNING_WORKFLOW": "Running workflow",
+            "TABLE": {
+               "CAPTION": "Selected events",
+               "ERRORS": "Errors"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Metadata of selected events",
+               "FIELDS": "Metadata",
+               "VALUES": "Values"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Update Failures"
+            },
+            "UPDATE_FAILED": "Update failed",
+            "NO_EVENTS_UPDATED": "All updates failed.",
+            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+         }
       }
    },
    "DATES": {
@@ -295,6 +390,63 @@
       },
       "STATISTICS": {
          "TITLE": "Statistics"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Registration",
+         "SKIP": "Not now",
+         "CONTINUE": "Continue",
+         "BACK": "Back",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Terms of Service and Privacy Policy"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Thank you for using Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Organisation",
+            "DEPARTMENT": "Department",
+            "COUNTRY": "Country",
+            "POSTAL_CODE": "Postal code",
+            "CITY": "City",
+            "CONTACT_INFO": "Contact information",
+            "GENDER": "Gender",
+            "GENDER_MALE": "male",
+            "GENDER_FEMALE": "female",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name",
+            "STREET": "Street",
+            "NUMBER": "Number",
+            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "MAIL": "Email",
+            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
+            "POLICY_HEADLINE": "Privacy policy and terms of use",
+            "USAGE_STATISTICS": "Usage statistcs",
+            "ERROR_REPORTS": "Error reports",
+            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
+            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Maybe next time!",
+            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Thank you for your registration!",
+            "TEXT_LEADING_TO_PATH": "You can change your data at ",
+            "TEXT_LEADING_AFTER_PATH": "at any time."
+         },
+         "ERROR": {
+            "HEADER": "Error",
+            "TEXT": "An error occurred while processing your request."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Are you sure you want to delete your registration data?"
+         }
       }
    },
    "EVENTS": {
@@ -467,6 +619,7 @@
                "LOCATION": "Filter til denne placering",
                "DETAILS": "Åbn begivenhedsoplysninger",
                "DELETE": "Slet begivenhed",
+               "EMBEDDING_CODE": "Embedding code",
                "EDITOR": "Åbn videoredigeringsværktøj",
                "EDITOR_NEEDS_CUTTING": "Åbn videoredigeringsværktøjet (en kommentar indikerer, at der er blevet anmodet om videobeskæring)",
                "COMMENTS": "Vis kommentarer",
@@ -997,7 +1150,9 @@
                   "NEW": "Ny politik",
                   "DETAILS": "Oplysninger",
                   "REPLACE_EVENT_ACLS": "Opdatér begivenhedsrettigheder",
-                  "REPLACE_EVENT_ACLS_HINT": "Sikrer, at alle begivenhederne i denne serie har disse aktive rettighedeer"
+                  "REPLACE_EVENT_ACLS_HINT": "Sikrer, at alle begivenhederne i denne serie har disse aktive rettighedeer",
+                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LINK": "Load more"
                },
                "ROLES": {
                   "LABEL": "Vælg en rolle",
@@ -1985,23 +2140,6 @@
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
          "PUBLISHEDHOURS": "This displays the published hours of video"
-      }
-   },
-   "dateFormats": {
-      "dateTime": {
-         "short": "{{dateTime, DD-MM-YY HH:mm}}",
-         "medium": "{{dateTime, DD-MM-YYYY HH:mm:ss}}",
-         "full": "{{dateTime, D. MMMM YYYY HH:mm:ss z}}"
-      },
-      "date": {
-         "short": "{{date, DD-MM-YY}}",
-         "medium": "{{date, DD-MM-YYYY}}",
-         "full": "{{date, D. MMMM YYYY}}"
-      },
-      "time": {
-         "short": "{{time, HH:mm}}",
-         "medium": "{{time, HH:mm:ss}}",
-         "full": "{{time, HH:mm:ss z}}"
       }
    }
 }
