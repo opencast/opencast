@@ -255,6 +255,14 @@
       <property name="ignoreComments" value="true" />
       <property name="severity" value="error" />
     </module>
+    <module name="Regexp">
+      <property name="format" value="createLSParser" />
+      <property name="message"
+        value="It seems like an XmlParser has been added that is not protected against xxe by default. Please consider using one of the pre-existing secured parsers provided by the XmlSafeParser class in the common module, or add a securely configured version of your parser to this class." />
+      <property name="illegalPattern" value="true" />
+      <property name="ignoreComments" value="true" />
+      <property name="severity" value="error" />
+    </module>
 
     <!-- Miscellaneous other checks.                   -->
     <!-- See http://checkstyle.sf.net/config_misc.html -->
