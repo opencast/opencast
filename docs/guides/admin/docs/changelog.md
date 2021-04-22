@@ -4,6 +4,77 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.4
+
+*Released on April 19th, 2021*
+
+- [[#2526](https://github.com/opencast/opencast/pull/2526)] -
+  LTI Service Docs
+- [[#2509](https://github.com/opencast/opencast/pull/2509)] -
+  Fix checkstyle violations in 24 modules
+- [[#2506](https://github.com/opencast/opencast/pull/2506)] -
+  Fix checkstyle violation in 4 `search*` modules
+- [[#2500](https://github.com/opencast/opencast/pull/2500)] -
+  Make media package handle multi-byte Unicode characters
+- [[#2497](https://github.com/opencast/opencast/pull/2497)] -
+  Fixes getting the version information behind a proxy
+- [[#2494](https://github.com/opencast/opencast/pull/2494)] -
+  Fix Processing of Unicode Titles
+- [[#2492](https://github.com/opencast/opencast/pull/2492)] -
+  Prevent NPE if mediapackage duration is null
+- [[#2479](https://github.com/opencast/opencast/pull/2479)] -
+  Fix Memory Leak
+- [[#2478](https://github.com/opencast/opencast/pull/2478)] -
+  Fixed test for daylight saving time
+- [[#2475](https://github.com/opencast/opencast/pull/2475)] -
+  Enable Elasticsearch in docs
+- [[#2473](https://github.com/opencast/opencast/pull/2473)] -
+  Document Hardware Requirements
+- [[#2472](https://github.com/opencast/opencast/pull/2472)] -
+  Internal server error in workflow endpoint
+- [[#2470](https://github.com/opencast/opencast/pull/2470)] -
+  fixed admin UI - displaying roles correctly when adding a new event to a series
+- [[#2467](https://github.com/opencast/opencast/pull/2467)] -
+  Changed the content-type of the adopter POST request.
+- [[#2464](https://github.com/opencast/opencast/pull/2464)] -
+  Use a different ServiceType for the Standalone Video Editor on the presentation Node
+- [[#2443](https://github.com/opencast/opencast/pull/2443)] -
+  Bump guava from 24.1.1-jre to 30.1.1-jre
+- [[#2437](https://github.com/opencast/opencast/pull/2437)] -
+  Updated new editor with new frontend-release 2021-03-24
+- [[#2427](https://github.com/opencast/opencast/pull/2427)] -
+  Revert "No Matrix Build on Opencast 8"
+- [[#2424](https://github.com/opencast/opencast/pull/2424)] -
+  Fix checkstyle violations in 22 modules
+- [[#2423](https://github.com/opencast/opencast/pull/2423)] -
+  Fix checkstyle violations for 3 `series-service*` modules
+- [[#2420](https://github.com/opencast/opencast/pull/2420)] -
+  Fix checkstyle violations in `lti` and `lti-service-impl`
+- [[#2419](https://github.com/opencast/opencast/pull/2419)] -
+  Fix checkstyle violations in 5 asset manager modules
+- [[#2417](https://github.com/opencast/opencast/pull/2417)] -
+  Correct Series ACLs when Recreating the Search Service Index
+- [[#2414](https://github.com/opencast/opencast/pull/2414)] -
+  Corrected configuration files in editor documentation
+- [[#2413](https://github.com/opencast/opencast/pull/2413)] -
+  Link new features
+- [[#2411](https://github.com/opencast/opencast/pull/2411)] -
+  Editor Documentation
+- [[#2391](https://github.com/opencast/opencast/pull/2391)] -
+  Perform `check-availibility` WF check with system user
+- [[#2332](https://github.com/opencast/opencast/pull/2332)] -
+  Fix resolution scaling by removing `force_original_aspect_ratio`
+- [[#2318](https://github.com/opencast/opencast/pull/2318)] -
+  Serverless HLS leaves files open
+- [[#2298](https://github.com/opencast/opencast/pull/2298)] -
+  Add infos about Wowza streaming configuration changes to upgrade guide
+- [[#2112](https://github.com/opencast/opencast/pull/2112)] -
+  Fix admin interface not displaying the correct role
+- [[#2103](https://github.com/opencast/opencast/pull/2103)] -
+  Only persist users with specific LTI role
+- [[#1792](https://github.com/opencast/opencast/pull/1792)] -
+  Standalone downloads Paella plugin
+
 ### Opencast 9.3
 
 *Released on March 15th, 2021*

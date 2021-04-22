@@ -59,7 +59,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
    * Creates a search result that was created using the given query. Note that <code>hits</code> indicates the overall
    * number of appearances of the search term, while size is equal to the number of documents that contain those
    * <code>hits</code> hits.
-   * 
+   *
    * @param query
    *          the query
    * @param hitCount
@@ -77,31 +77,33 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * Adds the given search result item to the result set.
-   * 
+   *
    * @param item
    *          the result item
    */
   public void addResultItem(SearchResultItem<T> item) {
-    if (result == null)
+    if (result == null) {
       result = new ArrayList<SearchResultItem<T>>();
+    }
     result.add(item);
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchResult#getItems()
    */
   @SuppressWarnings("unchecked")
   public SearchResultItem<T>[] getItems() {
-    if (result == null)
+    if (result == null) {
       return new SearchResultItem[] {};
+    }
     return result.toArray(new SearchResultItem[result.size()]);
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchResult#getLimit()
    */
   public long getLimit() {
@@ -110,7 +112,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchResult#getOffset()
    */
   public long getOffset() {
@@ -119,18 +121,19 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchResult#getPage()
    */
   public long getPage() {
-    if (offset == 0 || limit == 0)
+    if (offset == 0 || limit == 0) {
       return 1;
+    }
     return (long) Math.floor(offset / limit) + 1;
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchResult#getPageSize()
    */
   public long getPageSize() {
@@ -146,7 +149,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * Sets the search time in milliseconds.
-   * 
+   *
    * @param time
    *          the time
    */
@@ -156,7 +159,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchResult#getSearchTime()
    */
   public long getSearchTime() {
@@ -165,7 +168,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchResult#getHitCount()
    */
   public long getHitCount() {
@@ -174,7 +177,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.matterhorn.search.SearchResult#getDocumentCount()
    */
   public long getDocumentCount() {
@@ -183,7 +186,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * Sets the document count.
-   * 
+   *
    * @param count
    *          the number of documents in this search result
    */

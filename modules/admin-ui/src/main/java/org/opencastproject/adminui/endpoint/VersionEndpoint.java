@@ -102,7 +102,7 @@ public class VersionEndpoint {
     if (System.currentTimeMillis() / 1000L - lastUpdated < 3600) {
       return;
     }
-    HttpClient client = HttpClientBuilder.create().build();
+    HttpClient client = HttpClientBuilder.create().useSystemProperties().build();
     HttpGet request = new HttpGet(URL);
     final String responseString;
     try {

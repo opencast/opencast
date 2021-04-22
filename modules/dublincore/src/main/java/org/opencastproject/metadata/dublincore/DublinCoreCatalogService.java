@@ -40,7 +40,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,11 +48,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * Parses {@link DublinCoreCatalog}s from serialized DC representations.
@@ -96,21 +90,9 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
   }
 
   public InputStream serialize(DublinCoreCatalog catalog) throws IOException {
-    try {
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-      Document xmlCatalog = catalog.toXml();
-      // CHECKSTYLE:OFF
-      DOMSource xmlSource = new DOMSource(xmlCatalog);
-      Transformer tf = TransformerFactory.newInstance().newTransformer();
-      // Document was already parsed, so this is safe
-      tf.transform(xmlSource, new StreamResult(out));
-      // CHECKSTYLE:ON
-
-      return new ByteArrayInputStream(out.toByteArray());
-    } catch (Exception e) {
-      throw new IOException(e);
-    }
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    catalog.toXml(out, true);
+    return new ByteArrayInputStream(out.toByteArray());
   }
 
   /**

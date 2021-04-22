@@ -32,9 +32,9 @@ import javax.ws.rs.Path;
 @Path("/")
 public class EngagePluginVideoVideojs extends AbstractEngagePlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(EngagePluginVideoVideojs.class);
+  private static final Logger log = LoggerFactory.getLogger(EngagePluginVideoVideojs.class);
 
-    protected void activate(ComponentContext cc) {
-        log.info("Activated engage plugin: Videojs.");
-    }
+  protected void activate(ComponentContext cc) {
+    log.info("Activated engage plugin: Videojs.");
+  }
 }

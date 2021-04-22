@@ -519,7 +519,7 @@ public class EditorServiceImpl implements EditorService {
       lastTime = segmentData.getEnd();
       // check for last segment
       if (segments.size() - 1 == i) {
-        if (lastTime < mediaPackage.getDuration()) {
+        if (mediaPackage.getDuration() != null && lastTime < mediaPackage.getDuration()) {
           deletedElements.add(new SegmentData(lastTime, mediaPackage.getDuration(), true));
         }
       }

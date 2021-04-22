@@ -37,6 +37,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
@@ -66,10 +70,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 /**
@@ -528,7 +528,7 @@ public final class MediaPackageImpl implements MediaPackage {
         candidates.remove(c);
       }
     }
-    return candidates.toArray(new Catalog[candidates.size()]);
+    return candidates.toArray(new Catalog[0]);
   }
 
   /**
@@ -1221,33 +1221,28 @@ public final class MediaPackageImpl implements MediaPackage {
    * @return the deserialized media package
    */
   public static MediaPackageImpl valueOf(Node xml) throws MediaPackageException {
-    InputStream in = null;
-    ByteArrayOutputStream out = null;
-    try {
+    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       Unmarshaller unmarshaller = context.createUnmarshaller();
-
       // Serialize the media package
-      out = new ByteArrayOutputStream();
-      StreamResult result = new StreamResult(out);
-
-      // CHECKSTYLE:OFF
+      DOMImplementationRegistry reg = DOMImplementationRegistry.newInstance();
+      DOMImplementationLS impl = (DOMImplementationLS) reg.getDOMImplementation("LS");
+      LSSerializer serializer = impl.createLSSerializer();
+      serializer.getDomConfig().setParameter("comments", false);
+      serializer.getDomConfig().setParameter("format-pretty-print", false);
+      LSOutput output = impl.createLSOutput();
+      output.setEncoding("UTF-8");
+      output.setByteStream(out);
       // This is safe because the Node was already parsed
-      Transformer transformer = TransformerFactory.newInstance().newTransformer();
-      // CHECKSTYLE:ON
-      DOMSource domSource = new DOMSource(xml);
-      transformer.transform(domSource, result);
+      serializer.write(xml, output);
 
-      in = new ByteArrayInputStream(out.toByteArray());
-
-      // CHECKSTYLE:OFF
-      // in was already parsed, therefore this is save
-      return unmarshaller.unmarshal(new StreamSource(in), MediaPackageImpl.class).getValue();
-      // CHECKSTYLE:ON
+      try (InputStream in = new ByteArrayInputStream(out.toByteArray())) {
+        // CHECKSTYLE:OFF
+        // in was already parsed, therefore this is save
+        return unmarshaller.unmarshal(new StreamSource(in), MediaPackageImpl.class).getValue();
+        // CHECKSTYLE:ON
+      }
     } catch (Exception e) {
       throw new MediaPackageException("Error deserializing media package node", e);
-    } finally {
-      IoSupport.closeQuietly(in);
-      IoSupport.closeQuietly(out);
     }
   }
 

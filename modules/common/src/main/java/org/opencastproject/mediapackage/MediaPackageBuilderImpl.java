@@ -23,12 +23,10 @@
 package org.opencastproject.mediapackage;
 
 import org.opencastproject.mediapackage.identifier.Id;
-import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -102,18 +100,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#loadFromXml(java.io.InputStream)
    */
   public MediaPackage loadFromXml(InputStream is) throws MediaPackageException {
-    if (serializer != null) {
-      // FIXME This code runs if *any* serializer is present, regardless of the serializer implementation
-      try {
-        Document xml = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder().parse(is);
-        rewriteUrls(xml, serializer);
-        return MediaPackageImpl.valueOf(xml);
-      } catch (Exception e) {
-        throw new MediaPackageException("Error deserializing paths in media package", e);
-      }
-    } else {
-      return MediaPackageImpl.valueOf(is);
-    }
+    return MediaPackageImpl.valueOf(is);
   }
 
   /**
