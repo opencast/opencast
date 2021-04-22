@@ -43,7 +43,6 @@ import org.opencastproject.elasticsearch.index.series.SeriesIndexUtils;
 import org.opencastproject.elasticsearch.index.series.SeriesQueryBuilder;
 import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.index.theme.Theme;
-import org.opencastproject.elasticsearch.index.theme.ThemeIndexUtils;
 import org.opencastproject.elasticsearch.index.theme.ThemeQueryBuilder;
 import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.User;
@@ -329,7 +328,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     logger.debug("Adding theme {} to search index", theme.getIdentifier());
 
     // Add the resource to the index
-    SearchMetadataCollection inputDocument = ThemeIndexUtils.toSearchMetadata(theme);
+    SearchMetadataCollection inputDocument = theme.toSearchMetadata();
     List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
     ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
             inputDocument.getDocumentType(), resourceMetadata);
@@ -538,7 +537,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     try {
       return executeQuery(query, searchRequest, metadata -> {
         try {
-          return ThemeIndexUtils.toTheme(metadata);
+          return Theme.fromSearchMetadata(metadata);
         } catch (IOException e) {
           return chuck(e);
         }

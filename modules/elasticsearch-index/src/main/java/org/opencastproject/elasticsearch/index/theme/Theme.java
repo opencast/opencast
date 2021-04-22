@@ -21,14 +21,21 @@
 
 package org.opencastproject.elasticsearch.index.theme;
 
+import org.opencastproject.elasticsearch.api.SearchMetadata;
+import org.opencastproject.elasticsearch.impl.SearchMetadataCollection;
 import org.opencastproject.elasticsearch.index.IndexObject;
+import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.DateTimeSupport.UtcTimestampAdapter;
 import org.opencastproject.util.IoSupport;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -360,4 +367,95 @@ public class Theme implements IndexObject {
     }
   }
 
+  /**
+   * Creates a search result item based on the data returned from the search index.
+   *
+   * @param metadata
+   *          the search metadata
+   * @return the search result item
+   * @throws IOException
+   *           if unmarshalling fails
+   */
+  public static Theme fromSearchMetadata(SearchMetadataCollection metadata) throws IOException {
+    Map<String, SearchMetadata<?>> metadataMap = metadata.toMap();
+    String themeXml = (String) metadataMap.get(ThemeIndexSchema.OBJECT).getValue();
+    return Theme.valueOf(IOUtils.toInputStream(themeXml));
+  }
+
+  /**
+   * Creates search metadata from a theme such that the theme can be stored in the search index.
+   *
+   * @return the set of metadata
+   */
+  public SearchMetadataCollection toSearchMetadata() {
+    SearchMetadataCollection metadata = new SearchMetadataCollection(Long.toString(getIdentifier()).concat(
+            getOrganization()), Theme.DOCUMENT_TYPE);
+    // Mandatory fields
+    metadata.addField(ThemeIndexSchema.ID, getIdentifier(), true);
+    metadata.addField(ThemeIndexSchema.ORGANIZATION, getOrganization(), false);
+    metadata.addField(ThemeIndexSchema.OBJECT, toXML(), false);
+
+    // Optional fields
+    if (StringUtils.isNotBlank(getName())) {
+      metadata.addField(ThemeIndexSchema.NAME, getName(), true);
+    }
+
+    if (StringUtils.isNotBlank(getDescription())) {
+      metadata.addField(ThemeIndexSchema.DESCRIPTION, getDescription(), true);
+    }
+
+    metadata.addField(ThemeIndexSchema.DEFAULT, isDefault(), false);
+
+    if (getCreationDate() != null) {
+      metadata.addField(ThemeIndexSchema.CREATION_DATE,
+              DateTimeSupport.toUTC(getCreationDate().getTime()), true);
+    }
+
+    if (StringUtils.isNotBlank(getCreator())) {
+      metadata.addField(ThemeIndexSchema.CREATOR, getCreator(), true);
+    }
+
+    metadata.addField(ThemeIndexSchema.BUMPER_ACTIVE, isBumperActive(), false);
+
+    if (StringUtils.isNotBlank(getBumperFile())) {
+      metadata.addField(ThemeIndexSchema.BUMPER_FILE, getBumperFile(), false);
+    }
+
+    metadata.addField(ThemeIndexSchema.TRAILER_ACTIVE, isTrailerActive(), false);
+
+    if (StringUtils.isNotBlank(getTrailerFile())) {
+      metadata.addField(ThemeIndexSchema.TRAILER_FILE, getTrailerFile(), false);
+    }
+
+    metadata.addField(ThemeIndexSchema.TITLE_SLIDE_ACTIVE, isTrailerActive(), false);
+
+    if (StringUtils.isNotBlank(getTitleSlideMetadata())) {
+      metadata.addField(ThemeIndexSchema.TITLE_SLIDE_METADATA, getTitleSlideMetadata(), false);
+    }
+
+    if (StringUtils.isNotBlank(getTitleSlideBackground())) {
+      metadata.addField(ThemeIndexSchema.TITLE_SLIDE_BACKGROUND, getTitleSlideBackground(), false);
+    }
+
+    metadata.addField(ThemeIndexSchema.LICENSE_SLIDE_ACTIVE, isLicenseSlideActive(), false);
+
+    if (StringUtils.isNotBlank(getLicenseSlideDescription())) {
+      metadata.addField(ThemeIndexSchema.LICENSE_SLIDE_DESCRIPTION, getLicenseSlideDescription(), false);
+    }
+
+    if (StringUtils.isNotBlank(getLicenseSlideBackground())) {
+      metadata.addField(ThemeIndexSchema.LICENSE_SLIDE_BACKGROUND, getLicenseSlideBackground(), false);
+    }
+
+    metadata.addField(ThemeIndexSchema.WATERMARK_ACTIVE, isWatermarkActive(), false);
+
+    if (StringUtils.isNotBlank(getWatermarkFile())) {
+      metadata.addField(ThemeIndexSchema.WATERMARK_FILE, getWatermarkFile(), false);
+    }
+
+    if (StringUtils.isNotBlank(getWatermarkPosition())) {
+      metadata.addField(ThemeIndexSchema.WATERMARK_POSITION, getWatermarkPosition(), false);
+    }
+    return metadata;
+  }
 }
