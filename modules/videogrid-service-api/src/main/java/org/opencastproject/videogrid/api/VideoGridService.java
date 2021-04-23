@@ -42,14 +42,14 @@ public interface VideoGridService {
   /**
    * Generate the final video in parts
    *
-   * @param commands
-   *          A list of ffmpeg commands, one for each part
+   * @param command
+   *          An ffmpeg command as a list
    * @param tracks
-   *          Source tracks used by the ffmpeg commands
+   *          Source tracks used by the ffmpeg command
    * @return VideoGrid service job.
    * @throws VideoGridServiceException
    *          If something went wrong during the processing
    */
-  Job createPartialTracks(List<List<String>> commands, Track... tracks)
+  Job createPartialTrack(List<String> command, Track... tracks)
           throws VideoGridServiceException, EncoderException, MediaPackageException;
 }
