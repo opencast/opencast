@@ -657,8 +657,12 @@ function($, bootbox, _, alertify, jsyaml) {
         }
         tile = tile + '<div class="infos">';
 
-        if (data.dcCreator) {
-          creator = _.escape(data.dcCreator);
+        if (data.mediapackage.creators) {
+          creator = (Array.isArray(data.mediapackage.creators.creator)
+            ? data.mediapackage.creators.creator
+            : [data.mediapackage.creators.creator])
+            .map(_.escape)
+            .join(', ');
         }
         tile = tile + '<div class="creator">' + creator + '</div>';
 
