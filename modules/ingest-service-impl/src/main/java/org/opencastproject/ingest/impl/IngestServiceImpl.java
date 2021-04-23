@@ -113,6 +113,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -134,6 +135,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.ObjectInstance;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Creates and augments Opencast MediaPackages. Stores media into the Working File Repository.
@@ -924,9 +928,21 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG, null, null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       job = serviceRegistry.updateJob(job);
-      String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding catalog {} from input stream on mediapackage {}", elementId, mediaPackage);
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+      final String elementId = UUID.randomUUID().toString();
+      final String mediaPackageId = mediaPackage.getIdentifier().toString();
+      logger.info("Start adding catalog {} from input stream on mediapackage {}", elementId, mediaPackageId);
+      final URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+
+      // Verify XML is not corrupted
+      try {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        builder.parse(workingFileRepository.get(mediaPackageId, elementId));
+      } catch (SAXException | ParserConfigurationException e) {
+        workingFileRepository.delete(mediaPackageId, elementId);
+        throw new IOException("Catalog XML is invalid", e);
+      }
+
       if (MediaPackageElements.SERIES.equals(flavor)) {
         updateSeries(newUrl);
       }
