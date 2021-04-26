@@ -251,7 +251,7 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
                         episode={episode}
                         deleteCallback={this.isInstructor() && this.hasDeletion() ? this.deleteEventCallback.bind(this) : undefined}
                         editCallback={this.isInstructor() && this.hasEdit() ? this.editEpisodeCallback.bind(this) : undefined}
-                        downloadCallback={this.isInstructor() && this.hasDownload() ? this.downloadEventCallback.bind(this) : undefined}
+                        downloadCallback={this.hasDownload() ? this.downloadEventCallback.bind(this) : undefined}
                         t={this.props.t} />)}
                 </div>
                 <footer className="mt-3">
