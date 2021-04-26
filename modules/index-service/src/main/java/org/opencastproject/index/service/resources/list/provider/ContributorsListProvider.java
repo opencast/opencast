@@ -21,7 +21,6 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
@@ -55,6 +54,9 @@ import java.util.TreeSet;
 
 public class ContributorsListProvider implements ResourceListProvider {
 
+  private static final String CONFIGURATION_KEY_EXCLUDE_USER_PROVIDER = "exclude.user.provider";
+  private static final String ALL_USER_PROVIDERS_VALUE = "*";
+
   private static final String PROVIDER_PREFIX = "CONTRIBUTORS";
 
   public static final String DEFAULT = PROVIDER_PREFIX;
@@ -65,11 +67,24 @@ public class ContributorsListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(ContributorsListProvider.class);
 
+  private Set<String> excludeUserProvider = new HashSet<>();
   private UserDirectoryService userDirectoryService;
   private AbstractSearchIndex searchIndex;
 
   protected void activate(BundleContext bundleContext) {
     logger.info("Contributors list provider activated!");
+  }
+
+  public void modified(Map<String, Object> properties) {
+    Object excludeUserProviderValue = properties.get(CONFIGURATION_KEY_EXCLUDE_USER_PROVIDER);
+    excludeUserProvider.clear();
+    if (excludeUserProviderValue != null) {
+      for (String userProvider : StringUtils.split(excludeUserProviderValue.toString(), ',')) {
+        if (StringUtils.trimToNull(userProvider) != null) {
+          excludeUserProvider.add(StringUtils.trimToNull(userProvider));
+        }
+      }
+    }
   }
 
   /** OSGi callback for users services. */
@@ -116,11 +131,13 @@ public class ContributorsListProvider implements ResourceListProvider {
       }
     });
 
-    Iterator<User> users = userDirectoryService.findUsers("%", offset, limit);
-    while (users.hasNext()) {
-      User u = users.next();
-      if (StringUtils.isNotBlank(u.getName()))
-        contributorsList.add(u.getName());
+    if (!excludeUserProvider.contains(ALL_USER_PROVIDERS_VALUE)) {
+      Iterator<User> users = userDirectoryService.findUsers("%", offset, limit);
+      while (users.hasNext()) {
+        User u = users.next();
+        if (!excludeUserProvider.contains(u.getProvider()) && StringUtils.isNotBlank(u.getName()))
+          contributorsList.add(u.getName());
+      }
     }
 
     contributorsList.addAll(searchIndex.getTermsForField(EventIndexSchema.CONTRIBUTOR,
@@ -174,15 +191,19 @@ public class ContributorsListProvider implements ResourceListProvider {
 
     HashSet<String> labels = new HashSet<String>();
 
-    Iterator<User> users = userDirectoryService.findUsers("%", offset, limit);
-    while (users.hasNext()) {
-      User u = users.next();
-      if (StringUtils.isNotBlank(u.getName())) {
-        contributorsList.add(new Contributor(u.getUsername(), u.getName()));
-        labels.add(u.getName());
-      } else {
-        contributorsList.add(new Contributor(u.getUsername(), u.getUsername()));
-        labels.add(u.getUsername());
+    if (!excludeUserProvider.contains(ALL_USER_PROVIDERS_VALUE)) {
+      Iterator<User> users = userDirectoryService.findUsers("%", offset, limit);
+      while (users.hasNext()) {
+        User u = users.next();
+        if (!excludeUserProvider.contains(u.getProvider())) {
+          if (StringUtils.isNotBlank(u.getName())) {
+            contributorsList.add(new Contributor(u.getUsername(), u.getName()));
+            labels.add(u.getName());
+          } else {
+            contributorsList.add(new Contributor(u.getUsername(), u.getUsername()));
+            labels.add(u.getUsername());
+          }
+        }
       }
     }
 
@@ -220,6 +241,7 @@ public class ContributorsListProvider implements ResourceListProvider {
    * @return The {@link Map} including all of the contributors.
    */
   protected Map<String, String> getListWithUserNames(ResourceListQuery query) {
+
     int offset = 0;
     int limit = 0;
 
@@ -227,15 +249,19 @@ public class ContributorsListProvider implements ResourceListProvider {
 
     HashSet<String> labels = new HashSet<String>();
 
-    Iterator<User> users = userDirectoryService.findUsers("%", offset, limit);
-    while (users.hasNext()) {
-      User u = users.next();
-      if (StringUtils.isNotBlank(u.getName())) {
-        contributorsList.add(new Contributor(u.getUsername(), u.getName()));
-        labels.add(u.getName());
-      } else {
-        contributorsList.add(new Contributor(u.getUsername(), u.getUsername()));
-        labels.add(u.getUsername());
+    if (!excludeUserProvider.contains(ALL_USER_PROVIDERS_VALUE)) {
+      Iterator<User> users = userDirectoryService.findUsers("%", offset, limit);
+      while (users.hasNext()) {
+        User u = users.next();
+        if (!excludeUserProvider.contains(u.getProvider())) {
+          if (StringUtils.isNotBlank(u.getName())) {
+            contributorsList.add(new Contributor(u.getUsername(), u.getName()));
+            labels.add(u.getName());
+          } else {
+            contributorsList.add(new Contributor(u.getUsername(), u.getUsername()));
+            labels.add(u.getUsername());
+          }
+        }
       }
     }
 
