@@ -180,18 +180,20 @@ public final class RestUtils {
    * {@code <field name>:ASC|DESC}
    *
    * @param sort
-   *          the parameter string to parse
+   *          the parameter string to parse (will be checked if blank)
    * @return a set of sort criterion, never {@code null}
    */
   public static Set<SortCriterion> parseSortQueryParameter(String sort) throws WebApplicationException {
-    Set<SortCriterion> sortOrders = new HashSet<SortCriterion>();
+    Set<SortCriterion> sortOrders = new HashSet<>();
 
-    StringTokenizer tokenizer = new StringTokenizer(sort, ",");
-    while (tokenizer.hasMoreTokens()) {
-      try {
-        sortOrders.add(SortCriterionImpl.parse(tokenizer.nextToken()));
-      } catch (IllegalArgumentException e) {
-        throw new WebApplicationException(Status.BAD_REQUEST);
+    if (StringUtils.isNotBlank(sort)) {
+      StringTokenizer tokenizer = new StringTokenizer(sort, ",");
+      while (tokenizer.hasMoreTokens()) {
+        try {
+          sortOrders.add(SortCriterionImpl.parse(tokenizer.nextToken()));
+        } catch (IllegalArgumentException e) {
+          throw new WebApplicationException(Status.BAD_REQUEST);
+        }
       }
     }
 
@@ -253,6 +255,7 @@ public final class RestUtils {
           logger.debug("No value for filter '{}' in filters list: {}", filterTuple[0], filter);
           continue;
         }
+        // use substring because dates also contain : so there might be more than two parts
         filters.put(filterTuple[0], f.substring(filterTuple[0].length() + 1));
       }
     }
