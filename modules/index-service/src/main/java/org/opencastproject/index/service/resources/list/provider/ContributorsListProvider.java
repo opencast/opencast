@@ -34,7 +34,6 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,11 +66,12 @@ public class ContributorsListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(ContributorsListProvider.class);
 
-  private Set<String> excludeUserProvider = new HashSet<>();
+  private final Set<String> excludeUserProvider = new HashSet<>();
   private UserDirectoryService userDirectoryService;
   private AbstractSearchIndex searchIndex;
 
-  protected void activate(BundleContext bundleContext) {
+  protected void activate(Map<String, Object> properties) {
+    modified(properties);
     logger.info("Contributors list provider activated!");
   }
 
@@ -85,6 +85,7 @@ public class ContributorsListProvider implements ResourceListProvider {
         }
       }
     }
+    logger.debug("Excluded user providers: {}", excludeUserProvider);
   }
 
   /** OSGi callback for users services. */
