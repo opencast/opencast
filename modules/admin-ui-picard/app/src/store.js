@@ -20,6 +20,7 @@ import themes from "./reducers/themeReducers";
 import health from "./reducers/healthReducers";
 import {notifications} from "./reducers/notificationReducers";
 import workflows from "./reducers/workflowReducers";
+import eventDetails from "./reducers/eventDeatilsReducers";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -42,7 +43,8 @@ const reducers = {
     themes,
     health,
     notifications,
-    workflows
+    workflows,
+    eventDetails
 };
 
 // Configuration for persisting store

@@ -46,7 +46,8 @@ const EventActionCell = ({ row })  => {
             {/* Display modal for editing table view if table edit button is clicked */}
             <EventDetailsModal showModal={displayEventDetailsModal}
                                handleClose={hideEventDetailsModal}
-                               tabIndex={eventDetailsTabIndex}/>
+                               tabIndex={eventDetailsTabIndex}
+                               eventId={row.id} />
 
             {/* Open event details */}
             {/*TODO: implement and properly call function */}

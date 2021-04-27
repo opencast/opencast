@@ -6,7 +6,7 @@ import EventDetails from "./EventDetails";
 /**
  * This component renders the modal for adding new resources
  */
-const EventDetailsModal = ({ handleClose, showModal, tabIndex }) => {
+const EventDetailsModal = ({ handleClose, showModal, tabIndex, eventId }) => {
     const { t } = useTranslation();
 
     const close = () => {
@@ -26,6 +26,7 @@ const EventDetailsModal = ({ handleClose, showModal, tabIndex }) => {
                     </header>
 
                     <EventDetails tabIndex={tabIndex}
+                                  eventId={eventId}
                                     close={close}/>
                 </section>
             </>

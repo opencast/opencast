@@ -12,7 +12,7 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manages the pages of the event details
  */
-const EventDetails = ({ tabIndex }) => {
+const EventDetails = ({ tabIndex, eventId }) => {
     const { t } = useTranslation();
 
 
@@ -70,7 +70,6 @@ const EventDetails = ({ tabIndex }) => {
     ];
 
     const openTab = (tabNr) => {
-        console.log(`Should open tab "${tabNr}"`);
         setPage(tabNr);
     }
 
@@ -158,8 +157,10 @@ const EventDetails = ({ tabIndex }) => {
                                                  t={t}/>
                             )}
                             {page === 7 && (
-                                <EventDetailsCommentsTab header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
+                                <EventDetailsCommentsTab
+                                    eventId={eventId}
+                                    header={tabs[page].bodyHeaderTranslation}
+                                    t={t}/>
                             )}
                             {page === 8 && (
                                 <MockDataPage header={tabs[page].bodyHeaderTranslation}
