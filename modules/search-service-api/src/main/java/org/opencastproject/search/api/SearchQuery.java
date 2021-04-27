@@ -45,7 +45,18 @@ public class SearchQuery {
   protected boolean signURL = false;
 
   public enum Sort {
-    DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER
+    DATE_CREATED,
+    DATE_PUBLISHED,
+    TITLE,
+    SERIES_ID,
+    MEDIA_PACKAGE_ID,
+    CREATOR,
+    CONTRIBUTOR,
+    LANGUAGE,
+    LICENSE,
+    SUBJECT,
+    DESCRIPTION,
+    PUBLISHER
   }
 
   public SearchQuery signURLs(final boolean sign) {

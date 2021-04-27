@@ -32,9 +32,9 @@ import javax.ws.rs.Path;
 @Path("/")
 public class EngagePluginTabDescription extends AbstractEngagePlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(EngagePluginTabDescription.class);
+  private static final Logger log = LoggerFactory.getLogger(EngagePluginTabDescription.class);
 
-    protected void activate(ComponentContext cc) {
-        log.info("Activated.");
-    }
+  protected void activate(ComponentContext cc) {
+    log.info("Activated.");
+  }
 }

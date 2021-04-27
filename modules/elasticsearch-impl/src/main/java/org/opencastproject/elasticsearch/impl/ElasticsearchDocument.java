@@ -51,7 +51,7 @@ public final class ElasticsearchDocument extends HashMap<String, Object> {
    * Creates a new elastic search document based on the id, the document type and the metadata.
    * <p>
    * Note that the type needs to map to an Elasticsearch document type mapping.
-   * 
+   *
    * @param id
    *          the resource identifier.
    * @param type
@@ -75,7 +75,7 @@ public final class ElasticsearchDocument extends HashMap<String, Object> {
 
   /**
    * Returns the document type.
-   * 
+   *
    * @return the type
    */
   public String getType() {
@@ -84,7 +84,7 @@ public final class ElasticsearchDocument extends HashMap<String, Object> {
 
   /**
    * Adds the resource metadata to the designated fulltext fields.
-   * 
+   *
    * @param item
    *          the metadata item
    * @param fulltextFieldName
@@ -141,7 +141,7 @@ public final class ElasticsearchDocument extends HashMap<String, Object> {
 
   /**
    * Returns the identifier.
-   * 
+   *
    * @return the identifier
    */
   public String getUID() {

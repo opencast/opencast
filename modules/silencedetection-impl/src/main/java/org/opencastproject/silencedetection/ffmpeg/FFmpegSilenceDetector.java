@@ -99,7 +99,7 @@ public class FFmpegSilenceDetector {
    * @param track source track
    */
   public FFmpegSilenceDetector(Properties properties, Track track, Workspace workspace)
-    throws SilenceDetectionFailedException, MediaPackageException, IOException {
+          throws SilenceDetectionFailedException, MediaPackageException, IOException {
 
     long minSilenceLength;
     long minVoiceLength;
@@ -246,8 +246,9 @@ public class FFmpegSilenceDetector {
    * @return nonsilent media segments
    */
   public MediaSegments getMediaSegments() {
-    if (segments == null)
+    if (segments == null) {
       return null;
+    }
 
     return new MediaSegments(trackId, filePath, segments);
   }

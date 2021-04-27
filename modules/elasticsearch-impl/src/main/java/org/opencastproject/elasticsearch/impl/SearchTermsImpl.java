@@ -41,7 +41,7 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /**
    * Creates a list of search terms, to be queried using the given quantifier.
-   * 
+   *
    * @param quantifier
    *          the quantifier
    * @param values

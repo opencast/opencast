@@ -89,8 +89,9 @@ public class AggregationFeedService extends AbstractFeedService implements FeedG
    *          the series identifier
    */
   public void setSeries(String[] series) {
-    if (series == null || series.length == 0)
+    if (series == null || series.length == 0) {
       throw new IllegalArgumentException("Series cannot be null or empty");
+    }
 
     // Create the solr query for the series
     StringBuffer q = new StringBuffer();

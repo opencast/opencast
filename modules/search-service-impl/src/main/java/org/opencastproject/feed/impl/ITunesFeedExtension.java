@@ -153,8 +153,9 @@ public class ITunesFeedExtension implements FeedExtension {
    *          the keyword to add
    */
   public void addKeyword(String keyword) {
-    if (keywords == null)
+    if (keywords == null) {
       keywords = new ArrayList<String>();
+    }
     keywords.add(keyword);
   }
 

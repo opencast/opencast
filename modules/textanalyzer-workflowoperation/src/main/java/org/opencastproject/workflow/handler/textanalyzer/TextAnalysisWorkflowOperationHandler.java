@@ -151,12 +151,6 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
     this.mpeg7CatalogService = catalogService;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -240,8 +234,9 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         List<VideoSegment> videoSegments = new LinkedList<VideoSegment>();
         while (segmentIterator.hasNext()) {
           Segment segment = segmentIterator.next();
-          if ((segment instanceof VideoSegment))
+          if ((segment instanceof VideoSegment)) {
             videoSegments.add((VideoSegment) segment);
+          }
         }
 
         // argument array for image extraction
@@ -254,10 +249,11 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
           // Choose a time
           MediaPackageReference reference = null;
-          if (catalogRef == null)
+          if (catalogRef == null) {
             reference = new MediaPackageReferenceImpl();
-          else
+          } else {
             reference = new MediaPackageReferenceImpl(catalogRef.getType(), catalogRef.getIdentifier());
+          }
           reference.setProperty("time", segmentTimePoint.toString());
 
           // Have the time for ocr image created. To circumvent problems with slowly building slides, we take the image
@@ -271,21 +267,24 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         // Have the ocr image(s) created.
 
         Job imageJob = composer.image(sourceTrack, IMAGE_EXTRACTION_PROFILE, times);
-        if (!waitForStatus(imageJob).isSuccess())
+        if (!waitForStatus(imageJob).isSuccess()) {
           throw new WorkflowOperationException("Extracting scene images from " + sourceTrack + " failed");
-        if (imageJob.getPayload() == null)
+        }
+        if (imageJob.getPayload() == null) {
           throw new WorkflowOperationException(
                   "The payload of extracting images job from " + sourceTrack + " was null");
+        }
 
         totalTimeInQueue += imageJob.getQueueTime();
         for (MediaPackageElement imageMpe : MediaPackageElementParser.getArrayFromXml(imageJob.getPayload())) {
           Attachment image = (Attachment) imageMpe;
           images.add(image);
         }
-        if (images.isEmpty() || images.size() != times.length)
+        if (images.isEmpty() || images.size() != times.length) {
           throw new WorkflowOperationException(
                   "There are no images produced for " + sourceTrack
                           + " or the images count isn't equal the count of the video segments.");
+        }
 
         // Run text extraction on each of the images
         Iterator<VideoSegment> it = videoSegments.iterator();
@@ -313,8 +312,9 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
             continue;
           }
           Mpeg7Catalog videoTextCatalog = loadMpeg7Catalog(catalog);
-          if (videoTextCatalog == null)
+          if (videoTextCatalog == null) {
             throw new IllegalStateException("Text analysis service did not return a valid mpeg7");
+          }
 
           // Add the spatiotemporal decompositions from the new catalog to the existing video segments
           Iterator<Video> videoTextContents = videoTextCatalog.videoContent();
@@ -381,11 +381,13 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           Catalog catalog = null;
           try {
             Job job = serviceRegistry.getJob(j.getId());
-            if (!Job.Status.FINISHED.equals(job.getStatus()))
+            if (!Job.Status.FINISHED.equals(job.getStatus())) {
               continue;
+            }
             catalog = (Catalog) MediaPackageElementParser.getFromXml(job.getPayload());
-            if (catalog != null)
+            if (catalog != null) {
               workspace.delete(catalog.getURI());
+            }
           } catch (Exception e) {
             if (catalog != null) {
               logger.warn("Unable to delete temporary text file {}: {}", catalog.getURI(), e);
@@ -449,16 +451,19 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         continue;
       }
       if (sourceFlavor != null) {
-        if (mediaPackageCatalog.getReference() == null)
+        if (mediaPackageCatalog.getReference() == null) {
           continue;
+        }
         Track t = mediaPackage.getTrack(mediaPackageCatalog.getReference().getIdentifier());
-        if (t == null || !t.getFlavor().matches(MediaPackageElementFlavor.parseFlavor(sourceFlavor)))
+        if (t == null || !t.getFlavor().matches(MediaPackageElementFlavor.parseFlavor(sourceFlavor))) {
           continue;
+        }
       }
 
       // Make sure the catalog features at least one of the required tags
-      if (!mediaPackageCatalog.containsTag(sourceTagSet))
+      if (!mediaPackageCatalog.containsTag(sourceTagSet)) {
         continue;
+      }
 
       Mpeg7Catalog mpeg7 = loadMpeg7Catalog(mediaPackageCatalog);
 
@@ -494,11 +499,13 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         logger.info("The videosegmenter's stability threshold has been set to {} frames", stabilityThreshold);
       } catch (Exception e) {
         stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
-        logger.warn("Found illegal value '{}' for the videosegmenter stability threshold. Falling back to default value of {} frames", threshold, DEFAULT_STABILITY_THRESHOLD);
+        logger.warn("Found illegal value '{}' for the videosegmenter stability threshold. "
+            + "Falling back to default value of {} frames", threshold, DEFAULT_STABILITY_THRESHOLD);
       }
     } else {
       stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
-      logger.info("Using the default value of {} frames for the videosegmenter stability threshold", DEFAULT_STABILITY_THRESHOLD);
+      logger.info("Using the default value of {} frames for the videosegmenter stability threshold",
+          DEFAULT_STABILITY_THRESHOLD);
     }
   }
 
