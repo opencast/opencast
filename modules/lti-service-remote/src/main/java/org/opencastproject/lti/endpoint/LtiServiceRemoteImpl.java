@@ -83,8 +83,8 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
   public void upsertEvent(
           final LtiFileUpload file,
           final String captions,
-          final String captionsFormat,
-          final String captionsLanguage,
+          final String captionFormat,
+          final String captionLanguage,
           final String eventId,
           final String seriesId,
           final String metadataJson) {
@@ -97,11 +97,11 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
     if (captions != null) {
       entity.addTextBody("captions", captions);
     }
-    if (captionsFormat != null) {
-      entity.addTextBody("captionsFormat", captionsFormat);
+    if (captionFormat != null) {
+      entity.addTextBody("captionFormat", captionFormat);
     }
-    if (captionsLanguage != null) {
-      entity.addTextBody("captionsLanguage", captionsLanguage);
+    if (captionLanguage != null) {
+      entity.addTextBody("captionLanguage", captionLanguage);
     }
     if (file != null) {
       entity.addPart(file.getSourceName(), new InputStreamBody(file.getStream(), file.getSourceName()));

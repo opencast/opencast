@@ -235,8 +235,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   public void upsertEvent(
           final LtiFileUpload file,
           final String captions,
-          final String captionsFormat,
-          final String captionsLanguage,
+          final String captionFormat,
+          final String captionLanguage,
           final String eventId,
           final String seriesId,
           final String metadataJson) throws UnauthorizedException, NotFoundException {
@@ -253,27 +253,41 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         throw new RuntimeException("Unable to create media package for event");
       }
       if (captions != null) {
-        final MediaPackageElementFlavor captionsFlavor =
-            new MediaPackageElementFlavor(captionsFormat + "+" + captionsLanguage, "captions");
-        final MediaPackageElementBuilder elementBuilder
-            = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+        final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor(
+            "captions", captionFormat + "+" + captionLanguage
+        );
+        final MediaPackageElementBuilder elementBuilder =
+            MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         final MediaPackageElement captionsMpe = elementBuilder
                 .newElement(MediaPackageElement.Type.Attachment, captionsFlavor);
-        if ("dfxp".equals(captionsFormat)) {
+        if ("dfxp".equals(captionFormat)) {
           captionsMpe.setMimeType(mimeType("application", "xml"));
         } else {
-          captionsMpe.setMimeType(mimeType("text", captionsFormat));
+          captionsMpe.setMimeType(mimeType("text", captionFormat));
         }
-        captionsMpe.addTag("lang:" + captionsLanguage);
+        captionsMpe.addTag("lang:" + captionLanguage);
         mp.add(captionsMpe);
         final URI captionsUri = workspace
                 .put(
                         mp.getIdentifier().toString(),
                         captionsMpe.getIdentifier(),
-                        "captions." + captionsFormat,
+                        "captions." + captionFormat,
                         new ByteArrayInputStream(captions.getBytes(StandardCharsets.UTF_8)));
         captionsMpe.setURI(captionsUri);
       }
+
+      r.setMediaPackage(mp);
+      final MetadataList metadataList = new MetadataList();
+      final MediaPackageElementFlavor flavor = new MediaPackageElementFlavor("dublincore", "episode");
+      final EventCatalogUIAdapter adapter = catalogUIAdapters.stream()
+          .filter(e -> e.getFlavor().equals(flavor)).findAny().orElse(null);
+      if (adapter == null) {
+        throw new RuntimeException("no adapter found");
+      }
+      final DublinCoreMetadataCollection collection = adapter.getRawFields();
+
+      r.setMediaPackage(ingestService.addTrack(file.getStream(), file.getSourceName(),
+          MediaPackageElements.PRESENTER_SOURCE, mp));
 
       JSONArray metadataJsonArray = (JSONArray) new JSONParser().parse(metadataJson);
 

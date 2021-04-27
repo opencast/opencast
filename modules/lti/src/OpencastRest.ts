@@ -262,14 +262,14 @@ export async function uploadFile(
     if (eventId !== undefined)
         data.append("eventId", eventId);
     data.append("seriesId", seriesId);
-    if (captionFile !== undefined)
-        data.append("captions", captionFile);
-    if (presenterFile !== undefined)
-        data.append("presenter", presenterFile);
     if (captionFormat !== undefined)
         data.append("captionFormat", captionFormat);
     if (captionLanguage !== undefined)
         data.append("captionLanguage", captionLanguage);
+    if (captionFile !== undefined)
+        data.append("captions", captionFile);
+    if (presenterFile !== undefined)
+        data.append("presenter", presenterFile);
     return axios.post(
         hostAndPort() + "/lti-service-gui",
         data,
