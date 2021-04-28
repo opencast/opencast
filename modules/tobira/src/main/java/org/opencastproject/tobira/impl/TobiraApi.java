@@ -26,8 +26,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
-import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.search.api.SearchService;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -35,7 +34,6 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,32 +48,25 @@ import javax.ws.rs.core.Response;
 /**
  * Tobira API Endpoint
  */
-@Component(
-    property = {
-        "service.description=Tobira API Endpoint",
-        "opencast.service.type=org.opencastproject.tobira",
-        "opencast.service.path=/tobira",
-        "opencast.service.jobproducer=false"
-    },
-    immediate = true,
-    service = TobiraApi.class
-)
 @Path("")
-@RestService(name = "TobiraApiEndpoint",
+@RestService(
+    name = "TobiraApiEndpoint",
     title = "Tobira API Endpoint",
     abstractText = "Opencast Tobira API endpoint.",
-    notes = { "This provides API endpoint used by Tobira to harvest media metadata" })
+    notes = { "This provides API endpoint used by Tobira to harvest media metadata" }
+)
 public class TobiraApi {
-  /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(TobiraApi.class);
 
-  /** The service */
-  private ServiceRegistry serviceRegistry;
-  private OrganizationDirectoryService organizationDirectoryService;
+  private SearchService searchService;
 
   @Activate
   public void activate(BundleContext bundleContext) {
     logger.info("Activated Tobira API");
+  }
+
+  public void setSearchService(SearchService service) {
+    this.searchService = service;
   }
 
   @GET
@@ -130,7 +121,7 @@ public class TobiraApi {
           .entity(json)
           .build();
     } catch (Exception e) {
-      logger.error("Exception handling tobira/harvest: {}", e);
+      logger.error("Unexpected exception in tobira/harvest", e);
       return Response.serverError().build();
     }
   }
