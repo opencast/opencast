@@ -10,8 +10,8 @@
    "SAVE": "Gem",
    "LOGOUT": "Log ud",
    "RESET": "Nulstil",
-   "SELECT_NO_OPTION_SELECTED": "Ingen mulighed valgt",
-   "SELECT_NO_OPTIONS_AVAILABLE": "Ingen tilgængelige muligheder",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabisk",
@@ -232,9 +232,9 @@
          },
          "EDIT": {
             "CAPTION": "Redigér",
-            "EVENT": "begivenhed",
-            "EVENTS": "begivenheder",
-            "HEADER": "Denne side muliggør redigering af planlagte begivenheder grupperet efter ugedage. Indtastningsfelterne er forudfyldte, hvis alle planlagte begivenheder har samme værdi i et bestemt felt - ellers er felterne tomme. Efterlades inputfelter tomme, betyder det, at de respektive værdier ikke skal ændres.",
+            "EVENT": "event",
+            "EVENTS": "events",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Metadata",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -376,7 +376,7 @@
                   "REPEATS": "Gentag",
                   "REPEAT_ON": "Gentag på",
                   "WEEKDAYS": "Ugedage",
-                  "WEEKDAY": "Ugedag"
+                  "WEEKDAY": "Weekday"
                },
                "NO_SOURCE_AVAILABLE": "Ingen optageagent tilgængelig for planlægning"
             },
@@ -427,7 +427,7 @@
                "TH": "Torsdag",
                "FR": "Fredag",
                "SA": "Lørdag",
-               "SU": "Søndag"
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -445,7 +445,7 @@
             "SERIES": "Serier",
             "DATE": "Dato",
             "START": "Start",
-            "END": "Slut",
+            "END": "End",
             "STOP": "Stop",
             "STATUS": "Status",
             "LOCATION": "Placering",
@@ -458,7 +458,7 @@
             "PREVIOUS": "Foregående",
             "NOCONTENT": "Ingen tilgængelige data",
             "PUBLISHED": "Offentliggjort",
-            "WEEKDAY": "Ugedag",
+            "WEEKDAY": "Weekday",
             "TOOLTIP": {
                "ASSETS": "Open asset details",
                "START": "Filtrer til denne startdato",
@@ -468,10 +468,10 @@
                "DETAILS": "Åbn begivenhedsoplysninger",
                "DELETE": "Slet begivenhed",
                "EDITOR": "Åbn videoredigeringsværktøj",
-               "EDITOR_NEEDS_CUTTING": "Åbn videoredigeringsværktøjet (en kommentar indikerer, at der er blevet anmodet om videobeskæring)",
+               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "Vis kommentarer",
                "PAUSED_WORKFLOW": "Vis arbejdsgange på pause",
-               "PRESENTER": "Filtrér til denne vært"
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "STATUS": {
@@ -593,7 +593,7 @@
                "SIZE": "Størrelse",
                "DETAILS": "Oplysninger",
                "STREAMS": "Streams",
-               "PREVIEW": "Eksempelvisning",
+               "PREVIEW": "Preview",
                "ATTACHMENTS": {
                   "TITLE": "Vedhæftninger",
                   "CAPTION": "Vedhæftninger",
@@ -767,7 +767,7 @@
                "SOURCE": "Kilde",
                "CREATED": "Oprettet",
                "CREATED_BY": "Oprettet af",
-               "PUBLISHER": "Udgiver",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Licens",
                "CONTRIBUTORS": "Bidragyder(-e)",
                "RIGHTS": "Rettigheder",
@@ -791,7 +791,7 @@
                "ACTIONS": "Handlinger",
                "DETAILS": "Oplysninger",
                "DESCRIPTION": "Beskriveslse",
-               "MORE_INFO": "Mere information",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titel",
@@ -799,8 +799,8 @@
                "STARTED": "Startet",
                "SERIES": "Serier",
                "SUBMITTED": "Indsendt",
-               "SUBMITTER": "Indsender",
-               "EXECUTION_TIME": "Eksekveringstid",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
                "WDID": "Arbejdsgngsdefinition",
                "MIMETYPE": "Mime-type",
                "URL": "URL",
@@ -808,22 +808,22 @@
                "NO_CONFIGURATION": "Ingen eksisterende opsætningsparametre til den valgte arbejdsgangsdefinition.",
                "WORKFLOW": "Arbejdsgang",
                "TOOLTIP": {
-                  "STOP": "Stop arbejdsgang",
-                  "ABORT": "Afbryd eksekvering af arbejdsgang (forsøg ikke fejlede operationer igen)",
-                  "RETRY": "Førsøg eksekvering af arbejdsgang igen",
-                  "DELETE": "Slet arbejdsgang",
-                  "DETAILS": "Åbn arbejdsgangsdetaljer"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
-                  "INSTANTIATED": "Forberedes",
+                  "INSTANTIATED": "Instantiated",
                   "RUNNING": "I gang",
                   "PAUSED": "På pause",
-                  "SUCCEEDED": "Gennemført",
+                  "SUCCEEDED": "Succeeded",
                   "FAILED": "Mislykkedes",
                   "FAILING": "Mislykkede",
-                  "SKIPPED": "Oversprunget",
+                  "SKIPPED": "Skipped",
                   "STOPPED": "Standsede",
-                  "RETRY": "Prøv igen"
+                  "RETRY": "Retry"
                }
             },
             "WORKFLOW_INSTANCES": {
@@ -848,16 +848,16 @@
                   "TITLE": "Titel",
                   "STATE": "Tilstand",
                   "DESCRIPTION": "Beskriveslse",
-                  "EXECUTION_HOST": "Eksekveringsvært",
+                  "EXECUTION_HOST": "Execution Host",
                   "JOB": "Job",
-                  "TIME_IN_QUEUE": "Tid i kø",
+                  "TIME_IN_QUEUE": "Time in Queue",
                   "STARTED": "Startet",
                   "FINISHED": "Afsluttet",
-                  "RETRY_STRATEGY": "Forsøg igen-strategi",
-                  "FAILED_ATTEMPTS": "Mislykkede forsøg",
-                  "MAX_ATTEMPTS": "Maks.",
-                  "EXCEPTION_HANDLER_WORKFLOW": "Arbejdsproces for undtagelseshåndtering",
-                  "FAIL_ON_ERROR": "Svigt ved fejl"
+                  "RETRY_STRATEGY": "Retry Strategy",
+                  "FAILED_ATTEMPTS": "Failed Attempts",
+                  "MAX_ATTEMPTS": "Max",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+                  "FAIL_ON_ERROR": "Fail on Error"
                }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
@@ -955,7 +955,7 @@
          "TABLE": {
             "CAPTION": "Serier",
             "TITLE": "Serier",
-            "HAS_EVENTS": "Indeholder begivenheder",
+            "HAS_EVENTS": "Contains events",
             "ORGANIZERS": "Organisator(-er)",
             "CONTRIBUTORS": "Bidragyder(-e)",
             "CREATED": "Oprettet",
@@ -996,8 +996,8 @@
                   "ACTION": "Handlinger",
                   "NEW": "Ny politik",
                   "DETAILS": "Oplysninger",
-                  "REPLACE_EVENT_ACLS": "Opdatér begivenhedsrettigheder",
-                  "REPLACE_EVENT_ACLS_HINT": "Sikrer, at alle begivenhederne i denne serie har disse aktive rettighedeer"
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Vælg en rolle",
@@ -1110,7 +1110,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Opret bruger",
-            "EDITCAPTION": "Brugerdetaljer - {{username}}",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Bruger",
                "ROLES": "Roller",
@@ -1154,7 +1154,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Opret gruppe",
-            "EDITCAPTION": "Gruppe detaljer - {{name}}",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Gruppe",
                "ROLES": "Roller",
@@ -1235,7 +1235,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Adgangspolitikdetaljer - {{name}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Oversigt",
                "METADATA": "Metadata",
@@ -1348,7 +1348,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Opret tema",
-            "EDITCAPTION": "Temadetaljer - {{name}}",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Generelt",
                "NAME": "Navn",
@@ -1442,11 +1442,11 @@
             "RUNNING": "I gang",
             "FINISHED": "Afsluttet",
             "FAILED": "Mislykkedes",
-            "DELETED": "Slettet",
-            "INSTANTIATED": "Forberedt",
-            "DISPATCHING": "Afsendelse",
-            "RESTART": "Genstart",
-            "CANCELED": "Annulleret",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
             "WAITING": "Afventer"
          }
       },
@@ -1512,10 +1512,10 @@
       },
       "AREAS": {
          "METADATA": "Metadata",
-         "THUMBNAIL": "Eksempel",
+         "THUMBNAIL": "Thumbnail",
          "COMMENTS": "Kommentarer",
          "SEGMENTS": "Segmenter",
-         "TRACKS": "Spor"
+         "TRACKS": "Tracks"
       },
       "ACTIONS": {
          "SPLIT": "Opdel",
@@ -1538,71 +1538,71 @@
          "SHOW_SEGMENT": "Show this Segment",
          "HIDE_SEGMENT": "Hide this Segment",
          "START": "Start",
-         "END": "Slut"
+         "END": "End"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "En standardminiature, benyttet som en visuel repræsentation af begivenheden, genereres automatisk. Vil du hellere benytte en anden miniature, kan du udtrække en fra videoen på den aktuelle afspilningsposition eller uploade et billede.",
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
-                  "LABEL": "Udtræk fra video",
-                  "TOOLTIP": "Udtræk miniature fra videoen på den aktuelle afspilningsposition"
+                  "LABEL": "Extract from video",
+                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
                },
                "FROM_LEFT_VIDEO": {
-                  "LABEL": "Udtræk fra venstre video",
-                  "TOOLTIP": "Udtræk miniature fra den venstre video på den aktuelle afspilningsposition"
+                  "LABEL": "Extract from left video",
+                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
                },
                "FROM_RIGHT_VIDEO": {
-                  "LABEL": "Udtræk fra højre video",
-                  "TOOLTIP": "Udtræk miniature fra den højre video på den aktuelle afspilningsposition"
+                  "LABEL": "Extract from right video",
+                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
                }
             },
             "UPLOAD": {
                "LABEL": "Upload billede",
-               "TOOLTIP": "Uploade et miniaturebillede"
+               "TOOLTIP": "Upload a thumbnail image"
             },
             "USE_DEFAULT": {
-               "LABEL": "Benyt standardminiature",
-               "TOOLTIP": "Brug automatisk genereret standardminiature"
+               "LABEL": "Use default thumbnail",
+               "TOOLTIP": "Use the default thumbnail that is generated automatically"
             }
          },
          "PREVIEW": {
-            "NOT_AVAILABLE": "Intet eksempel tilgængeligt",
-            "OUTDATED": "Eksemplet er forældet, da segmenter er ændret. Det opdateres, så snart du gemmer dine ændringer."
+            "NOT_AVAILABLE": "No preview available",
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
-            "DEFAULT": "Du benytter aktuelt standardminiaturen.",
-            "SNAPSHOT": "Den aktuelle miniature er blevet udtrukket fra videoen.",
-            "UPLOAD": "Du benytter aktuelt en uploadet miniature."
+            "DEFAULT": "You are currently using the default thumbnail.",
+            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
+            "UPLOAD": "You are currently using an uploaded thumbnail."
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "Du kan fravælge spor for at udelukke dem fra yderligere behandling. Bemærk, at du er nødt til at (gen-)udgive begivenheden for at effektuere ændringerne.",
+         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Du skal aktivere minimum ét videospor",
-            "NO_AUDIO_TRACK_SELECTED": "Du skal aktivere minimum ét lydspor"
+            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
          },
          "TRACK": {
-            "HEADER": "Spor"
+            "HEADER": "Track"
          },
          "VIDEO": {
-            "HEADER": "Videospor",
-            "NOT_AVAILABLE": "Intet videospor tilgængeligt",
-            "NO_PREVIEW_AVAILABLE": "Intet billedeksempel fundet",
-            "NO_TRACK_SELECTED": "Intet videospor valgt",
+            "HEADER": "Video track",
+            "NOT_AVAILABLE": "No video tracks available",
+            "NO_PREVIEW_AVAILABLE": "No preview image found",
+            "NO_TRACK_SELECTED": "No video track selected",
             "TOOLTIPS": {
-               "HIDE": "Dette videospor er i øjeblikket aktivt. Klik for at deaktivere",
-               "UNHIDE": "Dette videospor er i øjeblikket inaktivt. Klik for at eaktivere."
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
-            "HEADER": "Lydspor",
-            "NOT_AVAILABLE": "Ingen lydspor tilgængelig",
-            "NO_PREVIEW_AVAILABLE": "Intet billedeksempel fundet",
-            "NO_TRACK_SELECTED": "Intet lydspor valgt",
+            "HEADER": "Audio track",
+            "NOT_AVAILABLE": "No audio tracks available",
+            "NO_PREVIEW_AVAILABLE": "No preview image found",
+            "NO_TRACK_SELECTED": "No audio track selected",
             "TOOLTIPS": {
-               "HIDE": "Dette lydspor er i øjeblikket aktivt. Klik for at deaktivere",
-               "UNHIDE": "Dette videospor er i øjeblikket inaktivt. Klik for at aktivere"
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
             }
          }
       },
@@ -1674,8 +1674,8 @@
          },
          "COMMENTS": {
             "LABEL": "Kommentarer",
-            "NONE": "Ingen",
-            "OPEN": "Åbne",
+            "NONE": "None",
+            "OPEN": "Open",
             "RESOLVED": "Løst"
          },
          "CONTRIBUTORS": {
@@ -1685,7 +1685,7 @@
             "LABEL": "Kreatør"
          },
          "PUBLISHER": {
-            "LABEL": "Udgiver"
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Værtsnavn"
@@ -1880,14 +1880,14 @@
    },
    "HOTKEYS": {
       "CHEAT_SHEET": {
-         "TITLE": "Tastaturgenveje",
-         "HINT": "Denne side viser de aktuelt tilgængelige tastaturgenveje. Bemærk, at disse kan ændre sig, afhængigt af hvilken side du besøger."
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
       },
       "KEYS": {
          "CTRL": "Ctrl",
          "ALT": "Alt",
          "OPTION": "⌥",
-         "SPACE": "Mellemrum",
+         "SPACE": "Space",
          "BACKSPACE": "⌫",
          "LEFT": "←",
          "RIGHT": "→",
@@ -1902,8 +1902,8 @@
          "CAPSLOCK": "⇪",
          "ESC": "Esc",
          "ESCAPE": "Esc",
-         "PAGEUP": "Side↑",
-         "PAGEDOWN": "Side↓",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
          "END": "End",
          "HOME": "Home",
          "INS": "Ins",
@@ -1911,57 +1911,57 @@
       },
       "GROUPS": {
          "GENERAL": "Generelt",
-         "PLAYER": "Afspiller",
+         "PLAYER": "Player",
          "EDITOR": "Redigering"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
-            "MAIN_MENU": "Hovedmenu",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Vælg næste betjeningspanelsfilter",
-            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Vælg foregående betjeningspanelsfilter",
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
             "REMOVE_FILTERS": "Ryd alle filtre",
             "EVENT_VIEW": "Begivenheder",
             "SERIES_VIEW": "Serier",
             "NEW_EVENT": "Tilføj begivenhed",
             "NEW_SERIES": "Tilføj serier",
-            "CHEAT_SHEET": "Tastaturgenveje"
+            "CHEAT_SHEET": "Keyboard shortcuts"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Afspil/pause",
+            "PLAY_PAUSE": "Play/pause",
             "PREVIOUS_FRAME": "Foregående billede",
             "NEXT_FRAME": "Næste billede",
-            "STEP_BACKWARD": "Spring 10s tilbage",
-            "STEP_FORWARD": "Spring 10s frem",
-            "PREVIOUS_SEGMENT": "Foregående segment/Spring til start",
-            "NEXT_SEGMENT": "Næste segment/Spring til slutning",
-            "VOLUME_UP": "Lydstyrke op",
-            "VOLUME_DOWN": "Lydstyrke ned",
-            "MUTE": "Slå lyd fra/til"
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Opdel",
             "CUT_SELECTED_SEGMENT": "Klip",
-            "PLAY_CURRENT_SEGMENT": "Afspil aktuelle segment",
-            "CLEAR_LIST": "Ryd segment",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Genafspil segment med pre-roll",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Slut på segment"
          }
       }
    },
    "AGENTS": {
       "STATUS": {
-         "CAPTURING": "Optager",
+         "CAPTURING": "Capturing",
          "ERROR": "Fejl",
-         "IDLE": "Ikke aktiv",
+         "IDLE": "Idle",
          "OFFLINE": "Offline",
-         "SHUTTING_DOWN": "Lukker ned",
-         "UNKNOWN": "Ukendt",
+         "SHUTTING_DOWN": "Shutting down",
+         "UNKNOWN": "Unknown",
          "UPLOADING": "Uploader"
       }
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "For at indsætte flere værdier, så tryk Retur efter hver værdi"
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    },
    "STATISTICS": {
