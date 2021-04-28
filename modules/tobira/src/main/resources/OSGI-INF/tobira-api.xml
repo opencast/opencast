@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.tobira.impl.TobiraApi"
+               immediate="true">
+    <implementation class="org.opencastproject.tobira.impl.TobiraApi" />
+    <property name="service.description" value="Tobira API Endpoint" />
+    <property name="opencast.service.type" value="org.opencastproject.tobira"/>
+    <property name="opencast.service.path" value="/tobira"/>
+    <property name="opencast.service.jobproducer" value="false"/>
+    <service>
+        <provide interface="org.opencastproject.tobira.impl.TobiraApi" />
+    </service>
+    <reference name="searchService"
+               interface="org.opencastproject.search.api.SearchService"
+               bind="setSearchService"/>
+</scr:component>
