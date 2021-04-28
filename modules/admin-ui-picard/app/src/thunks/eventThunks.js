@@ -78,6 +78,85 @@ export const fetchEventMetadata = () => async dispatch => {
         dispatch(loadEventMetadataFailure());
         console.log(e);
     }
+};
+
+// get merged metadata for provided event ids
+export const postEditMetadata = async ids => {
+    let formData = new FormData();
+    formData.append('eventIds', JSON.stringify(ids));
+
+    try {
+        let data = await axios.post('/admin-ng/event/events/metadata.json', formData,
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }
+        );
+        let response = await data.data;
+
+        // transform response
+        const metadata = transformMetadataCollection(response.mergedMetadata, true);
+        return {
+            mergedMetadata: metadata,
+            notFound: response.notFound,
+            merged: response.merged,
+            runningWorkflow: response.runningWorkflow,
+        };
+    } catch (e) {
+        // return error
+        return {
+            fatalError: e.message
+        };
+    }
+};
+
+export const updateBulkMetadata = (metadataFields, values) => async dispatch => {
+    let formData = new FormData();
+    formData.append('eventId', JSON.stringify(metadataFields.merged));
+    let metadata = {
+        flavor: 'dublincore/episode',
+        title: 'EVENTS.EVENTS.DETAILS.CATALOG.EPISODE',
+        fields: []
+    };
+
+    metadataFields.mergedMetadata.forEach(field => {
+        if (field.selected) {
+            let value = values[field.id];
+            metadata.fields.push({
+                ...field,
+                value: value
+            });
+        }
+    });
+
+    formData.append('metadata', JSON.stringify(metadata));
+
+    axios.put('/event/events/metadata', formData)
+        .then(res => {
+            console.log(res);
+            dispatch(addNotification('success', 'BULK_METADATA_UPDATE.ALL_EVENTS_UPDATED'));
+        })
+        .catch(err => {
+            console.log(err);
+            if (err.status === 500) {
+                if (!!err.data) {
+                    dispatch(addNotification('error', 'BULK_METADATA_UPDATE.UNEXPECTED_ERROR'));
+                } else {
+                    if (err.data.updated && err.data.updated.length === 0) {
+                        dispatch(addNotification('error', 'BULK_METADATA_UPDATE.NO_EVENTS_UPDATED'));
+                    }
+                    if (err.data.updateFailures && err.data.updateFailures.length > 0) {
+                        dispatch(addNotification('warning', 'BULK_METADATA_UPDATE.SOME_EVENTS_NOT_UPDATED'));
+                    }
+                    if (err.data.notFound && err.data.notFound.length > 0) {
+                        dispatch(addNotification('warning', 'BULK_ACTIONS.EDIT_EVENTS_METADATA.REQUEST_ERRORS.NOT_FOUND'));
+                    }
+                }
+            } else {
+                dispatch(addNotification('error', 'BULK_METADATA_UPDATE.UNEXPECTED_ERROR'));
+            }
+        });
 }
 
 // Check for conflicts with already scheduled events

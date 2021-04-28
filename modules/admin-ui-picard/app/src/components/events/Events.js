@@ -124,12 +124,6 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         setEditMetadataEventsModal(false);
     };
 
-    const showEditMetadataEventsModal = async () => {
-        await loadingEventMetadata();
-
-        setEditMetadataEventsModal(true);
-    };
-
     const styleNavOpen = {
         marginLeft: '130px',
     };
@@ -227,7 +221,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                                     </li>
                                     {/*todo: show  user is admin with roles ROLE_UI_EVENTS_DETAILS_METADATA_EDIT*/}
                                     <li>
-                                        <a onClick={() => showEditMetadataEventsModal()}>
+                                        <a onClick={() => setEditMetadataEventsModal(true)}>
                                             {t('BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION')}
                                         </a>
                                     </li>

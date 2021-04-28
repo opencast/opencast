@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import {connect} from "react-redux";
-import {FieldArray, Field} from "formik";
+import {Field, FieldArray} from "formik";
 import {
     fetchAclActions,
     fetchAclTemplateById,
@@ -12,8 +12,8 @@ import {
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
 import Notifications from "../../../shared/Notifications";
-import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/wizardConfig";
+import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 
 
 const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess }) => {
@@ -209,13 +209,17 @@ const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, rem
                                                                                             {aclActions.length > 0 && (
                                                                                                 <td className="fit editable">
                                                                                                     <div>
-                                                                                                        <RenderMultiField fieldInformation={
-                                                                                                            {
-                                                                                                                id: `acls.${index}.actions`,
-                                                                                                                type: 'mixed_text',
-                                                                                                                collection: aclActions
+                                                                                                        <Field
+                                                                                                            name={`acls.${index}.actions`}
+                                                                                                            fieldInfo={
+                                                                                                                {
+                                                                                                                    id: `acls.${index}.actions`,
+                                                                                                                    type: 'mixed_text',
+                                                                                                                    collection: aclActions
+                                                                                                                }
                                                                                                             }
-                                                                                                        } onlyCollectionValues/>
+                                                                                                            onlyCollectionValues
+                                                                                                            component={RenderMultiField}/>
                                                                                                     </div>
                                                                                                 </td>
                                                                                             )}
