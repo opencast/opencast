@@ -2,6 +2,12 @@
    "MATTERHORN": "Opencast",
    "NAV_HOME": "Zur Startseite",
    "NAV_ABOUT": "Über",
+   "BUILD": {
+      "BUILT_ON": "gebaut am",
+      "DATE_DESC": "Datum an welchem das Kernelmodul dieses Systems gebaut wurde.",
+      "COMMIT": "Git-Commit dieser Version.",
+      "VERSION": "Version der Opencast-Bundles des Systems"
+   },
    "NO": "Nein",
    "SUBMIT": "Speichern",
    "UPDATE": {
@@ -420,7 +426,7 @@
             "LAST_NAME": "Nachname",
             "STREET": "Straße",
             "NUMBER": "Hausnummer",
-            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "ADDITIONAL_ADRESS_INFO": "Adressinformationen hinzufügen",
             "MAIL": "E-Mail-Adresse",
             "CONTACT_ME": "Kontaktiere mich für Aktualisierungen und Sicherheitsupdates",
             "WHICH_DATA_TO_SHARE": "Welche Daten möchtest du teilen?",
@@ -1151,7 +1157,7 @@
                   "DETAILS": "Details",
                   "REPLACE_EVENT_ACLS": "Zugriffsrechte des Videos aktualisieren",
                   "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Videos dieser Serie genau diese Zugriffsrechte haben",
-                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LIMIT": "angezeigte Richtlinien.",
                   "LOAD_MORE_LINK": "Mehr laden"
                },
                "ROLES": {
