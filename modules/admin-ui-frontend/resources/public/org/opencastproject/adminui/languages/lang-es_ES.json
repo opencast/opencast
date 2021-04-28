@@ -2,6 +2,12 @@
    "MATTERHORN": "Opencast",
    "NAV_HOME": "Inicio",
    "NAV_ABOUT": "Acerca de",
+   "BUILD": {
+      "BUILT_ON": "Compilado el:",
+      "DATE_DESC": "Fecha en la que se compiló el módulo del kernel de este sistema.",
+      "COMMIT": "Git commit desde el que se compiló esta version",
+      "VERSION": "Versión común del paquete"
+   },
    "NO": "No",
    "SUBMIT": "Enviar",
    "UPDATE": {
@@ -42,7 +48,7 @@
       "SELECT_OPTION": "Selecciona la opción",
       "JOB_TITLE": "Título",
       "JOB_STATUS": "Estado",
-      "UPLOAD_SUCCESS": "Upload succeeded!",
+      "UPLOAD_SUCCESS": "¡ El archivo ha sido enviado !",
       "UPLOAD_FAILURE": "Upload failed!",
       "UPLOAD_FAILURE_DESCRIPTION": "Por favor, inténtelo más tarde.",
       "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
