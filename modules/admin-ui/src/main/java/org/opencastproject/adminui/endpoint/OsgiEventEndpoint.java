@@ -40,6 +40,7 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
 import java.util.Dictionary;
+import java.util.Objects;
 
 import javax.ws.rs.Path;
 
@@ -211,14 +212,10 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
             this.getClass().getSimpleName());
 
     Object dictionaryValue = properties.get(EVENTMODAL_ONLYSERIESWITHWRITEACCESS_KEY);
-    if (dictionaryValue != null) {
-      onlySeriesWithWriteAccessEventModal = BooleanUtils.toBoolean(dictionaryValue.toString());
-    }
+    onlySeriesWithWriteAccessEventModal = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
 
     dictionaryValue = properties.get(EVENTSTAB_ONLYEVENTSWITHWRITEACCESS_KEY);
-    if (dictionaryValue != null) {
-      onlyEventsWithWriteAccessEventsTab = BooleanUtils.toBoolean(dictionaryValue.toString());
-    }
+    onlyEventsWithWriteAccessEventsTab = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
   }
 
   @Override
