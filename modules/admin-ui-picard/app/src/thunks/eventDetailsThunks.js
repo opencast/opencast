@@ -7,6 +7,9 @@ import {
     saveCommentReplyInProgress,
     saveCommentReplyDone,
 } from '../actions/eventDetailsActions';
+import {
+    getURLParams
+} from "../utils/resourceUtils";
 import axios from "axios";
 
 export const fetchComments = (eventId) => async (dispatch) => {
@@ -26,12 +29,15 @@ export const fetchComments = (eventId) => async (dispatch) => {
     }
 }
 
-export const saveComment = (eventId, commentText, commentReason) => async (dispatch) => {
+export const saveComment = (eventId, commentText, commentReason) => async (dispatch, getState) => {
     try {
         dispatch(saveCommentInProgress());
 
+        const state = getState();
+        let params = getURLParams(state);
+
         const commentSaved = await axios.post(`admin-ng/event/${eventId}/comment`,
-            `text=${commentText}&reason=${commentReason}`);
+            `text=${commentText}&reason=${commentReason}`, { params: params });
         await commentSaved.data;
 
         dispatch(saveCommentDone());
@@ -43,9 +49,13 @@ export const saveComment = (eventId, commentText, commentReason) => async (dispa
     }
 }
 
-export const deleteComment = (eventId, commentId) => async (dispatch) => {
+export const deleteComment = (eventId, commentId) => async (getState) => {
     try {
-        const commentDeleted = await axios.delete(`admin-ng/event/${eventId}/comment/${commentId}`);
+        const state = getState();
+        let params = getURLParams(state);
+
+        const commentDeleted = await axios.delete(`admin-ng/event/${eventId}/comment/${commentId}`,
+            { params: params });
         await commentDeleted.data;
         return true;
     } catch (e) {
@@ -54,12 +64,15 @@ export const deleteComment = (eventId, commentId) => async (dispatch) => {
     }
 }
 
-export const saveCommentReply = (eventId, commentId, replyText, commentResolved) => async (dispatch) => {
+export const saveCommentReply = (eventId, commentId, replyText, commentResolved) => async (dispatch, getState) => {
     try {
         dispatch(saveCommentReplyInProgress());
 
+        const state = getState();
+        let params = getURLParams(state);
+
         const commentReply = await axios.post(`admin-ng/event/${eventId}/comment/${commentId}/reply`,
-            `text=${replyText}&resolved=${commentResolved}`);
+            `text=${replyText}&resolved=${commentResolved}`, { params: params });
 
         await commentReply.data;
 
@@ -72,9 +85,13 @@ export const saveCommentReply = (eventId, commentId, replyText, commentResolved)
     }
 }
 
-export const deleteCommentReply = (eventId, commentId, replyId) => async (dispatch) => {
+export const deleteCommentReply = (eventId, commentId, replyId) => async (getState) => {
     try {
-        const commentReplyDeleted = await axios.delete(`admin-ng/event/${eventId}/comment/${commentId}/${replyId}`);
+        const state = getState();
+        let params = getURLParams(state);
+
+        const commentReplyDeleted = await axios.delete(`admin-ng/event/${eventId}/comment/${commentId}/${replyId}`,
+            { params: params });
         await commentReplyDeleted.data;
 
         return true;

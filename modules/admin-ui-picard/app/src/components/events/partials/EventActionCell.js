@@ -47,6 +47,7 @@ const EventActionCell = ({ row })  => {
             <EventDetailsModal showModal={displayEventDetailsModal}
                                handleClose={hideEventDetailsModal}
                                tabIndex={eventDetailsTabIndex}
+                               eventTitle={row.title}
                                eventId={row.id} />
 
             {/* Open event details */}

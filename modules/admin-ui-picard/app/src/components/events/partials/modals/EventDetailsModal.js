@@ -4,9 +4,9 @@ import EventDetails from "./EventDetails";
 
 
 /**
- * This component renders the modal for adding new resources
+ * This component renders the modal for displaying event details
  */
-const EventDetailsModal = ({ handleClose, showModal, tabIndex, eventId }) => {
+const EventDetailsModal = ({ handleClose, showModal, tabIndex, eventTitle, eventId }) => {
     const { t } = useTranslation();
 
     const close = () => {
@@ -21,8 +21,9 @@ const EventDetailsModal = ({ handleClose, showModal, tabIndex, eventId }) => {
                 <section id="event-details-modal" tabIndex={tabIndex} className="modal wizard modal-animation">
                     <header>
                         <a className="fa fa-times close-modal" onClick={() => close()}/>
-                        <h2>{t('EVENTS.EVENTS.DETAILS.HEADER',
-                            { resourceId: "Beispiel Event ID" /*todo: find real value*/} ) /*Event details - {{resourceId}}*/} </h2>
+                        <h2>
+                            {t('EVENTS.EVENTS.DETAILS.HEADER', { resourceId: eventTitle} ) /*Event details - {{resourceId}}*/}
+                        </h2>
                     </header>
 
                     <EventDetails tabIndex={tabIndex}

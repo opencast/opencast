@@ -180,7 +180,6 @@ const MockDataPage = ({ header, t }) => {
                 <div className="full-col">
                     <div className="obj tbl-details">
                         <header className="no-expand">{t(header)}</header>
-                        {/* Table view containing input fields for metadata */}
                         <div className="obj-container">
                             <table class="main-tbl">
                                 <tr>
