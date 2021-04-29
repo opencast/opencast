@@ -369,7 +369,7 @@
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
@@ -384,7 +384,7 @@
         <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="strategy">merge</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
@@ -399,7 +399,7 @@
         <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
         <configuration key="url-pattern">http://localhost:8080/api/events/${event_id}</configuration>
         <configuration key="with-published-elements">false</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
@@ -414,7 +414,7 @@
         <configuration key="download-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-tags">engage-download,atom,rss</configuration>
         <configuration key="streaming-tags">engage-streaming</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
         <configuration key="repository">default</configuration>
       </configurations>
     </operation>
