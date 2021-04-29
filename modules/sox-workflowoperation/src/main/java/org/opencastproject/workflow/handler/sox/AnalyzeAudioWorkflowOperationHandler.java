@@ -107,12 +107,6 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
     this.workspace = workspace;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     logger.debug("Running analyze audio workflow operation on workflow {}", workflowInstance.getId());
@@ -197,8 +191,9 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
       }
 
       // Wait for the jobs to return
-      if (!waitForStatus(analyzeJobs.keySet().toArray(new Job[analyzeJobs.size()])).isSuccess())
+      if (!waitForStatus(analyzeJobs.keySet().toArray(new Job[analyzeJobs.size()])).isSuccess()) {
         throw new WorkflowOperationException("One of the analyze jobs did not complete successfully");
+      }
 
       // Process the result
       for (Map.Entry<Job, Track> entry : analyzeJobs.entrySet()) {
@@ -244,8 +239,9 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
           MediaPackageException {
     logger.info("Extract audio stream from track {}", videoTrack);
     Job job = composerService.encode(videoTrack, SOX_AONLY_PROFILE);
-    if (!waitForStatus(job).isSuccess())
+    if (!waitForStatus(job).isSuccess()) {
       throw new WorkflowOperationException("Extracting audio track from video track " + videoTrack + " failed");
+    }
 
     return (Track) MediaPackageElementParser.getFromXml(job.getPayload());
   }

@@ -112,7 +112,13 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final String[] FFMPEG = {"ffmpeg", "-y", "-v", "warning", "-nostats", "-max_error_rate", "1.0"};
   private static final String FFMPEG_WF_CODEC = "h264"; //"mpeg2video";
   private static final int FFMPEG_WF_FRAMERATE = 24;
-  private static final String[] FFMPEG_WF_ARGS = {"-an", "-codec", FFMPEG_WF_CODEC, "-q:v", "2", "-g", Integer.toString(FFMPEG_WF_FRAMERATE * 10), "-pix_fmt", "yuv420p", "-r", Integer.toString(FFMPEG_WF_FRAMERATE)};
+  private static final String[] FFMPEG_WF_ARGS = {
+      "-an", "-codec", FFMPEG_WF_CODEC,
+      "-q:v", "2",
+      "-g", Integer.toString(FFMPEG_WF_FRAMERATE * 10),
+      "-pix_fmt", "yuv420p",
+      "-r", Integer.toString(FFMPEG_WF_FRAMERATE)
+  };
 
   /** Services */
   private Workspace workspace = null;
@@ -139,8 +145,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
    * Holds basic information on the final video, which is for example used to appropriately place and scale
    * individual videos.
    */
-  class LayoutArea
-  {
+  class LayoutArea {
     private int x = 0;
     private int y = 0;
     private int width = 1920;
@@ -202,8 +207,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   /**
    * Holds information on a single video beyond what is usually stored in a Track
    */
-  class VideoInfo
-  {
+  class VideoInfo {
     private int aspectRatioWidth = 16;
     private int aspectRatioHeight = 9;
 
@@ -252,8 +256,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       aspectRatioHeight = height;
     }
 
-    VideoInfo(Track video, long timeStamp, int aspectRatioHeight, int aspectRatioWidth, long startTime)
-    {
+    VideoInfo(Track video, long timeStamp, int aspectRatioHeight, int aspectRatioWidth, long startTime) {
       this(aspectRatioHeight, aspectRatioWidth);
       this.video = video;
       this.startTime = startTime;
@@ -263,8 +266,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   /**
    * Pair class for readability
    */
-  class Offset
-  {
+  class Offset {
     private int x = 16;
     private int y = 9;
 
@@ -292,8 +294,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
    * A new section is defined whenever a video becomes active or inactive.
    * Therefore it contains information on the timing as well as all currently active videos in the section.
    */
-  class EditDecisionListSection
-  {
+  class EditDecisionListSection {
     private long timeStamp = 0;
     private long nextTimeStamp = 0;
     private List<VideoInfo> areas;
@@ -317,8 +318,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       this.areas = areas;
     }
 
-    EditDecisionListSection()
-    {
+    EditDecisionListSection() {
       areas = new ArrayList<VideoInfo>();
     }
   }
@@ -326,8 +326,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   /**
    * Stores relevant information from the source SMIL
    */
-  class StartStopEvent implements Comparable<StartStopEvent>
-  {
+  class StartStopEvent implements Comparable<StartStopEvent> {
     private boolean start;
     private long timeStamp;
     private Track video;
@@ -352,8 +351,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       this.videoInfo = videoInfo;
     }
 
-    StartStopEvent(boolean start, Track video, long timeStamp, VideoInfo videoInfo)
-    {
+    StartStopEvent(boolean start, Track video, long timeStamp, VideoInfo videoInfo) {
       this.start = start;
       this.timeStamp = timeStamp;
       this.video = video;
@@ -366,12 +364,6 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -409,11 +401,13 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     }
 
     // No concat encoding profile? Fail
-    if (concatEncodingProfile == null)
+    if (concatEncodingProfile == null) {
       throw new WorkflowOperationException("Encoding profile must be set!");
+    }
     EncodingProfile profile = composerService.getProfile(concatEncodingProfile);
-    if (profile == null)
+    if (profile == null) {
       throw new WorkflowOperationException("Encoding profile '" + concatEncodingProfile + "' was not found");
+    }
 
 
     // Define a general Layout for the final video
@@ -498,7 +492,8 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
           tmpList.add(track);
           LayoutArea trackDimension = determineDimension(tmpList, true);
           if (trackDimension == null) {
-            throw new WorkflowOperationException("One of the source video tracks did not contain a valid video stream or dimension");
+            throw new WorkflowOperationException("One of the source video tracks did not contain "
+                + "a valid video stream or dimension");
           }
           videoInfo.aspectRatioHeight = trackDimension.getHeight();
           videoInfo.aspectRatioWidth = trackDimension.getWidth();
@@ -579,13 +574,17 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
 
       Job job;
       try {
-        job = videoGridService.createPartialTrack(commands.get(i), tracksForCommands.get(i).toArray(new Track[tracksForCommands.get(i).size()]));
+        job = videoGridService.createPartialTrack(
+            commands.get(i),
+            tracksForCommands.get(i).toArray(new Track[tracksForCommands.get(i).size()])
+        );
       } catch (VideoGridServiceException | org.apache.commons.codec.EncoderException | MediaPackageException e) {
         throw new WorkflowOperationException(e);
       }
 
       if (!waitForStatus(job).isSuccess()) {
-        throw new WorkflowOperationException(String.format("VideoGrid job for media package '%s' failed", mediaPackage));
+        throw new WorkflowOperationException(
+            String.format("VideoGrid job for media package '%s' failed", mediaPackage));
       }
 
       Gson gson = new Gson();
@@ -674,14 +673,14 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
    *          The edit decision list for the current cut
    * @return A command line ready ffmpeg command
    */
-  private List<String> compositeSection(LayoutArea layoutArea, EditDecisionListSection videoEdl)
-  {
+  private List<String> compositeSection(LayoutArea layoutArea, EditDecisionListSection videoEdl) {
     // Duration for this cut
     long duration = videoEdl.nextTimeStamp - videoEdl.timeStamp;
     logger.info("Cut timeStamp {}, duration {}", videoEdl.timeStamp, duration);
 
     // Declare ffmpeg command
-    String ffmpegFilter = String.format("color=c=%s:s=%dx%d:r=24", layoutArea.bgColor, layoutArea.width, layoutArea.height);
+    String ffmpegFilter = String.format("color=c=%s:s=%dx%d:r=24", layoutArea.bgColor,
+        layoutArea.width, layoutArea.height);
 
     List<VideoInfo> videos = videoEdl.areas;
     int videoCount = videoEdl.areas.size();
@@ -777,16 +776,19 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
         ffmpegFilter += String.format(",fps=%d:start_time=%s", FFMPEG_WF_FRAMERATE, msToS(video.startTime));
         // Reset the timestamps to start at 0 so that everything is synced
         // for the video tiling, and scale to the desired size.
-        ffmpegFilter += String.format(",setpts=PTS-STARTPTS,scale=%d:%d,setsar=1", videoScaled.aspectRatioWidth, videoScaled.aspectRatioHeight);
+        ffmpegFilter += String.format(",setpts=PTS-STARTPTS,scale=%d:%d,setsar=1",
+            videoScaled.aspectRatioWidth, videoScaled.aspectRatioHeight);
         // And finally, pad the video to the desired aspect ratio
-        ffmpegFilter += String.format(",pad=w=%d:h=%d:x=%d:y=%d:color=%s", tileWidth, tileHeight, offset.x, offset.y, layoutArea.bgColor);
+        ffmpegFilter += String.format(",pad=w=%d:h=%d:x=%d:y=%d:color=%s", tileWidth, tileHeight,
+            offset.x, offset.y, layoutArea.bgColor);
         ffmpegFilter += String.format("[%s_movie];", padName);
 
         // In case the video was shorter than expected, we might have to pad
         // it to length. do that by concatenating a video generated by the
         // color filter. (It would be nice to repeat the last frame instead,
         // but there's no easy way to do that.)
-        ffmpegFilter += String.format("color=c=%s:s=%dx%d:r=%d", layoutArea.bgColor, tileWidth, tileHeight, FFMPEG_WF_FRAMERATE);
+        ffmpegFilter += String.format("color=c=%s:s=%dx%d:r=%d", layoutArea.bgColor, tileWidth,
+            tileHeight, FFMPEG_WF_FRAMERATE);
         ffmpegFilter += String.format("[%s_pad];", padName);
         ffmpegFilter += String.format("[%s_movie][%s_pad]concat=n=2:v=1:a=0[%s];", padName, padName, padName);
 
@@ -822,7 +824,8 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       }
       ffmpegFilter += String.format("pad=w=%d:h=%d:color=%s", layoutArea.width, layoutArea.height, layoutArea.bgColor);
       ffmpegFilter += String.format("[%s];", layoutArea.name);
-      ffmpegFilter += String.format("[%s_in][%s]overlay=x=%d:y=%d", layoutArea.name, layoutArea.name, layoutArea.x, layoutArea.y);
+      ffmpegFilter += String.format("[%s_in][%s]overlay=x=%d:y=%d", layoutArea.name,
+          layoutArea.name, layoutArea.x, layoutArea.y);
 
       // Here would be the end of the layoutArea Loop
     }
@@ -888,8 +891,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
    * @return
    *          Time in seconds, e.g. "12.567"
    */
-  private String msToS(long timestamp)
-  {
+  private String msToS(long timestamp) {
     double s = (double)timestamp / 1000;
     return String.format(Locale.US, "%.3f", s);   // Locale.US to get a . instead of a ,
   }
@@ -924,8 +926,9 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
    */
   private LayoutArea determineDimension(List<Track> tracks, boolean forceDivisible) {
     Tuple<Track, LayoutArea> trackDimension = getLargestTrack(tracks);
-    if (trackDimension == null)
+    if (trackDimension == null) {
       return null;
+    }
 
     if (forceDivisible && (trackDimension.getB().getHeight() % 2 != 0 || trackDimension.getB().getWidth() % 2 != 0)) {
       LayoutArea scaledDimension = new LayoutArea((trackDimension.getB().getWidth() / 2) * 2, (trackDimension
@@ -950,8 +953,9 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     Track track = null;
     LayoutArea dimension = null;
     for (Track t : tracks) {
-      if (!t.hasVideo())
+      if (!t.hasVideo()) {
         continue;
+      }
 
       VideoStream[] videoStreams = TrackSupport.byType(t.getStreams(), VideoStream.class);
       int frameWidth = videoStreams[0].getFrameWidth();
@@ -961,8 +965,9 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
         track = t;
       }
     }
-    if (track == null || dimension == null)
+    if (track == null || dimension == null) {
       return null;
+    }
 
     return Tuple.tuple(track, dimension);
   }
@@ -997,13 +1002,18 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
    *          Currently active videos
    * @return
    */
-  private EditDecisionListSection createEditDecisionList(StartStopEvent event, HashMap<Track, StartStopEvent> activeVideos) {
+  private EditDecisionListSection createEditDecisionList(
+      StartStopEvent event,
+      HashMap<Track, StartStopEvent> activeVideos
+  ) {
     EditDecisionListSection nextEdl = new EditDecisionListSection();
     nextEdl.timeStamp = event.timeStamp;
 
     for (Map.Entry<Track, StartStopEvent> activeVideo : activeVideos.entrySet()) {
-      nextEdl.areas.add(new VideoInfo(activeVideo.getKey(), event.timeStamp, activeVideo.getValue().videoInfo.aspectRatioHeight,
-              activeVideo.getValue().videoInfo.aspectRatioWidth, event.timeStamp - activeVideo.getValue().timeStamp));
+      nextEdl.areas.add(new VideoInfo(activeVideo.getKey(), event.timeStamp,
+          activeVideo.getValue().videoInfo.aspectRatioHeight,
+          activeVideo.getValue().videoInfo.aspectRatioWidth,
+          event.timeStamp - activeVideo.getValue().timeStamp));
     }
 
     return nextEdl;
@@ -1018,10 +1028,11 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
    * @throws IllegalArgumentException
    */
   private ImmutablePair<Integer, Integer> getResolution(String s) throws IllegalArgumentException {
-      String[] parts = s.split("x");
-      if (parts.length != 2)
-        throw new IllegalArgumentException(format("Unable to create resolution from \"%s\"", s));
+    String[] parts = s.split("x");
+    if (parts.length != 2) {
+      throw new IllegalArgumentException(format("Unable to create resolution from \"%s\"", s));
+    }
 
-      return new ImmutablePair<Integer, Integer>(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+    return new ImmutablePair<Integer, Integer>(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
   }
 }

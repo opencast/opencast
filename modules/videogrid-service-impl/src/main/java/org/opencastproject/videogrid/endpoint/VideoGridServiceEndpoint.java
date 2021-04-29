@@ -62,12 +62,15 @@ import javax.ws.rs.core.Response;
  */
 @Path("/")
 @RestService(
-        name = "videogrid",
-        title = "VideoGrid Service",
-        abstractText = "The Video Grid Service creates a section of the final video grid file for the "
+    name = "videogrid",
+    title = "VideoGrid Service",
+    abstractText = "The Video Grid Service creates a section of the final video grid file for the "
         + "Video Grid Workflow Operation Handler.",
-        notes = { "Only offers one service",
-                  "Only meant to be used with the VideoGridWorkflowOperationHandler"})
+    notes = {
+        "Only offers one service",
+        "Only meant to be used with the VideoGridWorkflowOperationHandler"
+    }
+)
 public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -102,17 +105,30 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("videogrid")
-  @RestQuery(name = "videogrid", description = "Create a section of the final video grid",
-          restParameters = {
-                  @RestParameter(name = "command", isRequired = true, type = STRING,
-                          description = "An ffmpeg command as a list. File paths are replaced by track identifiers."),
-                  @RestParameter(name = "tracks", isRequired = true, type = RestParameter.Type.TEXT,
-                          description = "The source tracks to concat as XML") },
-          responses = {
-                  @RestResponse(description = "Video created successfully", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "Invalid data", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                  @RestResponse(description = "Internal error", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
-          returnDescription = "Returns the path to the generated video for the grid")
+  @RestQuery(
+      name = "videogrid",
+      description = "Create a section of the final video grid",
+      restParameters = {
+          @RestParameter(
+              name = "command",
+              isRequired = true,
+              type = STRING,
+              description = "An ffmpeg command as a list. File paths are replaced by track identifiers."
+          ),
+          @RestParameter(
+              name = "tracks",
+              isRequired = true,
+              type = RestParameter.Type.TEXT,
+              description = "The source tracks to concat as XML"
+          )
+      },
+      responses = {
+          @RestResponse(description = "Video created successfully", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Invalid data", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Internal error", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "Returns the path to the generated video for the grid"
+  )
   public Response createPartialTrack(
           @FormParam("command") String commandString,
           @FormParam("sourceTracks") String tracksXml) throws MediaPackageException, EncoderException {
