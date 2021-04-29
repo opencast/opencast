@@ -10,7 +10,7 @@ const EventActionCell = ({ row })  => {
     const { t } = useTranslation();
 
     const [displayEventDetailsModal, setEventDetailsModal] = useState(false);
-    const [eventDetailsTabIndex, setEventDetailsTabIndex] = useState(0);
+    const [eventDetailsTabIndex, setEventDetailsTabIndex] = useState(0)
 
     const showEventDetailsModal = () => {
         setEventDetailsModal(true);
@@ -47,10 +47,10 @@ const EventActionCell = ({ row })  => {
             <EventDetailsModal showModal={displayEventDetailsModal}
                                handleClose={hideEventDetailsModal}
                                tabIndex={eventDetailsTabIndex}
-                               eventId={row.id} />
+                               eventTitle={row.title}
+                               eventId={row.id}/>
 
             {/* Open event details */}
-            {/*TODO: implement and properly call function */}
             {/*TODO: with-Role ROLE_UI_EVENTS_DETAILS_VIEW*/}
             <a onClick={() => onClickEventDetails()}
                className="more"
@@ -89,7 +89,7 @@ const EventActionCell = ({ row })  => {
 
             {/* If the event has comments and no open comments then the comment tab of event details can be opened directly */}
             {(row.has_comments && !row.has_open_comments) && (
-                //todo: implement and properly call function, what data does the comments-tab need? (opens comment-tab)
+                /*TODO: with-Role ROLE_UI_EVENTS_DETAILS_VIEW*/
                 <a onClick={() => onClickComments()}
                    title={t('EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS')}
                    className="comments" />
@@ -97,7 +97,7 @@ const EventActionCell = ({ row })  => {
 
             {/* If the event has comments and open comments then the comment tab of event details can be opened directly */}
             {(row.has_comments && row.has_open_comments) && (
-                //todo: implement and properly call function, what data does the comments-tab need? (opens comment-tab)
+                /*TODO: with-Role ROLE_UI_EVENTS_DETAILS_VIEW*/
                 <a onClick={() => onClickComments()}
                    title={t('EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS')}
                    className="comments-open" />
@@ -106,7 +106,6 @@ const EventActionCell = ({ row })  => {
             {/*If the event is in in a paused workflow state then a warning icon is shown and workflow tab of event
                 details can be opened directly */}
             {row.workflow_state === 'PAUSED' && (
-                //todo: implement and properly call function, what data does the workflow-tab need? (opens workflow-tab)
                 //todo: with role ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT
                 <a title={t('EVENTS.EVENTS.TABLE.TOOLTIP.PAUSED_WORKFLOW')}
                    onClick={() => onClickWorkflow()}
@@ -114,7 +113,6 @@ const EventActionCell = ({ row })  => {
             )}
 
             {/* Open assets tab of event details directly*/}
-            {/*Todo: implement and properly call function, what data does the assets-tab need? (opens asset-tab)*/}
             {/*todo: with-role ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW*/}
             <a onClick={() => onClickAssets()}
                title={t('EVENTS.EVENTS.TABLE.TOOLTIP.ASSETS')}

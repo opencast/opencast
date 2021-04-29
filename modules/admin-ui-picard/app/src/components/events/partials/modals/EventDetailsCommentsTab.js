@@ -91,7 +91,7 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                 { /* <div data-admin-ng-notifications="" context="events-access"/> */}
                 <div className="full-col">
                     <div className="obj comments">
-                        <header className="no-expand">{t(header)}</header>
+                        <header>{t(header)}</header>
                         <div className="obj-container">
                             <div className="comment-container">
                                 {
