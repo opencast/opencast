@@ -1,5 +1,5 @@
 import { parse as parseQuery } from "query-string";
-import { Track } from "./OpencastRest";
+
 
 export function parsedQueryString() {
     return parseQuery(window.location.search);
@@ -16,58 +16,28 @@ export function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-/**
- * Sorts an array of tracks alphabetically by their type
- * If tracks have the same type, they are then sorted by resolution
- * @param tracks the tracks to be sorted
- */
-export const sortByType = (tracks: Track[]) => {
-  tracks.sort(function(a, b){
-    const nameA = a.type,
-        nameB = b.type;
-    const descA = a.resolution,
-        descB = b.resolution;
 
-    if(nameA > nameB) {
-      return 1;
-    }
-    if(nameB > nameA) {
-      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-      return -1;
-    }
-
-    if (descA === undefined || descB === undefined) {
-      return 0;
-    } // Else
-    return sortResolutions(descA, descB);
-
-  })
-  return tracks;
-}
 
 /**
- * Helper function for sortByType. Sorts a resolution string by the number it contains
- * @param descA resolution of the first track
- * @param descB resolution of the second track
+ * Comparator for resolutions. Compares by width first.
+ * @param resolutionA resolution of the first track
+ * @param resolutionB resolution of the second track
  */
-const sortResolutions = (descA: string, descB: string) => {
-  const descAWidth = parseInt(descA.split('x')[0]);
-  const descBWidth = parseInt(descB.split('x')[0]);
-  if(descAWidth > descBWidth) {
+export const compareResolutions = (resolutionA: {width: number, height: number},
+                                   resolutionB: {width: number, height: number}) => {
+  if(resolutionA.width > resolutionB.width) {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    return -1;  // Returns descB
+    return -1;  // Returns resolutionB
   }
-  if(descBWidth > descAWidth) {
+  if(resolutionB.width > resolutionA.width) {
     return 1;
   }
 
-  const descAHeight = parseInt(descA.split('x')[1]);
-  const descBHeight = parseInt(descB.split('x')[1]);
-  if(descAHeight > descBHeight) {
+  if(resolutionA.height > resolutionB.height) {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     return -1;
   }
-  if(descBHeight > descAHeight) {
+  if(resolutionB.height > resolutionA.height) {
     return 1;
   }
 

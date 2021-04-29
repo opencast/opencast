@@ -9,7 +9,8 @@ import Helmet from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faEdit, faDownload } from "@fortawesome/free-solid-svg-icons";
 import i18next from "i18next";
-import { parsedQueryString, sortByType, capitalize, } from "../utils";
+import { parsedQueryString, capitalize } from "../utils";
+import { sortByType } from "../trackUtils";
 import Dropdown from "react-bootstrap/esm/Dropdown";
 import DropdownMenu from "react-bootstrap/esm/DropdownMenu";
 
@@ -88,7 +89,8 @@ const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, delete
                           if (track !== undefined && (track.url.endsWith('mp4') || track.url.endsWith('webm'))) {
                             return (
                               <Dropdown.Item onClick={(e) => { downloadCallback(track); e.stopPropagation(); }} >
-                                {capitalize(track.type.split('/')[0])} <br/> {track.resolution}
+                                {capitalize(track.type.split('/')[0])} <br/>
+                                {track.resolution !== undefined ? `${track.resolution.width} x ${track.resolution.height}` : undefined}
                               </Dropdown.Item>
                             );
                           }

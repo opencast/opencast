@@ -8,7 +8,7 @@ export interface Attachment {
 export interface Track {
     readonly type: string;
     readonly url: string;
-    readonly resolution: string | undefined;
+    readonly resolution: { width: number, height: number} | undefined;
 }
 
 export interface JobResult {
@@ -136,6 +136,21 @@ export async function copyEventToSeries(eventId: string, targetSeries: string): 
 }
 
 /**
+ * Parse resolution from string to object if possible
+ * A resolution is expected to have the format {width}x{height}
+ * @param resolution resolution to be parsed
+ */
+const parseResolutionFromString = (resolution: any) => {
+  if (typeof resolution === "string" && /[0-9]+x[0-9]+/.test(resolution)) {
+    return {
+      width: parseInt(resolution.split('x')[0]),
+      height: parseInt(resolution.split('x')[1]),
+    }
+  }
+  return undefined;
+}
+
+/**
  * Track is not guaranteed to be an array or even exist at all, so we need to handle different cases
  * @param result a result from the search query
  */
@@ -148,7 +163,7 @@ const parseTracksFromResult = (result: any) => {
           res.push({
             type: track.type,
             url: track.url,
-            resolution: track.video.resolution
+            resolution: parseResolutionFromString(track.video.resolution)
           })
         }
         return res;
@@ -163,7 +178,7 @@ const parseTracksFromResult = (result: any) => {
     return {
       type: result.mediapackage.media.track.type,
       url: result.mediapackage.media.track.url,
-      resolution: result.mediapackage.media.track.video.resolution,
+      resolution: parseResolutionFromString(result.mediapackage.media.track.video.resolution),
     }
   }
   return undefined;
