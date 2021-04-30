@@ -7,13 +7,13 @@
   "dependencies": {
     "bootbox": "^5.5.2",
     "jquery": "^3.6.0",
-    "js-yaml": "^4.0.0",
+    "js-yaml": "^4.1.0",
     "requirejs": "^2.3.6",
     "seedrandom": "^3.0.5",
-    "underscore": "^1.12.1"
+    "underscore": "^1.13.1"
   },
   "devDependencies": {
-    "eslint": "^7.22.0",
+    "eslint": "^7.25.0",
     "eslint-plugin-header": "^3.1.1"
   }
 }

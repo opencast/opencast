@@ -34,6 +34,7 @@ import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.storage.AssetStore;
 import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
@@ -84,11 +85,11 @@ import javax.persistence.EntityManagerFactory;
  * implementations.
  */
 @Component(
-  property = {
-    "service.description=Opencast Asset Manager"
-  },
-  immediate = true,
-  service = { AssetManager.class, TieredStorageAssetManager.class, IndexProducer.class }
+    property = {
+        "service.description=Opencast Asset Manager"
+    },
+    immediate = true,
+    service = { AssetManager.class, TieredStorageAssetManager.class, IndexProducer.class }
 )
 public class OsgiAssetManager extends AbstractIndexProducer implements AssetManager, TieredStorageAssetManager {
   /**
@@ -181,8 +182,8 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
     boolean includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
     boolean includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     boolean includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
-    delegate = new AssetManagerWithSecurity(withMessaging, authSvc, secSvc, includeAPIRoles, includeCARoles,
-            includeUIRoles);
+    delegate = new AssetManagerWithSecurity(
+        withMessaging, authSvc, secSvc, includeAPIRoles, includeCARoles, includeUIRoles);
     for (RemoteAssetStore ras : remotes) {
       delegate.addRemoteAssetStore(ras);
     }
@@ -312,7 +313,12 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
     this.assetStore = assetStore;
   }
 
-  @Reference(name = "remoteAssetStores", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, unbind = "removeRemoteAssetStore")
+  @Reference(
+      name = "remoteAssetStores",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeRemoteAssetStore"
+  )
   public synchronized void addRemoteAssetStore(RemoteAssetStore assetStore) {
     if (null == delegate) {
       remotes.add(assetStore);
@@ -434,7 +440,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate(final String indexName) throws IndexRebuildException {
+  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
     final Organization org = secSvc.getOrganization();
     final User user = (org != null ? secSvc.getUser() : null);
     try {
@@ -447,7 +453,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
       final int total = r.countSnapshots();
       int current = 0;
-      logIndexRebuildBegin(logger, indexName, total, "snapshot(s)");
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
 
       final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
       for (String orgId : byOrg.keySet()) {
@@ -461,16 +467,17 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
             current += 1;
             try {
               AssetManagerItem.TakeSnapshot takeSnapshot = withMessaging.mkTakeSnapshotMessage(snapshot, null);
-              messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName),
+              messageSender.sendObjectMessage(
+                      AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName()),
                       MessageSender.DestinationType.Queue, takeSnapshot);
             } catch (Throwable t) {
               logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
             }
-            logIndexRebuildProgress(logger, indexName, total, current);
+            logIndexRebuildProgress(logger, index.getIndexName(), total, current);
           }
         } catch (Throwable t) {
-          logIndexRebuildError(logger, indexName, t, org);
-          throw new IndexRebuildException(indexName, getService(), org, t);
+          logIndexRebuildError(logger, index.getIndexName(), t, org);
+          throw new IndexRebuildException(index.getIndexName(), getService(), org, t);
         } finally {
           secSvc.setOrganization(defaultOrg);
           secSvc.setUser(systemUser);

@@ -46,7 +46,6 @@ import org.junit.rules.TemporaryFolder;
 
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,6 +55,7 @@ public class VideoGridServiceImplTest {
   private ServiceRegistry serviceRegistry;
 
   private Track sourceVideoTrack;
+  private URI mockUri;
 
   @Rule
   public TemporaryFolder testFolder = new TemporaryFolder();
@@ -65,9 +65,9 @@ public class VideoGridServiceImplTest {
     videoGridService = new VideoGridServiceImpl();
 
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    URI uri = new URI("/uri");
+    mockUri = new URI("/uri");
     EasyMock.expect(workspace.putInCollection(anyString(),
-            anyString(), anyObject())).andReturn(uri).anyTimes();
+            anyString(), anyObject())).andReturn(mockUri).anyTimes();
     final String directory = testFolder.newFolder().getAbsolutePath();
     EasyMock.expect(workspace.rootDirectory()).andReturn(directory).anyTimes();
 
@@ -95,21 +95,17 @@ public class VideoGridServiceImplTest {
   }
 
   @Test
-  public void testCreatePartialTracks() throws Exception {
+  public void testCreatePartialTrack() throws Exception {
 
     List<String> command = Arrays.asList("ffmpeg", "-y", "-v", "warning", "-nostats", "-max_error_rate", "1.0",
             "-filter_complex", "color=c=0xFF00FF:s=320x180:r=24,trim=end=3.14", "-an", "-codec", "h264", "-q:v", "2",
             "-g", "240", "-pix_fmt", "yuv420p", "-r", "24");
 
-    List<List<String>> commands = new ArrayList<>();
-    commands.add(command);
-    commands.add(command);
-
-    Job job = videoGridService.createPartialTracks(
-            commands,
+    Job job = videoGridService.createPartialTrack(
+            command,
             sourceVideoTrack);
     Gson gson = new Gson();
-    List<URI> uris = gson.fromJson(job.getPayload(), new TypeToken<List<URI>>() { }.getType());
-    Assert.assertEquals(2, uris.size());
+    URI parsedURI = gson.fromJson(job.getPayload(), new TypeToken<URI>() { }.getType());
+    Assert.assertTrue(mockUri.equals(parsedURI));
   }
 }

@@ -66,7 +66,7 @@ import javax.persistence.UniqueConstraint;
     @Index(name = "IX_oc_assets_snapshot_organization_id", columnList = ("organization_id")),
     @Index(name = "IX_oc_assets_snapshot_owner", columnList = ("owner")),
     @Index(name = "IX_oc_assets_snapshot_series", columnList = ("series_id, version"))
-  }, uniqueConstraints = {
+    }, uniqueConstraints = {
     @UniqueConstraint(columnNames = {"mediapackage_id", "version"}) })
 @NamedQueries({
         @NamedQuery(name = "Snapshot.countEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s "

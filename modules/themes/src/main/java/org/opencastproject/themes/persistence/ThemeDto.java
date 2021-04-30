@@ -48,8 +48,12 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "Themes.count", query = "SELECT COUNT(t) FROM Themes t WHERE t.organization = :org"),
     @NamedQuery(name = "Themes.findById", query = "SELECT t FROM Themes t WHERE t.id = :id AND t.organization = :org"),
     @NamedQuery(name = "Themes.findByOrg", query = "SELECT t FROM Themes t WHERE t.organization = :org"),
-    @NamedQuery(name = "Themes.findByUserName", query = "SELECT t FROM Themes t WHERE t.username = :username AND t.organization = :org"),
-    @NamedQuery(name = "Themes.clear", query = "DELETE FROM Themes t WHERE t.organization = :org") })
+    @NamedQuery(
+        name = "Themes.findByUserName",
+        query = "SELECT t FROM Themes t WHERE t.username = :username AND t.organization = :org"
+    ),
+    @NamedQuery(name = "Themes.clear", query = "DELETE FROM Themes t WHERE t.organization = :org")
+})
 public class ThemeDto {
 
   @Id

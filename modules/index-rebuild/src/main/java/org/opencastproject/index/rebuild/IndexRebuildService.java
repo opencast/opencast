@@ -169,7 +169,7 @@ public class IndexRebuildService implements BundleActivator {
 
     IndexProducer indexProducer = indexProducers.get(service);
     logger.info("Starting to rebuild index '{}' from service '{}'", index.getIndexName(), service);
-    indexProducer.repopulate(index.getIndexName());
+    indexProducer.repopulate(index);
     logger.info("Finished to rebuild index '{}' from service '{}'", index.getIndexName(), service);
   }
 

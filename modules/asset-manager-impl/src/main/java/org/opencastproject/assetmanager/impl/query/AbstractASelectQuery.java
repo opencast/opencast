@@ -140,27 +140,27 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
       // Entity aliasing produces many issues which seem to cause a huge rewrite of the query building mechanism
       //   so it should be prevented at all costs.
       final Map<EntityPath<?>, BooleanExpression> joins = r.join.foldl(
-              new HashMap<EntityPath<?>, BooleanExpression>(),
-              new Fn2<Map<EntityPath<?>, BooleanExpression>, Join, Map<EntityPath<?>, BooleanExpression>>() {
-                @Override
-                public Map<EntityPath<?>, BooleanExpression> apply(Map<EntityPath<?>, BooleanExpression> sum, Join join) {
-                  // get the on expression saved with the join, may be null
-                  final BooleanExpression existing = sum.get(join.join);
-                  final BooleanExpression combined;
-                  // combine the existing and the current expression
-                  if (existing == null) {
-                    combined = join.on;
-                  } else if (existing.equals(join.on)) {
-                    // if both expressions are equal there is no need to combine them
-                    combined = existing;
-                  } else {
-                    // if different combine with logical "or"
-                    combined = existing.or(join.on);
-                  }
-                  sum.put(join.join, combined);
-                  return sum;
-                }
-              });
+          new HashMap<EntityPath<?>, BooleanExpression>(),
+          new Fn2<Map<EntityPath<?>, BooleanExpression>, Join, Map<EntityPath<?>, BooleanExpression>>() {
+            @Override
+            public Map<EntityPath<?>, BooleanExpression> apply(Map<EntityPath<?>, BooleanExpression> sum, Join join) {
+              // get the on expression saved with the join, may be null
+              final BooleanExpression existing = sum.get(join.join);
+              final BooleanExpression combined;
+              // combine the existing and the current expression
+              if (existing == null) {
+                combined = join.on;
+              } else if (existing.equals(join.on)) {
+                // if both expressions are equal there is no need to combine them
+                combined = existing;
+              } else {
+                // if different combine with logical "or"
+                combined = existing.or(join.on);
+              }
+              sum.put(join.join, combined);
+              return sum;
+            }
+          });
       for (final Map.Entry<EntityPath<?>, BooleanExpression> j : joins.entrySet()) {
         q.leftJoin(j.getKey()).on(j.getValue());
       }
@@ -222,26 +222,30 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
         });
       } else {
         logger.trace("Fetched properties");
-        // Properties have been fetched -> there may be multiple rows (tuples) per snapshot because of the join with the property table.
-        // Extract records and properties and link them together.
+        // Properties have been fetched -> there may be multiple rows (tuples)
+        // per snapshot because of the join with the property table. Extract
+        // records and properties and link them together.
 
         // group properties after their media package ID and make sure that no duplicate properties occur
-        final Map<String, Set<Property>> propertiesPerMp = $(result).bind(toProperty)
-                .foldl(new HashMap<String, Set<Property>>(), new Fn2<Map<String, Set<Property>>, Property, Map<String, Set<Property>>>() {
-                  @Override
-                  public Map<String, Set<Property>> apply(Map<String, Set<Property>> sum, Property p) {
-                    final String mpId = p.getId().getMediaPackageId();
-                    final Set<Property> props = sum.get(mpId);
-                    if (props != null) {
-                      props.add(p);
-                    } else {
-                      sum.put(mpId, SetB.MH.mk(p));
-                    }
-                    return sum;
-                  }
-                });
+        final Map<String, Set<Property>> propertiesPerMp = $(result).bind(toProperty).foldl(
+            new HashMap<String, Set<Property>>(),
+            new Fn2<Map<String, Set<Property>>, Property, Map<String, Set<Property>>>() {
+              @Override
+              public Map<String, Set<Property>> apply(Map<String, Set<Property>> sum, Property p) {
+                final String mpId = p.getId().getMediaPackageId();
+                final Set<Property> props = sum.get(mpId);
+                if (props != null) {
+                  props.add(p);
+                } else {
+                  sum.put(mpId, SetB.MH.mk(p));
+                }
+                return sum;
+              }
+            });
         // group records after their media package ID
-        final Map<String, List<ARecordImpl>> distinctRecords = $($(result).map(toARecord(r)).toSet()).groupMulti(ARecordImpl.getMediaPackageId);
+        final Map<String, List<ARecordImpl>> distinctRecords = $($(result)
+            .map(toARecord(r)).toSet())
+            .groupMulti(ARecordImpl.getMediaPackageId);
         records = $(distinctRecords.values()).bind(new Fn<List<ARecordImpl>, Iterable<ARecordImpl>>() {
           @Override public Iterable<ARecordImpl> apply(List<ARecordImpl> records) {
             return $(records).map(new Fn<ARecordImpl, ARecordImpl>() {
@@ -263,7 +267,13 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
     }
     final long searchTime = (System.nanoTime() - startTime) / 1000000;
     logger.debug("Complete query ms " + searchTime);
-    return new AResultImpl(AbstractASelectQuery.<ARecord>vary(records), sizeOf(records), r.offset.getOr(0), r.limit.getOr(-1), searchTime);
+    return new AResultImpl(
+        AbstractASelectQuery.<ARecord>vary(records),
+        sizeOf(records),
+        r.offset.getOr(0),
+        r.limit.getOr(-1),
+        searchTime
+    );
   }
 
   /**
@@ -284,7 +294,10 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
         } else {
           // The media package ID and the snapshot's database ID must always be fetched.
           id = RequireUtil.notNull(tuple.get(Q_SNAPSHOT.id), "[BUG] snapshot table id");
-          mediaPackageId = RequireUtil.notNull(tuple.get(Q_SNAPSHOT.mediaPackageId), "[BUG] snapshot table media package id");
+          mediaPackageId = RequireUtil.notNull(
+              tuple.get(Q_SNAPSHOT.mediaPackageId),
+              "[BUG] snapshot table media package id"
+          );
         }
         return new ARecordImpl(id, mediaPackageId, Stream.<Property>empty(), snapshotDto);
       }

@@ -51,8 +51,8 @@ public class TimelinePreviewsException extends Exception {
   }
 
   /**
-   * Creates a new timeline previews exception with <code>message</code> as a reason and <code>cause</code> as the original
-   * cause of failure.
+   * Creates a new timeline previews exception with <code>message</code> as a
+   * reason and <code>cause</code> as the original cause of failure.
    *
    * @param message
    *          the reason of failure

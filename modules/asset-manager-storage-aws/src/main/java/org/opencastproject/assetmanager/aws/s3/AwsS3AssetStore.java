@@ -34,6 +34,7 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -62,12 +63,12 @@ import java.io.InputStream;
 import java.util.Dictionary;
 
 @Component(
-  property = {
+    property = {
     "service.description=Amazon S3 based asset store",
     "store.type=aws-s3"
-  },
-  immediate = true,
-  service = { RemoteAssetStore.class, AwsS3AssetStore.class }
+    },
+    immediate = true,
+    service = { RemoteAssetStore.class, AwsS3AssetStore.class }
 )
 public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetStore {
 
@@ -82,6 +83,14 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public static final String AWS_S3_BUCKET_CONFIG = "org.opencastproject.assetmanager.aws.s3.bucket";
   public static final String AWS_S3_ENDPOINT_CONFIG = "org.opencastproject.assetmanager.aws.s3.endpoint";
   public static final String AWS_S3_PATH_STYLE_CONFIG = "org.opencastproject.assetmanager.aws.s3.path.style";
+  public static final String AWS_S3_MAX_CONNECTIONS = "org.opencastproject.assetmanager.aws.s3.max.connections";
+  public static final String AWS_S3_CONNECTION_TIMEOUT = "org.opencastproject.assetmanager.aws.s3.connection.timeout";
+  public static final String AWS_S3_MAX_RETRIES = "org.opencastproject.assetmanager.aws.s3.max.retries";
+
+  // defaults
+  public static final int DEFAULT_MAX_CONNECTIONS = 50;
+  public static final int DEFAULT_CONNECTION_TIMEOUT = 10000;
+  public static final int DEFAULT_MAX_RETRIES = 100;
 
   /** The AWS client and transfer manager */
   private AmazonS3 s3 = null;
@@ -144,12 +153,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       regionName = getAWSConfigKey(cc, AWS_S3_REGION_CONFIG);
       logger.info("AWS region is {}", regionName);
 
-      endpoint = OsgiUtil.getComponentContextProperty(cc, AWS_S3_ENDPOINT_CONFIG, "s3." + regionName + ".amazonaws.com");
+      endpoint = OsgiUtil.getComponentContextProperty(
+          cc, AWS_S3_ENDPOINT_CONFIG, "s3." + regionName + ".amazonaws.com");
       logger.info("AWS endpoint is {}", endpoint);
 
       pathStyle = BooleanUtils.toBoolean(OsgiUtil.getComponentContextProperty(cc, AWS_S3_PATH_STYLE_CONFIG, "false"));
       logger.info("AWS path style is {}", pathStyle);
-
 
       // Explicit credentials are optional.
       AWSCredentialsProvider provider = null;
@@ -159,16 +168,36 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       // Keys not informed so use default credentials provider chain, which
       // will look at the environment variables, java system props, credential files, and instance
       // profile credentials
-      if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone())
+      if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone()) {
         provider = new DefaultAWSCredentialsProviderChain();
-      else
+      } else {
         provider = new AWSStaticCredentialsProvider(
                 new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
+      }
+
+      // S3 client configuration
+      ClientConfiguration clientConfiguration = new ClientConfiguration();
+
+      int maxConnections = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_CONNECTIONS)
+              .getOrElse(DEFAULT_MAX_CONNECTIONS);
+      logger.debug("Max Connections: {}", maxConnections);
+      clientConfiguration.setMaxConnections(maxConnections);
+
+      int connectionTimeout = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_CONNECTION_TIMEOUT)
+              .getOrElse(DEFAULT_CONNECTION_TIMEOUT);
+      logger.debug("Connection Output: {}", connectionTimeout);
+      clientConfiguration.setConnectionTimeout(connectionTimeout);
+
+      int maxRetries = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_RETRIES)
+              .getOrElse(DEFAULT_MAX_RETRIES);
+      logger.debug("Max Retry: {}", maxRetries);
+      clientConfiguration.setMaxErrorRetry(maxRetries);
 
       // Create AWS client.
       s3 = AmazonS3ClientBuilder.standard()
               .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
               , regionName))
+              .withClientConfiguration(clientConfiguration)
               .withPathStyleAccessEnabled(pathStyle)
               .withCredentials(provider)
               .build();
@@ -199,7 +228,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
           s3.setBucketVersioningConfiguration(configRequest);
           logger.info("AWS S3 ARCHIVE bucket {} created and versioning enabled", bucketName);
         } catch (Exception e2) {
-          throw new IllegalStateException("ARCHIVE bucket " + bucketName + " cannot be created: " + e2.getMessage(), e2);
+          throw new IllegalStateException(
+              "ARCHIVE bucket " + bucketName + " cannot be created: " + e2.getMessage(), e2);
         }
       } else {
         throw new IllegalStateException("ARCHIVE bucket " + bucketName + " exists, but we can't access it: "
@@ -215,8 +245,9 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    */
   protected AwsUploadOperationResult uploadObject(File origin, String objectName) throws AssetStoreException {
     // Check first if bucket is there.
-    if (!bucketCreated)
+    if (!bucketCreated) {
       createAWSBucket();
+    }
 
     // Upload file to AWS S3
     // Use TransferManager to take advantage of multipart upload.

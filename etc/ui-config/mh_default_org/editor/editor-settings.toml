@@ -13,7 +13,7 @@
 ### Settings of the metadata tab
 [metadata]
 # If false, the metadata button is not displayed in the main menu
-show = false
+show = true
 
 ### Settings of the thumbnail tab
 [thumbnail]

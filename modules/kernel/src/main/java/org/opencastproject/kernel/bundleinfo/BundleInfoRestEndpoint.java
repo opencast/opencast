@@ -44,6 +44,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+
 import java.util.List;
 import java.util.Set;
 
@@ -66,6 +69,13 @@ public abstract class BundleInfoRestEndpoint {
   private static final String DEFAULT_BUNDLE_PREFIX = "opencast";
 
   protected abstract BundleInfoDb getDb();
+
+  private long lastModified = 0;
+
+  @Activate
+  public void activate(ComponentContext cc) {
+    lastModified = cc.getBundleContext().getBundle().getLastModified();
+  }
 
   @GET
   // path prefix "bundles" is contained here and not in the path annotation of the class
@@ -149,7 +159,9 @@ public abstract class BundleInfoRestEndpoint {
             throw new Error("bug");
           case 1:
             // all versions align
-            return ok(obj(p("consistent", true)).append(fullVersionJson.apply(example.getVersion())));
+            return ok(obj(p("consistent", true))
+                .append(fullVersionJson.apply(example.getVersion()))
+                .append(obj(p("last-modified", lastModified))));
           default:
             // multiple versions found
             return ok(obj(p("consistent", false),

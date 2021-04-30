@@ -377,6 +377,12 @@
       "es.upv.paella.opencast.downloadsPlugin": {
         "enabled": true
       },
+      "es.upv.paella.opencast.downloadsButtonPlugin": {
+        "enabled": false,
+        "tags": ["engage-download"],
+        "flavors": [],
+        "tagsAndFlavors": false
+      },
       "es.upv.paella.opencast.episodesFromSeries": {
         "enabled": true
       },
@@ -390,7 +396,7 @@
         "enabled": true
       },
       "es.upv.paella.opencast.userTrackingSaverPlugIn": {
-        "enabled": true
+        "enabled": false
       },
       "es.upv.paella.defaultKeysPlugin": {
         "enabled": true

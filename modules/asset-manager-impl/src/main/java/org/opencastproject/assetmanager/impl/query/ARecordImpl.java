@@ -56,8 +56,9 @@ public final class ARecordImpl implements ARecord {
           Stream<Property> properties,
           Snapshot snapshot) {
     this(snapshotId, mediaPackageId, properties);
-    if (snapshot != null)
+    if (snapshot != null) {
       this.snapshot = Opt.some(snapshot);
+    }
   }
 
   public ARecordImpl(
@@ -66,8 +67,9 @@ public final class ARecordImpl implements ARecord {
           Stream<Property> properties,
           SnapshotDto snapshotDto) {
     this(snapshotId, mediaPackageId, properties);
-    if (snapshotDto != null)
+    if (snapshotDto != null) {
       this.snapshotDto = Opt.some(snapshotDto);
+    }
   }
 
 
@@ -92,8 +94,9 @@ public final class ARecordImpl implements ARecord {
    * @return the snapshot
    */
   @Override public Opt<Snapshot> getSnapshot() {
-    if (snapshot.isNone() && snapshotDto.isSome())
+    if (snapshot.isNone() && snapshotDto.isSome()) {
       snapshot = Opt.some(snapshotDto.get().toSnapshot());
+    }
     return snapshot;
   }
 

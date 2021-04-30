@@ -6,7 +6,7 @@ on:
 
 jobs:
   main:
-    if: github.event.pull_request.user.login != 'dependabot'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-python@v1
