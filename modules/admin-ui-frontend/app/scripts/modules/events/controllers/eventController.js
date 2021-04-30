@@ -168,6 +168,9 @@ angular.module('adminNg.controllers')
         },
         changePolicies = function (access, loading) {
           var newPolicies = {};
+          if (!Array.isArray(access)) {
+            access = [access];
+          }
           angular.forEach(access, function (acl) {
             var policy = newPolicies[acl.role];
 
@@ -180,6 +183,19 @@ angular.module('adminNg.controllers')
               newPolicies[acl.role].actions.value.push(acl.action);
             }
           });
+
+          // add policy to allow ROLE_USER_* to read and write
+          var userRole = Object.keys($scope.roles).filter(function(role){
+            return role.startsWith('ROLE_USER_') && role != 'ROLE_USER_ADMIN';
+          });
+          if (angular.isDefined(userRole) && userRole.length == 1){
+            userRole = userRole[0];
+            if (angular.isUndefined(newPolicies[userRole])){
+              newPolicies[userRole] = createPolicy(userRole);
+            }
+            newPolicies[userRole]['read'] = true;
+            newPolicies[userRole]['write'] = true;
+          }
 
           $scope.policies = [];
           angular.forEach(newPolicies, function (policy) {
@@ -418,7 +434,7 @@ angular.module('adminNg.controllers')
           //to resolve before we can add the roles that are present in the series but not in the system
           $scope.access.$promise.then(function () {
             $scope.roles.$promise.then(function() {
-              angular.forEach($scope.access.episode_access.privileges, function(newRole) {
+              angular.forEach(Object.keys($scope.access.episode_access.privileges), function(newRole) {
                 if ($scope.roles.indexOf(newRole) == -1) {
                   $scope.roles.push(newRole);
                 }
@@ -704,6 +720,16 @@ angular.module('adminNg.controllers')
 
     $scope.metadataSave = function (id, callback, catalog) {
       catalog.attributeToSend = id;
+
+      if (Object.prototype.hasOwnProperty.call(catalog, 'fields')) {
+        for (var fieldNo in catalog.fields) {
+          var field = catalog.fields[fieldNo];
+          if (Object.prototype.hasOwnProperty.call(field, 'collection')) {
+            field.collection = [];
+          }
+        }
+      }
+
       EventMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
         if (angular.isDefined(callback)) {
           callback();

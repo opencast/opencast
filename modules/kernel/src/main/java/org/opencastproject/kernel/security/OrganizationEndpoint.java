@@ -64,7 +64,7 @@ public class OrganizationEndpoint {
   @GET
   @Path("all.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "orgsasxml", description = "Lists the organizations as xml", returnDescription = "The list of org as xml", reponses = { @RestResponse(responseCode = 200, description = "Organizations returned") })
+  @RestQuery(name = "orgsasxml", description = "Lists the organizations as xml", returnDescription = "The list of org as xml", responses = { @RestResponse(responseCode = 200, description = "Organizations returned") })
   public JaxbOrganizationList getOrganizationsAsXml() {
     JaxbOrganizationList organizationList = new JaxbOrganizationList();
     for (Organization org : orgDirectoryService.getOrganizations()) {
@@ -76,7 +76,7 @@ public class OrganizationEndpoint {
   @GET
   @Path("all.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "orgsasjson", description = "Lists the organizations as a json array", returnDescription = "The list of org as a json array", reponses = { @RestResponse(responseCode = 200, description = "Organizations returned") })
+  @RestQuery(name = "orgsasjson", description = "Lists the organizations as a json array", returnDescription = "The list of org as a json array", responses = { @RestResponse(responseCode = 200, description = "Organizations returned") })
   public JaxbOrganizationList getOrganizationsAsJson() {
     return getOrganizationsAsXml();
   }
@@ -84,7 +84,7 @@ public class OrganizationEndpoint {
   @GET
   @Path("{id}.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "orgasxml", description = "Gets an organizations as xml", returnDescription = "The org as xml", pathParameters = { @RestParameter(name = "id", type = Type.STRING, description = "The job identifier", isRequired = true) }, reponses = {
+  @RestQuery(name = "orgasxml", description = "Gets an organizations as xml", returnDescription = "The org as xml", pathParameters = { @RestParameter(name = "id", type = Type.STRING, description = "The job identifier", isRequired = true) }, responses = {
           @RestResponse(responseCode = 200, description = "Organization returned"),
           @RestResponse(responseCode = 404, description = "No organization with this identifier found") })
   public JaxbOrganization getOrganizationAsXml(@PathParam("id") String id) {
@@ -98,7 +98,7 @@ public class OrganizationEndpoint {
   @GET
   @Path("{id}.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "orgasjson", description = "Gets an organizations as json", returnDescription = "The org as json", pathParameters = { @RestParameter(name = "id", type = Type.STRING, description = "The job identifier", isRequired = true) }, reponses = {
+  @RestQuery(name = "orgasjson", description = "Gets an organizations as json", returnDescription = "The org as json", pathParameters = { @RestParameter(name = "id", type = Type.STRING, description = "The job identifier", isRequired = true) }, responses = {
           @RestResponse(responseCode = 200, description = "Organization returned"),
           @RestResponse(responseCode = 404, description = "No organization with this identifier found") })
   public JaxbOrganization getOrganizationAsJson(@PathParam("id") String id) {

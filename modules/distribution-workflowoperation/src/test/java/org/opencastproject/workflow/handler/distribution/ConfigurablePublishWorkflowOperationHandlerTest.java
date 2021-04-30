@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobBarrier.Result;
@@ -116,10 +117,14 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
 
     Track track = new TrackImpl();
     track.addTag("engage-streaming");
+    track.addTag("engage-download");
     track.setIdentifier(trackId);
     track.setURI(new URI("http://api.com/track"));
 
-    Publication publicationtest = new  PublicationImpl(trackId, channelId, new URI("http://api.com/publication"),MimeType.mimeType(trackId, trackId));
+    Publication publicationtest = new PublicationImpl(
+        trackId, channelId,
+        new URI("http://api.com/publication"),
+        MimeType.mimeType(trackId, trackId));
 
     Track unrelatedTrack = new TrackImpl();
     unrelatedTrack.addTag("unrelated");
@@ -145,20 +150,22 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     EasyMock.replay(mediapackage);
 
     WorkflowOperationInstance op = EasyMock.createNiceMock(WorkflowOperationInstance.class);
-    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.CHANNEL_ID_KEY)).andStubReturn(
-            channelId);
-    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.MIME_TYPE)).andStubReturn(
-            "text/html");
-    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.URL_PATTERN)).andStubReturn(
-            "http://api.opencast.org/api/events/${event_id}");
-    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.SOURCE_TAGS)).andStubReturn(
-            "engage-download,engage-streaming");
-    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.CHECK_AVAILABILITY)).andStubReturn(
-            "true");
-    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.STRATEGY)).andStubReturn(
-            "retract");
-    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.MODE)).andStubReturn(
-            "single");
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.CHANNEL_ID_KEY))
+        .andStubReturn(channelId);
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.MIME_TYPE))
+        .andStubReturn("text/html");
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.URL_PATTERN))
+        .andStubReturn("http://api.opencast.org/api/events/${event_id}");
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS))
+        .andStubReturn("engage-download");
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.STREAMING_SOURCE_TAGS))
+        .andStubReturn("engage-streaming");
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.CHECK_AVAILABILITY))
+        .andStubReturn("true");
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.STRATEGY))
+        .andStubReturn("retract");
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.MODE))
+        .andStubReturn("single");
     EasyMock.replay(op);
 
     WorkflowInstance workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
@@ -178,21 +185,35 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     EasyMock.replay(catalogJob);
 
     Job trackJob = EasyMock.createNiceMock(Job.class);
-    EasyMock.expect(trackJob.getPayload()).andReturn(MediaPackageElementParser.getAsXml(track));
+    EasyMock.expect(trackJob.getPayload()).andReturn(MediaPackageElementParser.getAsXml(track)).anyTimes();
     EasyMock.replay(trackJob);
 
     Job retractJob = EasyMock.createNiceMock(Job.class);
     EasyMock.expect(retractJob.getPayload()).andReturn(MediaPackageElementParser.getAsXml(track));
     EasyMock.replay(retractJob);
 
-    DownloadDistributionService distributionService = EasyMock.createNiceMock(DownloadDistributionService.class);
+    DownloadDistributionService downloadDistributionService
+        = EasyMock.createNiceMock(DownloadDistributionService.class);
     // Make sure that all of the elements are distributed.
-    EasyMock.expect(distributionService.distribute(channelId, mediapackage, attachmentId, true)).andReturn(
-            attachmentJob);
-    EasyMock.expect(distributionService.distribute(channelId, mediapackage, catalogId, true)).andReturn(catalogJob);
-    EasyMock.expect(distributionService.distribute(channelId, mediapackage, trackId, true)).andReturn(trackJob);
-    EasyMock.expect(distributionService.retract(channelId, mediapackage, channelId)).andReturn(retractJob);
-    EasyMock.replay(distributionService);
+    EasyMock.expect(downloadDistributionService.distribute(channelId, mediapackage, attachmentId, true))
+        .andReturn(attachmentJob);
+    EasyMock.expect(downloadDistributionService.distribute(channelId, mediapackage, catalogId, true))
+        .andReturn(catalogJob);
+    EasyMock.expect(downloadDistributionService.distribute(channelId, mediapackage, trackId, true))
+        .andReturn(trackJob);
+    EasyMock.expect(downloadDistributionService.retract(channelId, mediapackage, channelId))
+        .andReturn(retractJob);
+    EasyMock.replay(downloadDistributionService);
+
+    StreamingDistributionService streamingDistributionService
+        = EasyMock.createNiceMock(StreamingDistributionService.class);
+    EasyMock.expect(streamingDistributionService.publishToStreaming())
+        .andReturn(true).atLeastOnce();
+    EasyMock.expect(streamingDistributionService.distribute(channelId, mediapackage, trackId))
+        .andReturn(trackJob).atLeastOnce();
+    EasyMock.expect(streamingDistributionService.retract(channelId, mediapackage, channelId))
+        .andReturn(retractJob).atLeastOnce();
+    EasyMock.replay(streamingDistributionService);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andStubReturn(org);
@@ -205,7 +226,9 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     ConfigurablePublishWorkflowOperationHandler configurePublish = new ConfigurablePublishWorkflowOperationHandler() {
       @Override
       protected Result waitForStatus(long timeout, Job... jobs) {
-        HashMap<Job, Status> map = Stream.mk(jobs).foldl(new HashMap<Job, Status>(),
+        HashMap<Job, Status> map = Stream.mk(jobs)
+            .foldl(
+                new HashMap<Job, Status>(),
                 new Fn2<HashMap<Job, Status>, Job, HashMap<Job, Status>>() {
                   @Override
                   public HashMap<Job, Status> apply(HashMap<Job, Status> a, Job b) {
@@ -217,7 +240,8 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
       }
     };
 
-    configurePublish.setDownloadDistributionService(distributionService);
+    configurePublish.setDownloadDistributionService(downloadDistributionService);
+    configurePublish.setStreamingDistributionService(streamingDistributionService);
     configurePublish.setSecurityService(securityService);
     configurePublish.setServiceRegistry(serviceRegistry);
 
@@ -238,10 +262,13 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     catalog.setIdentifier(publication.getCatalogs()[0].getIdentifier());
     assertEquals(catalog, publication.getCatalogs()[0]);
 
-    assertEquals(1, publication.getTracks().length);
-    assertNotEquals(track.getIdentifier(), publication.getTracks()[0].getIdentifier());
-    track.setIdentifier(publication.getTracks()[0].getIdentifier());
-    assertEquals(track, publication.getTracks()[0]);
+    assertEquals(2, publication.getTracks().length); //one streaming, one download
+    for (Track t: publication.getTracks()) {
+      assertNotEquals(track.getIdentifier(), t.getIdentifier());
+      track.setIdentifier(t.getIdentifier());
+      assertEquals(track, t);
+    }
+
   }
 
   @Test

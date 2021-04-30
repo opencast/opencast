@@ -93,8 +93,9 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
       }
 
       cronExpression = (String) properties.get(PARAM_KEY_CRON_EXPR);
-      if (StringUtils.isBlank(cronExpression) || !CronExpression.isValidExpression(cronExpression))
+      if (StringUtils.isBlank(cronExpression) || !CronExpression.isValidExpression(cronExpression)) {
         throw new ConfigurationException(PARAM_KEY_CRON_EXPR, "Cron expression must be valid");
+      }
       setCronExpression(cronExpression);
       logger.debug("Timed media offload cron expression: '" + cronExpression + "'");
 

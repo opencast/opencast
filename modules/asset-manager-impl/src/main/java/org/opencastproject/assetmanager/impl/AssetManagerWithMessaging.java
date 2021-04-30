@@ -20,42 +20,23 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
-import static org.opencastproject.util.RequireUtil.notEmpty;
-
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery.DeleteSnapshotHandler;
-import org.opencastproject.index.IndexProducer;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
-import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
-import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Bind an asset manager to ActiveMQ messaging.
@@ -63,135 +44,39 @@ import java.util.Map;
  * Please make sure to {@link #close()} the AssetManager.
  */
 public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStorageAssetManager>
-        implements DeleteSnapshotHandler, IndexProducer, AutoCloseable {
+        implements DeleteSnapshotHandler, AutoCloseable {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerWithMessaging.class);
 
   private final MessageSender messageSender;
-  private final MessageReceiver messageReceiver;
   private final AuthorizationService authSvc;
-  private final OrganizationDirectoryService orgDir;
-  private final SecurityService secSvc;
   private final Workspace workspace;
 
-  private final AbstractIndexProducer indexProducerMsgReceiver;
-
   public AssetManagerWithMessaging(final TieredStorageAssetManager delegate, final MessageSender messageSender,
-          MessageReceiver messageReceiver, AuthorizationService authSvc, OrganizationDirectoryService orgDir,
-          SecurityService secSvc, Workspace workspace, final String systemUserName) {
+          AuthorizationService authSvc, Workspace workspace) {
     super(delegate);
     this.messageSender = messageSender;
-    this.messageReceiver = messageReceiver;
     this.authSvc = authSvc;
-    this.orgDir = orgDir;
-    this.secSvc = secSvc;
     this.workspace = workspace;
-    this.indexProducerMsgReceiver = new AbstractIndexProducer() {
-      @Override
-      public String getClassName() {
-        return AssetManagerWithMessaging.class.getName();
-      }
-
-      @Override
-      public MessageReceiver getMessageReceiver() {
-        return AssetManagerWithMessaging.this.messageReceiver;
-      }
-
-      @Override
-      public Service getService() {
-        return Service.AssetManager;
-      }
-
-      @Override
-      public MessageSender getMessageSender() {
-        return AssetManagerWithMessaging.this.messageSender;
-      }
-
-      @Override
-      public SecurityService getSecurityService() {
-        return AssetManagerWithMessaging.this.secSvc;
-      }
-
-      @Override
-      public String getSystemUserName() {
-        return systemUserName;
-      }
-
-      @Override
-      public void repopulate(final String indexName) {
-        notEmpty(indexName, "indexName");
-        final Organization org = getSecurityService().getOrganization();
-        final User user = (org != null ? getSecurityService().getUser() : null);
-        try {
-          final Organization defaultOrg = new DefaultOrganization();
-          final User systemUser = SecurityUtil.createSystemUser(getSystemUserName(), defaultOrg);
-          getSecurityService().setOrganization(defaultOrg);
-          getSecurityService().setUser(systemUser);
-
-          final AQueryBuilder q = delegate.createQuery();
-          final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
-          final int total = r.countSnapshots();
-          logger.info("Populating index '{}' with {} snapshots | start", indexName, total);
-          final int responseInterval = (total < 100) ? 1 : (total / 100);
-          int current = 0;
-
-          final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
-          for (String orgId : byOrg.keySet()) {
-            final Organization snapshotOrg;
-            try {
-              snapshotOrg = AssetManagerWithMessaging.this.orgDir.getOrganization(orgId);
-              getSecurityService().setOrganization(snapshotOrg);
-              getSecurityService().setUser(SecurityUtil.createSystemUser(systemUserName, snapshotOrg));
-
-              for (Snapshot snapshot : byOrg.get(orgId)) {
-                current += 1;
-                try {
-                  TakeSnapshot takeSnapshot = mkTakeSnapshotMessage(snapshot, null);
-                  getMessageSender().sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName),
-                          MessageSender.DestinationType.Queue, takeSnapshot);
-                } catch (Throwable t) {
-                  logger.error("Unable to recreate event {} from organization {}",
-                          snapshot.getMediaPackage().getIdentifier().toString(), orgId, t);
-                }
-                if (((current % responseInterval) == 0) || (current == total)) {
-                  getMessageSender().sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
-                          MessageSender.DestinationType.Queue, IndexRecreateObject.update(indexName, getService(),
-                                  total, current));
-                }
-              }
-            } catch (Throwable t) {
-              logger.error("Unable to recreate event index for organization {}", orgId, t);
-            } finally {
-              getSecurityService().setOrganization(defaultOrg);
-              getSecurityService().setUser(systemUser);
-            }
-          }
-          getMessageSender().sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                  IndexRecreateObject.end(indexName, getService()));
-
-        } finally {
-          getSecurityService().setOrganization(org);
-          getSecurityService().setUser(user);
-        }
-      }
-    };
-    this.indexProducerMsgReceiver.activate();
   }
 
   @Override
   public void close() throws Exception {
-    indexProducerMsgReceiver.deactivate();
   }
 
   @Override
   public Snapshot takeSnapshot(String owner, MediaPackage mp) {
     final Snapshot snapshot = super.takeSnapshot(owner, mp);
-    // We pass the original media package here, instead of using snapshot.getMediaPackage(), for security reasons.
-    // The original media package has elements with URLs of type http://.../files/... in it. These URLs will be pulled
-    // from the Workspace cache without a HTTP call.
-    // Were we to use snapshot.getMediaPackage(), we'd have a HTTP call on our hands that's secured via the asset
-    // manager security model. But the snapshot taken here doesn't have the necessary security properties installed (yet).
-    // This happens in AssetManagerWithSecurity, some layers higher up. So there's a weird loop in here.
+    // We pass the original media package here, instead of using
+    // snapshot.getMediaPackage(), for security reasons. The original media
+    // package has elements with URLs of type http://.../files/... in it. These
+    // URLs will be pulled from the Workspace cache without a HTTP call.
+    //
+    // Were we to use snapshot.getMediaPackage(), we'd have a HTTP call on our
+    // hands that's secured via the asset manager security model. But the
+    // snapshot taken here doesn't have the necessary security properties
+    // installed (yet). This happens in AssetManagerWithSecurity, some layers
+    // higher up. So there's a weird loop in here.
     notifyTakeSnapshot(snapshot, mp);
     return snapshot;
   }
@@ -232,7 +117,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
    * <p>
    * Do not call outside of a security context.
    */
-  private TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot, MediaPackage mp) {
+  TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot, MediaPackage mp) {
     final MediaPackage chosenMp;
     if (mp != null) {
       chosenMp = mp;
@@ -253,15 +138,6 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
       // is used.
       throw new RuntimeException("The current implementation of the index requires versions being of type 'long'.");
     }
-  }
-
-  /*
-   * ------------------------------------------------------------------------------------------------------------------
-   */
-
-  @Override
-  public void repopulate(String indexName) throws Exception {
-    indexProducerMsgReceiver.repopulate(indexName);
   }
 
   /*

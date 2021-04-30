@@ -49,6 +49,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -58,7 +59,9 @@ import javax.persistence.TemporalType;
 
 @Entity(name = "Incident")
 @Access(AccessType.FIELD)
-@Table(name = "oc_incident")
+@Table(name = "oc_incident", indexes = {
+    @Index(name = "IX_oc_incident_jobid", columnList = ("jobid")),
+    @Index(name = "IX_oc_incident_severity", columnList = ("severity")) })
 @NamedQueries({@NamedQuery(name = "Incident.findByJobId",
                            query = "select a from Incident a where a.jobId = :jobId")})
 public class IncidentDto {

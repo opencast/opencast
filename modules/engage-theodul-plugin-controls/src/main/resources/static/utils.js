@@ -92,11 +92,11 @@ define(['jquery'], function($) {
   };
 
   /**
-     * Returns the formatted seconds
-     *
-     * @param seconds seconds to format
-     * @return formatted seconds
-     */
+   * Returns the formatted seconds
+   *
+   * @param seconds seconds to format
+   * @return formatted seconds
+   */
   Utils.prototype.formatSeconds = function(seconds) {
     if (!seconds) {
       seconds = 0;
@@ -124,34 +124,34 @@ define(['jquery'], function($) {
   };
 
   /**
-     * enable
-     *
-     * @param id
-     */
+   * enable
+   *
+   * @param id
+   */
   Utils.prototype.enable = function(id) {
     $('#' + id).removeAttr('disabled');
   };
 
   /**
-     * disable
-     *
-     * @param id
-     */
+   * disable
+   *
+   * @param id
+   */
   Utils.prototype.disable = function(id) {
     $('#' + id).attr('disabled', 'disabled');
   };
 
   Utils.prototype.removeParentIfElementExists = function(elemenId) {
     if ($('#' + elemenId) && $('#' + elemenId).parent()) {
-      +                $('#' + elemenId).parent().remove();
+      $('#' + elemenId).parent().remove();
     }
   };
 
   /**
-     * greyIn
-     *
-     * @param id
-     */
+   * greyIn
+   *
+   * @param id
+   */
   Utils.prototype.greyIn = function(id) {
     $('#' + id).animate({
       opacity: 1.0
@@ -159,10 +159,10 @@ define(['jquery'], function($) {
   };
 
   /**
-     * greyOut
-     *
-     * @param id
-     */
+   * greyOut
+   *
+   * @param id
+   */
   Utils.prototype.greyOut = function(id) {
     $('#' + id).animate({
       opacity: 0.5

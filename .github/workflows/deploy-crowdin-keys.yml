@@ -1,0 +1,26 @@
+name: Deploy Crowdin keys
+
+on:
+  push:
+    branches:
+      - develop
+      - 'r/*.x'
+
+jobs:
+  deploy-translation-keys:
+    if: github.repository_owner == 'opencast'
+    runs-on: ubuntu-20.04
+    env:
+      CROWDIN_API_KEY: ${{ secrets.CROWDIN_API_KEY }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: prepare crowdin client
+      run: |
+        wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin.deb
+        sudo dpkg -i crowdin.deb
+        echo "api_key: ${CROWDIN_API_KEY}" > ~/.crowdin.yaml
+
+    - name: upload translation source
+      run: |
+        crowdin --config .crowdin.yaml upload sources -b "${GITHUB_REF##*/}"

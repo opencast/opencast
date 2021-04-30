@@ -29,8 +29,8 @@ import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEven
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DublinCoreByteFormat;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesException;
@@ -57,7 +57,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogU
   private SecurityService securityService;
 
   @Override
-  public Opt<MetadataCollection> getFields(String seriesId) {
+  public Opt<DublinCoreMetadataCollection> getFields(String seriesId) {
 
     final Opt<DublinCoreCatalog> optDCCatalog = loadDublinCoreCatalog(
             RequireUtil.requireNotBlank(seriesId, "seriesId"));
@@ -68,7 +68,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogU
   }
 
   @Override
-  public boolean storeFields(String seriesId, MetadataCollection metadata) {
+  public boolean storeFields(String seriesId, DublinCoreMetadataCollection metadata) {
     final Opt<DublinCoreCatalog> optDCCatalog = loadDublinCoreCatalog(
             RequireUtil.requireNotBlank(seriesId, "seriesId"));
     if (optDCCatalog.isSome()) {

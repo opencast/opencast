@@ -1261,6 +1261,123 @@ angular.module('adminNg.directives')
           if (scope.timer) $timeout.cancel( scope.timer );
         });
 
+        /**
+         * Creates a promise object to load the AuthService so that user properties
+         * are available to the current scope.
+         */
+        AuthService.getUser().$promise.then(function (user) {
+          var startLength = parseInt(user.org.properties['admin.editor.segment.start_length'] || 0, 10);
+          var endLength = parseInt(user.org.properties['admin.editor.segment.end_length'] || 0, 10);
+          var minLength = parseInt(user.org.properties['admin.editor.segment.minimum_length'] || 0, 10);
+
+          scope.startLength = startLength;
+          scope.endLength = endLength;
+          scope.minLength = minLength;
+
+          if (!startLength && !endLength && !minLength) {
+            return;
+          }
+
+          scope.video.$promise.then(function(vidObj) {
+            var duration = parseInt(vidObj.duration, 10);
+            var segments = vidObj.segments;
+
+            if (duration <= startLength + endLength) {
+              return;
+            }
+
+            var setSegment = function(_start, _end, _min, _del) {
+
+              if (_min > 0) {
+                _end = (_start - _end < _min) ? _start + _min : _end;
+              }
+
+              return {
+                start: _start,
+                end: _end,
+                deleted: _del,
+                selected: false
+              };
+            };
+
+            var getSegmentLength = function(_s) {
+              return (_s.end - _s.start);
+            };
+
+            var maxSegIdx = segments.length - 1;
+            segments[0].start = 0;
+            segments[maxSegIdx].end = duration;
+
+            if (segments.length == 1) {
+
+              var _start = 0;
+              var _duration = duration;
+
+              if (startLength > 0) {
+                segments.push( setSegment(0, startLength, startLength, true) );
+                _start += startLength;
+                _duration -= startLength;
+              }
+
+              if (endLength > 0) {
+                segments.push( setSegment(duration - endLength, duration, endLength, true) );
+                _duration -= endLength;
+              }
+
+              segments[0] = setSegment(_start, _duration, _duration, false);
+
+            } else if (segments.length == 2) {
+
+              // two segments: ||    | / |  |  | / |    ||
+              var a = getSegmentLength(segments[0]) / duration,
+                  b = getSegmentLength(segments[1]) / duration;
+
+              if (a <= b) {
+
+                // small first segment add end if required
+                if (endLength > 0) {
+                  segments.push( setSegment(duration - endLength, duration, endLength, true) );
+                  if (segments[1]) segments[1].end = duration - endLength;
+                }
+              } else {
+
+                // small end segment add front if required
+                if (startLength > 0) {
+                  segments.push( setSegment(0, startLength, startLength, true) );
+                  if (segments[0]) segments[0].start = startLength;
+                }
+              }
+            }
+
+            segments.sort(function (a, b) {
+              return a.start - b.start;
+            });
+
+            maxSegIdx = segments.length - 1;
+
+            if ((startLength > 0) && (getSegmentLength(segments[0]) < startLength)) {
+              segments[0].end = startLength;
+              if (segments[1]) segments[1].start = startLength;
+            }
+
+            if ((endLength > 0) && (getSegmentLength(segments[maxSegIdx]) < endLength)) {
+              segments[maxSegIdx].start = duration - endLength;
+              if (segments[maxSegIdx - 1]) segments[maxSegIdx - 1].end = duration - endLength;
+            }
+
+            var i = maxSegIdx;
+            while (i--) {
+              var segment = segments[i];
+              if (getSegmentLength(segment) < minLength) {
+                scope.mergeSegment(null, segment);
+              }
+            }
+
+            maxSegIdx = segments.length - 1;
+            segments[0].start = 0;
+            segments[maxSegIdx].end = duration;
+          });
+        });
 
         scope.setWrapperClasses();
       }

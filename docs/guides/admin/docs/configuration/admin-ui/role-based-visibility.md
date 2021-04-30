@@ -2,13 +2,13 @@
 
 Opencast supports a powerful mechanism that allows to provide users selective access to the administrative user
 interface. Using that mechanism, it is possible to configure what parts of the UI (and therefore functionality)
-are visibile to a given user based on the user's roles. Hence, we call that mechanism role-based visibility.
+are visible to a given user based on the user's roles. Hence, we call that mechanism role-based visibility.
 
 > This is __no__ security feature and does not guarantee that users cannot access any of the functionality.
 
 ## How To Use
 
-The best practise to assign a larger set of roles to a user is to use Opencast's support for user groups. This
+The best practice to assign a larger set of roles to a user is to use Opencast's support for user groups. This
 way, you can define a group whose roles provide access to the parts of the UI you want to provide access to. Given
 such a group, you can just add users to that group and they will get all the roles of the group which includes
 roles that allow the users to access specific parts of the UI.

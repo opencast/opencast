@@ -9,7 +9,17 @@ If the elements have been added to the Publication using "with-published-element
 api, they haven't actually been published so it is unnecessary to have a retract-configuration. Adding a retraction
 won't cause any errors, it will just skip those elements.
 
-There is only one configuration key "channel-id". This is the channel to remove the published elements from.
+## Parameters
+
+These are the keys that can be configured for the workflow operation in the workflow definition.  The `channel-id` is
+mandatory.
+
+|Key                    |Description                                          |Example    |Default  |
+|-----------------------|-----------------------------------------------------|-----------|---------|
+|channel-id             |The id of the channel to retract from                |`internal` |         |
+|retract-streaming      |Whether to retract streaming elements as well        |`true`     | `false` |
+
+Setting `retract-streaming` to true only makes sense if you've published streaming elements for this channel before.
 
 ## Operation Examples
 
@@ -32,5 +42,6 @@ There is only one configuration key "channel-id". This is the channel to remove 
       description="Retract from external api publication channel">
       <configurations>
         <configuration key="channel-id">api</configuration>
+        <configuration key="retract-streaming">false</configuration>
       </configurations>
     </operation>

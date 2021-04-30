@@ -28,10 +28,10 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.adminui.impl.ProviderQuery;
 import org.opencastproject.adminui.impl.RawProviderQuery;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.impl.index.event.Event;
-import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -120,7 +120,7 @@ public class StatisticsEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getprovidersbyresourcetype", description = "Returns the available statistics providers for an (optional) resource type", returnDescription = "The available statistics providers as JSON", restParameters = {
     @RestParameter(name = "resourceType", description = "The resource type: either 'episode', 'series' or 'organization'", isRequired = false, type = STRING)},
-    reponses = {
+    responses = {
       @RestResponse(description = "Returns the providers for the given resource type as JSON, or all, if the resource type is missing", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED)
     })
@@ -182,7 +182,7 @@ public class StatisticsEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getproviderdata", description = "Returns the statistical data for a specific provider and a specific resource", returnDescription = "The statistical data as JSON", restParameters = {
     @RestParameter(name = "data", isRequired = true, description = "A list of statistical data requests, containing a provider id, from, to, the resource id and a resolution - all as JSON", type = RestParameter.Type.TEXT) },
-    reponses = {
+    responses = {
       @RestResponse(description = "Returns the statistical data for the given resource type as JSON", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED)
     })
@@ -229,7 +229,7 @@ public class StatisticsEndpoint {
     @RestParameter(name = "from", isRequired = true, description = "The from date in iso 8601 UTC notation", type = RestParameter.Type.TEXT),
     @RestParameter(name = "to", isRequired = true, description = "The to date in iso 8601 UTC notation", type = RestParameter.Type.TEXT),
     @RestParameter(name = "dataResolution", isRequired = true, description = "The data resolution. Valid values are 'HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY', and 'YEARLY'", type = RestParameter.Type.TEXT)},
-    reponses = {
+    responses = {
       @RestResponse(description = "Returns the statistical data for the given resource type as csv", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED)
     })

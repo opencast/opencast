@@ -44,6 +44,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+
 import java.util.List;
 import java.util.Set;
 
@@ -67,6 +70,13 @@ public abstract class BundleInfoRestEndpoint {
 
   protected abstract BundleInfoDb getDb();
 
+  private long lastModified = 0;
+
+  @Activate
+  public void activate(ComponentContext cc) {
+    lastModified = cc.getBundleContext().getBundle().getLastModified();
+  }
+
   @GET
   // path prefix "bundles" is contained here and not in the path annotation of the class
   // See https://opencast.jira.com/browse/MH-9768
@@ -75,7 +85,7 @@ public abstract class BundleInfoRestEndpoint {
   @RestQuery(
     name = "list",
     description = "Return a list of all running bundles on the whole cluster.",
-    reponses = {
+    responses = {
       @RestResponse(description = "A list of bundles.", responseCode = HttpServletResponse.SC_OK) },
     returnDescription = "The search results, expressed as xml or json.")
   public Response getVersions() {
@@ -97,7 +107,7 @@ public abstract class BundleInfoRestEndpoint {
         isRequired = false,
         defaultValue = DEFAULT_BUNDLE_PREFIX,
         type = RestParameter.Type.STRING) },
-    reponses = {
+    responses = {
       @RestResponse(description = "true/false", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "cannot find any bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) },
     returnDescription = "The search results, expressed as xml or json.")
@@ -130,7 +140,7 @@ public abstract class BundleInfoRestEndpoint {
         isRequired = false,
         defaultValue = DEFAULT_BUNDLE_PREFIX,
         type = RestParameter.Type.STRING) },
-    reponses = {
+    responses = {
       @RestResponse(description = "Version structure", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "No bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) },
     returnDescription = "The search results as json.")
@@ -149,7 +159,9 @@ public abstract class BundleInfoRestEndpoint {
             throw new Error("bug");
           case 1:
             // all versions align
-            return ok(obj(p("consistent", true)).append(fullVersionJson.apply(example.getVersion())));
+            return ok(obj(p("consistent", true))
+                .append(fullVersionJson.apply(example.getVersion()))
+                .append(obj(p("last-modified", lastModified))));
           default:
             // multiple versions found
             return ok(obj(p("consistent", false),

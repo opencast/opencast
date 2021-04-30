@@ -30,6 +30,12 @@ angular.module('adminNg.controllers')
     function pushAllPropertiesIntoArray(object, array) {
       for (var o in object) {
         if (Object.prototype.hasOwnProperty.call(object, o)) {
+          for (var fieldNo in object[o].fields) {
+            var field = object[o].fields[fieldNo];
+            if (Object.prototype.hasOwnProperty.call(field, 'collection')) {
+              field.collection = [];
+            }
+          }
           array.push(object[o]);
         }
       }

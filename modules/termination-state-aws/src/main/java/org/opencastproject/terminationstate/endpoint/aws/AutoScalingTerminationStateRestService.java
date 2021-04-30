@@ -69,7 +69,7 @@ public class AutoScalingTerminationStateRestService implements TerminationStateR
   @Path("/state")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "stateasjson", description = "Returns the Termination State as JSON.  Possible termination states are none, wait and ready.", returnDescription = "A JSON representation of the termination state.",
-          reponses = {
+          responses = {
             @RestResponse(responseCode = SC_OK, description = "A JSON representation of the termination state."),
             @RestResponse(responseCode = SC_SERVICE_UNAVAILABLE, description = "The AWS Autoscaling Termination State Service is disabled or unavailable")
           })
@@ -92,7 +92,7 @@ public class AutoScalingTerminationStateRestService implements TerminationStateR
           restParameters = {
             @RestParameter(name = "state", type = Type.STRING, defaultValue = "wait", description = "The termination state, the only valid value is 'wait'", isRequired = false)
           },
-          reponses = {
+          responses = {
             @RestResponse(responseCode = SC_NO_CONTENT, description = "The node is preparing to terminate"),
             @RestResponse(responseCode = SC_BAD_REQUEST, description = "The state was not 'wait'"),
             @RestResponse(responseCode = SC_SERVICE_UNAVAILABLE, description = "The AWS Autoscaling Termination State Service is disabled or unavailable"),

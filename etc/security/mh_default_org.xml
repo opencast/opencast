@@ -1,11 +1,16 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:sec="http://www.springframework.org/schema/security"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/osgi
-       http://www.springframework.org/schema/osgi/spring-osgi.xsd
-       http://www.springframework.org/schema/security
-       http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util-3.1.xsd
+                           http://www.springframework.org/schema/osgi
+                           http://www.springframework.org/schema/osgi/spring-osgi.xsd
+                           http://www.springframework.org/schema/security
+                           http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
   <!-- ######################################## -->
   <!-- # Open and unsecured url patterns      # -->
@@ -16,11 +21,14 @@
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
     entry-point-ref="opencastEntryPoint">
 
+    <sec:access-denied-handler error-page="/403.html"/>
+
     <!-- ################ -->
     <!-- # URL SECURITY # -->
     <!-- ################ -->
 
     <!-- Allow anonymous access to the login form -->
+    <sec:intercept-url pattern="/" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/login.html" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/sysinfo/bundles/version" method="GET" access="ROLE_ANONYMOUS" />
 
@@ -32,6 +40,9 @@
 
     <!-- Allow anonymous access to the player redirect -->
     <sec:intercept-url pattern="/play/*" access="ROLE_ANONYMOUS" />
+
+    <!-- Define roles for metrics endpoint -->
+    <sec:intercept-url pattern="/metrics" access="ROLE_ADMIN, ROLE_METRICS" />
 
     <!-- Protect admin UI facade -->
     <sec:intercept-url pattern="/workflow/definitions.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
@@ -79,6 +90,8 @@
     <sec:intercept-url pattern="/admin-ng/series/*/metadata.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_METADATA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/series/*/theme.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/server/servers.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVERS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/series/*/hasEvents.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/series/configuration.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/services/services.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVICES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/tasks/processing.json" method="GET" access="ROLE_ADMIN, ROLE_UI_TASKS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/themes/themes.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_VIEW" />
@@ -91,7 +104,10 @@
     <sec:intercept-url pattern="/admin-ng/users/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/resources/events/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/resources/jobs/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_JOBS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/series/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/resources/servers/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVERS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/resources/services/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVICES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/themes/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/recordings/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/users/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_VIEW" />
@@ -103,6 +119,7 @@
     <sec:intercept-url pattern="/admin-ng/statistics/*.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/statistics/export.csv" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/assets/assets/**" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="GET" access="ROLE_ADMIN" />
 
     <sec:intercept-url pattern="/admin-ng/acl/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_ACLS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_EDIT" />
@@ -120,6 +137,7 @@
     <sec:intercept-url pattern="/admin-ng/themes/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_THEMES_EDIT" />
     <sec:intercept-url pattern="/admin-ng/users/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature/*" method="PUT" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="PUT" access="ROLE_ADMIN" />
 
     <sec:intercept-url pattern="/services/maintenance" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVERS_MAINTENANCE_EDIT" />
     <sec:intercept-url pattern="/services/sanitize" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVICES_STATUS_EDIT" />
@@ -147,6 +165,7 @@
     <sec:intercept-url pattern="/admin-ng/tools/*/thumbnail.json" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_EDIT" />
     <sec:intercept-url pattern="/admin-ng/users" method="POST" access="ROLE_ADMIN, ROLE_UI_USERS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="POST" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="POST" access="ROLE_ADMIN" />
 
     <sec:intercept-url pattern="/admin-ng/acl/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_ACLS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_DELETE" />
@@ -159,6 +178,7 @@
     <sec:intercept-url pattern="/admin-ng/series/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_SERIES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/themes/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_THEMES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/users/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_USERS_DELETE" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="DELETE" access="ROLE_ADMIN" />
 
     <!-- Securing the URLs for the external API interface -->
     <!-- External API GET Endpoints -->
@@ -179,6 +199,7 @@
     <sec:intercept-url pattern="/api/groups/*" method="GET" access="ROLE_ADMIN, ROLE_API_GROUPS_VIEW"/>
     <sec:intercept-url pattern="/api/info/*" method="GET" access="ROLE_ADMIN, ROLE_API" />
     <sec:intercept-url pattern="/api/info/me/*" method="GET" access="ROLE_ADMIN, ROLE_API" />
+    <sec:intercept-url pattern="/api/info/organization/properties/engageuiurl" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW" />
     <sec:intercept-url pattern="/api/series" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
     <sec:intercept-url pattern="/api/series/*" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
     <sec:intercept-url pattern="/api/series/*/acl" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_ACL_VIEW"/>
@@ -211,7 +232,7 @@
     <sec:intercept-url pattern="/api/events/*" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/acl/*" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_EDIT"/>
     <sec:intercept-url pattern="/api/groups" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_CREATE"/>
-    <sec:intercept-url pattern="/api/groups/*/members/*" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
+    <sec:intercept-url pattern="/api/groups/*/members" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
     <sec:intercept-url pattern="/api/clearIndex" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="ROLE_ADMIN"/>
@@ -272,6 +293,9 @@
     <sec:intercept-url pattern="/studio/static/js/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/studio/**" access="ROLE_ADMIN, ROLE_STUDIO" />
 
+    <!-- Enable access to Opencast Editor -->
+    <sec:intercept-url pattern="/editor-ui/**" access="ROLE_ADMIN" />
+
     <!-- Enable anonymous access to the annotation and the series endpoints -->
     <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS, ROLE_CAPTURE_AGENT" />
     <sec:intercept-url pattern="/annotation/**" method="GET" access="ROLE_ANONYMOUS" />
@@ -297,10 +321,13 @@
     <sec:intercept-url pattern="/admin/users.html" access="ROLE_ADMIN" />
 
     <!-- Enable 2-legged OAuth access ("signed fetch") to the LTI launch servlet -->
-    <sec:intercept-url pattern="/lti" access="ROLE_OAUTH_USER" />
+    <sec:intercept-url pattern="/lti/**" access="ROLE_OAUTH_USER" />
 
     <!-- Enable access to the LTI tools -->
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
+
+    <!-- Enable access to the LTI service -->
+    <sec:intercept-url pattern="/lti-service-gui/**" access="ROLE_OAUTH_USER" />
 
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
@@ -398,6 +425,9 @@
         <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
         <!-- Uncomment the line below to support LTI or other OAuth clients.          -->
         <!-- <ref bean="oauthProtectedResourceFilter" /> -->
+
+        <!-- Uncomment the line below to support Shibboleth. -->
+        <!-- <ref bean="shibbolethHeaderFilter" /> -->
       </list>
     </property>
   </bean>
@@ -572,17 +602,64 @@
     <property name="userDirectoryService" ref="userDirectoryService" />
     <property name="shibbolethLoginHandler" ref="aaiLoginHandler" />
     <property name="exceptionIfHeaderMissing" value="false" />
-  </bean>
-  -->
+  </bean>-->
 
   <!-- AAI header extractor and user generator
   <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.ConfigurableLoginHandler">
     <property name="securityService" ref="securityService" />
     <property name="userReferenceProvider" ref="userReferenceProvider" />
-  </bean>
-  -->
+  </bean>-->
 
-  <!--
+  <!-- Dynamic AAI Loginhandler
+  <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.DynamicLoginHandler">
+    <property name="securityService" ref="securityService" />
+    <property name="userReferenceProvider" ref="userReferenceProvider" />
+    <property name="attributeMapper" ref="attributeMapper" />
+  </bean>
+
+  <bean id="attributeMapper" class="org.opencastproject.security.aai.api.AttributeMapper">
+    <property name="useHeader" value="true" />
+    <property name="multiValueDelimiter" value=";" />
+    <property name="attributeMap" ref="attributeMap" />
+    <property name="aaiAttributes" ref="aaiAttributes" />
+  </bean>
+
+  <util:list id="aaiAttributes" value-type="java.lang.String">
+    <value>sn</value>
+    <value>givenName</value>
+    <value>mail</value>
+    <value>homeOrganization</value>
+    <value>eduPersonEntitlement</value>
+    <value>eduPersonPrincipalName</value>
+    <value>homeOrganization</value>
+  </util:list>
+
+  <util:map id="attributeMap" map-class="java.util.HashMap">
+    <entry key="roles" value-ref="roleMapping" />
+    <entry key="displayName" value-ref="displayNameMapping" />
+    <entry key="mail" value-ref="mailMapping" />
+  </util:map>
+
+  <util:list id="displayNameMapping" value-type="java.lang.String">
+    <value>['givenName'][0] + ' ' + ['sn'][0]</value>
+  </util:list>
+
+  <util:list id="mailMapping" value-type="java.lang.String">
+    <value>['mail'][0]</value>
+  </util:list>
+
+  <util:list id="roleMapping" value-type="java.lang.String">
+    <value>'ROLE_AAI_USER'</value>
+    <value>'ROLE_AAI_USER_' + ['eduPersonPrincipalName']</value>
+    <value>('ROLE_AAI_OWNER_' + ['eduPersonPrincipalName']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+    <value>['homeOrganization'] != null ? 'ROLE_AAI_ORG_' + ['homeOrganization'] + '_MEMBER' : null</value>
+    <value>['eduPersonEntitlement'].contains('urn:mace:opencast.org:permission:shibboleth:opencast_admin') ? 'ROLE_ADMIN' : null</value>
+    <value>['eduPersonPrincipalName'].contains('john.doe@example.org') ? 'ROLE_ADMIN' : null</value>
+    <value>['eduPersonScopedAffiliation'].contains('faculty@example.org') ? 'ROLE_GROUP_AAI_TRAINER' : null</value>
+  </util:list>
+
+   -->
+
   <bean id="preauthAuthProvider"
         class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
     <property name="preAuthenticatedUserDetailsService">
@@ -591,7 +668,6 @@
       </bean>
     </property>
   </bean>
-  -->
 
   <!-- ################ -->
   <!-- # LDAP Support # -->
@@ -682,7 +758,6 @@
 
   <bean id="passwordEncoder" class="org.opencastproject.kernel.security.CustomPasswordEncoder" />
 
-  <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
   <sec:authentication-manager alias="authenticationManager">
     <sec:authentication-provider ref="rememberMeAuthenticationProvider"/>
     <!-- CAS Auth: Uncomment this if using CAS authentication -->
@@ -692,6 +767,7 @@
     <!-- Uncomment the following line if using LDAP -->
     <!-- <sec:authentication-provider ref="ldapAuthProvider" /> -->
     <sec:authentication-provider user-service-ref="userDetailsService">
+      <!-- The JPA user directory stores bcrypt hashed passwords, but can still decrypt legacy md5 hashes -->
       <sec:password-encoder ref="passwordEncoder">
         <!-- This salt is used only for decoding legacy MD5 hased passwords -->
         <sec:salt-source user-property="username" />

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.videogrid.impl.VideoGridServiceImpl"
+               immediate="true" activate="activate">
+  <implementation class="org.opencastproject.videogrid.impl.VideoGridServiceImpl"/>
+  <property name="service.description" value="Video Grid Service"/>
+  <property name="service.pid" value="org.opencastproject.videogrid.impl.VideoGridServiceImpl"/>
+  <service>
+    <provide interface="org.opencastproject.videogrid.api.VideoGridService"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
+  </service>
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+             bind="setWorkspace"/>
+  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             bind="setServiceRegistry"/>
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
+  <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
+             bind="setUserDirectoryService"/>
+  <reference name="organization-directory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             bind="setOrganizationDirectoryService"/>
+</scr:component>

@@ -25,8 +25,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.index.service.resources.list.provider.TestServiceStatistics;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
-import org.opencastproject.index.service.resources.list.query.StringListFilter;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
+import org.opencastproject.list.query.StringListFilter;
 
 import org.junit.Before;
 import org.junit.Test;

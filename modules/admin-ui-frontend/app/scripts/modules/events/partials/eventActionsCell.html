@@ -22,7 +22,7 @@
 </a>
 
 <a ng-if="row.has_preview"
-   href="#!/events/events/{{row.id}}/tools/editor"
+   href="{{ row.editorUrl }}"
    class="cut"
    title="{{ row.needs_cutting ? 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR_NEEDS_CUTTING' : 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR' | translate }}"
    with-role="ROLE_UI_EVENTS_EDITOR_VIEW">
@@ -62,3 +62,8 @@
    with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW">
 </a>
 
+<a ng-click="row.embeddingCode()"
+   class="fa fa-link"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.EMBEDDING_CODE' | translate }}"
+   with-role="ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW">
+</a>

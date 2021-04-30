@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.lti.endpoint.LtiServiceRemoteImpl"
+               immediate="true">
+  <implementation class="org.opencastproject.lti.endpoint.LtiServiceRemoteImpl"/>
+  <property name="service.description" value="LTI Service Remote Service"/>
+  <service>
+    <!-- expose interface for MH REST publisher! -->
+    <provide interface="org.opencastproject.lti.service.api.LtiService"/>
+  </service>
+  <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
+             bind="setTrustedHttpClient"/>
+  <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             bind="setRemoteServiceManager"/>
+</scr:component>

@@ -162,12 +162,12 @@
       exception-handler-workflow="partial-error"
       description="Publish to editor">
       <configurations>
-        <configuration key="source-tags">preview</configuration>
+        <configuration key="download-source-tags">preview,editor</configuration>
         <configuration key="channel-id">internal</configuration>
         <configuration key="url-pattern">
           ${org_org_opencastproject_admin_ui_url!'http://localhost:8080'}/admin-ng/index.html#/events/events/${event_id}/tools/editor
         </configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 

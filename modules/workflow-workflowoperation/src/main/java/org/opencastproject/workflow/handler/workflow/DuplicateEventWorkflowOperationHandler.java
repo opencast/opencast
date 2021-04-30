@@ -32,18 +32,28 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementBuilder;
+import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
+import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.api.SeriesException;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -78,6 +88,20 @@ import java.util.UUID;
  * This WOH duplicates an input event.
  */
 public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
+  /**
+   * If a target series is given, bundle all the information about it in a class
+   */
+  private static final class SeriesInformation {
+    private final String id;
+    private final DublinCoreCatalog dc;
+    private final String title;
+
+    private SeriesInformation(String id, DublinCoreCatalog dc, String title) {
+      this.id = id;
+      this.dc = dc;
+      this.title = title;
+    }
+  }
 
   private static final Logger logger = LoggerFactory.getLogger(DuplicateEventWorkflowOperationHandler.class);
   private static final String PLUS = "+";
@@ -98,6 +122,12 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
   /** Name of the configuration option that provides the maximum number of events to create */
   public static final String MAX_NUMBER_PROPERTY = "max-number-of-events";
 
+  /** Whether to actually use the number suffix (makes sense in conjunction with "set-series-id" */
+  public static final String NO_SUFFIX = "no-suffix";
+
+  /** The series ID that should be set on the copies (if unset, uses the same series) */
+  public static final String SET_SERIES_ID = "set-series-id";
+
   /** The default maximum number of events to create. Can be overridden. */
   public static final int MAX_NUMBER_DEFAULT = 25;
 
@@ -115,6 +145,28 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
   /** The distribution service */
   protected DistributionService distributionService;
+
+  /** The series service */
+  private SeriesService seriesService;
+
+  /** The authorization service */
+  private AuthorizationService authorizationService;
+
+  /**
+   * OSGi setter
+   * @param authorizationService
+   */
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
+  }
+
+  /**
+   * OSGi setter
+   * @param seriesService
+   */
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
+  }
 
   /**
    * Callback for the OSGi declarative services configuration.
@@ -155,6 +207,8 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final String configuredSourceFlavors = trimToEmpty(operation.getConfiguration(SOURCE_FLAVORS_PROPERTY));
     final String configuredSourceTags = trimToEmpty(operation.getConfiguration(SOURCE_TAGS_PROPERTY));
     final String configuredTargetTags = trimToEmpty(operation.getConfiguration(TARGET_TAGS_PROPERTY));
+    final boolean noSuffix = Boolean.parseBoolean(trimToEmpty(operation.getConfiguration(NO_SUFFIX)));
+    final String seriesId = trimToEmpty(operation.getConfiguration(SET_SERIES_ID));
     final int numberOfEvents = Integer.parseInt(operation.getConfiguration(NUMBER_PROPERTY));
     final String configuredPropertyNamespaces = trimToEmpty(operation.getConfiguration(PROPERTY_NAMESPACES_PROPERTY));
     int maxNumberOfEvents = MAX_NUMBER_DEFAULT;
@@ -166,6 +220,22 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     if (numberOfEvents > maxNumberOfEvents) {
       throw new WorkflowOperationException("Number of events to create exceeds the maximum of "
           + maxNumberOfEvents + ". Aborting.");
+    }
+
+    SeriesInformation series = null;
+    AccessControlList seriesAccessControl = null;
+    if (!seriesId.isEmpty()) {
+      try {
+        final DublinCoreCatalog dc = seriesService.getSeries(seriesId);
+        series = new SeriesInformation(seriesId, dc, dc.get(DublinCore.PROPERTY_TITLE).get(0).getValue());
+        seriesAccessControl = seriesService.getSeriesAccessControl(seriesId);
+      } catch (SeriesException e) {
+        throw new WorkflowOperationException(e);
+      } catch (NotFoundException e) {
+        throw new WorkflowOperationException("couldn't find series for ID \"" + seriesId + "\"");
+      } catch (UnauthorizedException e) {
+        throw new WorkflowOperationException("not allowed to access series \"" + seriesId + "\"");
+      }
     }
 
     logger.info("Creating {} new media packages from media package with id {}.", numberOfEvents,
@@ -204,6 +274,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, false);
     final Collection<Publication> internalPublications = new HashSet<>();
 
+    final List<String> seriesAclTags = new ArrayList<>();
     for (MediaPackageElement e : mediaPackage.getElements()) {
       if (e instanceof Publication) {
         if (InternalPublicationChannel.CHANNEL_ID.equals(((Publication) e).getChannel())) {
@@ -213,6 +284,15 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       }
       if (MediaPackageElements.EPISODE.equals(e.getFlavor())) {
         // Remove episode DC since we will add a new one (with changed title)
+        elements.remove(e);
+      }
+      // The series DC changes
+      if (series != null && MediaPackageElements.SERIES.equals(e.getFlavor())) {
+        // Remove episode DC since we will add a new one
+        elements.remove(e);
+      }
+      if (series != null && MediaPackageElements.XACML_POLICY_SERIES.equals(e.getFlavor())) {
+        seriesAclTags.addAll(Arrays.asList(e.getTags()));
         elements.remove(e);
       }
     }
@@ -230,11 +310,38 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       MediaPackage newMp = null;
 
       try {
+        String newMpId = workflowInstance.getConfiguration("newMpId");
+        if (newMpId == null) {
+          newMpId = UUID.randomUUID().toString();
+        }
         // Clone the media package (without its elements)
-        newMp = copyMediaPackage(mediaPackage, i + 1, copyNumberPrefix);
+        newMp = copyMediaPackage(mediaPackage, series, newMpId, noSuffix, i + 1, copyNumberPrefix);
+
+        if (series != null) {
+          URI newSeriesURI = null;
+          String newSeriesId = UUID.randomUUID().toString();
+          try (InputStream seriesDCInputStream = IOUtils.toInputStream(series.dc.toXmlString(), "UTF-8")) {
+            newSeriesURI = workspace.put(newMpId, newSeriesId, "dublincore.xml", seriesDCInputStream);
+          }
+          MediaPackageElementBuilder elementBuilder = MediaPackageElementBuilderFactory.newInstance()
+                  .newElementBuilder();
+          MediaPackageElement newSeriesMpElement = elementBuilder.elementFromURI(newSeriesURI,
+                  Catalog.TYPE, MediaPackageElements.SERIES);
+          newSeriesMpElement.setIdentifier(newSeriesId);
+          newMp.add(newSeriesMpElement);
+
+          if (seriesAccessControl != null) {
+            newMp = authorizationService.setAcl(newMp, AclScope.Series, seriesAccessControl).getA();
+            for (MediaPackageElement seriesAclMpe : newMp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
+              for (final String tag : seriesAclTags) {
+                seriesAclMpe.addTag(tag);
+              }
+            }
+          }
+        }
 
         // Create and add new episode dublin core with changed title
-        newMp = copyDublinCore(mediaPackage, originalEpisodeDc[0], newMp, removeTags, addTags, overrideTags,
+        newMp = copyDublinCore(mediaPackage, originalEpisodeDc[0], newMp, series, removeTags, addTags, overrideTags,
                 temporaryFiles);
 
         // Clone regular elements
@@ -246,7 +353,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
         // Clone internal publications
         for (final Publication originalPub : internalPublications) {
-          copyPublication(originalPub, mediaPackage, newMp, removeTags, addTags, overrideTags, temporaryFiles);
+         copyPublication(originalPub, mediaPackage, newMp, removeTags, addTags, overrideTags, temporaryFiles);
         }
 
         assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, newMp);
@@ -258,6 +365,8 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
         // Store media package ID as workflow property
         properties.put("duplicate_media_package_" + (i + 1) + "_id", newMp.getIdentifier().toString());
+      } catch (IOException | MediaPackageException e) {
+        throw new WorkflowOperationException(e);
       } finally {
         cleanup(temporaryFiles, Optional.ofNullable(newMp));
       }
@@ -308,25 +417,36 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
   }
 
   private MediaPackage copyMediaPackage(
-      MediaPackage source,
-      long copyNumber,
-      String copyNumberPrefix) throws WorkflowOperationException {
+      final MediaPackage source,
+      final SeriesInformation series,
+      final String newMpId,
+      final boolean noSuffix,
+      final long copyNumber,
+      final String copyNumberPrefix) throws WorkflowOperationException {
     // We are not using MediaPackage.clone() here, since it does "too much" for us (e.g. copies all the attachments)
     MediaPackage destination;
     try {
-      destination = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+      destination = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new IdImpl(newMpId));
     } catch (MediaPackageException e) {
       logger.error("Failed to create media package " + e.getLocalizedMessage());
       throw new WorkflowOperationException(e);
     }
     logger.info("Created mediapackage {}", destination);
     destination.setDate(source.getDate());
-    destination.setSeries(source.getSeries());
-    destination.setSeriesTitle(source.getSeriesTitle());
+    if (series != null) {
+      destination.setSeries(series.id);
+      destination.setSeriesTitle(series.title);
+    } else {
+      destination.setSeries(source.getSeries());
+      destination.setSeriesTitle(source.getSeriesTitle());
+    }
     destination.setDuration(source.getDuration());
     destination.setLanguage(source.getLanguage());
     destination.setLicense(source.getLicense());
-    destination.setTitle(source.getTitle() + " (" + copyNumberPrefix + " " + copyNumber + ")");
+    final String newTitle = noSuffix
+            ? source.getTitle()
+            : String.format("%s (%s %d)", source.getTitle(), copyNumberPrefix, copyNumber);
+    destination.setTitle(newTitle);
     return destination;
   }
 
@@ -385,17 +505,21 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
   }
 
   private MediaPackage copyDublinCore(
-      MediaPackage source,
-      MediaPackageElement sourceDublinCore,
-      MediaPackage destination,
-      List<String> removeTags,
-      List<String> addTags,
-      List<String> overrideTags,
-      List<URI> temporaryFiles) throws WorkflowOperationException {
+      final MediaPackage source,
+      final MediaPackageElement sourceDublinCore,
+      final MediaPackage destination,
+      final SeriesInformation series,
+      final List<String> removeTags,
+      final List<String> addTags,
+      final List<String> overrideTags,
+      final List<URI> temporaryFiles) throws WorkflowOperationException {
     final DublinCoreCatalog destinationDublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, source).get();
     destinationDublinCore.setIdentifier(null);
     destinationDublinCore.setURI(sourceDublinCore.getURI());
     destinationDublinCore.set(DublinCore.PROPERTY_TITLE, destination.getTitle());
+    if (series != null) {
+      destinationDublinCore.set(DublinCore.PROPERTY_IS_PART_OF, series.id);
+    }
     try (InputStream inputStream = IOUtils.toInputStream(destinationDublinCore.toXmlString(), "UTF-8")) {
       final String elementId = UUID.randomUUID().toString();
       final URI newUrl = workspace.put(destination.getIdentifier().toString(), elementId, "dublincore.xml",
@@ -403,11 +527,11 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       temporaryFiles.add(newUrl);
       final MediaPackageElement mpe = destination.add(newUrl, MediaPackageElement.Type.Catalog,
           MediaPackageElements.EPISODE);
-      mpe.setIdentifier(elementId);
       for (String tag : sourceDublinCore.getTags()) {
         mpe.addTag(tag);
       }
       updateTags(mpe, removeTags, addTags, overrideTags);
+      mpe.setIdentifier(elementId);
     } catch (IOException e) {
       throw new WorkflowOperationException(e);
     }
@@ -419,7 +543,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final AResult properties = q.select(q.propertiesOf(namespace))
         .where(q.mediaPackageId(source.getIdentifier().toString())).run();
     if (properties.getRecords().head().isNone()) {
-      logger.info("No properties to copy for media package {}.", source.getIdentifier(), namespace);
+      logger.info("No properties to copy for media package {}, namespace {}.", source.getIdentifier(), namespace);
       return;
     }
     for (final Property p : properties.getRecords().head().get().getProperties()) {

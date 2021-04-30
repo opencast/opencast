@@ -107,8 +107,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
   }
 
   /** @see org.opencastproject.assetmanager.impl.storage.AssetStore#copy(StoragePath, StoragePath) */
-  public boolean copy(final StoragePath from, final StoragePath to) throws AssetStoreException
-  {
+  public boolean copy(final StoragePath from, final StoragePath to) throws AssetStoreException {
     try {
       AwsAssetMapping map = database.findMapping(from);
       if (map == null) {
@@ -220,7 +219,8 @@ public abstract class AwsAbstractArchive implements AssetStore {
   /** @see org.opencastproject.assetmanager.impl.storage.AssetStore#delete(DeletionSelector) */
   public boolean delete(DeletionSelector sel) throws AssetStoreException {
     // Build path, version may be null if all versions are desired
-    StoragePath path = new StoragePath(sel.getOrganizationId(), sel.getMediaPackageId(), sel.getVersion().orNull(), null);
+    StoragePath path = new StoragePath(
+        sel.getOrganizationId(), sel.getMediaPackageId(), sel.getVersion().orNull(), null);
     try {
       List<AwsAssetMapping> list = database.findMappingsByMediaPackageAndVersion(path);
       // Traverse all file mappings for that media package / version(s)
@@ -229,13 +229,18 @@ public abstract class AwsAbstractArchive implements AssetStore {
         List<AwsAssetMapping> links = database.findMappingsByKey(map.getObjectKey());
         if (links.size() == 1) {
           // This is the only active mapping thats point to the object; thus, the object can be deleted.
-          logger.debug("Deleting archive object from AWS {}: {}, version {}", getStoreType(), map.getObjectKey(), map.getObjectVersion());
+          logger.debug("Deleting archive object from AWS {}: {}, version {}",
+              getStoreType(), map.getObjectKey(), map.getObjectVersion());
           deleteObject(map);
-          logger.info("Archive object deleted from AWS {}: {}, version {}", getStoreType(), map.getObjectKey(), map.getObjectVersion());
+          logger.info("Archive object deleted from AWS {}: {}, version {}",
+              getStoreType(), map.getObjectKey(), map.getObjectVersion());
         }
         // Add a deletion date to the mapping in the table. This doesn't delete the row.
-        database.deleteMapping(new StoragePath(map.getOrganizationId(), map.getMediaPackageId(), new VersionImpl(map
-                .getVersion()), map.getMediaPackageElementId()));
+        database.deleteMapping(new StoragePath(
+            map.getOrganizationId(),
+            map.getMediaPackageId(),
+            new VersionImpl(map.getVersion()),
+            map.getMediaPackageElementId()));
       }
       return true;
     } catch (AwsAssetDatabaseException e) {

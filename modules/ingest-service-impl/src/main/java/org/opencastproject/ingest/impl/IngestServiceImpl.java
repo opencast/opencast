@@ -59,7 +59,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -96,32 +95,36 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.methods.HttpGet;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.filter.ElementFilter;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -135,6 +138,17 @@ import javax.management.ObjectInstance;
 /**
  * Creates and augments Opencast MediaPackages. Stores media into the Working File Repository.
  */
+@Component(
+  immediate = true,
+  service = {
+    IngestService.class,
+    ManagedService.class
+  },
+  property = {
+    "service.description=Ingest Service",
+    "service.pid=org.opencastproject.ingest.impl.IngestServiceImpl"
+  }
+)
 public class IngestServiceImpl extends AbstractJobProducer implements IngestService, ManagedService {
 
   /** The logger */
@@ -306,6 +320,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *          the osgi component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     logger.info("Ingest Service started.");
@@ -319,6 +334,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /**
    * Callback from OSGi on service deactivation.
    */
+  @Deactivate
   public void deactivate() {
     JmxUtil.unregisterMXBean(registerMXBean);
   }
@@ -367,6 +383,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param httpClient
    *          the http client
    */
+  @Reference
   public void setHttpClient(TrustedHttpClient httpClient) {
     this.httpClient = httpClient;
   }
@@ -377,6 +394,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param serviceRegistry
    *          the serviceRegistry to set
    */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -387,6 +405,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param mediaInspectionService
    *          the media inspection service to set
    */
+  @Reference
   public void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     this.mediaInspectionService = mediaInspectionService;
   }
@@ -471,8 +490,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             continue;
 
           if (entry.getName().endsWith("manifest.xml") || entry.getName().endsWith("index.xml")) {
-            // Build the mediapackage
-            mp = loadMediaPackageFromManifest(new ZipEntryInputStream(zis, entry.getSize()));
+            // Build the media package
+            final InputStream is = new ZipEntryInputStream(zis, entry.getSize());
+            mp = MediaPackageParser.getFromXml(IOUtils.toString(is, StandardCharsets.UTF_8));
           } else {
             logger.info("Storing zip entry {}/{} in working file repository collection '{}'", job.getId(),
                     entry.getName(), wfrCollectionId);
@@ -564,50 +584,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         workingFileRepository.deleteFromCollection(Long.toString(job.getId()), filename, true);
       }
     }
-  }
-
-  private MediaPackage loadMediaPackageFromManifest(InputStream manifest)
-          throws IOException, MediaPackageException, IngestException {
-    // TODO: Uncomment the following line and remove the patch when the compatibility with pre-1.4 MediaPackages is
-    // discarded
-    //
-    // mp = builder.loadFromXml(manifestStream);
-    //
-    // =========================================================================================
-    // =================================== PATCH BEGIN =========================================
-    // =========================================================================================
-    ByteArrayOutputStream baos = null;
-    ByteArrayInputStream bais = null;
-    try {
-      Document domMP = new SAXBuilder().build(manifest);
-      String mpNSUri = "http://mediapackage.opencastproject.org";
-
-      Namespace oldNS = domMP.getRootElement().getNamespace();
-      Namespace newNS = Namespace.getNamespace(oldNS.getPrefix(), mpNSUri);
-
-      if (!newNS.equals(oldNS)) {
-        @SuppressWarnings("rawtypes")
-        Iterator it = domMP.getDescendants(new ElementFilter(oldNS));
-        while (it.hasNext()) {
-          Element elem = (Element) it.next();
-          elem.setNamespace(newNS);
-        }
-      }
-
-      baos = new ByteArrayOutputStream();
-      new XMLOutputter().output(domMP, baos);
-      bais = new ByteArrayInputStream(baos.toByteArray());
-      return MediaPackageParser.getFromXml(IOUtils.toString(bais, "UTF-8"));
-    } catch (JDOMException e) {
-      throw new IngestException("Error unmarshalling mediapackage", e);
-    } finally {
-      IOUtils.closeQuietly(bais);
-      IOUtils.closeQuietly(baos);
-      IOUtils.closeQuietly(manifest);
-    }
-    // =========================================================================================
-    // =================================== PATCH END ===========================================
-    // =========================================================================================
   }
 
   /**
@@ -1542,32 +1518,29 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (!workingFileRepository.delete(mediaPackageId, element.getIdentifier()))
         logger.warn("Unable to find (and hence, delete), this mediapackage element");
     }
-    logger.info("Sucessful discarded mediapackage {}", mp);
-  }
-
-  /**
-   * Creates a StandAloneTrustedHttpClientImpl
-   *
-   * @param user the username
-   * @param password the password
-   * @return the trusted client
-   */
-  protected TrustedHttpClient createStandaloneHttpClient(String user, String password) {
-    return new StandAloneTrustedHttpClientImpl(this.downloadUser, this.downloadPassword, none(), none(), none());
+    logger.info("Successfully discarded media package {}", mp);
   }
 
   protected URI addContentToRepo(MediaPackage mp, String elementId, URI uri) throws IOException {
     InputStream in = null;
     HttpResponse response = null;
-    TrustedHttpClient httpClientStandAlone = httpClient;
+    CloseableHttpClient externalHttpClient = null;
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
 
-        if (uri.getHost().matches(this.downloadSource)) {
-          httpClientStandAlone = this.createStandaloneHttpClient(downloadUser,downloadPassword);
+        if (uri.getHost().matches(downloadSource)) {
+          CredentialsProvider provider = new BasicCredentialsProvider();
+          provider.setCredentials(
+              new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
+              new UsernamePasswordCredentials(downloadUser, downloadPassword));
+           externalHttpClient = HttpClientBuilder.create()
+              .setDefaultCredentialsProvider(provider)
+              .build();
+          response = externalHttpClient.execute(get);
+        } else {
+          response = httpClient.execute(get);
         }
-        response = httpClientStandAlone.execute(get);
 
         int httpStatusCode = response.getStatusLine().getStatusCode();
         if (httpStatusCode != 200) {
@@ -1585,8 +1558,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         throw new IOException("No filename extension found: " + fileName);
       return addContentToRepo(mp, elementId, fileName, in);
     } finally {
-      IOUtils.closeQuietly(in);
-      httpClientStandAlone.close(response);
+      if (in != null) {
+        in.close();
+      }
+      if (externalHttpClient != null) {
+        externalHttpClient.close();
+      }
+      httpClient.close(response);
     }
   }
 
@@ -1624,18 +1602,22 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   // ---------------------------------------------
   // --------- bind and unbind bundles ---------
   // ---------------------------------------------
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
+  @Reference
   public void setWorkingFileRepository(WorkingFileRepository workingFileRepository) {
     this.workingFileRepository = workingFileRepository;
   }
 
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
+  @Reference
   public void setDublinCoreService(DublinCoreCatalogService dublinCoreService) {
     this.dublinCoreService = dublinCoreService;
   }
@@ -1666,6 +1648,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param securityService
    *          the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -1676,6 +1659,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -1686,8 +1670,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param schedulerService
    *          the scheduler service to set
    */
+  @Reference(
+    policy = ReferencePolicy.DYNAMIC,
+    cardinality = ReferenceCardinality.OPTIONAL,
+    unbind = "unsetSchedulerService"
+  )
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
+  }
+
+  public void unsetSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = null;
   }
 
   /**
@@ -1696,6 +1689,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     organizationDirectoryService = organizationDirectory;
   }

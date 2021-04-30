@@ -23,9 +23,9 @@
 // Controller for all event screens.
 angular.module('adminNg.controllers')
 .controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource',
-  'ResourcesListResource', 'Notifications', 'ConfirmationModal', 'RelativeDatesService',
+  'ResourcesListResource', 'Notifications', 'ConfirmationModal', 'RelativeDatesService', 'AuthService',
   function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications,
-    ConfirmationModal, RelativeDatesService) {
+    ConfirmationModal, RelativeDatesService, AuthService) {
 
     $scope.stats = Stats;
 
@@ -41,6 +41,13 @@ angular.module('adminNg.controllers')
         resource:   'events',
         apiService: EventsResource
       });
+    }).catch(angular.noop);
+
+    AuthService.getUser().$promise.then(function (user) {
+      $scope.editorUrl = user.org.properties['admin.editor.url'];
+      if (!$scope.editorUrl) {
+        $scope.editorUrl = '#!/events/events/$id/tools/editor';
+      }
     }).catch(angular.noop);
 
     $scope.table = Table;
@@ -78,9 +85,10 @@ angular.module('adminNg.controllers')
         label: 'EVENTS.EVENTS.TABLE.LOCATION',
         sortable: true
       }, {
-        name:  'published',
+        name:  'publication',
         label: 'EVENTS.EVENTS.TABLE.PUBLISHED',
-        template: 'modules/events/partials/publishedCell.html'
+        template: 'modules/events/partials/publishedCell.html',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventsStatusCell.html',
         name:  'event_status',
@@ -112,6 +120,10 @@ angular.module('adminNg.controllers')
         row.checkedDelete = function() {
           ConfirmationModal.show('confirm-modal',Table.delete,row);
         };
+        row.embeddingCode = function() {
+          ConfirmationModal.show('embedding-code',Table.fullScreenUrl,row);
+        };
+        row.editorUrl = $scope.editorUrl.replace('$id', row.id);
       }
     });
 

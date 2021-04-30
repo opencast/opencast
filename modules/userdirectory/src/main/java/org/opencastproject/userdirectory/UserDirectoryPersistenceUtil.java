@@ -382,8 +382,26 @@ public final class UserDirectoryPersistenceUtil {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      Query q = em.createNamedQuery("User.countAll");
+      Query q = em.createNamedQuery("User.countAllByOrg");
       q.setParameter("org", organizationId);
+      return ((Number) q.getSingleResult()).longValue();
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * Returns the total number of users
+   *
+   * @param emf the entity manager factory
+   * @return the total number of users
+   */
+  public static long countUsers(EntityManagerFactory emf) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("User.countAll");
       return ((Number) q.getSingleResult()).longValue();
     } finally {
       if (em != null)

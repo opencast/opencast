@@ -98,6 +98,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -116,6 +117,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
 import javax.persistence.EntityManager;
@@ -212,13 +214,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   static final int DEFAULT_DISPATCH_JOBS_LIMIT = 100;
 
   /** Default setting on job statistics collection */
-  static final boolean DEFAULT_JOB_STATISTICS = true;
+  static final boolean DEFAULT_JOB_STATISTICS = false;
 
   /** Default setting on service statistics retrieval */
   static final int DEFAULT_SERVICE_STATISTICS_MAX_JOB_AGE = 14;
 
   /** Default value for {@link #maxAttemptsBeforeErrorState} */
-  private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 1;
+  private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 10;
 
   /** The configuration key for setting {@link #maxAttemptsBeforeErrorState} */
   private static final String MAX_ATTEMPTS_CONFIG_KEY = "max.attempts";
@@ -270,7 +272,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** A static list of statuses that influence how load balancing is calculated */
   protected static final List<Status> JOB_STATUSES_INFLUENCING_LOAD_BALANCING;
 
-  protected static HashMap<Long, Float> jobCache = new HashMap<Long, Float>();
+  private static final Status[] activeJobStatus =
+      Arrays.stream(Status.values()).filter(Status::isActive).collect(Collectors.toList()).toArray(new Status[0]);
+
+  protected static HashMap<Long, Float> jobCache = new HashMap<>();
 
   static {
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING = new ArrayList<Status>();
@@ -336,7 +341,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     // Register this host
     try {
       if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OpencastConstants.NODE_NAME_PROPERTY))) {
-        nodeName = hostName;
+        nodeName = null;
       } else {
         nodeName = cc.getBundleContext().getProperty(OpencastConstants.NODE_NAME_PROPERTY);
       }
@@ -1172,6 +1177,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         hostRegistration.setCores(cores);
         hostRegistration.setMaxLoad(maxLoad);
         hostRegistration.setOnline(true);
+        hostRegistration.setNodeName(nodeName);
         em.merge(hostRegistration);
       }
       logger.info("Registering {} with a maximum load of {}", host, maxLoad);
@@ -1830,20 +1836,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public List<Job> getActiveJobs() throws ServiceRegistryException {
-    List<Status> statuses = new ArrayList<Status>();
-    for (Status status : Status.values()) {
-      if (status.isActive())
-        statuses.add(status);
-    }
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      List<JpaJob> jpaJobs = getJobsByStatus(em, statuses.toArray(new Status[statuses.size()]));
-      List<Job> jobs = new ArrayList<Job>(jpaJobs.size());
-      for (JpaJob jpaJob : jpaJobs) {
-        jobs.add(jpaJob.toJob());
-      }
-      return jobs;
+      List<JpaJob> jpaJobs = getJobsByStatus(em, activeJobStatus);
+      return jpaJobs.stream().map(JpaJob::toJob).collect(Collectors.toList());
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
@@ -2076,27 +2073,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       query.setParameter("operation", operation);
       Number countResult = (Number) query.getSingleResult();
       return countResult.longValue();
-    } catch (Exception e) {
-      throw new ServiceRegistryException(e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
-   */
-  @Override
-  public long countOfAbnormalServices() throws ServiceRegistryException {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query query = em.createNamedQuery("ServiceRegistration.countNotNormal");
-      Number count = (Number) query.getSingleResult();
-      return count.longValue();
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
@@ -3205,7 +3181,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         } catch (Exception e) {
           logger.warn("Unable to dispatch {}", job, e);
         } finally {
-          client.close(response);
+          try {
+            client.close(response);
+          } catch (IOException e) {
+            // ignore
+          }
           setCurrentJob(null);
         }
       }

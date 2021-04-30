@@ -12,5 +12,5 @@
     "msg_waitToSeek": "视频载入完成后，才能搜寻。",
     "msg_startPlayingToSeek": "至少要点击一次播放按钮后才能搜寻。",
     "chromeBuffer": "由于Chrome浏览器局限性，缓冲区检查已被禁用。有可能您会遇到视频播放问题。",
-    "scroll_overlay_text": "Use shift + scroll to zoom."
+    "scroll_overlay_text": "使用 shift + 鼠标滚动轴 进行缩放。"
 }

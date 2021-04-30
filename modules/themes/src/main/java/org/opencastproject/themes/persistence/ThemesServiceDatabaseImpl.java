@@ -21,15 +21,13 @@
 
 package org.opencastproject.themes.persistence;
 
-import org.opencastproject.index.IndexProducer;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.theme.SerializableTheme;
 import org.opencastproject.message.broker.api.theme.ThemeItem;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -94,16 +92,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for themes");
     this.cc = cc;
-    super.activate();
-  }
-
-  /**
-   * Closes entity manager factory.
-   *
-   * @param cc
-   */
-  public void deactivate(ComponentContext cc) {
-    super.deactivate();
   }
 
   /** OSGi DI */
@@ -152,8 +140,9 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     try {
       em = emf.createEntityManager();
       ThemeDto themeDto = getThemeDto(id, em);
-      if (themeDto == null)
+      if (themeDto == null) {
         throw new NotFoundException("No theme with id=" + id + " exists");
+      }
 
       return themeDto.toTheme(userDirectoryService);
     } catch (NotFoundException e) {
@@ -162,8 +151,9 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       logger.error("Could not get theme", e);
       throw new ThemesServiceDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -184,8 +174,9 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       logger.error("Could not get themes", e);
       throw new ThemesServiceDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -199,8 +190,9 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       tx.begin();
 
       ThemeDto themeDto = null;
-      if (theme.getId().isSome())
+      if (theme.getId().isSome()) {
         themeDto = getThemeDto(theme.getId().get(), em);
+      }
 
       if (themeDto == null) {
         // no theme stored, create new entity
@@ -258,8 +250,9 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     try {
       em = emf.createEntityManager();
       ThemeDto themeDto = getThemeDto(id, em);
-      if (themeDto == null)
+      if (themeDto == null) {
         throw new NotFoundException("No theme with id=" + id + " exists");
+      }
 
       tx = em.getTransaction();
       tx.begin();
@@ -270,12 +263,14 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       throw e;
     } catch (Exception e) {
       logger.error("Could not delete theme '{}'", id, e);
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
       throw new ThemesServiceDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -336,22 +331,19 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   @Override
-  public void repopulate(final String indexName) {
-    final String destinationId = ThemeItem.THEME_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+  public void repopulate(final AbstractSearchIndex index) {
+    final String destinationId = ThemeItem.THEME_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName());
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
       SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
         try {
           final List<Theme> themes = getThemes();
           int total = themes.size();
           int current = 1;
-          logger.info(
-                  "Re-populating '{}' index with themes from organization {}. There are {} theme(s) to add to the index.",
-                  indexName, securityService.getOrganization().getId(), total);
+          logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
           for (Theme theme : themes) {
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     ThemeItem.update(toSerializableTheme(theme)));
-            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                    IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Themes, total, current));
+            logIndexRebuildProgress(logger, index.getIndexName(), total, current);
             current++;
           }
         } catch (ThemesServiceDatabaseException e) {
@@ -360,41 +352,10 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
         }
       });
     }
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Themes));
-    });
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Themes;
   }
-
-  @Override
-  public Service getService() {
-    return IndexRecreateObject.Service.Themes;
-  }
-
-  @Override
-  public String getClassName() {
-    return ThemesServiceDatabaseImpl.class.getName();
-  }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return SecurityUtil.getSystemUserName(cc);
-  }
-
 }

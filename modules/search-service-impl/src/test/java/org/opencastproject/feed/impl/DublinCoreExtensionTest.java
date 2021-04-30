@@ -34,95 +34,95 @@ import java.util.Date;
 
 public class DublinCoreExtensionTest {
 
-    private static DublinCoreExtension instance;
+  private static DublinCoreExtension instance;
 
-    public DublinCoreExtensionTest() {
-    }
+  public DublinCoreExtensionTest() {
+  }
 
-    @Before
+  @Before
     public void setUp() {
-        instance = new DublinCoreExtension();
-    }
+    instance = new DublinCoreExtension();
+  }
 
-    @After
+  @After
     public void tearDown() {
-    }
+  }
 
     /**
      * Test of getUri method, of class DublinCoreExtension.
      */
-    @Test
+  @Test
     public void testSetterAndGetter() {
-        String expResult = "http://purl.org/dc/elements/1.1/";
-        String result = instance.getUri();
-        assertEquals(expResult, result);
+    String expResult = "http://purl.org/dc/elements/1.1/";
+    String result = instance.getUri();
+    assertEquals(expResult, result);
 
-        assertNull(instance.getContributor());
-        instance.setContributor(result);
-        assertEquals(instance.getContributor(), result);
+    assertNull(instance.getContributor());
+    instance.setContributor(result);
+    assertEquals(instance.getContributor(), result);
 
-        instance.setCoverage(result);
-        assertEquals(instance.getCoverage(), result);
+    instance.setCoverage(result);
+    assertEquals(instance.getCoverage(), result);
 
-        assertNull(instance.getCreator());
-        instance.setCreator(result);
-        assertEquals(instance.getCreator(), result);
+    assertNull(instance.getCreator());
+    instance.setCreator(result);
+    assertEquals(instance.getCreator(), result);
 
-        Date date = new Date(21091981);
-        instance.setDate(date);
-        assertEquals(instance.getDate(), date);
+    Date date = new Date(21091981);
+    instance.setDate(date);
+    assertEquals(instance.getDate(), date);
 
-        instance.setDescription(result);
-        assertEquals(instance.getDescription(), result);
+    instance.setDescription(result);
+    assertEquals(instance.getDescription(), result);
 
-        instance.setFormat(result);
-        assertEquals(instance.getFormat(), result);
+    instance.setFormat(result);
+    assertEquals(instance.getFormat(), result);
 
-        instance.setIdentifier(result);
-        assertEquals(instance.getIdentifier(), result);
+    instance.setIdentifier(result);
+    assertEquals(instance.getIdentifier(), result);
 
-        instance.setLanguage(result);
-        assertEquals(instance.getLanguage(), result);
+    instance.setLanguage(result);
+    assertEquals(instance.getLanguage(), result);
 
-        assertNull(instance.getPublisher());
-        instance.setPublisher(result);
-        assertEquals(instance.getPublisher(), result);
+    assertNull(instance.getPublisher());
+    instance.setPublisher(result);
+    assertEquals(instance.getPublisher(), result);
 
-        instance.setRelation(result);
-        assertEquals(instance.getRelation(), result);
+    instance.setRelation(result);
+    assertEquals(instance.getRelation(), result);
 
-        instance.setRights(result);
-        assertEquals(instance.getRights(), result);
+    instance.setRights(result);
+    assertEquals(instance.getRights(), result);
 
-        instance.setSource(result);
-        assertEquals(instance.getSource(), result);
+    instance.setSource(result);
+    assertEquals(instance.getSource(), result);
 
-        instance.setTitle(result);
-        assertEquals(instance.getTitle(), result);
-        assertEquals(instance.geTitles(), result);
+    instance.setTitle(result);
+    assertEquals(instance.getTitle(), result);
+    assertEquals(instance.geTitles(), result);
 
-        instance.setType(result);
-        assertEquals(instance.getType(), result);
+    instance.setType(result);
+    assertEquals(instance.getType(), result);
 
-    }
+  }
 
     /**
      * Tests for the List Properties ans Subclass Subject
      */
-    @Test
+  @Test
     public void testLists() {
-        String result = "item";
-        instance.addContributor(result);
-        assertEquals(instance.getContributors().get(0), result);
+    String result = "item";
+    instance.addContributor(result);
+    assertEquals(instance.getContributors().get(0), result);
 
-        instance.addPublisher(result);
-        assertEquals(instance.getPublishers().get(0), result);
+    instance.addPublisher(result);
+    assertEquals(instance.getPublishers().get(0), result);
 
-        instance.addCreator(result);
-        assertEquals(instance.getCreators().get(0), result);
+    instance.addCreator(result);
+    assertEquals(instance.getCreators().get(0), result);
 
-        instance.addSubject("uri", result);
-        assertEquals(instance.getSubjects().get(0).getValue(), result);
-        assertEquals(instance.getSubjects().get(0).getTaxonomyUri(), "uri");
-    }
+    instance.addSubject("uri", result);
+    assertEquals(instance.getSubjects().get(0).getValue(), result);
+    assertEquals(instance.getSubjects().get(0).getTaxonomyUri(), "uri");
+  }
 }

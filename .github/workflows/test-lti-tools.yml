@@ -1,0 +1,36 @@
+name: Test LTI Tools
+
+on:
+  pull_request:
+    paths:
+      - modules/lti/**
+  push:
+    paths:
+      - modules/lti/**
+
+jobs:
+  main:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: set up python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: install javascript dependencies
+      working-directory: modules/lti/
+      run: npm ci
+
+    - name: copy translation from where they do not belong
+      working-directory: modules/lti/
+      run: ./copy-translations.sh
+
+    - name: install selenium
+      working-directory: modules/lti/
+      run: pip install -r requirements.txt
+
+    - name: running selenium tests
+      working-directory: modules/lti/
+      run: ./selenium-tests

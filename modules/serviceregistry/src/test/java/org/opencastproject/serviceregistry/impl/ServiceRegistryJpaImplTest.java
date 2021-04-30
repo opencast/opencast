@@ -22,6 +22,7 @@
 package org.opencastproject.serviceregistry.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -339,7 +340,7 @@ public class ServiceRegistryJpaImplTest {
     launchDispatcherOnce(false);
     try {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
-      Assert.fail("Did not recieve a timeout exception");
+      Assert.fail("Did not receive a timeout exception");
     } catch (Exception e) {
       Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
     }
@@ -353,7 +354,7 @@ public class ServiceRegistryJpaImplTest {
     launchDispatcherOnce(false);
     try {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
-      Assert.fail("Did not recieve a timeout exception");
+      Assert.fail("Did not receive a timeout exception");
     } catch (Exception e) {
       Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
     } finally {
@@ -370,7 +371,7 @@ public class ServiceRegistryJpaImplTest {
     launchDispatcherOnce(false);
     try {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
-      Assert.fail("Did not recieve a timeout exception");
+      Assert.fail("Did not receive a timeout exception");
     } catch (Exception e) {
       Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
     } finally {
@@ -387,7 +388,7 @@ public class ServiceRegistryJpaImplTest {
     launchDispatcherOnce(false);
     try {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
-      Assert.fail("Did not recieve a timeout exception");
+      Assert.fail("Did not receive a timeout exception");
     } catch (Exception e) {
       logger.debug("job1: '{}'", serviceRegistryJpaImpl.getJob(testJob.getId()));
       logger.debug("job2: '{}'", serviceRegistryJpaImpl.getJob(testJob2.getId()));
@@ -397,13 +398,13 @@ public class ServiceRegistryJpaImplTest {
       // Mock http client always returns 503 for this path so it won't be dispatched anyway
       testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
       Assert.assertTrue("First job should not have a processing host", StringUtils.isBlank(testJob.getProcessingHost()));
-      Assert.assertEquals("First job is queueued", Job.Status.QUEUED, testJob.getStatus());
+      Assert.assertEquals("First job is queued", Job.Status.QUEUED, testJob.getStatus());
 
       // Mock http client always returns 204 for this path, but it should not be dispatched
       // because the host is in the dispatchPriorityList
       testJob2 = serviceRegistryJpaImpl.getJob(testJob2.getId());
       Assert.assertTrue("Second job should not have a processing host", StringUtils.isBlank(testJob2.getProcessingHost()));
-      Assert.assertEquals("Second job is queueued", Job.Status.QUEUED, testJob2.getStatus());
+      Assert.assertEquals("Second job is queued", Job.Status.QUEUED, testJob2.getStatus());
 
       Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
       String blockingHost = serviceRegistryJpaImpl.dispatchPriorityList.get(testJob2.getId());
@@ -461,17 +462,7 @@ public class ServiceRegistryJpaImplTest {
             10.0f);
     JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
     launchDispatcherOnce(false);
-    try {
-      barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
-      // We should never successfully complete the job, so if we get here then something is wrong
-      Assert.fail("Did not recieve a timeout exception");
-    } catch (Exception e) {
-      testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
-      // Some explanation here: If the load exceeds the global maximum node load (ie, jobLoad > all individual node max
-      // loads), then we dispatch to the biggest, even if it's not going to normally accept the job.  That node may still
-      // reject the job, but that's AbstractJobProducer's job, not the service registry's
-      Assert.assertEquals(TEST_HOST_THIRD, testJob.getProcessingHost());
-    }
+    assertThrows(IllegalStateException.class, () -> barrier.waitForJobs(JOB_BARRIER_TIMEOUT));
   }
 
   @Test

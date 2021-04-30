@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>9-SNAPSHOT</version>
+  <version>10-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
@@ -17,31 +17,36 @@
 
     <!-- library version specifications -->
     <aws.version>1.11.469_1</aws.version>
-    <commons-codec.version>1.12</commons-codec.version>
-    <commons-collections.version>4.3</commons-collections.version>
-    <commons-compress.version>1.19</commons-compress.version>
-    <commons-csv.version>1.6</commons-csv.version>
+    <commons-codec.version>1.15</commons-codec.version>
+    <commons-collections.version>4.4</commons-collections.version>
+    <commons-compress.version>1.20</commons-compress.version>
+    <commons-csv.version>1.8</commons-csv.version>
     <commons-fileupload.version>1.4</commons-fileupload.version>
-    <commons-lang3.version>3.8.1</commons-lang3.version>
-    <commons-text.version>1.7</commons-text.version>
+    <commons-io.version>2.8.0</commons-io.version>
+    <commons-lang3.version>3.11</commons-lang3.version>
+    <commons-text.version>1.9</commons-text.version>
     <cxf.version>3.3.3</cxf.version>
     <eclipselink.version>2.7.5</eclipselink.version>
+    <failureaccess.version>1.0.1</failureaccess.version>
+    <freemarker.version>2.3.30</freemarker.version>
     <functional.version>1.4.2</functional.version>
-    <guava.version>23.0</guava.version>
-    <httpcomponents-httpclient.version>4.5.10</httpcomponents-httpclient.version>
-    <httpcomponents-httpcore.version>4.4.12</httpcomponents-httpcore.version>
-    <jackson.version>2.10.0</jackson.version>
+    <gson.version>2.8.6</gson.version>
+    <guava.version>30.1.1-jre</guava.version>
+    <httpcomponents-httpclient.version>4.5.12</httpcomponents-httpclient.version>
+    <httpcomponents-httpcore.version>4.4.13</httpcomponents-httpcore.version>
+    <jackson.version>2.12.3</jackson.version>
     <jersey.version>2.29.1</jersey.version>
+    <jettison.version>1.4.1</jettison.version>
     <jdk.version>1.8</jdk.version>
-    <joda-time.version>2.10.1</joda-time.version>
+    <joda-time.version>2.10.10</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.2.7</karaf.version>
+    <karaf.version>4.2.9</karaf.version>
     <mina.version>2.1.3</mina.version>
-    <node.version>v10.16.0</node.version>
-    <npm.version>6.9.0</npm.version>
+    <node.version>v14.15.1</node.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <querydsl.version>3.7.4</querydsl.version>
+    <rest-assured.version>4.3.3</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
     <spring-security.version>3.1.7.RELEASE</spring-security.version>
   </properties>
@@ -60,6 +65,7 @@
     <module>modules/asset-manager-workflowoperation</module>
     <module>modules/asset-manager-storage-aws</module>
     <module>modules/asset-manager-storage-fs</module>
+    <module>modules/asset-manager-static-file-authorization</module>
     <module>modules/shared-filesystem-utils</module>
     <module>modules/authorization-manager</module>
     <module>modules/authorization-xacml</module>
@@ -99,6 +105,11 @@
     <module>modules/distribution-service-streaming-remote</module>
     <module>modules/distribution-workflowoperation</module>
     <module>modules/dublincore</module>
+    <module>modules/editor-service</module>
+    <module>modules/editor-service-api</module>
+    <module>modules/editor-service-remote</module>
+    <module>modules/editor-service-endpoint</module>
+    <module>modules/editor-service-endpoint-remote</module>
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
     <module>modules/event-comment</module>
@@ -109,13 +120,12 @@
     <module>modules/engage-theodul-plugin-controls</module>
     <module>modules/engage-theodul-plugin-custom-mhConnection</module>
     <module>modules/engage-theodul-plugin-custom-notifications</module>
-    <module>modules/engage-theodul-plugin-custom-usertracking</module>
     <module>modules/engage-theodul-plugin-custom-matomo</module>
     <module>modules/engage-theodul-plugin-description</module>
     <module>modules/engage-theodul-plugin-tab-description</module>
     <module>modules/engage-theodul-plugin-tab-shortcuts</module>
     <module>modules/engage-theodul-plugin-tab-slidetext</module>
-    <module>modules/engage-theodul-plugin-timeline-statistics</module>
+    <module>modules/engage-theodul-plugin-tab-downloads</module>
     <module>modules/engage-theodul-plugin-video-videojs</module>
     <module>modules/engage-ui</module>
     <module>modules/execute-api</module>
@@ -127,8 +137,11 @@
     <module>modules/fileupload</module>
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
+    <module>modules/adopter-statistics-api</module>
+    <module>modules/adopter-statistics-impl</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
+    <module>modules/index-rebuild</module>
     <module>modules/ingest-download-service-api</module>
     <module>modules/ingest-download-service-impl</module>
     <module>modules/ingest-download-service-remote</module>
@@ -141,15 +154,21 @@
     <module>modules/inspection-workflowoperation</module>
     <module>modules/statistics-writer-workflowoperation</module>
     <module>modules/kernel</module>
+    <module>modules/editor</module>
+    <module>modules/list-providers-service</module>
     <module>modules/live-schedule-api</module>
     <module>modules/live-schedule-impl</module>
     <module>modules/logging-workflowoperation</module>
     <module>modules/lti</module>
+    <module>modules/lti-service-remote</module>
+    <module>modules/lti-service-impl</module>
+    <module>modules/lti-service-api</module>
     <module>modules/mattermost-notification-workflowoperation</module>
     <module>modules/message-broker-api</module>
     <module>modules/message-broker-impl</module>
     <module>modules/metadata</module>
     <module>modules/metadata-api</module>
+    <module>modules/metrics-exporter</module>
     <module>modules/mpeg7</module>
     <module>modules/notification-workflowoperation</module>
     <module>modules/oaipmh</module>
@@ -172,8 +191,9 @@
     <module>modules/scheduler-impl</module>
     <module>modules/scheduler-remote</module>
     <module>modules/schema</module>
-    <module>modules/search</module>
-    <module>modules/search-api</module>
+    <module>modules/elasticsearch-impl</module>
+    <module>modules/elasticsearch-api</module>
+    <module>modules/elasticsearch-index</module>
     <module>modules/search-service-api</module>
     <module>modules/search-service-feeds</module>
     <module>modules/search-service-impl</module>
@@ -183,7 +203,6 @@
     <module>modules/security-cas</module>
     <module>modules/security-ldap</module>
     <module>modules/security-lti</module>
-    <module>modules/security-openid</module>
     <module>modules/security-shibboleth</module>
     <module>modules/series-service-api</module>
     <module>modules/series-service-impl</module>
@@ -194,6 +213,7 @@
     <module>modules/silencedetection-remote</module>
     <module>modules/smil-api</module>
     <module>modules/smil-impl</module>
+    <module>modules/smil-workflowoperation</module>
     <module>modules/solr</module>
     <module>modules/sox-api</module>
     <module>modules/sox-impl</module>
@@ -240,6 +260,7 @@
     <module>modules/userdirectory-moodle</module>
     <module>modules/userdirectory-sakai</module>
     <module>modules/userdirectory-brightspace</module>
+    <module>modules/userdirectory-canvas</module>
     <module>modules/user-interface-configuration</module>
     <module>modules/usertracking-api</module>
     <module>modules/usertracking-impl</module>
@@ -247,6 +268,10 @@
     <module>modules/videoeditor-ffmpeg-impl</module>
     <module>modules/videoeditor-remote</module>
     <module>modules/videoeditor-workflowoperation</module>
+    <module>modules/videogrid-service-api</module>
+    <module>modules/videogrid-service-impl</module>
+    <module>modules/videogrid-remote</module>
+    <module>modules/videogrid-workflowoperation</module>
     <module>modules/videosegmenter-api</module>
     <module>modules/videosegmenter-ffmpeg</module>
     <module>modules/videosegmenter-remote</module>
@@ -266,6 +291,7 @@
     <module>modules/workspace-api</module>
     <module>modules/workspace-impl</module>
     <module>assemblies</module>
+
   </modules>
   <build>
     <defaultGoal>install</defaultGoal>
@@ -362,18 +388,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.1.1</version>
         <dependencies>
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.29</version>
+            <version>8.36.2</version>
           </dependency>
         </dependencies>
         <configuration>
           <skip>${checkstyle.skip}</skip>
           <configLocation>${opencast.basedir}/docs/checkstyle/opencast-checkstyle.xml</configLocation>
           <headerLocation>${opencast.basedir}/docs/checkstyle/opencast-header.txt</headerLocation>
+          <suppressionsLocation>${opencast.basedir}/docs/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <consoleOutput>true</consoleOutput>
           <logViolationsToConsole>true</logViolationsToConsole>
@@ -695,7 +722,7 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>1.7.6</version>
+          <version>1.10.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -710,7 +737,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>3.1.2</version>
           <executions>
             <execution>
               <id>analyze</id>
@@ -726,7 +753,7 @@
             <dependency>
               <groupId>org.ow2.asm</groupId>
               <artifactId>asm</artifactId>
-              <version>7.1</version>
+              <version>7.3.1</version>
             </dependency>
             <dependency>
               <groupId>org.apache.maven.shared</groupId>
@@ -840,7 +867,7 @@
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-client</artifactId>
-        <version>5.15.11</version>
+        <version>5.16.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
@@ -889,6 +916,11 @@
         <version>${guava.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>failureaccess</artifactId>
+        <version>${failureaccess.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.mnode.ical4j</groupId>
         <artifactId>ical4j</artifactId>
         <version>3.0.6-patched</version>
@@ -926,17 +958,17 @@
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
         <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>2.3.2</version>
+        <version>2.3.3</version>
       </dependency>
       <dependency>
-        <groupId>com.sun.xml.bind</groupId>
+        <groupId>org.glassfish.jaxb</groupId>
         <artifactId>jaxb-core</artifactId>
         <version>2.3.0.1</version>
       </dependency>
       <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>2.3.3-b02</version>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-runtime</artifactId>
+        <version>2.3.3</version>
         <exclusions>
           <exclusion>
             <groupId>com.sun.activation</groupId>
@@ -953,6 +985,11 @@
         <groupId>javax.mail</groupId>
         <artifactId>mail</artifactId>
         <version>1.4.7</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
       </dependency>
       <dependency>
         <groupId>jakarta.ws.rs</groupId>
@@ -1073,11 +1110,6 @@
         <version>${spring-security.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-openid</artifactId>
-        <version>${spring-security.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.springframework.security.oauth</groupId>
         <artifactId>spring-security-oauth</artifactId>
         <version>2.3.7.RELEASE</version>
@@ -1118,11 +1150,6 @@
         <version>3.3.3</version>
       </dependency>
       <dependency>
-        <groupId>org.openid4java</groupId>
-        <artifactId>com.springsource.org.openid4java</artifactId>
-        <version>0.9.5</version>
-      </dependency>
-      <dependency>
         <groupId>net.sourceforge.nekohtml</groupId>
         <artifactId>com.springsource.org.cyberneko.html</artifactId>
         <version>1.9.13</version>
@@ -1135,7 +1162,7 @@
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.xerces</artifactId>
-        <version>2.12.0_1</version>
+        <version>2.12.1_1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -1151,7 +1178,7 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <scope>test</scope>
-        <version>4.1</version>
+        <version>4.2</version>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
@@ -1166,9 +1193,9 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.jdom</groupId>
-        <artifactId>com.springsource.org.jdom</artifactId>
-        <version>1.1.0</version>
+        <groupId>xml-apis</groupId>
+        <artifactId>xml-apis</artifactId>
+        <version>2.0.2</version>
       </dependency>
       <!-- logging -->
       <dependency>
@@ -1205,7 +1232,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.6</version>
+        <version>${commons-io.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -1235,6 +1262,11 @@
         <version>${querydsl.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.mysema.querydsl</groupId>
+        <artifactId>querydsl-core</artifactId>
+        <version>${querydsl.version}</version>
+      </dependency>
+      <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
         <version>${joda-time.version}</version>
@@ -1249,19 +1281,19 @@
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>json-path</artifactId>
-        <version>4.1.2</version>
+        <version>${rest-assured.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>xml-path</artifactId>
-        <version>4.1.2</version>
+        <version>${rest-assured.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
-        <version>4.1.2</version>
+        <version>${rest-assured.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1291,9 +1323,14 @@
         <version>2.2</version>
       </dependency>
       <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-core</artifactId>
+        <version>2.2</version>
+      </dependency>
+      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>4.13.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1319,17 +1356,17 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.8.5</version>
+        <version>${gson.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mariadb.jdbc</groupId>
         <artifactId>mariadb-java-client</artifactId>
-        <version>2.5.3</version>
+        <version>2.7.2</version>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.2.8.jre7</version>
+        <version>42.2.19.jre7</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -1359,12 +1396,12 @@
       <dependency>
         <groupId>org.freemarker</groupId>
         <artifactId>freemarker</artifactId>
-        <version>2.3.28</version>
+        <version>${freemarker.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
       </dependency>
       <dependency>
         <groupId>org.opencastproject</groupId>
@@ -1379,7 +1416,7 @@
       <dependency>
         <groupId>org.codehaus.jettison</groupId>
         <artifactId>jettison</artifactId>
-        <version>1.4.0</version>
+        <version>${jettison.version}</version>
         <exclusions>
           <exclusion>
             <groupId>stax</groupId>
@@ -1909,11 +1946,6 @@
       <id>central</id>
       <name>Central Maven Repository</name>
       <url>https://repo.maven.apache.org/maven2/</url>
-    </repository>
-    <repository>
-      <id>spring.io</id>
-      <name>Spring Framework Maven Plugins-Release Repository</name>
-      <url>https://repo.spring.io/plugins-release/</url>
     </repository>
     <repository>
       <id>mvn.opencast.org</id>

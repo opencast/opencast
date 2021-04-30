@@ -93,7 +93,8 @@ public class IngestDownloadServiceRemoteImpl extends RemoteBase implements Inges
 
       if (response != null) {
         Job job = JobParser.parseJob(response.getEntity().getContent());
-        logger.info("Starting to download into workspace on remote IngestDownload {}", mediaPackage.getIdentifier().toString());
+        logger.info("Starting to download into workspace on remote IngestDownload {}",
+                mediaPackage.getIdentifier().toString());
         return job;
       }
       throw new ServiceRegistryException("Failed to start remote IngestDownload " + mediaPackage.getIdentifier());

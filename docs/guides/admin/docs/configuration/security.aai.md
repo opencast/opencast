@@ -4,17 +4,17 @@ Authentication and Authorization Infrastructure (AAI) Configuration
 This page describes how to configure Opencast to take advantage of the Authentication and Authorization
 Infrastructure (AAI).
 
-Prerequesites
+Prerequisites
 -------------
 
 This guides assumes that you know how to setup and configure a Shibboleth Service Provider, i.e. you are assumed
 to already have performed the following steps:
 
-- Registeration of your Shibboleth Service Provider at your Shibboleth Federation Service Registry
+- Registration of your Shibboleth Service Provider at your Shibboleth Federation Service Registry
 - Setup and configuration of Shibboleth on the servers you want to use it
 - Configuration of your web server
 
-In case you require help on this, contact the institution responsilbe for managing the Shibboleth Federation you
+In case you require help on this, contact the institution responsible for managing the Shibboleth Federation you
 are part of.
 
 An informative list of Shibboleth Federations can be found on:
@@ -74,7 +74,7 @@ Step 2: Spring Security Configuration
 In order to take advantage of Shibboleth authentication, you will need to uncomment the following lines found
 in `etc/security/mh_default_org.xml`:
 
-The Shibboleth header authentification filter needs to be enabled to get access to the Shibboleth information
+The Shibboleth header authentication filter needs to be enabled to get access to the Shibboleth information
 within the HTTP request headers.
 
     <!-- Shibboleth header authentication filter -->
@@ -93,7 +93,7 @@ respective name of the Shibboleth attribute you use in your Shibboleth Federatio
     <!-- # Shibboleth Support # -->
     <!-- ###################### -->
 
-    <!-- General Shibboleth header extration filter -->
+    <!-- General Shibboleth header extraction filter -->
     <bean id="shibbolethHeaderFilter"
           class="org.opencastproject.security.shibboleth.ShibbolethRequestHeaderAuthenticationFilter">
       <property name="principalRequestHeader" value="<Shibboleth attribute name>"/>
@@ -158,3 +158,103 @@ To protect HTML pages, you will need to adapt the configuration of your web serv
         require valid-user
     </LocationMatch>
 
+Advanced SSO configuration: The DynamicLoginHandler
+-----------------------------------
+
+To configure complex mappings of AAI attributes via [`SpEL`](https://docs.spring.io/spring-framework/docs/3.0.x/reference/expressions.html) in the `mh_default_org.xml` file, it is necessary to follow the same steps as above. Just change the bean reference of `shibbolethLoginHandler` to `aaiLoginHandler` in the `shibbolethHeaderFilter`:
+
+    <bean id="shibbolethHeaderFilter"
+          class="org.opencastproject.security.shibboleth.ShibbolethRequestHeaderAuthenticationFilter">
+      <property name="principalRequestHeader" value="<Shibboleth attribute name>"/>
+      <property name="authenticationManager" ref="authenticationManager" />
+      <property name="userDetailsService" ref="userDetailsService" />
+      <property name="userDirectoryService" ref="userDirectoryService" />
+      <property name="shibbolethLoginHandler" ref="aaiLoginHandler" />
+      <property name="exceptionIfHeaderMissing" value="false" />
+    </bean>
+
+Activate the `aaiLoginHandler` bean and the `attributeMapper` bean
+
+    <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.DynamicLoginHandler">
+      <property name="securityService" ref="securityService" />
+      <property name="userReferenceProvider" ref="userReferenceProvider" />
+      <property name="attributeMapper" ref="attributeMapper" />
+    </bean>
+
+    <bean id="attributeMapper" class="org.opencastproject.security.aai.api.AttributeMapper">
+      <property name="useHeader" value="true" />
+      <property name="multiValueDelimiter" value=";" />
+      <property name="attributeMap" ref="attributeMap" />
+      <property name="aaiAttributes" ref="aaiAttributes" />
+    </bean>
+
+then, define all the attributes you may want to use, so the mapper gets populated at login e.g.
+
+    <util:list id="aaiAttributes" value-type="java.lang.String">
+      <value>sn</value>
+      <value>givenName</value>
+      <value>mail</value>
+      <value>homeOrganization</value>
+      <value>eduPersonEntitlement</value>
+      <value>eduPersonPrincipalName</value>
+      <value>homeOrganization</value>
+    </util:list>
+
+Opencast has a fairly simple account model that consists only of an username, display name and email address. Additionally an user may have some roles. For each of those attributes you define a map entry that refers to a list of mappings (username is mapped in the `shibbolethHeaderFilter` bean above).
+
+    <util:map id="attributeMap" map-class="java.util.HashMap">
+      <entry key="roles" value-ref="roleMapping" />
+      <entry key="displayName" value-ref="displayNameMapping" />
+      <entry key="mail" value-ref="mailMapping" />
+    </util:map>
+
+ Each attribute as treated as multi-value so you have to access single value attributes (like `sn` and `givenName`) by accessing the first element of the list of values received via Shibboleth. For the email address and the `displayName` of an user the mapping is usually straight forward, see inline comments for further explanation:
+
+    <!-- Use SpEL string concatenation to build a displayName from `sn` and `givenName` -->
+    <util:list id="displayNameMapping" value-type="java.lang.String">
+      <value>['givenName'][0] + ' ' + ['sn'][0]</value>
+    </util:list>
+
+    <util:list id="mailMapping" value-type="java.lang.String">
+      <value>['mail'][0]</value>
+    </util:list>
+
+The `mail` and the `displayName` of an user has only one value, but when it comes to the roles of an user you are able to produce an arbitrary number of roles using the whole power of SpEL and [`java.lang.String`](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html) methods. See inline comments for further explanation and examples:
+
+    <util:list id="roleMapping" value-type="java.lang.String">
+      <!-- assign every user the role ROLE_AAI_USER -->
+      <value>'ROLE_AAI_USER'</value>
+
+      <!-- assign every user the role ROLE_AAI_USER_<username>.
+           For a user john.doe@example.org this will result in a ROLE_USER_JOHN_DOE_EXAMPLE_ORG
+           since Opencast replaces all special chars in this case -->
+      <value>'ROLE_AAI_USER_' + ['eduPersonPrincipalName']</value>
+
+      <!-- if you implement a kind of DAC based access control you may want to produce
+      an owner role. To get the same behaviour as for ROLE_AAI_USER_<username> above
+      you may replace all special chars from the value of `eduPersonPrincipalName`
+      and convert it to uppercase -->
+      <value>('ROLE_AAI_OWNER_' + ['eduPersonPrincipalName']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+
+      <!-- an AAI user may provide the attribute homeOrganization.
+           If so, assign an appropriate role. Otherwise not. -->
+      <value>['homeOrganization'] != null ? 'ROLE_AAI_ORG_' + ['homeOrganization'] + '_MEMBER' : null</value>
+
+      <!-- a sophisticated AAI approach would use entitlements to assign
+           e.g. the admin role to authorized users -->
+      <value>['eduPersonEntitlement'].contains('urn:mace:opencast.org:permission:shibboleth:opencast_admin') ? 'ROLE_ADMIN' : null</value>
+
+      <!-- a less sophisticated approach would directly assign the admin role
+           to users based on usernames (same as bootstrap user above) -->
+      <value>['eduPersonPrincipalName'].contains('john.doe@example.org') ? 'ROLE_ADMIN' : null</value>
+
+      <!-- to assing a common set of roles to a class of users, you may create
+           a group (e.g. AAI_EDITOR) and assign some roles to it in the admin ui.
+           So the group is the container of all the roles and you assign only the
+           group to a user e.g. based on his affiliation, thus enabling a class
+           of users for certain abilities in Opencast -->
+      <value>['eduPersonScopedAffiliation'].contains('faculty@example.org') ? 'ROLE_GROUP_AAI_EDITOR' : null</value>
+
+    </util:list>
+
+You may start by uncommenting the whole example in `mh_default_org.xml`.

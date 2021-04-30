@@ -9,10 +9,10 @@
       <div ng-repeat="publication in row.publications | orderBy:'order'" model="publication" ng-if="!publication.hide">
         <!-- WARNING! translate directive + ng-include may lead to untranslated codes -->
         <a data-ng-show="publication.enabled" href="{{publication.url}}" class="popover__list-item" target="_blank">
-          {{publication.label | translate}}
+          <span>{{publication.label | translate}}</span>
         </a>
         <span data-ng-hide="publication.enabled" class="popover__list-item-disabled">
-          {{publication.label | translate}}
+          <span>{{publication.label | translate}}</span>
         </span>
       </div>
     </div>

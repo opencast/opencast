@@ -50,12 +50,12 @@ import java.nio.charset.Charset;
  * package at a given point of a workflow.
  */
 @Component(
-  property = {
-    "service.description=Logging Workflow Operation Handler",
-    "workflow.operation=log"
-  },
-  immediate = true,
-  service = WorkflowOperationHandler.class
+    property = {
+        "service.description=Logging Workflow Operation Handler",
+        "workflow.operation=log"
+    },
+    immediate = true,
+    service = WorkflowOperationHandler.class
 )
 public class LoggingWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -65,8 +65,8 @@ public class LoggingWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)

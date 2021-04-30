@@ -46,7 +46,7 @@ requirejs.config({
     'dropdowns-enhancement' : {
       deps: ['bootstrap']
     },
-    'underscore-min' : {
+    'underscore' : {
       exports: '_'
     }
   }

@@ -59,7 +59,8 @@ public class IncidentCreatorWorkflowOperationHandler extends AbstractWorkflowOpe
   public WorkflowOperationResult start(WorkflowInstance wi, JobContext ctx) throws WorkflowOperationException {
     final WorkflowOperationInstance woi = wi.getCurrentOperation();
     final int code = option(woi.getConfiguration(OPT_CODE)).bind(Strings.toInt).getOrElse(1);
-    final Severity severity = option(woi.getConfiguration(OPT_SEVERITY)).bind(parseEnum(Severity.FAILURE)).getOrElse(Severity.INFO);
+    final Severity severity = option(woi.getConfiguration(OPT_SEVERITY)).bind(parseEnum(Severity.FAILURE))
+            .getOrElse(Severity.INFO);
 
     final List<Tuple<String, String>> details = Arrays.stream(ArrayUtils.nullToEmpty(
             StringUtils.split(woi.getConfiguration(OPT_DETAILS), ";")))

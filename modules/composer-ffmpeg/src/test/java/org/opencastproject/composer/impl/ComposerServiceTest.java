@@ -74,12 +74,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
@@ -91,6 +94,7 @@ public class ComposerServiceTest {
   private File sourceVideoOnly = null;
   private File sourceAudioOnly = null;
   private File sourceImage = null;
+  private File sourceAVTS = null;
 
   /** The composer service to test */
   private ComposerServiceImpl composerService = null;
@@ -108,6 +112,7 @@ public class ComposerServiceTest {
   private static final Logger logger = LoggerFactory.getLogger(ComposerServiceTest.class);
   private Track sourceVideoTrack;
   private Track sourceAudioTrack;
+  private Track sourceAVTSTrack; // Test that this ffmpeg works with TS files
   private Track inspectedTrack;
   private Attachment watermarkImageAttachment;
 
@@ -139,6 +144,10 @@ public class ComposerServiceTest {
     File f = getFile("/video.mp4");
     sourceVideoOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp4", testDir);
     FileUtils.copyFile(f, sourceVideoOnly);
+
+    f = getFile("/avts.mts");
+    sourceAVTS = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mts", testDir);
+    FileUtils.copyFile(f, sourceAVTS);
 
     // Create another audio only file
     f = getFile("/audio.mp3");
@@ -200,6 +209,9 @@ public class ComposerServiceTest {
             ComposerServiceTest.class.getResourceAsStream("/composer_test_source_track_audio.xml"), Charset.defaultCharset()));
     watermarkImageAttachment = (Attachment) MediaPackageElementParser.getFromXml(IOUtils.toString(
             ComposerServiceTest.class.getResourceAsStream("/composer_test_watermark_attachment.xml"), Charset.defaultCharset()));
+    sourceAVTSTrack = (Track) MediaPackageElementParser.getFromXml(IOUtils.toString(
+            ComposerServiceTest.class.getResourceAsStream("/composer_test_source_track_transport_stream.xml"),
+            Charset.defaultCharset()));
 
     // Create and populate the composer service
     composerService = new ComposerServiceImpl() {
@@ -380,6 +392,20 @@ public class ComposerServiceTest {
     Assert.assertEquals(inspectedTrack, compositeTrack);
   }
 
+  /**
+   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, float, Track...)}
+   */
+  @Test
+  public void testConcatTransportStream() throws Exception {
+    // Some versions of ffmpeg crashes
+    Job concat = composerService.concat("concat.work", null, true, sourceAVTSTrack, sourceAVTSTrack);
+    Track concatTrack = (Track) MediaPackageElementParser.getFromXml(concat.getPayload());
+    Assert.assertNotNull(concatTrack);
+    inspectedTrack.setIdentifier(concatTrack.getIdentifier());
+    inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
+    Assert.assertEquals(inspectedTrack, concatTrack);
+  }
+
   @Test
   public void testCompositeAudio() throws Exception {
     if (!ffmpegInstalled)
@@ -466,6 +492,33 @@ public class ComposerServiceTest {
     inspectedTrack.setIdentifier(compositeTrack.getIdentifier());
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
     Assert.assertEquals(inspectedTrack, compositeTrack);
+  }
+
+  @Test
+  public void testRemapNames() throws Exception {
+    long jobId = 1234567;
+    final String[] outFiles = { "/master.m3u8", "/variant_0.m3u8", "/variant_1.m3u8", "/segment_0.mp4",
+    "/segment_1.mp4" };
+    List<File> testFiles = new ArrayList<File>();
+    for (String of : outFiles) {
+      File testFile = getFile(of);
+      File f = new File(FilenameUtils.concat(testDir.getAbsolutePath(), testFile.getName()));
+      FileUtils.copyFile(testFile, f);
+      testFiles.add(f);
+    }
+    composerService.hlsFixReference(jobId, testFiles);
+    for (int i = 0; i < 3; i++) {
+      BufferedReader bufferedReader = new BufferedReader(new FileReader(testFiles.get(i)));
+      Stream<String> stream = bufferedReader.lines();
+      stream.filter(line -> !line.startsWith("#") && !line.trim().isEmpty()).forEach(line -> {
+        Assert.assertTrue(line.startsWith("1234567"));
+      });
+      stream = bufferedReader.lines();
+      stream.filter(line -> line.startsWith("#EXT-X-MAP:URI=")).forEach(line -> {
+        Assert.assertTrue(line.startsWith("#EXT-X-MAP:URI=1234567_"));
+      });
+      bufferedReader.close();
+    }
   }
 
   /**

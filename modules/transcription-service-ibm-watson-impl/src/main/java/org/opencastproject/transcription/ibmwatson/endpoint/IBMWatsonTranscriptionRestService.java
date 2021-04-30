@@ -91,7 +91,7 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
   @Path("results")
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "results", description = "Called by the speech-to-text service when registering the callback url", returnDescription = "Echo the string sent.", restParameters = {
-          @RestParameter(name = "challenge_string", description = "String to be echoed in the response body", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "challenge_string", description = "String to be echoed in the response body", isRequired = true, type = Type.STRING) }, responses = {
                   @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "If no errors"),
                   @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "An error occurred") })
   // GET /transcripts/watson/results?challenge_string=51WRISEyAbuJq5fE HTTP/1.1" 302 5 "-" "Jersey/2.22.1 (Apache
@@ -118,7 +118,7 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
   @POST
   @Path("results")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "results", description = "Called by the speech-to-text service to report status.", returnDescription = "", reponses = {
+  @RestQuery(name = "results", description = "Called by the speech-to-text service to report status.", returnDescription = "", responses = {
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Got notification!") })
   public Response reportStatus(String body) {
     logger.trace("Body is: " + body);

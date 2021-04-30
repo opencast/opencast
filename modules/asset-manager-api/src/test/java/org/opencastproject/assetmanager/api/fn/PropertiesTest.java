@@ -94,8 +94,9 @@ public class PropertiesTest {
   @Test
   public void testGetValue() throws Exception {
     assertEquals(
-            $(Value.mk(false), Value.mk("Bad audio"), Value.mk(new Date(0)), Value.mk("Hello world"), Value.mk(1L)).toList(),
-            ps.map(Properties.getValue).toList());
+        $(Value.mk(false), Value.mk("Bad audio"), Value.mk(new Date(0)),
+            Value.mk("Hello world"), Value.mk(1L)).toList(),
+        ps.map(Properties.getValue).toList());
   }
 
   @Test(expected = java.lang.RuntimeException.class)
@@ -147,7 +148,9 @@ public class PropertiesTest {
   @Test
   public void testGetStrings() throws Exception {
     assertEquals($("Bad audio", "Hello world").toList(), ps.apply(Properties.getStrings("comment")).toList());
-    assertEquals($("Hello world").toList(), ps.apply(Properties.getStrings(PropertyName.mk("org.opencastproject.comment", "comment"))).toList());
+    assertEquals(
+        $("Hello world").toList(),
+        ps.apply(Properties.getStrings(PropertyName.mk("org.opencastproject.comment", "comment"))).toList());
   }
 
   @Test
@@ -214,7 +217,7 @@ public class PropertiesTest {
     assertEquals(Opt.none(), ps.apply(Properties.getLongOpt("unknown")));
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   private int filterCount(Pred<Property> p) {
     return ps.filter(p).toList().size();

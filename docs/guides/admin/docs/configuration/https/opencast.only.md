@@ -1,11 +1,12 @@
 Enable HTTPS directly in Opencast
 =================================
 
-In `opencast/etc/`, use the `org.ops4j.pax.web.cfg` file for
-configuration:
+Edit `etc/org.ops4j.pax.web.cfg` and set:
 
 ```
-# ...
+# This property specifies the comma separated list of addresses used by Opencast to listen to (e.g. localhost or
+# localhost,10.0.0.1). Host names or IP addresses can be used. Pax Web default value is "0.0.0.0".
+org.ops4j.pax.web.listening.addresses=0.0.0.0
 
 # Whether Opencast itself should handle HTTPS traffic.
 # Even if you set this to 'false',you can still use an HTTP proxy to handle SSL.
@@ -96,12 +97,12 @@ table https_hosts {
 Creating the keystore
 ---------------------
 
-What you need, is the TLS private key and the certificate including the
+What you need is the TLS private key and the certificate including the
 whole chain between the root certificate, all intermediates and the
 certificate itself.
 
 
-### Obtaining the certificate chain
+### Step 1: Obtaining the certificate chain
 
 If you only have the key and the certificate, I recommend
 [certificatechain.io](https://certificatechain.io/) or
@@ -118,7 +119,7 @@ cert-chain-resolver -s -o "opencast.chain.pem.tmp" "cert.pem"
 openssl verify -crl_download -crl_check -untrusted "opencast.chain.pem.tmp" "cert.pem"
 ```
 
-### Create the p12 keystore
+### Step 2: Create the p12 keystore
 
 If the private key (assumed to be `key.pem`) is encrypted
 (password protected), issue the following command. Note that there
@@ -148,7 +149,7 @@ openssl pkcs12 \
 ```
 
 
-### Import the p12 keystore into a Java keystore:
+### Step 3: Import the p12 keystore into a Java keystore:
 
 ```bash
 keytool \

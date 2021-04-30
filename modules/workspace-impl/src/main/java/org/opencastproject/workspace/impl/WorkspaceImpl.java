@@ -34,13 +34,13 @@ import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Prelude.sleep;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.util.AssetPathUtils;
 import org.opencastproject.assetmanager.util.DistributionPathUtils;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.IoSupport;
@@ -50,7 +50,6 @@ import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
@@ -86,7 +85,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -97,18 +98,19 @@ import javax.ws.rs.core.UriBuilder;
 /**
  * Implements a simple cache for remote URIs. Delegates methods to {@link WorkingFileRepository} wherever possible.
  * <p>
- * Note that if you are running the workspace on the same machine as the singleton working file repository, you can save
- * a lot of space if you configure both root directories onto the same volume (that is, if your file system supports
- * hard links).
+ * Note that if you are running the workspace on the same machine as the
+ * singleton working file repository, you can save a lot of space if you
+ * configure both root directories onto the same volume (that is, if your file
+ * system supports hard links).
  *
  * TODO Implement cache invalidation using the caching headers, if provided, from the remote server.
  */
 @Component(
-  property = {
+    property = {
     "service.description=Workspace"
-  },
-  immediate = true,
-  service = { Workspace.class }
+    },
+    immediate = true,
+    service = { Workspace.class }
 )
 public final class WorkspaceImpl implements Workspace {
   /** The logging facility */
@@ -254,9 +256,9 @@ public final class WorkspaceImpl implements Workspace {
       // Clean up
       FileUtils.deleteQuietly(targetFile);
 
-      if (linkingEnabled)
+      if (linkingEnabled) {
         logger.info("Hard links between the working file repository and the workspace enabled");
-      else {
+      } else {
         logger.warn("Hard links between the working file repository and the workspace are not possible");
         logger.warn("This will increase the overall amount of disk space used");
       }
@@ -352,7 +354,7 @@ public final class WorkspaceImpl implements Workspace {
         // does the file exist and is it up to date?
         logger.trace("Looking up {} at {}", uri.toString(), wfrCopy.getAbsolutePath());
         if (wfrCopy.isFile()) {
-          final Long workspaceFileLastModified = inWs.isFile() ? inWs.lastModified() : 0L;
+          final long workspaceFileLastModified = inWs.isFile() ? inWs.lastModified() : 0L;
           // if the file exists in the workspace, but is older than the wfr copy, replace it
           if (workspaceFileLastModified < wfrCopy.lastModified()) {
             logger.debug("Replacing {} with an updated version from the file repository", inWs.getAbsolutePath());
@@ -406,7 +408,8 @@ public final class WorkspaceImpl implements Workspace {
     }
 
     // Check if we can get the files directly from the distribution download directory
-    final File publishedFile = DistributionPathUtils.getLocalFile(downloadPath, downloadUrl, securityService.getOrganization().getId(), uri);
+    final File publishedFile = DistributionPathUtils.getLocalFile(
+        downloadPath, downloadUrl, securityService.getOrganization().getId(), uri);
     if (publishedFile != null) {
       return new FileInputStream(publishedFile);
     }
@@ -465,25 +468,12 @@ public final class WorkspaceImpl implements Workspace {
     }
   }
 
-  /**
-   * {@link #handleDownloadResponse(org.apache.http.HttpResponse, java.net.URI, java.io.File)} as a function.
-   * <code>(URI, dst_file) -> HttpResponse -> Either token (Option File)</code>
-   */
-  private Function<HttpResponse, Either<String, Option<File>>> handleDownloadResponse(final URI src, final File dst) {
-    return new Function.X<HttpResponse, Either<String, Option<File>>>() {
-      @Override
-      public Either<String, Option<File>> xapply(HttpResponse response) throws Exception {
-        return handleDownloadResponse(response, src, dst);
-      }
-    };
-  }
-
   /** Create a get request to the given URI. */
-  private HttpGet createGetRequest(final URI src, final File dst, Tuple<String, String>... params) throws IOException {
+  private HttpGet createGetRequest(final URI src, final File dst, final Map<String, String> params) throws IOException {
     try {
       URIBuilder builder = new URIBuilder(src.toString());
-      for (final Tuple<String, String> a : params) {
-        builder.setParameter(a.getA(), a.getB());
+      for (Map.Entry<String, String> param : params.entrySet()) {
+        builder.setParameter(param.getKey(), param.getValue());
       }
       final HttpGet get = new HttpGet(builder.build());
       // if the destination file already exists add the If-None-Match header
@@ -503,16 +493,21 @@ public final class WorkspaceImpl implements Workspace {
    * @return the file
    */
   private File downloadIfNecessary(final URI src, final File dst) throws IOException, NotFoundException {
-    HttpGet get = createGetRequest(src, dst);
+    HttpGet get = createGetRequest(src, dst, Collections.emptyMap());
     while (true) {
       // run the http request and handle its response
-      final Either<Exception, Either<String, Option<File>>> result = trustedHttpClient
-              .<Either<String, Option<File>>> runner(get).run(handleDownloadResponse(src, dst));
-      // handle to result of response processing
-      // right: there's an expected result
-      for (Either<String, Option<File>> a : result.right()) {
-        // right: either a file could be found or not
-        for (Option<File> ff : a.right()) {
+      try {
+        HttpResponse response = null;
+        final Either<String, Option<File>> result;
+        try {
+          response = trustedHttpClient.execute(get);
+          result = handleDownloadResponse(response, src, dst);
+        } finally {
+          if (response != null) {
+            trustedHttpClient.close(response);
+          }
+        }
+        for (Option<File> ff : result.right()) {
           for (File f : ff) {
             return f;
           }
@@ -521,16 +516,13 @@ public final class WorkspaceImpl implements Workspace {
           throw new NotFoundException();
         }
         // left: file will be ready later
-        for (String token : a.left()) {
-          get = createGetRequest(src, dst, tuple("token", token));
+        for (String token : result.left()) {
+          get = createGetRequest(src, dst, Collections.singletonMap("token", token));
           sleep(60000);
         }
-      }
-      // left: an exception occurred
-      for (Exception e : result.left()) {
-        logger.warn("Could not copy {} to {}: {}", src.toString(), dst.getAbsolutePath(), e.getMessage());
+      } catch (TrustedHttpClientException e) {
         FileUtils.deleteQuietly(dst);
-        throw new NotFoundException(e);
+        throw new NotFoundException(String.format("Could not copy %s to %s", src, dst.getAbsolutePath()), e);
       }
     }
   }
@@ -578,10 +570,12 @@ public final class WorkspaceImpl implements Workspace {
    *           if <code>file</code> does not exist or is not a regular file
    */
   protected String md5(File file) throws IOException, IllegalArgumentException, IllegalStateException {
-    if (file == null)
+    if (file == null) {
       throw new IllegalArgumentException("File must not be null");
-    if (!file.isFile())
+    }
+    if (!file.isFile()) {
       throw new IllegalArgumentException("File " + file.getAbsolutePath() + " can not be read");
+    }
 
     try (InputStream in = new FileInputStream(file)) {
       return DigestUtils.md5Hex(in);
@@ -623,12 +617,14 @@ public final class WorkspaceImpl implements Workspace {
         FileUtils.forceDelete(f);
 
         // Remove containing folder if a mediapackage element or a not a static collection
-        if (isMediaPackage || !isStaticCollection(collectionId))
+        if (isMediaPackage || !isStaticCollection(collectionId)) {
           FileSupport.delete(mpElementDir);
+        }
 
         // Also delete mediapackage itself when empty
-        if (isMediaPackage)
+        if (isMediaPackage) {
           FileSupport.delete(mpElementDir.getParentFile());
+        }
       }
     }
 
@@ -747,8 +743,9 @@ public final class WorkspaceImpl implements Workspace {
       FileUtils.forceMkdir(copy.getParentFile());
       FileUtils.deleteQuietly(copy);
       FileUtils.moveFile(original, copy);
-      if (!isStaticCollection(collection))
+      if (!isStaticCollection(collection)) {
         FileSupport.delete(original.getParentFile());
+      }
     }
     // move in WFR
     final URI wfrUri = wfr.moveTo(collection, filename, toMediaPackage, toMediaPackageElement, toFileName);
@@ -762,7 +759,8 @@ public final class WorkspaceImpl implements Workspace {
     return wfr.getCollectionContents(collectionId);
   }
 
-  private void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
+  private void deleteFromCollection(String collectionId, String fileName, boolean removeCollection)
+          throws NotFoundException, IOException {
     // local delete
     final File f = workspaceFile(WorkingFileRepository.COLLECTION_PATH_PREFIX, collectionId,
             PathSupport.toSafeName(fileName));
@@ -810,8 +808,9 @@ public final class WorkspaceImpl implements Workspace {
     wsDirectory.mkdirs();
 
     String safeFileName = PathSupport.toSafeName(FilenameUtils.getName(uriString));
-    if (StringUtils.isBlank(safeFileName))
+    if (StringUtils.isBlank(safeFileName)) {
       safeFileName = UNKNOWN_FILENAME;
+    }
     return new File(wsDirectory, safeFileName);
   }
 
@@ -839,12 +838,14 @@ public final class WorkspaceImpl implements Workspace {
    */
   private String getCollection(URI uri) {
     String path = uri.toString();
-    if (path.indexOf(WorkingFileRepository.COLLECTION_PATH_PREFIX) < 0)
+    if (path.indexOf(WorkingFileRepository.COLLECTION_PATH_PREFIX) < 0) {
       throw new IllegalArgumentException(uri + " must point to a working file repository collection");
+    }
 
     String collection = FilenameUtils.getPath(path);
-    if (collection.endsWith("/"))
+    if (collection.endsWith("/")) {
       collection = collection.substring(0, collection.length() - 1);
+    }
     collection = collection.substring(collection.lastIndexOf("/"));
     collection = collection.substring(collection.lastIndexOf("/") + 1, collection.length());
     return collection;
@@ -959,7 +960,8 @@ public final class WorkspaceImpl implements Workspace {
 
   @Override
   public void cleanup(Id mediaPackageId, boolean filesOnly) throws IOException {
-    final File mediaPackageDir = workspaceFile(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, mediaPackageId.toString());
+    final File mediaPackageDir = workspaceFile(
+        WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, mediaPackageId.toString());
 
     if (filesOnly) {
       logger.debug("Clean workspace media package directory {} (files only)", mediaPackageDir);

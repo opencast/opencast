@@ -1,37 +1,41 @@
-Opencast 9: Release Notes
+Opencast 10: Release Notes
 =========================
 
 Important Changes
 -----------------
 
-- External Elasticsearch
-- MariaDB JDBC driver
-- Dropping compose operation in favor of encode
-
+- …
 
 Features
 --------
 
-- todo:
-- list
-- of
-- listed
+- …
 
-Configuration changes
----------------------
+Improvements
+------------
+
+- …
+
+API changes
+-----------
+
+- …
+
 
 Release Schedule
 ----------------
 
-| Date                        | Phase                   |
-|-----------------------------|-------------------------|
-| October 5th                 | Feature freeze          |
-| November 9th–November 15th  | Translation week        |
-| November 16th–November 29th | Public QA phase         |
-| December 15th               | Release of Opencast 9.0 |
+| Date                        | Phase                    |
+|-----------------------------|--------------------------|
+| May 18, 2021                | Feature freeze           |
+| May 24, 2021                | Translation week         |
+| May 31, 2021                | Public QA                |
+| June 15, 2021               | Release of Opencast 10.0 |
+
+
 
 Release managers
 ----------------
 
-- Julian Kniephoff (ELAN e.V.)
-- Carlos Turro Ribalta (Universitat Politècnica de València)
+- Greg Logan
+- Per Pascal Seeland (University of Stuttgart)

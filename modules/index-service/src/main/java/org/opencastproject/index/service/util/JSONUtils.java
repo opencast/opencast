@@ -26,10 +26,10 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.data.Option;
 
@@ -42,6 +42,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,6 +55,12 @@ import java.util.Set;
  * Utility class providing helpers for all operation related to JSON.
  */
 public final class JSONUtils {
+
+  /** This regex is used to reduce the users in the filter selectbox.
+   * The filter is located in the top right corner in the admin ui. */
+  private static String userFilterRegex;
+  private static final String[] userListsToReduce = {"CONTRIBUTORS", "PUBLISHER",
+          "ORGANIZERS", "CONTRIBUTORS.USERNAMES", "EVENTS.PUBLISHER", "USERS.NAME"};
 
   private JSONUtils() {
 
@@ -133,6 +140,10 @@ public final class JSONUtils {
           values = new HashMap<String, String>();
         } else {
           values = listProvidersService.getList(listProviderName.get(), query, false);
+          if (Arrays.asList(userListsToReduce).contains(listProviderName.get())) {
+            // reduces the user list ('values' map) by the configured userFilterRegex
+            values.keySet().removeIf(u -> !u.matches(userFilterRegex));
+          }
           translatable = listProvidersService.isTranslatable(listProviderName.get());
         }
 
@@ -247,6 +258,10 @@ public final class JSONUtils {
     }
 
     return map;
+  }
+
+  public static void setUserRegex(String regex) {
+    userFilterRegex = regex;
   }
 
 }

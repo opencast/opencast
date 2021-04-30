@@ -25,12 +25,12 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 
 /**
  * Entity object for storing scheduled last modified dates in persistence storage.
@@ -40,7 +40,8 @@ import javax.persistence.UniqueConstraint;
         @NamedQuery(name = "LastModified.findAll", query = "SELECT e FROM LastModified e "),
         @NamedQuery(name = "LastModified.findById", query = "SELECT e FROM LastModified e WHERE e.captureAgentId = :agentId"),
         @NamedQuery(name = "LastModified.countAll", query = "SELECT COUNT(e) FROM LastModified e ") })
-@Table(name = "oc_scheduled_last_modified", uniqueConstraints = { @UniqueConstraint(columnNames = { "capture_agent_id" }) })
+@Table(name = "oc_scheduled_last_modified", indexes = {
+    @Index(name = "IX_oc_scheduled_last_modified_last_modified", columnList = ("last_modified")) })
 public class LastModifiedDto {
 
   /** Capture agent ID */
@@ -48,7 +49,7 @@ public class LastModifiedDto {
   @Column(name = "capture_agent_id", length = 255)
   protected String captureAgentId;
 
-  @Column(name = "last_modified")
+  @Column(name = "last_modified", nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   protected Date lastModifiedDate;
 

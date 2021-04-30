@@ -24,15 +24,16 @@ package org.opencastproject.index.service.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
 import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
-import org.opencastproject.index.service.resources.list.query.StringListFilter;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.impl.ListProvidersServiceImpl;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
+import org.opencastproject.list.query.StringListFilter;
+import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Option;
@@ -114,12 +115,13 @@ public class JSONUtilsTest {
 
   /**
    * Test method for
-   * {@link JSONUtils#filtersToJSON(org.opencastproject.index.service.resources.list.api.ResourceListQuery, org.opencastproject.index.service.resources.list.api.ListProvidersService, org.opencastproject.security.api.Organization)}
+   * {@link JSONUtils#filtersToJSON(org.opencastproject.list.api.ResourceListQuery, org.opencastproject.list.api.ListProvidersService, org.opencastproject.security.api.Organization)}
    * (filters, listProviderService, query, org)}
    */
   @Test
   public void testFiltersToJSON() throws Exception {
     String expectedJSON = IOUtils.toString(getClass().getResource("/filters.json"));
+    String expectedJSONreduced = IOUtils.toString(getClass().getResource("/filters_reduced.json"));
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     Organization organization = EasyMock.createNiceMock(Organization.class);
@@ -174,6 +176,7 @@ public class JSONUtilsTest {
     EasyMock.expect(query.getOffset()).andReturn(Option.<Integer> none()).anyTimes();
     EasyMock.replay(query);
 
+    JSONUtils.setUserRegex(".*"); //allow all users
     JValue result = JSONUtils.filtersToJSON(query, listProvidersService, organization);
 
     StreamingOutput stream = RestUtils.stream(serializer.fn.toJson(result));
@@ -181,6 +184,18 @@ public class JSONUtilsTest {
     try {
       stream.write(resultStream);
       assertThat(expectedJSON, SameJSONAs.sameJSONAs(resultStream.toString()));
+    } finally {
+      IOUtils.closeQuietly(resultStream);
+    }
+
+    JSONUtils.setUserRegex("contributor2"); //allow just one user
+    result = JSONUtils.filtersToJSON(query, listProvidersService, organization);
+
+    stream = RestUtils.stream(serializer.fn.toJson(result));
+    resultStream = new ByteArrayOutputStream();
+    try {
+      stream.write(resultStream);
+      assertThat(expectedJSONreduced, SameJSONAs.sameJSONAs(resultStream.toString()));
     } finally {
       IOUtils.closeQuietly(resultStream);
     }

@@ -28,48 +28,48 @@ import org.junit.Test;
 
 public class DOIExtensionTest {
 
-    private static DOIExtension instance;
+  private static DOIExtension instance;
 
-    public DOIExtensionTest() {
-    }
+  public DOIExtensionTest() {
+  }
 
-    @Before
+  @Before
     public void setUp() {
-        instance = new DOIExtension();
-    }
+    instance = new DOIExtension();
+  }
 
-    @After
+  @After
     public void tearDown() {
-        instance = null;
-    }
+    instance = null;
+  }
 
     /**
      * Test Setter and Getter for DOIExtension
      */
-    @Test
+  @Test
     public void testSetterAndGetter() {
-        instance.setAlsoPublishedAs("publish");
-        Assert.assertEquals(instance.getAlsoPublishedAs(), "publish");
+    instance.setAlsoPublishedAs("publish");
+    Assert.assertEquals(instance.getAlsoPublishedAs(), "publish");
 
-        instance.setCompiledBy("compile");
-        Assert.assertEquals(instance.getCompiledBy(), "compile");
+    instance.setCompiledBy("compile");
+    Assert.assertEquals(instance.getCompiledBy(), "compile");
 
-        instance.setDoi("doi");
-        Assert.assertEquals(instance.getDoi(), "doi");
+    instance.setDoi("doi");
+    Assert.assertEquals(instance.getDoi(), "doi");
 
-        instance.setIssueNumber("number");
-        Assert.assertEquals(instance.getIssueNumber(), "number");
+    instance.setIssueNumber("number");
+    Assert.assertEquals(instance.getIssueNumber(), "number");
 
-        instance.setMode("mode");
-        Assert.assertEquals(instance.getMode(), "mode");
+    instance.setMode("mode");
+    Assert.assertEquals(instance.getMode(), "mode");
 
-        instance.setRegistrationAgency("agency");
-        Assert.assertEquals(instance.getRegistrationAgency(), "agency");
+    instance.setRegistrationAgency("agency");
+    Assert.assertEquals(instance.getRegistrationAgency(), "agency");
 
-        instance.setStructuralType("type");
-        Assert.assertEquals(instance.getStructuralType(), "type");
+    instance.setStructuralType("type");
+    Assert.assertEquals(instance.getStructuralType(), "type");
 
-        Assert.assertEquals(instance.getUri(), "http://www.doi.org");
+    Assert.assertEquals(instance.getUri(), "http://www.doi.org");
 
-    }
+  }
 }

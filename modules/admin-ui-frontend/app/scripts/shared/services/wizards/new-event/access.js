@@ -52,6 +52,9 @@ angular.module('adminNg.services')
       };
 
       var changePolicies = function (access, loading) {
+        if (!Array.isArray(access)) {
+          access = [access];
+        }
         var newPolicies = {},
             foundUserRole = false;
         angular.forEach(access, function (acl) {
@@ -72,8 +75,8 @@ angular.module('adminNg.services')
             foundUserRole = true;
           }
 
-          if (angular.isUndefined(me.roles[acl.role])) {
-            me.roles[acl.role] = acl.role;
+          if (me.roles.indexOf(acl.role) == -1) {
+            me.roles.push(acl.role);
           }
         });
 

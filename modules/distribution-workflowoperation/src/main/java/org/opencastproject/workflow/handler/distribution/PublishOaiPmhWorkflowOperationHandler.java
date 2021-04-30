@@ -111,12 +111,6 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
   public void activate(ComponentContext cc) {
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -142,8 +136,9 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
     Opt<MimeType> externalMimetype = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_MIME_TYPE)
             .bind(MimeTypes.toMimeType);
 
-    if (repository == null)
+    if (repository == null) {
       throw new IllegalArgumentException("No repository has been specified");
+    }
 
     String[] sourceDownloadTags = StringUtils.split(downloadTags, ",");
     String[] sourceDownloadFlavors = StringUtils.split(downloadFlavors, ",");
@@ -202,9 +197,10 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       // Wait until the publication job has returned
-      if (!waitForStatus(publishJob).isSuccess())
+      if (!waitForStatus(publishJob).isSuccess()) {
         throw new WorkflowOperationException("Mediapackage " + mediaPackage.getIdentifier()
                 + " could not be published to OAI-PMH repository " + repository);
+      }
 
       // The job has passed
       Job job = serviceRegistry.getJob(publishJob.getId());
@@ -224,8 +220,9 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
 
       if (newElement == null) {
         logger.warn(
-                "Publication to OAI-PMH repository '{}' failed, unable to parse the payload '{}' from job '{}' to a mediapackage element",
-                repository, job.getPayload(), job.toString());
+            "Publication to OAI-PMH repository '{}' failed, unable to parse the payload '{}' from "
+                + "job '{}' to a mediapackage element",
+            repository, job.getPayload(), job.toString());
         return createResult(mediaPackage, Action.CONTINUE);
       }
 
@@ -237,8 +234,9 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
 
       if (externalChannel.isSome() && externalMimetype.isSome() && externalTempalte.isSome()) {
         String template = externalTempalte.get().replace("{event}", mediaPackage.getIdentifier().toString());
-        if (StringUtils.isNotBlank(mediaPackage.getSeries()))
+        if (StringUtils.isNotBlank(mediaPackage.getSeries())) {
           template = template.replace("{series}", mediaPackage.getSeries());
+        }
 
         Publication externalElement = PublicationImpl.publication(UUID.randomUUID().toString(), externalChannel.get(),
                 URI.create(template), externalMimetype.get());

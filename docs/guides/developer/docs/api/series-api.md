@@ -6,7 +6,7 @@
 
 Returns a list of series.
 
-The following query string parameters are supported to filter, sort and pagingate the returned list:
+The following query string parameters are supported to filter, sort and paginate the returned list:
 
 Query String Parameter |Type                         | Description
 :----------------------|:----------------------------|:-----------
@@ -43,6 +43,13 @@ Sort Criteria  | Description
 `created`      | By when the series was created
 `creator`      | By who created the series
 `title`        | By the title of the series
+
+This request additionally supports the following query string parameters to include additional information directly in
+the response:
+
+Query String Parameter     |Type                         | Description
+:--------------------------|:----------------------------|:-----------
+`withacl`                  | [`boolean`](types.md#basic) | Whether the acl should be included in the response (version 1.5.0 and higher)
 
 __Sample request__
 ```xml
@@ -121,6 +128,10 @@ __Example__
 ### GET /api/series/{series_id}
 
 Returns a single series.
+
+Query String Parameter     |Type                         | Description
+:--------------------------|:----------------------------|:-----------
+`withacl`                  | [`boolean`](types.md#basic) | Whether the acl should be included in the response (version 1.5.0 and higher)
 
 __Response__
 

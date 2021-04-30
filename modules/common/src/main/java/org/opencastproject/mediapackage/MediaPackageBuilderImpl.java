@@ -27,7 +27,6 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -36,7 +35,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -83,7 +81,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
    *
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#createNew()
    */
-  public MediaPackage createNew() throws MediaPackageException {
+  public MediaPackage createNew() {
     return new MediaPackageImpl();
   }
 
@@ -92,7 +90,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
    *
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#createNew(org.opencastproject.mediapackage.identifier.Id)
    */
-  public MediaPackage createNew(Id identifier) throws MediaPackageException {
+  public MediaPackage createNew(Id identifier) {
     return new MediaPackageImpl(identifier);
   }
 
@@ -102,18 +100,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#loadFromXml(java.io.InputStream)
    */
   public MediaPackage loadFromXml(InputStream is) throws MediaPackageException {
-    if (serializer != null) {
-      // FIXME This code runs if *any* serializer is present, regardless of the serializer implementation
-      try {
-        Document xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-        rewriteUrls(xml, serializer);
-        return MediaPackageImpl.valueOf(xml);
-      } catch (Exception e) {
-        throw new MediaPackageException("Error deserializing paths in media package", e);
-      }
-    } else {
-      return MediaPackageImpl.valueOf(is);
-    }
+    return MediaPackageImpl.valueOf(is);
   }
 
   /**

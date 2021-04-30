@@ -4,7 +4,7 @@
     <h2 translate="BULK_ACTIONS.EDIT_EVENTS.CAPTION"><!-- Template --></h2>
   </header>
   <wizard edit-mode="false" name="editEventsWz" on-finish="submit()" template="shared/partials/wizardNav.html">
-  <wz-step wz-title="General" canexit="editEventsForm.generalForm.$valid" wz-disabled="!editEventsForm.generalForm.$valid" ng-form="generalForm" novalidate>
+  <wz-step wz-title="{{ 'BULK_ACTIONS.EDIT_EVENTS.GENERAL.CAPTION' | translate }}" canexit="editEventsForm.generalForm.$valid" wz-disabled="!editEventsForm.generalForm.$valid" ng-form="generalForm" novalidate>
     <!-- First Step: General -->
     <div class="modal-content active">
       <div class="modal-body">
@@ -186,7 +186,7 @@
                             data-width="'200px'"
                             ng-change="roomChanged();"
                             ng-model="scheduling[wd].location"
-                            ng-options="value.name for (id, value) in captureAgents | filter:hasAgentAccess"
+                            ng-options="ca.name for ca in captureAgents | filter:hasAgentAccess track by ca.id"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                             />
                   </td>

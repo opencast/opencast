@@ -1,249 +1,312 @@
 {
    "MATTERHORN": "Opencast",
-   "NAV_HOME": "Start",
-   "NAV_ABOUT": "About",
-   "NO": "No",
-   "SUBMIT": "Submit",
-   "UPDATE": "Update",
-   "CANCEL": "Cancel",
-   "CONFIRM": "Confirm",
-   "SAVE": "Save",
+   "NAV_HOME": "Başla",
+   "NAV_ABOUT": "Hakkında",
+   "BUILD": {
+      "BUILT_ON": "built on",
+      "DATE_DESC": "Date this system's kernel module was built on.",
+      "COMMIT": "Git commit this version was built from.",
+      "VERSION": "Common bundle version"
+   },
+   "NO": "Hayır",
+   "SUBMIT": "Gönder",
+   "UPDATE": {
+      "MINOR": "Minor update available",
+      "MAJOR": "Major update available",
+      "UNSUPPORTED": "Version {{ version }} no longer supported",
+      "UNDETERMINED": "Indeterminable version"
+   },
+   "CANCEL": "İptal Et",
+   "CONFIRM": "Onayla",
+   "SAVE": "Kaydet",
    "CONTINUE": "Continue",
    "CLOSE": "Close",
-   "LOGOUT": "Logout",
-   "RESET": "Reset",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
-   "YES": "Yes",
+   "LOGOUT": "Çıkış yap",
+   "RESET": "Sıfırla",
+   "SELECT_NO_OPTION_SELECTED": "Seçili seçenek yok",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Mevcut Seçenek yok",
+   "YES": "Evet",
+   "COPY": "Copy to clipboard",
+   "LTI": {
+      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
+      "SERIES_TITLE": "View Series",
+      "UPLOAD_TITLE": "Upload event",
+      "LOADING": "Loading…",
+      "NEW_UPLOAD": "Upload new event",
+      "EDIT_UPLOAD": "Edit event",
+      "CURRENT_JOBS": "Today's jobs",
+      "PRESENTER": "Presenter",
+      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
+      "CAPTION": "Captions",
+      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+      "UPLOAD": "Upload",
+      "UPLOADING": "Uploading",
+      "EDIT": "Save",
+      "EDIT_TITLE": "Edit event",
+      "NO_OPTION_SELECTED": "No option selected",
+      "EDITING": "Saving…",
+      "SELECT_OPTION": "Select option",
+      "JOB_TITLE": "Title",
+      "JOB_STATUS": "Status",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
+      "UPLOAD_FAILURE": "Upload failed!",
+      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
+      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
+      "EDIT_FAILURE": "Edit failed!",
+      "COPY_SUCCESS": "Copying started…",
+      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
+      "GENERIC_ERROR": "Error: {{message}}",
+      "DELETION_SUCCESS": "Event deletion successful",
+      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
+      "DELETION_FAILURE": "Event deletion failed",
+      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
+      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
+      "CONFIRM_DELETION": "Really delete this event?",
+      "COPY_TO_SERIES": "Copy event to series",
+      "SELECT_COPY_TARGET": "Select destination series",
+      "COPY": "Copy",
+      "COPY_IN_PROGRESS": "Starting copy…",
+      "CREATOR": "by {{creator}}"
+   },
    "LANGUAGES": {
-      "ARABIC": "Arabic",
-      "DANISH": "Danish",
-      "GERMAN": "German",
-      "GERMAN_CH": "Swiss German",
-      "FINNISH": "Finnish",
-      "HINDI": "Hindi",
-      "ITALIAN": "Italian",
-      "JAPANESE": "Japanese",
-      "DUTCH": "Dutch",
-      "NORWEGIAN": "Norwegian",
-      "FRENCH": "French",
-      "ENGLISH": "English",
-      "SPANISH": "Spanish",
-      "ROMANSH": "Romansh",
-      "POLISH": "Polish",
-      "PORTUGESE": "Portuguese",
-      "SLOVENIAN": "Slovenian",
-      "SWEDISH": "Swedish",
-      "RUSSIAN": "Russian",
-      "TURKISH": "Turkish",
-      "UKRAINIAN": "Ukrainian",
-      "CHINESE": "Chinese"
+      "ARABIC": "Arapça",
+      "DANISH": "Danca",
+      "GERMAN": "Almanca",
+      "GERMAN_CH": "İsviçre Almancası",
+      "FINNISH": "Fince",
+      "HINDI": "Hintçe",
+      "ITALIAN": "İtalyanca",
+      "JAPANESE": "Japonca",
+      "DUTCH": "Flemenkçe",
+      "NORWEGIAN": "Norveççe",
+      "FRENCH": "Fransızca",
+      "ENGLISH": "İngilizce",
+      "SPANISH": "İspanyolca",
+      "ROMANSH": "Romence",
+      "POLISH": "Lehçe",
+      "PORTUGESE": "Portekizce",
+      "SLOVENIAN": "Slovakça",
+      "SWEDISH": "İsveççe",
+      "RUSSIAN": "Rusça",
+      "TURKISH": "Türkçe",
+      "UKRAINIAN": "Ukraynaca",
+      "CHINESE": "Çince"
    },
    "PREFERENCES": {
       "TABLE": {
-         "CAPTION": "Edit Table View",
-         "SUBHEADING": "Select the default data you would like displayed in the {{ tableName }} view",
-         "AVAILABLE_COLUMNS": "Available columns",
-         "SELECTED_COLUMNS": "Selected columns",
-         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
+         "CAPTION": "Tablo Görünümünü Düzenle",
+         "SUBHEADING": "{{ tableName }} görüntülemede göstermek istediğiniz varsayılan veriyi seçiniz",
+         "AVAILABLE_COLUMNS": "Kullanılabilir Sütunlar",
+         "SELECTED_COLUMNS": "Seçili sütunlar",
+         "FOOTER_TEXT": "Sıralama ve seçim otomatik olarak kaydedilecek. Varsayılan görünümü yüklemek için \"{{resetTranslation}}\" düğmesine tıklayın."
       }
    },
    "CONFIRMATIONS": {
-      "CONTINUE_ACTION": "Are you sure you want to continue?",
+      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+      "CONTINUE_ACTION": "Devam etmek istediğinizden emin misiniz?",
       "METADATA": {
          "NOTICE": {
-            "UNKNOWN": "The following element will be deleted",
-            "EVENT": "The following event will be deleted",
-            "SERIES": "The following series will be deleted",
-            "ACL": "The following ACL will be deleted",
-            "GROUP": "The following group will be deleted",
-            "USER": "The following user will be deleted",
-            "THEME": "The following theme will be deleted",
-            "LOCATION": "The following location will be deleted"
+            "UNKNOWN": "Öğe silinecek",
+            "EVENT": "Aşağıdaki etkinlik silinecek",
+            "SERIES": "Aşağıdaki seriler silinecek",
+            "ACL": "Aşağıdaki ACL silinecek",
+            "GROUP": "Aşağıdaki grup silinecek",
+            "USER": "Aşağıdaki kullanıcı silinecek",
+            "THEME": "Aşağıdaki tema silinecek",
+            "LOCATION": "Aşağıdaki konum silinecek"
          },
-         "NAME": "Name"
+         "NAME": "İsim"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Confirmation"
+         "CONFIRMATION": "Onaylama",
+         "SHOW": {
+            "EMBEDDING_CODE": "Embedding code"
+         }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "SERIES_HAS_EVENTS": "Bu seri etkinlikler içeriyor. Serinin silinmesi, etkinlikleri silmez.",
+         "EVENT_WILL_BE_GONE": "Devam ederseniz, bu etkinlik geri alınamaz bir şekilde gider."
       },
       "ERRORS": {
-         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
+         "SERIES_HAS_EVENTS": "Bu seri, hala etkinlik içerdiğinden silinemez."
       }
    },
-   "MEDIAMODULE": "Media Module",
-   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
-   "LANGUAGE": "Select language",
+   "MEDIAMODULE": "Ortam Modülü",
+   "SYSTEM_NOTIFICATIONS": "Sistem uyarıları ve bildirimleri",
+   "LANGUAGE": "Dil seç",
    "HELP": {
-      "HELP": "Help",
-      "USERS_GUIDE": "User's Guide",
-      "DOCUMENTATION": "Documentation",
-      "REST_DOC": "REST API Docs",
-      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
+      "HELP": "Yardım",
+      "USERS_GUIDE": "Kullanım Kılavuzu",
+      "DOCUMENTATION": "Dökümantasyon",
+      "REST_DOC": "REST API Dökümanları",
+      "HOTKEY_CHEAT_SHEET": "Klavye Kısayolları",
+      "ADOPTER_REGISTRATION": "Adopter Registration"
    },
    "NOTIFICATIONS": {
-      "ACL_ADDED": "The access policy has been created",
-      "ACL_NOT_SAVED": "The access policy could not be saved",
-      "ACL_UPDATED": "The access policy has been updated",
-      "ACL_DELETED": "The access policy has been deleted",
-      "ACL_NOT_DELETED": "The access policy could not be deleted",
-      "USER_ADDED": "The user has been created",
-      "USER_UPDATED": "The user has been updated",
-      "USER_NOT_SAVED": "The user could not be saved",
-      "USER_DELETED": "The user has been deleted",
-      "USER_NOT_DELETED": "The user could not be deleted",
-      "USER_NOT_MANAGEABLE": "The user is not manageable",
-      "GROUP_ADDED": "The group has been created",
-      "GROUP_CONFLICT": "The generated group name already exists",
-      "GROUP_UPDATED": "The group has been updated",
-      "GROUP_NOT_SAVED": "The group could not be saved",
-      "GROUP_DELETED": "The group has been deleted",
-      "GROUP_NOT_DELETED": "The group could not be deleted",
-      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
-      "SERIES_ADDED": "The series has been created",
-      "SERIES_NOT_SAVED": "The series could not be saved",
-      "EVENTS_CREATED": "The event has been created",
-      "EVENTS_UPLOAD_STARTED": "The event is being uploaded…",
-      "EVENTS_NOT_CREATED": "The event could not be created",
-      "EVENTS_UPDATED_NB": "{{ number }} events have been successfully updated",
-      "EVENTS_UPDATED_ALL": "All events have been successfully updated",
-      "EVENTS_NOT_UPDATED": "The event could not be saved",
-      "EVENTS_NOT_UPDATED_ID": "The event {{ id }} could not be saved",
-      "EVENTS_NOT_UPDATED_ALL": "None of the events could be saved",
-      "EVENTS_PROCESSING_ACTION_RETRY": "Processing resumed.",
-      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Processing could not be resumed.",
-      "EVENTS_PROCESSING_ACTION_NONE": "Processing aborted.",
-      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Processing could not be aborted.",
-      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
-      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
-      "SERIES_UPDATED_NB": "{{ number }} series have been successfully updated",
-      "SERIES_UPDATED_ALL": "All series have been successfully updated",
-      "SERIES_NOT_UPDATED": "The series could not be saved",
-      "SERIES_NOT_UPDATED_ID": "The series {{ id }} could not be saved",
-      "SERIES_NOT_UPDATED_ALL": "None of the series could be saved",
-      "EVENT_DELETED": "The event has been deleted.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
-      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
-      "SERIES_DELETED": "The series has been deleted",
-      "SERIES_NOT_DELETED": "The series could not be deleted",
-      "LOCATION_DELETED": "The location has been deleted",
-      "LOCATION_NOT_DELETED": "The location could not be deleted",
-      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
-      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
-      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
-      "CONFLICT_ALREADY_ENDED": "Scheduling error: The event has already ended.",
-      "CONFLICT_END_BEFORE_START": "Scheduling error: Schedule end has to be later than the start.",
-      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
-      "INVALID_ACL_RULES": "Rules have to contain a valid role and read or/and write right(s).",
-      "MISSING_ACL_RULES": "At least one role with Read and Write permissions is required!",
-      "SAVED_ACL_RULES": "The access rules have been saved.",
-      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
-      "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
-      "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
-      "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
-      "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
-      "THEME_NAME_EMPTY": "The name cannot be empty",
-      "BUMPER_UPLOAD_ERROR": "Error while uploading media",
-      "BUMPER_REQUIRED": "You must upload a bumper",
-      "TRAILER_UPLOAD_ERROR": "Error while uploading media",
-      "TITLE_UPLOAD_ERROR": "Error while uploading media",
-      "LICENSE_UPLOAD_ERROR": "Error while uploading media",
-      "WATERMARK_UPLOAD_ERROR": "Error while uploading media",
-      "WATERMARK_REQUIRED": "You must upload a watermark",
-      "THEME_UPLOAD_STARTED": "The media is being uploaded…",
-      "THEME_CREATED": "The theme has been created",
-      "THEME_NOT_CREATED": "The theme could not be created",
-      "THEME_DELETED": "The theme has been deleted",
-      "THEME_NOT_DELETED": "The theme could not be deleted",
-      "TASK_CREATED": "The task has been created",
-      "TASK_NOT_CREATED": "The task could not be created",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
-      "VIDEO_CUT_PROCESSING": "The video is being processed…",
-      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
-      "VIDEO_SOURCE_TRACKS_INVALID": "You have selected no video tracks to process",
-      "VIDEO_TOO_MANY_AUDIOS": "You cannot have more than one audio stream on a single video stream",
-      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
-      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
-      "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction.",
+      "ACL_ADDED": "Erişim ilkesi oluşturuldu",
+      "ACL_NOT_SAVED": "Erişim ilkesi kaydedilemedi",
+      "ACL_UPDATED": "Erişim ilkesi güncellendi",
+      "ACL_DELETED": "Erişim ilkesi silinmiş",
+      "ACL_NOT_DELETED": "Erişim ilkesi silinemedi",
+      "USER_ADDED": "Kullanıcı oluşturuldu",
+      "USER_UPDATED": "Kullanıcı güncelleştirildi",
+      "USER_NOT_SAVED": "Kullanıcı kaydedilemedi",
+      "USER_DELETED": "Kullanıcı silindi",
+      "USER_NOT_DELETED": "Kullanıcı silinemedi",
+      "USER_NOT_MANAGEABLE": "Kullanıcı düzenlenebilir değil",
+      "GROUP_ADDED": "Grup oluşturuldu",
+      "GROUP_CONFLICT": "Grup adı zaten var",
+      "GROUP_UPDATED": "Grup güncellendi",
+      "GROUP_NOT_SAVED": "Grup kaydedilemedi",
+      "GROUP_DELETED": "Grup silindi",
+      "GROUP_NOT_DELETED": "Grup silinemedi",
+      "ACCESS_DENIED": "Erişim engellendi. Bu sayfayı görme yetkiniz bulunmamakta",
+      "SERIES_ADDED": "Dizi oluşturuldu",
+      "SERIES_NOT_SAVED": "Dizi kaydedilemedi",
+      "EVENTS_CREATED": "Etkinlik oluşturuldu",
+      "EVENTS_UPLOAD_STARTED": "Etkinlik yüklenmekte…",
+      "EVENTS_NOT_CREATED": "Etkinlik oluşturulamadı",
+      "EVENTS_UPDATED_NB": "{{ number }} etkinlikler başarıyla güncellendi",
+      "EVENTS_UPDATED_ALL": "Tüm etkinlikler başarıyla güncellendi",
+      "EVENTS_NOT_UPDATED": "Etkinlik kaydedilemedi",
+      "EVENTS_NOT_UPDATED_ID": "{{ id }} etkinliği kaydedilemedi",
+      "EVENTS_NOT_UPDATED_ALL": "Etkinliklerden hiçbiri kaydedilemedi",
+      "EVENTS_PROCESSING_ACTION_RETRY": "İşleme devam ediliyor...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "İşleme devam edilemedi.",
+      "EVENTS_PROCESSING_ACTION_NONE": "İşlem iptal ediliyor...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "İşlem iptal edilemedi.",
+      "EVENTS_PROCESSING_ACTION_STOP": "İşlem durduruldu.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "İşlem durdurulamadı.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Silinen iş akışı.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "İş akışı silinemedi.",
+      "SERIES_UPDATED_NB": "{{ number }} serileri başarıyla güncellendi",
+      "SERIES_UPDATED_ALL": "Tüm seriler başarıyla güncellendi",
+      "SERIES_NOT_UPDATED": "Seriler kaydedilemedi",
+      "SERIES_NOT_UPDATED_ID": "{{ id }} serileri kaydedilemedi",
+      "SERIES_NOT_UPDATED_ALL": "Serilerin hiçbiri kaydedilemedi",
+      "EVENT_DELETED": "Etkinlik silindi.",
+      "EVENT_WILL_BE_DELETED": "Etkinlik siliniyor",
+      "EVENTS_DELETED": "Etkinlikler siliniyor.",
+      "EVENTS_NOT_DELETED": "Etkinlik(ler) silinemedi.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Etkinlik(ler) silinemedi çünkü bunu yapma izniniz yok.",
+      "SERIES_DELETED": "Seriler silindi",
+      "SERIES_NOT_DELETED": "Seriler silinemedi",
+      "LOCATION_DELETED": "Konum silindi",
+      "LOCATION_NOT_DELETED": "Konum silinemedi",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Lokasyon silinemedi çünkü bunu yapma izniniz yok.",
+      "CONFLICT_DETECTED": "Zamanlama sorunu: yeni etkinlik eski etkinlikle çakışmakta. Lütfen konumu, tarihi ve zamanı değiştirin.",
+      "CONFLICT_BULK_DETECTED": "Zamanlamada Çatışma: etkinliklerin değiştirilmesi çatışmalara neden olur. Lütfen yer, tarih veya saatleri değiştirin.",
+      "CONFLICT_ALREADY_ENDED": "Zamanlama hatası: Etkinlik zaten bitmiş durumda.",
+      "CONFLICT_END_BEFORE_START": "Zamanlama hatası: Bitiş zamanlaması başlangıçtan daha sonra olmalı.",
+      "CONFLICT_IN_THE_PAST": "Zamanlama planı güncelleştirilemedi: Bir etkinliği geçmişe planlayamazsınız.",
+      "INVALID_ACL_RULES": "Kuralların okuma veya/ve yazma hakkında(haklarında) etkin bir rolü olmalı.",
+      "MISSING_ACL_RULES": "En az bir Yazma ve Okuma yetkisi gerekli!",
+      "SAVED_ACL_RULES": "Giriş kuralları kaydedildi.",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Dizideki mevcut etkinliklerin yeniden işlenmesi gerekecek",
+      "SERIES_ACL_LOCKED": "Dizideki etkinlikler üzerinde işlem yapılırken Erişim İlkelerinin düzenlenmesine izin verilmez",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "Erişim İlkesi en az 1 Okuma ve Yazma yetkisi gerektirir.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "Erişim İlkesi en az bir Okuma ve Yazma yetkisi gerektirir.",
+      "THEME_NAME_ALREADY_TAKEN": "Bu isim zaten kullanılıyor",
+      "THEME_NAME_EMPTY": "İsim boş bırakılamaz",
+      "BUMPER_UPLOAD_ERROR": "Medyayı yüklerken bir hata oluştu",
+      "BUMPER_REQUIRED": "Bir tampon yüklemeniz gerekir",
+      "TRAILER_UPLOAD_ERROR": "Medya yüklerken hata oluştu",
+      "TITLE_UPLOAD_ERROR": "Medyayı yüklerken bir hata oluştu",
+      "LICENSE_UPLOAD_ERROR": "Medyayı yüklerken bir hata oluştu",
+      "WATERMARK_UPLOAD_ERROR": "Medyayı yüklerken bir hata oluştu",
+      "WATERMARK_REQUIRED": "Filigran yüklemeniz gerekir",
+      "THEME_UPLOAD_STARTED": "Medya şuanda yüklenmekte…",
+      "THEME_CREATED": "Tema oluşturuldu",
+      "THEME_NOT_CREATED": "Tema oluşturulamadı",
+      "THEME_DELETED": "Tema silindi",
+      "THEME_NOT_DELETED": "Tema silinemedi",
+      "TASK_CREATED": "Görev oluşturuldu",
+      "TASK_NOT_CREATED": "Görev oluşturulamadı",
+      "VIDEO_CUT_NOT_SAVED": "Değişiklikler kaydedilemedi",
+      "VIDEO_CUT_SAVED": "Değişiklikler kaydedildi",
+      "VIDEO_CUT_PROCESSING": "Video işeniyor…",
+      "THUMBNAIL_CHANGE_FAILED": "Küçük resim değiştirilemedi.",
+      "VIDEO_SOURCE_TRACKS_INVALID": "İşlenecek video kaydı seçmediniz",
+      "VIDEO_TOO_MANY_AUDIOS": "Tek bir video akışında birden fazla ses akışına sahip olamazsınız",
+      "SERVER_UNRESPONSIVE": "Hop! Sunucu yanıt vermiyor. Lütfen daha sonra tekrar deneyin.",
+      "SERVICE_UNAVAILABLE": "Hop! Sunucu yanıt vermiyor. Lütfen daha sonra tekrar deneyin.",
+      "ACTIVE_TRANSACTION": "Bu etkinlik iş akışında aktif bir işem olduğu sürece düzenlenemez.",
       "BULK_METADATA_UPDATE": {
          "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
          "ALL_EVENTS_UPDATED": "All events were successfully updated.",
          "NO_EVENTS_UPDATED": "All updates failed.",
          "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
-      }
+      },
+      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
+      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
    },
    "BULK_ACTIONS": {
-      "CAPTION": "Actions",
+      "CAPTION": "Hareketler",
       "DELETE": {
          "SERIES": {
-            "CAPTION": "Delete",
-            "BUTTON": "Delete",
-            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
+            "CAPTION": "Sil",
+            "BUTTON": "Sil",
+            "CANNOT_DELETE": "Bu seri, hala etkinlik içerdiğinden silinemez."
          },
          "EVENTS": {
-            "CAPTION": "Delete",
-            "DELETE_EVENTS": "Delete Events",
-            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
+            "CAPTION": "Sil",
+            "DELETE_EVENTS": "Olayları Sil",
+            "UNAUTHORIZED": "Vurgulanan etkinlikleri silme yetkiniz yok. Lütfen devam etmek için bu seçimleri kaldırın."
          }
       },
-      "DELETE_EVENTS_WARNING_LINE1": "Once deleted, all event metadata, audio and video files will be deleted and be unrecoverable.",
+      "DELETE_EVENTS_WARNING_LINE1": "Silindikten sonra, tüm etkinlik metaverisi, ses ve video dosyaları silinecek ve kurarılamaz olacaklar.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
+      "DELETE_SERIES_WARNING_LINE1": "Silindikten sonra, tüm metaveri serileri kurtarılamaz olacak. Serilerdeki etkinlikler silinmeyecek.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
-         "CAPTION": "Start Task",
+         "CAPTION": "Başlangıç Görevi",
          "GENERAL": {
-            "CAPTION": "General",
-            "SUMMARY": "({{ count }} events selected)",
-            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
+            "CAPTION": "Genel",
+            "SUMMARY": "({{ count }} etkinlik seçildi)",
+            "CANNOTSTART": "Altı çizlen etkinlik(ler) şu anda işlenemiyor. Seçimi kaldırın veya tekrar deneyin."
          },
          "TASKS": {
-            "CAPTION": "Tasks",
-            "SELECT": "Select Task"
+            "CAPTION": "Görevler",
+            "SELECT": "Görev Seç"
          },
          "SUMMARY": {
-            "CAPTION": "Summary",
-            "EVENTS": "Events",
-            "EVENTS_SUMMARY": "You have selected {{numberOfEvents}} events",
-            "CONFIGURATION": "Configuration",
-            "WORKFLOW": "Task"
+            "CAPTION": "Özet",
+            "EVENTS": "Etkinlikler",
+            "EVENTS_SUMMARY": "{{numberOfEvents}} etkinlik seçtiniz",
+            "CONFIGURATION": "Yapılandır",
+            "WORKFLOW": "Görev"
          }
       },
       "EDIT_EVENTS": {
-         "CAPTION": "Edit scheduled events",
-         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
+         "CAPTION": "Planlanan etkinlikleri düzenle",
+         "CONFLICT_CHECK_RUNNING": "Çakışma kontrolü çalışıyor…",
          "GENERAL": {
-            "CAPTION": "General",
-            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
-            "NOCHANGES": "No changes to the events detected!",
-            "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict",
-            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
+            "CAPTION": "Genel",
+            "CANNOTSTART": "Vurgulanan etkinlikler işlenemiyor, yalnızca planlanan etkinlikler destekleniyor.",
+            "NOCHANGES": "Saptanan olaylarda değişiklik bulunmadı!",
+            "CONFLICT_FIRST_EVENT": "Değiştirilen etkinlik",
+            "CONFLICT_SECOND_EVENT": "Çatışmada bulunan etkenlik",
+            "CANNOTEDITSCHEDULE": "Vurgulanan etkinlikler için zamanlama bilgilerini düzenleme izniniz yoktur. Devam edebilirsiniz, ancak hiçbir etkinliğin zamanlama bilgilerini düzenleyemezsiniz."
          },
          "METADATA": {
-            "EDIT": "Edit metadata"
+            "EDIT": "Meta verileri düzenle"
          },
          "SUMMARY": {
-            "CAPTION": "Summary",
-            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
-            "TYPE": "Type",
-            "PREVIOUS": "Old value",
-            "NEXT": "New value"
+            "CAPTION": "Özet",
+            "SINGLE_EVENT_CAPTION": "Etkinlik \"{{ title }}\"",
+            "TYPE": "Tip",
+            "PREVIOUS": "Eski değer",
+            "NEXT": "Yeni değer"
          },
          "EDIT": {
-            "CAPTION": "Edit",
-            "EVENT": "event",
-            "EVENTS": "events",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
-            "METADATA": "Metadata",
+            "CAPTION": "Düzenle",
+            "EVENT": "etkinlik",
+            "EVENTS": "etkinlikler",
+            "HEADER": "Bu sayfa, hafta içi gruplara göre düzenlenmiş etkinlikleri düzenlemenizi sağlar. Tüm zamanlanmış olayların belirli bir alan için aynı değere sahip olması durumunda giriş alanları önceden doldurulur. Aksi takdirde, giriş alanları boş bırakılır. Giriş alanlarını boş bırakmak, ilgili değerlerin değiştirilmemesi gerektiği anlamına gelir.",
+            "METADATA": "Üstveri",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       },
@@ -279,1036 +342,1094 @@
       }
    },
    "DATES": {
-      "TODAY": "Today",
-      "TOMORROW": "Tomorrow",
-      "YESTERDAY": "Yesterday",
-      "THIS_WEEK": "This week",
-      "THIS_MONTH": "This month",
-      "THIS_YEAR": "This year"
+      "TODAY": "Bugün",
+      "TOMORROW": "Yarın",
+      "YESTERDAY": "Dün",
+      "THIS_WEEK": "Bu hafta",
+      "THIS_MONTH": "Bu ay",
+      "THIS_YEAR": "Bu yıl"
    },
    "DATETIMES": {
-      "TODAY": "Today at {{ time }}",
-      "TOMORROW": "Tomorrow at {{ time }}",
-      "YESTERDAY": "Yesterday at {{ time }}"
+      "TODAY": "Bugün {{ time }}",
+      "TOMORROW": "Yarın {{ time }}",
+      "YESTERDAY": "Dün {{ time }}"
    },
    "WIZARD": {
-      "NEXT_STEP": "Next",
-      "BACK": "Previous",
-      "CREATE": "Create",
-      "DELETE": "Delete",
-      "UPDATE": "Update",
+      "NEXT_STEP": "İleri",
+      "BACK": "Önceki",
+      "CREATE": "Oluştur",
+      "DELETE": "Sil",
+      "UPDATE": "Güncelle",
       "DURATION": {
-         "HOURS": "Hours",
-         "MINUTES": "Minutes"
+         "HOURS": "Saat",
+         "MINUTES": "Dakika"
       }
    },
    "CAPTURE_AGENT": {
       "DEVICE": {
-         "MICROPHONE": "Microphone",
-         "CAMERA": "Camera",
-         "PRESENTATION": "Presentation"
+         "MICROPHONE": "Mikrofon",
+         "CAMERA": "Kamera",
+         "PRESENTATION": "Sunum"
       }
    },
    "NAV": {
       "DASHBOARD": {
-         "TITLE": "Dashboard"
+         "TITLE": "Yönetim Paneli"
       },
       "EVENTS": {
-         "TITLE": "Recordings"
+         "TITLE": "Kayıtlar"
       },
       "SYSTEMS": {
-         "TITLE": "Systems"
+         "TITLE": "Sistemler"
       },
       "CAPTUREAGENTS": {
-         "TITLE": "Capture"
+         "TITLE": "Yakala"
       },
       "USERS": {
-         "TITLE": "Organization"
+         "TITLE": "Organizasyon"
       },
       "INTEGRATIONS": {
-         "TITLE": "Integrations"
+         "TITLE": "Entegrasyon"
       },
       "CONFIGURATION": {
-         "TITLE": "Configuration"
+         "TITLE": "Yapılandırma"
       },
       "STATISTICS": {
-         "TITLE": "Statistics"
+         "TITLE": "İstatistikler"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Registration",
+         "SKIP": "Not now",
+         "CONTINUE": "Continue",
+         "BACK": "Back",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Terms of Service and Privacy Policy"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Thank you for using Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Organisation",
+            "DEPARTMENT": "Department",
+            "COUNTRY": "Country",
+            "POSTAL_CODE": "Postal code",
+            "CITY": "City",
+            "CONTACT_INFO": "Contact information",
+            "GENDER": "Gender",
+            "GENDER_MALE": "male",
+            "GENDER_FEMALE": "female",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name",
+            "STREET": "Street",
+            "NUMBER": "Number",
+            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "MAIL": "Email",
+            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
+            "POLICY_HEADLINE": "Privacy policy and terms of use",
+            "USAGE_STATISTICS": "Usage statistcs",
+            "ERROR_REPORTS": "Error reports",
+            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
+            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Maybe next time!",
+            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Thank you for your registration!",
+            "TEXT_LEADING_TO_PATH": "You can change your data at ",
+            "TEXT_LEADING_AFTER_PATH": "at any time."
+         },
+         "ERROR": {
+            "HEADER": "Error",
+            "TEXT": "An error occurred while processing your request."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Are you sure you want to delete your registration data?"
+         }
       }
    },
    "EVENTS": {
       "LICENSE": {
-         "ALLRIGHTS": "All rights reserved",
-         "CCBY": "CC BY",
-         "CCBYSA": "CC BY-SA",
-         "CCBYND": "CC BY-ND",
-         "CCBYNC": "CC BY-NC",
-         "CCBYNCSA": "CC BY-NC-SA",
-         "CCBYNCND": "CC BY-NC-ND",
-         "CC0": "CC0",
+         "ALLRIGHTS": "Tüm Hakları Saklıdır",
+         "CCBY": "CC Tarafından",
+         "CCBYSA": "SA Tarafından CC",
+         "CCBYND": "ND Tarafından CC",
+         "CCBYNC": "NC Tarafından CC",
+         "CCBYNCSA": "NC-SA Tarafından CC",
+         "CCBYNCND": "NC-ND Tarafından CC",
+         "CC0": "CCO",
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
       },
       "EVENTS": {
          "NEW": {
-            "CAPTION": "Create event",
+            "CAPTION": "Etkinlik oluştur",
             "METADATA": {
-               "CAPTION": "Metadata"
+               "CAPTION": "Üstveri"
             },
             "METADATA_EXTENDED": {
-               "CAPTION": "Extended metadata",
+               "CAPTION": "Genişletilmiş üstveriler",
                "DESCRIPTION": "",
                "METADATA": {
-                  "TITLE": "Extended metadata"
+                  "TITLE": "Genişletilmiş üstveriler"
                }
             },
             "SOURCE": {
-               "CAPTION": "Source",
-               "SELECT_SOURCE": "Select source",
+               "CAPTION": "Kaynak",
+               "SELECT_SOURCE": "Kaynak seçin",
                "PLACEHOLDER": {
-                  "LOCATION": "Location",
-                  "INPUTS": "Inputs",
-                  "HOUR": "Hour",
-                  "MINUTE": "Minute",
-                  "REPEATS": "Repeats",
-                  "START_DATE": "yyyy-mm-dd",
-                  "START_DATE_FORMAT": "yyyy-mm-dd",
-                  "END_DATE": "yyyy-mm-dd",
-                  "END_DATE_FORMAT": "yyyy-mm-dd"
+                  "LOCATION": "Konum",
+                  "INPUTS": "Girişler",
+                  "HOUR": "Saat",
+                  "MINUTE": "Dakika",
+                  "REPEATS": "Tekrarlar",
+                  "START_DATE": "yyyy--aa-gg",
+                  "START_DATE_FORMAT": "yyyy-aa-gg",
+                  "END_DATE": "yyyy-aa-gg",
+                  "END_DATE_FORMAT": "yyyy-aa-gg"
                },
                "UPLOAD": {
-                  "CAPTION": "Upload",
-                  "RECORDING_ELEMENTS": "Recording elements",
-                  "RECORDING_METADATA": "Recording metadata",
+                  "CAPTION": "Yükle",
+                  "RECORDING_ELEMENTS": "Ögeler kaydediliyor",
+                  "RECORDING_METADATA": "Metaveri kaydediliyor",
                   "SEGMENTABLE": {
-                     "SHORT": "Slides",
-                     "DETAIL": "The file contains a recording of a slide presentation (Keynote, Powerpoint, etc)."
+                     "SHORT": "Slaytlar",
+                     "DETAIL": "Dosya bir slayt sunumunun kaydını içeriyor (Keynote, Powerpoint vb.)."
                   },
                   "NON_SEGMENTABLE": {
-                     "SHORT": "Presenter",
-                     "DETAIL": "The file contains a recording of a person speaking to an audience."
+                     "SHORT": "Hediye Eden",
+                     "DETAIL": "Bu dosya bir kişinin kitleye konuşmasının kaydını içermekte."
                   },
                   "AUDIO_ONLY": {
-                     "SHORT": "Audio only",
-                     "DETAIL": "The file contains only audio."
+                     "SHORT": "Sadece ses",
+                     "DETAIL": "Dosyada sadece ses var."
                   },
                   "MULTIPLE_PARTS": {
-                     "SHORT": "Multiple parts",
-                     "DETAIL": "A set of files containing different parts of the event."
+                     "SHORT": "Birden fazla bölüm",
+                     "DETAIL": "Etkinliğin farklı bölümleriini içeren bir dosya seti."
                   }
                },
                "DATE_TIME": {
-                  "CAPTION": "Schedule",
-                  "START_DATE": "Start date",
-                  "START_TIME": "Start time",
-                  "TIMEZONE": "Time zone",
-                  "END_DATE": "End date",
-                  "END_TIME": "End time",
-                  "DURATION": "Duration"
+                  "CAPTION": "Zamanlama",
+                  "START_DATE": "Başlangıç tarihi",
+                  "START_TIME": "Başlangıç zamanı",
+                  "TIMEZONE": "Zaman dilimi",
+                  "END_DATE": "Bitiş tarihi",
+                  "END_TIME": "Bitiş Zamanı",
+                  "DURATION": "Süre"
                },
                "SCHEDULE_SINGLE": {
-                  "CAPTION": "Schedule single event"
+                  "CAPTION": "Tek etkinlik zamanla"
                },
                "SCHEDULE_MULTIPLE": {
-                  "CAPTION": "Schedule multiple events",
-                  "REPEATS": "Repeats",
-                  "REPEAT_ON": "Repeat on",
-                  "WEEKDAYS": "Weekdays",
-                  "WEEKDAY": "Weekday"
+                  "CAPTION": "Çoklu etkinlik zamanla",
+                  "REPEATS": "Tekrarlar",
+                  "REPEAT_ON": "Tekrarlama açık",
+                  "WEEKDAYS": "Hafta içi",
+                  "WEEKDAY": "Hafta içi günü"
                },
-               "NO_SOURCE_AVAILABLE": "No capture agents available for scheduling"
+               "NO_SOURCE_AVAILABLE": "Zamanlama için kullanılabilecek yakalama aracı yok"
             },
             "PROCESSING": {
-               "CAPTION": "Processing",
-               "SELECT_WORKFLOW": "Select workflow",
-               "SELECT_WORKFLOW_EMPTY": "No workflow found",
-               "WORKFLOW": "Workflow"
+               "CAPTION": "İşleniyor",
+               "SELECT_WORKFLOW": "İş akışı seçin",
+               "SELECT_WORKFLOW_EMPTY": "İş akışı bulunamadı",
+               "WORKFLOW": "İş Akışı"
             },
             "UPLOAD_ASSET": {
-               "CAPTION": "Asset Upload",
-               "SELECT_TYPE": "Select asset type",
-               "ADD": "Add Asset",
-               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
+               "CAPTION": "Kıymet Yükle",
+               "SELECT_TYPE": "Kıymet türü seç",
+               "ADD": "Varlık Ekle",
+               "NO_OPTIONS": "Web sayfasının bu bölümüne varlık seçeneklerinin bir listesi verilmemiştir!",
                "OPTION": {
-                  "CLASS_HANDOUT_NOTES": "Class handout notes",
-                  "CAPTIONS_DFXP": "Captions DFXP",
-                  "CAPTIONS_WEBVTT": "Captions WebVTT",
-                  "PREVIEW_IMAGE": "Preview image",
-                  "SMIL": "Smil catalog",
-                  "TRACK_PARTS": "Track parts"
+                  "CLASS_HANDOUT_NOTES": "Sınıfta verilen ders kağatları hakkında notlar",
+                  "CAPTIONS_DFXP": "Altyazı DFXP",
+                  "CAPTIONS_WEBVTT": "Altyazı WebVTT",
+                  "PREVIEW_IMAGE": "Resim önizleme",
+                  "SMIL": "SMIL Katalog",
+                  "TRACK_PARTS": "Kayıt parçası"
                }
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
-               "POLICY": "Access policy",
-               "ACL": "Access policy"
+               "CAPTION": "Erişim Politikası",
+               "POLICY": "Erişim Politikası",
+               "ACL": "Erişim İlkesi"
             },
             "SUMMARY": {
-               "CAPTION": "Summary",
+               "CAPTION": "Özet",
                "SOURCE": {
-                  "INPUT": "Input"
+                  "INPUT": "Girdi"
                }
             },
             "WEEKDAYS": {
-               "MO": "Mo",
-               "TU": "Tu",
-               "WE": "We",
-               "TH": "Th",
-               "FR": "Fr",
-               "SA": "Sa",
-               "SU": "Su"
+               "MO": "Pzt",
+               "TU": "Sal",
+               "WE": "Çar",
+               "TH": "Per",
+               "FR": "Cum",
+               "SA": "Cmt",
+               "SU": "Paz"
             },
             "WEEKDAYSLONG": {
-               "MO": "Monday",
-               "TU": "Tuesday",
-               "WE": "Wednesday",
-               "TH": "Thursday",
-               "FR": "Friday",
-               "SA": "Saturday",
-               "SU": "Sunday"
+               "MO": "Pazartesi",
+               "TU": "Salı",
+               "WE": "Çarşamba",
+               "TH": "Perşembe",
+               "FR": "Cuma",
+               "SA": "Cumartesi",
+               "SU": "Pazar"
             }
          },
          "NAVIGATION": {
-            "EVENTS": "Events",
-            "SERIES": "Series",
-            "OVERVIEW": "Overview"
+            "EVENTS": "Etkinlikler",
+            "SERIES": "Seri",
+            "OVERVIEW": "Önizleme"
          },
-         "UPLOAD": "Upload",
-         "ADD_SERIES": "Add series",
-         "ADD_EVENT": "Add event",
+         "UPLOAD": "Karşıya Yükle",
+         "ADD_SERIES": "Seri ekle",
+         "ADD_EVENT": "Etkinlik ekle",
          "TABLE": {
-            "CAPTION": "Events",
-            "TITLE": "Title",
-            "PRESENTERS": "Presenter(s)",
-            "SERIES": "Series",
-            "DATE": "Date",
-            "START": "Start",
-            "END": "End",
-            "STOP": "Stop",
-            "STATUS": "Status",
-            "LOCATION": "Location",
-            "ACTION": "Actions",
-            "FIRST": "First",
-            "LAST": "Last",
-            "NEXT": "Next",
-            "MANAGED_ACL": "Access policy",
-            "WORKFLOW_STATE": "Progress",
-            "PREVIOUS": "Previous",
-            "NOCONTENT": "No data available",
-            "PUBLISHED": "Published",
-            "WEEKDAY": "Weekday",
+            "CAPTION": "Etkinlikler",
+            "TITLE": "Başlık",
+            "PRESENTERS": "Sununlar",
+            "SERIES": "Seriler",
+            "DATE": "Tarih",
+            "START": "Başlat",
+            "END": "Son",
+            "STOP": "Durdur",
+            "STATUS": "Durum",
+            "LOCATION": "Konum",
+            "ACTION": "Eylemler",
+            "FIRST": "İlk",
+            "LAST": "Son",
+            "NEXT": "İleri",
+            "MANAGED_ACL": "Erişim İlkesi",
+            "WORKFLOW_STATE": "İlerleme Durumu",
+            "PREVIOUS": "Önceki",
+            "NOCONTENT": "Veri yok",
+            "PUBLISHED": "Yayınlandı",
+            "WEEKDAY": "Hafta içi günü",
             "TOOLTIP": {
-               "ASSETS": "Open asset details",
-               "START": "Filter for this start date",
-               "SERIES": "Filter for this series",
-               "STATUS": "Filter for this event status",
-               "LOCATION": "Filter for this location",
-               "DETAILS": "Open event details",
-               "DELETE": "Delete event",
-               "EDITOR": "Open video Editor",
-               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
-               "COMMENTS": "View comments",
-               "PAUSED_WORKFLOW": "View paused workflow",
-               "PRESENTER": "Filter for this presenter"
+               "ASSETS": "Detayları görüntüle",
+               "START": "Bu başlangıç tarihi için filtre",
+               "SERIES": "Bu dizi için filtre",
+               "STATUS": "Bu etkinlik durumu için filtre",
+               "LOCATION": "Yere göre filtrele",
+               "DETAILS": "Etkinlik detaylarını görüntüle",
+               "DELETE": "Etkinliği sil",
+               "EMBEDDING_CODE": "Embedding code",
+               "EDITOR": "Video editörünü aç",
+               "EDITOR_NEEDS_CUTTING": "Video Editörünü aç (videonun kesilmesini isteyen bir yorum var)",
+               "COMMENTS": "Yorumları görüntüle",
+               "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle",
+               "PRESENTER": "Bu sunucu için filtre"
             }
          },
          "STATUS": {
-            "SCHEDULED": "Scheduled",
-            "RECORDING": "Recording",
-            "UPLOADING": "Uploading",
-            "INGESTING": "Ingesting",
-            "PENDING": "Pending",
-            "PROCESSING": "Running",
-            "PAUSED": "Paused",
-            "PROCESSED": "Finished",
-            "RECORDING_FAILURE": "Recording failure",
-            "PROCESSING_FAILURE": "Processing failure",
-            "PROCESSING_CANCELED": "Processing canceled"
+            "SCHEDULED": "Zamanlandı",
+            "RECORDING": "Kaydediliyor",
+            "UPLOADING": "Yükleniyor",
+            "INGESTING": "Toplanıyor",
+            "PENDING": "Beklemede",
+            "PROCESSING": "Çalışıyor",
+            "PAUSED": "Duraklatıldı",
+            "PROCESSED": "Tamamlandı",
+            "RECORDING_FAILURE": "Kayıt hatası",
+            "PROCESSING_FAILURE": "İşlem hatası",
+            "PROCESSING_CANCELED": "İşlem iptal edildi"
          },
          "STATE_MAPPING": {
-            "RETRACTING": "Retracting",
-            "DELETING": "Deleting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
-            "REPUBLISHING_METADATA": "Republishing metadata",
-            "UPDATING_PREVIEWS": "Updating previews"
+            "RETRACTING": "Geri çekilmekte",
+            "DELETING": "Siliniyor",
+            "DUPLICATING": "Kopyalanıyor",
+            "PUBLISHING": "Yayınlanıyor",
+            "IMPORTING": "İçeri aktarılıyor",
+            "REPUBLISHING_METADATA": "Meta veriler yeniden yayınlanıyor",
+            "UPDATING_PREVIEWS": "Önizlemeler güncelleniyor"
          },
          "DETAILS": {
-            "HEADER": "Event details - {{resourceId}}",
+            "HEADER": "Etkinlik detayları - {{resourceId}}",
             "TABS": {
-               "METADATA": "Metadata",
-               "EXTENDED-METADATA": "Metadata II",
-               "ASSETS": "Assets",
-               "PUBLICATIONS": "Publications",
-               "SCHEDULING": "Scheduling",
-               "WORKFLOWS": "Workflows",
-               "ACCESS": "Access policy",
-               "COMMENTS": "Comments",
-               "STATISTICS": "Statistics"
+               "METADATA": "Üstveri",
+               "EXTENDED-METADATA": "Üstveri II",
+               "ASSETS": "Varlıklar",
+               "PUBLICATIONS": "Yayınlar",
+               "SCHEDULING": "Zamanlanıyor",
+               "WORKFLOWS": "İş Akışları",
+               "ACCESS": "Erişim İlkesi",
+               "COMMENTS": "Yorumlar",
+               "STATISTICS": "İstatistikler"
             },
             "PUBLICATIONS": {
-               "CAPTION": "Publications",
-               "NO_PUBLICATIONS_AVAILABLE": "This event has not been published",
-               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
-               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
-               "CUSTOM": "Custom",
-               "ENGAGE": "Engage",
+               "CAPTION": "Yayınlar",
+               "NO_PUBLICATIONS_AVAILABLE": "Etkinliğin hiçbir yayını yok",
+               "PUBLICATION_DESCRIPTION": "Bu etkinlik aşağıdaki yayın kanallarına yayınlanmıştır:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Bu etkinlik su anda devam etmiyor",
+               "CUSTOM": "Özel",
+               "ENGAGE": "Katıl",
                "ENGAGE_LIVE": "Engage Live",
-               "EXTERNAL_API": "External API Publication",
+               "EXTERNAL_API": "Harici API Yayıni",
                "YOUTUBE": "Youtube",
                "OAIPMH": "OAI-PMH",
-               "SELECT_WORKFLOW": "Select workflow",
-               "SELECT_WORKFLOW_EMPTY": "No workflows available"
+               "SELECT_WORKFLOW": "İş akışı seçin",
+               "SELECT_WORKFLOW_EMPTY": "Kullanılabilir iş alanları yok"
             },
             "MEDIA": {
-               "TRIM_MEDIA": "Trim media",
-               "MEDIA": "Media",
-               "ID": "ID",
-               "TYPE": "Type",
-               "MIMETYPE": "Mimetype",
-               "URL": "URL",
-               "DETAILS": "Details"
+               "TRIM_MEDIA": "Medya döşe",
+               "MEDIA": "Medya",
+               "ID": "KİMLİK",
+               "TYPE": "Tip",
+               "MIMETYPE": "Mime Türleri",
+               "URL": "Bağlantı",
+               "DETAILS": "Ayrıntılar"
             },
             "ATTACHMENTS": {
-               "CAPTION": "Attachments",
-               "ID": "Id",
-               "TYPE": "Type",
-               "MIMETYPE": "Mimetype",
-               "TAGS": "Tags",
-               "LINK": "Link"
+               "CAPTION": "Ekler",
+               "ID": "Kimlik",
+               "TYPE": "Tip",
+               "MIMETYPE": "Mime türü",
+               "TAGS": "Etiketler",
+               "LINK": "Bağlantı Adresi"
             },
             "SOURCE": {
-               "CAPTION": "Source",
-               "SELECT_SOURCE": "Select source",
+               "CAPTION": "Kaynak",
+               "SELECT_SOURCE": "Kaynak seç",
                "PLACEHOLDER": {
-                  "LOCATION": "Location",
-                  "INPUTS": "Inputs",
-                  "HOUR": "Hour",
-                  "MINUTE": "Minute",
-                  "REPEATS": "Repeats",
-                  "START_DATE": "yyyy-mm-dd",
-                  "END_DATE": "yyyy-mm-dd"
+                  "LOCATION": "Konum",
+                  "INPUTS": "Girişler",
+                  "HOUR": "Saat",
+                  "MINUTE": "Dakika",
+                  "REPEATS": "Tekrarlar",
+                  "START_DATE": "yyyy-aa-gg",
+                  "END_DATE": "yyyy-aa-gg"
                },
                "UPLOAD": {
-                  "CAPTION": "Upload",
-                  "RECORDING_ELEMENTS": "Recording elements",
+                  "CAPTION": "Karşıya Yükle",
+                  "RECORDING_ELEMENTS": "Öğeler kaydediliyor",
                   "SEGMENTABLE": {
-                     "SHORT": "Slides",
-                     "DETAIL": "The file contains a recording of a slide presentation (Keynote, Powerpoint, etc)."
+                     "SHORT": "Slaytlar",
+                     "DETAIL": "Bu dosya bir slayt sunum kaydını içerir (Keynote, Powerpoint, vs.)."
                   },
                   "NON_SEGMENTABLE": {
-                     "SHORT": "Presenter",
-                     "DETAIL": "The file contains a recording of a person speaking to an audience."
+                     "SHORT": "Sunan",
+                     "DETAIL": "Bu sodya bir kişinin bir kitleye konuşma kaydını içerir."
                   },
                   "AUDIO_ONLY": {
-                     "SHORT": "Audio only",
-                     "DETAIL": "The file contains only audio."
+                     "SHORT": "Sadece ses",
+                     "DETAIL": "Bu dosya sadece ses içerir."
                   }
                },
                "DATE_TIME": {
-                  "CAPTION": "Schedule",
-                  "START_DATE": "Start date",
-                  "START_TIME": "Start time",
-                  "TIMEZONE": "Time zone",
-                  "END_DATE": "End date",
-                  "END_TIME": "End time",
-                  "DURATION": "Duration"
+                  "CAPTION": "Zamanlama",
+                  "START_DATE": "Başlangıç tarihi",
+                  "START_TIME": "Başlangıç zamanı",
+                  "TIMEZONE": "Zaman dilimi",
+                  "END_DATE": "Bitiş tarihi",
+                  "END_TIME": "Bitiş zamanı",
+                  "DURATION": "Süre"
                },
                "SCHEDULE_SINGLE": {
-                  "CAPTION": "Schedule single event"
+                  "CAPTION": "Bir etkinlik zamanla"
                },
                "SCHEDULE_MULTIPLE": {
-                  "CAPTION": "Schedule multiple events",
-                  "REPEATS": "Repeats",
-                  "REPEAT_ON": "Repeat on",
-                  "WEEKDAYS": "Weekdays"
+                  "CAPTION": "Birkaç etkinlik zamanla",
+                  "REPEATS": "Tekrarlar",
+                  "REPEAT_ON": "Tekrarlama açık",
+                  "WEEKDAYS": "Hafta içi"
                }
             },
             "ASSETS": {
-               "CAPTION": "Assets",
-               "TYPE": "Type",
-               "SIZE": "Size",
-               "DETAILS": "Details",
-               "STREAMS": "Streams",
-               "PREVIEW": "Preview",
+               "CAPTION": "Varlıklar",
+               "TYPE": "Tür",
+               "SIZE": "Boyut",
+               "DETAILS": "Ayrıntılar",
+               "STREAMS": "Yayınlar",
+               "PREVIEW": "Önizleme",
                "ATTACHMENTS": {
-                  "TITLE": "Attachments",
-                  "CAPTION": "Attachments",
-                  "ID": "Id",
-                  "TYPE": "Type",
-                  "MIMETYPE": "Mimetype",
-                  "TAGS": "Tags",
-                  "LINK": "Link",
+                  "TITLE": "Ekli Dosyalar",
+                  "CAPTION": "Ekli Dosyalar",
+                  "ID": "Kimlik",
+                  "TYPE": "Tür",
+                  "MIMETYPE": "Mime Türü",
+                  "TAGS": "Etiketler",
+                  "LINK": "Bağlantı Adresi",
                   "DETAILS": {
-                     "TITLE": "Attachment details",
-                     "CAPTION": "Attachment details",
-                     "ID": "Id",
-                     "TYPE": "Type",
-                     "MIMETYPE": "Mimetype",
-                     "TAGS": "Tags",
-                     "URL": "URL",
-                     "SIZE": "Size",
-                     "CHECKSUM": "Checksum",
-                     "REFERENCE": "Reference"
+                     "TITLE": "Ek dosya ayrıntıları",
+                     "CAPTION": "Ek dosya ayrıntıları",
+                     "ID": "Kimlik",
+                     "TYPE": "Tür",
+                     "MIMETYPE": "Mime Türü",
+                     "TAGS": "Etiketler",
+                     "URL": "Bağlantı",
+                     "SIZE": "Boyut",
+                     "CHECKSUM": "Sağlama toplamı",
+                     "REFERENCE": "Referans"
                   }
                },
                "CATALOGS": {
-                  "TITLE": "Catalogs",
-                  "CAPTION": "Catalogs",
-                  "ID": "Id",
-                  "TYPE": "Type",
-                  "MIMETYPE": "Mimetype",
-                  "TAGS": "Tags",
-                  "LINK": "Link",
+                  "TITLE": "Kataloglar",
+                  "CAPTION": "Kataloglar",
+                  "ID": "Kimlik",
+                  "TYPE": "Tür",
+                  "MIMETYPE": "Mime Türü",
+                  "TAGS": "Etiketler",
+                  "LINK": "Bağlantı Adresi",
                   "DETAILS": {
-                     "TITLE": "Catalog details",
-                     "CAPTION": "Catalog details",
-                     "ID": "Id",
-                     "TYPE": "Type",
-                     "MIMETYPE": "Mimetype",
-                     "TAGS": "Tags",
-                     "URL": "URL",
-                     "SIZE": "Size",
-                     "CHECKSUM": "Checksum",
-                     "REFERENCE": "Reference"
+                     "TITLE": "Katalog Bilgileri",
+                     "CAPTION": "Katalog bilgileri",
+                     "ID": "Kimlik",
+                     "TYPE": "Tür",
+                     "MIMETYPE": "Mime Türü",
+                     "TAGS": "Etiketler",
+                     "URL": "Bağlantı Adresi",
+                     "SIZE": "Boyut",
+                     "CHECKSUM": "Sağlama toplamı",
+                     "REFERENCE": "Referans"
                   }
                },
                "MEDIA": {
-                  "TITLE": "Media",
-                  "CAPTION": "Media",
-                  "ID": "ID",
-                  "TYPE": "Type",
-                  "MIMETYPE": "Mimetype",
-                  "TAGS": "Tags",
-                  "LINK": "Link",
+                  "TITLE": "Ortam",
+                  "CAPTION": "Medya",
+                  "ID": "KİMLİK",
+                  "TYPE": "Tür",
+                  "MIMETYPE": "Mime Türü",
+                  "TAGS": "Etiketler",
+                  "LINK": "Bağlantı Adresi",
                   "DETAILS": {
-                     "TITLE": "Media details",
-                     "ID": "ID",
-                     "TYPE": "Type",
-                     "MIMETYPE": "Mimetype",
-                     "URL": "URL",
-                     "RECORDING_DATE": "Recording date",
-                     "FLAVOR": "Flavor",
-                     "TAGS": "Tags",
-                     "DURATION": "Duration",
-                     "STREAM_AUDIO": "Audio streams",
-                     "STREAM_VIDEO": "Video streams",
-                     "CHANNELS": "Channels",
-                     "BITRATE": "Bit rate",
-                     "BITDEPTH": "Bit depth",
-                     "SAMPLINGRATE": "Sample rate",
-                     "FRAMECOUNT": "Frame count",
-                     "PEAKLEVELDB": "Peak level (dB)",
-                     "RMSLEVELDB": "RMS level (dB)",
-                     "RMSPEAKDB": "RMS peak (dB)",
-                     "FRAMERATE": "Frame rate",
-                     "RESOLUTION": "Resolution",
-                     "SIZE": "Size",
-                     "SCANTYPE": "Scan type",
-                     "SCANORDER": "Scan order"
+                     "TITLE": "Medya bilgileri",
+                     "ID": "KİMLİK",
+                     "TYPE": "Tür",
+                     "MIMETYPE": "Mime Türü",
+                     "URL": "Bağlantı Adresi",
+                     "RECORDING_DATE": "Kayıt tarihi",
+                     "FLAVOR": "Aroma",
+                     "TAGS": "Etiketler",
+                     "DURATION": "Süre",
+                     "STREAM_AUDIO": "Ses akışı",
+                     "STREAM_VIDEO": "Video akışı",
+                     "CHANNELS": "Kanallar",
+                     "BITRATE": "Bit hızı",
+                     "BITDEPTH": "Bit derinliği",
+                     "SAMPLINGRATE": "Örnek hız",
+                     "FRAMECOUNT": "Kare sayısı",
+                     "PEAKLEVELDB": "En yüksek seviye (dB)",
+                     "RMSLEVELDB": "RMS seviyesi (dB)",
+                     "RMSPEAKDB": "RMS seviyesi (dB)",
+                     "FRAMERATE": "Kare hızı",
+                     "RESOLUTION": "Çözünürlük",
+                     "SIZE": "Boyut",
+                     "SCANTYPE": "Tarama türü",
+                     "SCANORDER": "Siparişi gözden geçir"
                   }
                },
                "PUBLICATIONS": {
-                  "TITLE": "Publications",
-                  "CAPTION": "Publications",
-                  "CHANNEL": "Channel",
-                  "ID": "Id",
-                  "TYPE": "Type",
-                  "MIMETYPE": "Mimetype",
-                  "TAGS": "Tags",
-                  "LINK": "Link",
+                  "TITLE": "Yayınlar",
+                  "CAPTION": "Yayınlar",
+                  "CHANNEL": "Kanal",
+                  "ID": "Kimlik",
+                  "TYPE": "Tür",
+                  "MIMETYPE": "Mime Türü",
+                  "TAGS": "Etiketler",
+                  "LINK": "Bağlantı Adresi",
                   "DETAILS": {
-                     "TITLE": "Publication details",
-                     "CAPTION": "Publication details",
-                     "ID": "Id",
-                     "TYPE": "Type",
-                     "MIMETYPE": "Mimetype",
-                     "TAGS": "Tags",
-                     "URL": "URL",
-                     "SIZE": "Size",
-                     "CHANNEL": "Channel",
-                     "REFERENCE": "Reference"
+                     "TITLE": "Yayın detayları",
+                     "CAPTION": "Yayın detayları",
+                     "ID": "Kimlik",
+                     "TYPE": "Tür",
+                     "MIMETYPE": "Mime Türü",
+                     "TAGS": "Etiketler",
+                     "URL": "Bağlantı Adresi",
+                     "SIZE": "Boyut",
+                     "CHANNEL": "Kanal",
+                     "REFERENCE": "Referans"
                   }
                }
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
+               "CAPTION": "Erişim İlkesi",
                "DESCRIPTION": "",
                "TEMPLATES": {
-                  "TITLE": "Templates"
+                  "TITLE": "Şablonlar"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Access policy",
+                  "TITLE": "Erişim İlkesi",
                   "DESCRIPTION": "",
-                  "LABEL": "Select a template",
-                  "EMPTY": "No template found",
-                  "ROLE": "Role",
-                  "WRITE": "Write",
-                  "READ": "Read",
-                  "ADDITIONAL_ACTIONS": "Additional Actions",
-                  "ACTION": "Actions",
-                  "NEW": "New policy",
-                  "DETAILS": "Details"
+                  "LABEL": "Bir şablon seç",
+                  "EMPTY": "Şablon bulunamadı",
+                  "ROLE": "Rol",
+                  "WRITE": "Yaz",
+                  "READ": "Oku",
+                  "ADDITIONAL_ACTIONS": "Ek Eylemler",
+                  "ACTION": "Eylemler",
+                  "NEW": "Yeni sözleşme",
+                  "DETAILS": "Ayrıntılar"
                },
                "ROLES": {
-                  "LABEL": "Select a role",
-                  "EMPTY": "No role found"
+                  "LABEL": "Bir rol seç",
+                  "EMPTY": "Rol bulunamadı"
                }
             },
             "COMMENTS": {
-               "CAPTION": "Comments",
-               "PLACEHOLDER": "Comment…",
-               "SELECTPLACEHOLDER": "Select reasons",
-               "RESOLVED": "Resolved",
-               "REPLY": "Reply",
-               "REPLY_TO": "Reply to",
-               "CANCEL_REPLY": "Cancel",
-               "DELETE": "Delete",
-               "REASON": "Reason",
+               "CAPTION": "Yorumlar",
+               "PLACEHOLDER": "Yorum…",
+               "SELECTPLACEHOLDER": "Sebep seç",
+               "RESOLVED": "Çözüldü",
+               "REPLY": "Yanıtla",
+               "REPLY_TO": "Yanıtla",
+               "CANCEL_REPLY": "İptal et",
+               "DELETE": "Sil",
+               "REASON": "Sebep",
                "REASONS": {
-                  "CUTTING": "Cutting required",
-                  "REVIEW": "Review required",
-                  "ASYNC": "A/V tracks asynchronous",
-                  "AUDIO_ISSUE": "Missing or defective audio track",
-                  "CANCELED": "Canceled event",
-                  "CONFLICTING_METADATA": "Conflicting metadata",
-                  "IMPROPER_POINT": "Improper in or out point",
-                  "MISSING_AGREEMENT": "Missing agreement",
-                  "OTHER": "Other",
-                  "PRIVACY": "Privacy concern",
-                  "SEGMENTATION": "Inaccurate segmentation",
-                  "UNKNOWN_CREATOR": "Creator unknown",
-                  "VIDEO_ISSUE": "Video distorted or cropped",
-                  "WRONG_INPUT_FORMAT": "Input file format not supported",
-                  "WRONG_METADATA": "Metadata needs correction",
-                  "WRONG_SERIES_PUBLICATION": "Wrong series or publication channel",
-                  "WRONG_WORKFLOW": "Wrong workflow",
-                  "PROCESSING_FAILURE": "Processing failure"
+                  "CUTTING": "Kesme gerekli",
+                  "REVIEW": "İnceleme gerekli",
+                  "ASYNC": "A / V parçaları eşzamansız",
+                  "AUDIO_ISSUE": "Eksik ya da bozuk ses parçası",
+                  "CANCELED": "Etkinlik iptal edildi",
+                  "CONFLICTING_METADATA": "Çakışan metaveri",
+                  "IMPROPER_POINT": "Hatalı giriş ve çıkış noktası",
+                  "MISSING_AGREEMENT": "Anlaşma eksik",
+                  "OTHER": "Diğer",
+                  "PRIVACY": "Gizlilik endişeleri",
+                  "SEGMENTATION": "Yanlış segmentasyon",
+                  "UNKNOWN_CREATOR": "Oluşturan bilinmiyor",
+                  "VIDEO_ISSUE": "Bozuk veya kırpılmış video",
+                  "WRONG_INPUT_FORMAT": "Girilen dosya formatı desteklenmiyor",
+                  "WRONG_METADATA": "Metaveri'nin düzeltilmeye ihtiyacı var",
+                  "WRONG_SERIES_PUBLICATION": "Yanlış seri veya yanlış yayın kanalı",
+                  "WRONG_WORKFLOW": "Yanlıs iş akışı",
+                  "PROCESSING_FAILURE": "İşem hatası"
                }
             },
             "STATISTICS": {
-               "CAPTION": "Statistics"
+               "CAPTION": "İstatistikler"
             },
             "METADATA": {
-               "CAPTION": "Event details",
-               "TITLE": "Title",
-               "ID": "UID",
-               "SERIES": "Series",
-               "RECORDING_DATE": "Recording date",
-               "SUBJECT": "Subject",
-               "DESCRIPTION": "Description",
-               "START_DATE": "Start date",
-               "START_TIME": "Start time",
-               "DURATION": "Duration",
-               "LOCATION": "Location",
-               "SOURCE": "Source",
-               "CREATED": "Created",
-               "CREATED_BY": "Created by",
-               "PUBLISHER": "Publisher",
-               "LICENSE": "License",
-               "CONTRIBUTORS": "Contributor(s)",
-               "RIGHTS": "Rights",
-               "PRESENTERS": "Presenter(s)",
-               "LANGUAGE": "Language",
-               "COPYRIGHT": "Copyright",
-               "VISIBILITY": "Visibility",
-               "PUBLIC": "Public target",
-               "OS": "Processing operating system",
+               "CAPTION": "Etkinlik ayrıntıları",
+               "TITLE": "Başlık",
+               "ID": "Kullanıcı Kimliği",
+               "SERIES": "Diziler",
+               "RECORDING_DATE": "Kayıt tarihi",
+               "SUBJECT": "Konu",
+               "DESCRIPTION": "Açıklama",
+               "START_DATE": "Başlangıç tarihi",
+               "START_TIME": "Başlangıç zamanı",
+               "DURATION": "Süre",
+               "LOCATION": "Konum",
+               "SOURCE": "Kaynak",
+               "CREATED": "Oluşturuldu",
+               "CREATED_BY": "Oluşturan kişi",
+               "PUBLISHER": "Yayıncı",
+               "LICENSE": "Sürüm",
+               "CONTRIBUTORS": "Katkı Sağlayan(lar)",
+               "RIGHTS": "Haklar",
+               "PRESENTERS": "Sunan(lar)",
+               "LANGUAGE": "Dil",
+               "COPYRIGHT": "Telif Hakkı",
+               "VISIBILITY": "Görünürlük",
+               "PUBLIC": "Genel hedef",
+               "OS": "İşleyen işletim sistemi",
                "LOCKED": {
-                  "RUNNING": "Editing metadata is not allowed when operations are running on an event"
+                  "RUNNING": "İşlemler bir etkinlik üzerinde çalışırken düzenleme meta verisine izin verilmez"
                }
             },
             "SCHEDULING": {
-               "CAPTION": "Scheduling configuration",
+               "CAPTION": "Participation status",
                "PLACEHOLDER": {
-                  "PRESENTERS": "Presenter(s)"
+                  "PRESENTERS": "Sunun(lar)"
                }
             },
             "WORKFLOWS": {
-               "ACTIONS": "Actions",
-               "DETAILS": "Details",
-               "DESCRIPTION": "Description",
-               "MORE_INFO": "More Information",
-               "ID": "ID",
-               "TYPE": "Type",
-               "TITLE": "Title",
-               "STATUS": "Status",
-               "STARTED": "Started",
-               "SERIES": "Series",
-               "SUBMITTED": "Submitted",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
-               "WDID": "Workflow definition",
-               "MIMETYPE": "Mimetype",
-               "URL": "URL",
-               "CONFIGURATION": "Configuration",
-               "NO_CONFIGURATION": "No existing configuration parameters for the selected workflow definition.",
-               "WORKFLOW": "Workflow",
+               "ACTIONS": "Hareketler",
+               "DETAILS": "Ayrıntılar",
+               "DESCRIPTION": "Açıklama",
+               "MORE_INFO": "Daha Fazla Bilgi",
+               "ID": "KİMLİK",
+               "TYPE": "Tür",
+               "TITLE": "Başlık",
+               "STATUS": "Durum",
+               "STARTED": "Başlatıldı",
+               "SERIES": "Diziler",
+               "SUBMITTED": "Gönderildi",
+               "SUBMITTER": "Gönderen",
+               "EXECUTION_TIME": "Yürütme süresi",
+               "WDID": "İş akışı tanımı",
+               "MIMETYPE": "Mime Türü",
+               "URL": "Bağlantı Adresi",
+               "CONFIGURATION": "Yapılandır",
+               "NO_CONFIGURATION": "Seçilen iş akışı tanımı için mevcut yapılandırma parametreleri yok.",
+               "WORKFLOW": "İş akışı",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "İş akışını durdur",
+                  "ABORT": "Bu iş akışı yürütümünü iptal et (başarısız işlemi yeniden deneme)",
+                  "RETRY": "Bu iş akışı yürütümünü yeniden dene",
+                  "DELETE": "İş akışını sil",
+                  "DETAILS": "İş akışı ayrıntılarını aç"
                },
                "OPERATION_STATUS": {
-                  "INSTANTIATED": "Instantiated",
-                  "RUNNING": "Running",
-                  "PAUSED": "Paused",
-                  "SUCCEEDED": "Succeeded",
-                  "FAILED": "Failed",
-                  "FAILING": "Failing",
-                  "SKIPPED": "Skipped",
-                  "STOPPED": "Stopped",
-                  "RETRY": "Retry"
+                  "INSTANTIATED": "İlklendirildi",
+                  "RUNNING": "Çalışıyor",
+                  "PAUSED": "Duraklatıldı",
+                  "SUCCEEDED": "Başarılı oldu",
+                  "FAILED": "Başarısız",
+                  "FAILING": "Arızalı",
+                  "SKIPPED": "Atlandı",
+                  "STOPPED": "Durduruldu",
+                  "RETRY": "Yeniden Dene"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Workflows"
+               "TITLE": "İş Akışları"
             },
             "WORKFLOW_DETAILS": {
-               "TITLE": "Workflow details",
-               "CONFIGURATION": "Workflow configuration"
+               "TITLE": "İş akışı detayları",
+               "CONFIGURATION": "İş akışı yapılandırılması"
             },
             "WORKFLOW_OPERATIONS": {
-               "TITLE": "Workflow operations",
-               "DETAILS_LINK": "Operations",
+               "TITLE": "İş akışı operasyonları",
+               "DETAILS_LINK": "İşlemler",
                "TABLE_HEADERS": {
-                  "TITLE": "Title",
-                  "STATUS": "Status",
-                  "DESCRIPTION": "Description"
+                  "TITLE": "Başlık",
+                  "STATUS": "Durum",
+                  "DESCRIPTION": "Açıklama"
                }
             },
             "OPERATION_DETAILS": {
-               "TITLE": "Operation details",
+               "TITLE": "Operasyon detayları",
                "TABLE_HEADERS": {
-                  "TITLE": "Title",
-                  "STATE": "State",
-                  "DESCRIPTION": "Description",
-                  "EXECUTION_HOST": "Execution Host",
-                  "JOB": "Job",
-                  "TIME_IN_QUEUE": "Time in Queue",
-                  "STARTED": "Started",
-                  "FINISHED": "Finished",
-                  "RETRY_STRATEGY": "Retry Strategy",
-                  "FAILED_ATTEMPTS": "Failed Attempts",
-                  "MAX_ATTEMPTS": "Max",
-                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
-                  "FAIL_ON_ERROR": "Fail on Error"
+                  "TITLE": "Başlık",
+                  "STATE": "Ülke",
+                  "DESCRIPTION": "Açıklama",
+                  "EXECUTION_HOST": "Yürütme Ana Bilgisayarı",
+                  "JOB": "Görev",
+                  "TIME_IN_QUEUE": "Sirada Bekleme Süresi",
+                  "STARTED": "Başlatıldı",
+                  "FINISHED": "Tamamlandı",
+                  "RETRY_STRATEGY": "Yeniden Deneme Stratejisi",
+                  "FAILED_ATTEMPTS": "Hatalı Girişimler",
+                  "MAX_ATTEMPTS": "Maks",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Özel durum işleyicisi iş akışı",
+                  "FAIL_ON_ERROR": "Hata ile başarısız oldu"
                }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
-               "TITLE": "Workflow details"
+               "TITLE": "İş akışı detayları"
             },
             "MEDIA_DETAILS": {
-               "TITLE": "Media details",
-               "ID": "ID",
-               "TYPE": "Type",
-               "MIMETYPE": "Mimetype",
-               "URL": "URL",
-               "RECORDING_DATE": "Recording date",
-               "TAGS": "Tags",
-               "DURATION": "Duration",
-               "STREAM_AUDIO": "Audio streams",
-               "STREAM_VIDEO": "Video streams",
-               "CHANNELS": "Channels",
-               "BITRATE": "Bit rate",
-               "FRAMERATE": "Frame rate",
-               "RESOLUTION": "Resolution"
+               "TITLE": "Medya detayları",
+               "ID": "KİMLİK",
+               "TYPE": "Tür",
+               "MIMETYPE": "Mime Türü",
+               "URL": "Bağlantı Adresi",
+               "RECORDING_DATE": "Kayıt tarihi",
+               "TAGS": "Etiketler",
+               "DURATION": "Süre",
+               "STREAM_AUDIO": "Ses akışı",
+               "STREAM_VIDEO": "Video akışı",
+               "CHANNELS": "Kanallar",
+               "BITRATE": "Bit hızı",
+               "FRAMERATE": "Kare Hızı",
+               "RESOLUTION": "Çözünürlük"
             },
             "ERRORS_AND_WARNINGS": {
-               "HEADER": "Errors & warnings",
-               "TITLE": "Errors & warnings",
-               "DATE": "Date",
-               "HOST": "Host",
-               "TYPE": "Type",
-               "EMPTY": "No error",
+               "HEADER": "Hatalar & Uyarılar",
+               "TITLE": "Hatalar & Uyarılar",
+               "DATE": "Tarih",
+               "HOST": "Sunucu",
+               "TYPE": "Tür",
+               "EMPTY": "Hata yok",
                "DETAILS": {
-                  "HEADER": "Error details",
-                  "SEVERITY": "Severity",
-                  "TITLE": "Title",
-                  "DESCRIPTION": "Description",
-                  "JOB_ID": "Job ID",
-                  "DATE": "Date",
-                  "HOST": "Processing host",
-                  "TYPE": "Service type",
-                  "TECHNICAL_DETAILS": "Technical details"
+                  "HEADER": "Hata ayrıntıları",
+                  "SEVERITY": "Önem Derecesi",
+                  "TITLE": "Başlık",
+                  "DESCRIPTION": "Açıklama",
+                  "JOB_ID": "İş Kimliği",
+                  "DATE": "Tarih",
+                  "HOST": "Sunucu işletme",
+                  "TYPE": "Hizmet Türü",
+                  "TECHNICAL_DETAILS": "Teknik Ayrıntılar"
                }
             }
          }
       },
       "SERIES": {
          "NEW": {
-            "CAPTION": "Create series",
+            "CAPTION": "Seri oluştur",
             "METADATA": {
-               "CAPTION": "Metadata",
+               "CAPTION": "Meta Verisi",
                "DESCRIPTION": "",
                "METADATA": {
-                  "TITLE": "Metadata"
+                  "TITLE": "Meta verisi"
                }
             },
             "METADATA_EXTENDED": {
-               "CAPTION": "Extended metadata",
+               "CAPTION": "Genişletişmiş meta verisi",
                "METADATA": {
-                  "TITLE": "Extended metadata"
+                  "TITLE": "Genişletişmiş meta verisi"
                }
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
+               "CAPTION": "Erişim İlkesi",
                "TEMPLATES": {
-                  "TITLE": "Templates"
+                  "TITLE": "Şablonlar"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Access policy",
-                  "DESCRIPTION": "At least one role with Read and Write permissions is required.",
-                  "LABEL": "Select a template",
-                  "EMPTY": "No template found",
-                  "ROLE": "Role",
-                  "WRITE": "Write",
-                  "READ": "Read",
-                  "ADDITIONAL_ACTIONS": "Additional Actions",
-                  "ACTION": "Actions",
-                  "NEW": "New policy",
-                  "DETAILS": "Details"
+                  "TITLE": "Erişim İlkesi",
+                  "DESCRIPTION": "En az bir rolün Okuma ve Yazma izinlerine sahip olması gereklidir.",
+                  "LABEL": "Bir şablon seç",
+                  "EMPTY": "Şablon bulunamadı",
+                  "ROLE": "Rol",
+                  "WRITE": "Yaz",
+                  "READ": "Oku",
+                  "ADDITIONAL_ACTIONS": "Ek Seçenekler",
+                  "ACTION": "Eylemler",
+                  "NEW": "Yeni sözleşme",
+                  "DETAILS": "Ayrıntılar"
                },
                "ROLES": {
-                  "LABEL": "Select a role",
-                  "EMPTY": "No role found"
+                  "LABEL": "Bir rol seç",
+                  "EMPTY": "Rol bulunamadı"
                }
             },
             "THEME": {
-               "CAPTION": "Theme",
+               "CAPTION": "Şablon",
                "DESCRIPTION": {
-                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+                  "TEXT": "Videolarınızı markalamak için temaları isteğe bağlı olarak kullanabilirsiniz. Temalar, tampon ve fragman videolarını, filigranları ve meta verileri içeren başlık slaytlarını tanımlayabilir."
                },
-               "TITLE": "Theme",
-               "LABEL": "Please select a theme",
-               "EMPTY": "No theme found"
+               "TITLE": "Şablon",
+               "LABEL": "Şablon yok",
+               "EMPTY": "Şablon bulunamadı"
             },
             "SUMMARY": {
-               "CAPTION": "Summary"
+               "CAPTION": "Özet"
             }
          },
          "TABLE": {
-            "CAPTION": "Series",
-            "TITLE": "Series",
-            "HAS_EVENTS": "Contains events",
-            "ORGANIZERS": "Organizer(s)",
-            "CONTRIBUTORS": "Contributor(s)",
-            "CREATED": "Created",
-            "MANAGED_ACL": "Access policy",
-            "EVENTS": "Events",
-            "ACTION": "Actions",
+            "CAPTION": "Diziler",
+            "TITLE": "Diziler",
+            "HAS_EVENTS": "Etkinlikler içerir",
+            "ORGANIZERS": "Organizatör(ler)",
+            "CONTRIBUTORS": "Katkı Sağlayan(lar)",
+            "CREATED": "Oluşturuldu",
+            "MANAGED_ACL": "Erişim İlkesi",
+            "EVENTS": "Etkinlikler",
+            "ACTION": "Eylemler",
             "TOOLTIP": {
-               "SERIES": "Filter events for this series",
-               "DETAILS": "Open series details",
-               "DELETE": "Delete series"
+               "SERIES": "Bu seri için etkinlikleri filtrele",
+               "DETAILS": "Seri ayrıntılarını aç",
+               "DELETE": "Seriyi sil"
             }
          },
          "DETAILS": {
-            "HEADER": "Series details - {{resourceId}}",
+            "HEADER": "Seri ayrıntıları - {{resourceId}}",
             "TABS": {
-               "METADATA": "Metadata",
-               "EXTENDED_METADATA": "Metadata II",
-               "EVENTS": "Events",
-               "PERMISSIONS": "Access policy",
-               "THEME": "Theme",
-               "STATISTICS": "Statistics"
+               "METADATA": "Meta verisi",
+               "EXTENDED_METADATA": "Meta Verisi II",
+               "EVENTS": "Etkinlikler",
+               "PERMISSIONS": "Erişim ilkesi",
+               "THEME": "Tema",
+               "STATISTICS": "İstatistikler"
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
+               "CAPTION": "Erişim İlkesi",
                "DESCRIPTION": "",
                "TEMPLATES": {
-                  "TITLE": "Templates"
+                  "TITLE": "Şablonlar"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Access policy",
+                  "TITLE": "Erişim İlkesi",
                   "DESCRIPTION": "",
-                  "LABEL": "Select a template",
-                  "EMPTY": "No template found",
-                  "ROLE": "Role",
-                  "WRITE": "Write",
-                  "READ": "Read",
-                  "ADDITIONAL_ACTIONS": "Additional Actions",
-                  "ACTION": "Actions",
-                  "NEW": "New policy",
-                  "DETAILS": "Details",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
+                  "LABEL": "Tema seçin",
+                  "EMPTY": "Tema bulunamadı",
+                  "ROLE": "Rol",
+                  "WRITE": "Yaz",
+                  "READ": "Oku",
+                  "ADDITIONAL_ACTIONS": "Ek eylemler",
+                  "ACTION": "Eylemler",
+                  "NEW": "Yeni sözleşme",
+                  "DETAILS": "Ayrıntılar",
+                  "REPLACE_EVENT_ACLS": "Etkinlik izinlerini güncelle",
+                  "REPLACE_EVENT_ACLS_HINT": "Bu dizinin tüm etkinliklerinin geçerli izinlere sahip olduğundan emin olun",
                   "LOAD_MORE_LIMIT": "policies shown.",
                   "LOAD_MORE_LINK": "Load more"
                },
                "ROLES": {
-                  "LABEL": "Select a role",
-                  "EMPTY": "No role found"
+                  "LABEL": "Bir rol seç",
+                  "EMPTY": "Rol bulunamadı"
                }
             },
             "METADATA": {
-               "TITLE": "Title",
-               "ID": "UID",
-               "SERIES": "Series",
-               "PUBLISHERS": "Publisher(s)",
-               "ORGANIZERS": "Organizer(s)",
-               "CONTRIBUTORS": "Contributor(s)",
-               "RECORDING_DATE": "Recording date",
-               "CREATED_BY": "Created By",
-               "RIGHTS": "Rights",
-               "SUBJECT": "Subject",
-               "LANGUAGE": "Language",
-               "LICENSE": "License",
-               "DESCRIPTION": "Description"
+               "TITLE": "Başlık",
+               "ID": "Kullanıcı Kimliği",
+               "SERIES": "Diziler",
+               "PUBLISHERS": "Yayıncı(lar)",
+               "ORGANIZERS": "Organizatör(ler)",
+               "CONTRIBUTORS": "Katkı Sağlayan(lar)",
+               "RECORDING_DATE": "Kayıt tarihi",
+               "CREATED_BY": "Oluşturan kişi",
+               "RIGHTS": "Haklar",
+               "SUBJECT": "Konu",
+               "LANGUAGE": "Dil",
+               "LICENSE": "Sürüm",
+               "DESCRIPTION": "Açıklama"
             },
             "EVENTS": {
-               "TITLE": "Title",
-               "PRESENTER": "Presenter(s)",
-               "CREATED": "Created",
-               "MODIFIED": "Modified",
-               "STATUS": "Status",
-               "LOCATION": "Location",
-               "LINK": "Link"
+               "TITLE": "Başlık",
+               "PRESENTER": "Sunun(lar)",
+               "CREATED": "Oluşturuldu",
+               "MODIFIED": "Düzenlendi",
+               "STATUS": "Durum",
+               "LOCATION": "Konum",
+               "LINK": "Bağlantı Adresi"
             }
          }
       }
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Locations"
+         "LOCATIONS": "Konumlar"
       },
       "ACTIONS": {
-         "EXPORT": "Export",
-         "REMOVE": "Remove"
+         "EXPORT": "Dışa Aktar",
+         "REMOVE": "Kaldır"
       },
       "RECORDINGS": {
          "TABLE": {
-            "CAPTION": "Locations",
-            "TITLE": "UID",
-            "NAME": "Name",
-            "LOCATION": "Location",
-            "UPDATED": "Last updated",
-            "NEXT_DATE": "Next event",
-            "NEXT_NAME": "Next event title",
-            "STATUS": "Status",
-            "VERSION": "Version",
-            "ACTION": "Actions",
+            "CAPTION": "Konumlar",
+            "TITLE": "Kullanıcı Kimliği",
+            "NAME": "İsim",
+            "LOCATION": "Konum",
+            "UPDATED": "Son güncelleme",
+            "NEXT_DATE": "Sonraki olay",
+            "NEXT_NAME": "Sonraki olay başlığı",
+            "STATUS": "Durum",
+            "VERSION": "Sürüm",
+            "ACTION": "Eylemler",
             "TOOLTIP": {
-               "NAME": "Filter events for this location",
-               "DETAILS": "Open location details",
-               "DELETE": "Delete location (unregister capture agent)"
+               "NAME": "Etkinlikleri bu lokasyona göre filtrele",
+               "DETAILS": "Lokasyon detaylarını aç",
+               "DELETE": "Lokasyonu sil (yakalama aracısı kaydını kaldır)"
             }
          },
          "DETAILS": {
-            "HEADER": "Location details - {{resourceId}}",
+            "HEADER": "Konum ayarları - {{resourceId}}",
             "TAB": {
-               "GENERAL": "General",
-               "CONFIGURATION": "Configuration",
-               "CAPABILITIES": "Capabilities"
+               "GENERAL": "Genel",
+               "CONFIGURATION": "Yapılandır",
+               "CAPABILITIES": "Yetenkler"
             },
             "GENERAL": {
-               "CAPTION": "General",
-               "NAME": "Name",
+               "CAPTION": "Genel",
+               "NAME": "İsim",
                "URL": "Url",
-               "STATUS": "Status",
-               "UPDATE": "Last heard from"
+               "STATUS": "Durum",
+               "UPDATE": "Son alınan haber"
             },
             "CONFIGURATION": {
-               "CAPTION": "Configuration",
-               "NO_CONFIGURATION": "No configuration provided"
+               "CAPTION": "Yapılandır",
+               "NO_CONFIGURATION": "Yapılandırma sağlanmadı"
             },
             "CAPABILITIES": {
-               "CAPTION": "Capabilities",
-               "NO_CAPABILITIES": "No capabilities provided"
+               "CAPTION": "Yetenekler",
+               "NO_CAPABILITIES": "Yetenekler sağlanmadı"
             }
          }
       }
    },
    "USERS": {
       "ACTIONS": {
-         "ADD_USER": "Add user",
-         "ADD_GROUP": "Add group",
-         "ADD_ACL": "Add access policy"
+         "ADD_USER": "Kullanıcı Ekle",
+         "ADD_GROUP": "Grup Ekle",
+         "ADD_ACL": "Erişim politikası ekle"
       },
       "NAVIGATION": {
-         "USERS": "Users",
-         "GROUPS": "Groups",
-         "PERMISSIONS": "Access policies"
+         "USERS": "Kullanıcılar",
+         "GROUPS": "Gruplar",
+         "PERMISSIONS": "Erişim Politikaları"
       },
       "USERS": {
          "TABLE": {
-            "CAPTION": "Users",
-            "NAME": "Name",
-            "USERNAME": "Username",
-            "EMAIL": "Email",
-            "ROLES": "Roles",
-            "TYPE": "Type",
-            "PROVIDER": "Provider",
-            "ACTION": "Actions",
+            "CAPTION": "Kullanıcılar",
+            "NAME": "İsim",
+            "USERNAME": "Kullanıcı Adı",
+            "EMAIL": "E-Posta",
+            "ROLES": "Roller",
+            "TYPE": "Tür",
+            "PROVIDER": "Sunucu",
+            "ACTION": "Eylemler",
             "TOOLTIP": {
-               "DELETE": "Delete user",
-               "DETAILS": "Open user details"
+               "DELETE": "Kullanıcıyı Sil",
+               "DETAILS": "Kullanıcı detaylarını aç"
             }
          },
          "DETAILS": {
-            "NEWCAPTION": "Create user",
-            "EDITCAPTION": "User details - {{username}}",
+            "NEWCAPTION": "Kullanıcı oluştur",
+            "EDITCAPTION": "Kullanıcı ayrıntıları - {{username}}",
             "TABS": {
-               "USER": "User",
-               "ROLES": "Roles",
-               "EXTERNALROLES": "External Roles",
-               "EFFECTIVEROLES": "Effective Roles"
+               "USER": "Kullanıcı",
+               "ROLES": "Roller",
+               "EXTERNALROLES": "Dış Roller",
+               "EFFECTIVEROLES": "Etkili Roller"
             },
             "DESCRIPTION": {
-               "ROLES": "Roles and groups that can be or are already assigned to the user.",
-               "EXTERNALROLES": "The list of external roles assigned to the user granted by the external role provider(s).",
-               "EFFECTIVEROLES": "The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
+               "ROLES": "Kullanıcıya önceden atanabilen veya atanmış roller ve gruplar.",
+               "EXTERNALROLES": "Dış rol sağlayıcısı(sağlayıcıları) tarafından kullanıcıya atanan dış rol listesi.",
+               "EFFECTIVEROLES": "Doğrudan kullanıcıya atanan etkili rollerin listesi ve dolaylı olarak grup üyeliği yoluyla atanan roller."
             },
             "FORM": {
-               "USERNAME": "Username",
-               "NAME": "Name",
+               "USERNAME": "Kullanıcı adı",
+               "NAME": "İsim",
                "EMAIL": "Email",
-               "PASSWORD": "Password",
-               "REPEAT_PASSWORD": "Repeat password"
+               "PASSWORD": "Şifre",
+               "REPEAT_PASSWORD": "Şifreyi tekrarla"
             },
             "ROLES": {
-               "LEFT": "Roles",
-               "RIGHT": "Selected roles",
-               "REMOVE": "Remove role",
-               "ADD": "Add role"
+               "LEFT": "Roller",
+               "RIGHT": "Seçilen roller",
+               "REMOVE": "Rolü sil",
+               "ADD": "Rol ekle"
             }
          }
       },
       "GROUPS": {
          "NEW": {
-            "CAPTION": "Create group"
+            "CAPTION": "Grup ekle"
          },
          "TABLE": {
-            "CAPTION": "Groups",
-            "NAME": "Name",
-            "DESCRIPTION": "Description",
-            "ROLE": "Role",
-            "ACTION": "Actions",
+            "CAPTION": "Gruplar",
+            "NAME": "İsim",
+            "DESCRIPTION": "Açıklama",
+            "ROLE": "Rol",
+            "ACTION": "Eylemler",
             "TOOLTIP": {
-               "DETAILS": "Open group details",
-               "DELETE": "Delete group"
+               "DETAILS": "Grup ayrıntılarını aç",
+               "DELETE": "Grubu sil"
             }
          },
          "DETAILS": {
-            "NEWCAPTION": "Create group",
-            "EDITCAPTION": "Group details - {{name}}",
+            "NEWCAPTION": "Grup oluştur",
+            "EDITCAPTION": "Grup ayrıntıları - {{name}}",
             "TABS": {
-               "GROUP": "Group",
-               "ROLES": "Roles",
-               "METADATA": "Metadata",
-               "USERS": "Users",
-               "SUMMARY": "Summary"
+               "GROUP": "Grup",
+               "ROLES": "Roller",
+               "METADATA": "Metaveri",
+               "USERS": "Kullanıcılar",
+               "SUMMARY": "Özet"
             },
             "FORM": {
-               "NAME": "Name",
-               "DESCRIPTION": "Description",
-               "SUMMARY": "Summary",
-               "ROLES": "Roles",
-               "USERS": "Users"
+               "NAME": "İsim",
+               "DESCRIPTION": "Açıklama",
+               "SUMMARY": "Özet",
+               "ROLES": "Roller",
+               "USERS": "Kullanıcılar"
             },
             "USERS": {
-               "LEFT": "Users",
-               "RIGHT": "Selected users",
-               "REMOVE": "Remove user",
-               "ADD": "Add user"
+               "LEFT": "Kullanıcılar",
+               "RIGHT": "Seçilen kullanıcılar",
+               "REMOVE": "Kullanıcı sil",
+               "ADD": "Kullanıcı ekle"
             },
             "ROLES": {
-               "LEFT": "Roles",
-               "RIGHT": "Selected roles",
-               "REMOVE": "Remove role",
-               "ADD": "Add role"
+               "LEFT": "Roller",
+               "RIGHT": "Seçilen doller",
+               "REMOVE": "Rolu seç",
+               "ADD": "Rol ekle"
             }
          }
       },
       "ACLS": {
          "TABLE": {
-            "CAPTION": "Access policies",
-            "NAME": "Name",
-            "CREATED": "Created",
-            "CREATOR": "Creator",
-            "IN_USE": "In use",
-            "ACTION": "Actions",
+            "CAPTION": "Erişim Politikaları",
+            "NAME": "İsim",
+            "CREATED": "Oluşturuldu",
+            "CREATOR": "Oluşturan",
+            "IN_USE": "Kullanımda",
+            "ACTION": "Eylemler",
             "TOOLTIP": {
-               "DELETE": "Delete access policy",
-               "DETAILS": "Open access policy details"
+               "DELETE": "Erişim ilkesini sil",
+               "DETAILS": "Erişim ilke ayrıntılarını aç"
             }
          },
          "NEW": {
-            "CAPTION": "New Access Policy",
+            "CAPTION": "Yeni Erişim İlkesi",
             "TABS": {
-               "SUMMARY": "Summary",
-               "METADATA": "Metadata",
-               "ACCESS": "Access"
+               "SUMMARY": "Özet",
+               "METADATA": "Meta verisi",
+               "ACCESS": "Erişim"
             },
             "METADATA": {
-               "TITLE": "Metadata",
+               "TITLE": "Meta verisi",
                "NAME": {
-                  "CAPTION": "Name",
-                  "PLACEHOLDER": "Name…"
+                  "CAPTION": "İsim",
+                  "PLACEHOLDER": "İsim…"
                }
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
+               "CAPTION": "Erişim İlkesi",
                "TEMPLATES": {
-                  "TITLE": "Templates"
+                  "TITLE": "Şablonlar"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Access policy",
-                  "LABEL": "Select a template",
-                  "EMPTY": "No template found",
-                  "ROLE": "Role",
-                  "WRITE": "Write",
-                  "READ": "Read",
-                  "ADDITIONAL_ACTIONS": "Additional Actions",
-                  "ACTION": "Actions",
-                  "NEW": "New policy",
-                  "DETAILS": "Details",
-                  "DESCRIPTION": "Please choose a pre-configured set of policies or add custom policies below"
+                  "TITLE": "Erişim İlkesi",
+                  "LABEL": "Bir şablon seç",
+                  "EMPTY": "Şablon bulunamadı",
+                  "ROLE": "Rol",
+                  "WRITE": "Yaz",
+                  "READ": "Oku",
+                  "ADDITIONAL_ACTIONS": "Ek Eylemler",
+                  "ACTION": "Eylemler",
+                  "NEW": "Yeni sözleşme",
+                  "DETAILS": "Ayrıntılar",
+                  "DESCRIPTION": "Lütfen önceden yapılandırılmış bir ilkeler kümesi seçim veya aşağıdaki özel ilkelerden ekleyin"
                },
                "ROLES": {
-                  "LABEL": "Select a role",
-                  "EMPTY": "No role found"
+                  "LABEL": "Bir rol seç",
+                  "EMPTY": "Rol bulunamadı"
                }
             }
          },
          "DETAILS": {
-            "HEADER": "Access policy details  - {{name}}",
+            "HEADER": "Erişim ilkesi ayrıntıları - {{name}}",
             "TABS": {
-               "SUMMARY": "Summary",
-               "METADATA": "Metadata",
-               "ACCESS": "Access"
+               "SUMMARY": "Özet",
+               "METADATA": "Meta verisi",
+               "ACCESS": "Erişim"
             },
             "METADATA": {
-               "TITLE": "Metadata",
+               "TITLE": "Meta verisi",
                "NAME": {
-                  "CAPTION": "Name",
-                  "PLACEHOLDER": "Name…"
+                  "CAPTION": "İsim",
+                  "PLACEHOLDER": "İsim…"
                }
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
+               "CAPTION": "Erişim İlkesi",
                "TEMPLATES": {
-                  "TITLE": "Templates"
+                  "TITLE": "Şablonlar"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Access policy",
-                  "LABEL": "Select a template",
-                  "EMPTY": "No template found",
-                  "ROLE": "Role",
-                  "WRITE": "Write",
-                  "READ": "Read",
-                  "ADDITIONAL_ACTIONS": "Additional Actions",
-                  "ACTION": "Actions",
-                  "NEW": "New policy",
-                  "DETAILS": "Details",
-                  "DESCRIPTION": "Please choose a pre-configured set of policies or add custom policies below"
+                  "TITLE": "Erişim İlkesi",
+                  "LABEL": "Bir şablon seç",
+                  "EMPTY": "Şablon bulunamadı",
+                  "ROLE": "Rol",
+                  "WRITE": "Yaz",
+                  "READ": "Oku",
+                  "ADDITIONAL_ACTIONS": "Ek Eylemler",
+                  "ACTION": "Eylemler",
+                  "NEW": "Yeni sözleşme",
+                  "DETAILS": "Ayrıntılar",
+                  "DESCRIPTION": "Lütfen önceden yapılandırılmış bir ilçe seti seçin ya da aşağıdaki özel ilkeleri ekleyin"
                },
                "ROLES": {
-                  "LABEL": "Select a role",
-                  "EMPTY": "No role found"
+                  "LABEL": "Rol seçin",
+                  "EMPTY": "Rol bulunamadı"
                }
             }
          }
@@ -1317,617 +1438,617 @@
    "THEMES": {
       "THEMES": {
          "DETAILS": {
-            "HEADER": "Theme details {{resourceId}}",
+            "HEADER": "Tema detayları {{resourceId}}",
             "TABS": {
-               "GENERAL": "General",
-               "BUMPER": "Bumper (begin)",
-               "TRAILER": "Bumper (end)",
-               "TITLE": "Title",
-               "LICENSE": "License",
-               "WATERMARK": "Watermark",
-               "USAGE": "Usage"
+               "GENERAL": "Genel",
+               "BUMPER": "Tampon (başla)",
+               "TRAILER": "Tampon (son)",
+               "TITLE": "Başlık",
+               "LICENSE": "Lisans",
+               "WATERMARK": "Filigran",
+               "USAGE": "Kullanım"
             },
             "GENERAL": {
-               "CAPTION": "General",
-               "NAME": "Name",
-               "DESCRIPTION": "Description",
-               "DEFAULT": "Default",
-               "SET_DEFAULT_INFO": "Set as default theme for all series and events",
-               "NAME_ERROR": "Name is already in use",
-               "NAME_REQUIRED": "Required"
+               "CAPTION": "Genel",
+               "NAME": "İsim",
+               "DESCRIPTION": "Açıklama",
+               "DEFAULT": "Varsayılan",
+               "SET_DEFAULT_INFO": "Tüm seriler ve etkinlikler için varsayılan tema olarak ayarla",
+               "NAME_ERROR": "Ad zaten kullanımda",
+               "NAME_REQUIRED": "Gerekli"
             },
             "BUMPER": {
-               "CAPTION": "Bumper (begin)",
-               "DESCRIPTION": "Predefined video that is appended to the beginning of a recording.",
-               "ACTIVE": "Active"
+               "CAPTION": "Tampon (başla)",
+               "DESCRIPTION": "Kayıt başlangıcına eklenen önceden tanımlanmış video.",
+               "ACTIVE": "Aktif"
             },
             "TRAILER": {
-               "CAPTION": "Bumper (end)",
-               "DESCRIPTION": "Predefined video that is appended to the end of a recording.",
-               "ACTIVE": "Active"
+               "CAPTION": "Tampom (son)",
+               "DESCRIPTION": "Bir kayda sonuna eklenen önceden tanımlanmış video.",
+               "ACTIVE": "Aktif"
             },
             "TITLE": {
-               "CAPTION": "Title",
-               "DESCRIPTION": "Predefined slide including descriptive metadata appended to the beginning or end of a recording.",
-               "ACTIVE": "Active"
+               "CAPTION": "Başlık",
+               "DESCRIPTION": "Kayıt başlangıcına veya sonuna eklenen tanımlayıcı meta veriler de dahil olmak üzere önceden tanımlanmış slayt.",
+               "ACTIVE": "Aktif"
             },
             "WATERMARK": {
-               "CAPTION": "Watermark",
-               "DESCRIPTION": "Semi-transparent image that is overlaid on every frame of the recording.",
-               "ACTIVE": "Active"
+               "CAPTION": "Filigran",
+               "DESCRIPTION": "Kayıt her çerçevesinde üzerine yarı şeffaf görüntü yerleştirilir.",
+               "ACTIVE": "Aktif"
             },
             "USAGE": {
-               "CAPTION": "Usage",
-               "SERIES": "Series name"
+               "CAPTION": "Kullanım",
+               "SERIES": "Seri ismi"
             }
          }
       }
    },
    "CONFIGURATION": {
       "ACTIONS": {
-         "ADD_MAIL_TEMPLATE": "Add template",
-         "ADD_THEME": "Add theme"
+         "ADD_MAIL_TEMPLATE": "Şablon ekle",
+         "ADD_THEME": "Tema ekle"
       },
       "NAVIGATION": {
-         "THEMES": "Themes"
+         "THEMES": "Temalar"
       },
       "THEMES": {
          "TABLE": {
-            "CAPTION": "Themes",
-            "NAME": "Name",
-            "DESCRIPTION": "Description",
-            "CREATOR": "Creator",
-            "CREATED": "Created",
-            "DEFAULT": "Default",
-            "USAGE": "Usage",
-            "ACTION": "Actions",
+            "CAPTION": "Temalar",
+            "NAME": "İsim",
+            "DESCRIPTION": "Açıklama",
+            "CREATOR": "Yapımcı",
+            "CREATED": "Oluşturuldu",
+            "DEFAULT": "Varsayılan",
+            "USAGE": "Kullanım",
+            "ACTION": "Eylemler",
             "TOOLTIP": {
-               "DELETE": "Delete theme",
-               "DETAILS": "Open theme details"
+               "DELETE": "Temayı sil",
+               "DETAILS": "Tema detaylarını aç"
             }
          },
          "DETAILS": {
-            "NEWCAPTION": "Create theme",
-            "EDITCAPTION": "Theme details - {{name}}",
+            "NEWCAPTION": "Tema oluştur",
+            "EDITCAPTION": "Tema detayları - {{name}}",
             "GENERAL": {
-               "CAPTION": "General",
-               "NAME": "Name",
-               "DESCRIPTION": "Description",
-               "DEFAULT": "Default",
-               "SET_DEFAULT_INFO": "Set as default theme for all series and events",
-               "NAME_REQUIRED": "Required"
+               "CAPTION": "Genel",
+               "NAME": "İsim",
+               "DESCRIPTION": "Açıklama",
+               "DEFAULT": "Varsayılan",
+               "SET_DEFAULT_INFO": "Tüm seriler ve etkinlikler için varsayılan olarak ayarla",
+               "NAME_REQUIRED": "Gerekli"
             },
             "BUMPER": {
-               "CAPTION": "Bumper (begin)",
-               "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined video that is appended to the beginning of a recording.",
-               "ACTIVE": "Active",
-               "ENABLE": "Enable bumper",
-               "SELECT": "Select",
-               "UPLOAD_LABEL": "Upload video",
-               "UPLOAD_BUTTON": "Upload"
+               "CAPTION": "Tampon (başla)",
+               "FILE_UPLOADED": "Yüklenen dosya: ",
+               "DESCRIPTION": "Kayıt başlangıcına eklenen önceden tanımlanmış video.",
+               "ACTIVE": "Etkin",
+               "ENABLE": "Tamponu etkinleştir",
+               "SELECT": "Seç",
+               "UPLOAD_LABEL": "Video yükle",
+               "UPLOAD_BUTTON": "Karşıya Yükle"
             },
             "TRAILER": {
-               "CAPTION": "Bumper (end)",
-               "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined video that is appended to the end of a recording.",
-               "ACTIVE": "Active",
-               "ENABLE": "Enable bumper",
-               "UPLOAD_LABEL": "Upload video",
-               "UPLOAD_BUTTON": "Upload",
-               "SELECT": "Select"
+               "CAPTION": "Tampon (son)",
+               "FILE_UPLOADED": "Yüklenen dosya: ",
+               "DESCRIPTION": "Kaydın sonuna eklenecek önceden tanımlanmış video.",
+               "ACTIVE": "Aktif",
+               "ENABLE": "Tampon etkinleştir",
+               "UPLOAD_LABEL": "Video yükle",
+               "UPLOAD_BUTTON": "Yükle",
+               "SELECT": "Seç"
             },
             "TITLE": {
-               "CAPTION": "Title",
-               "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined slide including descriptive metadata appended to the beginning or end of a recording.",
-               "ACTIVE": "Active",
-               "ENABLE": "Enable title slide",
-               "BACKGROUND": "Background",
-               "EXTRACT": "Extract background",
-               "UPLOAD": "Upload",
-               "UPLOAD_LABEL": "Upload image",
-               "UPLOAD_BUTTON": "Upload"
+               "CAPTION": "Başlık",
+               "FILE_UPLOADED": "Yüklenen dosya: ",
+               "DESCRIPTION": "Kayıt başlangıcına veya sonuna eklenen tanımlayıcı meta veriler de dahil olmak üzere önceden tanımlanmış slayt.",
+               "ACTIVE": "Aktif",
+               "ENABLE": "Başlık slaydı etkinleştir",
+               "BACKGROUND": "Arka plan",
+               "EXTRACT": "Arka planı ayıkla",
+               "UPLOAD": "Karşıya Yükle",
+               "UPLOAD_LABEL": "Resim yükle",
+               "UPLOAD_BUTTON": "Karşıya Yükle"
             },
             "WATERMARK": {
-               "CAPTION": "Watermark",
-               "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Semi-transparent image that is overlaid on every frame of the recording.",
-               "ACTIVE": "Active",
-               "ENABLE": "Enable watermark",
-               "TOP_LEFT": "Top left",
-               "TOP_RIGHT": "Top right",
-               "BOTTOM_LEFT": "Bottom left",
-               "BOTTOM_RIGHT": "Bottom right",
-               "UPLOAD": "Upload",
-               "POSITION": "Watermark position and preview",
-               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
-               "UPLOAD_LABEL": "Upload image",
-               "UPLOAD_BUTTON": "Upload"
+               "CAPTION": "Filigran",
+               "FILE_UPLOADED": "Yüklenen dosya: ",
+               "DESCRIPTION": "Kayıt her çerçevesinde üzerine yarı şeffaf görüntü yerleştirilir.",
+               "ACTIVE": "Aktif",
+               "ENABLE": "Filigran etkinleştir",
+               "TOP_LEFT": "Sol üst",
+               "TOP_RIGHT": "Sağ üst",
+               "BOTTOM_LEFT": "Sol alt",
+               "BOTTOM_RIGHT": "Sağ alt",
+               "UPLOAD": "Karşıya Yükle",
+               "POSITION": "Filigran pozisyonu ve önizleme",
+               "FILEUPLOAD_DESCRIPTION": "Dosya'nın bir alfa kanalı olmalı (şeffaf arkaplan). Kabul edilen dosya türleri: .PNG, .GIF, .SVG, .WEBP",
+               "UPLOAD_LABEL": "Görüntü yükle",
+               "UPLOAD_BUTTON": "Karşıya Yükle"
             },
             "SUMMARY": {
-               "CAPTION": "Summary"
+               "CAPTION": "Özet"
             },
             "USAGE": {
-               "CAPTION": "Usage",
-               "SERIE": "Series name",
-               "EMPTY": "No series found for current theme"
+               "CAPTION": "Kullanım",
+               "SERIE": "Seri adı",
+               "EMPTY": "Kullanınlan temada hiçbir seri yok"
             }
          }
       }
    },
    "SYSTEMS": {
       "NAVIGATION": {
-         "JOBS": "Jobs",
-         "SERVERS": "Servers",
-         "SERVICES": "Services"
+         "JOBS": "İşler",
+         "SERVERS": "Sunucular",
+         "SERVICES": "Servisler"
       },
       "JOBS": {
          "TABLE": {
-            "ID": "Job Identifier",
-            "CAPTION": "Jobs",
-            "CREATED": "Created",
-            "CREATOR": "Creator",
-            "HOST_NAME": "Host name",
-            "NODE_NAME": "Node name",
-            "OPERATION": "Operation",
-            "STARTED": "Started",
-            "STATUS": "Status",
-            "SUBMITTED": "Submitted",
-            "TYPE": "Type"
+            "ID": "Meslek Tanımlayıcı",
+            "CAPTION": "İşler",
+            "CREATED": "Oluşturuldu",
+            "CREATOR": "Yapımcı",
+            "HOST_NAME": "Ana bilgisayar adı",
+            "NODE_NAME": "Düğüm adı",
+            "OPERATION": "İşlem",
+            "STARTED": "Başlatıldı",
+            "STATUS": "Durum",
+            "SUBMITTED": "Gönderildi",
+            "TYPE": "Tür"
          },
          "STATUS": {
-            "QUEUED": "Queued",
-            "PAUSED": "Paused",
-            "RUNNING": "Running",
-            "FINISHED": "Finished",
-            "FAILED": "Failed",
-            "DELETED": "Deleted",
-            "INSTANTIATED": "Instantiated",
-            "DISPATCHING": "Dispatching",
-            "RESTART": "Restart",
-            "CANCELED": "Canceled",
-            "WAITING": "Waiting"
+            "QUEUED": "Sıraya alındı",
+            "PAUSED": "Duraklatıldı",
+            "RUNNING": "Çalışıyor",
+            "FINISHED": "Tamamlandı",
+            "FAILED": "Başarısız",
+            "DELETED": "Silindi",
+            "INSTANTIATED": "İlklendirildi",
+            "DISPATCHING": "Gönderiliyor",
+            "RESTART": "Yeniden Başlat",
+            "CANCELED": "İptal edildi",
+            "WAITING": "Beklemede"
          }
       },
       "SERVERS": {
          "TABLE": {
-            "CAPTION": "Servers",
-            "STATUS": "Status",
-            "HOST_NAME": "Host name",
-            "NODE_NAME": "Node name",
-            "CORES": "Cores",
-            "COMPLETED": "Jobs completed",
-            "RUNNING": "Jobs running",
-            "QUEUED": "Jobs queued",
-            "MEAN_RUN_TIME": "Mean run time",
-            "MEAN_QUEUE_TIME": "Mean queue time",
-            "MAINTENANCE": "Maintenance",
-            "MAINTENANCE_OFF": "Enter maintenance mode",
-            "MAINTENANCE_ON": "Leave maintenance mode"
+            "CAPTION": "Sunucular",
+            "STATUS": "Durum",
+            "HOST_NAME": "Ana bilgisayar adı",
+            "NODE_NAME": "Düğüm adı",
+            "CORES": "Çekirdekler",
+            "COMPLETED": "Tamamlanan işler",
+            "RUNNING": "Çalışan işler",
+            "QUEUED": "Kuyruktaki işler",
+            "MEAN_RUN_TIME": "Ortalama çalışma süresi",
+            "MEAN_QUEUE_TIME": "Ortalama kuyruk süresi",
+            "MAINTENANCE": "Bakım",
+            "MAINTENANCE_OFF": "Bakım moduna gir",
+            "MAINTENANCE_ON": "Bakım modundan çık"
          }
       },
       "SERVICES": {
          "TABLE": {
-            "CAPTION": "Services",
-            "STATUS": "Status",
-            "NAME": "Service name",
-            "HOST_NAME": "Host name",
-            "NODE_NAME": "Node name",
-            "COMPLETED": "Jobs completed",
-            "RUNNING": "Jobs running",
-            "QUEUED": "Jobs queued",
-            "MEAN_RUN_TIME": "Mean run time",
-            "MEAN_QUEUE_TIME": "Mean queue time",
-            "SANITIZE": "Clear failed service",
-            "ACTION": "Actions",
+            "CAPTION": "Hizmetler",
+            "STATUS": "Durum",
+            "NAME": "Hizmet adı",
+            "HOST_NAME": "Ana bilgisayar adı",
+            "NODE_NAME": "Düğüm adı",
+            "COMPLETED": "Tamamlanan işler",
+            "RUNNING": "Çalışan işler",
+            "QUEUED": "Kuyruktaki işler",
+            "MEAN_RUN_TIME": "Ortalama çalışma süresi",
+            "MEAN_QUEUE_TIME": "Ortalama kuyruk süresi",
+            "SANITIZE": "Başarısız servisi temizle",
+            "ACTION": "Eylemler",
             "TOOLTIP": {
-               "SANITIZE": "Sanitize service (set service back to state normal)"
+               "SANITIZE": "Servisi sanitize et (servisi normal durumuna döndür)"
             }
          },
          "STATUS": {
             "NORMAL": "Normal",
-            "WARNING": "Warning",
-            "ERROR": "Error"
+            "WARNING": "Uyarı",
+            "ERROR": "Hata"
          }
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
-      "TIMELINE": "Timeline",
-      "ZOOMLEVEL": "Zoom Level",
-      "PREVIEW_MODE": "Preview Mode",
-      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
-      "ZOOM": "Zoom",
+      "WARNING_UNSAVED": "Uyarı: Bazı değişiklikler kaydedilmedi. Video editörü bırakırsanız, bu değişiklikler kaybolur. Gerçekten devam etmek istiyor musunuz?",
+      "TIMELINE": "Zaman tüneli",
+      "ZOOMLEVEL": "Yakınlaştırma Düzeyi",
+      "PREVIEW_MODE": "Önizleme modu",
+      "PREVIEW_MODE_TOOLTIP": "Yalnızca seçili segmentleri oynat",
+      "ZOOM": "Yakınlaştır",
       "BUTTONS": {
-         "CLOSE": "Close",
-         "SAVE": "Save",
-         "PROCESS": "Save & Continue",
-         "ADD_COMMENT": "Add Comment"
+         "CLOSE": "Kapat",
+         "SAVE": "Kaydet",
+         "PROCESS": "Kaydet & Devam et",
+         "ADD_COMMENT": "Yorum Ekle"
       },
       "TABS": {
-         "EDIT": "Editor",
-         "CAPTIONS": "Captions",
-         "ANNOTATIONS": "Annotations"
+         "EDIT": "Düzenleyici",
+         "CAPTIONS": "Altyazılar",
+         "ANNOTATIONS": "Ek açıklamalar"
       },
       "AREAS": {
-         "METADATA": "Metadata",
-         "THUMBNAIL": "Thumbnail",
-         "COMMENTS": "Comments",
-         "SEGMENTS": "Segments",
-         "TRACKS": "Tracks"
+         "METADATA": "Metaveri",
+         "THUMBNAIL": "Küçük resim",
+         "COMMENTS": "Yorumlar",
+         "SEGMENTS": "Segmentler",
+         "TRACKS": "Parçalar"
       },
       "ACTIONS": {
-         "SPLIT": "Split",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
-         "REPLAY_SEGMENT": "Play Start of Segment",
-         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
-         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "SPLIT": "Ayır",
+         "SPLIT_TOOLTIP": "Şu andaki imleç konumunda bölütü böl.",
+         "CUT": "Gizle/Göster",
+         "CUT_TOOLTIP": "Videonun seçilen bölümünü gizleyin veya gösterin.",
+         "REPLAY_SEGMENT": "Bölümün başlangıcını oynat",
+         "REPLAY_SEGMENT_TOOLTIP": "Mevcut bölümü en baştan oynat.",
+         "REPLAY_END_OF_SEGMENT": "Bölümün Sonunu Oynat",
          "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Geçişi Oynat",
          "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
-         "UNDO": "Undo",
-         "REDO": "Redo",
-         "CLEAR_SEGMENTS": "Clear All Segments",
-         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+         "UNDO": "Geri Al",
+         "REDO": "İleri Al",
+         "CLEAR_SEGMENTS": "Bölümlerin Tümünü Temizle",
+         "CLEAR_SEGMENTS_TOOLTIP": "Tüm bölümleri temizleyip yerine tek bir büyük bölüm bırak."
       },
       "SEGMENTS": {
-         "REMOVE_SEGMENT": "Remove Segment",
-         "SHOW_SEGMENT": "Show this Segment",
-         "HIDE_SEGMENT": "Hide this Segment",
-         "START": "Start",
-         "END": "End"
+         "REMOVE_SEGMENT": "Bölümü Sil",
+         "SHOW_SEGMENT": "Bu Bölütü Göster",
+         "HIDE_SEGMENT": "Bu Bölütü Gizle",
+         "START": "Başla",
+         "END": "Son"
       },
       "THUMBNAIL": {
          "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
-                  "LABEL": "Extract from video",
+                  "LABEL": "Videodan çıkarıp al",
                   "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
                },
                "FROM_LEFT_VIDEO": {
-                  "LABEL": "Extract from left video",
+                  "LABEL": "Sol taraftaki videodan çıkarıp al",
                   "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
                },
                "FROM_RIGHT_VIDEO": {
-                  "LABEL": "Extract from right video",
-                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+                  "LABEL": "Sağ taraftaki videodan çıkarıp al",
+                  "TOOLTIP": "Küçük resmi, sağdaki videodan mevcut oynatma yerinden çıkarıp al"
                }
             },
             "UPLOAD": {
-               "LABEL": "Upload image",
-               "TOOLTIP": "Upload a thumbnail image"
+               "LABEL": "Resim yükle",
+               "TOOLTIP": "Bir küçük resim yükle"
             },
             "USE_DEFAULT": {
-               "LABEL": "Use default thumbnail",
-               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+               "LABEL": "Varsayılan küçük resim kullan",
+               "TOOLTIP": "Otomatik olarak oluşturulan varsayılan küçük resmi kullanın"
             }
          },
          "PREVIEW": {
-            "NOT_AVAILABLE": "No preview available",
+            "NOT_AVAILABLE": "Önizleme Mevcut Değil",
             "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
-            "DEFAULT": "You are currently using the default thumbnail.",
-            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
-            "UPLOAD": "You are currently using an uploaded thumbnail."
+            "DEFAULT": "Şu anda varsayılan küçük resmi kullanıyorsunuz.",
+            "SNAPSHOT": "Şu anda kullanılan küçük resim videodan alınmıştır.",
+            "UPLOAD": "Şu anda yüklenmiş bir küçük resmi kullanıyorsunuz."
          }
       },
       "TRACKS": {
          "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+            "NO_VIDEO_TRACK_SELECTED": "En az bir video kanalı etkinleştirmeniz gerekir",
+            "NO_AUDIO_TRACK_SELECTED": "En az bir ses parçası etkinleştirmeniz gerekir"
          },
          "TRACK": {
-            "HEADER": "Track"
+            "HEADER": "Parça"
          },
          "VIDEO": {
-            "HEADER": "Video track",
-            "NOT_AVAILABLE": "No video tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No video track selected",
+            "HEADER": "Video kaydı",
+            "NOT_AVAILABLE": "Hiçbir Video kaydı bulunmuyor",
+            "NO_PREVIEW_AVAILABLE": "Önizleme görseli bulunamadı",
+            "NO_TRACK_SELECTED": "Hiçbir video kaydı seçilmedi",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "Bu video kaydı şu anda etkin. Devre dışı bırakmak için tıklayın",
+               "UNHIDE": "Bu video kaydı şu anda devre dışı. Etkinleştirmek için tıklayın."
             }
          },
          "AUDIO": {
-            "HEADER": "Audio track",
-            "NOT_AVAILABLE": "No audio tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No audio track selected",
+            "HEADER": "Ses parçası",
+            "NOT_AVAILABLE": "Hiçbir ses kaydı bulunmuyor",
+            "NO_PREVIEW_AVAILABLE": "Önizleme görseli bulunamadı",
+            "NO_TRACK_SELECTED": "Hiçbir ses kaydı seçilmedi",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "Bu ses kaydı şu anda etkin. Devre dışı bırakmak için tıklayın",
+               "UNHIDE": "Bu ses kaydı şu anda devre dışı. Etkinleştirmek için tıklayın"
             }
          }
       },
       "PLAYER": {
-         "PLAY": "Play",
-         "PAUSE": "Pause",
-         "NEXT_FRAME": "Next frame",
-         "PREVIOUS_FRAME": "Previous frame",
-         "NEXT_SEGMENT": "Next segment / Jump to end",
-         "PREVIOUS_SEGMENT": "Previous segment / Jump to start",
-         "MUTE": "Mute",
-         "VOLUME": "Volume"
+         "PLAY": "Oynat",
+         "PAUSE": "Duraklat",
+         "NEXT_FRAME": "Sonraki kare",
+         "PREVIOUS_FRAME": "Önceki kare",
+         "NEXT_SEGMENT": "Sonraki bölüm / Sonuna atla",
+         "PREVIOUS_SEGMENT": "Önceki bölüm / Başına atla",
+         "MUTE": "Sustur",
+         "VOLUME": "Ses"
       }
    },
    "LOGIN": {
-      "WELCOME": "Welcome to Opencast",
-      "REMEMBER": "Remember me on this computer",
-      "USERNAME": "Username…",
-      "PASSWORD": "Password…",
-      "LOGIN": "Login",
-      "ERROR": "Incorrect username and / or password"
+      "WELCOME": "Opencast 'a Hoşgeldin",
+      "REMEMBER": "Beni bu bilgisayarda hatırla",
+      "USERNAME": "Kullanıcı Adı…",
+      "PASSWORD": "Şifre…",
+      "LOGIN": "Oturum Aç",
+      "ERROR": "Geçersiz kullanıcı adı ve / ya da şifre"
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
-         "PLACEHOLDER": "Please select a filter…",
-         "NO_OPTIONS": "No filters found"
+         "PLACEHOLDER": "Lütfen bir filtre seçin…",
+         "NO_OPTIONS": "Filtreler bulunamadı"
       },
       "FILTER_VALUE_SELECTION": {
-         "PLACEHOLDER": "Please select a value…",
-         "NO_OPTIONS": "No values found"
+         "PLACEHOLDER": "Lütfen bir değer seçin…",
+         "NO_OPTIONS": "Değerler bulunamadı"
       },
-      "CLEAR": "Clear all filters",
-      "REMOVE": "Remove filter",
-      "ADD": "Add filters",
-      "PLACEHOLDER": "Search…",
+      "CLEAR": "Tüm filtreleri temizle",
+      "REMOVE": "Filtrelemeyi kaldır",
+      "ADD": "Süzgeç ekle",
+      "PLACEHOLDER": "Ara…",
       "PROFILES": {
-         "FILTERS_HEADER": "Saved filter sets",
-         "EDIT": "Edit filter set",
-         "REMOVE": "Remove saved filter",
-         "EMPTY": "No saved filters yet",
-         "SAVE_FILTERS": "Save",
-         "FILTER_HEADER": "Save filter set",
-         "NAME": "Name",
-         "NAME_PLACEHOLDER": "Name…",
-         "DESCRIPTION": "Description",
-         "DESCRIPTION_PLACEHOLDER": "Description…"
+         "FILTERS_HEADER": "Filtreleme ayarları kaydedildi",
+         "EDIT": "Filtre setini düzenle",
+         "REMOVE": "Kayıtlı filtreyi kaldır",
+         "EMPTY": "Henüz kaydedilmiş filtreleme yok",
+         "SAVE_FILTERS": "Kaydet",
+         "FILTER_HEADER": "Filtre setini kaydet",
+         "NAME": "İsim",
+         "NAME_PLACEHOLDER": "İsim…",
+         "DESCRIPTION": "Açıklama",
+         "DESCRIPTION_PLACEHOLDER": "Açıklama…"
       }
    },
    "FILTERS": {
       "ACLS": {
          "NAME": {
-            "LABEL": "Name"
+            "LABEL": "Ad"
          }
       },
       "AGENTS": {
          "NAME": {
-            "LABEL": "Name"
+            "LABEL": "İsim"
          },
          "STATUS": {
-            "LABEL": "Status"
+            "LABEL": "Durum"
          }
       },
       "EVENTS": {
          "AGENT_ID": {
-            "LABEL": "Capture Agent ID"
+            "LABEL": "Yakalama Aracı Kimliği"
          },
          "ACCESS_POLICY": {
-            "LABEL": "Access policy"
+            "LABEL": "Erişim İlkesi"
          },
          "COMMENTS": {
-            "LABEL": "Comments",
-            "NONE": "None",
-            "OPEN": "Open",
-            "RESOLVED": "Resolved"
+            "LABEL": "Yorumlar",
+            "NONE": "Yok",
+            "OPEN": "Açık",
+            "RESOLVED": "Çözüldü"
          },
          "CONTRIBUTORS": {
-            "LABEL": "Contributors"
+            "LABEL": "Katkıda Bulunanlar"
          },
          "CREATOR": {
-            "LABEL": "Creator"
+            "LABEL": "Yaratıcı"
          },
          "PUBLISHER": {
-            "LABEL": "Publisher"
+            "LABEL": "Yayımcı"
          },
          "HOSTNAME": {
-            "LABEL": "Host name"
+            "LABEL": "Ana bilgisayar adı"
          },
          "LANGUAGE": {
-            "LABEL": "Language"
+            "LABEL": "Dil"
          },
          "LICENSE": {
-            "LABEL": "License"
+            "LABEL": "Lisans"
          },
          "LOCATION": {
-            "LABEL": "Location"
+            "LABEL": "Konum"
          },
          "PERIOD": {
-            "LABEL": "Period"
+            "LABEL": "Dönem"
          },
          "PRESENTERS_BIBLIOGRAPHIC": {
-            "LABEL": "Presenter Bibliographic"
+            "LABEL": "Sunucu Bilbiyografik"
          },
          "PRESENTERS_TECHNICAL": {
-            "LABEL": "Presenter Technical"
+            "LABEL": "Sunucu Teknik açıdan"
          },
          "PROGRESS": {
-            "LABEL": "Progress"
+            "LABEL": "İlerleme Durumu"
          },
          "SERIES": {
-            "LABEL": "Series"
+            "LABEL": "Seriler"
          },
          "SOURCE": {
-            "LABEL": "Source"
+            "LABEL": "Kaynak"
          },
          "START_DATE": {
-            "LABEL": "Start date"
+            "LABEL": "Başlangıç tarihi"
          },
          "STATUS": {
-            "LABEL": "Status",
-            "SCHEDULED": "Scheduled",
-            "RECORDING": "Recording",
-            "INGESTING": "Ingesting",
-            "PROCESSING": "Processing",
-            "ARCHIVE": "Archive",
-            "WAITINGFOR": "Waiting for",
-            "UPLOAD": "Upload",
-            "ONHOLD": "On hold"
+            "LABEL": "Durum",
+            "SCHEDULED": "Zamanlandı",
+            "RECORDING": "Kayıt ediliyor",
+            "INGESTING": "Toplanıyor",
+            "PROCESSING": "İşleniyor",
+            "ARCHIVE": "Arşiv",
+            "WAITINGFOR": "için bekleniyor",
+            "UPLOAD": "Karşıya Yükle",
+            "ONHOLD": "Beklemede"
          },
          "SUBJECT": {
-            "LABEL": "Subject"
+            "LABEL": "Konu"
          },
          "TRACK_MIMETYPE": {
-            "LABEL": "Mimetype"
+            "LABEL": "Mime türü"
          },
          "TRACK_RESOLUTION": {
-            "LABEL": "Resolution"
+            "LABEL": "Çözünürlük"
          },
          "TRACK_TYPE": {
-            "LABEL": "Type"
+            "LABEL": "Tür"
          },
          "WORKFLOW_DEFINITION": {
-            "LABEL": "Workflow definition"
+            "LABEL": "İş akışı tanımı"
          },
          "WORKFLOW_STATE": {
-            "LABEL": "Workflow state"
+            "LABEL": "İş akışı durumu"
          }
       },
       "JOBS": {
          "HOSTNAME": {
-            "LABEL": "Host name"
+            "LABEL": "Sunucu adı"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Düğüm adı"
          },
          "STATUS": {
-            "LABEL": "Status",
-            "PAUSED": "Paused",
-            "QUEUED": "Queued",
-            "RUNNING": "Running",
-            "WAITING": "Waiting"
+            "LABEL": "Durum",
+            "PAUSED": "Duraklatıldı",
+            "QUEUED": "Sıraya alındı",
+            "RUNNING": "Çalışıyor",
+            "WAITING": "Beklemede"
          }
       },
       "SERIES": {
          "TITLE": {
-            "LABEL": "Name"
+            "LABEL": "İsim"
          },
          "CONTRIBUTORS": {
-            "LABEL": "Contributors"
+            "LABEL": "Katkıda Bulunanlar"
          },
          "ORGANIZERS": {
-            "LABEL": "Organizers"
+            "LABEL": "Organizatörler"
          },
          "SUBJECT": {
-            "LABEL": "Subject"
+            "LABEL": "Konu"
          },
          "LANGUAGE": {
-            "LABEL": "Language"
+            "LABEL": "Dil"
          },
          "CREATOR": {
-            "LABEL": "Creator"
+            "LABEL": "Oluşturan"
          },
          "LICENSE": {
-            "LABEL": "License"
+            "LABEL": "Lisans"
          },
          "ACCESS_POLICY": {
-            "LABEL": "Access policy"
+            "LABEL": "Erişim Politikası"
          },
          "CREATION_DATE": {
-            "LABEL": "Creation date"
+            "LABEL": "Oluşturma tarihi"
          }
       },
       "SERVERS": {
          "HOSTNAME": {
-            "LABEL": "Host name"
+            "LABEL": "Ana bilgisayar adı"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Düğüm adı"
          },
          "STATUS": {
-            "LABEL": "Status",
-            "MAINTENANCE": "Maintenance",
-            "ONLINE": "Online",
-            "OFFLINE": "Offline"
+            "LABEL": "Durum",
+            "MAINTENANCE": "Bakım",
+            "ONLINE": "Çevirimci",
+            "OFFLINE": "Çevirim dışı"
          }
       },
       "SERVICES": {
          "ACTIONS": {
-            "LABEL": "Actions available"
+            "LABEL": "Kullanılabilir eylemler"
          },
          "HOSTNAME": {
-            "LABEL": "Host name"
+            "LABEL": "Ana bilgisayar adı"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Düğüm adı"
          },
          "NAME": {
-            "LABEL": "Name"
+            "LABEL": "İsim"
          },
          "STATUS": {
-            "LABEL": "Status",
-            "ERROR": "Error",
+            "LABEL": "Durum",
+            "ERROR": "Hata",
             "NORMAL": "Normal",
-            "WARNING": "Warning"
+            "WARNING": "Uyarı"
          }
       },
       "THEMES": {
          "NAME": {
-            "LABEL": "Name"
+            "LABEL": "İsim"
          },
          "DESCRIPTION": {
-            "LABEL": "Description"
+            "LABEL": "Açıklama"
          },
          "CREATOR": {
-            "LABEL": "Creator"
+            "LABEL": "Oluşturan"
          },
          "CREATION_DATE": {
-            "LABEL": "Created"
+            "LABEL": "Oluşturuldu"
          }
       },
       "USERS": {
          "PROVIDER": {
-            "LABEL": "Provider"
+            "LABEL": "Sunucu"
          },
          "ROLE": {
-            "LABEL": "Role"
+            "LABEL": "Rol"
          },
          "USERNAME": {
-            "LABEL": "Username"
+            "LABEL": "Kullanıcı Adı"
          },
          "NAME": {
-            "LABEL": "Name"
+            "LABEL": "İsim"
          },
          "USER_DIRECTORY": {
-            "LABEL": "User directory"
+            "LABEL": "Kullanıcı dizini"
          }
       },
       "REVIEW_STATUS": {
-         "UNSENT": "Unsent",
-         "UNCONFIRMED": "Unconfirmed",
-         "CONFIRMED": "Confirmed"
+         "UNSENT": "Gönderilmemiş",
+         "UNCONFIRMED": "Onaylanmamış",
+         "CONFIRMED": "Onaylandı"
       }
    },
-   "TABLE_SUMMARY": "{{numberOfRows}} rows",
-   "TABLE_NO_RESULT": "No results found",
-   "TABLE_LOADING": "Loading…",
-   "TABLE_EDIT": "Edit",
+   "TABLE_SUMMARY": "{{numberOfRows}} satırlar",
+   "TABLE_NO_RESULT": "Sonuç bulunamadı",
+   "TABLE_LOADING": "Yükleniyor…",
+   "TABLE_EDIT": "Düzenle",
    "DASHBOARD": {
-      "RUNNING": "Running",
-      "FINISHED": "Finished",
-      "PAUSED": "Paused",
-      "FAILED": "Failed",
-      "FINISHED_WITH_COMMENTS": "Todo",
-      "SCHEDULED": "Scheduled",
-      "RECORDING": "Recording"
+      "RUNNING": "Çalışıyor",
+      "FINISHED": "Tamamlandı",
+      "PAUSED": "Duraklatıldı",
+      "FAILED": "Başarısız",
+      "FINISHED_WITH_COMMENTS": "Yapılacaklar",
+      "SCHEDULED": "Zamanlandı",
+      "RECORDING": "Kayıt ediliyor"
    },
    "HOTKEYS": {
       "CHEAT_SHEET": {
-         "TITLE": "Keyboard shortcuts",
+         "TITLE": "Klavye Kısayolları",
          "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
       },
       "KEYS": {
          "CTRL": "Ctrl",
          "ALT": "Alt",
          "OPTION": "⌥",
-         "SPACE": "Space",
+         "SPACE": "Boşluk",
          "BACKSPACE": "⌫",
          "LEFT": "←",
          "RIGHT": "→",
@@ -1942,88 +2063,88 @@
          "CAPSLOCK": "⇪",
          "ESC": "Esc",
          "ESCAPE": "Esc",
-         "PAGEUP": "Page↑",
-         "PAGEDOWN": "Page↓",
+         "PAGEUP": "Page up",
+         "PAGEDOWN": "Page down",
          "END": "End",
          "HOME": "Home",
          "INS": "Ins",
          "DEL": "Del"
       },
       "GROUPS": {
-         "GENERAL": "General",
-         "PLAYER": "Player",
-         "EDITOR": "Editor"
+         "GENERAL": "Genel",
+         "PLAYER": "Oynatıcı",
+         "EDITOR": "Düzenleyici"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
-            "MAIN_MENU": "Main menu",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "MAIN_MENU": "Ana menü",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Bir sonraki gösterge paneli filtresini seç",
             "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
-            "REMOVE_FILTERS": "Clear all filters",
-            "EVENT_VIEW": "Events",
-            "SERIES_VIEW": "Series",
-            "NEW_EVENT": "Add event",
-            "NEW_SERIES": "Add series",
-            "CHEAT_SHEET": "Keyboard shortcuts"
+            "REMOVE_FILTERS": "Tüm filtreleri temizle",
+            "EVENT_VIEW": "Etkinlikler",
+            "SERIES_VIEW": "Seri",
+            "NEW_EVENT": "Etkinlik ekle",
+            "NEW_SERIES": "Seri ekle",
+            "CHEAT_SHEET": "Klavye Kısayolları"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Play/pause",
-            "PREVIOUS_FRAME": "Previous frame",
-            "NEXT_FRAME": "Next frame",
-            "STEP_BACKWARD": "Jump 10s back",
-            "STEP_FORWARD": "Jump 10s forward",
-            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
-            "NEXT_SEGMENT": "Next segment/jump to end",
-            "VOLUME_UP": "Volume up",
-            "VOLUME_DOWN": "Volume down",
-            "MUTE": "Mute/unmute"
+            "PLAY_PAUSE": "Oynat/Duraklat",
+            "PREVIOUS_FRAME": "Önceki kare",
+            "NEXT_FRAME": "Sonraki kare",
+            "STEP_BACKWARD": "10s geriye atla",
+            "STEP_FORWARD": "10s ileri atla",
+            "PREVIOUS_SEGMENT": "Önceki bölüm / Başa atla",
+            "NEXT_SEGMENT": "Sonraki bölüm / Sona atla",
+            "VOLUME_UP": "Sesi artır",
+            "VOLUME_DOWN": "Sesi azalt",
+            "MUTE": "Sesi kapat/aç"
          },
          "EDITOR": {
-            "SPLIT_AT_CURRENT_TIME": "Split",
-            "CUT_SELECTED_SEGMENT": "Cut",
-            "PLAY_CURRENT_SEGMENT": "Play current segment",
-            "CLEAR_LIST": "Clear segment",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
-            "PLAY_ENDING_OF_CURRENT_SEGMENT": "End of segment"
+            "SPLIT_AT_CURRENT_TIME": "Ayır",
+            "CUT_SELECTED_SEGMENT": "Kes",
+            "PLAY_CURRENT_SEGMENT": "Geçerli bölümü oynat",
+            "CLEAR_LIST": "Bölümü temizle",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Bölütü 'pre-roll' ile oynat",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Böüm sonu"
          }
       }
    },
    "AGENTS": {
       "STATUS": {
-         "CAPTURING": "Capturing",
-         "ERROR": "Error",
-         "IDLE": "Idle",
-         "OFFLINE": "Offline",
-         "SHUTTING_DOWN": "Shutting down",
-         "UNKNOWN": "Unknown",
-         "UPLOADING": "Uploading"
+         "CAPTURING": "Yakalanıyor",
+         "ERROR": "Hata",
+         "IDLE": "Boşta",
+         "OFFLINE": "Çevirim dışı",
+         "SHUTTING_DOWN": "Kapatılıyor",
+         "UNKNOWN": "Bilinmiyor",
+         "UPLOADING": "Yükleniyor"
       }
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Birden çok değer eklemek için her değer arasında Giriş/Enter tuşuna basın"
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
-      "FROM": "From",
-      "TO": "To",
-      "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
+      "NOT_AVAILABLE": "İstatistiklere şu anda erişilemiyor. Lütfen daha sonra tekrar deneyin.",
+      "UNSUPPORTED_TYPE": "Üzgünüz, Opencast bu tür istatistiksel veriyi oluşturamıyor.",
+      "FROM": "den",
+      "TO": "Kime",
+      "TOTAL": "Toplam",
+      "GRANULARITY": "Ayrıntı Düzeyi",
       "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
+         "ORGANIZATION": "Organizasyon"
       },
       "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views",
+         "RANDOM": "Rastgele Veriler",
+         "VIEWS_SUM": "Toplam Görüntülenme Sayısı",
+         "VIEWS_AVG": "Ortalama Görüntülenme Sayısı",
          "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time unit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "RANDOM": "Bu rastgele veriler sadece deneme ve tanıtım amaçlıdır. Bu grafiğin istatistik sağlayıcısının json tanımını 'etc/providers' klasörün içinden silerek bu grafiği devre dışı bırakabilirsiniz.",
+         "VIEWS_SUM": "Zaman birimi başına toplam görüntülenme sayısını görüntüler.",
+         "VIEWS_AVG": "Zaman birimi başına ortalama günlük görüntü sayısını görüntüler.",
          "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }

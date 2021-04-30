@@ -37,12 +37,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 @Component(
-  property = {
+    property = {
     "service.description=File system based asset store",
     "store.type=local-filesystem"
-  },
-  immediate = true,
-  service = { AssetStore.class }
+    },
+    immediate = true,
+    service = { AssetStore.class }
 )
 public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
   /** Log facility */
@@ -97,8 +97,9 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
     rootDirectory = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_STORE_ROOT_DIR));
     if (rootDirectory == null) {
       final String storageDir = StringUtils.trimToNull(cc.getBundleContext().getProperty(CFG_OPT_STORAGE_DIR));
-      if (storageDir == null)
+      if (storageDir == null) {
         throw new IllegalArgumentException("Storage directory must be set");
+      }
       rootDirectory = PathSupport.concat(storageDir, DEFAULT_STORE_DIRECTORY);
     }
     mkDirs(file(rootDirectory));

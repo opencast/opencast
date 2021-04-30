@@ -22,6 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.util.RestUtil.R;
@@ -34,8 +35,6 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -70,11 +69,17 @@ public class IndexEndpoint {
   /** The security service */
   protected SecurityService securityService = null;
 
+  private IndexRebuildService indexRebuildService = null;
+
   /**
    * OSGI DI
    */
   public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
     this.adminUISearchIndex = adminUISearchIndex;
+  }
+
+  public void setIndexRebuildService(IndexRebuildService indexRebuildService) {
+    this.indexRebuildService = indexRebuildService;
   }
 
   /**
@@ -91,7 +96,7 @@ public class IndexEndpoint {
   @POST
   @Path("clearIndex")
   @RestQuery(name = "clearIndex", description = "Clear the Admin UI index",
-    returnDescription = "OK if index is cleared", reponses = {
+    returnDescription = "OK if index is cleared", responses = {
     @RestResponse(description = "Index is cleared", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "Unable to clear index", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) })
   public Response clearIndex() {
@@ -118,7 +123,7 @@ public class IndexEndpoint {
         + "The available services are: Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
         + "The service order (see above) is very important! Make sure, you do not run index rebuild for more than one "
         + "service at a time!",
-        type = RestParameter.Type.STRING) }, reponses = {
+        type = RestParameter.Type.STRING) }, responses = {
       @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
   public Response recreateIndexFromService(@PathParam("service") final String service) {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
@@ -126,13 +131,7 @@ public class IndexEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
-        adminUISearchIndex.recreateIndex(service);
-      } catch (InterruptedException e) {
-        logger.error("Repopulating the index was interrupted", e);
-      } catch (CancellationException e) {
-        logger.trace("Listening for index messages has been cancelled.");
-      } catch (ExecutionException e) {
-        logger.error("Repopulating the index failed to execute", e);
+        indexRebuildService.rebuildIndex(adminUISearchIndex, service);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -143,7 +142,7 @@ public class IndexEndpoint {
   @POST
   @Path("recreateIndex")
   @RestQuery(name = "recreateIndex", description = "Clear and repopulates the Admin UI Index directly from the Services",
-    returnDescription = "OK if repopulation has started", reponses = {
+    returnDescription = "OK if repopulation has started", responses = {
     @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
   public Response recreateIndex() {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
@@ -151,13 +150,7 @@ public class IndexEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index");
-        adminUISearchIndex.recreateIndex();
-      } catch (InterruptedException e) {
-        logger.error("Repopulating the index was interrupted", e);
-      } catch (CancellationException e) {
-        logger.trace("Listening for index messages has been cancelled.");
-      } catch (ExecutionException e) {
-        logger.error("Repopulating the index failed to execute", e);
+        indexRebuildService.rebuildIndex(adminUISearchIndex);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }

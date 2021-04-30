@@ -31,6 +31,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -38,7 +39,9 @@ import javax.persistence.TableGenerator;
 
 /** JPA DTO modeling the asset database table. */
 @Entity(name = "Asset")
-@Table(name = "oc_assets_asset")
+@Table(name = "oc_assets_asset", indexes = {
+    @Index(name = "IX_oc_assets_asset_checksum", columnList = ("checksum")),
+    @Index(name = "IX_oc_assets_asset_mediapackage_element_id", columnList = ("mediapackage_element_id")) })
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.
 // Otherwise duplicate key errors will most likely happen.
@@ -68,13 +71,20 @@ public class AssetDto {
   @Column(name = "size", nullable = false)
   private Long size;
 
-  @Column(name = "storage_id", nullable = false)
+  @Column(name = "storage_id", nullable = false, length = 256)
   private String storageId;
 
   /**
    * Create a new DTO.
    */
-  public static AssetDto mk(String mediaPackageElementId, SnapshotDto snapshot, String checksum, Opt<MimeType> mimeType, String storeageId, long size) {
+  public static AssetDto mk(
+      String mediaPackageElementId,
+      SnapshotDto snapshot,
+      String checksum,
+      Opt<MimeType> mimeType,
+      String storeageId,
+      long size
+  ) {
     final AssetDto dto = new AssetDto();
     dto.snapshot = snapshot;
     dto.mediaPackageElementId = mediaPackageElementId;
@@ -121,4 +131,3 @@ public class AssetDto {
     this.snapshot = snapshot;
   }
 }
-

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -34,6 +34,16 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-elasticsearch-index</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -65,8 +75,7 @@
               OSGI-INF/message-receiver-scheduler.xml,
               OSGI-INF/message-receiver-series.xml,
               OSGI-INF/message-receiver-theme.xml,
-              OSGI-INF/message-receiver-workflow.xml,
-              OSGI-INF/search-index.xml
+              OSGI-INF/message-receiver-workflow.xml
             </Service-Component>
           </instructions>
         </configuration>

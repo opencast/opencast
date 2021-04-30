@@ -2,16 +2,16 @@
   "name": "adminui",
   "version": "0.0.0",
   "dependencies": {
-    "jquery": "3.4.1",
+    "jquery": "3.5.1",
     "jquery-ui": "1.12.1",
     "jqueryui-timepicker-addon": "1.6.3",
-    "angular": "1.7.9",
-    "angular-route": "1.7.9",
-    "angular-resource": "1.7.9",
-    "angular-animate": "1.7.9",
-    "angular-messages": "1.7.9",
-    "angular-translate": "2.18.1",
-    "angular-translate-loader-static-files": "2.18.1",
+    "angular": "1.8.2",
+    "angular-route": "1.8.2",
+    "angular-resource": "1.8.2",
+    "angular-animate": "1.8.2",
+    "angular-messages": "1.8.2",
+    "angular-translate": "2.18.3",
+    "angular-translate-loader-static-files": "2.18.3",
     "angular-local-storage": "0.7.1",
     "angular-wizard": "1.1.1",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
@@ -20,7 +20,7 @@
     "angular-chart.js": "^1.1.1"
   },
   "devDependencies": {
-    "angular-mocks": "1.7.9"
+    "angular-mocks": "1.8.2"
   },
   "overrides": {
     "angular-wizard": {
@@ -30,6 +30,6 @@
   "appPath": "app",
   "moduleName": "adminNg",
   "resolutions": {
-    "angular": "1.7.9"
+    "angular": "1.8.2"
   }
 }

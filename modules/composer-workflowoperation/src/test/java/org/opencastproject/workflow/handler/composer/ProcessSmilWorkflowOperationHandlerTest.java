@@ -44,6 +44,7 @@ import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -97,6 +98,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
   private EncodingProfile profile = null;
   private EncodingProfile profile2 = null;
   private EncodingProfile profile3 = null;
+  private EncodingProfile profilehls = null;
   private ComposerService composerService = null;
   private SmilService smilService = null;
   private Workspace workspace = null;
@@ -107,10 +109,14 @@ public class ProcessSmilWorkflowOperationHandlerTest {
   private static final String PROFILE_ID = "flash.http";
   private static final String PROFILE_ID2 = "x264.http";
   private static final String PROFILE_ID3 = "aac.http";
+  private static final String PROFILE_HLS = "hls";
   private static final String SOURCE_PRESENTER_TRACK_ID = "compose-workflow-operation-test-source-presenter-track-id";
   private static final String ENCODED_PRESENTER_TRACK_ID = "compose-workflow-operation-test-trimmed-presenter-track-id";
   private static final String SOURCE_PRESENTATION_TRACK_ID = "compose-workflow-operation-test-source-presentation-track-id";
   private static final String ENCODED_PRESENTATION_TRACK_ID = "compose-workflow-operation-test-trimmed-presentation-track-id";
+  private static final String ENCODED_MASTER_ID = "multiencode-workflow-operation-test-encode-track-id1";
+  private static final String ENCODED_VARIANT_ID = "multiencode-workflow-operation-test-encode-track-id2";
+  private static final String ENCODED_X264_ID = "multiencode-workflow-operation-test-encode-track-id3";
 
   // <operation
   // id="processsmil"
@@ -221,6 +227,29 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     return (smilService);
   }
 
+  private Job createJob(Track[] encodedTracks, long s) throws Exception {
+    Job job = EasyMock.createNiceMock(Job.class);
+    EasyMock.expect(job.getPayload()).andReturn(MediaPackageElementParser.getArrayAsXml(Arrays.asList(encodedTracks)))
+            .anyTimes();
+    EasyMock.expect(job.getStatus()).andReturn(Job.Status.FINISHED).anyTimes();
+    EasyMock.expect(job.getDateCreated()).andReturn(new Date()).anyTimes();
+    EasyMock.expect(job.getDateStarted()).andReturn(new Date()).anyTimes();
+    EasyMock.expect(job.getQueueTime()).andReturn(new Long(s)).anyTimes();
+    EasyMock.replay(job);
+    return job;
+  }
+
+  private EncodingProfile createProfile(String name, MediaType inType, MediaType outType, String mime, String suffix) {
+    EncodingProfile profile = EasyMock.createNiceMock(EncodingProfile.class); // Video Only
+    EasyMock.expect(profile.getIdentifier()).andReturn(name).anyTimes();
+    EasyMock.expect(profile.getApplicableMediaType()).andReturn(inType).anyTimes();
+    EasyMock.expect(profile.getOutputType()).andReturn(outType).anyTimes();
+    EasyMock.expect(profile.getMimeType()).andReturn(mime).anyTimes();
+    EasyMock.expect(profile.getSuffix()).andReturn(suffix).anyTimes();
+    EasyMock.replay(profile);
+    return profile;
+  }
+
   @Before
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
@@ -229,29 +258,15 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     smilfile = new File("src/test/resources/smil.smil");
 
     // set up mock smil service
-    SmilService smilService = mockSmilService();
+    smilService = mockSmilService();
     // smilService.fromXml(FileUtils.readFileToString(smilFile, "UTF-8"))
 
     // set up mock profile
-    profile = EasyMock.createNiceMock(EncodingProfile.class);
-    EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE_ID).anyTimes();
-    EasyMock.expect(profile.getApplicableMediaType()).andReturn(MediaType.Stream).anyTimes();
-    EasyMock.expect(profile.getOutputType()).andReturn(MediaType.AudioVisual).anyTimes();
-    EasyMock.expect(profile.getSuffix()).andReturn("-v.flv").anyTimes();
-
-    profile2 = EasyMock.createNiceMock(EncodingProfile.class); // Video Only
-    EasyMock.expect(profile2.getIdentifier()).andReturn(PROFILE_ID2).anyTimes();
-    EasyMock.expect(profile2.getApplicableMediaType()).andReturn(MediaType.Visual).anyTimes();
-    EasyMock.expect(profile2.getOutputType()).andReturn(MediaType.Visual).anyTimes();
-    EasyMock.expect(profile2.getSuffix()).andReturn("-v.mp4").anyTimes();
-
-    profile3 = EasyMock.createNiceMock(EncodingProfile.class); // different suffix
-    EasyMock.expect(profile3.getIdentifier()).andReturn(PROFILE_ID3).anyTimes();
-    EasyMock.expect(profile3.getApplicableMediaType()).andReturn(MediaType.Audio).anyTimes();
-    EasyMock.expect(profile3.getOutputType()).andReturn(MediaType.Audio).anyTimes();
-    EasyMock.expect(profile3.getSuffix()).andReturn("-a.mp4").anyTimes();
-    profileList = new EncodingProfile[] { profile, profile2, profile3 };
-    EasyMock.replay(profile, profile2, profile3);
+    profile = createProfile(PROFILE_ID, MediaType.Stream, MediaType.AudioVisual, MimeTypes.MPEG4.toString(), "-v.flv");
+    profile2 = createProfile(PROFILE_ID2, MediaType.Visual, MediaType.Visual, MimeTypes.MPEG4.toString(), "-low.mp4");
+    profile3 = createProfile(PROFILE_ID3, MediaType.Audio, MediaType.Audio, MimeTypes.AAC.toString(), "-a.mp4");
+    profilehls = createProfile(PROFILE_HLS, MediaType.Stream, MediaType.Manifest, MimeTypes.HLS.toString(), ".m3u8");
+    profileList = new EncodingProfile[] { profile, profile2, profile3, profilehls };
 
     // AV both tracks
     final URI uriMP = InspectWorkflowOperationHandler.class.getResource("/process_smil_mediapackage.xml").toURI();
@@ -271,22 +286,9 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     encodedTracks = mpEncode.getTracks();
     encodedTracks2 = mpEncode2.getTracks();
 
-    job = EasyMock.createNiceMock(Job.class);
-    EasyMock.expect(job.getPayload()).andReturn(MediaPackageElementParser.getArrayAsXml(Arrays.asList(encodedTracks)))
-            .anyTimes();
-    EasyMock.expect(job.getStatus()).andReturn(Job.Status.FINISHED).anyTimes();
-    EasyMock.expect(job.getDateCreated()).andReturn(new Date()).anyTimes();
-    EasyMock.expect(job.getDateStarted()).andReturn(new Date()).anyTimes();
-    EasyMock.expect(job.getQueueTime()).andReturn(new Long(10)).anyTimes();
-    EasyMock.replay(job);
-    Job job2 = EasyMock.createNiceMock(Job.class);
-    EasyMock.expect(job2.getPayload()).andReturn(MediaPackageElementParser.getArrayAsXml(Arrays.asList(encodedTracks2)))
-            .anyTimes();
-    EasyMock.expect(job2.getStatus()).andReturn(Job.Status.FINISHED);
-    EasyMock.expect(job2.getDateCreated()).andReturn(new Date());
-    EasyMock.expect(job2.getDateStarted()).andReturn(new Date());
-    EasyMock.expect(job2.getQueueTime()).andReturn(new Long(13));
-    EasyMock.replay(job2);
+    job = createJob(encodedTracks, 10);
+    Job job2 = createJob(encodedTracks2, 13);
+
     // set up mock service registry
     ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job);
@@ -356,6 +358,94 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     operationHandler = new ProcessSmilWorkflowOperationHandler();
     operationHandler.setSmilService(smilService);
     operationHandler.setJobBarrierPollingInterval(0);
+    operationHandler.setWorkspace(workspace);
+    operationHandler.setServiceRegistry(serviceRegistry);
+    operationHandler.setComposerService(composerService);
+  }
+
+  // supplemental setup for HLS
+  public void setUpHLS() throws Exception {
+    MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
+
+    // AV both tracks
+    final URI uriMP = InspectWorkflowOperationHandler.class.getResource("/process_smil_mediapackage.xml").toURI();
+    final URI uriMPEncode = InspectWorkflowOperationHandler.class.getResource("/hls_1_var_mediapackage.xml").toURI();
+
+    mp = builder.loadFromXml(uriMP.toURL().openStream());
+    MediaPackage mpEncode = builder.loadFromXml(uriMPEncode.toURL().openStream());
+    encodedTracks = mpEncode.getTracks();
+    encodedTracks2 = new Track[encodedTracks.length];
+    encodedTracks2[0] = (Track) encodedTracks[0].clone();
+    encodedTracks2[1] = (Track) encodedTracks[1].clone();
+    encodedTracks2[2] = (Track) encodedTracks[2].clone();
+    encodedTracks2[0].setIdentifier(ENCODED_PRESENTER_TRACK_ID);
+    encodedTracks2[1].setIdentifier(ENCODED_PRESENTER_TRACK_ID);
+
+    Job job3 = createJob(encodedTracks, 10);
+    // set up mock service registry
+    ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
+    EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job3).anyTimes();
+    EasyMock.replay(serviceRegistry);
+
+    // set up mock composer service
+    composerService = EasyMock.createNiceMock(ComposerService.class);
+    EasyMock.expect(composerService.getProfile(PROFILE_ID)).andReturn(profile).anyTimes();
+    EasyMock.expect(composerService.getProfile(PROFILE_ID2)).andReturn(profile2).anyTimes();
+    EasyMock.expect(composerService.getProfile(PROFILE_ID3)).andReturn(profile3).anyTimes();
+    EasyMock.expect(composerService.getProfile(PROFILE_HLS)).andReturn(profilehls).anyTimes();
+    EasyMock.expect(composerService.processSmil((Smil) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (String) EasyMock.anyObject(), EasyMock.<List<String>> anyObject())).andReturn(job3).anyTimes();
+    EasyMock.replay(composerService);
+    // set up mock workspace
+    workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(workspace.moveTo((URI) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (String) EasyMock.anyObject(), (String) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
+              @Override
+              public URI answer() throws Throwable {
+                String name;
+                try { // media file should be returned "as is"
+                  // URI uri = (URI) EasyMock.getCurrentArguments()[0];
+                  name = (String) EasyMock.getCurrentArguments()[3];
+                  String ext = FilenameUtils.getExtension(name);
+                  if (ext.matches("[fm][pol][v43]")) {
+                    return new URI(name);
+                  }
+                } catch (Exception e) {
+                }
+                return uriMP; // default
+              }
+            }).anyTimes();
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
+      @Override
+      public File answer() throws Throwable {
+        String name;
+        try {
+          URI uri = (URI) EasyMock.getCurrentArguments()[0];
+          name = uri.getPath();
+          if (name.contains("smil.smil"))
+            return smilfile;
+        } catch (Exception e) {
+          name = uriMP.getPath();
+        }
+        return new File(name); // default
+      }
+    }).anyTimes();
+
+    EasyMock.expect(workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
+              @Override
+              public URI answer() throws Throwable {
+                File f = new File(workingDirectory, (String) EasyMock.getCurrentArguments()[1]);
+                FileOutputStream out = new FileOutputStream(f);
+                InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
+                IOUtils.copy(in, out);
+                return (f.toURI());
+              }
+            }).anyTimes();
+    EasyMock.replay(workspace);
+
+    operationHandler = new ProcessSmilWorkflowOperationHandler();
+    operationHandler.setSmilService(smilService);
     operationHandler.setWorkspace(workspace);
     operationHandler.setServiceRegistry(serviceRegistry);
     operationHandler.setComposerService(composerService);
@@ -588,6 +678,44 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     } catch (WorkflowOperationException e) {
       // expecting exception
     }
+  }
+
+  @Test
+  public void testProcessSmilHLSTwoTrackAllSections() throws Exception {
+    // operation configuration
+    String targetTags = "engage," + PROFILE_HLS + ",rss";
+    setUpHLS();
+    Map<String, String> configurations = new HashMap<>();
+    configurations.put("source-flavors", "presentation/work"); // should do 2 flavors as 2 jobs
+    configurations.put("smil-flavor", "smil/smil");
+    configurations.put("target-tags", "engage;rss"); // should collapse the tags
+    configurations.put("target-flavors", "*/delivery");
+    configurations.put("encoding-profiles", PROFILE_ID2 + "," + PROFILE_HLS);
+    configurations.put("tag-with-profile", "true");
+
+    // run the operation handler
+    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+
+    // check track metadata
+    MediaPackage mpNew = result.getMediaPackage();
+    // Track trackEncoded = mpNew.getTrack(ENCODED_PRESENTER_TRACK_ID);
+    MediaPackageElement[] mpelems = mpNew
+            .getElementsByFlavor(MediaPackageElementFlavor.parseFlavor("presentation/delivery"));
+    logger.info("Encoded tracks are : " + Arrays.toString(mpelems));
+    Assert.assertEquals(mpelems.length, 3);
+    Track trackEncoded = (Track) mpelems[0];
+    String[] mytags = trackEncoded.getTags();
+    Arrays.sort(mytags);
+    logger.info("Encoded tracks are tagged: {} should be {}", Arrays.toString(trackEncoded.getTags()), targetTags);
+    // Assert.assertArrayEquals(("MASTER," + targetTags).split(","), mytags);
+    Assert.assertArrayEquals(targetTags.split(","), mytags);
+
+    Assert.assertEquals(ENCODED_MASTER_ID, trackEncoded.getIdentifier());
+    Assert.assertEquals(SOURCE_PRESENTATION_TRACK_ID, trackEncoded.getReference().getIdentifier());
+    mpelems = mpNew.getElementsByTags(Arrays.asList((PROFILE_HLS)));
+    Assert.assertEquals(mpelems.length, 2);
+    mpelems = mpNew.getElementsByTags(Arrays.asList((PROFILE_ID2)));
+    Assert.assertEquals(mpelems.length, 1);
 
   }
 

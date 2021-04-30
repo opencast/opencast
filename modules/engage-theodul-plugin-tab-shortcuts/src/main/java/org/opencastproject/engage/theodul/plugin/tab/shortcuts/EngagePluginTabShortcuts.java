@@ -32,9 +32,9 @@ import javax.ws.rs.Path;
 @Path("/")
 public class EngagePluginTabShortcuts extends AbstractEngagePlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(EngagePluginTabShortcuts.class);
+  private static final Logger log = LoggerFactory.getLogger(EngagePluginTabShortcuts.class);
 
-    protected void activate(ComponentContext cc) {
-        log.info("Activated engage plugin: Shortcuts.");
-    }
+  protected void activate(ComponentContext cc) {
+    log.info("Activated engage plugin: Shortcuts.");
+  }
 }

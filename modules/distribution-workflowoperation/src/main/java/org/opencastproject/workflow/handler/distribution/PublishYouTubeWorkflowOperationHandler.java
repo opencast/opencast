@@ -67,12 +67,6 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
     this.publicationService = publicationService;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     logger.debug("Running youtube publication workflow operation");
@@ -125,8 +119,9 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
       }
 
       // Wait until the youtube publication job has returned
-      if (!waitForStatus(youtubeJob).isSuccess())
+      if (!waitForStatus(youtubeJob).isSuccess()) {
         throw new WorkflowOperationException("The youtube publication jobs did not complete successfully");
+      }
 
       // All the jobs have passed
       Job job = serviceRegistry.getJob(youtubeJob.getId());
@@ -146,8 +141,8 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
 
       if (newElement == null) {
         logger.warn(
-                "Publication to youtube failed, unable to parse the payload '{}' from job '{}' to a mediapackage element",
-                job.getPayload(), job);
+            "Publication to youtube failed, unable to parse the payload '{}' from job '{}' to a mediapackage element",
+            job.getPayload(), job);
         return createResult(mediaPackage, Action.CONTINUE);
       }
       mediaPackage.add(newElement);

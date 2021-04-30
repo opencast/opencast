@@ -316,6 +316,27 @@
             "displayLanguage": "T\u00fcrk\u00e7e"
         },
         {
+            "code": "zh_CN",
+            "dateFormats": {
+                "dateTime": {
+                    "short": "yy-M-d ah:mm",
+                    "medium": "yyyy-M-d H:mm:ss",
+                    "full": "yyyy'\u5e74'M'\u6708'd'\u65e5' EEEE ahh'\u65f6'mm'\u5206'ss'\u79d2' z"
+                },
+                "date": {
+                    "short": "yy-M-d",
+                    "medium": "yyyy-M-d",
+                    "full": "yyyy'\u5e74'M'\u6708'd'\u65e5' EEEE"
+                },
+                "time": {
+                    "short": "ah:mm",
+                    "medium": "H:mm:ss",
+                    "full": "ahh'\u65f6'mm'\u5206'ss'\u79d2' z"
+                }
+            },
+            "displayLanguage": "\u4e2d\u6587"
+        },
+        {
             "code": "zh_TW",
             "dateFormats": {
                 "dateTime": {

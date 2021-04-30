@@ -21,14 +21,13 @@
 
 package org.opencastproject.userdirectory;
 
-import org.opencastproject.index.IndexProducer;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.group.GroupItem;
-import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.GroupProvider;
 import org.opencastproject.security.api.JaxbGroup;
@@ -47,6 +46,8 @@ import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.userdirectory.api.AAIRoleProvider;
+import org.opencastproject.userdirectory.api.GroupRoleProvider;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
 
@@ -79,9 +80,10 @@ import javax.persistence.EntityTransaction;
     "service.description=Provides a group role directory"
   },
   immediate = true,
-  service = { RoleProvider.class, JpaGroupRoleProvider.class }
+  service = { RoleProvider.class, JpaGroupRoleProvider.class, IndexProducer.class }
 )
-public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider, GroupProvider {
+public class JpaGroupRoleProvider extends AbstractIndexProducer
+        implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);
@@ -173,9 +175,17 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   public void activate(ComponentContext cc) {
     logger.debug("Activate group role provider");
     this.cc = cc;
+  }
 
-    // Set up persistence
-    super.activate();
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.userdirectory.api.AAIRoleProvider#getRoles()
+   */
+  @Override
+  public Iterator<Role> getRoles() {
+    String orgId = securityService.getOrganization().getId();
+    return getGroupsRoles(UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf)).iterator();
   }
 
   /**
@@ -263,6 +273,22 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    *          the list of group role names
    */
   public void updateGroupMembershipFromRoles(String userName, String orgId, List<String> roleList) {
+      updateGroupMembershipFromRoles(userName, orgId, roleList, "");
+  }
+
+  /**
+   * Updates a user's group membership
+   *
+   * @param userName
+   *          the username
+   * @param orgId
+              the user's organization
+   * @param roleList
+   *          the list of group role names
+   * @param prefix
+   *          handle only roles with given prefix
+   */
+  public void updateGroupMembershipFromRoles(String userName, String orgId, List<String> roleList, String prefix) {
 
     logger.debug("updateGroupMembershipFromRoles({}, size={})", userName, roleList.size());
 
@@ -275,6 +301,10 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     // List of the user's groups
     List<JpaGroup> membership = UserDirectoryPersistenceUtil.findGroupsByUser(userName, orgId, emf);
     for (JpaGroup group : membership) {
+      if (StringUtils.isNotBlank(prefix) && !group.getRole().startsWith(prefix)) {
+        //ignore groups of other providers
+        continue;
+      }
       try {
         if (roleList.contains(group.getRole())) {
           // record this membership
@@ -286,7 +316,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
           addGroup(group);
         }
       } catch (UnauthorizedException e) {
-         logger.warn("Unable to add or remove user {} from group {} - unauthorized", userName, group.getRole());
+         logger.warn("Unauthorized to add or remove user {} from group {}", userName, group.getRole(), e);
       }
     }
 
@@ -303,7 +333,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
             logger.warn("Cannot add user {} to group {} - no group found with that role", userName, rolename);
           }
         } catch (UnauthorizedException e) {
-          logger.warn("Unable to add user {} to group {} - unauthorized", userName, group.getRole());
+          logger.warn("Unauthorized to add user {} to group {}", userName, group.getRole(), e);
         }
       }
     }
@@ -329,6 +359,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @param group
    *          the group to add
    */
+  @Override
   public void addGroup(final JpaGroup group) throws UnauthorizedException {
     if (group != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, group.getRoles()))
       throw new UnauthorizedException("The user is not allowed to add or update a group with the admin role");
@@ -519,23 +550,11 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   }
 
   /**
-   * Update a group
+   * {@inheritDoc}
    *
-   * @param groupId
-   *          the id of the group to update
-   * @param name
-   *          the name to update
-   * @param description
-   *          the description to update
-   * @param roles
-   *          the roles to update
-   * @param users
-   *          the users to update
-   * @throws NotFoundException
-   *           if the group is not found
-   * @throws UnauthorizedException
-   *           if the user does not have rights to update the group
+   * @see org.opencastproject.userdirectory.api.GroupRoleProvider#updateGroup(String, String, String, String, String)
    */
+  @Override
   public void updateGroup(String groupId, String name, String description, String roles, String users)
           throws NotFoundException, UnauthorizedException {
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
@@ -592,63 +611,26 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   }
 
   @Override
-  public void repopulate(final String indexName) {
-    final String destinationId = GroupItem.GROUP_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+  public void repopulate(final AbstractSearchIndex index) {
+    final String destinationId = GroupItem.GROUP_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName());
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
       SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
         final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
         int total = groups.size();
-        final int responseInterval = (total < 100) ? 1 : (total / 100);
         int current = 1;
-        logger.info(
-                "Re-populating index '{}' with groups of organization {}. There are {} group(s) to add to the index.",
-                indexName, securityService.getOrganization().getId(), total);
+        logIndexRebuildBegin(logger, index.getIndexName(), total, "groups", organization);
         for (JpaGroup group : groups) {
           messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                   GroupItem.update(JaxbGroup.fromGroup(group)));
-          if (((current % responseInterval) == 0) || (current == total)) {
-            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                  IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Groups, total, current));
-          }
+          logIndexRebuildProgress(logger, index.getIndexName(), total, current);
           current++;
         }
       });
     }
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Groups));
-    });
   }
 
   @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.Groups;
   }
-
-  @Override
-  public Service getService() {
-    return Service.Groups;
-  }
-
-  @Override
-  public String getClassName() {
-    return JpaGroupRoleProvider.class.getName();
-  }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return SecurityUtil.getSystemUserName(cc);
-  }
-
 }

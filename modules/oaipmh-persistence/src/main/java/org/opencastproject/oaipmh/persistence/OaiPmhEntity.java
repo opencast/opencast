@@ -58,21 +58,21 @@ public class OaiPmhEntity {
 
   /** media package id, primary key */
   @Id
-  @Column(name = "mp_id", length = 128)
+  @Column(name = "mp_id", length = 64)
   private String mediaPackageId;
 
   /** Organization id */
   @Id
-  @Column(name = "organization", length = 128)
+  @Column(name = "organization", length = 96)
   protected String organization;
 
   /** Repository id */
   @Id
-  @Column(name = "repo_id")
+  @Column(name = "repo_id", length = 12)
   private String repositoryId;
 
   /** Series id */
-  @Column(name = "series_id")
+  @Column(name = "series_id",length = 128)
   private String series;
 
   /** Flag indicating deletion. */
@@ -91,7 +91,7 @@ public class OaiPmhEntity {
 
   /** Serialized media package */
   @Lob
-  @Column(name = "mediapackage_xml", length = 65535)
+  @Column(name = "mediapackage_xml", length = 65535, nullable = false)
   private String mediaPackageXML;
 
   /** List of serialized media package element entities */

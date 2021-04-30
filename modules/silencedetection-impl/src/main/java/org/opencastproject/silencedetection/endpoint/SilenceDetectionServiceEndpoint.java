@@ -34,6 +34,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -48,9 +51,22 @@ import javax.ws.rs.core.Response;
  * SilenceDetectionService REST Endpoint.
  */
 @Path("/")
-@RestService(name = "SilenceDetectionServiceEndpoint", title = "Silence Detection Service REST Endpoint",
-        abstractText = "Detect silent sequences in audio file.",
-        notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/silencedetection)"})
+@RestService(
+    name = "SilenceDetectionServiceEndpoint",
+    title = "Silence Detection Service REST Endpoint",
+    abstractText = "Detect silent sequences in audio file.",
+    notes = {"All paths above are relative to the REST endpoint base (/silencedetection)"}
+)
+@Component(
+    property = {
+        "service.description=Silence Detection Service REST Endpoint",
+        "opencast.service.type=org.opencastproject.silencedetection",
+        "opencast.service.path=/silencedetection",
+        "opencast.service.jobproducer=true"
+    },
+    immediate = true,
+    service = SilenceDetectionServiceEndpoint.class
+)
 public class SilenceDetectionServiceEndpoint extends AbstractJobProducerEndpoint {
 
   private SilenceDetectionService silenceDetectionService;
@@ -59,18 +75,27 @@ public class SilenceDetectionServiceEndpoint extends AbstractJobProducerEndpoint
   @POST
   @Path("/detect")
   @Produces({MediaType.APPLICATION_XML})
-  @RestQuery(name = "detect", description = "Create silence detection job.",
-          returnDescription = "Silence detection job.",
-          restParameters = {
-            @RestParameter(name = "track", type = RestParameter.Type.TEXT,
-                    description = "Track where to run silence detection.", isRequired = true),
-            @RestParameter(name = "referenceTracks", type = RestParameter.Type.TEXT,
-                    description = "Tracks referenced by resulting smil (as sources).", isRequired = false)
-          },
-          reponses = {
-            @RestResponse(description = "Silence detection job created successfully.", responseCode = HttpServletResponse.SC_OK),
-            @RestResponse(description = "Create silence detection job failed.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-          })
+  @RestQuery(
+      name = "detect",
+      description = "Create silence detection job.",
+      returnDescription = "Silence detection job.",
+      restParameters = {
+          @RestParameter(name = "track", type = RestParameter.Type.TEXT,
+              description = "Track where to run silence detection.", isRequired = true),
+          @RestParameter(name = "referenceTracks", type = RestParameter.Type.TEXT,
+              description = "Tracks referenced by resulting smil (as sources).", isRequired = false)
+      },
+      responses = {
+          @RestResponse(
+              description = "Silence detection job created successfully.",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "Create silence detection job failed.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+          )
+      }
+  )
   public Response detect(@FormParam("track") String trackXml, @FormParam("referenceTracks") String referenceTracksXml) {
     try {
       Track track = (Track) MediaPackageElementParser.getFromXml(trackXml);
@@ -102,10 +127,12 @@ public class SilenceDetectionServiceEndpoint extends AbstractJobProducerEndpoint
     return serviceRegistry;
   }
 
+  @Reference
   public void setSilenceDetectionService(SilenceDetectionService silenceDetectionService) {
     this.silenceDetectionService = silenceDetectionService;
   }
 
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

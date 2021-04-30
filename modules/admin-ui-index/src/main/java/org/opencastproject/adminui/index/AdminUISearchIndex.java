@@ -21,18 +21,23 @@
 
 package org.opencastproject.adminui.index;
 
+import org.opencastproject.elasticsearch.api.SearchIndex;
+import org.opencastproject.elasticsearch.impl.AbstractElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
+import org.opencastproject.elasticsearch.index.group.Group;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.theme.Theme;
+import org.opencastproject.elasticsearch.index.theme.ThemeIndexSchema;
 import org.opencastproject.index.service.api.EventIndex;
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
-import org.opencastproject.index.service.impl.index.event.Event;
-import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
-import org.opencastproject.index.service.impl.index.group.Group;
-import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.impl.index.theme.Theme;
-import org.opencastproject.index.service.impl.index.theme.ThemeIndexSchema;
 import org.opencastproject.util.data.Option;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.ComponentException;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,6 +45,14 @@ import java.util.List;
 /**
  * A search index implementation based on ElasticSearch.
  */
+@Component(
+        property = {
+                "service.description=Admin Interface Search Index",
+                "index.name=adminui"
+        },
+        immediate = true,
+        service = { SearchIndex.class, AbstractSearchIndex.class, AdminUISearchIndex.class }
+)
 public class AdminUISearchIndex extends AbstractSearchIndex implements EventIndex {
 
   /** The name of this index */
@@ -49,8 +62,13 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
   private static final int INDEX_VERSION = 101;
 
   /** The document types */
-  private static final String[] DOCUMENT_TYPES = new String[] { Event.DOCUMENT_TYPE, Group.DOCUMENT_TYPE,
-          Series.DOCUMENT_TYPE, Theme.DOCUMENT_TYPE, "version" };
+  private static final String[] DOCUMENT_TYPES = new String[] {
+      Event.DOCUMENT_TYPE,
+      Group.DOCUMENT_TYPE,
+      Series.DOCUMENT_TYPE,
+      Theme.DOCUMENT_TYPE,
+      "version"
+  };
 
   /**
    * OSGi callback to activate this component instance.
@@ -60,7 +78,7 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
    * @throws ComponentException
    *           if the search index cannot be initialized
    */
-  @Override
+  @Activate
   public void activate(ComponentContext ctx) throws ComponentException {
     super.activate(ctx);
     try {
@@ -77,6 +95,7 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
    *          the component context
    * @throws IOException
    */
+  @Deactivate
   public void deactivate(ComponentContext ctx) throws IOException {
     close();
   }
@@ -87,7 +106,7 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
   }
 
   /**
-   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchIndex#getDocumentTypes()
+   * @see AbstractElasticsearchIndex#getDocumentTypes()
    */
   @Override
   public String[] getDocumentTypes() {

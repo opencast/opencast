@@ -117,8 +117,9 @@ public class SearchResultImpl implements SearchResult {
    */
   public SearchResultImpl(String query) {
     this();
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query cannot be null");
+    }
     this.query = query;
   }
 
@@ -138,8 +139,9 @@ public class SearchResultImpl implements SearchResult {
    *          the item to add
    */
   public void addItem(SearchResultItemImpl item) {
-    if (item == null)
+    if (item == null) {
       throw new IllegalArgumentException("Parameter item cannot be null");
+    }
     resultSet.add(item);
   }
 
@@ -243,8 +245,9 @@ public class SearchResultImpl implements SearchResult {
    * @see org.opencastproject.search.api.SearchResult#getPage()
    */
   public long getPage() {
-    if (limit != 0)
+    if (limit != 0) {
       return offset / limit;
+    }
     return 0;
   }
 

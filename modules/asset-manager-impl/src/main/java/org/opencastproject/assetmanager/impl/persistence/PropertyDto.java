@@ -41,6 +41,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -49,7 +50,14 @@ import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 @Entity(name = "Property")
-@Table(name = "oc_assets_properties")
+@Table(name = "oc_assets_properties", indexes = {
+    @Index(name = "IX_oc_assets_properties_val_date", columnList = ("val_date")),
+    @Index(name = "IX_oc_assets_properties_val_long", columnList = ("val_long")),
+    @Index(name = "IX_oc_assets_properties_val_string", columnList = ("val_string")),
+    @Index(name = "IX_oc_assets_properties_val_bool", columnList = ("val_bool")),
+    @Index(name = "IX_oc_assets_properties_mediapackage_id", columnList = ("mediapackage_id")),
+    @Index(name = "IX_oc_assets_properties_namespace", columnList = ("namespace")),
+    @Index(name = "IX_oc_assets_properties_property_name", columnList = ("property_name")) })
 @NamedQueries({
     @NamedQuery(name = "Property.selectByMediaPackageAndNamespace", query = "select p from Property p where "
             + "p.mediaPackageId = :mediaPackageId and p.namespace = :namespace"),
@@ -126,31 +134,31 @@ public class PropertyDto {
 
   private static void setValue(final PropertyDto dto, final Value value) {
     value.decompose(
-            new Fx<String>() {
-              @Override public void apply(String a) {
-                dto.stringValue = a;
-              }
-            }.toFn(),
-            new Fx<Date>() {
-              @Override public void apply(Date a) {
-                dto.dateValue = a;
-              }
-            }.toFn(),
-            new Fx<Long>() {
-              @Override public void apply(Long a) {
-                dto.longValue = a;
-              }
-            }.toFn(),
-            new Fx<Boolean>() {
-              @Override public void apply(Boolean a) {
-                dto.boolValue = a;
-              }
-            }.toFn(),
-            new Fx<Version>() {
-              @Override public void apply(Version a) {
-                dto.longValue = RuntimeTypes.convert(a).value();
-              }
-            }.toFn());
+        new Fx<String>() {
+          @Override public void apply(String a) {
+            dto.stringValue = a;
+          }
+        }.toFn(),
+        new Fx<Date>() {
+          @Override public void apply(Date a) {
+            dto.dateValue = a;
+          }
+        }.toFn(),
+        new Fx<Long>() {
+          @Override public void apply(Long a) {
+            dto.longValue = a;
+          }
+        }.toFn(),
+        new Fx<Boolean>() {
+          @Override public void apply(Boolean a) {
+            dto.boolValue = a;
+          }
+        }.toFn(),
+        new Fx<Version>() {
+          @Override public void apply(Version a) {
+            dto.longValue = RuntimeTypes.convert(a).value();
+          }
+        }.toFn());
   }
 
   public static int delete(EntityManager em, final String mediaPackageId) {

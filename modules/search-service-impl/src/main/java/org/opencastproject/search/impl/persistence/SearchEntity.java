@@ -43,15 +43,25 @@ import javax.persistence.TemporalType;
  * Entity object for storing search in persistence storage. Media package id is stored as primary key.
  */
 @Entity(name = "SearchEntity")
-@Table(name = "oc_search", indexes = {
-    @Index(name = "IX_oc_search_series", columnList = ("series_id")),
-    @Index(name = "IX_oc_search_organization", columnList = ("organization")) })
+@Table(name = "oc_search",
+    indexes = {
+        @Index(name = "IX_oc_search_series", columnList = ("series_id")),
+        @Index(name = "IX_oc_search_organization", columnList = ("organization"))
+    }
+)
 @NamedQueries({
     @NamedQuery(name = "Search.findAll", query = "SELECT s FROM SearchEntity s"),
     @NamedQuery(name = "Search.getCount", query = "SELECT COUNT(s) FROM SearchEntity s"),
-    @NamedQuery(name = "Search.findById", query = "SELECT s FROM SearchEntity s WHERE s.mediaPackageId=:mediaPackageId"),
-    @NamedQuery(name = "Search.findBySeriesId", query = "SELECT s FROM SearchEntity s WHERE s.seriesId=:seriesId"),
-    @NamedQuery(name = "Search.getNoSeries", query = "SELECT s FROM SearchEntity s WHERE s.seriesId IS NULL")})
+    @NamedQuery(
+        name = "Search.findById",
+        query = "SELECT s FROM SearchEntity s WHERE s.mediaPackageId=:mediaPackageId"
+    ),
+    @NamedQuery(
+        name = "Search.findBySeriesId",
+        query = "SELECT s FROM SearchEntity s WHERE s.seriesId=:seriesId and s.deletionDate is null"
+    ),
+    @NamedQuery(name = "Search.getNoSeries", query = "SELECT s FROM SearchEntity s WHERE s.seriesId IS NULL")
+})
 public class SearchEntity {
 
   /** media package id, primary key */

@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
 
 public class EngagePluginImpl extends AbstractEngagePlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(EngagePluginImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(EngagePluginImpl.class);
 
-    protected void activate(ComponentContext cc) {
-        log.info("Activated engage plugin: Matomo.");
-    }
+  protected void activate(ComponentContext cc) {
+    log.info("Activated engage plugin: Matomo.");
+  }
 }

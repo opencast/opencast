@@ -22,15 +22,16 @@
 package org.opencastproject.index.service.catalog.adapter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_FLAVOR_KEY;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_ORGANIZATION_KEY;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_TITLE_KEY;
 
 import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEventDCCatalogUIAdapter;
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -39,6 +40,7 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.MetadataField;
@@ -108,8 +110,8 @@ public class DublinCoreCatalogUIAdapterTest {
 
   private FileInputStream startDateTimeDurationCatalog;
   private DublinCoreCatalog dc;
-  private MetadataField<String> startDateMetadataField;
-  private MetadataField<String> durationMetadataField;
+  private MetadataField startDateMetadataField;
+  private MetadataField durationMetadataField;
 
   private DublinCoreMetadataCollection metadata;
 
@@ -122,12 +124,38 @@ public class DublinCoreCatalogUIAdapterTest {
             "/catalog-adapter/start-date-time-duration.xml").toURI()));
     dc = DublinCores.read(startDateTimeDurationCatalog);
     metadata = new DublinCoreMetadataCollection();
-    startDateMetadataField = MetadataField.createTemporalStartDateMetadata(TEMPORAL_DUBLIN_CORE_KEY,
-            Opt.some("startDate"), "START_DATE_LABEL", false, false, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Opt.<Integer> none(),
-            Opt.<String> none());
-    durationMetadataField = MetadataField.createDurationMetadataField(TEMPORAL_DUBLIN_CORE_KEY, Opt.some("duration"),
-            "DURATION_LABEL", false, false, Opt.<Integer> none(), Opt.<String> none());
-    TreeMap<String, String> collection = new TreeMap<String, String>();
+    startDateMetadataField = new MetadataField(
+            TEMPORAL_DUBLIN_CORE_KEY,
+            "startDate",
+            "START_DATE_LABEL",
+            false,
+            false,
+            null,
+            null,
+            MetadataField.Type.START_DATE,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+            null);
+    durationMetadataField = new MetadataField(TEMPORAL_DUBLIN_CORE_KEY,
+            "duration",
+            "DURATION_LABEL",
+            false,
+            false,
+            "",
+            null,
+            MetadataField.Type.DURATION,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+    TreeMap<String, String> collection = new TreeMap<>();
     collection.put("Entry 1", "Value 1");
     collection.put("Entry 2", "Value 2");
     collection.put("Entry 3", "Value 3");
@@ -186,7 +214,7 @@ public class DublinCoreCatalogUIAdapterTest {
     EasyMock.expect(mediapackage.getIdentifier()).andReturn(id).anyTimes();
     EasyMock.replay(mediapackage);
 
-    dictionary = new Hashtable<String, String>();
+    dictionary = new Hashtable<>();
 
     dictionary.put(CONF_ORGANIZATION_KEY, ORGANIZATION_STRING);
     dictionary.put(CONF_FLAVOR_KEY, FLAVOR_STRING);
@@ -209,15 +237,12 @@ public class DublinCoreCatalogUIAdapterTest {
     assertEquals(
             name,
             DublinCoreMetadataUtil.getDublinCorePropertyName(
-                    MetadataField.CONFIG_PROPERTY_PREFIX + "." + name + "." + MetadataField.CONFIG_INPUT_ID_KEY).get());
-    assertEquals(Opt.none(),
-            DublinCoreMetadataUtil.getDublinCorePropertyName(MetadataField.CONFIG_PROPERTY_PREFIX + "." + name + "."));
-    assertEquals(Opt.none(),
-            DublinCoreMetadataUtil.getDublinCorePropertyName(name + "." + MetadataField.CONFIG_INPUT_ID_KEY));
-    assertEquals(
-            Opt.none(),
-            DublinCoreMetadataUtil.getDublinCorePropertyName("Irrelevant." + name + "."
-                    + MetadataField.CONFIG_INPUT_ID_KEY));
+                    MetadataField.CONFIG_PROPERTY_PREFIX + "." + name + "." + MetadataField.CONFIG_INPUT_ID_KEY));
+    assertNull(DublinCoreMetadataUtil
+            .getDublinCorePropertyName(MetadataField.CONFIG_PROPERTY_PREFIX + "." + name + "."));
+    assertNull(DublinCoreMetadataUtil.getDublinCorePropertyName(name + "." + MetadataField.CONFIG_INPUT_ID_KEY));
+    assertNull(DublinCoreMetadataUtil
+            .getDublinCorePropertyName("Irrelevant." + name + "." + MetadataField.CONFIG_INPUT_ID_KEY));
   }
 
   @Test
@@ -226,21 +251,21 @@ public class DublinCoreCatalogUIAdapterTest {
     assertEquals(
             MetadataField.CONFIG_INPUT_ID_KEY,
             DublinCoreMetadataUtil.getDublinCorePropertyKey(
-                    MetadataField.CONFIG_PROPERTY_PREFIX + "." + name + "." + MetadataField.CONFIG_INPUT_ID_KEY).get());
+                    MetadataField.CONFIG_PROPERTY_PREFIX + "." + name + "." + MetadataField.CONFIG_INPUT_ID_KEY));
   }
 
   @Test
   public void testGetDublinCoreProperties() {
-    Map<String, MetadataField<?>> dublinCoreProperties = DublinCoreMetadataUtil.getDublinCoreProperties(dictionary);
+    Map<String, MetadataField> dublinCoreProperties = DublinCoreMetadataUtil.getDublinCoreProperties(dictionary);
     assertEquals(1, dublinCoreProperties.size());
-    List<MetadataField<?>> metadataFields = new ArrayList<MetadataField<?>>(dublinCoreProperties.values());
+    List<MetadataField> metadataFields = new ArrayList<>(dublinCoreProperties.values());
     assertEquals(title, metadataFields.get(0).getInputID());
     assertEquals(label, metadataFields.get(0).getLabel());
     assertEquals(MetadataField.Type.TEXT, metadataFields.get(0).getType());
-    assertEquals(true, metadataFields.get(0).isReadOnly());
-    assertEquals(true, metadataFields.get(0).isRequired());
-    assertEquals(listProvider, metadataFields.get(0).getListprovider().get());
-    assertEquals(collectionID, metadataFields.get(0).getCollectionID().get());
+    assertTrue(metadataFields.get(0).isReadOnly());
+    assertTrue(metadataFields.get(0).isRequired());
+    assertEquals(listProvider, metadataFields.get(0).getListprovider());
+    assertEquals(collectionID, metadataFields.get(0).getCollectionID());
   }
 
   @Test
@@ -257,24 +282,81 @@ public class DublinCoreCatalogUIAdapterTest {
 
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
 
-    MetadataField<String> titleField = MetadataField.createTextMetadataField(title, Opt.some(title),
-            "New Label for Title", true, false, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none());
+    MetadataField titleField = new MetadataField(
+            title,
+            title,
+            "New Label for Title",
+            true,
+            false,
+            null,
+            null,
+            MetadataField.Type.TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     dublinCoreMetadata.addField(titleField, expectedTitle, listProvidersService);
     titleField.setUpdated(true);
 
-    MetadataField<String> missingField = MetadataField.createTextMetadataField("missing", Opt.none(),
-            "The Missing's Label", false, false, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none());
+    MetadataField missingField = new MetadataField(
+            "missing",
+            null,
+            "The Missing's Label",
+            false,
+            false,
+            null,
+            null,
+            MetadataField.Type.TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     dublinCoreMetadata.addField(missingField, expectedMissing, listProvidersService);
     missingField.setUpdated(true);
 
-    MetadataField<String> durationField = MetadataField.createDurationMetadataField(temporal, Opt.some("duration"),
-            label, true, true, Opt.none(), Opt.none());
-    dublinCoreMetadata.addField(durationField, "start=2016-03-01T09:27:35Z; end=2016-03-01T11:43:12Z; scheme=W3C-DTF;",
+    MetadataField durationField = new MetadataField(temporal,
+            "duration",
+            label,
+            true,
+            true,
+            "",
+            null,
+            MetadataField.Type.DURATION,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+    dublinCoreMetadata.addField(
+            durationField,
+            "start=2016-03-01T09:27:35Z; end=2016-03-01T11:43:12Z; scheme=W3C-DTF;",
             listProvidersService);
     durationField.setUpdated(true);
 
-    MetadataField<String> startDate = MetadataField.createTemporalStartDateMetadata(temporal, Opt.some("startDate"),
-            label, true, true, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Opt.none(), Opt.none());
+    MetadataField startDate = new MetadataField(
+            temporal,
+            "startDate",
+            label,
+            true,
+            true,
+            null,
+            null,
+            MetadataField.Type.START_DATE,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+            null);
     dublinCoreMetadata.addField(startDate, "2016-03-01T09:27:35.000Z", listProvidersService);
     startDate.setUpdated(true);
 
@@ -298,12 +380,12 @@ public class DublinCoreCatalogUIAdapterTest {
     int endSecond = 23;
 
     // Test a none() period
-    Opt<DCMIPeriod> emptyPeriod = Opt.<DCMIPeriod> none();
+    Opt<DCMIPeriod> emptyPeriod = Opt.none();
     Long result = DublinCoreMetadataUtil.getDuration(emptyPeriod);
     assertEquals(new Long(0L), result);
 
-    DateTime periodStart = new DateTime(2014, 11, 04, startHour, startMinute, startSecond, DateTimeZone.UTC);
-    DateTime periodEnd = new DateTime(2014, 11, 04, endHour, endMinute, endSecond, DateTimeZone.UTC);
+    DateTime periodStart = new DateTime(2014, 11, 4, startHour, startMinute, startSecond, DateTimeZone.UTC);
+    DateTime periodEnd = new DateTime(2014, 11, 4, endHour, endMinute, endSecond, DateTimeZone.UTC);
 
     // Test a period that is missing the start date
     DCMIPeriod withoutStartPeriod = new DCMIPeriod(null, periodEnd.toDate());
@@ -322,8 +404,8 @@ public class DublinCoreCatalogUIAdapterTest {
   }
 
   @Test
-  public void testSetStartDateInputEmptyValueExpectsNoChange() throws IOException, URISyntaxException {
-    metadata.addField(new MetadataField<>(startDateMetadataField), "2013-10-29T19:35:19.000Z", listProvidersService);
+  public void testSetStartDateInputEmptyValueExpectsNoChange() {
+    metadata.addField(new MetadataField(startDateMetadataField), "2013-10-29T19:35:19.000Z", listProvidersService);
     DublinCoreMetadataUtil.setStartDate(dc, startDateMetadataField, temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
     assertEquals(1, result.size());
@@ -331,7 +413,7 @@ public class DublinCoreCatalogUIAdapterTest {
   }
 
   @Test
-  public void testSetTemporalStartDateInputNewValueExpectsChange() throws IOException, URISyntaxException {
+  public void testSetTemporalStartDateInputNewValueExpectsChange() {
     startDateMetadataField.setValue("2013-10-29T19:35:19.000Z");
     metadata.addField(startDateMetadataField, "2013-10-29T19:35:19.000Z", listProvidersService);
     DublinCoreMetadataUtil.setStartDate(dc, startDateMetadataField, temporalEname);
@@ -341,7 +423,7 @@ public class DublinCoreCatalogUIAdapterTest {
   }
 
   @Test
-  public void testSetDurationInputEmptyValueExpectsNoChange() throws IOException, URISyntaxException {
+  public void testSetDurationInputEmptyValueExpectsNoChange() {
     metadata.addField(durationMetadataField, "", listProvidersService);
     DublinCoreMetadataUtil.setStartDate(dc, startDateMetadataField, temporalEname);
     DublinCoreMetadataUtil.setDuration(dc, durationMetadataField, temporalEname);
@@ -351,7 +433,7 @@ public class DublinCoreCatalogUIAdapterTest {
   }
 
   @Test
-  public void testSetDurationInputNewValueExpectsChange() throws IOException, URISyntaxException {
+  public void testSetDurationInputNewValueExpectsChange() {
     metadata.addField(new MetadataField(durationMetadataField), CHANGED_DURATION_PERIOD, listProvidersService);
     DublinCoreMetadataUtil.setDuration(dc, metadata.getOutputFields().get("duration"), temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
@@ -364,9 +446,22 @@ public class DublinCoreCatalogUIAdapterTest {
     FileInputStream fis = new FileInputStream(new File(getClass().getResource(
             "/catalog-adapter/start-date-time-duration.xml").toURI()));
     DublinCoreCatalog catalog = DublinCores.read(fis);
-    MetadataField<String> startDate = MetadataField.createTemporalStartDateMetadata(TEMPORAL_DUBLIN_CORE_KEY,
-            Opt.some("startDate"), "START_DATE_LABEL", false, false, "yyyy-MM-dd", Opt.<Integer> none(),
-            Opt.<String> none());
+    MetadataField startDate = new MetadataField(
+            TEMPORAL_DUBLIN_CORE_KEY,
+            "startDate",
+            "START_DATE_LABEL",
+            false,
+            false,
+            null,
+            null,
+            MetadataField.Type.START_DATE,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "yyyy-MM-dd",
+            null);
     DublinCoreMetadataCollection metadata = new DublinCoreMetadataCollection();
     metadata.addField(startDate, "2014-11-01", listProvidersService);
     DublinCoreMetadataUtil.updateDublincoreCatalog(catalog, metadata);

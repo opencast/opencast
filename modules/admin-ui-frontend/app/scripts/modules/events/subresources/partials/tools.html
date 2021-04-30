@@ -46,367 +46,375 @@
       -->
       <div class="video-container">
 
-        <div data-video-player data-player="player" data-video="video" data-adapter="html5" data-player-ref="player" />
+        <div data-video-player
+             data-player="player"
+             data-video="video"
+             data-adapter="html5"
+             data-player-ref="player">
+        </div>
 
-          <div class="tool-tab" ng-if="tab === 'editor' && player.adapter">
-            <div data-admin-ng-timeline="" data-video="video" data-player="player"></div>
+        <div class="tool-tab" ng-if="tab === 'editor' && player.adapter">
+          <div data-admin-ng-timeline="" data-video="video" data-player="player"></div>
+        </div>
+        <div class="event-container" ng-controller="EventCtrl">
+          <div>
+            <nav class="modal-nav view-controller-secondary">
+              <a ng-class="{active: area === 'segments'}"
+                 ng-if="tab === 'editor'"
+                 ng-click="openArea('segments')" translate>VIDEO_TOOL.AREAS.SEGMENTS</a>
+              <a ng-class="{active: area === 'metadata'}"
+                 ng-click="openArea('metadata')" translate>VIDEO_TOOL.AREAS.METADATA</a>
+              <a ng-class="{active: area === 'thumbnail'}" ng-if="tab === 'editor' && video.thumbnail_enabled"
+                                                           ng-click="openArea('thumbnail')" translate>VIDEO_TOOL.AREAS.THUMBNAIL</a>
+              <a ng-class="{active: area === 'tracks'}" ng-if="tab === 'editor'"
+                                                        ng-click="openArea('tracks')" translate>VIDEO_TOOL.AREAS.TRACKS</a>
+              <a ng-class="{active: area === 'comments'}"
+                 ng-click="openArea('comments')" translate>VIDEO_TOOL.AREAS.COMMENTS</a>
+            </nav>
           </div>
-          <div class="event-container" ng-controller="EventCtrl">
-            <div>
-              <nav class="modal-nav view-controller-secondary">
-                <a ng-class="{active: area === 'segments'}" ng-if="tab === 'editor'"
-                                                            ng-click="openArea('segments')" translate>VIDEO_TOOL.AREAS.SEGMENTS</a>
-                <a ng-class="{active: area === 'metadata'}"
-                   ng-click="openArea('metadata')" translate>VIDEO_TOOL.AREAS.METADATA</a>
-                <a ng-class="{active: area === 'thumbnail'}" ng-if="tab === 'editor' && video.thumbnail_enabled"
-                                                             ng-click="openArea('thumbnail')" translate>VIDEO_TOOL.AREAS.THUMBNAIL</a>
-                <a ng-class="{active: area === 'tracks'}" ng-if="tab === 'editor'"
-                                                          ng-click="openArea('tracks')" translate>VIDEO_TOOL.AREAS.TRACKS</a>
-                <a ng-class="{active: area === 'comments'}"
-                   ng-click="openArea('comments')" translate>VIDEO_TOOL.AREAS.COMMENTS</a>
-              </nav>
-            </div>
 
-            <div ng-if="area === 'metadata'">
-              <div class="area-body">
-                <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
-                <div class="full-col">
-                  <div class="obj tbl-details">
-                    <header><span translate="EVENTS.EVENTS.DETAILS.METADATA.CAPTION"><!-- Event details --></span></header>
-                    <div class="obj-container">
-                      <table class="main-tbl">
-                        <tr ng-repeat="row in episodeCatalog.fields track by $index">
-                          <td translate="{{ row.label }}"></td>
-                          <td admin-ng-editable
-                              required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                              params="row" save="getSaveFunction(episodeCatalog.flavor)">
-                          </td>
-                        </tr>
-                      </table>
+          <div ng-if="area === 'metadata'">
+            <div class="area-body">
+              <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
+              <div class="full-col">
+                <div class="obj tbl-details">
+                  <header><span translate="EVENTS.EVENTS.DETAILS.METADATA.CAPTION"><!-- Event details --></span></header>
+                  <div class="obj-container">
+                    <table class="main-tbl">
+                      <tr ng-repeat="row in episodeCatalog.fields track by $index">
+                        <td translate="{{ row.label }}"></td>
+                        <td admin-ng-editable
+                            required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
+                            params="row" save="getSaveFunction(episodeCatalog.flavor)">
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div ng-if="area === 'thumbnail' && video.thumbnail_enabled" class="editor-thumbnail">
+            <div class="area-body">
+              <div class="full-col">
+                <div class="obj content-wrapper">
+                  <div class="thumbnail-canvas" style="background-image:url({{video.thumbnail.url}})">
+                    <div ng-show="video.thumbnail.loading">
+                      <i class='fa fa-spinner fa-spin spinner'></i>
+                    </div>
+                    <div ng-show="video.thumbnail && !video.thumbnail.url && !video.thumbnail.loading"
+                         translate="VIDEO_TOOL.THUMBNAIL.PREVIEW.NOT_AVAILABLE">
+                      <!-- No preview available -->
+                    </div>
+                    <div ng-show="video.thumbnail && !video.thumbnail.loading && video.thumbnail.type === 'DEFAULT' && video.thumbnail.defaultThumbnailPositionChanged"
+                         translate="VIDEO_TOOL.THUMBNAIL.PREVIEW.OUTDATED">
+                      <!-- preview outdated -->
+                    </div>
+                    <div ng-show="!video || !video.thumbnail">
+                      <i class="fa fa-exclamation-circle error"></i>
+                    </div>
+                  </div>
+
+                  <div class="controls">
+                    <div class="description">
+                      <p translate="VIDEO_TOOL.THUMBNAIL.DESCRIPTION"><!-- Description --></p>
+                      <br/>
+                      <p ng-if="video.thumbnail.type === 'DEFAULT'" translate="VIDEO_TOOL.THUMBNAIL.CURRENT.DEFAULT">
+                      <!-- You are currently using the default thumbnail. -->
+                      </p>
+                      <p ng-if="video.thumbnail.type === 'SNAPSHOT'" translate="VIDEO_TOOL.THUMBNAIL.CURRENT.SNAPSHOT">
+                      <!-- You are currently using a thumbnail that has been extracted from the video. -->
+                      </p>
+                      <p ng-if="video.thumbnail.type === 'UPLOAD'" translate="VIDEO_TOOL.THUMBNAIL.CURRENT.UPLOAD">
+                      <!-- You are currently using a thumbnail that has been uploaded. -->
+                      </p>
+                    </div>
+                    <div class="function-buttons">
+                      <a class="extract-thumbnail"
+                         ng-if="video.source_tracks.length === 1"
+                         translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.LABEL"
+                         title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.TOOLTIP' |translate  }}"
+                         ng-click="changeThumbnail(undefined, 'single', player.adapter.getCurrentTime())"
+                         ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
+                        <!-- Extract -->
+                      </a>
+                      <a class="extract-thumbnail"
+                         ng-if="video.source_tracks.length > 1"
+                         translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.LABEL"
+                         title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.TOOLTIP' |translate  }}"
+                         ng-click="changeThumbnail(undefined, 'left', player.adapter.getCurrentTime())"
+                         ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
+                        <!-- Extract -->
+                      </a>
+                      <a class="extract-thumbnail"
+                         ng-if="video.source_tracks.length > 1"
+                         translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.LABEL"
+                         title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.TOOLTIP' | translate }}"
+                         ng-click="changeThumbnail(undefined, 'right', player.adapter.getCurrentTime())"
+                         ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
+                        <!-- Extract from video -->
+                      </a>
+                      <form>
+                        <a class="upload-thumbnail"
+                           translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.UPLOAD.LABEL"
+                           title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.UPLOAD.TOOLTIP' | translate }}"
+                           onclick="angular.element('#thumbnail-upload').click()"
+                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
+                          <!-- Upload image -->
+                        </a>
+                        <input
+                          id="thumbnail-upload"
+                          class="hidden"
+                          type="file"
+                          accept="image/*"
+                          onchange="angular.element(this).scope().changeThumbnail(this.files[0], undefined, undefined)"
+                          ng-disabled="video.thumbnail.loading"/>
+                      </form>
+                      <a class="use-default-thumbnail"
+                         translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.USE_DEFAULT.LABEL"
+                         title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.USE_DEFAULT.TOOLTIP' | translate }}"
+                         ng-click="changeThumbnail(undefined, 'DEFAULT', calculateDefaultThumbnailPosition())"
+                         ng-if="video.thumbnail.url && video.thumbnail.type !== 'DEFAULT'"
+                         ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
+                        <!-- Use default thumbnail -->
+                      </a>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div ng-if="area === 'thumbnail' && video.thumbnail_enabled" class="editor-thumbnail">
-              <div class="area-body">
-                <div class="full-col">
-                  <div class="obj content-wrapper">
-                    <div class="thumbnail-canvas" style="background-image:url({{video.thumbnail.url}})">
-                      <div ng-show="video.thumbnail.loading">
-                        <i class='fa fa-spinner fa-spin spinner'></i>
-                      </div>
-                      <div ng-show="video.thumbnail && !video.thumbnail.url && !video.thumbnail.loading"
-                           translate="VIDEO_TOOL.THUMBNAIL.PREVIEW.NOT_AVAILABLE">
-                        <!-- No preview available -->
-                      </div>
-                      <div ng-show="video.thumbnail && !video.thumbnail.loading && video.thumbnail.type === 'DEFAULT' && video.thumbnail.defaultThumbnailPositionChanged"
-                           translate="VIDEO_TOOL.THUMBNAIL.PREVIEW.OUTDATED">
-                        <!-- preview outdated -->
-                      </div>
-                      <div ng-show="!video || !video.thumbnail">
-                        <i class="fa fa-exclamation-circle error"></i>
-                      </div>
-                    </div>
-
-                    <div class="controls">
-                      <div class="description">
-                        <p translate="VIDEO_TOOL.THUMBNAIL.DESCRIPTION"><!-- Description --></p>
-                        <br/>
-                        <p ng-if="video.thumbnail.type === 'DEFAULT'" translate="VIDEO_TOOL.THUMBNAIL.CURRENT.DEFAULT">
-                        <!-- You are currently using the default thumbnail. -->
-                        </p>
-                        <p ng-if="video.thumbnail.type === 'SNAPSHOT'" translate="VIDEO_TOOL.THUMBNAIL.CURRENT.SNAPSHOT">
-                        <!-- You are currently using a thumbnail that has been extracted from the video. -->
-                        </p>
-                        <p ng-if="video.thumbnail.type === 'UPLOAD'" translate="VIDEO_TOOL.THUMBNAIL.CURRENT.UPLOAD">
-                        <!-- You are currently using a thumbnail that has been uploaded. -->
-                        </p>
-                      </div>
-                      <div class="function-buttons">
-                        <a class="extract-thumbnail"
-                           ng-if="video.source_tracks.length === 1"
-                           translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.LABEL"
-                           title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.TOOLTIP' |translate  }}"
-                           ng-click="changeThumbnail(undefined, 'single', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
-                          <!-- Extract -->
-                        </a>
-                        <a class="extract-thumbnail"
-                           ng-if="video.source_tracks.length > 1"
-                           translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.LABEL"
-                           title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.TOOLTIP' |translate  }}"
-                           ng-click="changeThumbnail(undefined, 'left', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
-                          <!-- Extract -->
-                        </a>
-                        <a class="extract-thumbnail"
-                           ng-if="video.source_tracks.length > 1"
-                           translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.LABEL"
-                           title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.TOOLTIP' | translate }}"
-                           ng-click="changeThumbnail(undefined, 'right', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
-                          <!-- Extract from video -->
-                        </a>
-                        <form>
-                          <a class="upload-thumbnail"
-                             translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.UPLOAD.LABEL"
-                             title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.UPLOAD.TOOLTIP' | translate }}"
-                             onclick="angular.element('#thumbnail-upload').click()"
-                             ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
-                            <!-- Upload image -->
+          <div ng-if="area === 'comments'">
+            <div class="area-body">
+              <div class="full-col">
+                <div class="obj comments">
+                  <header class="no-expand" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CAPTION">
+                    <!-- Comments -->
+                  </header>
+                  <div class="obj-container">
+                    <div class="comment-container">
+                      <div class="comment-view">
+                        <div class="comment" ng-class="{ active : $parent.replyToId === comment.id }"
+                                             ng-repeat="comment in comments track by $index">
+                          <hr>
+                          <div class="date">{{ comment.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
+                          <h4>{{ comment.author.name }}</h4>
+                          <span class="category">
+                            <strong translate="EVENTS.EVENTS.DETAILS.COMMENTS.REASON">Reason: </strong>: {{ comment.reason | translate }}
+                          </span>
+                          <p>{{ comment.text }}</p>
+                          <a ng-click="deleteComment(comment.id)" class="delete">
+                            {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
                           </a>
-                          <input
-                            id="thumbnail-upload"
-                            class="hidden"
-                            type="file"
-                            accept="image/*"
-                            onchange="angular.element(this).scope().changeThumbnail(this.files[0], undefined, undefined)"
-                            ng-disabled="video.thumbnail.loading"/>
-                        </form>
-                        <a class="use-default-thumbnail"
-                           translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.USE_DEFAULT.LABEL"
-                           title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.USE_DEFAULT.TOOLTIP' | translate }}"
-                           ng-click="changeThumbnail(undefined, 'DEFAULT', calculateDefaultThumbnailPosition())"
-                           ng-if="video.thumbnail.url && video.thumbnail.type !== 'DEFAULT'"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
-                          <!-- Use default thumbnail -->
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                          <a ng-click="replyTo(comment)" class="reply" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY">
+                            {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY' | translate }}
+                          </a>
+                          <span class="resolve" ng-class="{ resolved : comment.resolvedStatus }">
+                            {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED' | translate }}
+                          </span>
 
-            <div ng-if="area === 'comments'">
-              <div class="area-body">
-                <div class="full-col">
-                  <div class="obj comments">
-                    <header class="no-expand" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CAPTION">
-                      <!-- Comments -->
-                    </header>
-                    <div class="obj-container">
-                      <div class="comment-container">
-                        <div class="comment-view">
-                          <div class="comment" ng-class="{ active : $parent.replyToId === comment.id }"
-                                               ng-repeat="comment in comments track by $index">
+                          <div class="comment is-reply" ng-repeat="reply in comment.replies track by $index">
                             <hr>
-                            <div class="date">{{ comment.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
-                            <h4>{{ comment.author.name }}</h4>
+                            <div class="date">{{ reply.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
+                            <h4>{{ reply.author.name }}</h4>
                             <span class="category">
                               <strong translate="EVENTS.EVENTS.DETAILS.COMMENTS.REASON">Reason: </strong>: {{ comment.reason | translate }}
                             </span>
-                            <p>{{ comment.text }}</p>
-                            <a ng-click="deleteComment(comment.id)" class="delete">
-                              {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
+                            <p>
+                            <span>@{{ comment.author.name }}</span> {{ reply.text }}
+                            </p>
+                            <a ng-click="deleteCommentReply(comment.id, reply.id)" class="delete" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
+                              <i class="fa fa-times-circle"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
                             </a>
-                            <a ng-click="replyTo(comment)" class="reply" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY">
-                              {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY' | translate }}
-                            </a>
-                            <span class="resolve" ng-class="{ resolved : comment.resolvedStatus }">
-                              {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED' | translate }}
-                            </span>
-
-                            <div class="comment is-reply" ng-repeat="reply in comment.replies track by $index">
-                              <hr>
-                              <div class="date">{{ reply.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
-                              <h4>{{ reply.author.name }}</h4>
-                              <span class="category">
-                                <strong translate="EVENTS.EVENTS.DETAILS.COMMENTS.REASON">Reason: </strong>: {{ comment.reason | translate }}
-                              </span>
-                              <p>
-                              <span>@{{ comment.author.name }}</span> {{ reply.text }}
-                              </p>
-                              <a ng-click="deleteCommentReply(comment.id, reply.id)" class="delete" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
-                                <i class="fa fa-times-circle"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
-                              </a>
-                            </div>
                           </div>
                         </div>
-                        <div class="comment-creation">
-                          <form class="add-comment" ng-if="replyToId === null" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE">
-                            <textarea ng-model="myComment.text" placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER' | translate }}"></textarea>
-                            <div class="reasons">
-                              <select chosen pre-select-from="components.eventCommentReasons"
-                                             data-width="'200px'"
-                                             ng-model="myComment.reason"
-                                             ng-options="value | translate for (id, value) in components.eventCommentReasons"
-                                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER' | translate }}'"
-                                             >
-                                             <option value=""></option>
-                              </select>
-                            </div>
-                            <button ng-class="{ disabled: !myComment.text.length || !myComment.reason.length || myComment.saving }" class="save green" ng-click="comment()" translate="VIDEO_TOOL.BUTTONS.ADD_COMMENT">
-                              <!-- Submit -->
-                            </button>
-                          </form>
+                      </div>
+                      <div class="comment-creation">
+                        <form class="add-comment" ng-if="replyToId === null" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE">
+                          <textarea ng-model="myComment.text" placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER' | translate }}"></textarea>
+                          <div class="reasons">
+                            <select chosen pre-select-from="components.eventCommentReasons"
+                                           data-width="'200px'"
+                                           ng-model="myComment.reason"
+                                           ng-options="value | translate for (id, value) in components.eventCommentReasons"
+                                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER' | translate }}'"
+                                           >
+                                           <option value=""></option>
+                            </select>
+                          </div>
+                          <button ng-class="{ disabled: !myComment.text.length || !myComment.reason.length || myComment.saving }" class="save green" ng-click="comment()" translate="VIDEO_TOOL.BUTTONS.ADD_COMMENT">
+                            <!-- Submit -->
+                          </button>
+                        </form>
 
-                          <form class="add-comment reply" ng-if="replyToId !== null">
-                            <textarea ng-model="myComment.text"
-                                      placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY_TO' | translate }} @{{ originalComment.author.name }}"></textarea>
-                            <button ng-class="{ disabled: !myComment.text.length || myComment.saving }" class="save green" ng-click="reply()"
-                                                                                                                           translate="EVENTS.EVENTS.DETAILS.COMMENTS.REPLY">
-                              <!-- Reply -->
-                            </button>
-                            <button class="save red" ng-click="exitReplyMode()" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CANCEL_REPLY">
-                              <!-- Cancel -->
-                            </button>
-                            <input with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" type="checkbox" ng-model="myComment.resolved" id="resolved-checkbox" class="resolve-select ios "/>
-                            <label with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" class="resolved" for="resolved-checkbox" translate="EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED">
-                              <!-- Resolved -->
-                            </label>
-                          </form>
-                        </div>
+                        <form class="add-comment reply" ng-if="replyToId !== null">
+                          <textarea ng-model="myComment.text"
+                                    placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY_TO' | translate }} @{{ originalComment.author.name }}"></textarea>
+                          <button ng-class="{ disabled: !myComment.text.length || myComment.saving }" class="save green" ng-click="reply()"
+                                                                                                                         translate="EVENTS.EVENTS.DETAILS.COMMENTS.REPLY">
+                            <!-- Reply -->
+                          </button>
+                          <button class="save red" ng-click="exitReplyMode()" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CANCEL_REPLY">
+                            <!-- Cancel -->
+                          </button>
+                          <input with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" type="checkbox" ng-model="myComment.resolved" id="resolved-checkbox" class="resolve-select ios "/>
+                          <label with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" class="resolved" for="resolved-checkbox" translate="EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED">
+                            <!-- Resolved -->
+                          </label>
+                        </form>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div ng-if="area === 'segments'">
-              <div class="area-body">
-                <div class="segments-area">
-                  <div class="video-toolbar">
-                    <div class="start-column">
-                      <div class="primary-functions function-buttons">
-                        <a class="split" ng-click="split()" translate title="{{'VIDEO_TOOL.ACTIONS.SPLIT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.SPLIT</a>
-                        <a class="cut" ng-click="cut()" translate title="{{'VIDEO_TOOL.ACTIONS.CUT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.CUT</a>
-                        <a class="replay" ng-click="replay()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT</a>
-                        <a class="replay-end-of-segment" ng-click="replayEndOfSegment()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT</a>
-                        <a class="replay-with-preroll" ng-click="replayPreRoll()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL</a>
-                        <!--
-                          <a class="switch-feed" translate>VIDEO_TOOL.ACTIONS.SWITCH_FEED</a>
-                        -->
-                      </div>
-                    </div>
-                    <div class="end-column">
-                      <div class="destructive-functions function-buttons">
-                        <a class="clear-segments" ng-click="clearSegments()" translate title="{{'VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS</a>
-                      </div>
-                    </div>
-                  </div>
-                  <div data-admin-ng-segments="" data-video="video" data-player="player"></div>
-                </div>
-              </div>
-            </div>
-
-            <div ng-if="area === 'tracks'" class="editor-tracks">
-              <div class="area-body">
-                <div data-admin-ng-notification="" data-type="error"
-                                                   show="!anyTrackSelected('video')" message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_VIDEO_TRACK_SELECTED">
-                </div>
-                <div data-admin-ng-notification="" data-type="error"
-                                                   show="!anyTrackSelected('audio')" message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_AUDIO_TRACK_SELECTED">
-                </div>
-                <div data-admin-ng-notification="" data-type="error"
-                                                   show="tooManyAudios() && anyTrackSelected('video')" message="NOTIFICATIONS.VIDEO_TOO_MANY_AUDIOS">
-                </div>
-                <div class="full-col">
-                  <div class="obj tbl-details">
-                    <div class="obj-container">
-                      <table class="main-tbl">
-                        <tr>
-                          <th translate="VIDEO_TOOL.TRACKS.TRACK.HEADER">
-                            <!-- Track -->
-                          </th>
-                          <th translate="VIDEO_TOOL.TRACKS.VIDEO.HEADER">
-                            <!-- Video -->
-                          </th>
-                          <th translate="VIDEO_TOOL.TRACKS.AUDIO.HEADER">
-                            <!-- Audio -->
-                          </th>
-                        </tr>
-                        <tr ng-repeat="row in video.source_tracks">
-                          <td>
-                            <span class="track-name">{{ trackIndexToName($index) }}</span>
-                          </td>
-                          <td>
-                            <div ng-if="video.source_tracks[$index].video.present"
-                                 class="video-canvas"
-                                 style="background-image: url({{video.source_tracks[$index].video.preview_image}})"
-                                 ng-click="trackClicked($index, 'video')"
-                                 title="{{ video.source_tracks[$index].video.hidden ? 'VIDEO_TOOL.TRACKS.VIDEO.TOOLTIPS.UNHIDE' : 'VIDEO_TOOL.TRACKS.VIDEO.TOOLTIPS.HIDE' | translate }}">
-                              <div class="{{video.source_tracks[$index].video.hidden ? 'track-hidden' : 'track'}}" >
-                                <span class="video-line-height"
-                                      ng-if="!trackHasPreview($index, 'video')"
-                                      translate="VIDEO_TOOL.TRACKS.VIDEO.NO_PREVIEW_AVAILABLE">
-                                  <!-- No preview available -->
-                                </span>
-                                <span class="video-track-hidden-icon"
-                                      ng-if="video.source_tracks[$index].video.hidden">
-                                </span>
-                              </div>
-                            </div>
-
-                            <span ng-if="!video.source_tracks[$index].video.present"
-                                  class="video-line-height"
-                                  translate="VIDEO_TOOL.TRACKS.VIDEO.NOT_AVAILABLE">
-                              <!-- Stream has no video -->
-                            </span>
-                          </td>
-                          <td>
-                            <div ng-if="video.source_tracks[$index].audio.present"
-                                 class="audio-canvas"
-                                 style="background-image: url({{video.source_tracks[$index].audio.preview_image}})"
-                                 ng-click="trackClicked($index, 'audio')"
-                                 title="{{ video.source_tracks[$index].audio.hidden ? 'VIDEO_TOOL.TRACKS.AUDIO.TOOLTIPS.UNHIDE' : 'VIDEO_TOOL.TRACKS.AUDIO.TOOLTIPS.HIDE' | translate }}">
-
-                              <div class="{{video.source_tracks[$index].audio.hidden ? 'track-hidden' : 'track'}}">
-                                <span class="audio-line-height"
-                                      ng-if="!trackHasPreview($index, 'audio')"
-                                      translate="VIDEO_TOOL.TRACKS.AUDIO.NO_PREVIEW_AVAILABLE">
-                                  <!-- No preview available -->
-                                </span>
-                                <span class="audio-track-hidden-icon"
-                                      ng-if="video.source_tracks[$index].audio.hidden">
-                                </span>
-                              </div>
-                            </div>
-                            <span ng-if="!video.source_tracks[$index].audio.present"
-                                  class="audio-line-height"
-                                  translate="VIDEO_TOOL.TRACKS.AUDIO.NOT_AVAILABLE">
-                              <!-- Stream has no audio -->
-                            </span>
-                          </td>
-                        </tr>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
           </div>
 
-          <div data-admin-ng-notifications="" type="warning" show="activeTransaction" context="video-editor-event-access"></div>
-          <div class="video-editor-actions-toolbar">
+          <div ng-if="area === 'segments'">
+            <div class="area-body">
+              <div class="segments-area">
+                <div class="video-toolbar">
+                  <div class="start-column">
+                    <div class="primary-functions function-buttons">
+                      <a class="split" ng-click="split()" translate title="{{'VIDEO_TOOL.ACTIONS.SPLIT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.SPLIT</a>
+                      <a class="cut" ng-click="cut()" translate title="{{'VIDEO_TOOL.ACTIONS.CUT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.CUT</a>
+                      <a class="replay" ng-click="replay()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT</a>
+                      <a class="replay-end-of-segment" ng-click="replayEndOfSegment()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT</a>
+                      <a class="replay-with-preroll" ng-click="replayPreRoll()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL</a>
+                      <!--
+                        <a class="switch-feed" translate>VIDEO_TOOL.ACTIONS.SWITCH_FEED</a>
+                      -->
+                    </div>
+                  </div>
+                  <div class="end-column">
+                    <div class="destructive-functions function-buttons">
+                      <a class="clear-segments" ng-click="clearSegments()" translate title="{{'VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS</a>
+                    </div>
+                  </div>
+                </div>
+                <div data-admin-ng-segments="" data-video="video" data-player="player"></div>
+              </div>
+            </div>
+          </div>
 
-            <div data-admin-ng-notifications=""></div>
+          <div ng-if="area === 'tracks'" class="editor-tracks">
+            <div class="area-body">
+              <div data-admin-ng-notification="" data-type="error"
+                                                 show="!anyTrackSelected('video')" message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_VIDEO_TRACK_SELECTED">
+              </div>
+              <div data-admin-ng-notification="" data-type="error"
+                                                 show="!anyTrackSelected('audio')" message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_AUDIO_TRACK_SELECTED">
+              </div>
+              <div data-admin-ng-notification="" data-type="error"
+                                                 show="tooManyAudios() && anyTrackSelected('video')" message="NOTIFICATIONS.VIDEO_TOO_MANY_AUDIOS">
+              </div>
+              <div class="full-col">
+                <div class="obj tbl-details">
+                  <div class="obj-container">
+                    <table class="main-tbl">
+                      <tr>
+                        <th translate="VIDEO_TOOL.TRACKS.TRACK.HEADER">
+                          <!-- Track -->
+                        </th>
+                        <th translate="VIDEO_TOOL.TRACKS.VIDEO.HEADER">
+                          <!-- Video -->
+                        </th>
+                        <th translate="VIDEO_TOOL.TRACKS.AUDIO.HEADER">
+                          <!-- Audio -->
+                        </th>
+                      </tr>
+                      <tr ng-repeat="row in video.source_tracks">
+                        <td>
+                          <span class="track-name">{{ trackIndexToName($index) }}</span>
+                        </td>
+                        <td>
+                          <div ng-if="video.source_tracks[$index].video.present"
+                               class="video-canvas"
+                               style="background-image: url({{video.source_tracks[$index].video.preview_image}})"
+                               ng-click="trackClicked($index, 'video')"
+                               title="{{ video.source_tracks[$index].video.hidden ? 'VIDEO_TOOL.TRACKS.VIDEO.TOOLTIPS.UNHIDE' : 'VIDEO_TOOL.TRACKS.VIDEO.TOOLTIPS.HIDE' | translate }}">
+                            <div class="{{video.source_tracks[$index].video.hidden ? 'track-hidden' : 'track'}}" >
+                              <span class="video-line-height"
+                                    ng-if="!trackHasPreview($index, 'video')"
+                                    translate="VIDEO_TOOL.TRACKS.VIDEO.NO_PREVIEW_AVAILABLE">
+                                <!-- No preview available -->
+                              </span>
+                              <span class="video-track-hidden-icon"
+                                    ng-if="video.source_tracks[$index].video.hidden">
+                              </span>
+                            </div>
+                          </div>
 
-            <div class="video-save-panel" ng-if="tab === 'editor' && player.adapter">
-              <div class="buttons">
-                <select chosen pre-select-from="video.workflows" class="workflow"
-                                                                 ng-disabled="!video.workflows || video.workflows.length === 0 || activeTransaction || activeSubmission"
-                                                                 data-width="'175px'"
-                                                                 ng-model="video.workflow"
-                                                                 ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
+                          <span ng-if="!video.source_tracks[$index].video.present"
+                                class="video-line-height"
+                                translate="VIDEO_TOOL.TRACKS.VIDEO.NOT_AVAILABLE">
+                            <!-- Stream has no video -->
+                          </span>
+                        </td>
+                        <td>
+                          <div ng-if="video.source_tracks[$index].audio.present"
+                               class="audio-canvas"
+                               style="background-image: url({{video.source_tracks[$index].audio.preview_image}})"
+                               ng-click="trackClicked($index, 'audio')"
+                               title="{{ video.source_tracks[$index].audio.hidden ? 'VIDEO_TOOL.TRACKS.AUDIO.TOOLTIPS.UNHIDE' : 'VIDEO_TOOL.TRACKS.AUDIO.TOOLTIPS.HIDE' | translate }}">
 
-                  <a ng-click="submit()"
-                     ng-class="{disabled: activeTransaction || activeSubmission || sanityCheckFlags()}"
-                     class="save-and-close-button"
-                     translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
-                    <!-- Save and Continue -->
-                  </a>
-
-                  <a class="return-button" ng-click="leave()" translate>VIDEO_TOOL.BUTTONS.CLOSE</a>
+                            <div class="{{video.source_tracks[$index].audio.hidden ? 'track-hidden' : 'track'}}">
+                              <span class="audio-line-height"
+                                    ng-if="!trackHasPreview($index, 'audio')"
+                                    translate="VIDEO_TOOL.TRACKS.AUDIO.NO_PREVIEW_AVAILABLE">
+                                <!-- No preview available -->
+                              </span>
+                              <span class="audio-track-hidden-icon"
+                                    ng-if="video.source_tracks[$index].audio.hidden">
+                              </span>
+                            </div>
+                          </div>
+                          <span ng-if="!video.source_tracks[$index].audio.present"
+                                class="audio-line-height"
+                                translate="VIDEO_TOOL.TRACKS.AUDIO.NOT_AVAILABLE">
+                            <!-- Stream has no audio -->
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
         </div>
+
+        <div data-admin-ng-notifications="" type="warning" show="activeTransaction" context="video-editor-event-access"></div>
+        <div class="video-editor-actions-toolbar">
+
+          <div data-admin-ng-notifications=""></div>
+
+          <div class="video-save-panel" ng-if="tab === 'editor' && player.adapter">
+            <div class="buttons">
+              <select pre-select-from="video.workflows"
+                      class="workflow"
+                      ng-disabled="!video.workflows || video.workflows.length === 0 || activeTransaction || activeSubmission"
+                      data-width="'175px'"
+                      ng-model="video.workflow"
+                      ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" >
+              </select>
+
+              <a ng-click="submit()"
+                 ng-class="{disabled: activeTransaction || activeSubmission || sanityCheckFlags()}"
+                 class="save-and-close-button"
+                 translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
+                <!-- Save and Continue -->
+              </a>
+
+              <a class="return-button" ng-click="leave()" translate>VIDEO_TOOL.BUTTONS.CLOSE</a>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
+  </div>
 </section>

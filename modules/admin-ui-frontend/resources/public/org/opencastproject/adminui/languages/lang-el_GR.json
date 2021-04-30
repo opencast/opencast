@@ -1,343 +1,463 @@
 {
-   "MATTERHORN": "Opencast",
-   "NAV_HOME": "Start",
-   "NAV_ABOUT": "About",
-   "NO": "No",
-   "SUBMIT": "Submit",
-   "UPDATE": "Update",
-   "CANCEL": "Cancel",
-   "CONFIRM": "Confirm",
-   "SAVE": "Save",
-   "CONTINUE": "Continue",
-   "CLOSE": "Close",
-   "LOGOUT": "Logout",
-   "RESET": "Reset",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
-   "YES": "Yes",
+   "MATTERHORN": "Οpencast",
+   "NAV_HOME": "Έναρξη",
+   "NAV_ABOUT": "Σχετικά με",
+   "BUILD": {
+      "BUILT_ON": "Κατασκευάστηκε στις",
+      "DATE_DESC": "Ημερομηνία κατασκευής της μονάδας πυρήνα αυτού του συστήματος.",
+      "COMMIT": "Η υποβολή στο Git από την οποία κατασκευάστηκε αυτή η έκδοση",
+      "VERSION": "Κοινή έκδοση δέσμης"
+   },
+   "NO": "'Οχι",
+   "SUBMIT": "Υποβολή",
+   "UPDATE": {
+      "MINOR": "Ενημέρωση διαθέσιμη",
+      "MAJOR": "Σημαντική ενημέρωση διαθέσιμη",
+      "UNSUPPORTED": "Η έκδοση δεν υποστηρίζεται πλέον ",
+      "UNDETERMINED": "Απροσδιόριστη έκδοση"
+   },
+   "CANCEL": "Ακύρωση",
+   "CONFIRM": "Επιβεβαίωση",
+   "SAVE": "Αποθήκευση",
+   "CONTINUE": "Συνέχεια",
+   "CLOSE": "Κλείσιμο",
+   "LOGOUT": "Αποσύνδεση",
+   "RESET": "Επαναφορά",
+   "SELECT_NO_OPTION_SELECTED": "Δεν επιλέχθηκε κάποια επιλογή",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Δεν υπάρχουν διαθέσιμες επιλογές",
+   "YES": "Ναί",
+   "COPY": "Αντιγραφή στο πρόχειρο",
+   "LTI": {
+      "ERROR_LOADING_METADATA": "Σφάλμα στην φόρτωση των μεταδεδομένων της εκδήλωσης. Παρακαλώ προσπαθείστε αργότερα.",
+      "SERIES_TITLE": "Προβολή σειράς",
+      "UPLOAD_TITLE": "Μεταφόρτωση εκδήλωσης",
+      "LOADING": "Φόρτωση...",
+      "NEW_UPLOAD": "Μεταφόρτωση νέας εκδήλωσης",
+      "EDIT_UPLOAD": "Επεξεργασία εκδήλωσης",
+      "CURRENT_JOBS": "Σημερινές εργασίες",
+      "PRESENTER": "Παρουσιαστής",
+      "PRESENTER_DESCRIPTION": "Αρχείο βίντεο για το κομμάτι του παρουσιαστή",
+      "CAPTION": "Λεζάντες",
+      "CAPTION_DESCRIPTION": "Αρχείο λεζάντας; Ο τύπος αρχείου VTT υποστηρίζεται",
+      "UPLOAD": "Μεταφόρτωση",
+      "UPLOADING": "Αποστολή...",
+      "EDIT": "Αποθήκευση",
+      "EDIT_TITLE": "Επεξεργασία εκδήλωσης",
+      "NO_OPTION_SELECTED": "Δεν επιλέχθηκε κάποια επιλογή",
+      "EDITING": "Αποθήκευση...",
+      "SELECT_OPTION": "Επιλογή ρυθμίσεων",
+      "JOB_TITLE": "Τίτλος",
+      "JOB_STATUS": "Κατάσταση",
+      "UPLOAD_SUCCESS": "Η μεταφόρτωση ολοκληρώθηκε με επιτυχία!",
+      "UPLOAD_FAILURE": "Η μεταφόρτωση απέτυχε",
+      "UPLOAD_FAILURE_DESCRIPTION": "Παρακαλούμε δοκιμάστε ξανά αργότερα.",
+      "EDIT_SUCCESS": "Η επεξεργασία ολοκληρώθηκε, ξεκινάει η επαναδημοσίευση",
+      "EDIT_FAILURE": "Αποτυχία επεξεργασίας.",
+      "COPY_SUCCESS": "Η αντιγραφή ξεκίνησε...",
+      "COPY_SUCCESS_DESCRIPTION": "Παρακαλώ περιμένετε λίγο...",
+      "GENERIC_ERROR": "Μήνυμα σφάλματος:",
+      "DELETION_SUCCESS": "Επιτυχής διαγραφή εκδήλωσης",
+      "DELETION_SUCCESS_DESCRIPTION": "Η εκδήλωση θα διαγραφεί από την λίστα σε λίγα λεπτά...",
+      "EVENT_LOCKED": "Η εκδήλωσε βρίσκεται σε επεξεργασία. Παρακαλώ περιμένετε μέχρι να κάνετε περαιτέρω αλλαγές...",
+      "DELETION_FAILURE": "Η διαγραφή της εκδήλωσης απέτυχε",
+      "DELETION_FAILURE_DESCRIPTION": "Παρακαλούμε δοκιμάστε ξανά αργότερα.",
+      "RESULT_HEADING": "Αποτελέσματα {{range.begin}}-{{range.end}} από {{total}}",
+      "CONFIRM_DELETION": "ειστε σιγουροι οτι θελετε να διαγραψετε την εκδήλωση?",
+      "COPY_TO_SERIES": "Αντιγραφή εκδήλωσης στην σειρά",
+      "SELECT_COPY_TARGET": "Επιλέξτε σειρά προορισμού",
+      "COPY": "Αντιγραφή",
+      "COPY_IN_PROGRESS": "Έναρξη αντιγραφής...",
+      "CREATOR": "από {{creator}}"
+   },
    "LANGUAGES": {
-      "ARABIC": "Arabic",
-      "DANISH": "Danish",
-      "GERMAN": "German",
-      "GERMAN_CH": "Swiss German",
-      "FINNISH": "Finnish",
-      "HINDI": "Hindi",
-      "ITALIAN": "Italian",
-      "JAPANESE": "Japanese",
-      "DUTCH": "Dutch",
-      "NORWEGIAN": "Norwegian",
-      "FRENCH": "French",
-      "ENGLISH": "English",
-      "SPANISH": "Spanish",
-      "ROMANSH": "Romansh",
-      "POLISH": "Polish",
-      "PORTUGESE": "Portuguese",
-      "SLOVENIAN": "Slovenian",
-      "SWEDISH": "Swedish",
-      "RUSSIAN": "Russian",
-      "TURKISH": "Turkish",
-      "UKRAINIAN": "Ukrainian",
-      "CHINESE": "Chinese"
+      "ARABIC": "Αραβικά",
+      "DANISH": "Δανικά",
+      "GERMAN": "Γερμανικά",
+      "GERMAN_CH": "Ελβετικά Γερμανικά",
+      "FINNISH": "Φινλανδικά",
+      "HINDI": "Χίντι",
+      "ITALIAN": "Ιταλικά",
+      "JAPANESE": "Ιαπωνικά",
+      "DUTCH": "Ολλανδικά",
+      "NORWEGIAN": "Νορβηγικά",
+      "FRENCH": "Γαλλικά",
+      "ENGLISH": "Αγγλικά",
+      "SPANISH": "Ισπανικά",
+      "ROMANSH": "Ρωμανικά",
+      "POLISH": "Πολωνικά",
+      "PORTUGESE": "Πορτογαλικά",
+      "SLOVENIAN": "Σλοβενικά",
+      "SWEDISH": "Σουηδικά",
+      "RUSSIAN": "Ρωσικά",
+      "TURKISH": "Τουρκικά",
+      "UKRAINIAN": "Ουκρανικά",
+      "CHINESE": "Κινέζικα"
    },
    "PREFERENCES": {
       "TABLE": {
-         "CAPTION": "Edit Table View",
-         "SUBHEADING": "Select the default data you would like displayed in the {{ tableName }} view",
-         "AVAILABLE_COLUMNS": "Available columns",
-         "SELECTED_COLUMNS": "Selected columns",
-         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
+         "CAPTION": "Επεξεργασία προβολής πίνακα",
+         "SUBHEADING": "Επιλέξτε τα προεπιλεγμένα δεδομένα που θέλετε να εμφανίζεται στην προβολή {{ tableName }}",
+         "AVAILABLE_COLUMNS": "Διαθέσιμες στήλες",
+         "SELECTED_COLUMNS": "Επιλεγμένες στήλες",
+         "FOOTER_TEXT": "H σειρά και η επιλογή θα αποθηκευτούν αυτόματα. Πιέστε το πλήκτρο \"{{resetTranslation}}\" για να επαναφέρετε την προεπιλεγμένη προβολή."
       }
    },
    "CONFIRMATIONS": {
-      "CONTINUE_ACTION": "Are you sure you want to continue?",
+      "EMBEDDING_CODE": "Αυτός ο κώδικας αντιγράφτηκε στο πρόχειρο:",
+      "CONTINUE_ACTION": "Είστε βέβαιοι ότι θέλετε να συνεχίσετε;",
       "METADATA": {
          "NOTICE": {
-            "UNKNOWN": "The following element will be deleted",
-            "EVENT": "The following event will be deleted",
-            "SERIES": "The following series will be deleted",
-            "ACL": "The following ACL will be deleted",
-            "GROUP": "The following group will be deleted",
-            "USER": "The following user will be deleted",
-            "THEME": "The following theme will be deleted",
-            "LOCATION": "The following location will be deleted"
+            "UNKNOWN": "Το ακόλουθο στοιχείο θα διαγραφεί",
+            "EVENT": "Το ακόλουθο στοιχείο θα διαγραφεί",
+            "SERIES": "Θα διαγραφεί η ακόλουθη σειρά",
+            "ACL": "H παρακάτω πολιτική πρόσβασης θα διαγραφεί",
+            "GROUP": "Η παρακάτω ομάδα θα διαγραφεί",
+            "USER": "Ο παρακάτω χρήστης θα διαγραφεί",
+            "THEME": "Το ακόλουθο θέμα θα διαγραφεί",
+            "LOCATION": "Η ακόλουθη τοποθεσία θα διαγραφεί"
          },
-         "NAME": "Name"
+         "NAME": "Όνομα"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Confirmation"
-      },
-      "WARNINGS": {
-         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
-      },
-      "ERRORS": {
-         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
-      }
-   },
-   "MEDIAMODULE": "Media Module",
-   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
-   "LANGUAGE": "Select language",
-   "HELP": {
-      "HELP": "Help",
-      "USERS_GUIDE": "User's Guide",
-      "DOCUMENTATION": "Documentation",
-      "REST_DOC": "REST API Docs",
-      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
-   },
-   "NOTIFICATIONS": {
-      "ACL_ADDED": "The access policy has been created",
-      "ACL_NOT_SAVED": "The access policy could not be saved",
-      "ACL_UPDATED": "The access policy has been updated",
-      "ACL_DELETED": "The access policy has been deleted",
-      "ACL_NOT_DELETED": "The access policy could not be deleted",
-      "USER_ADDED": "The user has been created",
-      "USER_UPDATED": "The user has been updated",
-      "USER_NOT_SAVED": "The user could not be saved",
-      "USER_DELETED": "The user has been deleted",
-      "USER_NOT_DELETED": "The user could not be deleted",
-      "USER_NOT_MANAGEABLE": "The user is not manageable",
-      "GROUP_ADDED": "The group has been created",
-      "GROUP_CONFLICT": "The generated group name already exists",
-      "GROUP_UPDATED": "The group has been updated",
-      "GROUP_NOT_SAVED": "The group could not be saved",
-      "GROUP_DELETED": "The group has been deleted",
-      "GROUP_NOT_DELETED": "The group could not be deleted",
-      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
-      "SERIES_ADDED": "The series has been created",
-      "SERIES_NOT_SAVED": "The series could not be saved",
-      "EVENTS_CREATED": "The event has been created",
-      "EVENTS_UPLOAD_STARTED": "The event is being uploaded…",
-      "EVENTS_NOT_CREATED": "The event could not be created",
-      "EVENTS_UPDATED_NB": "{{ number }} events have been successfully updated",
-      "EVENTS_UPDATED_ALL": "All events have been successfully updated",
-      "EVENTS_NOT_UPDATED": "The event could not be saved",
-      "EVENTS_NOT_UPDATED_ID": "The event {{ id }} could not be saved",
-      "EVENTS_NOT_UPDATED_ALL": "None of the events could be saved",
-      "EVENTS_PROCESSING_ACTION_RETRY": "Processing resumed.",
-      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Processing could not be resumed.",
-      "EVENTS_PROCESSING_ACTION_NONE": "Processing aborted.",
-      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Processing could not be aborted.",
-      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
-      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
-      "SERIES_UPDATED_NB": "{{ number }} series have been successfully updated",
-      "SERIES_UPDATED_ALL": "All series have been successfully updated",
-      "SERIES_NOT_UPDATED": "The series could not be saved",
-      "SERIES_NOT_UPDATED_ID": "The series {{ id }} could not be saved",
-      "SERIES_NOT_UPDATED_ALL": "None of the series could be saved",
-      "EVENT_DELETED": "The event has been deleted.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
-      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
-      "SERIES_DELETED": "The series has been deleted",
-      "SERIES_NOT_DELETED": "The series could not be deleted",
-      "LOCATION_DELETED": "The location has been deleted",
-      "LOCATION_NOT_DELETED": "The location could not be deleted",
-      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
-      "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
-      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
-      "CONFLICT_ALREADY_ENDED": "Scheduling error: The event has already ended.",
-      "CONFLICT_END_BEFORE_START": "Scheduling error: Schedule end has to be later than the start.",
-      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
-      "INVALID_ACL_RULES": "Rules have to contain a valid role and read or/and write right(s).",
-      "MISSING_ACL_RULES": "At least one role with Read and Write permissions is required!",
-      "SAVED_ACL_RULES": "The access rules have been saved.",
-      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
-      "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
-      "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
-      "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
-      "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
-      "THEME_NAME_EMPTY": "The name cannot be empty",
-      "BUMPER_UPLOAD_ERROR": "Error while uploading media",
-      "BUMPER_REQUIRED": "You must upload a bumper",
-      "TRAILER_UPLOAD_ERROR": "Error while uploading media",
-      "TITLE_UPLOAD_ERROR": "Error while uploading media",
-      "LICENSE_UPLOAD_ERROR": "Error while uploading media",
-      "WATERMARK_UPLOAD_ERROR": "Error while uploading media",
-      "WATERMARK_REQUIRED": "You must upload a watermark",
-      "THEME_UPLOAD_STARTED": "The media is being uploaded…",
-      "THEME_CREATED": "The theme has been created",
-      "THEME_NOT_CREATED": "The theme could not be created",
-      "THEME_DELETED": "The theme has been deleted",
-      "THEME_NOT_DELETED": "The theme could not be deleted",
-      "TASK_CREATED": "The task has been created",
-      "TASK_NOT_CREATED": "The task could not be created",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
-      "VIDEO_CUT_PROCESSING": "The video is being processed…",
-      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
-      "VIDEO_SOURCE_TRACKS_INVALID": "You have selected no video tracks to process",
-      "VIDEO_TOO_MANY_AUDIOS": "You cannot have more than one audio stream on a single video stream",
-      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
-      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
-      "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction.",
-      "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
-         "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
-      }
-   },
-   "BULK_ACTIONS": {
-      "CAPTION": "Actions",
-      "DELETE": {
-         "SERIES": {
-            "CAPTION": "Delete",
-            "BUTTON": "Delete",
-            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
-         },
-         "EVENTS": {
-            "CAPTION": "Delete",
-            "DELETE_EVENTS": "Delete Events",
-            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
+         "CONFIRMATION": "Επιβεβαίωση",
+         "SHOW": {
+            "EMBEDDING_CODE": "Ενσωμάτωση κώδικα"
          }
       },
-      "DELETE_EVENTS_WARNING_LINE1": "Once deleted, all event metadata, audio and video files will be deleted and be unrecoverable.",
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "Αυτή η σειρά περιέχει εκδηλώσεις. Η διαγραφή της σειράς δεν θα διαγράψει τις εκδηλώσεις.",
+         "EVENT_WILL_BE_GONE": "Εάν συνεχίσετε, η εκδήλωση θα διαγραφεί αμετάκλητα."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "Αυτή η σειρά δεν μπορεί να διαγραφεί, καθώς εξακολουθεί να περιέχει εκδηλώσεις."
+      }
+   },
+   "MEDIAMODULE": "Μονάδα πολυμέσων",
+   "SYSTEM_NOTIFICATIONS": "Προειδοποιήσεις και ειδοποιήσεις συστήματος",
+   "LANGUAGE": "Επιλέξτε γλώσσα",
+   "HELP": {
+      "HELP": "Βοήθεια",
+      "USERS_GUIDE": "Εγχειρίδιο χρήσης",
+      "DOCUMENTATION": "Τεκμηρίωση",
+      "REST_DOC": "Εγχειρίδιο REST API",
+      "HOTKEY_CHEAT_SHEET": "Συντομεύσεις πληκτρολογίου",
+      "ADOPTER_REGISTRATION": "Εγγραφή adopter"
+   },
+   "NOTIFICATIONS": {
+      "ACL_ADDED": "H πολιτική πρόσβασης έχει δημιουργηθεί",
+      "ACL_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση της πολιτικής πρόσβασης",
+      "ACL_UPDATED": "Έχει ενημερωθεί η πολιτική πρόσβασης",
+      "ACL_DELETED": "Η πολιτική πρόσβασης έχει διαγραφεί",
+      "ACL_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της πολιτικής πρόσβασης",
+      "USER_ADDED": "Ο χρήστης έχει δημιουργηθεί",
+      "USER_UPDATED": "Ο χρήστης έχει ενημερωθεί",
+      "USER_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση του χρήστη",
+      "USER_DELETED": "Ο χρήστης έχει διαγραφεί",
+      "USER_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή χρήστη",
+      "USER_NOT_MANAGEABLE": "Ο χρήστης δεν είναι διαχειρίσιμος",
+      "GROUP_ADDED": "Η ομάδα έχει δημιουργηθεί",
+      "GROUP_CONFLICT": "Υπάρχει ήδη το όνομα της ομάδας που δημιουργήθηκε",
+      "GROUP_UPDATED": "Η ομάδα έχει ενημερωθεί",
+      "GROUP_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση της ομάδας",
+      "GROUP_DELETED": "Η ομάδα έχει διαγραφεί",
+      "GROUP_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της ομάδας",
+      "ACCESS_DENIED": "Δεν επιτρέπεται η πρόσβαση. Δεν έχετε δικαίωμα να δείτε αυτή τη σελίδα",
+      "SERIES_ADDED": "Η σειρά έχει δημιουργηθεί",
+      "SERIES_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση της σειράς",
+      "EVENTS_CREATED": "Η εκδήλωση έχει δημιουργηθεί",
+      "EVENTS_UPLOAD_STARTED": "Μια εκδήλωση ανέβηκε…",
+      "EVENTS_NOT_CREATED": "Δεν ήταν δυνατή η δημιουργία της εκδήλωσης",
+      "EVENTS_UPDATED_NB": "{{ number }} εκδηλώσεις έχουν ενημερωθεί με επιτυχία",
+      "EVENTS_UPDATED_ALL": "Όλες οι εκδηλώσεις έχουν ενημερωθεί με επιτυχία",
+      "EVENTS_NOT_UPDATED": "Δεν ήταν δυνατή η αποθήκευση της εκδήλωσης",
+      "EVENTS_NOT_UPDATED_ID": "Δεν ήταν δυνατή η αποθήκευση της εκδήλωσης {{ id }}",
+      "EVENTS_NOT_UPDATED_ALL": "Καμμία από τις εκδηλώσεις δεν μπορεί να αποθηκευτεί",
+      "EVENTS_PROCESSING_ACTION_RETRY": "H επεξεργασία συνεχίζεται...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Η επεξεργασία δεν θα μπορεί να συνεχιστεί.",
+      "EVENTS_PROCESSING_ACTION_NONE": "H επεξεργασία ματαιώθηκε...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Η επεξεργασία δεν θα μπορεί να ματαιωθεί.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Επεξεργασία διακόπηκε.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Δεν ήταν δυνατή η διακοπή της επεξεργασίας.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Διαγραμμένη ροή εργασίας.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Δεν ήταν δυνατή η διαγραφή της ροής εργασίας.",
+      "SERIES_UPDATED_NB": "{{ number }} σειρές έχουν ενημερωθεί με επιτυχία",
+      "SERIES_UPDATED_ALL": "Έχουν ενημερωθεί με επιτυχία όλες οι σειρές",
+      "SERIES_NOT_UPDATED": "Δεν ήταν δυνατή η αποθήκευση της σειράς",
+      "SERIES_NOT_UPDATED_ID": "Δεν ήταν δυνατή η αποθήκευση της σειράς {{ id }}",
+      "SERIES_NOT_UPDATED_ALL": "Καμμία από τις σειρές δεν μπορούσε να αποθηκευτεί",
+      "EVENT_DELETED": "Η εκδήλωση έχει διαγραφεί.",
+      "EVENT_WILL_BE_DELETED": "Η εκδήλωση έχει διαγραφεί",
+      "EVENTS_DELETED": "Οι εκδηλώσεις έχουν διαγραφεί.",
+      "EVENTS_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της/των εκδήλωσης/εων.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Η/Οι εκδήλωση/σεις δεν μπορεί/ουν να διαγραφεί/ουν, επειδή δεν έχετε τα δικαιώματα για να το πράξετε.",
+      "SERIES_DELETED": "Η σειρά έχει διαγραφεί",
+      "SERIES_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της σειράς",
+      "LOCATION_DELETED": "Η τοποθεσία έχει διαγραφεί",
+      "LOCATION_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της τοποθεσίας",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Η τοποθεσία δεν μπορεί να διαγραφεί, επειδή δεν έχετε τα δικαιώματα να το πράξετε.",
+      "CONFLICT_DETECTED": "Σύγκρουση στον προγραμματισμό: η νέα εκδήλωση συμπίμπτει με μία υπάρχουσα. Παρακαλώ αλλάξτε την αίθουσα, τις ημερηνίες ή τις ημέρες.",
+      "CONFLICT_BULK_DETECTED": "Προγραμματισμός σε σύγκρουση: η αλλαγή στις εκδηλώσεις οδηγεί σε συγκρούση. Παρακαλώ να αλλάξετε την τοποθεσία, τις ημερομηνίες ή τις ώρες.",
+      "CONFLICT_ALREADY_ENDED": "Σφάλμα στον προγραμματισμό. Η εκδήλωση έχει ήδη λήξει.",
+      "CONFLICT_END_BEFORE_START": "Σφάλμα στον προγραμματισμό. Η προγραμματισμένη λήξη πρέπει να είναι μεταγενέστερη από την προγραμματισμένη έναρξη.",
+      "CONFLICT_IN_THE_PAST": "Ο προγραμματισμός δεν μπορεί να ενημερωθεί: δεν μπορείτε να προγραμματίσετε μια εκδήλωση στο παρελθόν.",
+      "INVALID_ACL_RULES": "Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή/και εγγραφής.",
+      "MISSING_ACL_RULES": "Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής!",
+      "SAVED_ACL_RULES": "Οι κανόνες πρόσβασης έχουν αποθηκευτεί.",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Οι υπάρχουσες εκδηλώσεις σε αυτή τη σειρά θα πρέπει να επεξεργαστών ξάνα",
+      "SERIES_ACL_LOCKED": "Η επεξεργασία την πολιτικών πρόσβαησς δεν επιτρέπεται όταν εκτελούνται εργασίες σε μία εκδήλωση που αποτελεί μέρος της σειράς",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
+      "THEME_NAME_ALREADY_TAKEN": "Αυτό το όνομα είναι ήδη σε χρήση",
+      "THEME_NAME_EMPTY": "Το όνομα δεν είναι δυνατό να είναι κενό",
+      "BUMPER_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση των αρχείων πολυμέσων",
+      "BUMPER_REQUIRED": "Πρέπει να φορτώσετε ένα αρχείο πολυμέσων",
+      "TRAILER_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την αποστολή αρχείων πολυμέσων",
+      "TITLE_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την αποστολή των αρχείων πολυμέσων",
+      "LICENSE_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση του αρχείου πολυμέσων",
+      "WATERMARK_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση του αρχείου πολυμέσων",
+      "WATERMARK_REQUIRED": "Πρέπει να φορτώσετε ένα υδατογράφημα",
+      "THEME_UPLOAD_STARTED": "Το αρχείο πολυμέσων μεταφορτώθηκε…",
+      "THEME_CREATED": "Το θέμα έχει δημιουργηθεί",
+      "THEME_NOT_CREATED": "Το θέμα δεν μπορεί να δημιουργηθεί",
+      "THEME_DELETED": "Το θέμα έχει διαγραφεί",
+      "THEME_NOT_DELETED": "Το θέμα δεν είναι δυνατόν να διαγραφεί",
+      "TASK_CREATED": "Η εργασία έχει δημιουργήθει",
+      "TASK_NOT_CREATED": "Η εργασία δεν θα μπορούσε να δημιουργηθεί",
+      "VIDEO_CUT_NOT_SAVED": "Οι αλλαγές δεν μπορούν να αποθηκευτούν",
+      "VIDEO_CUT_SAVED": "Οι αλλαγές αποθηκεύτηκαν",
+      "VIDEO_CUT_PROCESSING": "Επεξεργάζεται το βίντεο…",
+      "THUMBNAIL_CHANGE_FAILED": "Αποτυχία αλλαγής μικρογραφίας.",
+      "VIDEO_SOURCE_TRACKS_INVALID": "Δεν έχετε επιλέξει κάποια κομμμάτια βίντεο για την επεξεργασία",
+      "VIDEO_TOO_MANY_AUDIOS": "Δεν μπορείτε να έχετε περισσότερες από μία ροές ήχου σε μια ενιαία ροή βίντεο",
+      "SERVER_UNRESPONSIVE": "Ωχ! Ο server φαίνεται να μην ανταποκρίνεται. Παρακαλώ δοκιμάστε ξανά αργότερα.",
+      "SERVICE_UNAVAILABLE": "Ωχ! Ο server φαίνεται να μην ανταποκρίνεται. Παρακαλώ δοκιμάστε ξανά αργότερα.",
+      "ACTIVE_TRANSACTION": "Δεν μπορεί να επεξεργαστεί αυτή την εκδήλωση, ενώ υπάρχει μια ενεργή ροή εργασίας ή συναλλαγή.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "Παρουσιάστηκε μη αναμενόμενο σφάλμα κατά την ενημέρωση. Ορισμένες εκδηλώσεις ενδέχεται να έχουν ενημερωθεί.",
+         "ALL_EVENTS_UPDATED": "Όλες οι εκδηλώσεις έχουν ενημερωθεί με επιτυχία",
+         "NO_EVENTS_UPDATED": "Όλες οι ενημερώσεις απέτυχαν.",
+         "SOME_EVENTS_NOT_UPDATED": "Δεν ήταν δυνατή η ενημέρωση ορισμένων εκδηλώσεων."
+      },
+      "ADOPTER_PROFILE_UPDATED": "Οι πληροφορίες προφίλ ενημερώθηκαν επιτυχώς.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Δεν ήταν δυνατή η ενημέρωση των πληροφοριών προφίλ.  Παρακαλώ προσπαθησε ξανά!",
+      "ADOPTER_PROFILE_DELETED": "Οι πληροφορίες προφίλ διαγράφηκαν με επιτυχία.",
+      "ADOPTER_PROFILE_NOT_DELETED": " Δεν ήταν δυνατή η διαγραφή πληροφοριών προφίλ. Παρακαλώ προσπαθησε ξανα!"
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "Ενέργειες",
+      "DELETE": {
+         "SERIES": {
+            "CAPTION": "Διαγραφή",
+            "BUTTON": "Διαγραφή",
+            "CANNOT_DELETE": "Η επιλεγμένη σειρά δεν μπορεί να διαγραφεί, καθώς περιέχει ακόμα εκδηλώσεις."
+         },
+         "EVENTS": {
+            "CAPTION": "Διαγραφή",
+            "DELETE_EVENTS": "Διαγραφή εκδηλώσεων",
+            "UNAUTHORIZED": "Δεν είστε εξουσιοδοτημένοι να διαγράψετε τις επιλεγμένες εκδηλώσεις. Παρακαλώ αποεπιλέξετε τις εκδηλώσεις για να συνεχίσετε."
+         }
+      },
+      "DELETE_EVENTS_WARNING_LINE1": "Μόλις διαγραφεί, όλα τα μεταδεδομένα, τα αρχεία εικόνας και ήχου της εκδήλωσης θα διαγραφούν και δεν θα μπορούν να ανακτηθούν.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Once deleted, all series metadata will be unrecoverable. Events in the series will not be deleted.",
+      "DELETE_SERIES_WARNING_LINE1": "Μόλις διαγραφεί, όλατ τα μεταδεδομένα της σειράς δεν θα μπορούν να ανακτηθούν. Οι εκδηλώσεις της σειράς δεν θα διαγραφούν.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
-         "CAPTION": "Start Task",
+         "CAPTION": "Έναρξη εργασίας",
          "GENERAL": {
-            "CAPTION": "General",
-            "SUMMARY": "({{ count }} events selected)",
-            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
+            "CAPTION": "Γενικά",
+            "SUMMARY": "({{ count }} εκδηλώσεις επιλεγμένες)",
+            "CANNOTSTART": "Οι επιλεγμένες εκδηλώσεις δεν μπορούν αυτή την στιγμή να επεξεργαστούν. Καταργήστε την επιλογή τούς ή δοκιμάστε ξανά αργότερα."
          },
          "TASKS": {
-            "CAPTION": "Tasks",
-            "SELECT": "Select Task"
+            "CAPTION": "Εργασίες",
+            "SELECT": "Επιλέξτε εργασία"
          },
          "SUMMARY": {
-            "CAPTION": "Summary",
-            "EVENTS": "Events",
-            "EVENTS_SUMMARY": "You have selected {{numberOfEvents}} events",
-            "CONFIGURATION": "Configuration",
-            "WORKFLOW": "Task"
+            "CAPTION": "Σύνοψη",
+            "EVENTS": "Εκδηλώσεις",
+            "EVENTS_SUMMARY": "Έχετε επιλέξει {{numberOfEvents}} εκδηλώσεις",
+            "CONFIGURATION": "Ρύθμιση παραμέτρων",
+            "WORKFLOW": "Εργασία"
          }
       },
       "EDIT_EVENTS": {
-         "CAPTION": "Edit scheduled events",
-         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
+         "CAPTION": "Επεξεργασία προγραμματισμένων εκδηλώσεων",
+         "CONFLICT_CHECK_RUNNING": "Εκτελείται έλεγχος σύγκρουσης…",
          "GENERAL": {
-            "CAPTION": "General",
-            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
-            "NOCHANGES": "No changes to the events detected!",
-            "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict",
-            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
+            "CAPTION": "Γενικά",
+            "CANNOTSTART": "Επισημανθείσα(ες) εκδήλωση(εις) δεν μπορούν να επεξεργαστούν, μόνο οι προγραμματισμένες εκδηλώσεις υποστηρίζονται.",
+            "NOCHANGES": "Καμία αλλαγή στις εκδηλώσεις δεν ανιχνεύεται!",
+            "CONFLICT_FIRST_EVENT": "Τροποποιημένη εκδήλωση",
+            "CONFLICT_SECOND_EVENT": "Εκδήλωση με σύγκρουση",
+            "CANNOTEDITSCHEDULE": "Για τις επιλεγμένες εκδηλώσεις, δεν έχετε τα δικαιώματα να επεξεργαστείτε τις πληροφορίες προγραμματισμού. Μπορείτε να συνεχίσετε, αλλά δεν θα μπορείτε να επεξεργαστείτε τις πληροφορίες προγραμματισμού σε οποιεσδήποτε εκδηλώσεις."
          },
          "METADATA": {
-            "EDIT": "Edit metadata"
+            "EDIT": "Επεξεργασία μεταδεδομένων"
          },
          "SUMMARY": {
-            "CAPTION": "Summary",
-            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
-            "TYPE": "Type",
-            "PREVIOUS": "Old value",
-            "NEXT": "New value"
+            "CAPTION": "Σύνοψη",
+            "SINGLE_EVENT_CAPTION": "Εκδήλωση «{{ title }}»",
+            "TYPE": "Τύπος",
+            "PREVIOUS": "Παλιά τιμή",
+            "NEXT": "Νέα τιμή"
          },
          "EDIT": {
-            "CAPTION": "Edit",
-            "EVENT": "event",
-            "EVENTS": "events",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
-            "METADATA": "Metadata",
+            "CAPTION": "Επεξεργασία",
+            "EVENT": "εκδήλωση",
+            "EVENTS": "εκδηλώσεις",
+            "HEADER": "Αυτή η σελίδα σας επιτρέπει να επεξεργαστείτε κάποιες προγραμματισμένες εκδηλώσεις ομαδοποιημένες κατά τις εργάσιμες ημέρες. Τα πεδία εισαγωγής είναι προ-συμπληρωμένα σε περίπτωση που όλες οι προγραμματισμένες εκδηλώσεις έχουν την ίδια τιμε σε ένα συγκεκριμένο πεδίο. Σε διαφορετική περίπτωση, όλα τα πεδιά εισαγωγής θα παραμείνουν κενά. Αφήνοντας τα πεδία εισαγωγής λευκά σημαίνει ότι οι αντίστοιχες τιμές δεν πρέπει να αλλάξουν.",
+            "METADATA": "Μεταδεδομένα",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "CAPTION": "Επεξεργασία μεταδεδομένων για πολλαπλές εκδηλώσεις",
+         "FATAL_ERROR": "Παρουσιάστηκε ανεπανόρθωτο σφάλμα: {{fatalError}}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
-            "NOT_FOUND": "Not found",
-            "RUNNING_WORKFLOW": "Running workflow",
+            "CANNOT_EDIT_SOME": "Οι επισημασμένες εκδηλώσεις δεν γίνεται να επεξεργαστούν",
+            "NOTHING_TO_EDIT": "Οι  εκδηλώσεις δεν γίνεται να επεξεργαστούν",
+            "NOT_FOUND": "Δε βρέθηκε",
+            "RUNNING_WORKFLOW": "Εκτελούμενες ροές εργασίας",
             "TABLE": {
-               "CAPTION": "Selected events",
-               "ERRORS": "Errors"
+               "CAPTION": "Επιλεγμένες εκδηλώσεις",
+               "ERRORS": "Σφάλματα"
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Επεξεργαστείτε και / ή επιλέξτε τα πεδία μεταδεδομένων που θέλετε να ενημερώσετε. Δεν είναι δυνατή η επιλογή πεδίου εάν αυτό δεν έχει ως αποτέλεσμα αλλαγή τιμής για τουλάχιστον μια εκδήλωση ή εάν το πεδίο δεν είναι έγκυρο (π.χ. τα απαιτούμενα πεδία δεν μπορούν να είναι κενά). Τα επισημασμένα πεδία μεταδεδομένων έχουν αποκλίνουσες τιμές για τις επιλεγμένες εκδηλώσεις.",
             "TABLE": {
-               "CAPTION": "Metadata of selected events",
-               "FIELDS": "Metadata",
-               "VALUES": "Values"
+               "CAPTION": "Μεταδεδομένα επιλεγμένων εκδηλώσεων",
+               "FIELDS": "Μεταδεδομένα",
+               "VALUES": "Τιμές"
             }
          },
          "UPDATE_FAILURES": {
             "TABLE": {
-               "CAPTION": "Update Failures"
+               "CAPTION": "Αποτυχίες ενημέρωσης"
             },
-            "UPDATE_FAILED": "Update failed",
-            "NO_EVENTS_UPDATED": "All updates failed.",
-            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+            "UPDATE_FAILED": "Η ενημέρωση απέτυχε",
+            "NO_EVENTS_UPDATED": "Όλες οι ενημερώσεις απέτυχαν.",
+            "SOME_EVENTS_NOT_UPDATED": "Οι επισημασμένες εκδηλώσεις δεν γίνεται να ενημερωθούν."
          }
       }
    },
    "DATES": {
-      "TODAY": "Today",
-      "TOMORROW": "Tomorrow",
-      "YESTERDAY": "Yesterday",
-      "THIS_WEEK": "This week",
-      "THIS_MONTH": "This month",
-      "THIS_YEAR": "This year"
+      "TODAY": "Σήμερα",
+      "TOMORROW": "Αύριο",
+      "YESTERDAY": "Χθες",
+      "THIS_WEEK": "Τρέχουσα εβδομάδα",
+      "THIS_MONTH": "Τρέχον Μήνας",
+      "THIS_YEAR": "Τρέχον έτος"
    },
    "DATETIMES": {
-      "TODAY": "Today at {{ time }}",
-      "TOMORROW": "Tomorrow at {{ time }}",
-      "YESTERDAY": "Yesterday at {{ time }}"
+      "TODAY": "Σήμερα στις {{ time }}",
+      "TOMORROW": "Αύριο στις {{ time }}",
+      "YESTERDAY": "Χθες στις {{ time }}"
    },
    "WIZARD": {
-      "NEXT_STEP": "Next",
-      "BACK": "Previous",
-      "CREATE": "Create",
-      "DELETE": "Delete",
-      "UPDATE": "Update",
+      "NEXT_STEP": "Επόμενη",
+      "BACK": "Προηγούμενη",
+      "CREATE": "Δημιουργία",
+      "DELETE": "Διαγραφή",
+      "UPDATE": "Ενημέρωση",
       "DURATION": {
-         "HOURS": "Hours",
-         "MINUTES": "Minutes"
+         "HOURS": "Ώρες",
+         "MINUTES": "Λεπτά"
       }
    },
    "CAPTURE_AGENT": {
       "DEVICE": {
-         "MICROPHONE": "Microphone",
-         "CAMERA": "Camera",
-         "PRESENTATION": "Presentation"
+         "MICROPHONE": "Μικρόφωνο",
+         "CAMERA": "κάμερα",
+         "PRESENTATION": "Παρουσίαση"
       }
    },
    "NAV": {
       "DASHBOARD": {
-         "TITLE": "Dashboard"
+         "TITLE": "Πίνακας Ελέγχου"
       },
       "EVENTS": {
-         "TITLE": "Recordings"
+         "TITLE": "Εγγραφές"
       },
       "SYSTEMS": {
-         "TITLE": "Systems"
+         "TITLE": "Συστήματα"
       },
       "CAPTUREAGENTS": {
-         "TITLE": "Capture"
+         "TITLE": "Στιγμιότυπα"
       },
       "USERS": {
-         "TITLE": "Organization"
+         "TITLE": "Οργανισμός"
       },
       "INTEGRATIONS": {
-         "TITLE": "Integrations"
+         "TITLE": "Ενσωματώσεις"
       },
       "CONFIGURATION": {
-         "TITLE": "Configuration"
+         "TITLE": "Ρύθμιση παραμέτρων"
       },
       "STATISTICS": {
-         "TITLE": "Statistics"
+         "TITLE": "Στατιστικά"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Εγγραφή",
+         "SKIP": "Να μην γίνει τώρα",
+         "CONTINUE": "Συνέχεια",
+         "BACK": "Επιστροφή",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Αποδοχή Όρων Παροχής Υπηρεσιών και Πολιτικής Απορρήτου"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Σας ευχαριστούμε για τη χρήση του Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Οι προγραμματιστές μας εργάζονται συνεχώς για να σας προσφέρουν την καλύτερη δυνατή εμπειρία χρήστη. Για αυτό, πρέπει να μάθουμε περισσότερα σχετικά με το ποιος χρησιμοποιεί το Opencast και πώς χρησιμοποιείται. Μπορείτε να μας βοηθήσετε με μια γρήγορη εγγραφή.",
+            "INFORMATION_PARAGRAPH_2": "\nΕκτιμούμε ιδιαίτερα τα σχόλια, καθώς ακόμη και μερικά από τα δεδομένα που συλλέγουμε σχετικά με τη χρήση του Opencast θα μας βοηθήσουν να δημιουργήσουμε καλύτερο λογισμικό, να έχουμε καλύτερες πιθανότητες για πρόσθετη χρηματοδότηση και να προσελκύσουμε περισσότερες εταιρείες για να παρέχουν υπηρεσίες γύρω από το Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Οργανισμός",
+            "DEPARTMENT": "Τμήμα",
+            "COUNTRY": "Χώρα",
+            "POSTAL_CODE": "Ταχυδρομικός Κώδικας",
+            "CITY": "Πόλη",
+            "CONTACT_INFO": "Πληροφορίες επικοινωνίας",
+            "GENDER": "Φύλο",
+            "GENDER_MALE": "Άνδρας",
+            "GENDER_FEMALE": "Γυναίκα",
+            "FIRST_NAME": "Όνομα",
+            "LAST_NAME": "Επώνυμο",
+            "STREET": "Οδός",
+            "NUMBER": "Αριθμός",
+            "ADDITIONAL_ADRESS_INFO": "Επιπλέον πληροφορίες διεύθυνσης",
+            "MAIL": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
+            "CONTACT_ME": "Επικοινωνήστε μαζί μου για ενημερώσεις και ζητήματα ασφάλειας",
+            "WHICH_DATA_TO_SHARE": "Ποια δεδομένα θέλετε να μοιραστείτε;",
+            "POLICY_HEADLINE": "Πολιτική Απορρήτου και όροι χρήσης",
+            "USAGE_STATISTICS": "Στατιστικά χρήσης",
+            "ERROR_REPORTS": "Αναφορές σφαλμάτων",
+            "READ_TERMS_OF_USE_BEFORE": "Έχω διαβάσει και αποδέχομαι τους ",
+            "READ_TERMS_OF_USE_LINK": "την πολιτική απορρήτου και τους όρους χρήσης",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Ισως την επόμενη φορά!",
+            "TEXT": "Εάν θέλετε να εγγραφείτε αργότερα, μπορείτε να το κάνετε πατώντας το κουμπί βοήθειας στην επάνω δεξιά γωνία."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Σας ευχαριστουμε για την εγγραφη σας.",
+            "TEXT_LEADING_TO_PATH": "Μπορείτε να αλλάξετε τα δεδομένα σας σε",
+            "TEXT_LEADING_AFTER_PATH": "οποιαδήποτε στιγμή."
+         },
+         "ERROR": {
+            "HEADER": "Σφάλμα",
+            "TEXT": "Παρουσιάστηκε μη αναμενόμενο σφάλμα κατά την επεξεργασία του αιτήματος."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Είστε βέβαιοι ότι θέλετε να διαγράψετε τα στοιχεία εγγραφής σας;"
+         }
       }
    },
    "EVENTS": {
       "LICENSE": {
-         "ALLRIGHTS": "All rights reserved",
+         "ALLRIGHTS": "Με επιφύλαξη παντός δικαιώματος",
          "CCBY": "CC BY",
          "CCBYSA": "CC BY-SA",
          "CCBYND": "CC BY-ND",
@@ -351,964 +471,965 @@
       },
       "EVENTS": {
          "NEW": {
-            "CAPTION": "Create event",
+            "CAPTION": "Δημιουργία εκδήλωσης",
             "METADATA": {
-               "CAPTION": "Metadata"
+               "CAPTION": "Μεταδεδομένα"
             },
             "METADATA_EXTENDED": {
-               "CAPTION": "Extended metadata",
+               "CAPTION": "Εκτεταμένα μεταδεδομένα",
                "DESCRIPTION": "",
                "METADATA": {
-                  "TITLE": "Extended metadata"
+                  "TITLE": "Εκτεταμένα μεταδεδομένα"
                }
             },
             "SOURCE": {
-               "CAPTION": "Source",
-               "SELECT_SOURCE": "Select source",
+               "CAPTION": "Πηγή",
+               "SELECT_SOURCE": "Επιλογή πηγής",
                "PLACEHOLDER": {
-                  "LOCATION": "Location",
-                  "INPUTS": "Inputs",
-                  "HOUR": "Hour",
-                  "MINUTE": "Minute",
-                  "REPEATS": "Repeats",
-                  "START_DATE": "yyyy-mm-dd",
-                  "START_DATE_FORMAT": "yyyy-mm-dd",
-                  "END_DATE": "yyyy-mm-dd",
-                  "END_DATE_FORMAT": "yyyy-mm-dd"
+                  "LOCATION": "Τοποθεσία",
+                  "INPUTS": "Εισαγωγές δεδομένων",
+                  "HOUR": "Ώρα",
+                  "MINUTE": "Λεπτά",
+                  "REPEATS": "Επαναλήψεις",
+                  "START_DATE": "ΕΕΕΕ-ΜΜ-ΗΗ",
+                  "START_DATE_FORMAT": "ΕΕΕΕ-ΜΜ-ΗΗ",
+                  "END_DATE": "ΕΕΕΕ-ΜΜ-ΗΗ",
+                  "END_DATE_FORMAT": "ΕΕΕΕ-ΜΜ-ΗΗ"
                },
                "UPLOAD": {
-                  "CAPTION": "Upload",
-                  "RECORDING_ELEMENTS": "Recording elements",
-                  "RECORDING_METADATA": "Recording metadata",
+                  "CAPTION": "Ανέβασμα αρχείων",
+                  "RECORDING_ELEMENTS": "Στοιχεία καταγραφής",
+                  "RECORDING_METADATA": "Μετά-δεδομένα εγγραφής",
                   "SEGMENTABLE": {
-                     "SHORT": "Slides",
-                     "DETAIL": "The file contains a recording of a slide presentation (Keynote, Powerpoint, etc)."
+                     "SHORT": "Διαφάνειες",
+                     "DETAIL": "Το αρχείο περιέχει μια καταγραφή  παρουσίασης διαφανειών (Keynote, Powerpoint, κλπ)."
                   },
                   "NON_SEGMENTABLE": {
-                     "SHORT": "Presenter",
-                     "DETAIL": "The file contains a recording of a person speaking to an audience."
+                     "SHORT": "Παρουσιαστής",
+                     "DETAIL": "Το αρχείο περιέχει μια καταγραφή ενός προσώπου μιλώντας σε ένα ακροατήριο."
                   },
                   "AUDIO_ONLY": {
-                     "SHORT": "Audio only",
-                     "DETAIL": "The file contains only audio."
+                     "SHORT": "Μόνο αρχείου ήχου",
+                     "DETAIL": "Το αρχείο περιέχει μόνο ήχο."
                   },
                   "MULTIPLE_PARTS": {
-                     "SHORT": "Multiple parts",
-                     "DETAIL": "A set of files containing different parts of the event."
+                     "SHORT": "Πολλαπλά τμήματα",
+                     "DETAIL": "Ένα σύνολο αρχείων που περιέχει διάφορα τμήματα της εκδήλωσης."
                   }
                },
                "DATE_TIME": {
-                  "CAPTION": "Schedule",
-                  "START_DATE": "Start date",
-                  "START_TIME": "Start time",
-                  "TIMEZONE": "Time zone",
-                  "END_DATE": "End date",
-                  "END_TIME": "End time",
-                  "DURATION": "Duration"
+                  "CAPTION": "Χρονοδιάγραμμα",
+                  "START_DATE": "Ημερομηνία έναρξης",
+                  "START_TIME": "Ώρα έναρξης",
+                  "TIMEZONE": "Ζώνη ώρας",
+                  "END_DATE": "Ημερομηνία λήξης",
+                  "END_TIME": "Ώρα λήξης",
+                  "DURATION": "Διάρκεια"
                },
                "SCHEDULE_SINGLE": {
-                  "CAPTION": "Schedule single event"
+                  "CAPTION": "Προγραμματισμός μίας εκδήλωσης"
                },
                "SCHEDULE_MULTIPLE": {
-                  "CAPTION": "Schedule multiple events",
-                  "REPEATS": "Repeats",
-                  "REPEAT_ON": "Repeat on",
-                  "WEEKDAYS": "Weekdays",
-                  "WEEKDAY": "Weekday"
+                  "CAPTION": "Προγραμματισμός πολλαπλών εκδηλώσεων",
+                  "REPEATS": "Επαναλήψεις",
+                  "REPEAT_ON": "Επανάληψη τη",
+                  "WEEKDAYS": "Ημέρες εβδομάδας",
+                  "WEEKDAY": "Ημέρες εβδομάδας"
                },
-               "NO_SOURCE_AVAILABLE": "No capture agents available for scheduling"
+               "NO_SOURCE_AVAILABLE": "Κανένας ατζέντης βιντεοσκόπησης δεν είναι διαθέσιμος για προγραμματισμό"
             },
             "PROCESSING": {
-               "CAPTION": "Processing",
-               "SELECT_WORKFLOW": "Select workflow",
-               "SELECT_WORKFLOW_EMPTY": "No workflow found",
-               "WORKFLOW": "Workflow"
+               "CAPTION": "Σε επεξεργασία",
+               "SELECT_WORKFLOW": "Επιλέξτε ροή εργασίας",
+               "SELECT_WORKFLOW_EMPTY": "Δεν βρέθηκε ροή εργασίας",
+               "WORKFLOW": "Ροή εργασίας"
             },
             "UPLOAD_ASSET": {
-               "CAPTION": "Asset Upload",
-               "SELECT_TYPE": "Select asset type",
-               "ADD": "Add Asset",
-               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
+               "CAPTION": "Μεταφόρτωση αντικειμένου",
+               "SELECT_TYPE": "Επιλέξτε τύπο αντικειμένου",
+               "ADD": "Προσθήκη αντικειμένου",
+               "NO_OPTIONS": "Δεν καθορίστηκε λίστα επιλογών αντικειμένων σε αυτό το τμήμα της ιστοσελίδας!",
                "OPTION": {
-                  "CLASS_HANDOUT_NOTES": "Class handout notes",
-                  "CAPTIONS_DFXP": "Captions DFXP",
-                  "CAPTIONS_WEBVTT": "Captions WebVTT",
-                  "PREVIEW_IMAGE": "Preview image",
-                  "SMIL": "Smil catalog",
-                  "TRACK_PARTS": "Track parts"
+                  "CLASS_HANDOUT_NOTES": "Ενημερωτικές σημειώσεις κλάσης",
+                  "CAPTIONS_DFXP": "Υπότιτλοι DFXP",
+                  "CAPTIONS_WEBVTT": "Υπότιτλοι WebVTT",
+                  "PREVIEW_IMAGE": "Προεπισκόπηση εικόνας",
+                  "SMIL": "Κατάλογος Smil",
+                  "TRACK_PARTS": "Παρακολούθηση τμημάτων"
                }
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
-               "POLICY": "Access policy",
-               "ACL": "Access policy"
+               "CAPTION": "Πολιτική πρόσβασης",
+               "POLICY": "Πολιτική πρόσβασης",
+               "ACL": "Πολιτική πρόσβασης"
             },
             "SUMMARY": {
-               "CAPTION": "Summary",
+               "CAPTION": "Περίληψη",
                "SOURCE": {
-                  "INPUT": "Input"
+                  "INPUT": "Απόκρυψη διεπαφής"
                }
             },
             "WEEKDAYS": {
-               "MO": "Mo",
-               "TU": "Tu",
-               "WE": "We",
-               "TH": "Th",
-               "FR": "Fr",
-               "SA": "Sa",
-               "SU": "Su"
+               "MO": "Δευτ",
+               "TU": "Τρί",
+               "WE": "Τετ",
+               "TH": "Πέμ",
+               "FR": "Παρ",
+               "SA": "Σάβ",
+               "SU": "Κυρ"
             },
             "WEEKDAYSLONG": {
-               "MO": "Monday",
-               "TU": "Tuesday",
-               "WE": "Wednesday",
-               "TH": "Thursday",
-               "FR": "Friday",
-               "SA": "Saturday",
-               "SU": "Sunday"
+               "MO": "Δευτέρα",
+               "TU": "Τρίτη",
+               "WE": "Τετάρτη",
+               "TH": "Πέμπτη",
+               "FR": "Παρασκευή",
+               "SA": "Σάββατο",
+               "SU": "Κυριακή"
             }
          },
          "NAVIGATION": {
-            "EVENTS": "Events",
-            "SERIES": "Series",
-            "OVERVIEW": "Overview"
+            "EVENTS": "Εκδηλώσεις",
+            "SERIES": "Σειρά",
+            "OVERVIEW": "Επισκόπηση"
          },
-         "UPLOAD": "Upload",
-         "ADD_SERIES": "Add series",
-         "ADD_EVENT": "Add event",
+         "UPLOAD": "Μεταφόρτωση",
+         "ADD_SERIES": "Προσθήκη σειράς",
+         "ADD_EVENT": "Προσθήκη εκδήλωσης",
          "TABLE": {
-            "CAPTION": "Events",
-            "TITLE": "Title",
-            "PRESENTERS": "Presenter(s)",
-            "SERIES": "Series",
-            "DATE": "Date",
-            "START": "Start",
-            "END": "End",
-            "STOP": "Stop",
-            "STATUS": "Status",
-            "LOCATION": "Location",
-            "ACTION": "Actions",
-            "FIRST": "First",
-            "LAST": "Last",
-            "NEXT": "Next",
-            "MANAGED_ACL": "Access policy",
-            "WORKFLOW_STATE": "Progress",
-            "PREVIOUS": "Previous",
-            "NOCONTENT": "No data available",
-            "PUBLISHED": "Published",
-            "WEEKDAY": "Weekday",
+            "CAPTION": "Εκδηλώσεις",
+            "TITLE": "Τίτλος",
+            "PRESENTERS": "Παρουσιαστής(ές)",
+            "SERIES": "Σειρά",
+            "DATE": "Ημερομηνία",
+            "START": "Έναρξη",
+            "END": "Τέλος",
+            "STOP": "Διακοπή",
+            "STATUS": "Κατάσταση",
+            "LOCATION": "Τοποθεσία",
+            "ACTION": "Ενέργειες",
+            "FIRST": "Πρώτη",
+            "LAST": "Τελευταία",
+            "NEXT": "Επόμενη",
+            "MANAGED_ACL": "Πολιτική πρόσβασης",
+            "WORKFLOW_STATE": "Πρόοδος",
+            "PREVIOUS": "Προηγούμενη",
+            "NOCONTENT": "Δεν υπάρχουν διαθέσιμα δεδομένα",
+            "PUBLISHED": "Δημοσιευμένο",
+            "WEEKDAY": "Ημέρες εβδομάδας",
             "TOOLTIP": {
-               "ASSETS": "Open asset details",
-               "START": "Filter for this start date",
-               "SERIES": "Filter for this series",
-               "STATUS": "Filter for this event status",
-               "LOCATION": "Filter for this location",
-               "DETAILS": "Open event details",
-               "DELETE": "Delete event",
-               "EDITOR": "Open video Editor",
-               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
-               "COMMENTS": "View comments",
-               "PAUSED_WORKFLOW": "View paused workflow",
-               "PRESENTER": "Filter for this presenter"
+               "ASSETS": "Άνοιγμα λεπτομερειών αντικιεμένων",
+               "START": "Φίλτρο για αυτήν την ημερομηνία έναρξης",
+               "SERIES": "Φίλτρο για αυτή τη σειρά",
+               "STATUS": "Φίλτρο για την κατάσταση της εκδήλωσης",
+               "LOCATION": "Εκδήλωση για αυτήν την τοποθεσία",
+               "DETAILS": "Προβολή λεπτομερειών εκδήλωσης",
+               "DELETE": "Διαγραφή εκδήλωσης",
+               "EMBEDDING_CODE": "Ενσωμάτωση κώδικα",
+               "EDITOR": "Άνοιγμα επεξεργασίας βίντεο",
+               "EDITOR_NEEDS_CUTTING": "Άνοιγμα επεξεργασίας βίντεο (ένα σχόλιο δείχνει ότι έχει ζητηθεί η επεξεργασία του βίντεο)",
+               "COMMENTS": "Δείτε σχόλια",
+               "PAUSED_WORKFLOW": "Δείτε σταματημένη εκδήλωση",
+               "PRESENTER": "Φίλτρο για αυτόν τον παρουσιαστή"
             }
          },
          "STATUS": {
-            "SCHEDULED": "Scheduled",
-            "RECORDING": "Recording",
-            "UPLOADING": "Uploading",
-            "INGESTING": "Ingesting",
-            "PENDING": "Pending",
-            "PROCESSING": "Running",
-            "PAUSED": "Paused",
-            "PROCESSED": "Finished",
-            "RECORDING_FAILURE": "Recording failure",
-            "PROCESSING_FAILURE": "Processing failure",
-            "PROCESSING_CANCELED": "Processing canceled"
+            "SCHEDULED": "Προγραμματισμένη",
+            "RECORDING": "Εγγραφή",
+            "UPLOADING": "Μεταφόρτωση",
+            "INGESTING": "Εισάγεται",
+            "PENDING": "Εκκρεμεί",
+            "PROCESSING": "Εκτελείται",
+            "PAUSED": "Σε παύση",
+            "PROCESSED": "Ολοκληρώθηκε",
+            "RECORDING_FAILURE": "Αποτυχία εγγραφής",
+            "PROCESSING_FAILURE": "Αποτυχία επεξεργασίας",
+            "PROCESSING_CANCELED": "Ακύρωση επεξεργασίας"
          },
          "STATE_MAPPING": {
-            "RETRACTING": "Retracting",
-            "DELETING": "Deleting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
-            "REPUBLISHING_METADATA": "Republishing metadata",
-            "UPDATING_PREVIEWS": "Updating previews"
+            "RETRACTING": "Ανάκληση",
+            "DELETING": "Διαγραφή",
+            "DUPLICATING": "Αντιγραφή",
+            "PUBLISHING": "Δημοσίευση",
+            "IMPORTING": "Εισαγωγή",
+            "REPUBLISHING_METADATA": "Επανέκδοση μεταδεδομένων",
+            "UPDATING_PREVIEWS": "Ενημέρωση προεπισκοπήσεων"
          },
          "DETAILS": {
-            "HEADER": "Event details - {{resourceId}}",
+            "HEADER": "Λεπτομέρειες εκδήλωσης {{resourceId}}",
             "TABS": {
-               "METADATA": "Metadata",
-               "EXTENDED-METADATA": "Metadata II",
-               "ASSETS": "Assets",
-               "PUBLICATIONS": "Publications",
-               "SCHEDULING": "Scheduling",
-               "WORKFLOWS": "Workflows",
-               "ACCESS": "Access policy",
-               "COMMENTS": "Comments",
-               "STATISTICS": "Statistics"
+               "METADATA": "Μεταδεδομένα",
+               "EXTENDED-METADATA": "Μεταδεδομένα ΙΙ",
+               "ASSETS": "Αντικείμενα",
+               "PUBLICATIONS": "Δημοσιεύσεις",
+               "SCHEDULING": "Προγραμματισμός",
+               "WORKFLOWS": "Ροές εργασίας",
+               "ACCESS": "Πολιτική πρόσβασης",
+               "COMMENTS": "Σχόλια",
+               "STATISTICS": "Στατιστικά"
             },
             "PUBLICATIONS": {
-               "CAPTION": "Publications",
-               "NO_PUBLICATIONS_AVAILABLE": "This event has not been published",
-               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
-               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
-               "CUSTOM": "Custom",
+               "CAPTION": "Δημοσιεύσεις",
+               "NO_PUBLICATIONS_AVAILABLE": "Αυτή η εκδήλωση δεν έχει δημοσιεύσεις",
+               "PUBLICATION_DESCRIPTION": "Αυτό η εκδήλωση έχει δημοσιευθεί στα παρακάτω κανάλια δημοσίευσης:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Αυτή η εκδήλωση δεν είναι σε εξέλιξη",
+               "CUSTOM": "Προσαρμοσμένη",
                "ENGAGE": "Engage",
-               "ENGAGE_LIVE": "Engage Live",
-               "EXTERNAL_API": "External API Publication",
-               "YOUTUBE": "Youtube",
+               "ENGAGE_LIVE": "Engage live",
+               "EXTERNAL_API": "Εξωτερική δημοσίευση API",
+               "YOUTUBE": "YouTube",
                "OAIPMH": "OAI-PMH",
-               "SELECT_WORKFLOW": "Select workflow",
-               "SELECT_WORKFLOW_EMPTY": "No workflows available"
+               "SELECT_WORKFLOW": "Επιλέξτε ροή εργασίας",
+               "SELECT_WORKFLOW_EMPTY": "Καμμία διαθέσιμη ροή εργασίας"
             },
             "MEDIA": {
-               "TRIM_MEDIA": "Trim media",
-               "MEDIA": "Media",
-               "ID": "ID",
-               "TYPE": "Type",
-               "MIMETYPE": "Mimetype",
-               "URL": "URL",
-               "DETAILS": "Details"
+               "TRIM_MEDIA": "Περικοπή πολυμέσων",
+               "MEDIA": "Πολυμέσα",
+               "ID": "Αναγνωριστικό",
+               "TYPE": "Τύπος",
+               "MIMETYPE": "MimeType",
+               "URL": "Διεύθυνση URL",
+               "DETAILS": "Λεπτομέρειες"
             },
             "ATTACHMENTS": {
-               "CAPTION": "Attachments",
-               "ID": "Id",
-               "TYPE": "Type",
-               "MIMETYPE": "Mimetype",
-               "TAGS": "Tags",
-               "LINK": "Link"
+               "CAPTION": "Συνημμένα",
+               "ID": "Αναγνωριστικό",
+               "TYPE": "Τύπος",
+               "MIMETYPE": "MimeType",
+               "TAGS": "Ετικέτες",
+               "LINK": "Σύνδεσμος"
             },
             "SOURCE": {
-               "CAPTION": "Source",
-               "SELECT_SOURCE": "Select source",
+               "CAPTION": "Πηγή",
+               "SELECT_SOURCE": "Επιλογή πηγής",
                "PLACEHOLDER": {
-                  "LOCATION": "Location",
-                  "INPUTS": "Inputs",
-                  "HOUR": "Hour",
-                  "MINUTE": "Minute",
-                  "REPEATS": "Repeats",
-                  "START_DATE": "yyyy-mm-dd",
-                  "END_DATE": "yyyy-mm-dd"
+                  "LOCATION": "Τοποθεσία",
+                  "INPUTS": "Εισαγωγές δεδομένων",
+                  "HOUR": "Ώρα",
+                  "MINUTE": "Λεπτά",
+                  "REPEATS": "Επαναλήψεις",
+                  "START_DATE": "ΕΕΕΕ-ΜΜ-ΗΗ",
+                  "END_DATE": "ΕΕΕΕ-ΜΜ-ΗΗ"
                },
                "UPLOAD": {
-                  "CAPTION": "Upload",
-                  "RECORDING_ELEMENTS": "Recording elements",
+                  "CAPTION": "Ανέβασμα αρχείων",
+                  "RECORDING_ELEMENTS": "Στοιχεία καταγραφής",
                   "SEGMENTABLE": {
-                     "SHORT": "Slides",
-                     "DETAIL": "The file contains a recording of a slide presentation (Keynote, Powerpoint, etc)."
+                     "SHORT": "Διαφάνειες",
+                     "DETAIL": "Το αρχείο περιέχει μια καταγραφή παρουσίασης διαφανειών (Keynote, Powerpoint, κλπ)."
                   },
                   "NON_SEGMENTABLE": {
-                     "SHORT": "Presenter",
-                     "DETAIL": "The file contains a recording of a person speaking to an audience."
+                     "SHORT": "Παρουσιαστής",
+                     "DETAIL": "Το αρχείο περιέχει μια καταγραφή ενός προσώπου μιλώντας σε ένα ακροατήριο."
                   },
                   "AUDIO_ONLY": {
-                     "SHORT": "Audio only",
-                     "DETAIL": "The file contains only audio."
+                     "SHORT": "Μόνο αρχείου ήχου",
+                     "DETAIL": "Το αρχείο περιέχει μόνο ήχο."
                   }
                },
                "DATE_TIME": {
-                  "CAPTION": "Schedule",
-                  "START_DATE": "Start date",
-                  "START_TIME": "Start time",
-                  "TIMEZONE": "Time zone",
-                  "END_DATE": "End date",
-                  "END_TIME": "End time",
-                  "DURATION": "Duration"
+                  "CAPTION": "Προγραμματισμός",
+                  "START_DATE": "Ημερομηνία έναρξης",
+                  "START_TIME": "Ώρα έναρξης",
+                  "TIMEZONE": "Ζώνη ώρας",
+                  "END_DATE": "Ημερομηνία λήξης",
+                  "END_TIME": "Ώρα τερματισμού",
+                  "DURATION": "Διάρκεια"
                },
                "SCHEDULE_SINGLE": {
-                  "CAPTION": "Schedule single event"
+                  "CAPTION": "Προγραμματισμός μίας εκδήλωσης"
                },
                "SCHEDULE_MULTIPLE": {
-                  "CAPTION": "Schedule multiple events",
-                  "REPEATS": "Repeats",
-                  "REPEAT_ON": "Repeat on",
-                  "WEEKDAYS": "Weekdays"
+                  "CAPTION": "Προγραμματισμός πολλαπλών εκδηλώσεων",
+                  "REPEATS": "Επαναλήψεις",
+                  "REPEAT_ON": "Επανάληψη τη",
+                  "WEEKDAYS": "Ημέρες εβδομάδας"
                }
             },
             "ASSETS": {
-               "CAPTION": "Assets",
-               "TYPE": "Type",
-               "SIZE": "Size",
-               "DETAILS": "Details",
-               "STREAMS": "Streams",
-               "PREVIEW": "Preview",
+               "CAPTION": "Αντικείμενα",
+               "TYPE": "Τύπος",
+               "SIZE": "Μέγεθος",
+               "DETAILS": "Λεπτομέρειες",
+               "STREAMS": "Ροές",
+               "PREVIEW": "Προεπισκόπηση",
                "ATTACHMENTS": {
-                  "TITLE": "Attachments",
-                  "CAPTION": "Attachments",
-                  "ID": "Id",
-                  "TYPE": "Type",
-                  "MIMETYPE": "Mimetype",
-                  "TAGS": "Tags",
-                  "LINK": "Link",
+                  "TITLE": "Συνημμένα",
+                  "CAPTION": "Συνημμένα",
+                  "ID": "Αναγνωριστικό",
+                  "TYPE": "Τύπος",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Ετικέτες",
+                  "LINK": "Σύνδεσμος (link)",
                   "DETAILS": {
-                     "TITLE": "Attachment details",
-                     "CAPTION": "Attachment details",
-                     "ID": "Id",
-                     "TYPE": "Type",
-                     "MIMETYPE": "Mimetype",
-                     "TAGS": "Tags",
-                     "URL": "URL",
-                     "SIZE": "Size",
-                     "CHECKSUM": "Checksum",
-                     "REFERENCE": "Reference"
+                     "TITLE": "Λεπτομέρεις συννημένου",
+                     "CAPTION": "Λεπτομέρεις συννημένου",
+                     "ID": "Αναγνωριστικό",
+                     "TYPE": "Τύπος",
+                     "MIMETYPE": "MimeType",
+                     "TAGS": "Ετικέτες",
+                     "URL": "Διεύθυνση URL",
+                     "SIZE": "Μέγεθος",
+                     "CHECKSUM": "Άθροισμα ελέγχου",
+                     "REFERENCE": "Αναφορά"
                   }
                },
                "CATALOGS": {
-                  "TITLE": "Catalogs",
-                  "CAPTION": "Catalogs",
-                  "ID": "Id",
-                  "TYPE": "Type",
-                  "MIMETYPE": "Mimetype",
-                  "TAGS": "Tags",
-                  "LINK": "Link",
+                  "TITLE": "Κατάλογοι",
+                  "CAPTION": "Κατάλογοι",
+                  "ID": "Αναγνωριστικό",
+                  "TYPE": "Τύπος",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Ετικέτες",
+                  "LINK": "Σύνδεσμος σελίδας",
                   "DETAILS": {
-                     "TITLE": "Catalog details",
-                     "CAPTION": "Catalog details",
-                     "ID": "Id",
-                     "TYPE": "Type",
-                     "MIMETYPE": "Mimetype",
-                     "TAGS": "Tags",
-                     "URL": "URL",
-                     "SIZE": "Size",
-                     "CHECKSUM": "Checksum",
-                     "REFERENCE": "Reference"
+                     "TITLE": "Λεπτομέρειες καταλόγου",
+                     "CAPTION": "Λεπτομέρειες καταλόγου",
+                     "ID": "Αναγνωριστικό",
+                     "TYPE": "Τύπος",
+                     "MIMETYPE": "MimeType",
+                     "TAGS": "Ετικέτες",
+                     "URL": "Διεύθυνση URL",
+                     "SIZE": "Μέγεθος",
+                     "CHECKSUM": "Άθροισμα ελέγχου",
+                     "REFERENCE": "Αναφορά"
                   }
                },
                "MEDIA": {
-                  "TITLE": "Media",
-                  "CAPTION": "Media",
-                  "ID": "ID",
-                  "TYPE": "Type",
-                  "MIMETYPE": "Mimetype",
-                  "TAGS": "Tags",
-                  "LINK": "Link",
+                  "TITLE": "Πολυμέσα",
+                  "CAPTION": "Πολυμέσα",
+                  "ID": "Αναγνωριστικό",
+                  "TYPE": "Τύπος",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Ετικέτες",
+                  "LINK": "Σύνδεσμος",
                   "DETAILS": {
-                     "TITLE": "Media details",
-                     "ID": "ID",
-                     "TYPE": "Type",
-                     "MIMETYPE": "Mimetype",
-                     "URL": "URL",
-                     "RECORDING_DATE": "Recording date",
-                     "FLAVOR": "Flavor",
-                     "TAGS": "Tags",
-                     "DURATION": "Duration",
-                     "STREAM_AUDIO": "Audio streams",
-                     "STREAM_VIDEO": "Video streams",
-                     "CHANNELS": "Channels",
-                     "BITRATE": "Bit rate",
-                     "BITDEPTH": "Bit depth",
-                     "SAMPLINGRATE": "Sample rate",
-                     "FRAMECOUNT": "Frame count",
-                     "PEAKLEVELDB": "Peak level (dB)",
-                     "RMSLEVELDB": "RMS level (dB)",
-                     "RMSPEAKDB": "RMS peak (dB)",
-                     "FRAMERATE": "Frame rate",
-                     "RESOLUTION": "Resolution",
-                     "SIZE": "Size",
-                     "SCANTYPE": "Scan type",
-                     "SCANORDER": "Scan order"
+                     "TITLE": "Πληροφορίες πολυμέσων",
+                     "ID": "Αναγνωριστικό",
+                     "TYPE": "Τύπος",
+                     "MIMETYPE": "MimeType",
+                     "URL": "Διεύθυνση URL",
+                     "RECORDING_DATE": "Ημερομηνία εγγραφής",
+                     "FLAVOR": "Γεύση",
+                     "TAGS": "Ετικέτες",
+                     "DURATION": "Διάρκεια",
+                     "STREAM_AUDIO": "Ροές ήχου",
+                     "STREAM_VIDEO": "Ροές βίντεο",
+                     "CHANNELS": "Κανάλια",
+                     "BITRATE": "Ρυθμός μετάδοσης bit",
+                     "BITDEPTH": "Βάθος bit",
+                     "SAMPLINGRATE": "Ρυθμός Δειγματοληψίας",
+                     "FRAMECOUNT": "Καταμέτρηση Πλαισίου",
+                     "PEAKLEVELDB": "Επίπεδο κορυφής (db)",
+                     "RMSLEVELDB": "Επίπεδο RMS (dB)",
+                     "RMSPEAKDB": "Κορυφή RMS (db)",
+                     "FRAMERATE": "Ρυθμός καρέ",
+                     "RESOLUTION": "Ανάλυση",
+                     "SIZE": "Μέγεθος",
+                     "SCANTYPE": "Τύπος σάρωσης",
+                     "SCANORDER": "Ανίχνευσή σειράς"
                   }
                },
                "PUBLICATIONS": {
-                  "TITLE": "Publications",
-                  "CAPTION": "Publications",
-                  "CHANNEL": "Channel",
-                  "ID": "Id",
-                  "TYPE": "Type",
-                  "MIMETYPE": "Mimetype",
-                  "TAGS": "Tags",
-                  "LINK": "Link",
+                  "TITLE": "Δημοσιεύσεις",
+                  "CAPTION": "Δημοσιεύσεις",
+                  "CHANNEL": "Κανάλι",
+                  "ID": "Αναγνωριστικό",
+                  "TYPE": "Τύπος",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Ετικέτες",
+                  "LINK": "Σύνδεση",
                   "DETAILS": {
-                     "TITLE": "Publication details",
-                     "CAPTION": "Publication details",
-                     "ID": "Id",
-                     "TYPE": "Type",
-                     "MIMETYPE": "Mimetype",
-                     "TAGS": "Tags",
-                     "URL": "URL",
-                     "SIZE": "Size",
-                     "CHANNEL": "Channel",
-                     "REFERENCE": "Reference"
+                     "TITLE": "Λεπτομέρειες δημοσίευσης",
+                     "CAPTION": "Λεπτομέρειες δημοσίευσης",
+                     "ID": "Αναγνωριστικό",
+                     "TYPE": "Τύπος",
+                     "MIMETYPE": "MimeType",
+                     "TAGS": "Ετικέτες",
+                     "URL": "Διεύθυνση URL",
+                     "SIZE": "Μέγεθος",
+                     "CHANNEL": "Κανάλι",
+                     "REFERENCE": "Αναφορά"
                   }
                }
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
+               "CAPTION": "Πολιτική πρόσβασης",
                "DESCRIPTION": "",
                "TEMPLATES": {
-                  "TITLE": "Templates"
+                  "TITLE": "Πρότυπα"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Access policy",
+                  "TITLE": "Πολιτική πρόσβασης",
                   "DESCRIPTION": "",
-                  "LABEL": "Select a template",
-                  "EMPTY": "No template found",
-                  "ROLE": "Role",
-                  "WRITE": "Write",
-                  "READ": "Read",
-                  "ADDITIONAL_ACTIONS": "Additional Actions",
-                  "ACTION": "Actions",
-                  "NEW": "New policy",
-                  "DETAILS": "Details"
+                  "LABEL": "Επιλέξτε ένα πρότυπο",
+                  "EMPTY": "Το πρότυπο δεν βρέθηκε",
+                  "ROLE": "Ρόλος",
+                  "WRITE": "Εγγραφή",
+                  "READ": "Ανάγνωση",
+                  "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
+                  "ACTION": "Ενέργειες",
+                  "NEW": "Νέα πολιτική",
+                  "DETAILS": "Λεπτομέρειες"
                },
                "ROLES": {
-                  "LABEL": "Select a role",
-                  "EMPTY": "No role found"
+                  "LABEL": "Επιλέξτε ένα ρόλο",
+                  "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                }
             },
             "COMMENTS": {
-               "CAPTION": "Comments",
-               "PLACEHOLDER": "Comment…",
-               "SELECTPLACEHOLDER": "Select reasons",
-               "RESOLVED": "Resolved",
-               "REPLY": "Reply",
-               "REPLY_TO": "Reply to",
-               "CANCEL_REPLY": "Cancel",
-               "DELETE": "Delete",
-               "REASON": "Reason",
+               "CAPTION": "Σχόλια",
+               "PLACEHOLDER": "Σχόλιο…",
+               "SELECTPLACEHOLDER": "Επιλέξτε αιτίες",
+               "RESOLVED": "Επιλυμένο",
+               "REPLY": "Απάντηση",
+               "REPLY_TO": "Απάντηση σε",
+               "CANCEL_REPLY": "Ακύρωση",
+               "DELETE": "Διαγραφή",
+               "REASON": "Αιτία",
                "REASONS": {
-                  "CUTTING": "Cutting required",
-                  "REVIEW": "Review required",
-                  "ASYNC": "A/V tracks asynchronous",
-                  "AUDIO_ISSUE": "Missing or defective audio track",
-                  "CANCELED": "Canceled event",
-                  "CONFLICTING_METADATA": "Conflicting metadata",
-                  "IMPROPER_POINT": "Improper in or out point",
-                  "MISSING_AGREEMENT": "Missing agreement",
-                  "OTHER": "Other",
-                  "PRIVACY": "Privacy concern",
-                  "SEGMENTATION": "Inaccurate segmentation",
-                  "UNKNOWN_CREATOR": "Creator unknown",
-                  "VIDEO_ISSUE": "Video distorted or cropped",
-                  "WRONG_INPUT_FORMAT": "Input file format not supported",
-                  "WRONG_METADATA": "Metadata needs correction",
-                  "WRONG_SERIES_PUBLICATION": "Wrong series or publication channel",
-                  "WRONG_WORKFLOW": "Wrong workflow",
-                  "PROCESSING_FAILURE": "Processing failure"
+                  "CUTTING": "Απαιτείται μοντάζ",
+                  "REVIEW": "Απαιτείται προεπισκόπηση",
+                  "ASYNC": "Ασύγχρονα κομμάτια εικόνας/ήχου",
+                  "AUDIO_ISSUE": "Χαμένο ή ελλατωματικό κομμάτι ήχου",
+                  "CANCELED": "Διαγραφείσα εκδήλωση",
+                  "CONFLICTING_METADATA": "Αντικρουόμενα μετα-δεδομένα",
+                  "IMPROPER_POINT": "Λανθασμένο σημείο εισαγωγής ή εξαγωγής",
+                  "MISSING_AGREEMENT": "Ελλειπής συμφνία",
+                  "OTHER": "Άλλο",
+                  "PRIVACY": "Ανησυχία ιδιωτικώτητας",
+                  "SEGMENTATION": "Ανακριβής διαχωρισμός",
+                  "UNKNOWN_CREATOR": "Άγνωστος δημιουργός",
+                  "VIDEO_ISSUE": "Το βίντεο έχει παραμορφωθεί ή περικοπεί",
+                  "WRONG_INPUT_FORMAT": "Το φορμάτ του αρχείου εισαγωγής δεν υποστηρίζεται",
+                  "WRONG_METADATA": "Τα μετα-δεδομένα χρειάζονται διόρθωση",
+                  "WRONG_SERIES_PUBLICATION": "Λάρθςο σειρά ή κανάλι δημοσίευσης",
+                  "WRONG_WORKFLOW": "Λάθος ροής εργασίας",
+                  "PROCESSING_FAILURE": "Αποτυχία επεξεργασίας"
                }
             },
             "STATISTICS": {
-               "CAPTION": "Statistics"
+               "CAPTION": "Στατιστικά"
             },
             "METADATA": {
-               "CAPTION": "Event details",
-               "TITLE": "Title",
+               "CAPTION": "Λεπτομέριες εκδήλωσης",
+               "TITLE": "Τίτλος",
                "ID": "UID",
-               "SERIES": "Series",
-               "RECORDING_DATE": "Recording date",
-               "SUBJECT": "Subject",
-               "DESCRIPTION": "Description",
-               "START_DATE": "Start date",
-               "START_TIME": "Start time",
-               "DURATION": "Duration",
-               "LOCATION": "Location",
-               "SOURCE": "Source",
-               "CREATED": "Created",
-               "CREATED_BY": "Created by",
-               "PUBLISHER": "Publisher",
-               "LICENSE": "License",
-               "CONTRIBUTORS": "Contributor(s)",
-               "RIGHTS": "Rights",
-               "PRESENTERS": "Presenter(s)",
-               "LANGUAGE": "Language",
-               "COPYRIGHT": "Copyright",
-               "VISIBILITY": "Visibility",
-               "PUBLIC": "Public target",
-               "OS": "Processing operating system",
+               "SERIES": "Σειρές",
+               "RECORDING_DATE": "Ημερομηνία εγγραφής",
+               "SUBJECT": "Θέμα",
+               "DESCRIPTION": "Περιγραφή",
+               "START_DATE": "Ημερομηνία έναρξης",
+               "START_TIME": "Ώρα έναρξης",
+               "DURATION": "Διάρκεια",
+               "LOCATION": "Τοποθεσία",
+               "SOURCE": "Πηγή",
+               "CREATED": "Δημιουργήθηκε",
+               "CREATED_BY": "Δημιουργήθηκε από",
+               "PUBLISHER": "Εκδότης",
+               "LICENSE": "Άδεια χρήσης",
+               "CONTRIBUTORS": "Χορηγός(οι)",
+               "RIGHTS": "Δικαιώματα",
+               "PRESENTERS": "Παρουσιαστής(ές)",
+               "LANGUAGE": "Γλώσσα",
+               "COPYRIGHT": "Πνευματικά δικαιώματα",
+               "VISIBILITY": "Εμφάνιση",
+               "PUBLIC": "Ανοιχτό",
+               "OS": "Επεξεργασία λειτουργικού συστήματος",
                "LOCKED": {
-                  "RUNNING": "Editing metadata is not allowed when operations are running on an event"
+                  "RUNNING": "Επεξεργασία μετα-δεδομένων δεν επιτρέπεται όταν λειτουργίες εκτελούνται σε μια εκδήλωση"
                }
             },
             "SCHEDULING": {
-               "CAPTION": "Scheduling configuration",
+               "CAPTION": "Κατάσταση συμμετοχής",
                "PLACEHOLDER": {
-                  "PRESENTERS": "Presenter(s)"
+                  "PRESENTERS": "Παρουσιαστής(ές)"
                }
             },
             "WORKFLOWS": {
-               "ACTIONS": "Actions",
-               "DETAILS": "Details",
-               "DESCRIPTION": "Description",
-               "MORE_INFO": "More Information",
-               "ID": "ID",
-               "TYPE": "Type",
-               "TITLE": "Title",
-               "STATUS": "Status",
-               "STARTED": "Started",
-               "SERIES": "Series",
-               "SUBMITTED": "Submitted",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
-               "WDID": "Workflow definition",
-               "MIMETYPE": "Mimetype",
-               "URL": "URL",
-               "CONFIGURATION": "Configuration",
-               "NO_CONFIGURATION": "No existing configuration parameters for the selected workflow definition.",
-               "WORKFLOW": "Workflow",
+               "ACTIONS": "Ενέργειες",
+               "DETAILS": "Λεπτομέρειες",
+               "DESCRIPTION": "Περιγραφή",
+               "MORE_INFO": "Περισσότερες πληροφορίες",
+               "ID": "Αναγνωριστικό",
+               "TYPE": "Τύπος",
+               "TITLE": "Τίτλος",
+               "STATUS": "Κατάσταση",
+               "STARTED": "Ξεκίνησε",
+               "SERIES": "Σειρές",
+               "SUBMITTED": "Υποβλήθηκε",
+               "SUBMITTER": "Υποβάλλων",
+               "EXECUTION_TIME": "Χρόνος Εκτέλεσης",
+               "WDID": "Ορισμός ροής εργασίας",
+               "MIMETYPE": "MimeType",
+               "URL": "Διεύθυνση URL",
+               "CONFIGURATION": "Ρυθμίσεις παραμέτρων",
+               "NO_CONFIGURATION": "Δεν υπάρχουν παράμετροι ρύθμισης για την επιλεγμένη ροή εργασίας.",
+               "WORKFLOW": "Ροή εργασίας",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "Παύση ροής εργασίας",
+                  "ABORT": "Ματαίωση της εκτέλεσης της εν ενεργεία ροής εργασίας (να μην επαναληφθεί η αποτυχημένη λειτουργία ξανά)",
+                  "RETRY": "Επανάληψη εκτέλεσης της εν ενεργεία ροής εργασίας",
+                  "DELETE": "Διαγραφή ροής εργασίας",
+                  "DETAILS": "Άνοιγμα λεπτομερειών ροής εργασίας"
                },
                "OPERATION_STATUS": {
-                  "INSTANTIATED": "Instantiated",
-                  "RUNNING": "Running",
-                  "PAUSED": "Paused",
-                  "SUCCEEDED": "Succeeded",
-                  "FAILED": "Failed",
-                  "FAILING": "Failing",
-                  "SKIPPED": "Skipped",
-                  "STOPPED": "Stopped",
-                  "RETRY": "Retry"
+                  "INSTANTIATED": "Αρχικοποιήθηκε",
+                  "RUNNING": "Εκτελείται",
+                  "PAUSED": "Σε παύση",
+                  "SUCCEEDED": "Ολοκληρώθηκε με επιτυχία",
+                  "FAILED": "Απέτυχε",
+                  "FAILING": "Αποτυγχάνει",
+                  "SKIPPED": "Παραλείφθηκε",
+                  "STOPPED": "Διακόπηκε",
+                  "RETRY": "Επανάληψη"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Workflows"
+               "TITLE": "Ροές εργασίας"
             },
             "WORKFLOW_DETAILS": {
-               "TITLE": "Workflow details",
-               "CONFIGURATION": "Workflow configuration"
+               "TITLE": "Λεπτομέρειες ροής εργασίας",
+               "CONFIGURATION": "Ρύθμισεις παραμέτρων ροής εργασίας"
             },
             "WORKFLOW_OPERATIONS": {
-               "TITLE": "Workflow operations",
-               "DETAILS_LINK": "Operations",
+               "TITLE": "Λειτουργίες ροής εργασίας",
+               "DETAILS_LINK": "Λειτουργίες",
                "TABLE_HEADERS": {
-                  "TITLE": "Title",
-                  "STATUS": "Status",
-                  "DESCRIPTION": "Description"
+                  "TITLE": "Τίτλος",
+                  "STATUS": "Κατάσταση",
+                  "DESCRIPTION": "Περιγραφή"
                }
             },
             "OPERATION_DETAILS": {
-               "TITLE": "Operation details",
+               "TITLE": "Λεπτομέρειες λειτουργίας",
                "TABLE_HEADERS": {
-                  "TITLE": "Title",
-                  "STATE": "State",
-                  "DESCRIPTION": "Description",
-                  "EXECUTION_HOST": "Execution Host",
-                  "JOB": "Job",
-                  "TIME_IN_QUEUE": "Time in Queue",
-                  "STARTED": "Started",
-                  "FINISHED": "Finished",
-                  "RETRY_STRATEGY": "Retry Strategy",
-                  "FAILED_ATTEMPTS": "Failed Attempts",
-                  "MAX_ATTEMPTS": "Max",
-                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
-                  "FAIL_ON_ERROR": "Fail on Error"
+                  "TITLE": "Τίτλος",
+                  "STATE": "Κατάσταση",
+                  "DESCRIPTION": "Περιγραφή",
+                  "EXECUTION_HOST": "Εξυπηρετητές εκτέλεσης",
+                  "JOB": "Εργασία",
+                  "TIME_IN_QUEUE": "Χρόνος στην ουρά",
+                  "STARTED": "Ξεκίνησε",
+                  "FINISHED": "Ολοκληρώθηκε",
+                  "RETRY_STRATEGY": "Στρατηγική επανάληψης",
+                  "FAILED_ATTEMPTS": "Αποτυχημένες προσπάθειες",
+                  "MAX_ATTEMPTS": "Μέγιστο",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Χειριστής εξαιρέσεων ροής εργασίας",
+                  "FAIL_ON_ERROR": "Απέτυχε σε σφάλμα"
                }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
-               "TITLE": "Workflow details"
+               "TITLE": "Λεπτομέρειες ροής εργασίας"
             },
             "MEDIA_DETAILS": {
-               "TITLE": "Media details",
-               "ID": "ID",
-               "TYPE": "Type",
-               "MIMETYPE": "Mimetype",
-               "URL": "URL",
-               "RECORDING_DATE": "Recording date",
-               "TAGS": "Tags",
-               "DURATION": "Duration",
-               "STREAM_AUDIO": "Audio streams",
-               "STREAM_VIDEO": "Video streams",
-               "CHANNELS": "Channels",
-               "BITRATE": "Bit rate",
-               "FRAMERATE": "Frame rate",
-               "RESOLUTION": "Resolution"
+               "TITLE": "Λεπτομέρειες πολυμέσων",
+               "ID": "Αναγνωριστικό",
+               "TYPE": "Τύπος",
+               "MIMETYPE": "MimeType",
+               "URL": "Διεύθυνση URL",
+               "RECORDING_DATE": "Ημερομηνία εγγραφής",
+               "TAGS": "Ετικέτες",
+               "DURATION": "Διάρκεια",
+               "STREAM_AUDIO": "Ροές ήχου",
+               "STREAM_VIDEO": "Ροές βίντεο",
+               "CHANNELS": "Κανάλια",
+               "BITRATE": "Ρυθμός μετάδοσης bit",
+               "FRAMERATE": "Ρυθμός καρέ",
+               "RESOLUTION": "Ανάλυση"
             },
             "ERRORS_AND_WARNINGS": {
-               "HEADER": "Errors & warnings",
-               "TITLE": "Errors & warnings",
-               "DATE": "Date",
-               "HOST": "Host",
-               "TYPE": "Type",
-               "EMPTY": "No error",
+               "HEADER": "Σφάλματα & προειδοποιήσεις",
+               "TITLE": "Σφάλματα & προειδοποιήσεις",
+               "DATE": "Ημερομηνία",
+               "HOST": "Διακομιστής",
+               "TYPE": "Τύπος",
+               "EMPTY": "Κανένα σφάλμα",
                "DETAILS": {
-                  "HEADER": "Error details",
-                  "SEVERITY": "Severity",
-                  "TITLE": "Title",
-                  "DESCRIPTION": "Description",
-                  "JOB_ID": "Job ID",
-                  "DATE": "Date",
-                  "HOST": "Processing host",
-                  "TYPE": "Service type",
-                  "TECHNICAL_DETAILS": "Technical details"
+                  "HEADER": "Λεπτομέρειες σφάλματος",
+                  "SEVERITY": "Σοβαρότητα",
+                  "TITLE": "Τίτλος",
+                  "DESCRIPTION": "Περιγραφή",
+                  "JOB_ID": "Αναγνωριστικό εργασίας",
+                  "DATE": "Ημερομηνία",
+                  "HOST": "Επεξεργασία διακομιστή",
+                  "TYPE": "Τύπος υπηρεσίας",
+                  "TECHNICAL_DETAILS": "Τεχνικές λεπτομέρειες"
                }
             }
          }
       },
       "SERIES": {
          "NEW": {
-            "CAPTION": "Create series",
+            "CAPTION": "Δημιουργία σειράς",
             "METADATA": {
-               "CAPTION": "Metadata",
+               "CAPTION": "Μεταδεδομένα",
                "DESCRIPTION": "",
                "METADATA": {
-                  "TITLE": "Metadata"
+                  "TITLE": "Μεταδεδομένα"
                }
             },
             "METADATA_EXTENDED": {
-               "CAPTION": "Extended metadata",
+               "CAPTION": "Εκτεταμένα μεταδεδομένα",
                "METADATA": {
-                  "TITLE": "Extended metadata"
+                  "TITLE": "Εκτεταμένα μεταδεδομένα"
                }
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
+               "CAPTION": "Πολιτική πρόσβασης",
                "TEMPLATES": {
-                  "TITLE": "Templates"
+                  "TITLE": "Πρότυπα"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Access policy",
-                  "DESCRIPTION": "At least one role with Read and Write permissions is required.",
-                  "LABEL": "Select a template",
-                  "EMPTY": "No template found",
-                  "ROLE": "Role",
-                  "WRITE": "Write",
-                  "READ": "Read",
-                  "ADDITIONAL_ACTIONS": "Additional Actions",
-                  "ACTION": "Actions",
-                  "NEW": "New policy",
-                  "DETAILS": "Details"
+                  "TITLE": "Πολιτική πρόσβασης",
+                  "DESCRIPTION": "Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής.",
+                  "LABEL": "Επιλέξτε ένα πρότυπο",
+                  "EMPTY": "Το πρότυπο δεν βρέθηκε",
+                  "ROLE": "Ρόλος",
+                  "WRITE": "Εγγραφή",
+                  "READ": "Ανάγνωση",
+                  "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
+                  "ACTION": "Ενέργειες",
+                  "NEW": "Νέα πολιτική",
+                  "DETAILS": "Λεπτομέρειες"
                },
                "ROLES": {
-                  "LABEL": "Select a role",
-                  "EMPTY": "No role found"
+                  "LABEL": "Επιλέξτε ένα ρόλο",
+                  "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                }
             },
             "THEME": {
-               "CAPTION": "Theme",
+               "CAPTION": "Θέμα",
                "DESCRIPTION": {
-                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+                  "TEXT": "Προαιρετικά, μπορείτε να χρησιμοποιήσετε θέματα για να προσθέσετε το σήμα σας στο βίντεο. Τα θέματα μπορούν να περιέχουν βίντεο εισαγωγής και τίτλων τέλους, υδατογραφήματα και διαφάνειες συμπεριλαμβανομένων των μετα-δεδομένων."
                },
-               "TITLE": "Theme",
-               "LABEL": "Please select a theme",
-               "EMPTY": "No theme found"
+               "TITLE": "Θέμα",
+               "LABEL": "Χωρίς θέμα",
+               "EMPTY": "Κανένα θέμα δεν βρέθηκε"
             },
             "SUMMARY": {
-               "CAPTION": "Summary"
+               "CAPTION": "Περίληψη"
             }
          },
          "TABLE": {
-            "CAPTION": "Series",
-            "TITLE": "Series",
-            "HAS_EVENTS": "Contains events",
-            "ORGANIZERS": "Organizer(s)",
-            "CONTRIBUTORS": "Contributor(s)",
-            "CREATED": "Created",
-            "MANAGED_ACL": "Access policy",
-            "EVENTS": "Events",
-            "ACTION": "Actions",
+            "CAPTION": "Σειρές",
+            "TITLE": "Σειρές",
+            "HAS_EVENTS": "Περιέχει εκδηλώσεις",
+            "ORGANIZERS": "Οργανωτής(ες)",
+            "CONTRIBUTORS": "Χορηγός(οι)",
+            "CREATED": "Δημιουργήθηκε",
+            "MANAGED_ACL": "Πολιτική πρόσβασης",
+            "EVENTS": "Εκδηλώσεις",
+            "ACTION": "Ενέργειες",
             "TOOLTIP": {
-               "SERIES": "Filter events for this series",
-               "DETAILS": "Open series details",
-               "DELETE": "Delete series"
+               "SERIES": "Φίλτρο για τις εκδηλώσεις αυτής της σειράς",
+               "DETAILS": "Άνοιγμα λεπτομερειών σειράς",
+               "DELETE": "Διαγραφή σειράς"
             }
          },
          "DETAILS": {
-            "HEADER": "Series details - {{resourceId}}",
+            "HEADER": "Λεπτομέρειες σειράς - {{resourceId}}",
             "TABS": {
-               "METADATA": "Metadata",
-               "EXTENDED_METADATA": "Metadata II",
-               "EVENTS": "Events",
-               "PERMISSIONS": "Access policy",
-               "THEME": "Theme",
-               "STATISTICS": "Statistics"
+               "METADATA": "Μεταδεδομένα",
+               "EXTENDED_METADATA": "Μεταδεδομένα ΙΙ",
+               "EVENTS": "Εκδηλώσεις",
+               "PERMISSIONS": "Πολιτική πρόσβασης",
+               "THEME": "Θέμα",
+               "STATISTICS": "Στατιστικά"
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
+               "CAPTION": "Πολιτική πρόσβασης",
                "DESCRIPTION": "",
                "TEMPLATES": {
-                  "TITLE": "Templates"
+                  "TITLE": "Πρότυπα"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Access policy",
+                  "TITLE": "Πολιτική πρόσβασης",
                   "DESCRIPTION": "",
-                  "LABEL": "Select a template",
-                  "EMPTY": "No template found",
-                  "ROLE": "Role",
-                  "WRITE": "Write",
-                  "READ": "Read",
-                  "ADDITIONAL_ACTIONS": "Additional Actions",
-                  "ACTION": "Actions",
-                  "NEW": "New policy",
-                  "DETAILS": "Details",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
-                  "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LABEL": "Επιλέξτε ένα πρότυπο",
+                  "EMPTY": "Το πρότυπο δεν βρέθηκε",
+                  "ROLE": "Ρόλος",
+                  "WRITE": "Εγγραφή",
+                  "READ": "Ανάγνωση",
+                  "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
+                  "ACTION": "Ενέργειες",
+                  "NEW": "Νέα πολιτική",
+                  "DETAILS": "Λεπτομέρειες",
+                  "REPLACE_EVENT_ACLS": "Ενημέρωση δικαιωμάτων εκδήλωσης",
+                  "REPLACE_EVENT_ACLS_HINT": "Επιβεβαίωση ότι όλες οι εκδηλώσεις σε αυτή την σειρά έχουν τα ίδια δικαιώματα σε ισχύ",
+                  "LOAD_MORE_LIMIT": "Εμφάνιση πολιτικών.",
+                  "LOAD_MORE_LINK": "Φόρτωση περισσοτέρων"
                },
                "ROLES": {
-                  "LABEL": "Select a role",
-                  "EMPTY": "No role found"
+                  "LABEL": "Επιλέξτε ένα ρόλο",
+                  "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                }
             },
             "METADATA": {
-               "TITLE": "Title",
+               "TITLE": "Τίτλος",
                "ID": "UID",
-               "SERIES": "Series",
-               "PUBLISHERS": "Publisher(s)",
-               "ORGANIZERS": "Organizer(s)",
-               "CONTRIBUTORS": "Contributor(s)",
-               "RECORDING_DATE": "Recording date",
-               "CREATED_BY": "Created By",
-               "RIGHTS": "Rights",
-               "SUBJECT": "Subject",
-               "LANGUAGE": "Language",
-               "LICENSE": "License",
-               "DESCRIPTION": "Description"
+               "SERIES": "Σειρές",
+               "PUBLISHERS": "Εκδότη (ες)",
+               "ORGANIZERS": "Οργανωτής(ες)",
+               "CONTRIBUTORS": "Χορηγός(οι)",
+               "RECORDING_DATE": "Ημερομηνία εγγραφής",
+               "CREATED_BY": "Δημιουργήθηκε από",
+               "RIGHTS": "Δικαιώματα",
+               "SUBJECT": "Θέμα",
+               "LANGUAGE": "Γλώσσα",
+               "LICENSE": "Άδεια χρήσης",
+               "DESCRIPTION": "Περιγραφή"
             },
             "EVENTS": {
-               "TITLE": "Title",
-               "PRESENTER": "Presenter(s)",
-               "CREATED": "Created",
-               "MODIFIED": "Modified",
-               "STATUS": "Status",
-               "LOCATION": "Location",
-               "LINK": "Link"
+               "TITLE": "Τίτλος",
+               "PRESENTER": "Παρουσιαστής(ές)",
+               "CREATED": "Δημιουργήθηκε",
+               "MODIFIED": "Τροποποιήθηκε",
+               "STATUS": "Κατάσταση",
+               "LOCATION": "Τοποθεσία",
+               "LINK": "Σύνδεσμος σελίδας"
             }
          }
       }
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Locations"
+         "LOCATIONS": "Τοποθεσίες"
       },
       "ACTIONS": {
-         "EXPORT": "Export",
-         "REMOVE": "Remove"
+         "EXPORT": "Εξαγωγή",
+         "REMOVE": "Κατάργηση"
       },
       "RECORDINGS": {
          "TABLE": {
-            "CAPTION": "Locations",
+            "CAPTION": "Τοποθεσίες",
             "TITLE": "UID",
-            "NAME": "Name",
-            "LOCATION": "Location",
-            "UPDATED": "Last updated",
-            "NEXT_DATE": "Next event",
-            "NEXT_NAME": "Next event title",
-            "STATUS": "Status",
-            "VERSION": "Version",
-            "ACTION": "Actions",
+            "NAME": "Όνομα",
+            "LOCATION": "Τοποθεσία",
+            "UPDATED": "τελευταία ενημέρωση",
+            "NEXT_DATE": "Επόμενη εκδήλωση",
+            "NEXT_NAME": "Επόμενος τίτλος εκδήλωσης",
+            "STATUS": "Κατάσταση",
+            "VERSION": "Έκδοση",
+            "ACTION": "Ενέργειες",
             "TOOLTIP": {
-               "NAME": "Filter events for this location",
-               "DETAILS": "Open location details",
-               "DELETE": "Delete location (unregister capture agent)"
+               "NAME": "Φίλτρο για τις εκδηλώσεις αυτής της τοποθεσίας",
+               "DETAILS": "Λεπτομέρειες τοποθεσίας",
+               "DELETE": "Διαγραφή τοποθεσίας (διαγραφή του μηχανήματος καταγραφής)"
             }
          },
          "DETAILS": {
-            "HEADER": "Location details - {{resourceId}}",
+            "HEADER": "Λεπτομέρειες εκδήλωσης {{resourceId}}",
             "TAB": {
-               "GENERAL": "General",
-               "CONFIGURATION": "Configuration",
-               "CAPABILITIES": "Capabilities"
+               "GENERAL": "Γενικά",
+               "CONFIGURATION": "Ρύθμιση παραμέτρων",
+               "CAPABILITIES": "Δυνατότητες"
             },
             "GENERAL": {
-               "CAPTION": "General",
-               "NAME": "Name",
-               "URL": "Url",
-               "STATUS": "Status",
-               "UPDATE": "Last heard from"
+               "CAPTION": "Γενικά",
+               "NAME": "Όνομα",
+               "URL": "Διεύθυνση Url",
+               "STATUS": "Κατάσταση",
+               "UPDATE": "Τελευταία ακρόαση από"
             },
             "CONFIGURATION": {
-               "CAPTION": "Configuration",
-               "NO_CONFIGURATION": "No configuration provided"
+               "CAPTION": "Ρύθμιση παραμέτρων",
+               "NO_CONFIGURATION": "Δεν παρέχεται καμμία παραμετροποίηση"
             },
             "CAPABILITIES": {
-               "CAPTION": "Capabilities",
-               "NO_CAPABILITIES": "No capabilities provided"
+               "CAPTION": "Δυνατότητες",
+               "NO_CAPABILITIES": "Δεν παρέχονται δυνατότητες"
             }
          }
       }
    },
    "USERS": {
       "ACTIONS": {
-         "ADD_USER": "Add user",
-         "ADD_GROUP": "Add group",
-         "ADD_ACL": "Add access policy"
+         "ADD_USER": "Προσθήκη χρήστη",
+         "ADD_GROUP": "Προσθήκη ομάδας",
+         "ADD_ACL": "Προσθήκη πολιτικής πρόσβασης"
       },
       "NAVIGATION": {
-         "USERS": "Users",
-         "GROUPS": "Groups",
-         "PERMISSIONS": "Access policies"
+         "USERS": "Χρήστες",
+         "GROUPS": "Ομάδες",
+         "PERMISSIONS": "Πολιτικές πρόσβασης"
       },
       "USERS": {
          "TABLE": {
-            "CAPTION": "Users",
-            "NAME": "Name",
-            "USERNAME": "Username",
-            "EMAIL": "Email",
-            "ROLES": "Roles",
-            "TYPE": "Type",
-            "PROVIDER": "Provider",
-            "ACTION": "Actions",
+            "CAPTION": "Χρήστες",
+            "NAME": "Όνομα",
+            "USERNAME": "Όνομα χρήστη",
+            "EMAIL": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
+            "ROLES": "Ρόλοι",
+            "TYPE": "Τύπος",
+            "PROVIDER": "Πάροχος",
+            "ACTION": "Ενέργειες",
             "TOOLTIP": {
-               "DELETE": "Delete user",
-               "DETAILS": "Open user details"
+               "DELETE": "Διαγραφή χρήστη",
+               "DETAILS": "Επεξεργασία λεπτομερειών χρήστη"
             }
          },
          "DETAILS": {
-            "NEWCAPTION": "Create user",
-            "EDITCAPTION": "User details - {{username}}",
+            "NEWCAPTION": "δημιουργία χρήστη",
+            "EDITCAPTION": "Στοιχεία χρήστη - {{username}}",
             "TABS": {
-               "USER": "User",
-               "ROLES": "Roles",
-               "EXTERNALROLES": "External Roles",
-               "EFFECTIVEROLES": "Effective Roles"
+               "USER": "Χρήστης",
+               "ROLES": "Ρόλοι",
+               "EXTERNALROLES": "Εξωτερικοί ρόλοι",
+               "EFFECTIVEROLES": "Εφαρμοσμένοι ρόλοι"
             },
             "DESCRIPTION": {
-               "ROLES": "Roles and groups that can be or are already assigned to the user.",
-               "EXTERNALROLES": "The list of external roles assigned to the user granted by the external role provider(s).",
-               "EFFECTIVEROLES": "The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
+               "ROLES": "Ρόλοι και ομάδες που μπορούν ή έχουν ήδη εκχωρηθεί στον χρήστη.",
+               "EXTERNALROLES": "Λίστα εξωτερικών ρόλων που έχουν παραχωρηθεί στον χρήστη από πάροχο(ους) εξωτερικών ρόλων.",
+               "EFFECTIVEROLES": "Λίστα εφαρμοσίμων ρόλων που έχουν εκχωρηθεί απευθείας στον χρήστη και ρόλοι που έχουν έμμεσα φορτωθεί μέσω ομάδας μέλους."
             },
             "FORM": {
-               "USERNAME": "Username",
-               "NAME": "Name",
-               "EMAIL": "Email",
-               "PASSWORD": "Password",
-               "REPEAT_PASSWORD": "Repeat password"
+               "USERNAME": "Όνομα χρήστη",
+               "NAME": "Όνομα",
+               "EMAIL": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
+               "PASSWORD": "Κωδικός",
+               "REPEAT_PASSWORD": "Επανάληψη κωδικού"
             },
             "ROLES": {
-               "LEFT": "Roles",
-               "RIGHT": "Selected roles",
-               "REMOVE": "Remove role",
-               "ADD": "Add role"
+               "LEFT": "Ρόλοι",
+               "RIGHT": "Επιλεγμένοι ρόλοι",
+               "REMOVE": "Κατάργηση ρόλου",
+               "ADD": "Προσθήκη ρόλου"
             }
          }
       },
       "GROUPS": {
          "NEW": {
-            "CAPTION": "Create group"
+            "CAPTION": "Δημιουργία ομάδας"
          },
          "TABLE": {
-            "CAPTION": "Groups",
-            "NAME": "Name",
-            "DESCRIPTION": "Description",
-            "ROLE": "Role",
-            "ACTION": "Actions",
+            "CAPTION": "Ομάδες",
+            "NAME": "Όνομα",
+            "DESCRIPTION": "Περιγραφή",
+            "ROLE": "Ρόλος",
+            "ACTION": "Ενέργειες",
             "TOOLTIP": {
-               "DETAILS": "Open group details",
-               "DELETE": "Delete group"
+               "DETAILS": "Επεξεργασία λεπτομερειών ομάδας",
+               "DELETE": "Διαγραφή ομάδας"
             }
          },
          "DETAILS": {
-            "NEWCAPTION": "Create group",
-            "EDITCAPTION": "Group details - {{name}}",
+            "NEWCAPTION": "Δημιουργία ομάδας",
+            "EDITCAPTION": "Λεπτομέρειες γκρούπ - {{name}}",
             "TABS": {
-               "GROUP": "Group",
-               "ROLES": "Roles",
-               "METADATA": "Metadata",
-               "USERS": "Users",
-               "SUMMARY": "Summary"
+               "GROUP": "Ομάδες",
+               "ROLES": "Ρόλοι",
+               "METADATA": "Μεταδεδομένα",
+               "USERS": "Χρήστες",
+               "SUMMARY": "Περίληψη"
             },
             "FORM": {
-               "NAME": "Name",
-               "DESCRIPTION": "Description",
-               "SUMMARY": "Summary",
-               "ROLES": "Roles",
-               "USERS": "Users"
+               "NAME": "Όνομα",
+               "DESCRIPTION": "Περιγραφή",
+               "SUMMARY": "Περίληψη",
+               "ROLES": "Ρόλοι",
+               "USERS": "Χρήστες"
             },
             "USERS": {
-               "LEFT": "Users",
-               "RIGHT": "Selected users",
-               "REMOVE": "Remove user",
-               "ADD": "Add user"
+               "LEFT": "Χρήστες",
+               "RIGHT": "Επιλεγμένοι Χρήστες",
+               "REMOVE": "Αφαίρεση χρήστη",
+               "ADD": "Προσθήκη χρήστη"
             },
             "ROLES": {
-               "LEFT": "Roles",
-               "RIGHT": "Selected roles",
-               "REMOVE": "Remove role",
-               "ADD": "Add role"
+               "LEFT": "Ρόλοι",
+               "RIGHT": "Επιλεγμένοι ρόλοι",
+               "REMOVE": "Κατάργηση ρόλου",
+               "ADD": "Προσθήκη ρόλου"
             }
          }
       },
       "ACLS": {
          "TABLE": {
-            "CAPTION": "Access policies",
-            "NAME": "Name",
-            "CREATED": "Created",
-            "CREATOR": "Creator",
-            "IN_USE": "In use",
-            "ACTION": "Actions",
+            "CAPTION": "Πολιτικές πρόσβασης",
+            "NAME": "Όνομα",
+            "CREATED": "Δημιουργήθηκε",
+            "CREATOR": "Δημιουργός",
+            "IN_USE": "Σε χρήση",
+            "ACTION": "Ενέργειες",
             "TOOLTIP": {
-               "DELETE": "Delete access policy",
-               "DETAILS": "Open access policy details"
+               "DELETE": "Διαγραφή πολιτικής πρόσβασης",
+               "DETAILS": "Άνοιγμα λεπτομερειών πολιτικής πρόσβασης"
             }
          },
          "NEW": {
-            "CAPTION": "New Access Policy",
+            "CAPTION": "Νέα πολιτική πρόσβασης",
             "TABS": {
-               "SUMMARY": "Summary",
-               "METADATA": "Metadata",
-               "ACCESS": "Access"
+               "SUMMARY": "Περίληψη",
+               "METADATA": "Μεταδεδομένα",
+               "ACCESS": "Πρόσβαση"
             },
             "METADATA": {
-               "TITLE": "Metadata",
+               "TITLE": "Μεταδεδομένα",
                "NAME": {
-                  "CAPTION": "Name",
-                  "PLACEHOLDER": "Name…"
+                  "CAPTION": "Όνομα",
+                  "PLACEHOLDER": "Όνομα…"
                }
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
+               "CAPTION": "Πολιτική πρόσβασης",
                "TEMPLATES": {
-                  "TITLE": "Templates"
+                  "TITLE": "Πρότυπα"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Access policy",
-                  "LABEL": "Select a template",
-                  "EMPTY": "No template found",
-                  "ROLE": "Role",
-                  "WRITE": "Write",
-                  "READ": "Read",
-                  "ADDITIONAL_ACTIONS": "Additional Actions",
-                  "ACTION": "Actions",
-                  "NEW": "New policy",
-                  "DETAILS": "Details",
-                  "DESCRIPTION": "Please choose a pre-configured set of policies or add custom policies below"
+                  "TITLE": "Πολιτική πρόσβασης",
+                  "LABEL": "Επιλέξτε ένα πρότυπο",
+                  "EMPTY": "Το πρότυπο δεν βρέθηκε",
+                  "ROLE": "Ρόλος",
+                  "WRITE": "Εγγραφή",
+                  "READ": "Ανάγνωση",
+                  "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
+                  "ACTION": "Ενέργειες",
+                  "NEW": "Νέα πολιτική",
+                  "DETAILS": "Λεπτομέρειες",
+                  "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές"
                },
                "ROLES": {
-                  "LABEL": "Select a role",
-                  "EMPTY": "No role found"
+                  "LABEL": "Επιλέξτε ένα ρόλο",
+                  "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                }
             }
          },
          "DETAILS": {
-            "HEADER": "Access policy details  - {{name}}",
+            "HEADER": "Λεπτομέρειες πολιτικής πρόσβασης - {{name}}",
             "TABS": {
-               "SUMMARY": "Summary",
-               "METADATA": "Metadata",
-               "ACCESS": "Access"
+               "SUMMARY": "Περίληψη",
+               "METADATA": "Μεταδεδομένα",
+               "ACCESS": "Πρόσβαση"
             },
             "METADATA": {
-               "TITLE": "Metadata",
+               "TITLE": "Μεταδεδομένα",
                "NAME": {
-                  "CAPTION": "Name",
-                  "PLACEHOLDER": "Name…"
+                  "CAPTION": "Όνομα",
+                  "PLACEHOLDER": "Όνομα…"
                }
             },
             "ACCESS": {
-               "CAPTION": "Access policy",
+               "CAPTION": "Πολιτική πρόσβασης",
                "TEMPLATES": {
-                  "TITLE": "Templates"
+                  "TITLE": "Πρότυπα"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Access policy",
-                  "LABEL": "Select a template",
-                  "EMPTY": "No template found",
-                  "ROLE": "Role",
-                  "WRITE": "Write",
-                  "READ": "Read",
-                  "ADDITIONAL_ACTIONS": "Additional Actions",
-                  "ACTION": "Actions",
-                  "NEW": "New policy",
-                  "DETAILS": "Details",
-                  "DESCRIPTION": "Please choose a pre-configured set of policies or add custom policies below"
+                  "TITLE": "Πολιτική πρόσβασης",
+                  "LABEL": "Επιλέξτε ένα πρότυπο",
+                  "EMPTY": "Το πρότυπο δεν βρέθηκε",
+                  "ROLE": "Ρόλος",
+                  "WRITE": "Εγγραφή",
+                  "READ": "Ανάγνωση",
+                  "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
+                  "ACTION": "Ενέργειες",
+                  "NEW": "Νέα πολιτική",
+                  "DETAILS": "Λεπτομέρειες",
+                  "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές"
                },
                "ROLES": {
-                  "LABEL": "Select a role",
-                  "EMPTY": "No role found"
+                  "LABEL": "Επιλέξτε ένα ρόλο",
+                  "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                }
             }
          }
@@ -1317,617 +1438,617 @@
    "THEMES": {
       "THEMES": {
          "DETAILS": {
-            "HEADER": "Theme details {{resourceId}}",
+            "HEADER": "Λεπτομέρειες θέματος: {{resourceId}}",
             "TABS": {
-               "GENERAL": "General",
-               "BUMPER": "Bumper (begin)",
-               "TRAILER": "Bumper (end)",
-               "TITLE": "Title",
-               "LICENSE": "License",
-               "WATERMARK": "Watermark",
-               "USAGE": "Usage"
+               "GENERAL": "Γενικά",
+               "BUMPER": "Αρχείο πολυμέσων έναρξης",
+               "TRAILER": "Αρχείο πολυμέσων τέλους",
+               "TITLE": "Τίτλος",
+               "LICENSE": "Άδεια χρήσης",
+               "WATERMARK": "Υδατογράφημα",
+               "USAGE": "Χρήση"
             },
             "GENERAL": {
-               "CAPTION": "General",
-               "NAME": "Name",
-               "DESCRIPTION": "Description",
-               "DEFAULT": "Default",
-               "SET_DEFAULT_INFO": "Set as default theme for all series and events",
-               "NAME_ERROR": "Name is already in use",
-               "NAME_REQUIRED": "Required"
+               "CAPTION": "Γενικά",
+               "NAME": "Όνομα",
+               "DESCRIPTION": "Περιγραφή",
+               "DEFAULT": "Προεπιλογή",
+               "SET_DEFAULT_INFO": "Ορισμός θέματος ως προεπιλεγμένου για όλες τις σειρές και εκδηλώσεις",
+               "NAME_ERROR": "Το όνομα είναι ήδη σε χρήση",
+               "NAME_REQUIRED": "Απαιτείται"
             },
             "BUMPER": {
-               "CAPTION": "Bumper (begin)",
-               "DESCRIPTION": "Predefined video that is appended to the beginning of a recording.",
-               "ACTIVE": "Active"
+               "CAPTION": "Αρχείο πολυμέσων έναρξης",
+               "DESCRIPTION": "Προκαθορισμένο βίντεο που εισάγεται στην αρχή της εγγραφής.",
+               "ACTIVE": "Ενεργό"
             },
             "TRAILER": {
-               "CAPTION": "Bumper (end)",
-               "DESCRIPTION": "Predefined video that is appended to the end of a recording.",
-               "ACTIVE": "Active"
+               "CAPTION": "Αρχείο πολυμέσων τέλους",
+               "DESCRIPTION": "Προκαθορισμένο βίντεο που εισάγεται στο τέλος της εγγραφής.",
+               "ACTIVE": "Ενεργό"
             },
             "TITLE": {
-               "CAPTION": "Title",
-               "DESCRIPTION": "Predefined slide including descriptive metadata appended to the beginning or end of a recording.",
-               "ACTIVE": "Active"
+               "CAPTION": "Τίτλος",
+               "DESCRIPTION": "Προκαθορισμένη διαφάνεις, συμπεριλαμβανομένων των περιγραφικών μεταδεδομένων που εισάγονται στην αρχή ή στο τέλος μιας εγγραφής.",
+               "ACTIVE": "Ενεργό"
             },
             "WATERMARK": {
-               "CAPTION": "Watermark",
-               "DESCRIPTION": "Semi-transparent image that is overlaid on every frame of the recording.",
-               "ACTIVE": "Active"
+               "CAPTION": "Υδατογράφημα",
+               "DESCRIPTION": "Ημι-διαφανή εικόνα που τοποθετείται σε κάθε πλαίσιο της εγγραφής.",
+               "ACTIVE": "Ενεργό"
             },
             "USAGE": {
-               "CAPTION": "Usage",
-               "SERIES": "Series name"
+               "CAPTION": "Χρήση",
+               "SERIES": "Όνομα σειράς"
             }
          }
       }
    },
    "CONFIGURATION": {
       "ACTIONS": {
-         "ADD_MAIL_TEMPLATE": "Add template",
-         "ADD_THEME": "Add theme"
+         "ADD_MAIL_TEMPLATE": "Προσθήκη Προτύπου",
+         "ADD_THEME": "Προσθέστε το θέμα"
       },
       "NAVIGATION": {
-         "THEMES": "Themes"
+         "THEMES": "Θέματα"
       },
       "THEMES": {
          "TABLE": {
-            "CAPTION": "Themes",
-            "NAME": "Name",
-            "DESCRIPTION": "Description",
-            "CREATOR": "Creator",
-            "CREATED": "Created",
-            "DEFAULT": "Default",
-            "USAGE": "Usage",
-            "ACTION": "Actions",
+            "CAPTION": "Θέματα",
+            "NAME": "Όνομα",
+            "DESCRIPTION": "Περιγραφή",
+            "CREATOR": "Δημιουργός",
+            "CREATED": "Δημιουργήθηκε",
+            "DEFAULT": "Προεπιλογή",
+            "USAGE": "Χρήση",
+            "ACTION": "Ενέργειες",
             "TOOLTIP": {
-               "DELETE": "Delete theme",
-               "DETAILS": "Open theme details"
+               "DELETE": "Διαγραφή θέματος",
+               "DETAILS": "Επεξεργασία λεπτομερειών θέματος"
             }
          },
          "DETAILS": {
-            "NEWCAPTION": "Create theme",
-            "EDITCAPTION": "Theme details - {{name}}",
+            "NEWCAPTION": "Δημιουργία θέματος",
+            "EDITCAPTION": "Λεπτομέρειες θέματος - {{name}}",
             "GENERAL": {
-               "CAPTION": "General",
-               "NAME": "Name",
-               "DESCRIPTION": "Description",
-               "DEFAULT": "Default",
-               "SET_DEFAULT_INFO": "Set as default theme for all series and events",
-               "NAME_REQUIRED": "Required"
+               "CAPTION": "Γενικά",
+               "NAME": "Όνομα",
+               "DESCRIPTION": "Περιγραφή",
+               "DEFAULT": "Προεπιλογή",
+               "SET_DEFAULT_INFO": "Ορισμός θέματος ως προεπιλεγμένου για όλες τις σειρές και εκδηλώσεις",
+               "NAME_REQUIRED": "Απαιτείται"
             },
             "BUMPER": {
-               "CAPTION": "Bumper (begin)",
-               "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined video that is appended to the beginning of a recording.",
-               "ACTIVE": "Active",
-               "ENABLE": "Enable bumper",
-               "SELECT": "Select",
-               "UPLOAD_LABEL": "Upload video",
-               "UPLOAD_BUTTON": "Upload"
+               "CAPTION": "Αρχείο πολυμέσων έναρξης",
+               "FILE_UPLOADED": "Το αρχείο μεταφορτώθηκε: ",
+               "DESCRIPTION": "Προκαθορισμένο βίντεο που εισάγεται στην αρχή της εγγραφής.",
+               "ACTIVE": "Ενεργό",
+               "ENABLE": "Ενεργοποίηση βίντεο εισαγωγής",
+               "SELECT": "Επιλογή",
+               "UPLOAD_LABEL": "Μεταφόρτωση βίντεο",
+               "UPLOAD_BUTTON": "Μεταφόρτωση"
             },
             "TRAILER": {
-               "CAPTION": "Bumper (end)",
-               "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined video that is appended to the end of a recording.",
-               "ACTIVE": "Active",
-               "ENABLE": "Enable bumper",
-               "UPLOAD_LABEL": "Upload video",
-               "UPLOAD_BUTTON": "Upload",
-               "SELECT": "Select"
+               "CAPTION": "Αρχείο πολυμέσων τέλους",
+               "FILE_UPLOADED": "Το αρχείο μεταφορτώθηκε: ",
+               "DESCRIPTION": "Προκαθορισμένο βίντεο που εισάγεται στο τέλος της εγγραφής.",
+               "ACTIVE": "Ενεργό",
+               "ENABLE": "Ενεργοποίηση βίντεο εισαγωγής",
+               "UPLOAD_LABEL": "Μεταφόρτωση βίντεο",
+               "UPLOAD_BUTTON": "Μεταφόρτωση",
+               "SELECT": "Επιλέξτε"
             },
             "TITLE": {
-               "CAPTION": "Title",
-               "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined slide including descriptive metadata appended to the beginning or end of a recording.",
-               "ACTIVE": "Active",
-               "ENABLE": "Enable title slide",
-               "BACKGROUND": "Background",
-               "EXTRACT": "Extract background",
-               "UPLOAD": "Upload",
-               "UPLOAD_LABEL": "Upload image",
-               "UPLOAD_BUTTON": "Upload"
+               "CAPTION": "Τίτλος",
+               "FILE_UPLOADED": "Το αρχείο μεταφορτώθηκε: ",
+               "DESCRIPTION": "Προκαθορισμένες διαφάνειες, συμπεριλαμβανομένων των περιγραφικών μεταδεδομένων που εισάγονται στην αρχή ή στο τέλος μιας εγγραφής.",
+               "ACTIVE": "Ενεργό",
+               "ENABLE": "Ενεργοποιήσετε τη διαφάνεια τίτλου",
+               "BACKGROUND": "Φόντο",
+               "EXTRACT": "Εξαγωγή φόντου",
+               "UPLOAD": "Μεταφόρτωση",
+               "UPLOAD_LABEL": "Μεταφόρτωση εικόνας",
+               "UPLOAD_BUTTON": "Μεταφόρτωση"
             },
             "WATERMARK": {
-               "CAPTION": "Watermark",
-               "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Semi-transparent image that is overlaid on every frame of the recording.",
-               "ACTIVE": "Active",
-               "ENABLE": "Enable watermark",
-               "TOP_LEFT": "Top left",
-               "TOP_RIGHT": "Top right",
-               "BOTTOM_LEFT": "Bottom left",
-               "BOTTOM_RIGHT": "Bottom right",
-               "UPLOAD": "Upload",
-               "POSITION": "Watermark position and preview",
-               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
-               "UPLOAD_LABEL": "Upload image",
-               "UPLOAD_BUTTON": "Upload"
+               "CAPTION": "Υδατογράφημα",
+               "FILE_UPLOADED": "Το αρχείο μεταφορτώθηκε: ",
+               "DESCRIPTION": "Ημι-διαφανή εικόνα που τοποθετείται σε κάθε πλαίσιο της εγγραφής.",
+               "ACTIVE": "Ενεργό",
+               "ENABLE": "Ενεργοποίηση υδατογραφήματος",
+               "TOP_LEFT": "Πάνω αριστερά",
+               "TOP_RIGHT": "Πάνω δεξιά",
+               "BOTTOM_LEFT": "Κάτω αριστερά",
+               "BOTTOM_RIGHT": "Κάτω δεξιά",
+               "UPLOAD": "Μεταφόρτωση",
+               "POSITION": "Θέση και προεπισκόπηση υδατογραφήματος",
+               "FILEUPLOAD_DESCRIPTION": "Αρχείο πρέπει να έχει ένα κανάλι άλφα (διαφανές φόντο). Αποδεκτοί τύποι αρχείων είναι:. PNG. GIF. SVG. .WEBP",
+               "UPLOAD_LABEL": "Μεταφόρτωση εικόνας",
+               "UPLOAD_BUTTON": "Μεταφόρτωση"
             },
             "SUMMARY": {
-               "CAPTION": "Summary"
+               "CAPTION": "Περίληψη"
             },
             "USAGE": {
-               "CAPTION": "Usage",
-               "SERIE": "Series name",
-               "EMPTY": "No series found for current theme"
+               "CAPTION": "Χρήση",
+               "SERIE": "Όνομα σειράς",
+               "EMPTY": "Καμία σειρά δεω βρέθηκε για το τρέχον θέμα"
             }
          }
       }
    },
    "SYSTEMS": {
       "NAVIGATION": {
-         "JOBS": "Jobs",
-         "SERVERS": "Servers",
-         "SERVICES": "Services"
+         "JOBS": "Εργασίες",
+         "SERVERS": "Διακομιστές",
+         "SERVICES": "Υπηρεσίες"
       },
       "JOBS": {
          "TABLE": {
-            "ID": "Job Identifier",
-            "CAPTION": "Jobs",
-            "CREATED": "Created",
-            "CREATOR": "Creator",
-            "HOST_NAME": "Host name",
-            "NODE_NAME": "Node name",
-            "OPERATION": "Operation",
-            "STARTED": "Started",
-            "STATUS": "Status",
-            "SUBMITTED": "Submitted",
-            "TYPE": "Type"
+            "ID": "Αναγνωριστικό εργασίας",
+            "CAPTION": "Εργασίες",
+            "CREATED": "Δημιουργήθηκε",
+            "CREATOR": "Δημιουργός",
+            "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
+            "NODE_NAME": "Όνομα κόμβου",
+            "OPERATION": "Λειτουργία",
+            "STARTED": "Ξεκίνησε",
+            "STATUS": "Κατάσταση",
+            "SUBMITTED": "Υποβλήθηκε",
+            "TYPE": "Τύπος"
          },
          "STATUS": {
-            "QUEUED": "Queued",
-            "PAUSED": "Paused",
-            "RUNNING": "Running",
-            "FINISHED": "Finished",
-            "FAILED": "Failed",
-            "DELETED": "Deleted",
-            "INSTANTIATED": "Instantiated",
-            "DISPATCHING": "Dispatching",
-            "RESTART": "Restart",
-            "CANCELED": "Canceled",
-            "WAITING": "Waiting"
+            "QUEUED": "Στην ουρά",
+            "PAUSED": "Σε παύση",
+            "RUNNING": "Εκτελείται",
+            "FINISHED": "Ολοκληρώθηκε",
+            "FAILED": "Απέτυχε",
+            "DELETED": "Διαγράφηκε",
+            "INSTANTIATED": "Αρχικοποιήθηκε",
+            "DISPATCHING": "Αποστέλλονται",
+            "RESTART": "Επανεκκίνηση",
+            "CANCELED": "Ακυρωμένες",
+            "WAITING": "Αναμονή"
          }
       },
       "SERVERS": {
          "TABLE": {
-            "CAPTION": "Servers",
-            "STATUS": "Status",
-            "HOST_NAME": "Host name",
-            "NODE_NAME": "Node name",
-            "CORES": "Cores",
-            "COMPLETED": "Jobs completed",
-            "RUNNING": "Jobs running",
-            "QUEUED": "Jobs queued",
-            "MEAN_RUN_TIME": "Mean run time",
-            "MEAN_QUEUE_TIME": "Mean queue time",
-            "MAINTENANCE": "Maintenance",
-            "MAINTENANCE_OFF": "Enter maintenance mode",
-            "MAINTENANCE_ON": "Leave maintenance mode"
+            "CAPTION": "Διακομιστές",
+            "STATUS": "Κατάσταση",
+            "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
+            "NODE_NAME": "Όνομα κόμβου",
+            "CORES": "Πυρήνες",
+            "COMPLETED": "Ολοκληρωμένες εργασίες",
+            "RUNNING": "Εργασίες σε εκτέλεση",
+            "QUEUED": "Εργασίες στην ουρά",
+            "MEAN_RUN_TIME": "Μέσος χρόνος εκτέλεσης",
+            "MEAN_QUEUE_TIME": "Μέσος χρόνος αναμονής",
+            "MAINTENANCE": "Συντήρηση",
+            "MAINTENANCE_OFF": "Είσοδος σε λειτουργία συντήρησης",
+            "MAINTENANCE_ON": "Έξοδος από λειτουργία συντήρησης"
          }
       },
       "SERVICES": {
          "TABLE": {
-            "CAPTION": "Services",
-            "STATUS": "Status",
-            "NAME": "Service name",
-            "HOST_NAME": "Host name",
-            "NODE_NAME": "Node name",
-            "COMPLETED": "Jobs completed",
-            "RUNNING": "Jobs running",
-            "QUEUED": "Jobs queued",
-            "MEAN_RUN_TIME": "Mean run time",
-            "MEAN_QUEUE_TIME": "Mean queue time",
-            "SANITIZE": "Clear failed service",
-            "ACTION": "Actions",
+            "CAPTION": "Υπηρεσίες",
+            "STATUS": "Κατάσταση",
+            "NAME": "Όνομα υπηρεσίας",
+            "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
+            "NODE_NAME": "Όνομα κόμβου",
+            "COMPLETED": "Ολοκληρωμένες εργασίες",
+            "RUNNING": "Εργασίες σε εκτέλεση",
+            "QUEUED": "Εργασίες στην ουρά",
+            "MEAN_RUN_TIME": "Μέσος χρόνος εκτέλεσης",
+            "MEAN_QUEUE_TIME": "Μέσος χρόνος αναμονής",
+            "SANITIZE": "Αποτυχημένη υπηρεσία",
+            "ACTION": "Ενέργειες",
             "TOOLTIP": {
-               "SANITIZE": "Sanitize service (set service back to state normal)"
+               "SANITIZE": "Επανεκκίνηση υπηρεσίας ( ορίζει την υπηρεσία στην κανονική κατάσταση)"
             }
          },
          "STATUS": {
-            "NORMAL": "Normal",
-            "WARNING": "Warning",
-            "ERROR": "Error"
+            "NORMAL": "Κανονική",
+            "WARNING": "Προειδοποίηση",
+            "ERROR": "Σφάλμα"
          }
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
-      "TIMELINE": "Timeline",
-      "ZOOMLEVEL": "Zoom Level",
-      "PREVIEW_MODE": "Preview Mode",
-      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
-      "ZOOM": "Zoom",
+      "WARNING_UNSAVED": "Προειδοποίηση: Μερικές από τις αλλαγές σας δεν αποθηκεύτηκαν. Εάν κλείσετε το πρόγραμμα επεξεργασίας βίντεο, αυτές οι αλλαγές θα χαθούν. Θέλετε πραγματικά να συνεχίσετε;",
+      "TIMELINE": "Χρονολόγιο",
+      "ZOOMLEVEL": "Επίπεδο ζουμ",
+      "PREVIEW_MODE": "Λειτουργία προεπισκόπησης",
+      "PREVIEW_MODE_TOOLTIP": "Παίξε μόνο επιλεγμένα τμήματα",
+      "ZOOM": "Ζουμ",
       "BUTTONS": {
-         "CLOSE": "Close",
-         "SAVE": "Save",
-         "PROCESS": "Save & Continue",
-         "ADD_COMMENT": "Add Comment"
+         "CLOSE": "Κλείσιμο",
+         "SAVE": "Αποθήκευση",
+         "PROCESS": "Αποθήκευση & συνεχεία",
+         "ADD_COMMENT": "Προσθήκη σχολίου"
       },
       "TABS": {
-         "EDIT": "Editor",
-         "CAPTIONS": "Captions",
-         "ANNOTATIONS": "Annotations"
+         "EDIT": "Πρόγραμμα επεξεργασίας",
+         "CAPTIONS": "Λεζάντες",
+         "ANNOTATIONS": "Σχολιασμοί"
       },
       "AREAS": {
-         "METADATA": "Metadata",
-         "THUMBNAIL": "Thumbnail",
-         "COMMENTS": "Comments",
-         "SEGMENTS": "Segments",
-         "TRACKS": "Tracks"
+         "METADATA": "Μεταδεδομένα",
+         "THUMBNAIL": "Μικρογραφία",
+         "COMMENTS": "Σχόλια",
+         "SEGMENTS": "Τμήματα",
+         "TRACKS": "Κομμάτια"
       },
       "ACTIONS": {
-         "SPLIT": "Split",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
-         "REPLAY_SEGMENT": "Play Start of Segment",
-         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
-         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
-         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
-         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
-         "UNDO": "Undo",
-         "REDO": "Redo",
-         "CLEAR_SEGMENTS": "Clear All Segments",
-         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+         "SPLIT": "Διαχωρισμός",
+         "SPLIT_TOOLTIP": "Διαχώρηση τμήματος στην τρέχουσα θέση του κέρσορα.",
+         "CUT": "Απόκρυψη/Εμφάνιση",
+         "CUT_TOOLTIP": "Απόκρυψη ή εμφάνιση του επιλεγμένου τμήματος του βίντεο.",
+         "REPLAY_SEGMENT": "Αναπαραγωγή της αρχής του τμήματος",
+         "REPLAY_SEGMENT_TOOLTIP": "Αναπαραγωγή του τρέχοντος τμήματος από την αρχή.",
+         "REPLAY_END_OF_SEGMENT": "Αναπαραγωγή του τέλους του τμήματος",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Αναπαραγωγή μερικών δευτερόλεπτα στο τέλος του τρέχοντος τμήματος.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Αναπαραγωγή μετάβασης",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Αναπαραγωγή μερικών δευτερολέπτων που περιέχουν το τέλος του προηγούμενου και την αρχή του επόμενου τμήματος.",
+         "UNDO": "Αναίρεση",
+         "REDO": "Ακύρωση Αναίρεσης",
+         "CLEAR_SEGMENTS": "Καθαρισμός όλων των τμημάτων",
+         "CLEAR_SEGMENTS_TOOLTIP": "Διαγραφή όλων των τμημάτων, αφήνοντας ένα μεγάλο τμήμα."
       },
       "SEGMENTS": {
-         "REMOVE_SEGMENT": "Remove Segment",
-         "SHOW_SEGMENT": "Show this Segment",
-         "HIDE_SEGMENT": "Hide this Segment",
-         "START": "Start",
-         "END": "End"
+         "REMOVE_SEGMENT": "Αφαίρεση τμήματος",
+         "SHOW_SEGMENT": "Εμφάνιση αυτού του τμήματος",
+         "HIDE_SEGMENT": "Απόκρυψη αυτού του τμήματος",
+         "START": "Έναρξη",
+         "END": "Τέλος"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "DESCRIPTION": "Αναπαράχθηκε αυτόματα μια προεπιλεγμένη μικρογραφία για την οπτική αναπαραγωγή της εκδήλωσης. Σε περίπτωση που θέλετε να χρησιμοποιήσετε μια διαφορετική μικρογραφία, μπορείετε να εξάγετε την μικρογραφία από το βίντεο στην τρέχουσα θέση αναπαραγωγής ή να μεταφορτώσετε μια εικόνα.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
-                  "LABEL": "Extract from video",
-                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+                  "LABEL": "Εξαγωγή από το βίντεο",
+                  "TOOLTIP": "Εξαγωγή μικρογραφίας από το βίντεο στην τρέχουσα θέση αναπαραγωγής"
                },
                "FROM_LEFT_VIDEO": {
-                  "LABEL": "Extract from left video",
-                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+                  "LABEL": "Εξαγωγή από το βίντεο αριστερά",
+                  "TOOLTIP": "Εξαγωγή μικρογραφίας από το βίντεο αριστερά στην τρέχουσα θέση αναπαραγωγής"
                },
                "FROM_RIGHT_VIDEO": {
-                  "LABEL": "Extract from right video",
-                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+                  "LABEL": "Εξαγωγή από το βίντεο δεξιά",
+                  "TOOLTIP": "Εξαγωγή μικρογραφίας από το βίντεο δεξιά στην τρέχουσα θέση αναπαραγωγής"
                }
             },
             "UPLOAD": {
-               "LABEL": "Upload image",
-               "TOOLTIP": "Upload a thumbnail image"
+               "LABEL": "Μεταφόρτωση εικόνας",
+               "TOOLTIP": "Μεταφόρτωση μικρογραφίας εικόνας"
             },
             "USE_DEFAULT": {
-               "LABEL": "Use default thumbnail",
-               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+               "LABEL": "Χρήση προεπιλεγμένης μικρογραφίας",
+               "TOOLTIP": "Χρήση προεπιλεγμένης μικρογραφίας που θα δημιουργηθεί αυτόματα"
             }
          },
          "PREVIEW": {
-            "NOT_AVAILABLE": "No preview available",
-            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+            "NOT_AVAILABLE": "Δεν υπάρχει διαθέσιμη προεπισκόπηση",
+            "OUTDATED": "Η προεπισκόπηση είναι απαρχαιωμένη, διότι κάποια τμήματα άλλαξαν. Θα ενημερωθεί αμέσως μόλις αποθηκεύσετε τις αλλαγές σας."
          },
          "CURRENT": {
-            "DEFAULT": "You are currently using the default thumbnail.",
-            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
-            "UPLOAD": "You are currently using an uploaded thumbnail."
+            "DEFAULT": "Αυτή την στιγμή χρησιμοποιείτε την προεπιλεγμένη μικρογραφία.",
+            "SNAPSHOT": "Η τρέχουσα μικρογραφία έχει εξαχθεί από το βίντεο.",
+            "UPLOAD": "Προς το παρόν χρησιμοποιείτε μια μικρογραφία που μεταφορτώθηκε."
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
+         "DESCRIPTION": "Μπορείτε να αποεπιλέξετε κομμάτια για να τα αποκλείσετε από περαιτέρω επεξεργασία. Παρακαλώ σημειώστε ότι πρέπει να (επαν-) δημοσιεύετε την εκδλήλωση για να εφαρμόσετε τις αλλαγές.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+            "NO_VIDEO_TRACK_SELECTED": "Πρέπει να ενεργοποιήσετε τουλάχιστον ένα κομμάτι βίντεο",
+            "NO_AUDIO_TRACK_SELECTED": "Πρέπει να ενεργοποιήσετε τουλάχιστον ένα κομμάτι ήχου"
          },
          "TRACK": {
-            "HEADER": "Track"
+            "HEADER": "Κομμάτι"
          },
          "VIDEO": {
-            "HEADER": "Video track",
-            "NOT_AVAILABLE": "No video tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No video track selected",
+            "HEADER": "Κομμάτι βίντεο",
+            "NOT_AVAILABLE": "Υπάρχουν διαθέσιμα κομμάτια βίντεο",
+            "NO_PREVIEW_AVAILABLE": "Δεν βρέθηκε η εικόνα προεπισκόπησης",
+            "NO_TRACK_SELECTED": "Δεν έχει επιλεχθεί κομμάτι βίντεο",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "Αυτό το κομμάτι βίντεο είναι προς το παρόν ενεργοποιημένο. Κάντε κλικ για να το απενεργοποιήσετε",
+               "UNHIDE": "Αυτό το κομμάτι βίντεο είναι προς το παρόν απενεργοποιημένο. Κάντε κλικ για να το ενεργοποιήσετε."
             }
          },
          "AUDIO": {
-            "HEADER": "Audio track",
-            "NOT_AVAILABLE": "No audio tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No audio track selected",
+            "HEADER": "Κομμάτι ήχου",
+            "NOT_AVAILABLE": "Υπάρχουν διαθέσιμα κομμάτια ήχου",
+            "NO_PREVIEW_AVAILABLE": "Δεν βρέθηκε η εικόνα προεπισκόπησης",
+            "NO_TRACK_SELECTED": "Δεν έχει επιλεχθεί κομμάτι ήχου",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "Αυτό το κομμάτι ήχου είναι προς το παρόν ενεργοποιημένο. Κάντε κλικ για να το απενεργοποιήσετε",
+               "UNHIDE": "Αυτό το κομμάτι ήχου είναι προς το παρόν απενεργοποιημένο. Κάντε κλικ για να το ενεργοποιήσετε"
             }
          }
       },
       "PLAYER": {
-         "PLAY": "Play",
-         "PAUSE": "Pause",
-         "NEXT_FRAME": "Next frame",
-         "PREVIOUS_FRAME": "Previous frame",
-         "NEXT_SEGMENT": "Next segment / Jump to end",
-         "PREVIOUS_SEGMENT": "Previous segment / Jump to start",
-         "MUTE": "Mute",
-         "VOLUME": "Volume"
+         "PLAY": "Αναπαραγωγή",
+         "PAUSE": "Παύση",
+         "NEXT_FRAME": "Επόμενο καρέ",
+         "PREVIOUS_FRAME": "Προηγούμενο καρέ",
+         "NEXT_SEGMENT": "Επόμενο τμήμα / μετακίνηση στο τέλος",
+         "PREVIOUS_SEGMENT": "Προηγούμενο τμήμα / μετακίνηση στην αρχή",
+         "MUTE": "Σίγαση",
+         "VOLUME": "Ένταση ήχου"
       }
    },
    "LOGIN": {
-      "WELCOME": "Welcome to Opencast",
-      "REMEMBER": "Remember me on this computer",
-      "USERNAME": "Username…",
-      "PASSWORD": "Password…",
-      "LOGIN": "Login",
-      "ERROR": "Incorrect username and / or password"
+      "WELCOME": "Καλωσορίσατε στο Opencast",
+      "REMEMBER": "Να με θυμάσαι σε αυτόν τον υπολογιστή",
+      "USERNAME": "Όνομα χρήστη…",
+      "PASSWORD": "Κωδικός πρόσβασης…",
+      "LOGIN": "Σύνδεση",
+      "ERROR": "Εσφαλμένο όνομα χρήστη ή / και τον κωδικό πρόσβασης"
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
-         "PLACEHOLDER": "Please select a filter…",
-         "NO_OPTIONS": "No filters found"
+         "PLACEHOLDER": "Παρακαλώ επιλέξτε ένα φίλτρο…",
+         "NO_OPTIONS": "Δεν βρέθηκαν φίλτρα"
       },
       "FILTER_VALUE_SELECTION": {
-         "PLACEHOLDER": "Please select a value…",
-         "NO_OPTIONS": "No values found"
+         "PLACEHOLDER": "Παρακαλώ επιλέξτε μια τιμή…",
+         "NO_OPTIONS": "Δεν βρέθηκαν τιμές"
       },
-      "CLEAR": "Clear all filters",
-      "REMOVE": "Remove filter",
-      "ADD": "Add filters",
-      "PLACEHOLDER": "Search…",
+      "CLEAR": "Απαλοιφή όλων των φίλτρων",
+      "REMOVE": "Αφαίρεση φίλτρου",
+      "ADD": "Προσθήκη Φίλτρων",
+      "PLACEHOLDER": "Αναζήτηση…",
       "PROFILES": {
-         "FILTERS_HEADER": "Saved filter sets",
-         "EDIT": "Edit filter set",
-         "REMOVE": "Remove saved filter",
-         "EMPTY": "No saved filters yet",
-         "SAVE_FILTERS": "Save",
-         "FILTER_HEADER": "Save filter set",
-         "NAME": "Name",
-         "NAME_PLACEHOLDER": "Name…",
-         "DESCRIPTION": "Description",
-         "DESCRIPTION_PLACEHOLDER": "Description…"
+         "FILTERS_HEADER": "Αποθηκευμένα σύνολα φίλτρου",
+         "EDIT": "Επεξεργασία σετ φίλτρων",
+         "REMOVE": "Κατάργηση των αποθηκευμένων φίλτρων",
+         "EMPTY": "Δεν υπάρχουν αποθηκευμένα φίλτρα ακόμη",
+         "SAVE_FILTERS": "Αποθήκευση",
+         "FILTER_HEADER": "Αποθήκευση σύνολο φίλτρου",
+         "NAME": "Όνομα",
+         "NAME_PLACEHOLDER": "Όνομα…",
+         "DESCRIPTION": "Περιγραφή",
+         "DESCRIPTION_PLACEHOLDER": "Περιγραφή…"
       }
    },
    "FILTERS": {
       "ACLS": {
          "NAME": {
-            "LABEL": "Name"
+            "LABEL": "Όνομα"
          }
       },
       "AGENTS": {
          "NAME": {
-            "LABEL": "Name"
+            "LABEL": "Όνομα"
          },
          "STATUS": {
-            "LABEL": "Status"
+            "LABEL": "Κατάσταση"
          }
       },
       "EVENTS": {
          "AGENT_ID": {
-            "LABEL": "Capture Agent ID"
+            "LABEL": "Αναγνωριστικό αντζέντη βιντεοσκόπησης"
          },
          "ACCESS_POLICY": {
-            "LABEL": "Access policy"
+            "LABEL": "Πολιτική πρόσβασης"
          },
          "COMMENTS": {
-            "LABEL": "Comments",
-            "NONE": "None",
-            "OPEN": "Open",
-            "RESOLVED": "Resolved"
+            "LABEL": "Σχόλια",
+            "NONE": "Κανένα",
+            "OPEN": "Ανοιχτό",
+            "RESOLVED": "Επιλυμένο"
          },
          "CONTRIBUTORS": {
-            "LABEL": "Contributors"
+            "LABEL": "Χορηγοί"
          },
          "CREATOR": {
-            "LABEL": "Creator"
+            "LABEL": "Δημιουργός"
          },
          "PUBLISHER": {
-            "LABEL": "Publisher"
+            "LABEL": "Εκδότης"
          },
          "HOSTNAME": {
-            "LABEL": "Host name"
+            "LABEL": "Όνομα κεντρικού υπολογιστή"
          },
          "LANGUAGE": {
-            "LABEL": "Language"
+            "LABEL": "Γλώσσα"
          },
          "LICENSE": {
-            "LABEL": "License"
+            "LABEL": "Άδεια χρήσης"
          },
          "LOCATION": {
-            "LABEL": "Location"
+            "LABEL": "Τοποθεσία"
          },
          "PERIOD": {
-            "LABEL": "Period"
+            "LABEL": "Περίοδος"
          },
          "PRESENTERS_BIBLIOGRAPHIC": {
-            "LABEL": "Presenter Bibliographic"
+            "LABEL": "Παρουσιαστής βιβλιογραφική"
          },
          "PRESENTERS_TECHNICAL": {
-            "LABEL": "Presenter Technical"
+            "LABEL": "Παρουσιαστής τεχνική"
          },
          "PROGRESS": {
-            "LABEL": "Progress"
+            "LABEL": "Πρόοδος"
          },
          "SERIES": {
-            "LABEL": "Series"
+            "LABEL": "Σειρά"
          },
          "SOURCE": {
-            "LABEL": "Source"
+            "LABEL": "Πηγή"
          },
          "START_DATE": {
-            "LABEL": "Start date"
+            "LABEL": "Ημερομηνία έναρξης"
          },
          "STATUS": {
-            "LABEL": "Status",
-            "SCHEDULED": "Scheduled",
-            "RECORDING": "Recording",
-            "INGESTING": "Ingesting",
-            "PROCESSING": "Processing",
-            "ARCHIVE": "Archive",
-            "WAITINGFOR": "Waiting for",
-            "UPLOAD": "Upload",
-            "ONHOLD": "On hold"
+            "LABEL": "Κατάσταση",
+            "SCHEDULED": "Προγραμματισμένη",
+            "RECORDING": "Εγγραφή",
+            "INGESTING": "Εισάγεται",
+            "PROCESSING": "Σε επεξεργασία",
+            "ARCHIVE": "Αρχειοθέτηση",
+            "WAITINGFOR": "Αναμονή για",
+            "UPLOAD": "Μεταφόρτωση",
+            "ONHOLD": "Σε αναμονή"
          },
          "SUBJECT": {
-            "LABEL": "Subject"
+            "LABEL": "Θέμα"
          },
          "TRACK_MIMETYPE": {
-            "LABEL": "Mimetype"
+            "LABEL": "MimeType"
          },
          "TRACK_RESOLUTION": {
-            "LABEL": "Resolution"
+            "LABEL": "Ανάλυση"
          },
          "TRACK_TYPE": {
-            "LABEL": "Type"
+            "LABEL": "Τύπος"
          },
          "WORKFLOW_DEFINITION": {
-            "LABEL": "Workflow definition"
+            "LABEL": "Ορισμός ροής εργασίας"
          },
          "WORKFLOW_STATE": {
-            "LABEL": "Workflow state"
+            "LABEL": "Κατάσταση ροής εργασίας"
          }
       },
       "JOBS": {
          "HOSTNAME": {
-            "LABEL": "Host name"
+            "LABEL": "Όνομα κεντρικού υπολογιστή"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Όνομα κόμβου"
          },
          "STATUS": {
-            "LABEL": "Status",
-            "PAUSED": "Paused",
-            "QUEUED": "Queued",
-            "RUNNING": "Running",
-            "WAITING": "Waiting"
+            "LABEL": "Κατάσταση",
+            "PAUSED": "Σε παύση",
+            "QUEUED": "Στην ουρά",
+            "RUNNING": "Εκτελείται",
+            "WAITING": "Αναμονή"
          }
       },
       "SERIES": {
          "TITLE": {
-            "LABEL": "Name"
+            "LABEL": "Όνομα"
          },
          "CONTRIBUTORS": {
-            "LABEL": "Contributors"
+            "LABEL": "Χορηγοί"
          },
          "ORGANIZERS": {
-            "LABEL": "Organizers"
+            "LABEL": "Διοργανωτές"
          },
          "SUBJECT": {
-            "LABEL": "Subject"
+            "LABEL": "Θέμα"
          },
          "LANGUAGE": {
-            "LABEL": "Language"
+            "LABEL": "Γλώσσα"
          },
          "CREATOR": {
-            "LABEL": "Creator"
+            "LABEL": "Δημιουργός"
          },
          "LICENSE": {
-            "LABEL": "License"
+            "LABEL": "Άδεια χρήσης"
          },
          "ACCESS_POLICY": {
-            "LABEL": "Access policy"
+            "LABEL": "Πολιτική πρόσβασης"
          },
          "CREATION_DATE": {
-            "LABEL": "Creation date"
+            "LABEL": "Ημερομηνία δημιουργίας"
          }
       },
       "SERVERS": {
          "HOSTNAME": {
-            "LABEL": "Host name"
+            "LABEL": "Όνομα κεντρικού υπολογιστή"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Όνομα κόμβου"
          },
          "STATUS": {
-            "LABEL": "Status",
-            "MAINTENANCE": "Maintenance",
-            "ONLINE": "Online",
-            "OFFLINE": "Offline"
+            "LABEL": "Κατάσταση",
+            "MAINTENANCE": "Συντήρηση",
+            "ONLINE": "Συνδεδεμένος",
+            "OFFLINE": "Αποσυνδεδεμένος"
          }
       },
       "SERVICES": {
          "ACTIONS": {
-            "LABEL": "Actions available"
+            "LABEL": "Έχει ενέργειες"
          },
          "HOSTNAME": {
-            "LABEL": "Host name"
+            "LABEL": "Όνομα κεντρικού υπολογιστή"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Όνομα κόμβου"
          },
          "NAME": {
-            "LABEL": "Name"
+            "LABEL": "Όνομα"
          },
          "STATUS": {
-            "LABEL": "Status",
-            "ERROR": "Error",
-            "NORMAL": "Normal",
-            "WARNING": "Warning"
+            "LABEL": "Κατάσταση",
+            "ERROR": "Σφάλμα",
+            "NORMAL": "Κανονική",
+            "WARNING": "Προειδοποίηση"
          }
       },
       "THEMES": {
          "NAME": {
-            "LABEL": "Name"
+            "LABEL": "Όνομα"
          },
          "DESCRIPTION": {
-            "LABEL": "Description"
+            "LABEL": "Περιγραφή"
          },
          "CREATOR": {
-            "LABEL": "Creator"
+            "LABEL": "Δημιουργός"
          },
          "CREATION_DATE": {
-            "LABEL": "Created"
+            "LABEL": "Δημιουργήθηκε"
          }
       },
       "USERS": {
          "PROVIDER": {
-            "LABEL": "Provider"
+            "LABEL": "Πάροχος"
          },
          "ROLE": {
-            "LABEL": "Role"
+            "LABEL": "Ρόλος"
          },
          "USERNAME": {
-            "LABEL": "Username"
+            "LABEL": "Όνομα χρήστη"
          },
          "NAME": {
-            "LABEL": "Name"
+            "LABEL": "Όνομα"
          },
          "USER_DIRECTORY": {
-            "LABEL": "User directory"
+            "LABEL": "Κατάλογος χρήστη"
          }
       },
       "REVIEW_STATUS": {
-         "UNSENT": "Unsent",
-         "UNCONFIRMED": "Unconfirmed",
-         "CONFIRMED": "Confirmed"
+         "UNSENT": "Aόριστο",
+         "UNCONFIRMED": "Ανεπιβεβαίωτη",
+         "CONFIRMED": "Επιβεβαιωμένο"
       }
    },
-   "TABLE_SUMMARY": "{{numberOfRows}} rows",
-   "TABLE_NO_RESULT": "No results found",
-   "TABLE_LOADING": "Loading…",
-   "TABLE_EDIT": "Edit",
+   "TABLE_SUMMARY": "{{numberOfRows}} γραμμές",
+   "TABLE_NO_RESULT": "Δεν βρέθηκαν αποτελέσματα",
+   "TABLE_LOADING": "Φόρτωση…",
+   "TABLE_EDIT": "Επεξεργασία",
    "DASHBOARD": {
-      "RUNNING": "Running",
-      "FINISHED": "Finished",
-      "PAUSED": "Paused",
-      "FAILED": "Failed",
-      "FINISHED_WITH_COMMENTS": "Todo",
-      "SCHEDULED": "Scheduled",
-      "RECORDING": "Recording"
+      "RUNNING": "Εκτελείται",
+      "FINISHED": "Ολοκληρώθηκε",
+      "PAUSED": "Σε παύση",
+      "FAILED": "Απέτυχε",
+      "FINISHED_WITH_COMMENTS": "Να γίνουν",
+      "SCHEDULED": "Προγραμματισμένη",
+      "RECORDING": "Εγγραφή"
    },
    "HOTKEYS": {
       "CHEAT_SHEET": {
-         "TITLE": "Keyboard shortcuts",
-         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+         "TITLE": "Συντομεύσεις πληκτρολογίου",
+         "HINT": "Αυτή η σελίδα παραθέτει τις συντομεύσεις πληκτρολογίου που είναι διαθέσιμες. Σημειώστε ότι μπορούν να αλλάξουν ανάλογα με την σελίδα που επισκέπτεστε."
       },
       "KEYS": {
          "CTRL": "Ctrl",
          "ALT": "Alt",
          "OPTION": "⌥",
-         "SPACE": "Space",
+         "SPACE": "Πλήκτρο διαστήματος",
          "BACKSPACE": "⌫",
          "LEFT": "←",
          "RIGHT": "→",
@@ -1943,88 +2064,88 @@
          "ESC": "Esc",
          "ESCAPE": "Esc",
          "PAGEUP": "Page↑",
-         "PAGEDOWN": "Page↓",
+         "PAGEDOWN": "Page↑",
          "END": "End",
          "HOME": "Home",
          "INS": "Ins",
          "DEL": "Del"
       },
       "GROUPS": {
-         "GENERAL": "General",
-         "PLAYER": "Player",
-         "EDITOR": "Editor"
+         "GENERAL": "Γενικά",
+         "PLAYER": "Αναπαραγωγέας",
+         "EDITOR": "Πρόγραμμα επεξεργασίας"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
-            "MAIN_MENU": "Main menu",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
-            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
-            "REMOVE_FILTERS": "Clear all filters",
-            "EVENT_VIEW": "Events",
-            "SERIES_VIEW": "Series",
-            "NEW_EVENT": "Add event",
-            "NEW_SERIES": "Add series",
-            "CHEAT_SHEET": "Keyboard shortcuts"
+            "MAIN_MENU": "Κεντρικό Μενού",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Επιλέξτε επόμενο φίλτρο",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Επιλέξτε προηγούμενο φίλτρο",
+            "REMOVE_FILTERS": "Απαλοιφή όλων των φίλτρων",
+            "EVENT_VIEW": "Εκδηλώσεις",
+            "SERIES_VIEW": "Σειρά",
+            "NEW_EVENT": "Προσθήκη εκδήλωσης",
+            "NEW_SERIES": "Προσθήκη σειράς",
+            "CHEAT_SHEET": "Συντομεύσεις πληκτρολογίου"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Play/pause",
-            "PREVIOUS_FRAME": "Previous frame",
-            "NEXT_FRAME": "Next frame",
-            "STEP_BACKWARD": "Jump 10s back",
-            "STEP_FORWARD": "Jump 10s forward",
-            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
-            "NEXT_SEGMENT": "Next segment/jump to end",
-            "VOLUME_UP": "Volume up",
-            "VOLUME_DOWN": "Volume down",
-            "MUTE": "Mute/unmute"
+            "PLAY_PAUSE": "Αναπαραγωγή/Παύση",
+            "PREVIOUS_FRAME": "Προηγούμενο καρέ",
+            "NEXT_FRAME": "Επόμενο καρέ",
+            "STEP_BACKWARD": "Άλμα πίσω 10s",
+            "STEP_FORWARD": "Άλμα προς τα εμπρός 10s",
+            "PREVIOUS_SEGMENT": "Προηγούμενο τμήμα / μετακίνηση στην αρχή",
+            "NEXT_SEGMENT": "Επόμενο τμήμα / μετακίνηση στο τέλος",
+            "VOLUME_UP": "Αύξηση έντασης",
+            "VOLUME_DOWN": "Μείωση έντασης",
+            "MUTE": "Σίγαση/κατάργηση σίγασης"
          },
          "EDITOR": {
-            "SPLIT_AT_CURRENT_TIME": "Split",
-            "CUT_SELECTED_SEGMENT": "Cut",
-            "PLAY_CURRENT_SEGMENT": "Play current segment",
-            "CLEAR_LIST": "Clear segment",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
-            "PLAY_ENDING_OF_CURRENT_SEGMENT": "End of segment"
+            "SPLIT_AT_CURRENT_TIME": "Διαχωρισμός",
+            "CUT_SELECTED_SEGMENT": "Αποκοπή",
+            "PLAY_CURRENT_SEGMENT": "Παίξτε το τρέχον τμήμα",
+            "CLEAR_LIST": "Καθαρισμός τμήματος",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Επανάληψη τμήματος με pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Τέλος του τμήματος"
          }
       }
    },
    "AGENTS": {
       "STATUS": {
-         "CAPTURING": "Capturing",
-         "ERROR": "Error",
-         "IDLE": "Idle",
-         "OFFLINE": "Offline",
-         "SHUTTING_DOWN": "Shutting down",
-         "UNKNOWN": "Unknown",
-         "UPLOADING": "Uploading"
+         "CAPTURING": "Βιντεοσκόπηση",
+         "ERROR": "Σφάλμα",
+         "IDLE": "Αδρανές",
+         "OFFLINE": "Αποσυνδεδεμένος",
+         "SHUTTING_DOWN": "Τερματισμός",
+         "UNKNOWN": "Άγνωστο",
+         "UPLOADING": "Μεταφόρτωση"
       }
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Για εισαγωγή πολλαπλώ ν τιμών πατήστε Enter μεταξύ τους"
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
-      "FROM": "From",
-      "TO": "To",
-      "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
+      "NOT_AVAILABLE": "Δεν είναι δυνατή η εμφάνιση των στατιστικών αυτή τη στιγμή. Παρακαλώ δοκιμάστε αργότερα.",
+      "UNSUPPORTED_TYPE": "Λυπούμαστε, το Opencast δεν μπορεί να προβάλει αυτόν τον τύπο στατιστικών δεδομένων.",
+      "FROM": "Απο",
+      "TO": "Προς",
+      "TOTAL": "Σύνολο",
+      "GRANULARITY": "Διακριτότητα",
       "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
+         "ORGANIZATION": "Οργανισμός"
       },
       "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views",
-         "PUBLISHEDHOURS": "Published Hours of Video"
+         "RANDOM": "Τυχαία δεδομένα",
+         "VIEWS_SUM": "Συνολικός αριθμός προβολών",
+         "VIEWS_AVG": "Μέσος αριθμός προβολών",
+         "PUBLISHEDHOURS": "Δημοσιευμένες ώρες του βίντεο"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time unit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the published hours of video"
+         "RANDOM": "Αυτό εμφανίζει τυχαία δεδομένα ως επίδειξη. Μπορείτε να απενεργοποιήσετε αυτό το γράφημα διαγράφοντας τον ορισμό json του αντίστοιχου παροχέα στατιστικών στοιχείων από τον κατάλογο etc/providers",
+         "VIEWS_SUM": "Η επιλογή εμφανίζει το συνολικό αριθμό προβολών ανά μονάδα χρόνου.",
+         "VIEWS_AVG": "Αυτή η επιλογή εμφανίζει τον μέσο αριθμό ημερήσιων προβολών ανά μονάδα χρόνου.",
+         "PUBLISHEDHOURS": "Αυτή η επιλογή εμφανίζει τις δημοσιευμένες ώρες του βίντεο"
       }
    }
 }

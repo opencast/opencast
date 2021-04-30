@@ -49,7 +49,7 @@
         </div>
 
         <div class="nav-dd" title="Studio" with-role="ROLE_STUDIO">
-          <a href="/studio">
+          <a href="/studio?return.label=Admin%20UI&return.target={{studioReturnUrl}}">
             <span class="fa fa-video-camera"><!-- Opencast Studio --></span>
           </a>
         </div>
@@ -59,7 +59,12 @@
           <span id="error-count" class="badge" ng-show="services.error">{{ services.numErr }}</span>
           <ul class="dropdown-ul">
             <li ng-repeat="(key, value) in services.service"><!-- service directive -->
-              <a ng-click="toServices($event)" service-name="{{ key }}">
+              <a ng-if="key == 'Latest Version' && (value.error || value.warning)" href="{{ value.docs_url }}" service-name="{{ key }}">
+                <span>Opencast</span>
+                <span ng-if="value.error" class="ng-multi-value ng-multi-value-red">{{ value.status }}</span>
+                <span ng-if="value.warning" class="ng-multi-value ng-multi-value-orange">{{ value.status }}</span>
+              </a>
+              <a ng-if="key != 'Latest Version'" ng-click="toServices($event)" service-name="{{ key }}">
                 <span>{{ key }}</span>
                 <span class="ng-multi-value ng-multi-value-red" ng-if="value.error">{{ value.status }}</span>
                 <span class="ng-multi-value ng-multi-value-green" ng-if="!value.error">{{ value.status }}</span>
@@ -68,8 +73,8 @@
           </ul>
         </div>
 
-        <div ng-if="documentationUrl || restdocsUrl" title="{{ 'HELP.HELP' | translate}}" class="nav-dd"
-                                                                                          id="help-dd" old-admin-ng-dropdown="">
+        <div ng-if="documentationUrl || restdocsUrl" title="{{ 'HELP.HELP' | translate}}"
+             class="nav-dd" id="help-dd" old-admin-ng-dropdown="">
           <div class="fa fa-question-circle"></div>
           <ul class="dropdown-ul">
             <li ng-if="documentationUrl">
@@ -84,6 +89,9 @@
             </li>
             <li>
               <a translate="HELP.HOTKEY_CHEAT_SHEET" ng-click="showHotkeyCheatSheet()"></a>
+            </li>
+            <li with-role="ROLE_ADMIN">
+              <a translate="HELP.ADOPTER_REGISTRATION" ng-click="showAdopterRegistrationModal()"></a>
             </li>
           </ul>
         </div>
@@ -106,9 +114,20 @@
 
     <footer id="main-footer" ng-controller="NavCtrl">
       <div class="default-footer">
-        <div ng-if="version.version" class="meta">
+        <div ng-if="version.version"
+             class="meta"
+             title="{{ 'BUILD.VERSION' | translate }}">
           Opencast {{ version.version }}
-          <span with-role="ROLE_ADMIN"> - {{ version.buildNumber || 'undefined' }}</span>
+          <span ng-if="version.buildNumber"
+                with-role="ROLE_ADMIN"
+                title="{{ 'BUILD.COMMIT' | translate }}">
+            - {{ version.buildNumber || 'undefined' }}
+          </span>
+          <span ng-if="version['last-modified']"
+                with-role="ROLE_ADMIN"
+                title="{{ 'BUILD.DATE_DESC' | translate }}">
+            - {{ 'BUILD.BUILT_ON' | translate }} {{ version['last-modified'] }}
+          </span>
         </div>
         <div ng-if="feedbackUrl" class="feedback-btn" id="feedback-btn">
           <a href="javascript:;">Feedback</a>
@@ -237,6 +256,8 @@
     <script src="scripts/shared/resources/themesResource.js"></script>
     <script src="scripts/shared/resources/newThemeResource.js"></script>
     <script src="scripts/shared/resources/taskResource.js"></script>
+    <script src="scripts/shared/resources/adopterRegistrationResource.js"></script>
+    <script src="scripts/shared/resources/countryResource.js"></script>
     <script src="scripts/shared/services/wizards/new-event/access.js"></script>
     <script src="scripts/shared/services/wizards/new-event/metadata.js"></script>
     <script src="scripts/shared/services/wizards/new-event/metadataExtended.js"></script>
@@ -343,6 +364,8 @@
     <script src="scripts/modules/events/validators/schedulingAuthorizedValidator.js"></script>
     <script src="scripts/modules/recordings/controllers/recordingController.js"></script>
     <script src="scripts/modules/recordings/controllers/recordingsController.js"></script>
+    <script src="scripts/modules/registration/controllers/registrationController.js"></script>
+    <script src="scripts/modules/registration/services/states.js"></script>
     <script src="scripts/modules/users/controllers/usersController.js"></script>
     <script src="scripts/modules/users/controllers/userController.js"></script>
     <script src="scripts/modules/users/controllers/groupsController.js"></script>

@@ -7,6 +7,7 @@
             value="Factory to create ACL services for storage and scheduling on a per organization basis"/>
   <service>
     <provide interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"/>
+    <provide interface="org.opencastproject.index.rebuild.IndexProducer"/>
   </service>
   <reference name="acl-db" interface="org.opencastproject.authorization.xacml.manager.impl.AclDb"
              cardinality="1..1" policy="static" bind="setAclDb"/>

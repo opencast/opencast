@@ -97,7 +97,9 @@ public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
 //                .where(new Fn<EntityPath<?>, BooleanExpression>() {
 //                  @Override public BooleanExpression apply(EntityPath<?> path) {
 //                    // Wildcard deletion. Disabled as of ticket CERV-1158. Kept for potentially later reference.
-//                    // return !"".equals(owner) ? Q_SNAPSHOT.owner.eq(owner).and(c.where.apply(path)) : c.where.apply(path);
+//                    // return !"".equals(owner)
+//                    //     ? Q_SNAPSHOT.owner.eq(owner).and(c.where.apply(path))
+//                    //     : c.where.apply(path);
 //                    return Q_SNAPSHOT.owner.eq(owner).and(c.where.apply(path));
 //                  }
 //                });
@@ -342,7 +344,9 @@ public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
     return new AbstractTarget() {
       @Override public SelectQueryContribution contributeSelect(JPAQueryFactory f) {
         // join on the media package ID and the given expressions
-        final BooleanExpression on = Q_PROPERTY.mediaPackageId.eq(Q_SNAPSHOT.mediaPackageId).and(JpaFns.anyOf(onExpressions));
+        final BooleanExpression on = Q_PROPERTY.mediaPackageId
+            .eq(Q_SNAPSHOT.mediaPackageId)
+            .and(JpaFns.anyOf(onExpressions));
         return SelectQueryContribution.mk().join($(new Join(Q_SNAPSHOT, Q_PROPERTY, on))).fetch($Q_PROPERTY);
       }
 

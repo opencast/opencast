@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -69,10 +69,6 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
@@ -128,6 +124,19 @@
       <artifactId>commons-fileupload</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.entwinemedia.common</groupId>
+      <artifactId>functional</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore-osgi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient-osgi</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-working-file-repository-service-impl</artifactId>
       <version>${project.version}</version>
@@ -148,12 +157,25 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>com.springsource.org.jdom</artifactId>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-authorization-xacml</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <!-- provide a logger for tests -->
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -181,31 +203,9 @@
               META-INF.services;-split-package:=merge-first,
               de.schlichtherle.*;-split-package:=merge-first
             </Private-Package>
-            <Service-Component>
-              OSGI-INF/ingest-service.xml,
-              OSGI-INF/ingest-service-rest.xml,
-              OSGI-INF/inbox-scanner-service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
     </plugins>
   </build>
-  <reporting>
-    <plugins>
-      <!--
-        DISABLED to get the mvn site:site running -AZ <plugin>
-        <groupId>gr.abiss.mvn.plugins</groupId>
-        <artifactId>maven-jstools-plugin</artifactId>
-        <version>0.7</version> <inherited>false</inherited>
-        <configuration>
-        <jsDir>${basedir}/src/main/resources/ui/js</jsDir>
-        <includes>**/*.js</includes>
-        <excludes>**/*-compressed.js</excludes>
-        <caseSensitive>true</caseSensitive> </configuration>
-        <reportSets> <reportSet> <reports> <report>jsdoc</report>
-        </reports> </reportSet> </reportSets> </plugin>
-      -->
-    </plugins>
-  </reporting>
 </project>

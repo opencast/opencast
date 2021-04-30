@@ -123,8 +123,22 @@ class OpencastToPaellaConverter {
 
   getStreamSourceFromTrack(track) {
     var res = new Array(0,0);
+    // HLS-VOD
     if (track.video instanceof Object) {
-      res = track.video.resolution.split('x');
+      if (!track.master) {
+        res = track.video.resolution.split('x');
+      }
+      // HLS-VOD- parse sub-video data from the adaptive "master" tagged track
+      // The other HLS flavored tracks must eventually be ignored when master track exists
+      else if (track.video[0] ) {    // multiple resolutions/streams within "master" track
+        let cnt = Object.keys(track.video);
+        for (var i = 0; i < cnt.length; i++) {
+          let tmpres = track.video[i].resolution.split('x');
+          if (parseInt(tmpres[0]) > parseInt(res[0])) {    // pick largest
+            res = tmpres;
+          }
+        }
+      }
     }
 
     var src = track.url;
@@ -139,6 +153,7 @@ class OpencastToPaellaConverter {
     }
 
     var source = {
+      master: (track.master === true), // HLS-VOD - adaptive master manifest
       src:  src,
       isLiveStream: (track.live === true)
     };
@@ -224,6 +239,7 @@ class OpencastToPaellaConverter {
    * @param subFlavor subflavor used for track selection
    */
   getStreamFromFlavor(episode, flavor, subFlavor) {
+    let hasAdaptiveMasterTrack = false;
     var currentStream = { sources:{}, preview: '', content: flavor };
 
     var tracks = episode.mediapackage.media.track;
@@ -239,6 +255,9 @@ class OpencastToPaellaConverter {
           if ( !(currentStream.sources[sourceType]) || !(currentStream.sources[sourceType] instanceof Array)){
             currentStream.sources[sourceType] = [];
           }
+          if (currentTrack.master) {  // HLS-VOD
+            hasAdaptiveMasterTrack = true;
+          }
           if (currentTrack.audio) {
             currentStream.audioTag = this.getAudioTagFromTrack(currentTrack);
           }
@@ -247,7 +266,7 @@ class OpencastToPaellaConverter {
           if (currentTrack.video) {
             currentStream.type = 'video';
           }
-          else if (currentTrack.audio) {
+          else if (currentTrack.audio && currentStream.type !== 'video') {
             currentStream.type = 'audio';
           }
 
@@ -258,6 +277,11 @@ class OpencastToPaellaConverter {
         }
       }
     });
+    // HLS-VOD Where there's a master HLS index, remove all non-master HLS sources
+    if (hasAdaptiveMasterTrack && currentStream.sources.hls) {
+      var filteredHls = currentStream.sources.hls.filter(track => track.master);
+      currentStream.sources.hls = filteredHls;
+    }
 
     // Read the attachments
     var duration = parseInt(episode.mediapackage.duration / 1000);

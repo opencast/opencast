@@ -41,6 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,8 +69,10 @@ public class EmailTemplateServiceImplTest {
     URI episodeURI = EmailTemplateServiceImplTest.class.getResource("/episode_dublincore.xml").toURI();
     URI seriesURI = EmailTemplateServiceImplTest.class.getResource("/series_dublincore.xml").toURI();
     Workspace workspace = EasyMock.createMock(Workspace.class);
-    EasyMock.expect(workspace.get(new URI("episode_dublincore.xml"))).andReturn(new File(episodeURI));
-    EasyMock.expect(workspace.get(new URI("series_dublincore.xml"))).andReturn(new File(seriesURI));
+    EasyMock.expect(workspace.read(new URI("episode_dublincore.xml")))
+        .andReturn(new FileInputStream(new File(episodeURI)));
+    EasyMock.expect(workspace.read(new URI("series_dublincore.xml")))
+        .andReturn(new FileInputStream(new File(seriesURI)));
     EasyMock.replay(workspace);
     service.setWorkspace(workspace);
 
@@ -79,11 +82,13 @@ public class EmailTemplateServiceImplTest {
                     + "title: ${mediaPackage.title}, series title: ${mediaPackage.seriesTitle}, "
                     + "date: ${mediaPackage.date?datetime?iso_utc}");
     EasyMock.expect(templateScanner.getTemplate("templateCatalog"))
-            .andReturn(
-                    "EPISODE creator: ${catalogs[\"episode\"][\"creator\"]}, isPartOf: ${catalogs[\"episode\"][\"isPartOf\"]}, "
-                            + "title: ${catalogs[\"episode\"][\"title\"]}, created: ${catalogs[\"episode\"][\"created\"]}, "
-                            + "SERIES creator: ${catalogs[\"series\"][\"creator\"]}, description: ${catalogs[\"series\"][\"description\"]}, "
-                            + "subject: ${catalogs[\"series\"][\"subject\"]}");
+        .andReturn(
+            "EPISODE creator: ${catalogs[\"episode\"][\"creator\"]}, "
+                + "isPartOf: ${catalogs[\"episode\"][\"isPartOf\"]}, "
+                + "title: ${catalogs[\"episode\"][\"title\"]}, created: ${catalogs[\"episode\"][\"created\"]}, "
+                + "SERIES creator: ${catalogs[\"series\"][\"creator\"]}, "
+                + "description: ${catalogs[\"series\"][\"description\"]}, "
+                + "subject: ${catalogs[\"series\"][\"subject\"]}");
     EasyMock.expect(templateScanner.getTemplate("templateFailed")).andReturn(
             "<#if failedOperation?has_content>Workflow failed in operation: ${failedOperation.template}</#if>, "
                     + "Workflow errors: <#list incident as inc><#list inc.details as de>${de.b} </#list></#list>");

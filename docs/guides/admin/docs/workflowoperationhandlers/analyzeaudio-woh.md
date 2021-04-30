@@ -1,7 +1,7 @@
 # AnalyzeAudioWorkflowOperationHandler
 
 ## Description
-The AnalyzeAudioiWorkflowOperationHandler analyzes the first audio stream of a video or audio track through SoX
+The AnalyzeAudioWorkflowOperationHandler analyzes the first audio stream of a video or audio track through SoX
 (http://sox.sourceforge.net/) and writes the result back to the given track.
 
 This workflow operation handler can be used with audio and/or video files. At least one audio stream must be available
