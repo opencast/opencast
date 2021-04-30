@@ -23,6 +23,11 @@
     <!-- opencast -->
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-elasticsearch-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -65,7 +70,6 @@
               org.opencastproject.external.index
             </Export-Package>
             <Service-Component>
-              OSGI-INF/external-index.xml,
               OSGI-INF/message-receiver-acl.xml,
               OSGI-INF/message-receiver-assetmanager.xml,
               OSGI-INF/message-receiver-comment.xml,
