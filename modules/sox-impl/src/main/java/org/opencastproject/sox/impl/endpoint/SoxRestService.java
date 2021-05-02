@@ -55,14 +55,21 @@ import javax.ws.rs.core.Response;
  * A REST endpoint delegating functionality to the {@link SoxService}
  */
 @Path("/")
-@RestService(name = "sox", title = "Sox", abstractText = "This service creates and augments Opencast media packages that include media tracks, metadata "
-        + "catalogs and attachments.", notes = {
+@RestService(
+    name = "sox",
+    title = "Sox",
+    abstractText = "This service creates and augments Opencast media packages that include media "
+        + "tracks, metadata catalogs and attachments.",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+        "If the service is down or not working it will return a status 503, this means the the "
+            + "underlying service is not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was "
+            + "not anticipated. In other words, there is a bug! You should file an error report "
+            + "with your server logs from the time when the error occurred: "
+            + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
 public class SoxRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -125,19 +132,41 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("analyze")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "analyze", description = "Starts an audio analyzing process", restParameters = { @RestParameter(description = "The track just containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT) }, responses = {
-          @RestResponse(description = "Results in an xml document containing the job for the analyzing task", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "If required parameters aren't set or if sourceAudioTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  @RestQuery(
+      name = "analyze",
+      description = "Starts an audio analyzing process",
+      restParameters = {
+          @RestParameter(
+              name = "sourceAudioTrack",
+              type = Type.TEXT,
+              isRequired = true,
+              description = "The track just containing the audio stream"
+          )
+      },
+      responses = {
+          @RestResponse(
+              description = "Results in an xml document containing the job for the analyzing task",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "If required parameters aren't set or if sourceAudioTrack isn't from the type Track",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST
+          )
+      },
+      returnDescription = ""
+  )
   public Response analyze(@FormParam("sourceAudioTrack") String sourceAudioTrackAsXml) throws Exception {
     // Ensure that the POST parameters are present
-    if (StringUtils.isBlank(sourceAudioTrackAsXml))
+    if (StringUtils.isBlank(sourceAudioTrackAsXml)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceAudioTrack must not be null").build();
+    }
 
     // Deserialize the track
     MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(sourceAudioTrackAsXml);
-    if (!Track.TYPE.equals(sourceTrack.getElementType()))
+    if (!Track.TYPE.equals(sourceTrack.getElementType())) {
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceAudioTrack element must be of type track")
               .build();
+    }
 
     try {
       // Asynchronously analyze the specified audio track
@@ -162,24 +191,51 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("normalize")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "normalize", description = "Starts audio normalization process", restParameters = {
-          @RestParameter(description = "The track containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT),
-          @RestParameter(description = "The target RMS level dB", isRequired = true, name = "targetRmsLevDb", type = Type.INTEGER) }, responses = {
-          @RestResponse(description = "Results in an xml document containing the job for the audio normalization task", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "If required parameters aren't set or if sourceAudioTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  @RestQuery(
+      name = "normalize",
+      description = "Starts audio normalization process",
+      restParameters = {
+          @RestParameter(
+              name = "sourceAudioTrack",
+              description = "The track containing the audio stream",
+              isRequired = true,
+              type = Type.TEXT
+          ),
+          @RestParameter(
+              name = "targetRmsLevDb",
+              description = "The target RMS level dB",
+              isRequired = true,
+              type = Type.INTEGER
+          )
+      },
+      responses = {
+          @RestResponse(
+              description = "Results in an xml document containing the job for the audio normalization task",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "If required parameters aren't set or if sourceAudioTrack isn't from the type Track",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST
+          )
+      },
+      returnDescription = ""
+  )
   public Response normalize(@FormParam("sourceAudioTrack") String sourceAudioTrackAsXml,
           @FormParam("targetRmsLevDb") Float targetRmsLevDb) throws Exception {
     // Ensure that the POST parameters are present
-    if (StringUtils.isBlank(sourceAudioTrackAsXml))
+    if (StringUtils.isBlank(sourceAudioTrackAsXml)) {
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceAudioTrack must not be null").build();
-    if (targetRmsLevDb == null)
+    }
+    if (targetRmsLevDb == null) {
       return Response.status(Response.Status.BAD_REQUEST).entity("targetRmsLevDb must not be null").build();
+    }
 
     // Deserialize the track
     MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(sourceAudioTrackAsXml);
-    if (!Track.TYPE.equals(sourceTrack.getElementType()))
+    if (!Track.TYPE.equals(sourceTrack.getElementType())) {
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceAudioTrack element must be of type track")
               .build();
+    }
 
     try {
       // Asynchronously normalyze the specified audio track
@@ -191,24 +247,15 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
-   */
   @Override
   public JobProducer getService() {
-    if (soxService instanceof JobProducer)
+    if (soxService instanceof JobProducer) {
       return (JobProducer) soxService;
-    else
+    } else {
       return null;
+    }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
-   */
   @Override
   public ServiceRegistry getServiceRegistry() {
     return serviceRegistry;

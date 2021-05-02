@@ -48,9 +48,12 @@ import javax.ws.rs.core.Response;
  * VideoEditorService REST Endpoint.
  */
 @Path("/")
-@RestService(name = "VideoEditorServiceEndpoint", title = "Video Editor Service REST Endpoint",
-        abstractText = "Video Editor Service consumes a smil document and create corresponding video files.",
-        notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/videoeditor)"})
+@RestService(
+    name = "VideoEditorServiceEndpoint",
+    title = "Video Editor Service REST Endpoint",
+    abstractText = "Video Editor Service consumes a smil document and create corresponding video files.",
+    notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/videoeditor)"}
+)
 public class VideoEditorServiceEndpoint extends AbstractJobProducerEndpoint {
 
   private ServiceRegistry serviceRegistry;
@@ -60,16 +63,29 @@ public class VideoEditorServiceEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Path("/process-smil")
   @Produces({MediaType.APPLICATION_XML})
-  @RestQuery(name = "processsmil", description = "Create smil processing jobs.",
-          returnDescription = "Smil processing jobs.",
-          restParameters = {
-    @RestParameter(name = "smil", type = RestParameter.Type.TEXT,
-            description = "Smil document to process.", isRequired = true)
-  },
-          responses = {
-    @RestResponse(description = "Smil processing jobs created successfully.", responseCode = HttpServletResponse.SC_OK),
-    @RestResponse(description = "Internal server error.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-  })
+  @RestQuery(
+      name = "processsmil",
+      description = "Create smil processing jobs.",
+      returnDescription = "Smil processing jobs.",
+      restParameters = {
+          @RestParameter(
+              name = "smil",
+              type = RestParameter.Type.TEXT,
+              description = "Smil document to process.",
+              isRequired = true
+          )
+      },
+      responses = {
+          @RestResponse(
+              description = "Smil processing jobs created successfully.",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "Internal server error.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+          )
+      }
+  )
   public Response processSmil(@FormParam("smil") String smilStr) {
     Smil smil;
     try {
