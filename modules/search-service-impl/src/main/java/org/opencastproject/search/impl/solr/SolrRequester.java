@@ -712,7 +712,16 @@ public class SolrRequester {
         sb.append(" AND ");
       }
       sb.append(Schema.OC_DELETED + ":"
-              + SolrUtils.serializeDateRange(option(q.getDeletedDate()), Option.<Date> none()));
+              + SolrUtils.serializeDateRange(option(q.getDeletedDate()), Option.none()));
+    }
+
+    if (q.getUpdatedSince() != null) {
+      if (sb.length() > 0) {
+        sb.append(" AND ");
+      }
+      sb.append(Schema.OC_MODIFIED)
+          .append(":")
+          .append(SolrUtils.serializeDateRange(option(q.getUpdatedSince()), Option.none()));
     }
 
     if (sb.length() == 0) {

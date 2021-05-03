@@ -40,6 +40,7 @@ public class SearchQuery {
   protected String[] tags = null;
   protected MediaPackageElementFlavor[] flavors = null;
   protected Date deletedDate = null;
+  protected Date updatedSince = null;
   protected Sort sort = Sort.DATE_CREATED;
   protected boolean sortAscending = true;
   protected boolean signURL = false;
@@ -165,6 +166,19 @@ public class SearchQuery {
 
   public Date getDeletedDate() {
     return deletedDate;
+  }
+
+  /**
+   * Adds a filter to only retrieve results that have been published or deleted since
+   * the given date.
+   */
+  public SearchQuery withUpdatedSince(Date date) {
+    this.updatedSince = date;
+    return this;
+  }
+
+  public Date getUpdatedSince() {
+    return updatedSince;
   }
 
    /**
