@@ -106,10 +106,12 @@
             <Service-Component>
               OSGI-INF/operations/publish-engage-aws.xml,
               OSGI-INF/operations/publish-engage.xml,
+              OSGI-INF/operations/publish-configurable-aws.xml,
               OSGI-INF/operations/publish-configurable.xml,
               OSGI-INF/operations/publish-youtube.xml,
               OSGI-INF/operations/publish-oaipmh.xml,
               OSGI-INF/operations/republish-oaipmh.xml,
+              OSGI-INF/operations/retract-configurable-aws.xml,
               OSGI-INF/operations/retract-configurable.xml,
               OSGI-INF/operations/retract-engage-aws.xml,
               OSGI-INF/operations/retract-engage.xml,

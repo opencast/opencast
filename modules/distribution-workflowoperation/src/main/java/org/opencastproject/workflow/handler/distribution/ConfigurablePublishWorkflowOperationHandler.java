@@ -279,7 +279,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     boolean streamingElementsDistributed = false;
     boolean downloadElementsDistributed = false;
 
-    if (streamingDistributionService.publishToStreaming()
+    if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()
             && (streamingSourceFlavors.length > 0 || streamingSourceTags.length > 0)) {
       streamingElementsDistributed = distributeElements(streamingSelector, mp, publication, channelId, mode,
               withPublishedElements, checkAvailability, true);
