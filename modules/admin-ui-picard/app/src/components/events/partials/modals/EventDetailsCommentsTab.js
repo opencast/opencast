@@ -89,7 +89,7 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
     return (
         <div className="modal-content">
             <div className="modal-body">
-                <Notifications context="events-access"/>
+                <Notifications context="not-corner"/>
                 <div className="full-col">
                     <div className="obj comments">
                         <header className="no-expand">{t(header)}</header>
