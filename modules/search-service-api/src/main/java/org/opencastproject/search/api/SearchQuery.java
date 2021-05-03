@@ -129,15 +129,15 @@ public class SearchQuery {
     return seriesId;
   }
 
-  public boolean isSignURLs() {
+  public boolean willSignURLs() {
     return signURL;
   }
 
-  public boolean isIncludeEpisodes() {
+  public boolean willIncludeEpisodes() {
     return includeEpisode;
   }
 
-  public boolean isIncludeSeries() {
+  public boolean willIncludeSeries() {
     return includeSeries;
   }
 
@@ -219,7 +219,7 @@ public class SearchQuery {
    *
    * @return whether the search results should be sorted in ascending order
    */
-  public boolean isSortAscending() {
+  public boolean willSortAscending() {
     return sortAscending;
   }
 }

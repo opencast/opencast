@@ -618,7 +618,7 @@ public class SolrRequester {
       sb.append(Schema.ID);
       sb.append(":");
       sb.append(cleanSolrIdRequest);
-      if (q.isIncludeEpisodes() && q.isIncludeSeries()) {
+      if (q.willIncludeEpisodes() && q.willIncludeSeries()) {
         sb.append(" OR ");
         sb.append(Schema.DC_IS_PART_OF);
         sb.append(":");
@@ -759,14 +759,14 @@ public class SolrRequester {
       }
     }
 
-    if (!q.isIncludeEpisodes()) {
+    if (!q.willIncludeEpisodes()) {
       if (sb.length() > 0) {
         sb.append(" AND ");
       }
       sb.append("-" + Schema.OC_MEDIATYPE + ":" + SearchResultItemType.AudioVisual);
     }
 
-    if (!q.isIncludeSeries()) {
+    if (!q.willIncludeSeries()) {
       if (sb.length() > 0) {
         sb.append(" AND ");
       }
@@ -793,7 +793,7 @@ public class SolrRequester {
     }
 
     if (q.getSort() != null) {
-      ORDER order = q.isSortAscending() ? ORDER.asc : ORDER.desc;
+      ORDER order = q.willSortAscending() ? ORDER.asc : ORDER.desc;
       query.addSortField(getSortField(q.getSort()), order);
     }
 
@@ -815,7 +815,7 @@ public class SolrRequester {
    */
   public SearchResult getForAdministrativeRead(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, READ.toString(), false);
-    return createSearchResult(query, q.isSignURLs());
+    return createSearchResult(query, q.willSignURLs());
   }
 
   /**
@@ -828,7 +828,7 @@ public class SolrRequester {
    */
   public SearchResult getForRead(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, READ.toString(), true);
-    return createSearchResult(query, q.isSignURLs());
+    return createSearchResult(query, q.willSignURLs());
   }
 
   /**
@@ -841,7 +841,7 @@ public class SolrRequester {
    */
   public SearchResult getForWrite(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, WRITE.toString(), true);
-    return createSearchResult(query, q.isSignURLs());
+    return createSearchResult(query, q.willSignURLs());
   }
 
   /**
