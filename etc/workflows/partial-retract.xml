@@ -20,7 +20,7 @@
     <!-- Retract from AWS -->
 
     <operation
-      id="retract-aws"
+      id="retract-engage-aws"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       if="${retractFromAws}"

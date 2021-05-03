@@ -518,7 +518,7 @@
     </operation>
 
     <operation
-      id="publish-aws"
+      id="publish-engage-aws"
       if="${publishToAws}"
       max-attempts="2"
       exception-handler-workflow="partial-error"
