@@ -82,6 +82,8 @@ The following table contains the workflow operations that are available in an ou
 |retract-configure   |Retracts media from configured publication                     |[Documentation](retract-configure-woh.md)|
 |retract-engage-aws  |Retracts media from AWS S3 and Cloudfront publication          |[Documentation](retract-engage-aws-woh.md)|
 |retract-engage      |Retracts media from Opencast Media Module publication          |[Documentation](retract-engage-woh.md)|
+|retract-partial-aws |Retract a subset of the mediapackage from a publication in Amazon S3 and Cloudfront|[Documentation](retract-partial-aws-woh.md)|
+|retract-partial     |Retract a subset of the mediapackage from a publication        |[Documentation](retract-partial-woh.md)|
 |retract-oaipmh      |Retracts media from a OAI-PMH repository                       |[Documentation](retract-oaipmh-woh.md)
 |retract-partial     |Retract a subset of the mediapackage from a publication        |[Documentation](retract-partial-woh.md)|
 |retract-youtube     |Retracts media from YouTube                                    |[Documentation](retract-youtube-woh.md)|

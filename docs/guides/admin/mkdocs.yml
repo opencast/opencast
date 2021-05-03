@@ -222,6 +222,7 @@ nav:
    - Retract Engage: 'workflowoperationhandlers/retract-engage-woh.md'
    - Retract Configure: 'workflowoperationhandlers/retract-configure-woh.md'
    - Retract OAI-PMH: 'workflowoperationhandlers/retract-oaipmh-woh.md'
+   - Retract Partial AWS: 'workflowoperationhandlers/retract-partial-aws-woh.md'
    - Retract Partial: 'workflowoperationhandlers/retract-partial-woh.md'
    - Retract YouTube: 'workflowoperationhandlers/retract-youtube-woh.md'
    - Sanitize Adaptive: 'workflowoperationhandlers/sanitize-adaptive-woh.md'
