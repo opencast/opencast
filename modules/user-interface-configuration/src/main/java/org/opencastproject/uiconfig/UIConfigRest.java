@@ -21,6 +21,8 @@
 
 package org.opencastproject.uiconfig;
 
+import static org.opencastproject.security.api.DefaultOrganization.DEFAULT_ORGANIZATION_ID;
+
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.MimeTypes;
@@ -137,16 +139,22 @@ public class UIConfigRest {
   public Response getConfigFile(@PathParam("component") String component, @PathParam("filename") String filename)
           throws IOException, NotFoundException {
     final String orgId = securityService.getOrganization().getId();
-    final File configFile = Paths.get(uiConfigFolder, orgId, component, filename).toFile();
+    File configFile = Paths.get(uiConfigFolder, orgId, component, filename).toFile();
 
     try {
-      String basePath = new File(uiConfigFolder, orgId).getCanonicalPath();
-      String configFileCanPath = configFile.getCanonicalPath();
+      final String basePath = new File(uiConfigFolder, orgId).getCanonicalPath();
+      final String configFileCanPath = configFile.getCanonicalPath();
 
       // is configFile a subdirectory of basePath (additional directory traversal protection), if not stop
       if (!configFileCanPath.startsWith(basePath)) {
-        logger.warn("Directory traversal prevented (trying to access '{}')", configFile.getPath());
+        logger.debug("Directory traversal prevented (trying to access '{}')", configFile.getPath());
         throw new AccessDeniedException(configFileCanPath);
+      }
+
+      // Falling back to default organization if files does not exist
+      if (!configFile.exists()) {
+        logger.debug("Falling back to default organization");
+        configFile = Paths.get(uiConfigFolder, DEFAULT_ORGANIZATION_ID, component, filename).toFile();
       }
 
       // It is safe to pass the InputStream without closing it, JAX-RS takes care of that
