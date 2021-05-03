@@ -2141,5 +2141,22 @@
          "VIEWS_AVG": "Ceci affiche la moyenne de vues quotidiennes en fonction du temps.",
          "PUBLISHEDHOURS": "Ceci affiche les heures publiées de la vidéo"
       }
+   },
+   "dateFormats": {
+      "dateTime": {
+         "short": "{{dateTime, DD/MM/YY HH:mm}}",
+         "medium": "{{dateTime, D MMM YYYY HH:mm:ss}}",
+         "full": "{{dateTime, dddd D MMMM YYYY HH [h] mm z}}"
+      },
+      "date": {
+         "short": "{{date, DD/MM/YY}}",
+         "medium": "{{date, D MMM YYYY}}",
+         "full": "{{date, dddd D MMMM YYYY}}"
+      },
+      "time": {
+         "short": "{{time, HH:mm}}",
+         "medium": "{{time, HH:mm:ss}}",
+         "full": "{{time, HH [h] mm z}}"
+      }
    }
 }

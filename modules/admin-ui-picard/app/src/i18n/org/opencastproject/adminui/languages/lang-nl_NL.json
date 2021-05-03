@@ -2141,5 +2141,22 @@
          "VIEWS_AVG": "Dit toont het gemiddelde aantal dagelijkse weergaven per tijdeenheid.",
          "PUBLISHEDHOURS": "Dit toont de gepubliceerde uren van video"
       }
+   },
+   "dateFormats": {
+      "dateTime": {
+         "short": "{{dateTime, D-M-YY H:mm}}",
+         "medium": "{{dateTime, D-MMM-YYYY H:mm:ss}}",
+         "full": "{{dateTime, dddd D MMMM YYYY H:mm:ss [uur] z}}"
+      },
+      "date": {
+         "short": "{{date, D-M-YY}}",
+         "medium": "{{date, D-MMM-YYYY}}",
+         "full": "{{date, dddd D MMMM YYYY}}"
+      },
+      "time": {
+         "short": "{{time, H:mm}}",
+         "medium": "{{time, H:mm:ss}}",
+         "full": "{{time, H:mm:ss [uur] z}}"
+      }
    }
 }

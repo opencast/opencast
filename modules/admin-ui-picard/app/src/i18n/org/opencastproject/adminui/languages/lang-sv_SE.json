@@ -2141,5 +2141,22 @@
          "VIEWS_AVG": "Det här visar det genomsnittliga antalet visningar per tidsenhet.",
          "PUBLISHEDHOURS": "Det här visar antalet publicerade timmar av video"
       }
+   },
+   "dateFormats": {
+      "dateTime": {
+         "short": "{{dateTime, YYYY-MM-DD HH:mm}}",
+         "medium": "{{dateTime, YYYY-MMM-DD HH:mm:ss}}",
+         "full": "{{dateTime, [den] D MMMM YYYY [kl] H:mm z}}"
+      },
+      "date": {
+         "short": "{{date, YYYY-MM-DD}}",
+         "medium": "{{date, YYYY-MMM-DD}}",
+         "full": "{{date, [den] D MMMM YYYY}}"
+      },
+      "time": {
+         "short": "{{time, HH:mm}}",
+         "medium": "{{time, HH:mm:ss}}",
+         "full": "{{time, [kl] H:mm z}}"
+      }
    }
 }

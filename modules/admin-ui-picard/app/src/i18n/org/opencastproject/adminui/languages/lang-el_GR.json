@@ -2141,5 +2141,22 @@
          "VIEWS_AVG": "Αυτή η επιλογή εμφανίζει τον μέσο αριθμό ημερήσιων προβολών ανά μονάδα χρόνου.",
          "PUBLISHEDHOURS": "Αυτή η επιλογή εμφανίζει τις δημοσιευμένες ώρες του βίντεο"
       }
+   },
+   "dateFormats": {
+      "dateTime": {
+         "short": "{{dateTime, D/M/YYYY h:mm a}}",
+         "medium": "{{dateTime, D MMM YYYY h:mm:ss a}}",
+         "full": "{{dateTime, dddd, D MMMM YYYY h:mm:ss a z}}"
+      },
+      "date": {
+         "short": "{{date, D/M/YYYY}}",
+         "medium": "{{date, D MMM YYYY}}",
+         "full": "{{date, dddd, D MMMM YYYY}}"
+      },
+      "time": {
+         "short": "{{time, h:mm a}}",
+         "medium": "{{time, h:mm:ss a}}",
+         "full": "{{time, h:mm:ss a z}}"
+      }
    }
 }

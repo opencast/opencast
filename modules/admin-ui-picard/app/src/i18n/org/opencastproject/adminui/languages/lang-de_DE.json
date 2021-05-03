@@ -2141,5 +2141,22 @@
          "VIEWS_AVG": "Diese Statistik zeigt die durchschnittliche Anzahl von Zugriffe pro Zeiteinheit.",
          "PUBLISHEDHOURS": "Dies zeigt die veröffentlichten Videostunden an"
       }
+   },
+   "dateFormats": {
+      "dateTime": {
+         "short": "{{dateTime, DD.MM.YY HH:mm}}",
+         "medium": "{{dateTime, DD.MM.YYYY HH:mm:ss}}",
+         "full": "{{dateTime, dddd, D. MMMM YYYY HH:mm [Uhr] z}}"
+      },
+      "date": {
+         "short": "{{date, DD.MM.YY}}",
+         "medium": "{{date, DD.MM.YYYY}}",
+         "full": "{{date, dddd, D. MMMM YYYY}}"
+      },
+      "time": {
+         "short": "{{time, HH:mm}}",
+         "medium": "{{time, HH:mm:ss}}",
+         "full": "{{time, HH:mm [Uhr] z}}"
+      }
    }
 }

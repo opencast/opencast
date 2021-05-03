@@ -2141,5 +2141,22 @@
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
          "PUBLISHEDHOURS": "This displays the published hours of video"
       }
+   },
+   "dateFormats": {
+      "dateTime": {
+         "short": "{{dateTime, DD/MM/YY H.mm}}",
+         "medium": "{{dateTime, D-MMM-YYYY H.mm.ss}}",
+         "full": "{{dateTime, dddd D MMMM YYYY H.mm.ss z}}"
+      },
+      "date": {
+         "short": "{{date, DD/MM/YY}}",
+         "medium": "{{date, D-MMM-YYYY}}",
+         "full": "{{date, dddd D MMMM YYYY}}"
+      },
+      "time": {
+         "short": "{{time, H.mm}}",
+         "medium": "{{time, H.mm.ss}}",
+         "full": "{{time, H.mm.ss z}}"
+      }
    }
 }
