@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-               name="org.opencastproject.workflow.handler.distribution.RetractAWSWorkflowOperationHandler"
+               name="org.opencastproject.workflow.handler.distribution.RetractEngageAWSS3WorkflowOperationHandler"
                immediate="true"
                activate="activate">
   <implementation class="org.opencastproject.workflow.handler.distribution.RetractEngageWorkflowOperationHandler"/>
   <property name="service.description" value="AWS Retraction Workflow Operation Handler"/>
-  <property name="workflow.operation" value="retract-aws"/>
+  <property name="workflow.operation" value="retract-engage-aws"/>
   <service>
     <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>

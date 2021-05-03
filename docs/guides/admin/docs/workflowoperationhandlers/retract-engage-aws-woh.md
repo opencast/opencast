@@ -1,9 +1,9 @@
-# RetractAWSWorkflowOperationHandler
+# RetractEngageAWSS3WorkflowOperationHandler
 
 
 ## Description
 
-The RetractAWSWorkflowOperationHandler retracts the published elements from Amazon S3.
+The RetractEngageAWSS3WorkflowOperationHandler retracts the published elements from Amazon S3.
 
 There are no configuration keys at this time.
 
@@ -13,7 +13,7 @@ There are no configuration keys at this time.
     <!-- Retract from AWS -->
 
     <operation
-      id="retract-aws"
+      id="retract-engage-aws"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="Retract recording from AWS">
