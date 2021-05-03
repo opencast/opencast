@@ -40,9 +40,6 @@
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/smil-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/sox-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/sox-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/static-file-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-export-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-provider-influx/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-service-api/.+\.(java|properties)"/>
@@ -55,9 +52,6 @@
     <suppress checks="LineLength" files="modules/transcription-service-ibm-watson-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-persistence/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/urlsigning-common/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/urlsigning-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/urlsigning-verifier-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-brightspace/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-canvas/.+\.(java|properties)"/>
@@ -65,10 +59,6 @@
     <suppress checks="LineLength" files="modules/userdirectory-moodle/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-sakai/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videoeditor-ffmpeg-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videoeditor-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videogrid-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videogrid-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-condition-parser/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-service-impl/.+\.(java|properties)"/>
@@ -101,19 +91,15 @@
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="Indentation" files="modules/smil-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/static-file-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-export-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-service-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-amberscript/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-google-speech-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-persistence/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-workflowoperation/.+\.java"/>
-    <suppress checks="Indentation" files="modules/urlsigning-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory-canvas/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory-sakai/.+\.java"/>
-    <suppress checks="Indentation" files="modules/videoeditor-ffmpeg-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/videogrid-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-workflowoperation/.+\.java"/>
@@ -152,22 +138,13 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/schema/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/sox-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/sox-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-api/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/static-file-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-ibm-watson-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/transcription-service-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/urlsigning-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-ldap/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-moodle/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-sakai/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/usertracking-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/videoeditor-ffmpeg-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/videoeditor-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/videogrid-service-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/videogrid-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-condition-parser/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-service-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-service-impl/.+\.java"/>

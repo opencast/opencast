@@ -35,9 +35,11 @@ public class SigningMediaPackageSerializerTest {
     Long testValue = 1339L;
     Properties properties = new Properties();
     SigningMediaPackageSerializer serializer = new SigningMediaPackageSerializer();
-    assertEquals(new Long(UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION), serializer.getExpirationSeconds());
+    assertEquals(new Long(UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION),
+        serializer.getExpirationSeconds());
     serializer.updated(properties);
-    assertEquals(new Long(UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION), serializer.getExpirationSeconds());
+    assertEquals(new Long(UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION),
+        serializer.getExpirationSeconds());
     properties.put(UrlSigningServiceOsgiUtil.URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, testValue.toString());
     serializer.updated(properties);
     assertEquals(testValue, serializer.getExpirationSeconds());

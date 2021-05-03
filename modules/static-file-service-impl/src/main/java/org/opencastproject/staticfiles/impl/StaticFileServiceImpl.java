@@ -107,8 +107,9 @@ public class StaticFileServiceImpl implements StaticFileService {
                 String.format("%s does not exists and could not be created", rootFile.getAbsolutePath()));
       }
     }
-    if (!rootFile.canRead())
+    if (!rootFile.canRead()) {
       throw new ComponentException(String.format("Cannot read from %s", rootFile.getAbsolutePath()));
+    }
 
     purgeService = new PurgeTemporaryStorageService();
     purgeService.addListener(new Listener() {
@@ -171,8 +172,9 @@ public class StaticFileServiceImpl implements StaticFileService {
 
   @Override
   public InputStream getFile(final String uuid) throws NotFoundException, IOException {
-    if (StringUtils.isBlank(uuid))
+    if (StringUtils.isBlank(uuid)) {
       throw new IllegalArgumentException("The uuid must not be blank");
+    }
 
     final String org = securityService.getOrganization().getId();
 
@@ -294,12 +296,12 @@ public class StaticFileServiceImpl implements StaticFileService {
     final Path temporaryStorageDir = getTemporaryStorageDir(org);
     if (Files.exists(temporaryStorageDir)) {
       try (DirectoryStream<Path> tempFilesStream = Files.newDirectoryStream(temporaryStorageDir,
-              new DirectoryStream.Filter<Path>() {
-                @Override
-                public boolean accept(Path path) throws IOException {
-                  return (Files.getLastModifiedTime(path).toMillis() < (new Date()).getTime() - lifetime);
-                }
-              })) {
+          new DirectoryStream.Filter<Path>() {
+            @Override
+            public boolean accept(Path path) throws IOException {
+              return (Files.getLastModifiedTime(path).toMillis() < (new Date()).getTime() - lifetime);
+            }
+          })) {
         for (Path file : tempFilesStream) {
           FileUtils.deleteQuietly(file.toFile());
         }

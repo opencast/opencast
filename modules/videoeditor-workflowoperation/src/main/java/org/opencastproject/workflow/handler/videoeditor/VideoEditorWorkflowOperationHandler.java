@@ -136,12 +136,6 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     logger.info("Registering videoEditor hold state ui from classpath {}", HOLD_UI_PATH);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -258,8 +252,9 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     Catalog[] targetSmilCatalogs = mp.getCatalogs(targetSmilFlavor);
     if (targetSmilCatalogs == null || targetSmilCatalogs.length == 0) {
 
-      if (!interactive && !skipProcessing) // create a smil even if not interactive
+      if (!interactive && !skipProcessing) { // create a smil even if not interactive
         return skip(workflowInstance, context);
+      }
 
       // Create new empty SMIL to fill it from editor UI
       try {
@@ -285,8 +280,9 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
                 ex);
       }
 
-      if (!interactive) // deferred skip, keep empty smil
+      if (!interactive) { // deferred skip, keep empty smil
         return skip(workflowInstance, context);
+      }
       logger.info("Holding for video edit...");
       return createResult(mp, Action.PAUSE);
     } else {
@@ -295,12 +291,6 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   @Override
   public WorkflowOperationResult skip(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -324,8 +314,9 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     // processing will operate directly on source tracks as named in smil file
     final boolean skipProcessing = BooleanUtils
             .toBoolean(worflowOperationInstance.getConfiguration(SKIP_PROCESSING_PROPERTY));
-    if (skipProcessing)
+    if (skipProcessing) {
       return createResult(mp, Action.SKIP);
+    }
     // If not skipProcessing (set it up for process-smil), then clone and tag to target
     String targetFlavorSubTypeProperty = StringUtils
             .trimToNull(worflowOperationInstance.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY));
@@ -355,12 +346,6 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     return createResult(mp, Action.SKIP);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext, java.util.Map)
-   */
   @Override
   public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context,
           Map<String, String> properties) throws WorkflowOperationException {
@@ -488,8 +473,9 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
           case 1:
             // If the whole duration was not defined in the mediapackage, we cannot tell whether or not this PAR
             // component represents the whole duration or not, therefore we don't bother to try
-            if (mp.getDuration() < 0)
+            if (mp.getDuration() < 0) {
               break;
+            }
 
             SmilMediaContainer parElement = (SmilMediaContainer) filteredSmil.getBody().getMediaElements().get(0);
             boolean skip = true;

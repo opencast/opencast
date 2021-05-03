@@ -104,8 +104,9 @@ public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGr
 
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    if (properties == null)
+    if (properties == null) {
       return;
+    }
     logger.debug("Start updating videogrid service");
 
     jobLoad = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_CONFIG, JOB_LOAD_DEFAULT, serviceRegistry);
@@ -147,8 +148,9 @@ public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGr
                   .filter(track -> track.getIdentifier().equals(trackId))
                   .findAny()
                   .orElse(null);
-          if (replaceTrack == null)
+          if (replaceTrack == null) {
             throw new VideoGridServiceException(String.format("Track with id %s could not be found!", trackId));
+          }
           command.set(i, command.get(i).replaceAll("#\\{" + trackId + "\\}", getTrackPath(replaceTrack)));
         }
       }
@@ -194,9 +196,10 @@ public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGr
       }
     }
 
-    if (exitCode != 0)
+    if (exitCode != 0) {
       throw new Exception(String.format("The encoder process exited abnormally with exit code %s "
               + "using command\n%s", exitCode, String.join(" ", command)));
+    }
 
     // Put generated video into workspace
     FileInputStream outputFileInputStream = null;
