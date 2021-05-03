@@ -73,12 +73,14 @@ The following table contains the workflow operations that are available in an ou
 |prepare-av          |Preparing audio and video work versions                        |[Documentation](prepareav-woh.md)|
 |probe-resolution    |Set workflow instance variables based on video resolution      |[Documentation](probe-resolution-woh.md)|
 |process-smil        |Edit and Encode media defined by a SMIL file                   |[Documentation](process-smil-woh.md)|
+|publish-configure-aws|Distribute and publish media to the configured publication using Amazon S3 and Cloudfront|[Documentation](publish-configure-aws-woh.md)|
 |publish-configure   |Distribute and publish media to the configured publication     |[Documentation](publish-configure-woh.md)|
 |publish-engage-aws  |Distribute and publish media to the engage player using Amazon S3 and Cloudfront|[Documentation](publish-engage-aws-woh.md)|
 |publish-engage      |Distribute and publish media to the engage player              |[Documentation](publish-engage-woh.md)|
 |publish-oaipmh      |Distribute and publish media to a OAI-PMH repository           |[Documentation](publish-oaipmh-woh.md)|
 |publish-youtube     |Distribute and publish media to YouTube                        |[Documentation](publish-youtube-woh.md)|
 |republish-oaipmh    |Update media in a OAI-PMH repository                           |[Documentation](republish-oaipmh-woh.md)|
+|retract-configure-aws|Retracts media from configured publication in AWS S3 and Cloudfront|[Documentation](retract-configure-aws-woh.md)|
 |retract-configure   |Retracts media from configured publication                     |[Documentation](retract-configure-woh.md)|
 |retract-engage-aws  |Retracts media from AWS S3 and Cloudfront publication          |[Documentation](retract-engage-aws-woh.md)|
 |retract-engage      |Retracts media from Opencast Media Module publication          |[Documentation](retract-engage-woh.md)|
