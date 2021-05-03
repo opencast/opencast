@@ -30,7 +30,7 @@ installation that cannot be mapped to any organization.
 ### Limitations
 
 Multi tenancy in Opencast is working, however it is not fully finished. Certain objects are still shared amongst
-organizations, most notably workflow definitions, RSS/Atom feeds and encoding profiles.
+organizations, most notably RSS/Atom feeds and encoding profiles.
 
 
 Adding A Tenant
@@ -48,11 +48,13 @@ installation, on each of the nodes.  As an example, this is what the admin node 
 
     id=tenant1
     name=Tenant 1
-    port=8080
-    prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org
-    prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
     admin_role=ROLE_ADMIN
     anonymous_role=ROLE_ANONYMOUS
+
+    # Hostname URL mapping
+    prop.org.opencastproject.host.admin.example.org=https://tenant1-admin.example.org
+    prop.org.opencastproject.host.presentation.example.org=https://tenant1-presentation.example.org
+    prop.org.opencastproject.host.worker.example.org=https://tenant1-worker.example.org:8443
 
     # Admin and Presentation Server Urls
     prop.org.opencastproject.admin.ui.url=https://tenant1-admin.example.org
@@ -68,15 +70,16 @@ copy of the already existing `org.opencastproject.organization-mh_default_org.cf
 Note, the default organization file `org.opencastproject.organization-mh_default_org.org` *must* refer to the actual
 server names:
 
-    prop.org.opencastproject.host.admin.example.org=admin.example.org
-    prop.org.opencastproject.host.presentation.example.org=presentation.example.org
+    prop.org.opencastproject.host.admin.example.org=https://admin.example.org
+    prop.org.opencastproject.host.presentation.example.org=https://presentation.example.org
+    prop.org.opencastproject.host.worker.example.org=https://worker.example.org:8443
 
 This file sets the default organization that is selected.  This is currently required because some Opencast components
 do not support multitenancy.
 
-Note that if you are running Apache httpd with mod\_proxy in front of the Opencast installation, the port number will be
--1 in both files.
-
+Hosts can have different schemas (http / https) and port numbers, e.g. when you run behind proxy server. Note, however,
+that hostnames are uniquely mapped to an organization. You cannot use the same hostname but different port numbers for
+two different organizations.
 ### Step 2: Security Configuration
 
 Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual URLs that specify
