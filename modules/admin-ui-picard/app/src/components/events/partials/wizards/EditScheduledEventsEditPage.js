@@ -302,7 +302,6 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, loadingIn
                         onClick={async () => {
                             removeNotificationWizardForm();
                             if (await checkConflicts()) {
-                                console.log('in if');
                                 nextPage(formik.values);
                             }
                         }}

@@ -8,7 +8,7 @@ import {connect} from "react-redux";
 /**
  * This component manages the delete bulk action
  */
-const DeleteEventsModal = ({ close, selectedRows }) => {
+const DeleteEventsModal = ({ close, selectedRows, deleteMultipleEvent }) => {
     const { t } = useTranslation();
 
     const [allChecked, setAllChecked] = useState(true);
@@ -141,8 +141,13 @@ const DeleteEventsModal = ({ close, selectedRows }) => {
     );
 };
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     selectedRows: getSelectedRows(state),
 });
 
-export default connect(mapStateToProps)(DeleteEventsModal);
+const mapDispatchToProps = dispatch => ({
+    deleteMultipleEvent: selectedEvents => dispatch(deleteMultipleEvent(selectedEvents))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(DeleteEventsModal);

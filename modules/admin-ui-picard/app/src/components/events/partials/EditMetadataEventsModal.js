@@ -15,6 +15,9 @@ import RenderMultiField from "../../shared/wizard/RenderMultiField";
 // Get info about the current language and its date locale
 const currentLanguage = getCurrentLanguageInformation();
 
+/**
+ * This component manges the edit metadata bulk action
+ */
 const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata}) => {
     const { t } = useTranslation();
 
@@ -31,11 +34,14 @@ const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata}) => 
             let eventIds = [];
             selectedEvents.forEach(event => eventIds.push(event.id));
 
+            // Get merged metadata from backend
             const responseMetadataFields = await postEditMetadata(eventIds);
 
+            // Set fatal error if response contain error
             if (!!responseMetadataFields.fatalError) {
                 setFatalError(responseMetadataFields);
             } else {
+                // Set initial values and save metadata field infos in state
                 let initialValues = getInitialValues(responseMetadataFields);
                 setFetchedValues(initialValues);
                 setMetadataFields(responseMetadataFields);
@@ -67,6 +73,7 @@ const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata}) => 
         setMetadataFields(fields);
     };
 
+    // Check if value of metadata field is changed
     const isTouchedOrSelected = (field, formikValues) => {
         if (field.selected) {
             return true;
@@ -178,8 +185,6 @@ const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata}) => 
                                                                         </td>
                                                                         <td className="editable ng-isolated-scope">
                                                                             {/* Render single value or multi value input */}
-                                                                            {console.log('field value')}
-                                                                            {console.log(fetchedValues[metadata.id])}
                                                                             {(metadata.type === 'mixed_text' && !!metadata.collection && metadata.collection.length !== 0) ? (
                                                                                 <Field name={metadata.id}
                                                                                        fieldInfo={metadata}

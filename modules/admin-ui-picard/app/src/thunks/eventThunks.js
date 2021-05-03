@@ -337,7 +337,7 @@ export const deleteEvent = id => async dispatch => {
 };
 
 // delete multiple events
-export const deleteMultipleEvent = async events => {
+export const deleteMultipleEvent = events => async dispatch => {
 
     let data = [];
 
@@ -348,7 +348,15 @@ export const deleteMultipleEvent = async events => {
     }
 
     axios.post('/admin-ng/event/deleteEvents', data)
-        .then(res => console.log(res)).catch(res => console.log(res));
+        .then(res => {
+            console.log(res);
+            //add success notification
+            dispatch(addNotification('success', 'EVENTS_DELETED'));
+        }).catch(res => {
+        console.log(res);
+        //add error notification
+        dispatch(addNotification('error', 'EVENTS_NOT_DELETED'));
+    });
 
 };
 
@@ -472,7 +480,7 @@ export const updateScheduledEventsBulk = values => async dispatch => {
                         translatable: false,
                         type: 'text',
                         value: eventChanges.changedSeries,
-                        // todo: what the hell is hashkey?
+                        // todo: what is hashkey?
                         $$hashKey: 'object:1589'
                     }
                 ]
