@@ -184,6 +184,8 @@ public interface SearchResultItem {
    */
   Date getModified();
 
+  Date getDeletionDate();
+
   /**
    * @return the score
    */

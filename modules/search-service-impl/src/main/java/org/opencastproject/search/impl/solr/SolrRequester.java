@@ -365,6 +365,11 @@ public class SolrRequester {
         }
 
         @Override
+        public Date getDeletionDate() {
+          return Schema.getOcDeleted(doc);
+        }
+
+        @Override
         public double getScore() {
           return Schema.getScore(doc);
         }
