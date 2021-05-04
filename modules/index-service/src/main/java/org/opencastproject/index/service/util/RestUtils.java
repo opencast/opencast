@@ -27,10 +27,9 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.lang.String.format;
 
-import org.opencastproject.elasticsearch.api.SortCriterion;
-import org.opencastproject.elasticsearch.impl.SortCriterionImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.requests.SortCriterion;
 
 import com.entwinemedia.fn.Fx;
 import com.entwinemedia.fn.data.json.JValue;
@@ -190,7 +189,7 @@ public final class RestUtils {
       StringTokenizer tokenizer = new StringTokenizer(sort, ",");
       while (tokenizer.hasMoreTokens()) {
         try {
-          sortOrders.add(SortCriterionImpl.parse(tokenizer.nextToken()));
+          sortOrders.add(SortCriterion.parse(tokenizer.nextToken()));
         } catch (IllegalArgumentException e) {
           throw new WebApplicationException(Status.BAD_REQUEST);
         }

@@ -20,19 +20,23 @@
  */
 
 
-package org.opencastproject.elasticsearch.impl;
+package org.opencastproject.util.requests;
 
 import static java.util.Objects.requireNonNull;
-
-import org.opencastproject.elasticsearch.api.SearchQuery.Order;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 
 import java.util.Objects;
 
 /**
  * A sort criterion represents the combination of a field name and a sort {@link Order}
  */
-public final class SortCriterionImpl implements SortCriterion {
+public final class SortCriterion {
+
+  /**
+   * Sort order definitions.
+   */
+  public enum Order {
+    None, Ascending, Descending
+  }
 
   private final String fieldName;
   private final Order order;
@@ -44,7 +48,7 @@ public final class SortCriterionImpl implements SortCriterion {
    *          the sort criterion string
    * @return the sort criterion
    */
-  public static SortCriterionImpl parse(final String sortCriterion) {
+  public static SortCriterion parse(final String sortCriterion) {
     requireNonNull(sortCriterion);
 
     String[] parts = sortCriterion.split(":");
@@ -53,10 +57,10 @@ public final class SortCriterionImpl implements SortCriterion {
     }
 
     if ("ASC".equalsIgnoreCase(parts[1]) || "Ascending".equalsIgnoreCase(parts[1])) {
-      return new SortCriterionImpl(parts[0].trim(), Order.Ascending);
+      return new SortCriterion(parts[0].trim(), Order.Ascending);
     }
     if ("DESC".equalsIgnoreCase(parts[1]) || "Descending".equalsIgnoreCase(parts[1])) {
-      return new SortCriterionImpl(parts[0].trim(), Order.Descending);
+      return new SortCriterion(parts[0].trim(), Order.Descending);
     }
 
     throw new IllegalArgumentException("Invalid order " + parts[1]);
@@ -70,17 +74,15 @@ public final class SortCriterionImpl implements SortCriterion {
    * @param order
    *          the order
    */
-  public SortCriterionImpl(String fieldName, Order order) {
+  public SortCriterion(String fieldName, Order order) {
     this.fieldName = fieldName;
     this.order = order;
   }
 
-  @Override
   public String getFieldName() {
     return fieldName;
   }
 
-  @Override
   public Order getOrder() {
     return order;
   }
@@ -91,11 +93,11 @@ public final class SortCriterionImpl implements SortCriterion {
       return true;
     }
 
-    if (!(o instanceof SortCriterionImpl)) {
+    if (!(o instanceof SortCriterion)) {
       return false;
     }
 
-    SortCriterionImpl that = (SortCriterionImpl) o;
+    SortCriterion that = (SortCriterion) o;
     return Objects.equals(this.fieldName, that.fieldName) && Objects.equals(this.order, that.order);
   }
 

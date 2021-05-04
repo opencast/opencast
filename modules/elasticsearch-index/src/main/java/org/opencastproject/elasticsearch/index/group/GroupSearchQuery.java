@@ -28,6 +28,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.impl.jpa.JpaRole;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.apache.commons.lang3.StringUtils;
 

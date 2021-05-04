@@ -23,8 +23,8 @@ package org.opencastproject.index.service.util;
 
 import static org.junit.Assert.assertTrue;
 
-import org.opencastproject.elasticsearch.api.SearchQuery.Order;
-import org.opencastproject.elasticsearch.impl.SortCriterionImpl;
+import org.opencastproject.util.requests.SortCriterion;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.junit.Test;
 
@@ -39,12 +39,12 @@ public class RestUtilsTest {
   /** Test method for {@link RestUtils#parseSortQueryParameter(String)} */
   @Test
   public void testParseSortQueryParameter() {
-    Set<SortCriterionImpl> sortOrders = new HashSet<SortCriterionImpl>();
+    Set<SortCriterion> sortOrders = new HashSet<SortCriterion>();
 
-    sortOrders.add(new SortCriterionImpl("name", Order.Descending));
+    sortOrders.add(new SortCriterion("name", Order.Descending));
     assertTrue(RestUtils.parseSortQueryParameter("name:DESC").equals(sortOrders));
 
-    sortOrders.add(new SortCriterionImpl("date", Order.Ascending));
+    sortOrders.add(new SortCriterion("date", Order.Ascending));
     assertTrue(RestUtils.parseSortQueryParameter("name:DESC,date:ASC").equals(sortOrders));
   }
 

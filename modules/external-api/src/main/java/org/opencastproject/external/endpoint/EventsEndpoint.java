@@ -40,7 +40,6 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.elasticsearch.index.IndexObject;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
@@ -107,6 +106,7 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.entwinemedia.fn.Fn;

@@ -21,6 +21,7 @@
 
 
 package org.opencastproject.elasticsearch.api;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import java.util.Collection;
 import java.util.Map;
@@ -29,13 +30,6 @@ import java.util.Map;
  * Interface for the implementation of search queries.
  */
 public interface SearchQuery {
-
-  /**
-   * Sort order definitions.
-   */
-  enum Order {
-    None, Ascending, Descending
-  }
 
   /**
    * Return documents of the given types.

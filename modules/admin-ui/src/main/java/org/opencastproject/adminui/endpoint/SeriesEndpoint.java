@@ -57,10 +57,8 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
@@ -99,6 +97,8 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
+import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.entwinemedia.fn.data.Opt;
@@ -451,7 +451,7 @@ public class SeriesEndpoint implements ManagedService {
     // need to set limit because elasticsearch limit results by 10 per default
     query.withLimit(Integer.MAX_VALUE);
     query.withOffset(0);
-    query.sortByName(SearchQuery.Order.Ascending);
+    query.sortByName(Order.Ascending);
     SearchResult<Theme> results = null;
     try {
       results = searchIndex.getByQuery(query);

@@ -34,8 +34,6 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.api.SearchQuery;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
@@ -55,6 +53,8 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
+import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -247,7 +247,7 @@ public class WorkflowsEndpoint {
     if (isNoneBlank(sort)) {
       Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
       for (SortCriterion criterion : sortCriteria) {
-        boolean isASC = criterion.getOrder() != SearchQuery.Order.Descending;
+        boolean isASC = criterion.getOrder() != Order.Descending;
         switch (criterion.getFieldName()) {
           case "event_identifier":
             // FIXME: sorting by event_identifier leads to an Solr exception

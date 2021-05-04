@@ -29,7 +29,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchQuery.Order;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.event.Event;
@@ -69,6 +68,7 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;

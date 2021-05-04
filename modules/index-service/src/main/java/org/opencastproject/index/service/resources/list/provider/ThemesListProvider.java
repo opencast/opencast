@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
@@ -32,6 +31,7 @@ import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -84,7 +84,7 @@ public class ThemesListProvider implements ResourceListProvider {
       themeQuery.withOffset(query.getOffset().getOrElse(0));
       int limit = query.getLimit().getOrElse(Integer.MAX_VALUE - themeQuery.getOffset());
       themeQuery.withLimit(limit);
-      themeQuery.sortByName(SearchQuery.Order.Ascending);
+      themeQuery.sortByName(Order.Ascending);
       SearchResult<Theme> results = null;
       try {
         results = searchIndex.getByQuery(themeQuery);
@@ -104,7 +104,7 @@ public class ThemesListProvider implements ResourceListProvider {
       themeQuery.withOffset(query.getOffset().getOrElse(0));
       int limit = query.getLimit().getOrElse(Integer.MAX_VALUE - themeQuery.getOffset());
       themeQuery.withLimit(limit);
-      themeQuery.sortByName(SearchQuery.Order.Ascending);
+      themeQuery.sortByName(Order.Ascending);
       SearchResult<Theme> results = null;
       try {
         results = searchIndex.getByQuery(themeQuery);

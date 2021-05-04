@@ -43,7 +43,6 @@ import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.elasticsearch.index.group.Group;
 import org.opencastproject.elasticsearch.index.group.GroupIndexSchema;
 import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
@@ -64,6 +63,7 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
 
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.Field;
