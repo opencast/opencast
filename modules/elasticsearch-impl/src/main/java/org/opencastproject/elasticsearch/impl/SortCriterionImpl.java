@@ -39,7 +39,7 @@ public final class SortCriterionImpl implements SortCriterion {
 
   /**
    * Parse a string representation of a sort criterion.
-   * 
+   *
    * @param sortCriterion
    *          the sort criterion string
    * @return the sort criterion
@@ -64,7 +64,7 @@ public final class SortCriterionImpl implements SortCriterion {
 
   /**
    * Create a order criterion based on the given field name and order.
-   * 
+   *
    * @param fieldName
    *          the field name
    * @param order

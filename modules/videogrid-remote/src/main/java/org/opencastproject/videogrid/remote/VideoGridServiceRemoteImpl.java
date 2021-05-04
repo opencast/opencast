@@ -57,23 +57,23 @@ public class VideoGridServiceRemoteImpl extends RemoteBase implements VideoGridS
   }
 
   @Override
-  public Job createPartialTracks(List<List<String>> commands, Track... tracks)
+  public Job createPartialTrack(List<String> command, Track... tracks)
           throws VideoGridServiceException, EncoderException {
 
     // serialize arguments and metadata
-    String commandsJson = gson.toJson(commands);
+    String commandJson = gson.toJson(command);
 
     // Build form parameters
     List<NameValuePair> params = new ArrayList<>();
     try {
-      params.add(new BasicNameValuePair("commands", commandsJson));
+      params.add(new BasicNameValuePair("command", commandJson));
       params.add(
               new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(Arrays.asList(tracks))));
     } catch (Exception e) {
       throw new EncoderException(e);
     }
 
-    logger.info("Video-gridding {}", commandsJson);
+    logger.info("Video-gridding {}", commandJson);
     HttpResponse response = null;
     try {
       HttpPost post = new HttpPost("/videogrid");
@@ -83,7 +83,7 @@ public class VideoGridServiceRemoteImpl extends RemoteBase implements VideoGridS
         throw new VideoGridServiceException("No response from service");
       }
       Job receipt = JobParser.parseJob(response.getEntity().getContent());
-      logger.info("Completed video-gridding {}", commands);
+      logger.info("Completed video-gridding {}", command);
       return receipt;
     } catch (IOException e) {
       throw new VideoGridServiceException("Failed building service request", e);

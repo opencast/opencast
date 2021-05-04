@@ -62,9 +62,15 @@ public class PresetProviderImplTest {
     EasyMock.replay(securityService);
 
     seriesService = EasyMock.createMock(SeriesService.class);
-    EasyMock.expect(seriesService.getSeriesProperty(SERIES_ID, SERIES_PROPERTY_NAME)).andReturn(SERIES_PROPERTY_VALUE).anyTimes();
-    EasyMock.expect(seriesService.getSeriesProperty(SERIES_ID, ORG_PROPERTY_NAME)).andThrow(new NotFoundException()).anyTimes();
-    EasyMock.expect(seriesService.getSeriesProperty(SERIES_ID, NOT_FOUND_NAME)).andThrow(new NotFoundException()).anyTimes();
+    EasyMock.expect(seriesService.getSeriesProperty(SERIES_ID, SERIES_PROPERTY_NAME))
+        .andReturn(SERIES_PROPERTY_VALUE)
+        .anyTimes();
+    EasyMock.expect(seriesService.getSeriesProperty(SERIES_ID, ORG_PROPERTY_NAME))
+        .andThrow(new NotFoundException())
+        .anyTimes();
+    EasyMock.expect(seriesService.getSeriesProperty(SERIES_ID, NOT_FOUND_NAME))
+        .andThrow(new NotFoundException())
+        .anyTimes();
     EasyMock.replay(seriesService);
 
     presetProviderImpl = new PresetProviderImpl();

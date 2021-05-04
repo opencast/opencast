@@ -141,7 +141,7 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
     return result;
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   @Test
   @Parameters
@@ -166,7 +166,7 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
                  true));
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Media package is created under the admin of the default organization.
@@ -223,7 +223,7 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
                  true));
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Media package is created under the admin of the default organization.
@@ -273,7 +273,7 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
 
 
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   @Test
   @Parameters
@@ -281,7 +281,7 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
       AccessControlList acl,
       User writeUser, User queryUser,
       final boolean assertReadAccess, final boolean assertWriteAccess)
-      throws Exception {
+          throws Exception {
     // create a snapshot -> should always work (set assertAccess to true)
     createSnapshot(acl, writeUser, true);
     // Set assertAccess to true since querying does not yield a security exception.
@@ -356,7 +356,7 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
     );
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /**
    * Create a test media package and take a snapshot under the rights of the admin of the default organization.

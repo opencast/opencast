@@ -108,8 +108,11 @@ public final class AssetDtos {
      * {@link com.mysema.query.jpa.impl.JPAQuery#singleResult(com.mysema.query.types.Expression[])} or
      * {@link com.mysema.query.jpa.impl.JPAQuery#list(Expression[])}.
      */
-    public static final Expression<?>[] select =
-            new Expression[]{QAssetDto.assetDto, QSnapshotDto.snapshotDto.availability, QSnapshotDto.snapshotDto.organizationId};
+    public static final Expression<?>[] select = new Expression[] {
+        QAssetDto.assetDto,
+        QSnapshotDto.snapshotDto.availability,
+        QSnapshotDto.snapshotDto.organizationId
+    };
   }
 
   /**

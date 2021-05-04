@@ -30,45 +30,45 @@ import org.junit.Test;
 
 public class ContentImplTest {
 
-    private static ContentImpl instance;
+  private static ContentImpl instance;
 
-    public ContentImplTest() {
-    }
+  public ContentImplTest() {
+  }
 
-    @Before
+  @Before
     public void setUp() {
-        instance = new ContentImpl("value");
-    }
+    instance = new ContentImpl("value");
+  }
 
-    @After
+  @After
     public void tearDown() {
-        instance = null;
-    }
+    instance = null;
+  }
 
-    @Test
+  @Test
     public void contentImplTest() {
-        ContentImpl content = new ContentImpl("value");
-        Assert.assertEquals(content.value, "value");
+    ContentImpl content = new ContentImpl("value");
+    Assert.assertEquals(content.value, "value");
 
-    }
+  }
 
     /**
      * Test for Setters and Getters ContentImpl
      */
-    @Test
+  @Test
     public void setterAndGetter() {
 
-        Content content = new ContentImpl("value");
-        instance.setMode(content.getMode());
-        Assert.assertEquals(instance.getMode(), content.getMode());
+    Content content = new ContentImpl("value");
+    instance.setMode(content.getMode());
+    Assert.assertEquals(instance.getMode(), content.getMode());
 
-        instance.setType("type");
-        Assert.assertEquals(instance.getType(), "type");
+    instance.setType("type");
+    Assert.assertEquals(instance.getType(), "type");
 
-        instance.setValue("value");
-        Assert.assertEquals(instance.getValue(), "value");
+    instance.setValue("value");
+    Assert.assertEquals(instance.getValue(), "value");
 
 
 
-    }
+  }
 }

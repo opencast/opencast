@@ -59,7 +59,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
    * Creates a search result that was created using the given query. Note that <code>hits</code> indicates the overall
    * number of appearances of the search term, while size is equal to the number of documents that contain those
    * <code>hits</code> hits.
-   * 
+   *
    * @param query
    *          the query
    * @param hitCount
@@ -77,7 +77,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * Adds the given search result item to the result set.
-   * 
+   *
    * @param item
    *          the result item
    */
@@ -149,7 +149,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * Sets the search time in milliseconds.
-   * 
+   *
    * @param time
    *          the time
    */
@@ -186,7 +186,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * Sets the document count.
-   * 
+   *
    * @param count
    *          the number of documents in this search result
    */

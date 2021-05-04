@@ -112,18 +112,23 @@ public class FeedEntryImpl implements FeedEntry {
    *          the entry uri
    */
   public FeedEntryImpl(Feed feed, String title, String description, Link link, String uri) {
-    if (feed == null)
+    if (feed == null) {
       throw new IllegalArgumentException("Argument 'feed' must not be null");
-    if (StringUtils.isEmpty(title))
+    }
+    if (StringUtils.isEmpty(title)) {
       throw new IllegalArgumentException("Entry title must not be null");
-    if (link == null || StringUtils.isEmpty(link.getHref()))
+    }
+    if (link == null || StringUtils.isEmpty(link.getHref())) {
       throw new IllegalArgumentException("Entry link must not be null");
-    if (StringUtils.isEmpty(uri))
+    }
+    if (StringUtils.isEmpty(uri)) {
       throw new IllegalArgumentException("Entry uri must not be null");
+    }
     this.feed = feed;
     this.title = new ContentImpl(title);
-    if (description != null)
+    if (description != null) {
       this.description = new ContentImpl(description);
+    }
     addLink(link);
     this.uri = uri;
   }
@@ -181,11 +186,14 @@ public class FeedEntryImpl implements FeedEntry {
    * @see org.opencastproject.feed.api.FeedEntry#getModule(java.lang.String)
    */
   public FeedExtension getModule(String uri) {
-    if (modules == null)
+    if (modules == null) {
       return null;
-    for (FeedExtension m : modules)
-      if (uri.equals(m.getUri()))
+    }
+    for (FeedExtension m : modules) {
+      if (uri.equals(m.getUri())) {
         return m;
+      }
+    }
     return null;
   }
 
@@ -228,8 +236,9 @@ public class FeedEntryImpl implements FeedEntry {
    * @see org.opencastproject.feed.api.FeedEntry#addAuthor(org.opencastproject.feed.api.Person)
    */
   public void addAuthor(Person author) {
-    if (authors == null)
+    if (authors == null) {
       authors = new ArrayList<Person>();
+    }
     authors.add(author);
   }
 
@@ -251,8 +260,9 @@ public class FeedEntryImpl implements FeedEntry {
    * @see org.opencastproject.feed.api.FeedEntry#addCategory(org.opencastproject.feed.api.Category)
    */
   public void addCategory(Category category) {
-    if (categories == null)
+    if (categories == null) {
       categories = new ArrayList<Category>();
+    }
     categories.add(category);
   }
 
@@ -267,8 +277,9 @@ public class FeedEntryImpl implements FeedEntry {
    * @see org.opencastproject.feed.api.FeedEntry#addContent(org.opencastproject.feed.api.Content)
    */
   public void addContent(Content content) {
-    if (contents == null)
+    if (contents == null) {
       contents = new ArrayList<Content>();
+    }
     contents.add(content);
   }
 
@@ -283,8 +294,9 @@ public class FeedEntryImpl implements FeedEntry {
    * @see org.opencastproject.feed.api.FeedEntry#addContributor(org.opencastproject.feed.api.Person)
    */
   public void addContributor(Person contributor) {
-    if (contributors == null)
+    if (contributors == null) {
       contributors = new ArrayList<Person>();
+    }
     contributors.add(contributor);
   }
 
@@ -306,8 +318,9 @@ public class FeedEntryImpl implements FeedEntry {
    * @see org.opencastproject.feed.api.FeedEntry#addEnclosure(org.opencastproject.feed.api.Enclosure)
    */
   public void addEnclosure(Enclosure enclosure) {
-    if (enclosures == null)
+    if (enclosures == null) {
       enclosures = new ArrayList<Enclosure>();
+    }
     enclosures.add(enclosure);
   }
 
@@ -322,8 +335,9 @@ public class FeedEntryImpl implements FeedEntry {
    * @see org.opencastproject.feed.api.FeedEntry#addLink(org.opencastproject.feed.api.Link)
    */
   public void addLink(Link link) {
-    if (links == null)
+    if (links == null) {
       links = new ArrayList<Link>();
+    }
     links.add(link);
   }
 
@@ -338,8 +352,9 @@ public class FeedEntryImpl implements FeedEntry {
    * @see org.opencastproject.feed.api.FeedEntry#addExtension(org.opencastproject.feed.api.FeedExtension)
    */
   public void addExtension(FeedExtension module) {
-    if (modules == null)
+    if (modules == null) {
       modules = new ArrayList<FeedExtension>();
+    }
     modules.add(module);
   }
 

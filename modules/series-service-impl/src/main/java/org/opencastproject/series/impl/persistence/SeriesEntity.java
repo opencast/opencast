@@ -53,10 +53,14 @@ import javax.persistence.UniqueConstraint;
 @Access(AccessType.FIELD)
 @Table(name = "oc_series")
 @NamedQueries({
-        @NamedQuery(name = "Series.findAll", query = "select s from SeriesEntity s"),
-        @NamedQuery(name = "Series.getCount", query = "select COUNT(s) from SeriesEntity s"),
-        @NamedQuery(name = "seriesById", query = "select s from SeriesEntity as s where s.seriesId=:seriesId and s.organization=:organization"),
-        @NamedQuery(name = "allSeriesInOrg", query = "select s from SeriesEntity as s where s.organization=:organization") })
+    @NamedQuery(name = "Series.findAll", query = "select s from SeriesEntity s"),
+    @NamedQuery(name = "Series.getCount", query = "select COUNT(s) from SeriesEntity s"),
+    @NamedQuery(
+        name = "seriesById",
+        query = "select s from SeriesEntity as s where s.seriesId=:seriesId and s.organization=:organization"
+    ),
+    @NamedQuery(name = "allSeriesInOrg", query = "select s from SeriesEntity as s where s.organization=:organization")
+})
 public class SeriesEntity {
 
   /** Series ID, primary key */
@@ -86,7 +90,7 @@ public class SeriesEntity {
   @Column(name = "value", length = 65535)
   @CollectionTable(name = "oc_series_property", uniqueConstraints = {
       @UniqueConstraint(name = "UNQ_series_properties", columnNames = {"series", "organization", "name"})
-  }, joinColumns = {
+      }, joinColumns = {
           @JoinColumn(name = "series", referencedColumnName = "id", nullable = false),
           @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false) })
   protected Map<String, String> properties;
@@ -96,7 +100,7 @@ public class SeriesEntity {
   @Column(name = "data")
   @CollectionTable(name = "oc_series_elements", uniqueConstraints = {
       @UniqueConstraint(name = "UNQ_series_elements", columnNames = {"series", "organization", "type"})
-    }, joinColumns = {
+      }, joinColumns = {
       @JoinColumn(name = "series", referencedColumnName = "id", nullable = false),
       @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false) })
   protected Map<String, byte[]> elements;
@@ -122,10 +126,12 @@ public class SeriesEntity {
    * @param seriesId
    */
   public void setSeriesId(String seriesId) {
-    if (seriesId == null)
+    if (seriesId == null) {
       throw new IllegalArgumentException("Series id can't be null");
-    if (seriesId.length() > 128)
+    }
+    if (seriesId.length() > 128) {
       throw new IllegalArgumentException("Series id can't be longer than 128 characters");
+    }
     this.seriesId = seriesId;
   }
 

@@ -27,7 +27,8 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 
 /**
- * Api for timeline preview generation implementations, that create preview images to be shown on the timeline of a video.
+ * Api for timeline preview generation implementations, that create preview
+ * images to be shown on the timeline of a video.
  */
 public interface TimelinePreviewsService {
 

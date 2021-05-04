@@ -71,7 +71,7 @@ import java.util.UUID;
  * This will be done using FFmpeg.
  */
 public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
-TimelinePreviewsService, ManagedService {
+    TimelinePreviewsService, ManagedService {
 
   /** Resulting collection in the working file repository */
   public static final String COLLECTION_ID = "timelinepreviews";
@@ -126,7 +126,7 @@ TimelinePreviewsService, ManagedService {
 
   /** The logging facility */
   protected static final Logger logger = LoggerFactory
-    .getLogger(TimelinePreviewsServiceImpl.class);
+      .getLogger(TimelinePreviewsServiceImpl.class);
 
   /** The horizontal resolution of a single preview image */
   protected int resolutionX = DEFAULT_RESOLUTION_X;
@@ -234,14 +234,9 @@ TimelinePreviewsService, ManagedService {
             DEFAULT_TIMELINEPREVIEWS_JOB_LOAD, serviceRegistry);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.timelinepreviews.api.TimelinePreviewsService#createTimelinePreviewImages(org.opencastproject.mediapackage.Track, int)
-   */
   @Override
   public Job createTimelinePreviewImages(Track track, int imageCount) throws TimelinePreviewsException,
-         MediaPackageException {
+          MediaPackageException {
     try {
       List<String> parameters = Arrays.asList(MediaPackageElementParser.getAsXml(track), Integer.toString(imageCount));
 
@@ -267,7 +262,7 @@ TimelinePreviewsService, ManagedService {
    * @throws org.opencastproject.mediapackage.MediaPackageException
    */
   protected Attachment generatePreviewImages(Job job, Track track, int imageCount)
-    throws TimelinePreviewsException, MediaPackageException {
+          throws TimelinePreviewsException, MediaPackageException {
 
     // Make sure the element can be analyzed using this analysis implementation
     if (!track.hasVideo()) {
@@ -277,8 +272,9 @@ TimelinePreviewsService, ManagedService {
 
     try {
 
-      if (track.getDuration() == null)
+      if (track.getDuration() == null) {
         throw new MediaPackageException("Track " + track + " does not have a duration");
+      }
 
       double duration = track.getDuration() / 1000.0;
       double seconds = duration / (double)(imageCount);
@@ -291,8 +287,9 @@ TimelinePreviewsService, ManagedService {
               duration);
 
 
-      if (composedImage == null)
+      if (composedImage == null) {
         throw new IllegalStateException("Unable to compose image");
+      }
 
       // Set the mimetype
       try {
@@ -335,7 +332,7 @@ TimelinePreviewsService, ManagedService {
       switch (op) {
         case TimelinePreview:
           Track track = (Track) MediaPackageElementParser
-            .getFromXml(arguments.get(0));
+              .getFromXml(arguments.get(0));
           int imageCount = Integer.parseInt(arguments.get(1));
           Attachment timelinePreviewsMpe = generatePreviewImages(job, track, imageCount);
           return MediaPackageElementParser.getAsXml(timelinePreviewsMpe);
@@ -383,12 +380,12 @@ TimelinePreviewsService, ManagedService {
                            + "_timelinepreviews" + outputFormat;
     int exitCode = 1;
     String[] command = new String[] {
-      binary,
-      "-loglevel", "error",
-      "-t", String.valueOf(duration - seconds / 2.0),
-      "-i", mediaFile.getAbsolutePath(),
-      "-vf", "fps=1/" + seconds + ",scale=" + width + ":" + height + ",tile=" + tileX + "x" + tileY,
-      imageFilePath
+        binary,
+        "-loglevel", "error",
+        "-t", String.valueOf(duration - seconds / 2.0),
+        "-i", mediaFile.getAbsolutePath(),
+        "-vf", "fps=1/" + seconds + ",scale=" + width + ":" + height + ",tile=" + tileX + "x" + tileY,
+        imageFilePath
     };
 
     logger.debug("Start timeline previews ffmpeg process: {}", StringUtils.join(command, " "));
@@ -426,9 +423,10 @@ TimelinePreviewsService, ManagedService {
       }
     }
 
-    if (exitCode != 0)
+    if (exitCode != 0) {
       throw new TimelinePreviewsException("Generating timeline preview for track " + track.getIdentifier()
               + " failed: ffmpeg process exited abnormally with exit code " + exitCode);
+    }
 
     // put timeline previews image into workspace
     FileInputStream timelinepreviewsFileInputStream = null;

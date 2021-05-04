@@ -42,23 +42,23 @@ public final class JpaFns {
   }
 
   static final Fn2<BooleanExpression, BooleanExpression, BooleanExpression> and =
-          new Fn2<BooleanExpression, BooleanExpression, BooleanExpression>() {
-            @Override public BooleanExpression apply(BooleanExpression left, BooleanExpression right) {
-              return left.and(right);
-            }
-          };
+      new Fn2<BooleanExpression, BooleanExpression, BooleanExpression>() {
+        @Override public BooleanExpression apply(BooleanExpression left, BooleanExpression right) {
+          return left.and(right);
+        }
+      };
   static final Fn2<BooleanExpression, BooleanExpression, BooleanExpression> or =
-          new Fn2<BooleanExpression, BooleanExpression, BooleanExpression>() {
-            @Override public BooleanExpression apply(BooleanExpression left, BooleanExpression right) {
-              return left.or(right);
-            }
-          };
+      new Fn2<BooleanExpression, BooleanExpression, BooleanExpression>() {
+        @Override public BooleanExpression apply(BooleanExpression left, BooleanExpression right) {
+          return left.or(right);
+        }
+      };
   static final Fn<BooleanExpression, BooleanExpression> not =
-          new Fn<BooleanExpression, BooleanExpression>() {
-            @Override public BooleanExpression apply(BooleanExpression expr) {
-              return expr.not();
-            }
-          };
+      new Fn<BooleanExpression, BooleanExpression>() {
+        @Override public BooleanExpression apply(BooleanExpression expr) {
+          return expr.not();
+        }
+      };
 
   /**
    * Apply a boolean operation to two expressions. If one of the expressions is none the other one is returned.
