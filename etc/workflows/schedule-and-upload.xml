@@ -17,7 +17,7 @@
     <![CDATA[
       <div id="workflow-configuration">
         <fieldset>
-          <input id="straightToPublishing" name="straightToPublishing" type="checkbox" class="configField" value="false" />
+          <input id="straightToPublishing" name="straightToPublishing" type="checkbox" class="configField" value="true" />
           <label for="straightToPublishing">Straight to publishing</label>
         </fieldset>
       </div>
@@ -36,7 +36,7 @@
       id="defaults"
       description="Applying default configuration values">
       <configurations>
-        <configuration key="straightToPublishing">false</configuration>
+        <configuration key="straightToPublishing">true</configuration>
       </configurations>
     </operation>
 
