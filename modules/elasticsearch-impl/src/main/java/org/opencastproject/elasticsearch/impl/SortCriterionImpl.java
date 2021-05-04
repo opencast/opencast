@@ -53,10 +53,10 @@ public final class SortCriterionImpl implements SortCriterion {
     }
 
     if ("ASC".equalsIgnoreCase(parts[1]) || "Ascending".equalsIgnoreCase(parts[1])) {
-      return new SortCriterionImpl(parts[0], Order.Ascending);
+      return new SortCriterionImpl(parts[0].trim(), Order.Ascending);
     }
     if ("DESC".equalsIgnoreCase(parts[1]) || "Descending".equalsIgnoreCase(parts[1])) {
-      return new SortCriterionImpl(parts[0], Order.Descending);
+      return new SortCriterionImpl(parts[0].trim(), Order.Descending);
     }
 
     throw new IllegalArgumentException("Invalid order " + parts[1]);

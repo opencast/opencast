@@ -256,7 +256,7 @@ public final class RestUtils {
           continue;
         }
         // use substring because dates also contain : so there might be more than two parts
-        filters.put(filterTuple[0], f.substring(filterTuple[0].length() + 1));
+        filters.put(filterTuple[0].trim(), f.substring(filterTuple[0].length() + 1).trim());
       }
     }
     return filters;
