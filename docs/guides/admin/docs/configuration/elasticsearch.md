@@ -13,6 +13,8 @@ Relevant configuration keys are:
 * `org.opencastproject.elasticsearch.server.hostname`
 * `org.opencastproject.elasticsearch.server.scheme`
 * `org.opencastproject.elasticsearch.server.port`
+* `org.opencastproject.elasticsearch.username`
+* `org.opencastproject.elasticsearch.password`
 
 Threfore only `admin`, `adminpresentation`, and `allinone` need to connect to Elasticsearch.
 
