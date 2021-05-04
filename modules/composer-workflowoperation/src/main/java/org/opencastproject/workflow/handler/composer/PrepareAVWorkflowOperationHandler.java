@@ -58,16 +58,16 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final String QUESTION_MARK = "?";
 
   /** Name of the 'encode to a/v prepared copy' encoding profile */
-  public static final String PREPARE_AV_PROFILE = "av.prepared";
+  public static final String PREPARE_AV_PROFILE = "av.prepare-av";
 
   /** Name of the muxing encoding profile */
-  public static final String MUX_AV_PROFILE = "mux-av.prepared";
+  public static final String MUX_AV_PROFILE = "mux-av.prepare-av";
 
   /** Name of the 'encode to audio only prepared copy' encoding profile */
-  public static final String PREPARE_AONLY_PROFILE = "audio-only.prepared";
+  public static final String PREPARE_AONLY_PROFILE = "audio-only.prepare-av";
 
   /** Name of the 'encode to video only prepared copy' encoding profile */
-  public static final String PREPARE_VONLY_PROFILE = "video-only.prepared";
+  public static final String PREPARE_VONLY_PROFILE = "video-only.prepare-av";
 
   /** Name of the 'rewrite' configuration key */
   public static final String OPT_REWRITE = "rewrite";

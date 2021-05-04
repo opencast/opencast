@@ -177,7 +177,7 @@ ${trimHold} variable like in the current workflow definitions with trimming.
 
 1. The prepare-av operations has to be adopted. Gstreamer/gnonlin is kind of picky on the codec that it supports. So the
    media file has to be re-encoded in the beginning of the workflow. The prepare-av encoding profiles (av.work and
-   mux-av.work) have been updated in the Video Editor branch for this. Within the prepare-av operation in the
+   mux-av.select-streams) have been updated in the Video Editor branch for this. Within the prepare-av operation in the
    workflow-definition XML-file rewriting the file should be forced:
 
    **Changes in the workflow definition**

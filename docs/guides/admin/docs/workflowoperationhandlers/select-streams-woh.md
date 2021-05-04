@@ -90,9 +90,9 @@ This workflow operation handler depends on the presence of the following encodin
 
 Name            | Description
 ----------------|------------
-video-only.work | Removes all audio streams from a media track
-audio-only.work | Removes all video streams from a media track
-mux-av.work     | Mux a video stream and an audio stream into a media track
+video-only.select-streams | Removes all audio streams from a media track
+audio-only.select-streams | Removes all video streams from a media track
+mux-av.select-streams     | Mux a video stream and an audio stream into a media track
 
 Note that those encoding profiles are included in the default configuration of Opencast.
 

@@ -21,6 +21,10 @@ the PartialImportWorkflowOperation works correctly in case of media files with i
 Note that the use of `accurate-frame-count` will force the InspectWorkflowOperation to decode the complete video
 stream which makes the operation more expensive in terms of load.
 
+Not all encoding profiles required for the PartialImportWorkflowOperation are available in
+Opencast per default, so you will have to add them yourself.
+Examples can be found [further down](encoding-profiles).
+
 
 Parameter Table
 ---------------
@@ -121,7 +125,7 @@ in the SMIL file:
     <configuration key="target-presentation-flavor">presentation/standard</configuration>
     <configuration key="concat-encoding-profile">concat.work</configuration>
     <configuration key="trim-encoding-profile">trim.work</configuration>
-    <configuration key="force-encoding-profile">editor.work</configuration>
+    <configuration key="force-encoding-profile">encode.partial-import</configuration>
   </configurations>
 </operation>
 ```
@@ -255,3 +259,52 @@ supposed to be changed by the user.
 |trim-encoding-profile|Used to trim the resulting concatenated single tracks if necessary|
 |force-encoding-profile|Used to re-encode target tracks in case the file extension of a given target track is not included in *required-extensions* or the configuration key *force-encoding* is set to *true* |
 |preencode-encoding-profile|Only used if *preencode-encoding* is set to true. Can be used to encode all source tracks before any processing happens, to avoid errors with non-uniform input. Should be used instead of [Encode](encode-woh.md), as the latter will break source-smil. |
+
+### Missing Encoding Profiles
+
+Some of the encoding profiles necessary for this operation are not included
+in Opencast per default, but the operation will not work without them.
+You need to include the following encoding profiles by copy and pasting them in
+a `.properties` file in the `etc/encoding` folder of your installation.
+
+```xml
+# Generate silent audio tracks for filling gaps for partial import operation
+profile.import.silent.name = Generate silent audio tracks for filling gaps
+profile.import.silent.input = nothing
+profile.import.silent.output = audio
+profile.import.silent.suffix = -silent-audio.mp4
+profile.import.silent.ffmpeg.command = -strict -2 -filter_complex aevalsrc=0:d=#{time} -c:a aac -b:a 8k #{out.dir}/#{out.name}#{out.suffix}
+
+# Extract last image for partial import operation
+profile.import.image-frame.name = Extract last image
+profile.import.image-frame.input = visual
+profile.import.image-frame.output = image
+profile.import.image-frame.suffix = -image.jpg
+profile.import.image-frame.ffmpeg.command = -sseof -3 -i #{in.video.path} -update 1 -q:v 1 #{out.dir}/#{out.name}#{out.suffix}
+
+# Extract image for partial import operation
+profile.import.preview.name = Extract an image
+profile.import.preview.input = visual
+profile.import.preview.output = image
+profile.import.preview.suffix = -image.jpg
+profile.import.preview.ffmpeg.command = -ss #{time} -i #{in.video.path} -r 1 -frames:v 1 #{out.dir}/#{out.name}#{out.suffix}
+
+# Trim a stream
+#   This command will trim and input stream. Trimming will be fast, as no
+#   re-encoding takes place. It will, however, not be frame accurate.
+profile.trim.work.name = trim track
+profile.trim.work.input = stream
+profile.trim.work.output = visual
+profile.trim.work.suffix = -trimmed.#{in.video.suffix}
+profile.trim.work.ffmpeg.command = -ss #{trim.start} -i #{in.video.path} -t #{trim.duration} -c copy #{out.dir}/#{out.name}#{out.suffix}
+
+# Used by Partial Import operation to encode tracks into equal formats
+profile.encode.partial-import.name = editor
+profile.encode.partial-import.input = audiovisual
+profile.encode.partial-import.output = audiovisual
+profile.encode.partial-import.suffix = -editor.mp4
+profile.encode.partial-import.mimetype = video/mp4
+profile.encode.partial-import.ffmpeg.command = -i #{in.video.path} \
+  -filter:v fps=25 -shortest -c:v libx264 -preset superfast -pix_fmt yuv420p -crf 18 -c:a aac -strict -2 -b:a 196k \
+  #{out.dir}/#{out.name}#{out.suffix}
+```

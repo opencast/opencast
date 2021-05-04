@@ -325,7 +325,7 @@ public class ComposerServiceTest {
     composerService.setWorkspace(workspace);
     EasyMock.replay(workspace);
 
-    Job job = composerService.mux(sourceVideoTrack, sourceAudioTrack, "mux-av.work");
+    Job job = composerService.mux(sourceVideoTrack, sourceAudioTrack, "mux-av.select-streams");
     MediaPackageElementParser.getFromXml(job.getPayload());
   }
 

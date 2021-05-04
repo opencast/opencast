@@ -59,13 +59,13 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final Logger logger = LoggerFactory.getLogger(SelectStreamsWorkflowOperationHandler.class);
 
   /** Name of the 'encode to video only work copy' encoding profile */
-  private static final String PREPARE_VIDEO_ONLY_PROFILE = "video-only.work";
+  private static final String PREPARE_VIDEO_ONLY_PROFILE = "video-only.select-streams";
 
   /** Name of the 'encode to video only work copy' encoding profile */
-  private static final String PREPARE_AUDIO_ONLY_PROFILE = "audio-only.work";
+  private static final String PREPARE_AUDIO_ONLY_PROFILE = "audio-only.select-streams";
 
   /** Name of the muxing encoding profile */
-  private static final String MUX_AV_PROFILE = "mux-av.work";
+  private static final String MUX_AV_PROFILE = "mux-av.select-streams";
 
   /** The composer service */
   private ComposerService composerService = null;
