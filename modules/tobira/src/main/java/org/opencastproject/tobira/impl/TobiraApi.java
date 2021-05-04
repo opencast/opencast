@@ -26,7 +26,10 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
+import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -37,8 +40,12 @@ import org.osgi.service.component.annotations.Activate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.stream.Collectors;
+
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -113,12 +120,67 @@ public class TobiraApi {
       return badRequest("Parameter 'limit' <= 0, but it has to be positive");
     }
 
+    logger.debug("Request to '/harvest' with limit={} and since={}", limit, since);
+
     try {
-      final String json = "{ \"limit\": " + limit +  ", \"since\": " + since + " }";
+      final SearchQuery q = new SearchQuery()
+          .withUpdatedSince(new Date(since))
+          .withSort(SearchQuery.Sort.DATE_MODIFIED)
+          .includeDeleted(true)
+          // We fetch one item more to know the timestamp of that item. See below how this is used.
+          .withLimit(limit + 1);
+      final SearchResultItem[] results = searchService.getByQuery(q).getItems();
+      logger.debug("Retrieved {} events from the index during harvest", results.length);
+
+      // Obtain information to allow Tobira to plan the next harvesting request. The `since`
+      // timestamp that needs to be used next is always the timestamp of the last item. In case we
+      // got `limit + 1` items, it's exactly the timestamp of the next new item. Otherwise, it's the
+      // timestamp of an item that Tobira already received. But Tobira has to be able to deal with
+      // duplicate items anyway.
+      boolean hasMore = results.length == limit + 1;
+      long includesItemsUntil = results.length > 0
+          ? results[results.length - 1].getModified().getTime()
+          : since; // TODO: this could maybe be `now()` or `now() - 5 min`
+
+      final ArrayList<Jsons.Val> items = Arrays.stream(results)
+          // We fetched up to `limit + 1` items above, so we limit here again to the actual number
+          // of items.
+          .limit(limit)
+          .map(item -> {
+            long modified = item.getModified().getTime();
+
+            // TODO: does `deleted != null` really imply the event is deleted?
+            if (item.getDeletionDate() == null) {
+              return Jsons.obj(
+                  Jsons.p("kind", "event"),
+                  Jsons.p("id", item.getId()),
+                  Jsons.p("title", item.getDcTitle()),
+                  Jsons.p("partOf", item.getDcIsPartOf()),
+                  Jsons.p("description", item.getDcDescription()),
+                  Jsons.p("updated", modified)
+              );
+            } else {
+              return Jsons.obj(
+                  Jsons.p("kind", "event-deleted"),
+                  Jsons.p("id", item.getId()),
+                  Jsons.p("updated", modified)
+              );
+            }
+          })
+          .collect(Collectors.toCollection(ArrayList::new));
+
+      // Assembly full response
+      final Jsons.Obj json = Jsons.obj(
+          Jsons.p("includesItemsUntil", includesItemsUntil),
+          Jsons.p("hasMore", hasMore),
+          Jsons.p("items", Jsons.arr(items))
+      );
+      logger.debug("Returning {} items from harvesting (hasMore={})", items.size(), hasMore);
+
       return Response.ok()
           .type(APPLICATION_JSON_TYPE)
           // TODO: encoding
-          .entity(json)
+          .entity(json.toJson())
           .build();
     } catch (Exception e) {
       logger.error("Unexpected exception in tobira/harvest", e);
