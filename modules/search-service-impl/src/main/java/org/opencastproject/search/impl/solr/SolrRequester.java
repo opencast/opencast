@@ -773,7 +773,7 @@ public class SolrRequester {
       sb.append("-" + Schema.OC_MEDIATYPE + ":" + SearchResultItemType.Series);
     }
 
-    if (q.getDeletedDate() == null) {
+    if (!q.willIncludeDeleted()) {
       if (sb.length() > 0) {
         sb.append(" AND ");
       }

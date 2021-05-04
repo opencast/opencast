@@ -31,6 +31,7 @@ import java.util.Date;
 public class SearchQuery {
   protected boolean includeEpisode = true;
   protected boolean includeSeries = false;
+  protected boolean includeDeleted = false;
   protected String id;
   protected String seriesId;
   protected String text;
@@ -72,6 +73,17 @@ public class SearchQuery {
 
   public SearchQuery includeSeries(boolean includeSeries) {
     this.includeSeries = includeSeries;
+    return this;
+  }
+
+  /**
+   * Specifies whether deleted events should be included in the results.
+   *
+   * Deleted events are automatically included if <code>deleteDate</code> is set. Otherwise,
+   * this defaults to <code>false</code>.
+   */
+  public SearchQuery includeDeleted(boolean includeDeleted) {
+    this.includeDeleted = includeDeleted;
     return this;
   }
 
@@ -139,6 +151,14 @@ public class SearchQuery {
 
   public boolean willIncludeSeries() {
     return includeSeries;
+  }
+
+  /**
+   * Returns true if <code>includeDeleted</code> was set to `true` or <code>withDeletedDate</code>
+   * was set. In those cases, the results of the query will include deleted elements.
+   */
+  public boolean willIncludeDeleted() {
+    return includeDeleted || this.deletedDate != null;
   }
 
   public MediaPackageElementFlavor[] getElementFlavors() {
