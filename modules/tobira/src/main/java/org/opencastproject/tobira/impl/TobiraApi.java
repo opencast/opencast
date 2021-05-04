@@ -22,27 +22,29 @@
 package org.opencastproject.tobira.impl;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 /**
@@ -50,7 +52,7 @@ import javax.ws.rs.core.Response;
  */
 @Component(
     property = {
-        "service.description=Tobira Api Endpoint",
+        "service.description=Tobira API Endpoint",
         "opencast.service.type=org.opencastproject.tobira",
         "opencast.service.path=/tobira",
         "opencast.service.jobproducer=false"
@@ -60,9 +62,9 @@ import javax.ws.rs.core.Response;
 )
 @Path("")
 @RestService(name = "TobiraApiEndpoint",
-    title = "Tobira Api Endpoint",
-    abstractText = "Opencast Tobira Api endpoint.",
-    notes = { "This provides API endpoint used by Tobira to harvest media metadata"})
+    title = "Tobira API Endpoint",
+    abstractText = "Opencast Tobira API endpoint.",
+    notes = { "This provides API endpoint used by Tobira to harvest media metadata" })
 public class TobiraApi {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(TobiraApi.class);
@@ -77,19 +79,64 @@ public class TobiraApi {
   }
 
   @GET
-  @Path("/")
+  @Path("/harvest")
   @Produces(APPLICATION_JSON)
-  @RestQuery(name = "metrics",
-      description = "Metrics about Opencast",
-      responses = {@RestResponse(description = "Metrics", responseCode = HttpServletResponse.SC_OK)},
-      returnDescription = "OpenMetrics about Opencast.")
-  public Response metrics() throws Exception {
-    try (InputStream in = TobiraApi.class.getResourceAsStream("result.json")) {
-      final String json = IOUtils.toString(in, StandardCharsets.UTF_8);
-      return Response.ok().entity(json).build();
+  @RestQuery(
+      name = "harvest",
+      description = "Harvesting API to get incremental updates about series and events.",
+      restParameters = {
+          @RestParameter(
+              name = "limit",
+              isRequired = true,
+              description = "The maximum number of items to return. Has to be positive.",
+              type = Type.INTEGER
+          ),
+          @RestParameter(
+              name = "since",
+              isRequired = true,
+              description = "Only return items that changed after or at this timestamp. "
+                  + "Specified in milliseconds since 1970-01-01T00:00:00Z.",
+              type = Type.INTEGER
+          ),
+      },
+      responses = {
+          @RestResponse(description = "Event and Series Data", responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "Event and Series Data changed after the given timestamp"
+  )
+  public Response harvest(
+      @QueryParam("limit") Integer limit,
+      @QueryParam("since") Long since
+  ) {
+    // Parameter error handling
+    if (since == null) {
+      return badRequest("Required parameter 'since' not specified");
+    }
+    if (limit == null) {
+      return badRequest("Required parameter 'limit' not specified");
+    }
+    if (since < 0) {
+      return badRequest("Parameter 'since' < 0, but it has to be positive or 0");
+    }
+    if (limit <= 0) {
+      return badRequest("Parameter 'limit' <= 0, but it has to be positive");
+    }
+
+    try {
+      final String json = "{ \"limit\": " + limit +  ", \"since\": " + since + " }";
+      return Response.ok()
+          .type(APPLICATION_JSON_TYPE)
+          // TODO: encoding
+          .entity(json)
+          .build();
     } catch (Exception e) {
-      return  Response.serverError().build();
+      logger.error("Exception handling tobira/harvest: {}", e);
+      return Response.serverError().build();
     }
   }
 
+  private static Response badRequest(String msg) {
+    logger.warn("Bad request to tobira/harvest: {}", msg);
+    return Response.status(BAD_REQUEST).entity(msg).build();
+  }
 }
