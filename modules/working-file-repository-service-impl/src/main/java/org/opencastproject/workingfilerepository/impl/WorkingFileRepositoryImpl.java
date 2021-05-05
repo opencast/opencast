@@ -160,9 +160,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       try {
         garbageCollectionPeriodInSeconds = Integer.parseInt(period);
       } catch (NumberFormatException e) {
-        logger.warn("Invalid configuration for working file garbage collection period ({}={})",
-                WORKING_FILE_REPOSITORY_CLEANUP_PERIOD_KEY, period);
-        garbageCollectionPeriodInSeconds = -1;
+        logger.error("The garbage collection period for the working file repository is not an integer {}", period);
+        throw e;
       }
     }
 
@@ -173,8 +172,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       try {
         maxAgeInDays = Integer.parseInt(age);
       } catch (NumberFormatException e) {
-        logger.warn("Invalid configuration for working file garbage collection max age ({}={})",
-                WORKING_FILE_REPOSITORY_CLEANUP_MAX_AGE_KEY, age);
+        logger.error("The max age for the working file repository garbage collection is not an integer {}", age);
+        throw e;
       }
     }
 
