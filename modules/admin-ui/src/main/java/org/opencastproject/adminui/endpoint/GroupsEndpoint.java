@@ -25,6 +25,7 @@ import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
+import static java.lang.Math.max;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
@@ -32,20 +33,12 @@ import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
-import org.opencastproject.adminui.util.QueryPreprocessor;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.group.Group;
-import org.opencastproject.elasticsearch.index.group.GroupIndexSchema;
-import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
@@ -57,15 +50,12 @@ import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.RestUtil;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
@@ -77,12 +67,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -178,77 +168,29 @@ public class GroupsEndpoint {
     responses = {
       @RestResponse(responseCode = SC_OK, description = "The groups.")})
   public Response getGroups(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
-          @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws IOException {
-
-    GroupSearchQuery query = new GroupSearchQuery(securityService.getOrganization().getId(),
-            securityService.getUser());
-
-    Opt<String> optSort = Opt.nul(trimToNull(sort));
-    Option<Integer> optOffset = Option.option(offset);
-    Option<Integer> optLimit = Option.option(limit);
-    // If the limit is set to 0, this is not taken into account
-    if (optLimit.isSome() && limit == 0) {
-      optLimit = Option.none();
-    }
+          @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) throws IOException {
+    Optional<Integer> optLimit = Optional.ofNullable(limit);
+    Optional<Integer> optOffset = Optional.ofNullable(offset);
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
-    for (String name : filters.keySet()) {
-      if (GroupsListQuery.FILTER_NAME_NAME.equals(name)) {
-        query.withName(filters.get(name));
-      } else if (GroupsListQuery.FILTER_TEXT_NAME.equals(name)) {
-        query.withText(QueryPreprocessor.sanitize(filters.get(name)));
-      }
-    }
+    Optional<String> optNameFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_NAME_NAME));
+    Optional<String> optTextFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_TEXT_NAME));
 
-    if (optSort.isSome()) {
-      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
-      for (SortCriterion criterion : sortCriteria) {
-        switch (criterion.getFieldName()) {
-          case GroupIndexSchema.NAME:
-            query.sortByName(criterion.getOrder());
-            break;
-          case GroupIndexSchema.DESCRIPTION:
-            query.sortByDescription(criterion.getOrder());
-            break;
-          case GroupIndexSchema.ROLE:
-            query.sortByRole(criterion.getOrder());
-            break;
-          case GroupIndexSchema.MEMBERS:
-            query.sortByMembers(criterion.getOrder());
-            break;
-          case GroupIndexSchema.ROLES:
-            query.sortByRoles(criterion.getOrder());
-            break;
-          default:
-            throw new WebApplicationException(Status.BAD_REQUEST);
-        }
-      }
-    }
+    Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
 
-    if (optLimit.isSome())
-      query.withLimit(optLimit.get());
-    if (optOffset.isSome())
-      query.withOffset(optOffset.get());
+    List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter, optTextFilter,
+            sortCriteria);
 
-    SearchResult<Group> results;
-    try {
-      results = searchIndex.getByQuery(query);
-    } catch (SearchIndexException e) {
-      logger.error("The External Search Index was not able to get the groups list.", e);
-      return RestUtil.R.serverError();
-    }
-
-    List<String> userNames = Arrays.stream(results.getItems()).flatMap(item -> item.getSource().getMembers().stream())
-      .collect(Collectors.toList());
-
+    // load users
+    List<String> userNames = results.stream().flatMap(item -> item.getMembers().stream())
+            .collect(Collectors.toList());
     final Map<String, User> users = new HashMap<>(userNames.size());
     userDirectoryService.loadUsers(userNames).forEachRemaining(user -> users.put(user.getUsername(), user));
 
     List<JValue> groupsJSON = new ArrayList<>();
-    for (SearchResultItem<Group> item : results.getItems()) {
-      Group group = item.getSource();
+    for (JpaGroup group : results) {
       List<Field> fields = new ArrayList<>();
-      fields.add(f("id", v(group.getIdentifier())));
+      fields.add(f("id", v(group.getGroupId())));
       fields.add(f("name", v(group.getName(), Jsons.BLANK)));
       fields.add(f("description", v(group.getDescription(), Jsons.BLANK)));
       fields.add(f("role", v(group.getRole())));
@@ -257,7 +199,20 @@ public class GroupsEndpoint {
       groupsJSON.add(obj(fields));
     }
 
-    return okJsonList(groupsJSON, offset, limit, results.getHitCount());
+    long dbTotal = jpaGroupRoleProvider.countTotalGroups(optNameFilter, optTextFilter);
+    long resultsTotal = optOffset.orElse(0) + results.size();
+
+    // groups could've been added or deleted in the meantime, so...
+    long total;
+    // don't show next page if current page isn't full
+    if (!optLimit.isPresent() || results.size() < optLimit.get()) {
+      total = resultsTotal;
+    // don't show less than the current results
+    } else {
+      total = max(dbTotal, resultsTotal);
+    }
+
+    return okJsonList(groupsJSON, optOffset, optLimit, total);
   }
 
   @DELETE

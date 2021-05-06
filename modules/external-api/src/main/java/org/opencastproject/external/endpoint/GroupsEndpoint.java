@@ -34,16 +34,12 @@ import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_6_0;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.group.Group;
-import org.opencastproject.elasticsearch.index.group.GroupIndexSchema;
-import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
@@ -59,18 +55,23 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.ComparatorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -131,77 +132,106 @@ public class GroupsEndpoint {
                   @RestResponse(description = "A (potentially empty) list of groups.", responseCode = HttpServletResponse.SC_OK) })
   public Response getGroups(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
-    Opt<Integer> optLimit = Opt.nul(limit);
-    if (optLimit.isSome() && limit <= 0)
-      optLimit = Opt.none();
-    Opt<Integer> optOffset = Opt.nul(offset);
-    if (optOffset.isSome() && offset < 0)
-      optOffset = Opt.none();
-    Opt<String> optSort = Opt.nul(StringUtils.trimToNull(sort));
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
+    Optional<Integer> optLimit = Optional.ofNullable(limit);
+    Optional<Integer> optOffset = Optional.ofNullable(offset);
 
-    SearchResult<Group> results;
-    try {
-      GroupSearchQuery query = new GroupSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
+    if (optLimit.isPresent() && limit <= 0) {
+      optLimit = Optional.empty();
+    }
+    if (optOffset.isPresent() && offset < 0) {
+      optOffset = Optional.empty();
+    }
 
-      // Parse the filters
-      if (StringUtils.isNotBlank(filter)) {
-        for (String f : filter.split(",")) {
-          String[] filterTuple = f.split(":");
-          if (filterTuple.length < 2) {
-            logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
+    // The API currently does not offer full text search for groups
+    Map<String, String> filters = RestUtils.parseFilter(filter);
+    Optional<String> optNameFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_NAME_NAME));
+
+    Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
+
+    // sorting by members & roles is not supported by the database, so we do this afterwards
+    Set<SortCriterion> deprecatedSortCriteria = new HashSet<>();
+    if (requestedVersion.isSmallerThan(VERSION_1_6_0)) {
+      deprecatedSortCriteria = sortCriteria.stream().filter(
+              sortCriterion -> sortCriterion.getFieldName().equals("members")
+                      || sortCriterion.getFieldName().equals("roles")).collect(Collectors.toSet());
+      sortCriteria.removeAll(deprecatedSortCriteria);
+    }
+
+    List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter, Optional.empty(),
+            sortCriteria);
+
+    // sorting by members & roles is only available for api versions < 1.6.0
+    if (requestedVersion.isSmallerThan(VERSION_1_6_0)) {
+      List<Comparator<JpaGroup>> comparators = new ArrayList<>();
+      for (SortCriterion sortCriterion : deprecatedSortCriteria) {
+        Comparator<JpaGroup> comparator;
+        switch (sortCriterion.getFieldName()) {
+          case "members":
+            comparator = new GroupComparator() {
+              @Override
+              public Set<String> getGroupAttribute(JpaGroup jpaGroup) {
+                return jpaGroup.getMembers();
+              }
+            };
+            break;
+          case "roles":
+            comparator = new GroupComparator() {
+              @Override
+              public Set<String> getGroupAttribute(JpaGroup jpaGroup) {
+                return jpaGroup.getRoleNames();
+              }
+            };
+            break;
+          default:
             continue;
-          }
-
-          String name = filterTuple[0];
-          String value = filterTuple[1];
-
-          if (GroupsListQuery.FILTER_NAME_NAME.equals(name))
-            query.withName(value);
         }
-      }
 
-      if (optSort.isSome()) {
-        Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
-        for (SortCriterion criterion : sortCriteria) {
-          switch (criterion.getFieldName()) {
-            case GroupIndexSchema.NAME:
-              query.sortByName(criterion.getOrder());
-              break;
-            case GroupIndexSchema.DESCRIPTION:
-              query.sortByDescription(criterion.getOrder());
-              break;
-            case GroupIndexSchema.ROLE:
-              query.sortByRole(criterion.getOrder());
-              break;
-            case GroupIndexSchema.MEMBERS:
-              query.sortByMembers(criterion.getOrder());
-              break;
-            case GroupIndexSchema.ROLES:
-              query.sortByRoles(criterion.getOrder());
-              break;
-            default:
-              throw new IllegalArgumentException("Unknown group index " + criterion.getFieldName());
-          }
+        if (sortCriterion.getOrder() == SortCriterion.Order.Descending) {
+          comparator = comparator.reversed();
         }
+        comparators.add(comparator);
       }
-
-      if (optLimit.isSome())
-        query.withLimit(optLimit.get());
-      if (optOffset.isSome())
-        query.withOffset(optOffset.get());
-
-      results = externalIndex.getByQuery(query);
-    } catch (SearchIndexException e) {
-      logger.error("The External Search Index was not able to get the groups list:", e);
-      return ApiResponses.serverError("Could not retrieve groups, reason: '%s'", getMessage(e));
+      Collections.sort(results, ComparatorUtils.chainedComparator(comparators));
     }
 
-    // If the results list if empty, we return already a response.
-    List<JValue> groupsList = new ArrayList<>();
-    for (SearchResultItem<Group> item : results.getItems()) {
-      groupsList.add(groupToJSON(item.getSource()));
+    List<JValue> groupsJSON = new ArrayList<>();
+    for (JpaGroup group : results) {
+      List<Field> fields = new ArrayList<>();
+      fields.add(f("identifier", v(group.getGroupId())));
+      fields.add(f("organization", v(group.getOrganization().getId())));
+      fields.add(f("role", v(group.getRole())));
+      fields.add(f("name", v(group.getName(), Jsons.BLANK)));
+      fields.add(f("description", v(group.getDescription(), Jsons.BLANK)));
+      fields.add(f("roles", v(join(group.getRoleNames(), ","), Jsons.BLANK)));
+      fields.add(f("members", v(join(group.getMembers(), ","), Jsons.BLANK)));
+      groupsJSON.add(obj(fields));
     }
-    return ApiResponses.Json.ok(acceptHeader, arr(groupsList));
+    return ApiResponses.Json.ok(acceptHeader, arr(groupsJSON));
+  }
+
+  /**
+   * Compare groups by set attributes like members or roles.
+   */
+  private abstract class GroupComparator implements Comparator<JpaGroup> {
+
+    public abstract Set<String> getGroupAttribute(JpaGroup jpaGroup);
+
+    @Override
+    public int compare(JpaGroup group1, JpaGroup group2) {
+      List<String> members1 = new ArrayList<>(getGroupAttribute(group1));
+      List<String> members2 = new ArrayList<>(getGroupAttribute(group2));
+
+      for (int i = 0; i < members1.size() && i < members2.size(); i++) {
+        String member1 = members1.get(i);
+        String member2 = members2.get(i);
+        int result = member1.compareTo(member2);
+        if (result != 0) {
+          return result;
+        }
+      }
+      return (members1.size() - members2.size());
+    }
   }
 
   @GET
@@ -355,24 +385,4 @@ public class GroupsEndpoint {
       return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
     }
   }
-
-  /**
-   * Transform an {@link Group} to Json
-   *
-   * @param group
-   *          The group to transform.
-   * @return The group in json format.
-   */
-  protected JValue groupToJSON(Group group) {
-    List<Field> fields = new ArrayList<>();
-    fields.add(f("identifier", v(group.getIdentifier())));
-    fields.add(f("organization", v(group.getOrganization())));
-    fields.add(f("role", v(group.getRole())));
-    fields.add(f("name", v(group.getName(), Jsons.BLANK)));
-    fields.add(f("description", v(group.getDescription(), Jsons.BLANK)));
-    fields.add(f("roles", v(join(group.getRoles(), ","), Jsons.BLANK)));
-    fields.add(f("members", v(join(group.getMembers(), ","), Jsons.BLANK)));
-    return obj(fields);
-  }
-
 }

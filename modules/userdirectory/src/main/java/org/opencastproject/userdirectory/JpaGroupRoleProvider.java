@@ -50,6 +50,7 @@ import org.opencastproject.userdirectory.api.AAIRoleProvider;
 import org.opencastproject.userdirectory.api.GroupRoleProvider;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -65,6 +66,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -480,6 +482,43 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
       groupList.add(group);
     }
     return groupList;
+  }
+
+  /**
+   * Get groups by the defined filter and sorting criteria.
+   *
+   * @param limit
+   *          how many groups to get (optional)
+   * @param offset
+   *          where to start the list for pagination (optional)
+   * @param nameFilter
+   *          filter by group name (optional)
+   * @param textFilter
+   *          fulltext filter (optional)
+   * @param sortCriteria
+   *          the sorting criteria
+   *
+   * @return a list of groups
+   */
+  public List<JpaGroup> getGroups(Optional<Integer> limit, Optional<Integer> offset, Optional<String> nameFilter,
+          Optional<String> textFilter, Set<SortCriterion> sortCriteria) {
+    String orgId = securityService.getOrganization().getId();
+    return UserDirectoryPersistenceUtil.findGroups(orgId, limit, offset, nameFilter, textFilter, sortCriteria, emf);
+  }
+
+  /**
+   * Count groups that fit the filter criteria in total.
+   *
+   * @param nameFilter
+   *          filter by group name (optional)
+   * @param textFilter
+   *          fulltext filter (optional)
+   *
+   * @return a list of groups
+   */
+  public long countTotalGroups(Optional<String> nameFilter, Optional<String> textFilter) {
+    String orgId = securityService.getOrganization().getId();
+    return UserDirectoryPersistenceUtil.countTotalGroups(orgId, nameFilter, textFilter, emf);
   }
 
   /**
