@@ -9,9 +9,11 @@
   </tags>
   <displayOrder>100</displayOrder>
   <description>
-    A minimal workflow that transcodes the media into distribution formats, then
+    A minimal testing workflow that transcodes the media into distribution formats, then
     sends the resulting distribution files, along with their associated metadata,
     to the distribution channels.
+
+    If straight to publishing is checked, then the uploaded media will be published to engage without cutting.
   </description>
   <configuration_panel>
     <![CDATA[

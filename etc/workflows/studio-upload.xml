@@ -9,6 +9,8 @@
   <displayOrder>1010</displayOrder>
   <description>
     A simple and fast workflow for publishing videos created by Opencast Studio.
+
+    If straight to publishing is checked, then the uploaded media will be published to engage without cutting.
   </description>
   <configuration_panel>
     <![CDATA[
