@@ -36,7 +36,7 @@ angular.module('adminNg.controllers')
       };
 
       angular.forEach($scope.states[2].stateController.users.selected, function (value) {
-        $scope.group.users.push(value.value);
+        $scope.group.users.push(value.name);
       });
 
       angular.forEach($scope.states[1].stateController.roles.selected, function (value) {
