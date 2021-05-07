@@ -267,7 +267,7 @@ in Opencast per default, but the operation will not work without them.
 You need to include the following encoding profiles by copy and pasting them in
 a `.properties` file in the `etc/encoding` folder of your installation.
 
-```xml
+```
 # Generate silent audio tracks for filling gaps for partial import operation
 profile.import.silent.name = Generate silent audio tracks for filling gaps
 profile.import.silent.input = nothing
