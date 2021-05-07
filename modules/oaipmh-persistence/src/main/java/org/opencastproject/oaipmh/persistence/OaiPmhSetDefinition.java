@@ -20,34 +20,33 @@
  */
 package org.opencastproject.oaipmh.persistence;
 
-import org.opencastproject.util.data.Option;
+import java.util.Collection;
 
-import java.util.Date;
-import java.util.List;
+public interface OaiPmhSetDefinition {
 
-/** Query the database. */
-public interface Query {
-  Option<String> getMediaPackageId();
+  /**
+   * Returns the setSpec.
+   *
+   * @return setSpec
+   */
+  String getSetSpec();
 
-  Option<String> getRepositoryId();
+  /**
+   * Returns the setSpec name.
+   *
+   * @return setSpec name
+   */
+  String getName();
 
-  Option<String> getSeriesId();
+  /**
+   * Returns the set description. The value may be null.
+   * @return set description or null
+   */
+  String getDescription();
 
-  Option<Boolean> isDeleted();
-
-  /** The date is inclusive. */
-  Option<Date> getModifiedAfter();
-
-  /** The date is inclusive. */
-  Option<Date> getModifiedBefore();
-
-  Option<Integer> getLimit();
-
-  Option<Integer> getOffset();
-
-  List<OaiPmhSetDefinition> getSetDefinitions();
-
-  Option<String> getSetSpec();
-
-  boolean isSubsequentRequest();
+  /**
+   * Returns the filters.
+   * @return setSpec filters
+   */
+  Collection<OaiPmhSetDefinitionFilter> getFilters();
 }
