@@ -31,8 +31,12 @@ import java.security.NoSuchAlgorithmException;
 public class SHA256UtilTest {
   @Test
   public void testSha256() throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException {
-    String testString = "{\"Statement\":{\"Condition\":{\"DateLessThan\":1425768129644},\"Resource\":\"rtmp:\\/\\/mh-wowza.localdomain\\/matterhorn-engage\\/mp4:engage-player\\/2c2c438d-bb4d-404c-a677-0ebc072d91e2\\/5dbfdbcd-a983-44ea-93b6-e1c457acb61f\\/short\"}}";
-    assertEquals("bf344862e1d317b246cb4336525146a4312081925c9641efaa5ebf272b944d78", SHA256Util.digest(testString, "abc123"));
-    assertEquals("5169ea7246cf084413228c5ca3590b9045e3a53a625074530ad222857c6d3b7c", SHA256Util.digest(testString, "123abc"));
+    String testString = "{\"Statement\":{\"Condition\":{\"DateLessThan\":1425768129644},"
+        + "\"Resource\":\"rtmp:\\/\\/mh-wowza.localdomain\\/matterhorn-engage\\/mp4:engage-player"
+        + "\\/2c2c438d-bb4d-404c-a677-0ebc072d91e2\\/5dbfdbcd-a983-44ea-93b6-e1c457acb61f\\/short\"}}";
+    assertEquals("bf344862e1d317b246cb4336525146a4312081925c9641efaa5ebf272b944d78",
+        SHA256Util.digest(testString, "abc123"));
+    assertEquals("5169ea7246cf084413228c5ca3590b9045e3a53a625074530ad222857c6d3b7c",
+        SHA256Util.digest(testString, "123abc"));
   }
 }

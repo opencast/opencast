@@ -218,23 +218,24 @@ public class ResourceRequestUtilTest {
 
     Policy differentScheme = Policy.mkSimplePolicy(rtmpResource, before);
     String signature = PolicyUtils.getPolicySignature(differentScheme, key);
-    String differentSchemeQueryString = ResourceRequest.ENCRYPTION_ID_KEY + "=default&" + ResourceRequest.POLICY_KEY + "="
-            + PolicyUtils.toBase64EncodedPolicy(differentScheme) + "&" + ResourceRequest.SIGNATURE_KEY + "="
-            + signature;
+    String differentSchemeQueryString = ResourceRequest.ENCRYPTION_ID_KEY + "=default&"
+        + ResourceRequest.POLICY_KEY + "="
+        + PolicyUtils.toBase64EncodedPolicy(differentScheme) + "&" + ResourceRequest.SIGNATURE_KEY + "="
+        + signature;
 
-    assertEquals(Status.Ok, ResourceRequestUtil
-            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, httpResource, properties, false).getStatus());
-    assertEquals(Status.Forbidden, ResourceRequestUtil
-            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, httpResource, properties, true).getStatus());
+    assertEquals(Status.Ok, ResourceRequestUtil.resourceRequestFromQueryString(
+        differentSchemeQueryString, clientIp, httpResource, properties, false).getStatus());
+    assertEquals(Status.Forbidden, ResourceRequestUtil.resourceRequestFromQueryString(
+        differentSchemeQueryString, clientIp, httpResource, properties, true).getStatus());
 
-    assertEquals(Status.Ok, ResourceRequestUtil
-            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, portResource, properties, false).getStatus());
-    assertEquals(Status.Forbidden, ResourceRequestUtil
-            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, portResource, properties, true).getStatus());
+    assertEquals(Status.Ok, ResourceRequestUtil.resourceRequestFromQueryString(
+        differentSchemeQueryString, clientIp, portResource, properties, false).getStatus());
+    assertEquals(Status.Forbidden, ResourceRequestUtil.resourceRequestFromQueryString(
+        differentSchemeQueryString, clientIp, portResource, properties, true).getStatus());
 
-    assertEquals(Status.Ok, ResourceRequestUtil
-            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, differentHostnameResource, properties, false).getStatus());
-    assertEquals(Status.Forbidden, ResourceRequestUtil
-            .resourceRequestFromQueryString(differentSchemeQueryString, clientIp, differentHostnameResource, properties, true).getStatus());
+    assertEquals(Status.Ok, ResourceRequestUtil.resourceRequestFromQueryString(
+        differentSchemeQueryString, clientIp, differentHostnameResource, properties, false).getStatus());
+    assertEquals(Status.Forbidden, ResourceRequestUtil.resourceRequestFromQueryString(
+        differentSchemeQueryString, clientIp, differentHostnameResource, properties, true).getStatus());
   }
 }

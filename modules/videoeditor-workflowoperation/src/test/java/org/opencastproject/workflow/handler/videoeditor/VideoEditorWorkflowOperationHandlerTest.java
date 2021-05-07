@@ -153,7 +153,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
 
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.start(workflowInstance, null);
     Assert.assertNotNull(
-            "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
+        "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
     EasyMock.verify(workspaceMock);
 
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
@@ -197,7 +197,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
     WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration(true));
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.skip(workflowInstance, null);
     Assert.assertNotNull(
-            "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
+        "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
 
     // mediapackage should contain new derived track with flavor given by "target-flavor-subtype" configuration
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
@@ -224,7 +224,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
     WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration(false));
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.start(workflowInstance, null);
     Assert.assertNotNull(
-            "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
+        "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
 
     // mediapackage should contain new derived track with flavor given by "target-flavor-subtype" configuration
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
@@ -279,7 +279,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
     // run test
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.resume(workflowInstance, null, null);
     Assert.assertNotNull(
-            "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
+        "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
 
     EasyMock.verify(workspaceMock, job, serviceRegistry, videoEditorServiceMock);
 

@@ -72,7 +72,8 @@ public class VideoGridServiceImplTest {
     EasyMock.expect(workspace.rootDirectory()).andReturn(directory).anyTimes();
 
     sourceVideoTrack = (Track) MediaPackageElementParser.getFromXml(IOUtils.toString(
-            VideoGridServiceImplTest.class.getResourceAsStream("/composer_test_source_track_video.xml"), Charset.defaultCharset()));
+            VideoGridServiceImplTest.class.getResourceAsStream("/composer_test_source_track_video.xml"),
+            Charset.defaultCharset()));
 
     serviceRegistry = EasyMock.createMock(ServiceRegistry.class);
     final Capture<String> type = EasyMock.newCapture();

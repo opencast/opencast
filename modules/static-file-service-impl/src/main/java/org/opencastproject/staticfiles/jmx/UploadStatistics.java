@@ -103,8 +103,9 @@ public class UploadStatistics implements UploadStatisticsMXBean {
   }
 
   public void add(long bytes) {
-    if (totalNumBytesRead == 0)
+    if (totalNumBytesRead == 0) {
       bytesCounter.put(System.currentTimeMillis(), 0L);
+    }
     totalNumBytesRead += bytes;
     bytesCounter.put(System.currentTimeMillis(), totalNumBytesRead);
   }

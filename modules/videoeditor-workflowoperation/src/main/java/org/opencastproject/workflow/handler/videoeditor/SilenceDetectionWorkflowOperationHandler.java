@@ -106,8 +106,9 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
             SMIL_TARGET_FLAVOR_PROPERTY));
 
     MediaPackageElementFlavor smilTargetFlavor = null;
-    if (smilTargetFlavorString != null)
+    if (smilTargetFlavorString != null) {
       smilTargetFlavor = MediaPackageElementFlavor.parseFlavor(smilTargetFlavorString);
+    }
 
     if (sourceFlavor == null && sourceFlavors == null) {
       throw new WorkflowOperationException(String.format("No %s or %s have been specified", SOURCE_FLAVOR_PROPERTY,
@@ -131,8 +132,9 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
 
     String referenceTracksFlavor = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
             REFERENCE_TRACKS_FLAVOR_PROPERTY));
-    if (referenceTracksFlavor == null)
+    if (referenceTracksFlavor == null) {
       referenceTracksFlavor = finalSourceFlavors;
+    }
 
     TrackSelector trackSelector = new TrackSelector();
     for (String flavor : asList(finalSourceFlavors)) {
@@ -175,8 +177,9 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
           is = IOUtils.toInputStream(smil.toXML(), "UTF-8");
           URI smilURI = workspace.put(mp.getIdentifier().toString(), smil.getId(), TARGET_FILE_NAME, is);
           MediaPackageElementFlavor smilFlavor = smilTargetFlavor;
-          if (smilFlavor == null)
+          if (smilFlavor == null) {
             smilFlavor = new MediaPackageElementFlavor(sourceTrack.getFlavor().getType(), smilFlavorSubType);
+          }
           Catalog catalog = (Catalog) mpeBuilder.elementFromURI(smilURI, MediaPackageElement.Type.Catalog, smilFlavor);
           catalog.setIdentifier(smil.getId());
           mp.add(catalog);

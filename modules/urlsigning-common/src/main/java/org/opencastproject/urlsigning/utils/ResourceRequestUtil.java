@@ -49,7 +49,8 @@ import java.util.Properties;
 public final class ResourceRequestUtil {
   private static final Logger logger = LoggerFactory.getLogger(ResourceRequestUtil.class);
 
-  private static final DateTimeFormatter humanReadableFormat = DateTimeFormat.forPattern("yyyy-MM-dd kk:mm:ss Z").withZoneUTC();
+  private static final DateTimeFormatter humanReadableFormat
+      = DateTimeFormat.forPattern("yyyy-MM-dd kk:mm:ss Z").withZoneUTC();
 
   private ResourceRequestUtil() {
   }
@@ -75,15 +76,20 @@ public final class ResourceRequestUtil {
    *          The query string parameters.
    * @return True if all of the mandatory query string parameters were provided.
    */
-  private static boolean getQueryStringParameters(ResourceRequest resourceRequest, List<NameValuePair> queryParameters) {
+  private static boolean getQueryStringParameters(
+      ResourceRequest resourceRequest,
+      List<NameValuePair> queryParameters
+  ) {
     for (NameValuePair nameValuePair : queryParameters) {
       if (ResourceRequest.ENCRYPTION_ID_KEY.equals(nameValuePair.getName())) {
         if (StringUtils.isBlank(resourceRequest.getEncryptionKeyId())) {
           resourceRequest.setEncryptionKeyId(nameValuePair.getValue());
         } else {
           resourceRequest.setStatus(Status.BadRequest);
-          resourceRequest.setRejectionReason(
-                  String.format("The mandatory '%s' query string parameter had an empty value.", ResourceRequest.ENCRYPTION_ID_KEY));
+          resourceRequest.setRejectionReason(String.format(
+              "The mandatory '%s' query string parameter had an empty value.",
+              ResourceRequest.ENCRYPTION_ID_KEY
+          ));
           return false;
         }
       }
@@ -92,16 +98,20 @@ public final class ResourceRequestUtil {
           resourceRequest.setEncodedPolicy(nameValuePair.getValue());
         } else {
           resourceRequest.setStatus(Status.BadRequest);
-          resourceRequest.setRejectionReason(
-                  String.format("The mandatory '%s' query string parameter had an empty value.", ResourceRequest.POLICY_KEY));
+          resourceRequest.setRejectionReason(String.format(
+              "The mandatory '%s' query string parameter had an empty value.",
+              ResourceRequest.POLICY_KEY
+          ));
           return false;
         }
       }
       if (ResourceRequest.SIGNATURE_KEY.equals(nameValuePair.getName())) {
         if (StringUtils.isBlank(resourceRequest.getSignature())) {
           resourceRequest.setSignature(nameValuePair.getValue());
-          resourceRequest.setRejectionReason(
-                  String.format("The mandatory '%s' query string parameter had an empty value.", ResourceRequest.SIGNATURE_KEY));
+          resourceRequest.setRejectionReason(String.format(
+              "The mandatory '%s' query string parameter had an empty value.",
+              ResourceRequest.SIGNATURE_KEY
+          ));
         } else {
           resourceRequest.setStatus(Status.BadRequest);
           return false;
@@ -230,17 +240,19 @@ public final class ResourceRequestUtil {
       resourceRequest.setStatus(Status.Forbidden);
       try {
         String policySignature = PolicyUtils.getPolicySignature(policy, encryptionKey);
-        resourceRequest
-                .setRejectionReason(String
-                        .format("Forbidden because policy and signature do not match. Policy: '%s' created Signature from this policy '%s' and query string Signature: '%s'.",
-                                PolicyUtils.toJson(resourceRequest.getPolicy()).toJSONString(), policySignature,
-                                resourceRequest.getSignature()));
+        resourceRequest.setRejectionReason(String.format(
+            "Forbidden because policy and signature do not match. Policy: '%s' created Signature "
+                + "from this policy '%s' and query string Signature: '%s'.",
+            PolicyUtils.toJson(resourceRequest.getPolicy()).toJSONString(),
+            policySignature,
+            resourceRequest.getSignature()));
       } catch (Exception e) {
-        resourceRequest
-                .setRejectionReason(String
-                        .format("Forbidden because policy and signature do not match. Policy: '%s' and query string Signature: '%s'. Unable to sign policy because: %s",
-                                PolicyUtils.toJson(resourceRequest.getPolicy()).toJSONString(),
-                                resourceRequest.getSignature(), ExceptionUtils.getStackTrace(e)));
+        resourceRequest.setRejectionReason(String.format(
+            "Forbidden because policy and signature do not match. Policy: '%s' and query string "
+                + "Signature: '%s'. Unable to sign policy because: %s",
+            PolicyUtils.toJson(resourceRequest.getPolicy()).toJSONString(),
+            resourceRequest.getSignature(),
+            ExceptionUtils.getStackTrace(e)));
       }
       return resourceRequest;
     }
@@ -268,17 +280,18 @@ public final class ResourceRequestUtil {
         if (!policyPath.endsWith(requestedPath)) {
           resourceRequest.setStatus(Status.Forbidden);
           resourceRequest.setRejectionReason(String.format(
-                  "Forbidden because resource trying to be accessed '%s' doesn't match policy resource '%s'", resourceUri,
-                  resourceRequest.getPolicy().getBaseUrl()));
+              "Forbidden because resource trying to be accessed '%s' doesn't match policy resource '%s'", resourceUri,
+              resourceRequest.getPolicy().getBaseUrl()));
           return resourceRequest;
         }
       } catch (URISyntaxException e) {
         resourceRequest.setStatus(Status.Forbidden);
-        resourceRequest
-            .setRejectionReason(String
-                .format("Forbidden because either the policy or requested URI cannot be parsed. Policy Path: '%s' and Request Path: '%s'. Unable to sign policy because: %s",
-                        policy.getResource(),
-                        resourceUri, ExceptionUtils.getStackTrace(e)));
+        resourceRequest.setRejectionReason(String.format(
+            "Forbidden because either the policy or requested URI cannot be parsed. Policy Path: "
+                + "'%s' and Request Path: '%s'. Unable to sign policy because: %s",
+            policy.getResource(),
+            resourceUri,
+            ExceptionUtils.getStackTrace(e)));
         return resourceRequest;
       }
     }
