@@ -81,7 +81,6 @@ public class JpaGroupRoleProviderTest {
 
     provider = new JpaGroupRoleProvider();
     provider.setSecurityService(securityService);
-    provider.setMessageSender(messageSender);
     provider.setEntityManagerFactory(newTestEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
     provider.activate(null);
 

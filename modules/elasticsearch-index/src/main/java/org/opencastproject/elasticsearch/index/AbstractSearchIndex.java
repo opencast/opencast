@@ -38,10 +38,6 @@ import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.elasticsearch.index.event.EventQueryBuilder;
 import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.group.Group;
-import org.opencastproject.elasticsearch.index.group.GroupIndexUtils;
-import org.opencastproject.elasticsearch.index.group.GroupQueryBuilder;
-import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesIndexUtils;
 import org.opencastproject.elasticsearch.index.series.SeriesQueryBuilder;
@@ -106,29 +102,6 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
       update(doc);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write resource " + event + " to index", t);
-    }
-  }
-
-  /**
-   * Adds or updates the group in the search index.
-   *
-   * @param group
-   *          The group to add
-   * @throws SearchIndexException
-   *           Thrown if unable to add or update the group.
-   */
-  public void addOrUpdate(Group group) throws SearchIndexException {
-    logger.debug("Adding group {} to search index", group.getIdentifier());
-
-    // Add the resource to the index
-    SearchMetadataCollection inputDocument = GroupIndexUtils.toSearchMetadata(group);
-    List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
-    ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
-            inputDocument.getDocumentType(), resourceMetadata);
-    try {
-      update(doc);
-    } catch (Throwable t) {
-      throw new SearchIndexException("Cannot write resource " + group + " to index", t);
     }
   }
 
@@ -325,34 +298,6 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
       });
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying event index", t);
-    }
-  }
-
-  /**
-   * @param query
-   *          The query to use to retrieve the groups that match the query
-   * @return {@link SearchResult} collection of {@link Group} from a query.
-   * @throws SearchIndexException
-   *           Thrown if there is an error getting the results.
-   */
-  public SearchResult<Group> getByQuery(GroupSearchQuery query) throws SearchIndexException {
-
-    logger.debug("Searching index using group query '{}'", query);
-
-    // Create the request
-    final SearchRequest searchRequest = getSearchRequest(query, new GroupQueryBuilder(query));
-
-    try {
-      final Unmarshaller unmarshaller = Group.createUnmarshaller();
-      return executeQuery(query, searchRequest, metadata -> {
-        try {
-          return GroupIndexUtils.toGroup(metadata, unmarshaller);
-        } catch (IOException e) {
-          return chuck(e);
-        }
-      });
-    } catch (Throwable t) {
-      throw new SearchIndexException("Error querying series index", t);
     }
   }
 

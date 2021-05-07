@@ -21,20 +21,11 @@
 
 package org.opencastproject.userdirectory;
 
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexProducer;
-import org.opencastproject.index.rebuild.IndexRebuildService;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.group.GroupItem;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.GroupProvider;
-import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.security.api.JaxbGroupList;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
@@ -45,7 +36,6 @@ import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
-import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.api.AAIRoleProvider;
 import org.opencastproject.userdirectory.api.GroupRoleProvider;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
@@ -53,7 +43,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -82,22 +71,15 @@ import javax.persistence.EntityTransaction;
     "service.description=Provides a group role directory"
   },
   immediate = true,
-  service = { RoleProvider.class, JpaGroupRoleProvider.class, IndexProducer.class }
+  service = { RoleProvider.class, JpaGroupRoleProvider.class }
 )
-public class JpaGroupRoleProvider extends AbstractIndexProducer
-        implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
+public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);
 
   /** The JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
-
-  /** The message broker service */
-  protected MessageSender messageSender;
-
-  /** The message broker receiver */
-  protected MessageReceiver messageReceiver;
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -129,24 +111,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
   @Reference(name = "userDirectoryService")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
-  }
-
-  /**
-   * @param messageSender
-   *          The messageSender to set
-   */
-  @Reference(name = "message-broker-sender")
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
-  /**
-   * @param messageReceiver
-   *          The messageReceiver to set
-   */
-  @Reference(name = "message-broker-receiver")
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
   }
 
   /**
@@ -407,8 +371,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
         em.merge(foundGroup);
       }
       tx.commit();
-      messageSender.sendObjectMessage(GroupItem.GROUP_QUEUE, MessageSender.DestinationType.Queue,
-              GroupItem.update(JaxbGroup.fromGroup(jpaGroup)));
     } finally {
       if (tx.isActive()) {
         tx.rollback();
@@ -424,8 +386,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
       throw new UnauthorizedException("The user is not allowed to delete a group with the admin role");
 
     UserDirectoryPersistenceUtil.removeGroup(groupId, orgId, emf);
-    messageSender.sendObjectMessage(GroupItem.GROUP_QUEUE, MessageSender.DestinationType.Queue,
-            GroupItem.delete(groupId));
   }
 
   /**
@@ -697,29 +657,5 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer
       }
     }
     addGroup(group);
-  }
-
-  @Override
-  public void repopulate(final AbstractSearchIndex index) {
-    final String destinationId = GroupItem.GROUP_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName());
-    for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-        final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
-        int total = groups.size();
-        int current = 1;
-        logIndexRebuildBegin(logger, index.getIndexName(), total, "groups", organization);
-        for (JpaGroup group : groups) {
-          messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                  GroupItem.update(JaxbGroup.fromGroup(group)));
-          logIndexRebuildProgress(logger, index.getIndexName(), total, current);
-          current++;
-        }
-      });
-    }
-  }
-
-  @Override
-  public IndexRebuildService.Service getService() {
-    return IndexRebuildService.Service.Groups;
   }
 }
