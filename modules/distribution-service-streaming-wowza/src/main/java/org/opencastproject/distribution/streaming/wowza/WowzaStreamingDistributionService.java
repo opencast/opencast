@@ -946,7 +946,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
     // Try to remove the parent folders, if possible
     File elementDir = elementFile.getParentFile();
-    if (elementDir != null && elementDir.exists()) {
+    if (elementDir != null && elementDir.exists() && elementDir.list() != null) {
       if (elementDir.list().length == 0) {
         if (!elementDir.delete()) {
           logger.warn("Could not properly delete element directory: {}", elementDir);
