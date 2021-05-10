@@ -164,6 +164,7 @@
               OSGI-INF/operations/analyze-tracks.xml,
               OSGI-INF/operations/cleanup.xml,
               OSGI-INF/operations/clone.xml,
+              OSGI-INF/operations/conditional-config.xml,
               OSGI-INF/operations/configure-by-dcterm.xml,
               OSGI-INF/operations/copy.xml,
               OSGI-INF/operations/defaults.xml,
