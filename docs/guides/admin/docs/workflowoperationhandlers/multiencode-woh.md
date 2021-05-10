@@ -168,7 +168,7 @@ profile.hls-quarter-15fps-presenter-mp4.ffmpeg.command = -i #{in.video.path} -r:
  -x264opts:v rc-lookahead=30:keyint=60:min-keyint=30:no-open-gop=1 \
  -preset:v veryfast -movflags +faststart \
  -c:v libx264 -c:a aac \
- -vf scale=min(320\\,trunc(iw/8)*2):-2,yadif \
+ -vf scale=min(320\\,trunc(iw/8)*2):-2 \
  -b:v 100k -minrate:v 90k -maxrate:v 110k -bufsize:v 100k \
  -b:a 48k #{out.dir}/#{out.name}#{out.suffix}
 profile.hls-quarter-15fps-presenter-mp4.jobload=4.0
@@ -184,7 +184,7 @@ profile.hls-quarter-res-presenter-mp4.ffmpeg.command = -i #{in.video.path} -r:v 
  -x264opts:v rc-lookahead=60:keyint=120:min-keyint=60:no-open-gop=1 \
  -preset:v veryfast -movflags +faststart \
  -c:v libx264 -c:a aac \
- -vf scale=min(320\\,trunc(iw/8)*2):-2,yadif \
+ -vf scale=min(320\\,trunc(iw/8)*2):-2 \
  -b:v 200k -maxrate:v 220k -bufsize:v 200k \
  -b:a 48k #{out.dir}/#{out.name}#{out.suffix}
 profile.hls-quarter-res-presenter-mp4.jobload=4.0
@@ -201,7 +201,7 @@ profile.hls-half-res-presenter-mp4.ffmpeg.command = -i #{in.video.path} -r:v 30 
  -x264opts:v rc-lookahead=60:keyint=120:min-keyint=60:no-open-gop=1 \
  -preset:v veryfast -movflags +faststart \
  -c:v libx264 -c:a aac \
- -vf scale=min(640\\,trunc(iw*0.25)*2):-2,yadif \
+ -vf scale=min(640\\,trunc(iw*0.25)*2):-2 \
  -b:v 1200k -maxrate:v 1320k -bufsize:v 1M  \
  -b:a 64k #{out.dir}/#{out.name}#{out.suffix}
 profile.hls-half-res-presenter-mp4.jobload=4.0
@@ -217,7 +217,7 @@ profile.hls-threequarters-res-presenter-mp4.ffmpeg.command = -i #{in.video.path}
  -x264opts:v rc-lookahead=60:keyint=120:min-keyint=60:no-open-gop=1 \
  -preset:v veryfast -movflags +faststart \
  -c:v libx264 -c:a aac \
- -vf scale=min(960\\,trunc(iw*0.375)*2):-2,yadif \
+ -vf scale=min(960\\,trunc(iw*0.375)*2):-2 \
  -b:v 2500k -maxrate:v 2700k -bufsize:v 2M \
  -b:a 96k #{out.dir}/#{out.name}#{out.suffix}
 profile.hls-threequarters-res-presenter-mp4.jobload=4.0
@@ -233,7 +233,7 @@ profile.hls-full-res-presenter-mp4.ffmpeg.command = -i #{in.video.path} -r:v 30 
  -force_key_frames:v expr:eq(mod(n,60),0) \
  -x264opts:v rc-lookahead=60:keyint=120:min-keyint=60:no-open-gop=1 \
  -preset:v veryfast -movflags +faststart \
- -vf scale=min(1280\\,trunc(iw/2)*2):-2,yadif \
+ -vf scale=min(1280\\,trunc(iw/2)*2):-2 \
  -pix_fmt:v yuv420p -c:v libx264 -c:a aac \
  -b:v 4500k -maxrate:v 4900k  -bufsize:v 4M  \
  -b:a 128k #{out.dir}/#{out.name}#{out.suffix}
@@ -251,7 +251,7 @@ profile.hls-quarter-15fps-presentation-mp4.ffmpeg.command = -i #{in.video.path} 
  -x264opts:v rc-lookahead=30:keyint=60:min-keyint=30:no-open-gop=1 \
  -preset:v veryfast -movflags +faststart \
  -c:v libx264 -c:a aac \
- -vf scale=min(480\\,trunc(iw/8)*2):-2,yadif \
+ -vf scale=min(480\\,trunc(iw/8)*2):-2 \
  -b:v 100k -minrate:v 90k -maxrate:v 110k -bufsize:v 100k \
  -b:a 48k #{out.dir}/#{out.name}#{out.suffix}
 profile.hls-quarter-15fps-presentation-mp4.jobload=4.0
@@ -267,7 +267,7 @@ profile.hls-quarter-res-presentation-mp4.ffmpeg.command = -i #{in.video.path} -r
  -x264opts:v rc-lookahead=60:keyint=120:min-keyint=60:no-open-gop=1 \
  -preset:v veryfast -movflags +faststart \
  -pix_fmt:v yuv420p -c:v libx264 -c:a aac \
- -vf scale=min(480\\,trunc(iw/8)*2):-2,yadif \
+ -vf scale=min(480\\,trunc(iw/8)*2):-2 \
  -b:v 250k -maxrate:v 275k -bufsize:v 250k  \
  -b:a 48k #{out.dir}/#{out.name}#{out.suffix}
 profile.hls-quarter-res-presentation-mp4.jobload=4.0
@@ -283,7 +283,7 @@ profile.hls-half-res-presentation-mp4.ffmpeg.command = -i #{in.video.path} -r:v 
  -x264opts:v rc-lookahead=60:keyint=120:min-keyint=60:no-open-gop=1 \
  -pix_fmt:v yuv420p -c:v libx264 -c:a aac \
  -preset:v veryfast -movflags +faststart \
- -vf scale=min(960\\,trunc(iw*0.25)*2):-2,yadif \
+ -vf scale=min(960\\,trunc(iw*0.25)*2):-2 \
  -b:v 1M -maxrate:v 1100k -bufsize:v 1M \
  -b:a 64k #{out.dir}/#{out.name}#{out.suffix}
 profile.hls-half-res-presentation-mp4.jobload=4.0
@@ -299,7 +299,7 @@ profile.hls-threequarters-res-presentation-mp4.ffmpeg.command = -i #{in.video.pa
  -x264opts:v rc-lookahead=60:keyint=120:min-keyint=60:no-open-gop=1 \
  -pix_fmt:v yuv420p -c:v libx264 -c:a aac \
  -preset:v veryfast -movflags +faststart \
- -vf scale=min(1440\\,trunc(iw*0.375)*2):-2,yadif \
+ -vf scale=min(1440\\,trunc(iw*0.375)*2):-2 \
  -b:v 2M -maxrate:v 2200k -bufsize:v 2M \
  -b:a 96k #{out.dir}/#{out.name}#{out.suffix}
 profile.hls-threequarters-res-presentation-mp4.jobload=4.0
@@ -315,7 +315,7 @@ profile.hls-full-res-presentation-mp4.ffmpeg.command = -i #{in.video.path} -r:v 
  -force_key_frames:v expr:eq(mod(n,60),0) \
  -x264opts:v rc-lookahead=60:keyint=120:min-keyint=60:no-open-gop=1 \
  -preset:v veryfast -movflags +faststart \
- -vf scale=min(1920\\,trunc(iw/2)*2):-2,yadif \
+ -vf scale=min(1920\\,trunc(iw/2)*2):-2 \
  -pix_fmt:v yuv420p -c:v libx264 -c:a aac \
  -b:v 4M -maxrate:v 4400k -bufsize:v 4M \
  -b:a 128k #{out.dir}/#{out.name}#{out.suffix}
