@@ -5,11 +5,11 @@ set -ue
 ret=0
 
 echo Checking pom.xml files for tabs or trailing spaces…
-if grep -rn $'\t' modules assemblies pom.xml --include=pom.xml; then
+if grep -rn $'\t' modules assemblies docs/checkstyle pom.xml --include=pom.xml; then
   echo "Tabs found!"
   ret=1
 fi
-if grep -rn ' $' modules assemblies pom.xml --include=pom.xml; then
+if grep -rn ' $' modules assemblies docs/checkstyle pom.xml --include=pom.xml; then
   echo "Trailing spaces found!"
   ret=1
 fi
