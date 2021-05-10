@@ -305,6 +305,6 @@ profile.encode.partial-import.output = audiovisual
 profile.encode.partial-import.suffix = -editor.mp4
 profile.encode.partial-import.mimetype = video/mp4
 profile.encode.partial-import.ffmpeg.command = -i #{in.video.path} \
-  -filter:v fps=25 -shortest -c:v libx264 -preset superfast -pix_fmt yuv420p -crf 18 -c:a aac -strict -2 -b:a 196k \
+  -filter:v fps=25 -shortest -c:v libx264 -preset superfast -pix_fmt yuv420p -crf 18 -c:a aac -b:a 196k \
   #{out.dir}/#{out.name}#{out.suffix}
 ```
