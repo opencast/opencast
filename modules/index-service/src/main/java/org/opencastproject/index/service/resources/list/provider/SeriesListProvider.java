@@ -21,17 +21,20 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
+import static org.opencastproject.matterhorn.search.SearchQuery.Order.Ascending;
+
+import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
+import org.opencastproject.index.service.impl.index.series.Series;
+import org.opencastproject.index.service.impl.index.series.SeriesIndexSchema;
+import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.list.query.StringListFilter;
-import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
-import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.matterhorn.search.SearchResult;
+import org.opencastproject.matterhorn.search.SearchResultItem;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -40,12 +43,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SeriesListProvider implements ResourceListProvider {
-  public static final String FILTER_TEXT = "text";
+  private static final Logger logger = LoggerFactory.getLogger(SeriesListProvider.class);
 
   public static final String PROVIDER_PREFIX = "SERIES";
 
@@ -63,17 +67,24 @@ public class SeriesListProvider implements ResourceListProvider {
 
   private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, ORGANIZERS, TITLE_EXTENDED };
 
-  private SeriesService seriesService;
+  /** The search index. */
+  private AbstractSearchIndex searchIndex;
 
-  private static final Logger logger = LoggerFactory.getLogger(SeriesListProvider.class);
+  /** The security service. */
+  private SecurityService securityService;
 
   protected void activate(BundleContext bundleContext) {
     logger.info("Series list provider activated!");
   }
 
   /** OSGi callback for series services. */
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
+  public void setSearchIndex(AbstractSearchIndex searchIndex) {
+    this.searchIndex = searchIndex;
+  }
+
+  /** OSGi callback for security service */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   @Override
@@ -84,69 +95,70 @@ public class SeriesListProvider implements ResourceListProvider {
   @Override
   public Map<String, String> getList(String listName, ResourceListQuery query)
           throws ListProviderException {
-
-    Map<String, String> series = new HashMap<String, String>();
-    SeriesQuery q = new SeriesQuery().setCount(Integer.MAX_VALUE);
-
-    if (query != null) {
-      if (query.hasFilter(FILTER_TEXT)) {
-        StringListFilter filter = (StringListFilter) query.getFilter(FILTER_TEXT);
-
-        if (filter.getValue().isSome())
-          q.setText(filter.getValue().get());
+    SeriesSearchQuery seriesQuery;
+    if (query instanceof SeriesSearchQuery) {
+      seriesQuery = (SeriesSearchQuery) query;
+    } else {
+      seriesQuery = new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
+      if (query.getLimit().isSome()) {
+        seriesQuery.withLimit(query.getLimit().get());
       }
-
-      if (query.getLimit().isSome())
-        q.setCount(query.getLimit().get());
-
-      if (query.getOffset().isSome())
-        q.setStartPage(query.getOffset().get());
-    }
-
-    List<DublinCoreCatalog> result = null;
-
-    try {
-      if (!CONTRIBUTORS.equals(listName) && !ORGANIZERS.equals(listName) && !TITLE_EXTENDED.equals(listName)) {
-        return seriesService.getIdTitleMapOfAllSeries();
+      if (query.getOffset().isSome()) {
+        seriesQuery.withOffset(query.getOffset().get());
       }
-      result = seriesService.getSeries(q).getCatalogList();
-    } catch (SeriesException e) {
-      throw new ListProviderException("Error appends on the series service: " + e);
-    } catch (UnauthorizedException e) {
-      throw new ListProviderException("Unauthorized access to series service: " + e);
     }
-
-    for (DublinCoreCatalog dc : result) {
-      if (CONTRIBUTORS.equals(listName)) {
-        String contributor = dc.getFirst(DublinCore.PROPERTY_CONTRIBUTOR);
-        if (StringUtils.isNotBlank(contributor))
-          series.put(contributor, contributor);
-      } else if (ORGANIZERS.equals(listName)) {
-        String organizer = dc.getFirst(DublinCore.PROPERTY_CREATOR);
-        if (StringUtils.isNotBlank(organizer))
-          series.put(organizer, organizer);
-      } else if (TITLE_EXTENDED.equals(listName)) {
-        String created = dc.getFirst(DublinCoreCatalog.PROPERTY_CREATED);
-        String organizer = dc.getFirst(DublinCore.PROPERTY_CREATOR);
-        StringBuilder sb = new StringBuilder(dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
-        if (StringUtils.isNotBlank(created) && StringUtils.isNotBlank(organizer)) {
-          List<String> extendedTitleData = new ArrayList<>();
-          if (StringUtils.isNotBlank(created)) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(EncodingSchemeUtils.decodeDate(created));
-            extendedTitleData.add(Integer.toString(calendar.get(Calendar.YEAR)));
+    Map<String, String> result = new HashMap<>();
+    if (TITLE.equals(listName)) {
+      seriesQuery.sortByTitle(Ascending);
+      for (String title : searchIndex.getTermsForField(SeriesIndexSchema.TITLE,
+          Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
+        result.put(title, title);
+      }
+    } else if (CONTRIBUTORS.equals(listName)) {
+      seriesQuery.sortByContributors(Ascending);
+      for (String contributor : searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS,
+          Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
+        result.put(contributor, contributor);
+      }
+    } else if (ORGANIZERS.equals(listName)) {
+      seriesQuery.sortByOrganizers(Ascending);
+      for (String organizer : searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS,
+          Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
+        result.put(organizer, organizer);
+      }
+    } else {
+      try {
+        seriesQuery.sortByTitle(Ascending);
+        seriesQuery.sortByCreatedDateTime(Ascending);
+        seriesQuery.sortByOrganizers(Ascending);
+        SearchResult searchResult = searchIndex.getByQuery(seriesQuery);
+        Calendar calendar = Calendar.getInstance();
+        for (SearchResultItem<Series> item : searchResult.getItems()) {
+          Series s = item.getSource();
+          if (TITLE_EXTENDED.equals(listName)) {
+            Date created = s.getCreatedDateTime();
+            List<String> organizers = s.getOrganizers();
+            StringBuilder sb = new StringBuilder(s.getTitle());
+            if (created != null || (organizers != null && !organizers.isEmpty())) {
+              List<String> extendedTitleData = new ArrayList<>();
+              if (created != null) {
+                calendar.setTime(created);
+                extendedTitleData.add(Integer.toString(calendar.get(Calendar.YEAR)));
+              }
+              if (organizers != null && !organizers.isEmpty())
+                extendedTitleData.addAll(organizers);
+              sb.append(" (").append(StringUtils.join(extendedTitleData, ", ")).append(")");
+            }
+            result.put(s.getIdentifier(), sb.toString());
+          } else {
+            result.put(s.getIdentifier(), s.getTitle());
           }
-          if (StringUtils.isNotBlank(organizer))
-            extendedTitleData.add(organizer);
-          sb.append(" (").append(StringUtils.join(extendedTitleData, ", ")).append(")");
         }
-        series.put(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER), sb.toString());
-      } else {
-        series.put(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER), dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
+      } catch (SearchIndexException e) {
+        logger.warn("Unable to query series.", e);
       }
     }
-
-    return series;
+    return result;
   }
 
   @Override
