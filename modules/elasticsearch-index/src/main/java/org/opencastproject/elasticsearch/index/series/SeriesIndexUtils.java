@@ -21,23 +21,13 @@
 
 package org.opencastproject.elasticsearch.index.series;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchMetadata;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.impl.SearchMetadataCollection;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Permissions.Action;
-import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
 
 import org.apache.commons.io.IOUtils;
@@ -177,151 +167,6 @@ public final class SeriesIndexUtils {
     for (Map.Entry<String, List<String>> entry : permissions.entrySet()) {
       String fieldName = SeriesIndexSchema.ACL_PERMISSION_PREFIX.concat(entry.getKey());
       doc.addField(fieldName, entry.getValue(), false);
-    }
-  }
-
-  /**
-   * Loads the series from the search index or creates a new one that can then be persisted.
-   *
-   * @param seriesId
-   *          the series identifier
-   * @param organization
-   *          the organization
-   * @param user
-   *          the user
-   * @param searchIndex
-   *          the AdminUISearchIndex to search in
-   * @return the series
-   * @throws SearchIndexException
-   *           if querying the search index fails
-   * @throws IllegalStateException
-   *           if multiple series with the same identifier are found
-   */
-  public static Series getOrCreate(String seriesId, String organization, User user, AbstractSearchIndex searchIndex)
-          throws SearchIndexException {
-    SeriesSearchQuery query = new SeriesSearchQuery(organization, user).withoutActions().withIdentifier(seriesId);
-    SearchResult<Series> searchResult = searchIndex.getByQuery(query);
-    if (searchResult.getDocumentCount() == 0) {
-      return new Series(seriesId, organization);
-    } else if (searchResult.getDocumentCount() == 1) {
-      return searchResult.getItems()[0].getSource();
-    } else {
-      throw new IllegalStateException("Multiple series with identifier " + seriesId + " found in search index");
-    }
-  }
-
-  /**
-   * Update the given {@link Series} with the given {@link DublinCore}.
-   *
-   * @param series
-   *          the series to update
-   * @param dc
-   *          the catalog with the metadata for the update
-   * @return the updated series
-   */
-  public static Series updateSeries(Series series, DublinCore dc) {
-    series.setTitle(dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
-    series.setDescription(dc.getFirst(DublinCore.PROPERTY_DESCRIPTION));
-    series.setSubject(dc.getFirst(DublinCore.PROPERTY_SUBJECT));
-    series.setLanguage(dc.getFirst(DublinCoreCatalog.PROPERTY_LANGUAGE));
-    series.setLicense(dc.getFirst(DublinCoreCatalog.PROPERTY_LICENSE));
-    series.setRightsHolder(dc.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER));
-    String createdDateStr = dc.getFirst(DublinCoreCatalog.PROPERTY_CREATED);
-    if (createdDateStr != null) {
-      series.setCreatedDateTime(EncodingSchemeUtils.decodeDate(createdDateStr));
-    }
-    series.setPublishers(dc.get(DublinCore.PROPERTY_PUBLISHER, DublinCore.LANGUAGE_ANY));
-    series.setContributors(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY));
-    series.setOrganizers(dc.get(DublinCoreCatalog.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY));
-    return series;
-  }
-
-  public static void updateEventSeriesTitles(Series series, String organization, User user,
-          AbstractSearchIndex searchIndex) throws SearchIndexException {
-    if (!series.isSeriesTitleUpdated()) {
-      return;
-    }
-
-    SearchResult<Event> events = searchIndex
-            .getByQuery(new EventSearchQuery(organization, user).withoutActions().withSeriesId(series.getIdentifier()));
-    for (SearchResultItem<Event> searchResultItem : events.getItems()) {
-      Event event = searchResultItem.getSource();
-      event.setSeriesName(series.getTitle());
-      searchIndex.addOrUpdate(event);
-    }
-  }
-
-  /**
-   * Update a unique managed acl name to a new one for all of the series.
-   *
-   * @param currentManagedAcl
-   *          The current name for the managed acl.
-   * @param newManagedAcl
-   *          The new name for the managed acl.
-   * @param organization
-   *          The organization for the managed acl.
-   * @param user
-   *          The user.
-   * @param searchIndex
-   *          The search index to update the managed acl name.
-   */
-  public static void updateManagedAclName(String currentManagedAcl, String newManagedAcl, String organization,
-          User user, AbstractSearchIndex searchIndex) {
-    SearchResult<Series> result = null;
-    try {
-      result = searchIndex
-              .getByQuery(new SeriesSearchQuery(organization, user).withoutActions().withManagedAcl(currentManagedAcl));
-    } catch (SearchIndexException e) {
-      logger.error("Unable to find the series in org '{}' with current managed acl name '{}'", organization,
-              currentManagedAcl, e);
-    }
-    if (result != null && result.getHitCount() > 0) {
-      for (SearchResultItem<Series> seriesItem : result.getItems()) {
-        Series series = seriesItem.getSource();
-        series.setManagedAcl(newManagedAcl);
-        try {
-          searchIndex.addOrUpdate(series);
-        } catch (SearchIndexException e) {
-          logger.warn(
-                  "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}'",
-                  series, currentManagedAcl, newManagedAcl, e);
-        }
-      }
-    }
-  }
-
-  /**
-   * Delete a managed acl from all of the series that reference it.
-   *
-   * @param managedAcl
-   *          The managed acl's unique name that will be removed.
-   * @param organization
-   *          The organization for the managed acl
-   * @param user
-   *          The user
-   * @param searchIndex
-   *          The search index to remove the managed acl from.
-   */
-  public static void deleteManagedAcl(String managedAcl, String organization, User user,
-          AbstractSearchIndex searchIndex) {
-    SearchResult<Series> result = null;
-    try {
-      result = searchIndex
-              .getByQuery(new SeriesSearchQuery(organization, user).withoutActions().withManagedAcl(managedAcl));
-    } catch (SearchIndexException e) {
-      logger.error("Unable to find the series in org '{}' with current managed acl name '{}'", organization,
-              managedAcl, e);
-    }
-    if (result != null && result.getHitCount() > 0) {
-      for (SearchResultItem<Series> seriesItem : result.getItems()) {
-        Series series = seriesItem.getSource();
-        series.setManagedAcl(null);
-        try {
-          searchIndex.addOrUpdate(series);
-        } catch (SearchIndexException e) {
-          logger.warn("Unable to update series '{}' to remove managed acl '{}'", series, managedAcl, e);
-        }
-      }
     }
   }
 }

@@ -50,6 +50,8 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 
+import com.google.common.util.concurrent.Striped;
+
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -71,6 +73,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 import javax.xml.bind.Unmarshaller;
@@ -78,6 +82,8 @@ import javax.xml.bind.Unmarshaller;
 public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractSearchIndex.class);
+
+  private final Striped<Lock> locks = Striped.lazyWeakLock(1024);
 
   @Override
   public abstract String getIndexName();
@@ -106,12 +112,45 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   }
 
   /**
+   * Adds or updates the series in the search index. Uses a locking mechanism to avoid issues like Lost Update.
+   *
+   * @param id
+   *          The id of the series to add
+   * @param updateFunction
+   *          The function that does the actual updating
+   * @param orgId
+   *           the organization the series belongs to
+   * @param user
+   *           the user
+   * @throws SearchIndexException
+   *           Thrown if unable to add or update the series.
+   */
+  public Optional<Series> addOrUpdate(String id, Function<Optional<Series>, Optional<Series>> updateFunction,  String orgId, User user)
+          throws SearchIndexException {
+    final Lock lock = this.locks.get(id);
+    lock.lock();
+    logger.debug("Locked series '{}'", id);
+
+    try {
+      Optional<Series> seriesOpt = getSeries(id, orgId, user);
+      Optional<Series> updatedSeriesOpt = updateFunction.apply(seriesOpt);
+      if (updatedSeriesOpt.isPresent()) {
+        addOrUpdate(updatedSeriesOpt.get());
+      }
+      return updatedSeriesOpt;
+    } finally {
+      lock.unlock();
+      logger.debug("Released locked series '{}'", id);
+    }
+  }
+
+  /**
    * Add or update a series in the search index.
    *
    * @param series
    * @throws SearchIndexException
    */
-  public void addOrUpdate(Series series) throws SearchIndexException {
+  protected void addOrUpdate(Series series) throws SearchIndexException {
     logger.debug("Adding series {} to search index", series.getIdentifier());
 
     // Add the resource to the index
@@ -123,6 +162,34 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
       update(doc);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write resource " + series + " to index", t);
+    }
+  }
+
+  /**
+   * Loads the series from the search index if it exists.
+   *
+   * @param seriesId
+   *          the series identifier
+   * @param organization
+   *          the organization
+   * @param user
+   *          the user
+   * @return the series wrapped in an optional
+   * @throws SearchIndexException
+   *           if querying the search index fails
+   * @throws IllegalStateException
+   *           if multiple series with the same identifier are found
+   */
+  public Optional<Series> getSeries(String seriesId, String organization, User user)
+          throws SearchIndexException {
+    SeriesSearchQuery query = new SeriesSearchQuery(organization, user).withoutActions().withIdentifier(seriesId);
+    SearchResult<Series> searchResult = getByQuery(query);
+    if (searchResult.getDocumentCount() == 0) {
+      return Optional.empty();
+    } else if (searchResult.getDocumentCount() == 1) {
+      return Optional.of(searchResult.getItems()[0].getSource());
+    } else {
+      throw new IllegalStateException("Multiple series with identifier " + seriesId + " found in search index");
     }
   }
 
