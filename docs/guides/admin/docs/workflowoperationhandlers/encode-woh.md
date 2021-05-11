@@ -75,13 +75,13 @@ profile.parallel.http.suffix.medium-quality = -medium.mp4
 profile.parallel.http.suffix.high-quality = -high.mp4
 profile.parallel.http.suffix.hd-quality = -hd.mp4
 profile.parallel.http.ffmpeg.command = -i #{in.video.path} \
-  -c:v libx264 -filter:v yadif,scale=-2:288 -preset slower -crf 28 -r 25 -profile:v baseline -tune film -movflags faststart \
+  -c:v libx264 -filter:v scale=-2:288 -preset slower -crf 28 -r 25 -profile:v baseline -tune film -movflags faststart \
   -c:a aac -ar 22050 -ac 1 -ab 32k #{out.dir}/#{out.name}#{out.suffix.low-quality} \
-  -c:v libx264 -filter:v yadif,scale=-2:360 -preset slower -crf 25 -r 25 -profile:v baseline -tune film -movflags faststart \
+  -c:v libx264 -filter:v scale=-2:360 -preset slower -crf 25 -r 25 -profile:v baseline -tune film -movflags faststart \
   -c:a aac -ar 22050 -ac 1 -ab 48k #{out.dir}/#{out.name}#{out.suffix.medium-quality} \
-  -c:v libx264 -filter:v yadif,scale=-2:576 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
+  -c:v libx264 -filter:v scale=-2:576 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
   -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.high-quality} \
-  -c:v libx264 -filter:v yadif,scale=-2:720 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
+  -c:v libx264 -filter:v scale=-2:720 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
   -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.hd-quality}
 ```
 
@@ -97,12 +97,12 @@ This modification to the encoding profile from above will encode the 720p output
 
 ```properties
 …
-profile.parallel.http.ffmpeg.command.if-height-geq-720 = -c:v libx264 -filter:v yadif,scale=-2:720 \
+profile.parallel.http.ffmpeg.command.if-height-geq-720 = -c:v libx264 -filter:v scale=-2:720 \
   -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
   -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.hd-quality}
 profile.parallel.http.ffmpeg.command = -i #{in.video.path} \
   …
-  -c:v libx264 -filter:v yadif,scale=-2:576 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
+  -c:v libx264 -filter:v scale=-2:576 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
   -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.high-quality} \
   #{if-height-geq-720}
 ```

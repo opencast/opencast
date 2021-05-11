@@ -1140,7 +1140,7 @@ public class ProcessSmilTest {
     EasyMock.replay(smilService);
     composerService.setSmilService(smilService);
 
-    // Encoding profile must support stream, visual or audiovisual - also does not like yadif for some edits
+    // Encoding profile must support stream, visual or audiovisual
     List<String> encodingProfiles = Arrays.asList("h264-low.http", "h264-medium.http");
 
     Job job = composerService.processSmil(smil, paramGroupId1, "x", encodingProfiles);
