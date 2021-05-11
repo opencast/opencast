@@ -24,7 +24,8 @@ package org.opencastproject.index.service.message;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.message.broker.api.MessageSender;
@@ -48,7 +49,8 @@ public class AclMessageReceiverImpl extends BaseMessageReceiverImpl<AclItem> {
     super(MessageSender.DestinationType.Queue);
   }
 
-  private void updateManagedAcl(String managedAcl, Optional<String> newManagedAclOpt, String organization, User user) {
+  private void updateManagedAclForSeries(String managedAcl, Optional<String> newManagedAclOpt, String organization,
+          User user) {
     SearchResult<Series> result;
     try {
       result = getSearchIndex().getByQuery(new SeriesSearchQuery(organization, user).withoutActions()
@@ -63,9 +65,8 @@ public class AclMessageReceiverImpl extends BaseMessageReceiverImpl<AclItem> {
       String seriesId = seriesItem.getSource().getIdentifier();
 
       Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
-        Series series = seriesOpt.orElse(new Series(seriesId, organization));
-
-        if (series.getManagedAcl().equals(managedAcl)) {  // check in case it changed between the queries
+        if (seriesOpt.isPresent() && seriesOpt.get().getManagedAcl().equals(managedAcl)) {
+          Series series = seriesOpt.get();
           series.setManagedAcl(newManagedAclOpt.orElse(null));
           return Optional.of(series);
         }
@@ -73,13 +74,51 @@ public class AclMessageReceiverImpl extends BaseMessageReceiverImpl<AclItem> {
       };
 
       try {
-        getSearchIndex().addOrUpdate(seriesId, updateFunction, organization, user);
+        getSearchIndex().addOrUpdateSeries(seriesId, updateFunction, organization, user);
       } catch (SearchIndexException e) {
         if (newManagedAclOpt.isPresent()) {
           logger.warn("Unable to update series'{}' from current managed acl '{}' to new managed acl name '{}'",
                   seriesId, managedAcl, newManagedAclOpt.get(), e);
         } else {
           logger.warn("Unable to update series '{}' to remove managed acl '{}'", seriesId, managedAcl, e);
+        }
+      }
+    }
+  }
+
+  private void updateManagedAclForEvents(String managedAcl, Optional<String> newManagedAclOpt, String organization,
+          User user) {
+    SearchResult<Event> result;
+    try {
+      result = getSearchIndex().getByQuery(new EventSearchQuery(organization, user).withoutActions()
+              .withManagedAcl(managedAcl));
+    } catch (SearchIndexException e) {
+      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event",
+              organization, managedAcl, e);
+      return;
+    }
+
+    for (SearchResultItem<Event> eventItem : result.getItems()) {
+      String eventId = eventItem.getSource().getIdentifier();
+
+      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+        if (eventOpt.isPresent() && eventOpt.get().getManagedAcl().equals(managedAcl)) {
+          Event event = eventOpt.get();
+          event.setManagedAcl(newManagedAclOpt.orElse(null));
+          return Optional.of(event);
+        }
+        return Optional.empty();
+      };
+
+      try {
+        getSearchIndex().addOrUpdateEvent(eventId, updateFunction, organization, user);
+      } catch (SearchIndexException e) {
+        if (newManagedAclOpt.isPresent()) {
+          logger.warn(
+                  "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}'",
+                  eventId, managedAcl, newManagedAclOpt.get(), e);
+        } else {
+          logger.warn("Unable to update event '{}' to remove managed acl '{}'", eventId, managedAcl, e);
         }
       }
     }
@@ -99,21 +138,20 @@ public class AclMessageReceiverImpl extends BaseMessageReceiverImpl<AclItem> {
 
         logger.debug("Update the events to change their managed acl name from '{}' to '{}'",
                 aclItem.getCurrentAclName(), aclItem.getNewAclName());
-        EventIndexUtils.updateManagedAclName(aclItem.getCurrentAclName(), aclItem.getNewAclName(), organization, user,
-                getSearchIndex());
+        updateManagedAclForEvents(managedAcl, Optional.of(aclItem.getNewAclName()), organization, user);
 
         logger.debug("Update the series to change their managed acl name from '{}' to '{}'",
                 aclItem.getCurrentAclName(), aclItem.getNewAclName());
-        updateManagedAcl(managedAcl, Optional.of(aclItem.getNewAclName()), organization, user);
+        updateManagedAclForSeries(managedAcl, Optional.of(aclItem.getNewAclName()), organization, user);
        return;
       case Delete:
         logger.debug("Received Delete Managed Entry {}", aclItem.getCurrentAclName());
 
         logger.debug("Update the events to delete their managed acl name '{}'", aclItem.getCurrentAclName());
-        EventIndexUtils.deleteManagedAcl(aclItem.getCurrentAclName(), organization, user, getSearchIndex());
+        updateManagedAclForEvents(managedAcl, Optional.empty(), organization, user);
 
         logger.debug("Update the series to delete their managed acl name '{}'", aclItem.getCurrentAclName());
-        updateManagedAcl(managedAcl, Optional.empty(), organization, user);
+        updateManagedAclForSeries(managedAcl, Optional.empty(), organization, user);
         return;
       default:
         throw new IllegalArgumentException("Unhandled type of AclItem");

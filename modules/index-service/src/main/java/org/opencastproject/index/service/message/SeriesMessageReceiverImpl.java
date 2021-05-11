@@ -147,7 +147,8 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
     // do the actual update
     if (updateFunction != null) {
       try {
-        Optional<Series> updatedSeriesOpt = getSearchIndex().addOrUpdate(seriesId, updateFunction, organization, user);
+        Optional<Series> updatedSeriesOpt = getSearchIndex().addOrUpdateSeries(seriesId, updateFunction, organization,
+                user);
 
         // update series title in events
         if (updatedSeriesOpt.isPresent() && updatedSeriesOpt.get().isSeriesTitleUpdated()) {
@@ -155,14 +156,23 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
           SearchResult<Event> events = getSearchIndex().getByQuery(
                   new EventSearchQuery(organization, user).withoutActions().withSeriesId(updatedSeries.getIdentifier()));
           for (SearchResultItem<Event> searchResultItem : events.getItems()) {
-            Event event = searchResultItem.getSource();
-            event.setSeriesName(updatedSeries.getTitle());
-            getSearchIndex().addOrUpdate(event);
+            String eventId = searchResultItem.getSource().getIdentifier();
+
+            Function<Optional<Event>, Optional<Event>> eventUpdateFunction = (Optional<Event> eventOpt) -> {
+              if (eventOpt.isPresent() && eventOpt.get().getSeriesId().equals(updatedSeries.getIdentifier())) {
+                Event event = eventOpt.get();
+                event.setSeriesName(updatedSeries.getTitle());
+                return Optional.of(event);
+              }
+              return Optional.empty();
+            };
+
+            getSearchIndex().addOrUpdateEvent(eventId, eventUpdateFunction, organization, user);
           }
         }
         logger.debug("Series {} updated in the search index", seriesId);
       } catch (SearchIndexException e) {
-        logger.error("Error storing the series {} to the search index", seriesId, e);
+        logger.error("Error storing the series {} in the search index", seriesId, e);
       }
     }
   }

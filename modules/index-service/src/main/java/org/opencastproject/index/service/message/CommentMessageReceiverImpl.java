@@ -22,14 +22,16 @@
 package org.opencastproject.index.service.message;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
+import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.comments.CommentItem;
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.NotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 public class CommentMessageReceiverImpl extends BaseMessageReceiverImpl<CommentItem> {
 
@@ -49,16 +51,38 @@ public class CommentMessageReceiverImpl extends BaseMessageReceiverImpl<CommentI
     switch (commentItem.getType()) {
       case Update:
         logger.debug("Received Comment update for {} search index", getSearchIndex().getIndexName());
+        String eventId = commentItem.getEventId();
+        boolean hasComments = commentItem.hasComments();
+        boolean hasOpenComments = commentItem.hasOpenComments();
+        boolean needsCutting = commentItem.needsCutting();
+
+        if (!hasComments && hasOpenComments) {
+          throw new IllegalStateException(
+                  "Invalid comment update request: You can't have open comments without having any comments!");
+        }
+        if (!hasOpenComments && needsCutting) {
+          throw new IllegalStateException(
+                  "Invalid comment update request: You can't have an needs cutting comment without having any open "
+                          + "comments!");
+        }
+
+        Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+          if (!eventOpt.isPresent()) {
+            logger.debug("Event {} not found for comment status updating", commentItem.getEventId());
+            return Optional.empty();
+          }
+          Event event = eventOpt.get();
+          event.setHasComments(hasComments);
+          event.setHasOpenComments(hasOpenComments);
+          event.setNeedsCutting(needsCutting);
+          return Optional.of(event);
+        };
 
         try {
-          EventIndexUtils.updateComments(commentItem.getEventId(), commentItem.hasComments(),
-                  commentItem.hasOpenComments(), commentItem.needsCutting(), organization, user, getSearchIndex());
+          getSearchIndex().addOrUpdateEvent(eventId, updateFunction, organization, user);
           logger.debug("Event {} comment status updated from search index", commentItem.getEventId());
         } catch (SearchIndexException e) {
           logger.error("Error updating comment status of event {} from the search index:", commentItem.getEventId(), e);
-        } catch (NotFoundException e) {
-          // This is expected if the event's comments have been removed as part of the event's removal
-          logger.debug("Event {} not found for comment status updating", commentItem.getEventId());
         }
         return;
       default:

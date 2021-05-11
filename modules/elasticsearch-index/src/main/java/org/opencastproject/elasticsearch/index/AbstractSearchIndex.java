@@ -89,6 +89,39 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   public abstract String getIndexName();
 
   /**
+   * Adds or updates the event in the search index. Uses a locking mechanism to avoid issues like Lost Update.
+   *
+   * @param id
+   *          The id of the event to update
+   * @param updateFunction
+   *          The function that does the actual updating
+   * @param orgId
+   *           the organization the event belongs to
+   * @param user
+   *           the user
+   * @throws SearchIndexException
+   *           Thrown if unable to update the event.
+   */
+  public Optional<Event> addOrUpdateEvent(String id, Function<Optional<Event>, Optional<Event>> updateFunction,  String orgId, User user)
+          throws SearchIndexException {
+    final Lock lock = this.locks.get(id);
+    lock.lock();
+    logger.debug("Locked event '{}'", id);
+
+    try {
+      Optional<Event> eventOpt = getEvent(id, orgId, user);
+      Optional<Event> updatedEventOpt = updateFunction.apply(eventOpt);
+      if (updatedEventOpt.isPresent()) {
+        addOrUpdate(updatedEventOpt.get());
+      }
+      return updatedEventOpt;
+    } finally {
+      lock.unlock();
+      logger.debug("Released locked event '{}'", id);
+    }
+  }
+
+  /**
    * Adds the recording event to the search index or updates it accordingly if it is there.
    *
    * @param event
@@ -96,7 +129,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *           if the event cannot be added or updated
    */
-  public void addOrUpdate(Event event) throws SearchIndexException {
+  protected void addOrUpdate(Event event) throws SearchIndexException {
     logger.debug("Adding event {} to search index", event.getIdentifier());
 
     // Add the resource to the index
@@ -125,8 +158,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *           Thrown if unable to add or update the series.
    */
-  public Optional<Series> addOrUpdate(String id, Function<Optional<Series>, Optional<Series>> updateFunction,  String orgId, User user)
-          throws SearchIndexException {
+  public Optional<Series> addOrUpdateSeries(String id, Function<Optional<Series>, Optional<Series>> updateFunction,
+          String orgId, User user) throws SearchIndexException {
     final Lock lock = this.locks.get(id);
     lock.lock();
     logger.debug("Locked series '{}'", id);
@@ -166,6 +199,34 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   }
 
   /**
+   * Loads the event from the search index if it exists.
+   *
+   * @param mediapackageId
+   *          the mediapackage identifier
+   * @param organization
+   *          the organization
+   * @param user
+   *          the user
+   * @return the event (optional)
+   * @throws SearchIndexException
+   *           if querying the search index fails
+   * @throws IllegalStateException
+   *           if multiple events with the same identifier are found
+   */
+  public Optional<Event> getEvent(String mediapackageId, String organization, User user) throws SearchIndexException {
+    EventSearchQuery query = new EventSearchQuery(organization, user).withoutActions().withIdentifier(mediapackageId);
+    SearchResult<Event> searchResult = getByQuery(query);
+    if (searchResult.getDocumentCount() == 0) {
+      return Optional.empty();
+    } else if (searchResult.getDocumentCount() == 1) {
+      return Optional.of(searchResult.getItems()[0].getSource());
+    } else {
+      throw new IllegalStateException(
+              "Multiple events with identifier " + mediapackageId + " found in search index");
+    }
+  }
+
+  /**
    * Loads the series from the search index if it exists.
    *
    * @param seriesId
@@ -174,7 +235,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *          the organization
    * @param user
    *          the user
-   * @return the series wrapped in an optional
+   * @return the series (optional)
    * @throws SearchIndexException
    *           if querying the search index fails
    * @throws IllegalStateException
@@ -267,11 +328,11 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *           Thrown if the event cannot be found.
    */
   public void deleteAssets(String organization, User user, String uid) throws SearchIndexException, NotFoundException {
-    Event event = EventIndexUtils.getEvent(uid, organization, user, this);
-    if (event == null) {
+    Optional<Event> eventOpt = getEvent(uid, organization, user);
+    if (!eventOpt.isPresent()) {
       throw new NotFoundException("No event with id " + uid + " found.");
     }
-
+    Event event = eventOpt.get();
     event.setArchiveVersion(null);
 
     if (toDelete(event)) {
@@ -297,11 +358,11 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    */
   public void deleteScheduling(String organization, User user, String uid)
           throws SearchIndexException, NotFoundException {
-    Event event = EventIndexUtils.getEvent(uid, organization, user, this);
-    if (event == null) {
+    Optional<Event> eventOpt = getEvent(uid, organization, user);
+    if (!eventOpt.isPresent()) {
       throw new NotFoundException("No event with id " + uid + " found.");
     }
-
+    Event event = eventOpt.get();
     event.setAgentId(null);
 
     if (toDelete(event)) {
@@ -329,11 +390,11 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    */
   public void deleteWorkflow(String organization, User user, String uid, Long workflowId)
           throws SearchIndexException, NotFoundException {
-    Event event = EventIndexUtils.getEvent(uid, organization, user, this);
-    if (event == null) {
+    Optional<Event> eventOpt = getEvent(uid, organization, user);
+    if (!eventOpt.isPresent()) {
       throw new NotFoundException("No event with id " + uid + " found.");
     }
-
+    Event event = eventOpt.get();
     if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowId)) {
       logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", uid, workflowId);
       event.setWorkflowId(null);
