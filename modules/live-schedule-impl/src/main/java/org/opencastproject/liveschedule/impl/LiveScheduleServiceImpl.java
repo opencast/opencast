@@ -59,6 +59,10 @@ import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.MimeTypes;
@@ -98,9 +102,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LiveScheduleServiceImpl implements LiveScheduleService {
-
-  // TODO Implement updated() so that change in configuration can be dynamically loaded.
-
   /** The server url property **/
   static final String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
   /** The engage base url property **/
@@ -148,6 +149,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private Cache<String, Version> snapshotVersionCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
   /** Which streaming formats should be published automatically */
   private List<String> publishedStreamingFormats = null;
+  private String systemUserName;
 
   /** Services */
   private DownloadDistributionService downloadDistributionService; // to distribute episode and series catalogs
@@ -160,6 +162,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private AssetManager assetManager; // to get current media package
   private AuthorizationService authService;
   private OrganizationDirectoryService organizationService;
+  private SecurityService securityService;
 
   private long jobPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
 
@@ -177,6 +180,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       logger.warn("Server url was not set in '{}'", SERVER_URL_PROPERTY);
     else
       logger.info("Server url is {}", serverUrl);
+    systemUserName = bundleContext.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
 
     @SuppressWarnings("rawtypes")
     Dictionary properties = context.getProperties();
@@ -455,17 +459,28 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
    *           if found many media packages with the same id
    */
   MediaPackage getMediaPackageFromSearch(String mediaPackageId) throws LiveScheduleException {
-    // Look for the media package in the search index
-    SearchQuery query = new SearchQuery().withId(mediaPackageId);
-    SearchResult result = searchService.getByQuery(query);
-    if (result.size() == 0) {
-      logger.debug("The search service doesn't know live mediapackage {}", mediaPackageId);
+    // Issue #2504: make sure the search index is read by admin so that the media package is always found.
+    Organization org = securityService.getOrganization();
+    User prevUser = org != null ? securityService.getUser() : null;
+    securityService.setUser(SecurityUtil.createSystemUser(systemUserName, org));
+    try {
+      // Look for the media package in the search index
+      SearchQuery query = new SearchQuery().withId(mediaPackageId);
+      SearchResult result = searchService.getForAdministrativeRead(query);
+      if (result.size() == 0) {
+        logger.debug("The search service doesn't know live mediapackage {}", mediaPackageId);
+        return null;
+      } else if (result.size() > 1) {
+        logger.warn("More than one live mediapackage with id {} returned from search service", mediaPackageId);
+        throw new LiveScheduleException("More than one live mediapackage with id " + mediaPackageId + " found");
+      }
+      return result.getItems()[0].getMediaPackage();
+    } catch (UnauthorizedException e) {
+      logger.warn("Unexpected unauthorized exception when querying the search index for mp {}", mediaPackageId, e);
       return null;
-    } else if (result.size() > 1) {
-      logger.warn("More than one live mediapackage with id {} returned from search service", mediaPackageId);
-      throw new LiveScheduleException("More than one live mediapackage with id " + mediaPackageId + " found");
+    } finally {
+      securityService.setUser(prevUser);
     }
-    return result.getItems()[0].getMediaPackage();
   }
 
   void setDuration(MediaPackage mp, DublinCoreCatalog dc) {
@@ -861,6 +876,10 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
 
   public void setOrganizationService(OrganizationDirectoryService service) {
     this.organizationService = service;
+  }
+
+  public void setSecurityService(SecurityService service) {
+    this.securityService = service;
   }
   // === Set by OSGI - end
 

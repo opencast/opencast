@@ -38,4 +38,8 @@
   <reference name="workspace" cardinality="1..1"
              interface="org.opencastproject.workspace.api.Workspace" policy="static"
              bind="setWorkspace"/>
+  <reference name="securityService" cardinality="1..1"
+    interface="org.opencastproject.security.api.SecurityService" policy="static"
+    bind="setSecurityService" />
 </scr:component>
+
