@@ -21,20 +21,23 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import static org.opencastproject.matterhorn.search.SearchQuery.Order.Ascending;
-
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesIndexSchema;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
+import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -95,42 +98,31 @@ public class SeriesListProvider implements ResourceListProvider {
   @Override
   public Map<String, String> getList(String listName, ResourceListQuery query)
           throws ListProviderException {
-    SeriesSearchQuery seriesQuery;
-    if (query instanceof SeriesSearchQuery) {
-      seriesQuery = (SeriesSearchQuery) query;
-    } else {
-      seriesQuery = new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
-      if (query.getLimit().isSome()) {
-        seriesQuery.withLimit(query.getLimit().get());
-      }
-      if (query.getOffset().isSome()) {
-        seriesQuery.withOffset(query.getOffset().get());
-      }
-    }
+    SeriesSearchQuery seriesQuery = toSearchQuery(query);
     Map<String, String> result = new HashMap<>();
     if (TITLE.equals(listName)) {
-      seriesQuery.sortByTitle(Ascending);
+      seriesQuery.sortByTitle(SearchQuery.Order.Ascending);
       for (String title : searchIndex.getTermsForField(SeriesIndexSchema.TITLE,
           Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
         result.put(title, title);
       }
     } else if (CONTRIBUTORS.equals(listName)) {
-      seriesQuery.sortByContributors(Ascending);
+      seriesQuery.sortByContributors(SearchQuery.Order.Ascending);
       for (String contributor : searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS,
           Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
         result.put(contributor, contributor);
       }
     } else if (ORGANIZERS.equals(listName)) {
-      seriesQuery.sortByOrganizers(Ascending);
+      seriesQuery.sortByOrganizers(SearchQuery.Order.Ascending);
       for (String organizer : searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS,
           Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
         result.put(organizer, organizer);
       }
     } else {
       try {
-        seriesQuery.sortByTitle(Ascending);
-        seriesQuery.sortByCreatedDateTime(Ascending);
-        seriesQuery.sortByOrganizers(Ascending);
+        seriesQuery.sortByTitle(SearchQuery.Order.Ascending);
+        seriesQuery.sortByCreatedDateTime(SearchQuery.Order.Descending);
+        seriesQuery.sortByOrganizers(SearchQuery.Order.Ascending);
         SearchResult searchResult = searchIndex.getByQuery(seriesQuery);
         Calendar calendar = Calendar.getInstance();
         for (SearchResultItem<Series> item : searchResult.getItems()) {
@@ -169,5 +161,63 @@ public class SeriesListProvider implements ResourceListProvider {
   @Override
   public String getDefault() {
     return null;
+  }
+
+  /**
+   * Creates a series search query from resource list query.
+   *
+   * @param query a resource list query
+   * @return a series search query
+   */
+  protected SeriesSearchQuery toSearchQuery(ResourceListQuery query) {
+    SeriesSearchQuery seriesQuery = new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
+    if (query.getLimit().isSome()) {
+      seriesQuery.withLimit(query.getLimit().get());
+    }
+    if (query.getOffset().isSome()) {
+      seriesQuery.withOffset(query.getOffset().get());
+    }
+    if (query instanceof SeriesListQuery) {
+      if (((SeriesListQuery) query).getReadPermission().isSome()
+          || ((SeriesListQuery) query).getWritePermission().isSome()) {
+        seriesQuery.withoutActions();
+        if (((SeriesListQuery) query).getReadPermission().getOrElse(true)) {
+          seriesQuery.withAction(Permissions.Action.READ);
+        }
+        if (((SeriesListQuery) query).getWritePermission().getOrElse(false)) {
+          seriesQuery.withAction(Permissions.Action.WRITE);
+        }
+      }
+      for (ResourceListFilter filter : query.getFilters()) {
+        if (filter.getValue().isNone()) {
+          continue;
+        } else if (SeriesListQuery.FILTER_CREATIONDATE_NAME.equals(filter.getName())) {
+          Tuple<Date, Date> creationDate = (Tuple<Date, Date>) filter.getValue().get();
+          if (creationDate.getA() != null) {
+            seriesQuery.withCreatedFrom(creationDate.getA());
+          }
+          if (creationDate.getB() != null) {
+            seriesQuery.withCreatedTo(creationDate.getB());
+          }
+        } else if (SeriesListQuery.FILTER_CREATOR_NAME.equals(filter.getName())) {
+          seriesQuery.withCreator((String)filter.getValue().get());
+        } else if (SeriesListQuery.FILTER_CONTRIBUTORS_NAME.equals(filter.getName())) {
+          seriesQuery.withContributor((String)filter.getValue().get());
+        } else if (SeriesListQuery.FILTER_LANGUAGE_NAME.equals(filter.getName())) {
+          seriesQuery.withLanguage((String)filter.getValue().get());
+        } else if (SeriesListQuery.FILTER_LICENSE_NAME.equals(filter.getName())) {
+          seriesQuery.withLicense((String)filter.getValue().get());
+        } else if (SeriesListQuery.FILTER_ORGANIZERS_NAME.equals(filter.getName())) {
+          seriesQuery.withOrganizer((String)filter.getValue().get());
+        } else if (SeriesListQuery.FILTER_SUBJECT_NAME.equals(filter.getName())) {
+          seriesQuery.withSubject((String)filter.getValue().get());
+        } else if (SeriesListQuery.FILTER_TEXT_NAME.equals(filter.getName())) {
+          seriesQuery.withText((String)filter.getValue().get());
+        } else if (SeriesListQuery.FILTER_TITLE_NAME.equals(filter.getName())) {
+          seriesQuery.withTitle((String)filter.getValue().get());
+        }
+      }
+    }
+    return seriesQuery;
   }
 }
