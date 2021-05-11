@@ -75,7 +75,7 @@ public class ConditionalConfigWorkflowOperationHandler extends AbstractWorkflowO
         result = WorkflowConditionInterpreter.interpret(condition.trim());
         logger.debug("Evaluate condition: {}, result: {}", condition, result);
       } catch (IllegalArgumentException e) {
-        logger.warn("Invalid condition to evaluate: {}.", condition);
+        logger.error("Invalid condition to evaluate: {}.", condition);
         throw new WorkflowOperationException(String.format("Invalid condition: %s", condition.trim()), e);
       }
       // If condition true, set variable and return
@@ -83,7 +83,7 @@ public class ConditionalConfigWorkflowOperationHandler extends AbstractWorkflowO
         String valuePropName = VALUE_PREFIX + key.substring(CONDITION_PREFIX.length());
         value = operation.getConfiguration(valuePropName);
         if (StringUtils.isEmpty(value)) {
-          logger.warn("Condition {}  evaluated to true, but no value informed to set {} variable in {}",
+          logger.error("Condition {}  evaluated to true, but no value informed to set {} variable in {}",
                   condition.trim(), wfConfigName, valuePropName);
           throw new WorkflowOperationException(
                   String.format("Condition: %s does not have a value set.", condition.trim()));
@@ -102,7 +102,7 @@ public class ConditionalConfigWorkflowOperationHandler extends AbstractWorkflowO
       logger.debug("Configuration key '{}' of workflow {} is set to value '{}'", wfConfigName, id, noMatch);
       return createResult(workflowInstance.getMediaPackage(), properties, Action.CONTINUE, 0);
     }
-    return createResult(Action.CONTINUE);
+    return createResult(Action.SKIP);
   }
 
 }

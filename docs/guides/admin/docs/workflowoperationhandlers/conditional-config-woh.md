@@ -8,8 +8,12 @@ Description
 
 The conditional-config operation sets a workflow configuration variable based on conditions that are
 tested in sequence.
+
 If _condition-1_ is true, _value-1_ is assigned to the variable, if _condition-2_ is true, _value-2_ is
 assigned, and so on. If no conditions are true, the value specified in _no-match_ is assigned.
+
+Conditions are tested in alphabetical order and the first condition that is true sets the variable so,
+if two conditions are true, the value is set by the first one that gets evaluated.
 
 This operation is useful to reduce workflow complexity when the same operation is repeated many times and
 executed based on distinct if-conditions.

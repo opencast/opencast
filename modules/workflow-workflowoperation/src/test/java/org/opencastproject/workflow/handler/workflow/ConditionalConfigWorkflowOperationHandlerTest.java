@@ -116,7 +116,7 @@ public class ConditionalConfigWorkflowOperationHandlerTest {
 
     // Replace operation configuration with variables form wf config
     final Function<String, String> systemVariableGetter = k -> null;
-    String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(workflowInstance),
+    String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(wf),
             systemVariableGetter, wfConfig, false);
     return WorkflowParser.parseWorkflowInstance(xml);
   }
