@@ -40,12 +40,26 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.entwinemedia.common</groupId>
+      <artifactId>functional</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -68,7 +82,8 @@
             <Service-Component>
               OSGI-INF/operations/snapshot.xml,
               OSGI-INF/operations/delete.xml,
-              OSGI-INF/operations/move-storage.xml
+              OSGI-INF/operations/move-storage.xml,
+              OSGI-INF/operations/select-version.xml
             </Service-Component>
           </instructions>
         </configuration>
