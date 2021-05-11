@@ -27,12 +27,12 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.lang.String.format;
 
-import org.opencastproject.elasticsearch.api.SortCriterion;
-import org.opencastproject.elasticsearch.impl.SortCriterionImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.requests.SortCriterion;
 
 import com.entwinemedia.fn.Fx;
+import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
 
@@ -43,11 +43,13 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -128,19 +130,8 @@ public final class RestUtils {
 
   /**
    * Return the given list of value with the standard format for JSON list value with offset, limit and total
-   * information. The JSON object in the response body has the following format:
-   *
-   * <pre>
-   * {
-   *  results: [
-   *    // array containing all the object from the given list
-   *  ],
-   *  count: 12, // The number of item returned (size of the given list)
-   *  offset: 2, // The result offset (given parameter)
-   *  limit: 12, // The maximal size of the list (given parameter)
-   *  total: 123 // The total number of items available in the system (given parameter)
-   * }
-   * </pre>
+   * information. See also
+   * {@link org.opencastproject.index.service.util.RestUtils#okJsonList(List, Optional, Optional, long)}.
    *
    * @param jsonList
    *          The list of value to return
@@ -155,12 +146,57 @@ public final class RestUtils {
    *           if the value list is null
    */
   public static Response okJsonList(List<JValue> jsonList, int offset, int limit, long total) {
+    return okJsonList(jsonList, Optional.of(offset), Optional.of(limit), total);
+  }
+
+  /**
+   * Return the given list of value with the standard format for JSON list value with offset, limit and total
+   * information. The JSON object in the response body has the following format:
+   *
+   * <pre>
+   * {
+   *  results: [
+   *    // array containing all the object from the given list
+   *  ],
+   *  count: 12, // The number of item returned (size of the given list)
+   *  offset: 2, // The result offset (given parameter)
+   *  limit: 12, // The maximal size of the list (given parameter)
+   *  total: 123 // The total number of items available in the system (given parameter)
+   * }
+   * </pre>
+   *
+   * Limit and offset are optional.
+   *
+   * @param jsonList
+   *          The list of value to return
+   * @param optOffset
+   *          The result offset (optional)
+   * @param optLimit
+   *          The maximal list size (optional)
+   * @param total
+   *          The amount of available items in the system
+   * @return a {@link Response} with an JSON object formatted like above as body.
+   * @throws IllegalArgumentException
+   *           if the value list is null
+   */
+  public static Response okJsonList(List<JValue> jsonList, Optional<Integer> optOffset, Optional<Integer> optLimit,
+          long total) {
     if (jsonList == null)
       throw new IllegalArgumentException("The list of value must not be null.");
-    JValue response = obj(f("results", arr(jsonList)), f("count", v(jsonList.size())), f("offset", v(offset)),
-            f("limit", v(limit)), f("total", v(total)));
 
-    return okJson(response);
+    ArrayList<Field> fields = new ArrayList<>();
+    fields.add(f("results", arr(jsonList)));
+    fields.add(f("count", v(jsonList.size())));
+    fields.add(f("total", v(total)));
+
+    if (optOffset.isPresent()) {
+      fields.add(f("offset", v(optOffset.get())));
+    }
+    if (optLimit.isPresent()) {
+      fields.add(f("limit", v(optLimit.get())));
+    }
+
+    return okJson(obj(fields));
   }
 
   /**
@@ -180,18 +216,20 @@ public final class RestUtils {
    * {@code <field name>:ASC|DESC}
    *
    * @param sort
-   *          the parameter string to parse
+   *          the parameter string to parse (will be checked if blank)
    * @return a set of sort criterion, never {@code null}
    */
   public static Set<SortCriterion> parseSortQueryParameter(String sort) throws WebApplicationException {
-    Set<SortCriterion> sortOrders = new HashSet<SortCriterion>();
+    Set<SortCriterion> sortOrders = new HashSet<>();
 
-    StringTokenizer tokenizer = new StringTokenizer(sort, ",");
-    while (tokenizer.hasMoreTokens()) {
-      try {
-        sortOrders.add(SortCriterionImpl.parse(tokenizer.nextToken()));
-      } catch (IllegalArgumentException e) {
-        throw new WebApplicationException(Status.BAD_REQUEST);
+    if (StringUtils.isNotBlank(sort)) {
+      StringTokenizer tokenizer = new StringTokenizer(sort, ",");
+      while (tokenizer.hasMoreTokens()) {
+        try {
+          sortOrders.add(SortCriterion.parse(tokenizer.nextToken()));
+        } catch (IllegalArgumentException e) {
+          throw new WebApplicationException(Status.BAD_REQUEST);
+        }
       }
     }
 
@@ -253,7 +291,8 @@ public final class RestUtils {
           logger.debug("No value for filter '{}' in filters list: {}", filterTuple[0], filter);
           continue;
         }
-        filters.put(filterTuple[0], f.substring(filterTuple[0].length() + 1));
+        // use substring because dates also contain : so there might be more than two parts
+        filters.put(filterTuple[0].trim(), f.substring(filterTuple[0].length() + 1).trim());
       }
     }
     return filters;

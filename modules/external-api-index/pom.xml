@@ -73,7 +73,6 @@
               OSGI-INF/message-receiver-acl.xml,
               OSGI-INF/message-receiver-assetmanager.xml,
               OSGI-INF/message-receiver-comment.xml,
-              OSGI-INF/message-receiver-group.xml,
               OSGI-INF/message-receiver-scheduler.xml,
               OSGI-INF/message-receiver-series.xml,
               OSGI-INF/message-receiver-workflow.xml

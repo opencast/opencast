@@ -26,7 +26,6 @@ import org.opencastproject.elasticsearch.impl.AbstractElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
-import org.opencastproject.elasticsearch.index.group.Group;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.theme.Theme;
 import org.opencastproject.elasticsearch.index.theme.ThemeIndexSchema;
@@ -64,7 +63,6 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
   /** The document types */
   private static final String[] DOCUMENT_TYPES = new String[] {
       Event.DOCUMENT_TYPE,
-      Group.DOCUMENT_TYPE,
       Series.DOCUMENT_TYPE,
       Theme.DOCUMENT_TYPE,
       "version"
