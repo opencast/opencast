@@ -401,7 +401,7 @@ public abstract class AbstractEventEndpoint {
     }
     final Runnable doOnNotFound = () -> {
       try {
-        getIndex().delete(Event.DOCUMENT_TYPE,id.concat(getSecurityService().getOrganization().getId()));
+        getIndex().delete(Event.DOCUMENT_TYPE,id,getSecurityService().getOrganization().getId());
       } catch (SearchIndexException e) {
         logger.error("error removing event {}: {}", id, e);
       }
@@ -461,7 +461,7 @@ public abstract class AbstractEventEndpoint {
       final String eventId = eventIdObject.toString();
       final Runnable doOnNotFound = () -> {
         try {
-          getIndex().delete(Event.DOCUMENT_TYPE,eventId.concat(getSecurityService().getOrganization().getId()));
+          getIndex().delete(Event.DOCUMENT_TYPE,eventId, getSecurityService().getOrganization().getId());
         } catch (SearchIndexException e) {
           logger.error("error removing event {}: {}", eventId, e);
         }

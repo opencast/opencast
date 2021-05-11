@@ -216,21 +216,27 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     }
   }
 
-  @Override
-  public boolean delete(String type, String uid) throws SearchIndexException {
-    logger.debug("Removing element with id '{}' from searching index '{}'", uid, getIndexName(type));
-    final DeleteRequest deleteRequest = new DeleteRequest(getIndexName(type), uid)
-            .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+  public boolean delete(String type, String id, String orgId) throws SearchIndexException {
+    final Lock lock = this.locks.get(id);
+    lock.lock();
+    logger.debug("Locked {} '{}'.", type, id);
     try {
+      String idWithOrgId = id.concat(orgId);
+      logger.debug("Removing element with id '{}' from search index '{}'", idWithOrgId, getIndexName(type));
+      final DeleteRequest deleteRequest = new DeleteRequest(getIndexName(type), idWithOrgId)
+              .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+
       final DeleteResponse delete = getClient().delete(deleteRequest, RequestOptions.DEFAULT);
       if (delete.getResult().equals(DocWriteResponse.Result.NOT_FOUND)) {
-        logger.trace("Document {} to delete was not found on index '{}'", uid, getIndexName(type));
+        logger.trace("Document {} to delete was not found on index '{}'", idWithOrgId, getIndexName(type));
         return false;
       }
     } catch (IOException e) {
       throw new SearchIndexException(e);
-    }
-
+    } finally {
+    lock.unlock();
+    logger.debug("Released locked {} '{}'.", type, id);
+  }
     return true;
   }
 
@@ -269,7 +275,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     event.setArchiveVersion(null);
 
     if (toDelete(event)) {
-      delete(Event.DOCUMENT_TYPE, uid.concat(organization));
+      delete(Event.DOCUMENT_TYPE, uid, organization);
     } else {
       addOrUpdate(event);
     }
@@ -299,7 +305,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     event.setAgentId(null);
 
     if (toDelete(event)) {
-      delete(Event.DOCUMENT_TYPE, uid.concat(organization));
+      delete(Event.DOCUMENT_TYPE, uid, organization);
     } else {
       addOrUpdate(event);
     }
@@ -336,7 +342,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     }
 
     if (toDelete(event)) {
-      delete(Event.DOCUMENT_TYPE, uid.concat(organization));
+      delete(Event.DOCUMENT_TYPE, uid, organization);
     } else {
       addOrUpdate(event);
     }

@@ -85,7 +85,7 @@ public class ThemeMessageReceiverImpl extends BaseMessageReceiverImpl<ThemeItem>
 
         // Remove the theme from the search index
         try {
-          getSearchIndex().delete(Theme.DOCUMENT_TYPE, Long.toString(themeItem.getThemeId()).concat(organization));
+          getSearchIndex().delete(Theme.DOCUMENT_TYPE, Long.toString(themeItem.getThemeId()), organization);
           logger.debug("Theme {} removed from {} search index", themeItem.getThemeId(),
                   getSearchIndex().getIndexName());
         } catch (SearchIndexException e) {

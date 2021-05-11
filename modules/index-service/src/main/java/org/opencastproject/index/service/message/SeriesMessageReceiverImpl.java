@@ -131,7 +131,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
 
         // Remove the series from the search index
         try {
-          getSearchIndex().delete(Series.DOCUMENT_TYPE, seriesItem.getSeriesId().concat(organization));
+          getSearchIndex().delete(Series.DOCUMENT_TYPE, seriesItem.getSeriesId(), organization);
           logger.debug("Series {} removed from search index", seriesItem.getSeriesId());
         } catch (SearchIndexException e) {
           logger.error("Error deleting the series {} from the search index", seriesItem.getSeriesId(), e);
