@@ -297,8 +297,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *           Thrown if unable to update the theme.
    */
-  public Optional<IndexTheme> addOrUpdateTheme(long id, Function<Optional<IndexTheme>, Optional<IndexTheme>> updateFunction,
-          String orgId, User user) throws SearchIndexException {
+  public Optional<IndexTheme> addOrUpdateTheme(long id, Function<Optional<IndexTheme>,
+          Optional<IndexTheme>> updateFunction, String orgId, User user) throws SearchIndexException {
     final Lock lock = this.locks.get(id);
     lock.lock();
     logger.debug("Locked theme '{}'", id);

@@ -372,7 +372,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    * @param index
    *           the index to update
    * @param orgId
- *           the organization the theme belongs to
+   *           the organization the theme belongs to
    * @param user
    */
   private void updateThemeInIndex(Theme theme, AbstractSearchIndex index, String orgId,
@@ -387,9 +387,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       Long id = theme.getId().get();
 
       // the function to do the actual updating
-      Function<Optional<IndexTheme>, Optional<IndexTheme>> updateFunction
-              = (Optional<IndexTheme> indexThemeOpt) -> {
-
+      Function<Optional<IndexTheme>, Optional<IndexTheme>> updateFunction = (Optional<IndexTheme> indexThemeOpt) -> {
         IndexTheme indexTheme;
         if (indexThemeOpt.isPresent()) {
           indexTheme = indexThemeOpt.get();
