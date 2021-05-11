@@ -113,13 +113,13 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
             event.setRecordingStatus(null);
             break;
           case UpdateEnd:
-            String endTime = schedulerItem.getEnd() == null ? null :
-                    DateTimeSupport.toUTC(schedulerItem.getEnd().getTime());
+            String endTime = schedulerItem.getEnd() == null ? null
+                    : DateTimeSupport.toUTC(schedulerItem.getEnd().getTime());
             event.setTechnicalEndTime(endTime);
             break;
           case UpdateStart:
-            String startTime = schedulerItem.getStart() == null ? null :
-                    DateTimeSupport.toUTC(schedulerItem.getStart().getTime());
+            String startTime = schedulerItem.getStart() == null ? null
+                    : DateTimeSupport.toUTC(schedulerItem.getStart().getTime());
             event.setTechnicalStartTime(startTime);
             break;
           case UpdatePresenters:

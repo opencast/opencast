@@ -23,7 +23,6 @@ package org.opencastproject.index.service.message;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.theme.Theme;
-import org.opencastproject.elasticsearch.index.theme.ThemeIndexUtils;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.theme.SerializableTheme;
 import org.opencastproject.message.broker.api.theme.ThemeItem;
@@ -31,6 +30,9 @@ import org.opencastproject.security.api.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 public class ThemeMessageReceiverImpl extends BaseMessageReceiverImpl<ThemeItem> {
 
@@ -50,12 +52,16 @@ public class ThemeMessageReceiverImpl extends BaseMessageReceiverImpl<ThemeItem>
     switch (themeItem.getType()) {
       case Update:
         SerializableTheme serializableTheme = themeItem.getTheme();
-
+        long id = serializableTheme.getId();
         logger.debug("Update the theme with id '{}', name '{}', description '{}', organization '{}'",
-                serializableTheme.getId(), serializableTheme.getName(), serializableTheme.getDescription(),
+                id, serializableTheme.getName(), serializableTheme.getDescription(),
                 organization);
-        try {
-          Theme theme = ThemeIndexUtils.getOrCreate(serializableTheme.getId(), organization, user, getSearchIndex());
+
+        // the function to do the actual updating
+        Function<Optional<Theme>, Optional<Theme>> updateFunction
+                = (Optional<org.opencastproject.elasticsearch.index.theme.Theme> indexThemeOpt) -> {
+
+          Theme theme = indexThemeOpt.orElse(new Theme(id, organization));
           theme.setCreationDate(serializableTheme.getCreationDate());
           theme.setDefault(serializableTheme.isDefault());
           theme.setName(serializableTheme.getName());
@@ -74,7 +80,11 @@ public class ThemeMessageReceiverImpl extends BaseMessageReceiverImpl<ThemeItem>
           theme.setWatermarkActive(serializableTheme.isWatermarkActive());
           theme.setWatermarkFile(serializableTheme.getWatermarkFile());
           theme.setWatermarkPosition(serializableTheme.getWatermarkPosition());
-          getSearchIndex().addOrUpdate(theme);
+          return Optional.of(theme);
+        };
+
+        try {
+          getSearchIndex().addOrUpdateTheme(id, updateFunction, organization, user);
         } catch (SearchIndexException e) {
           logger.error("Error storing the theme {} to the search index", serializableTheme.getId(), e);
           return;

@@ -102,8 +102,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *           Thrown if unable to update the event.
    */
-  public Optional<Event> addOrUpdateEvent(String id, Function<Optional<Event>, Optional<Event>> updateFunction,  String orgId, User user)
-          throws SearchIndexException {
+  public Optional<Event> addOrUpdateEvent(String id, Function<Optional<Event>, Optional<Event>> updateFunction,
+          String orgId, User user) throws SearchIndexException {
     final Lock lock = this.locks.get(id);
     lock.lock();
     logger.debug("Locked event '{}'", id);
@@ -255,6 +255,69 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   }
 
   /**
+   * Loads the theme from the search index if it exists.
+   *
+   * @param themeId
+   *          the theme identifier
+   * @param organization
+   *          the organization
+   * @param user
+   *          the user
+   * @return the theme wrapped in an optional
+   * @throws SearchIndexException
+   *           if querying the search index fails
+   * @throws IllegalStateException
+   *           if multiple themes with the same identifier are found
+   */
+  protected Optional<Theme> getTheme(long themeId, String organization, User user)
+          throws SearchIndexException {
+    ThemeSearchQuery query = new ThemeSearchQuery(organization, user).withIdentifier(themeId);
+    SearchResult<Theme> searchResult = getByQuery(query);
+    if (searchResult.getDocumentCount() == 0) {
+      return Optional.empty();
+    } else if (searchResult.getDocumentCount() == 1) {
+      return Optional.of(searchResult.getItems()[0].getSource());
+    } else {
+      throw new IllegalStateException("Multiple themes with identifier " + themeId + " found in search index");
+    }
+  }
+
+
+
+  /**
+   * Adds or updates the theme in the search index. Uses a locking mechanism to avoid issues like Lost Update.
+   *
+   * @param id
+   *          The id of the theme to update
+   * @param updateFunction
+   *          The function that does the actual updating
+   * @param orgId
+   *           the organization the theme belongs to
+   * @param user
+   *           the user
+   * @throws SearchIndexException
+   *           Thrown if unable to update the theme.
+   */
+  public Optional<Theme> addOrUpdateTheme(long id, Function<Optional<Theme>, Optional<Theme>> updateFunction,
+          String orgId, User user) throws SearchIndexException {
+    final Lock lock = this.locks.get(id);
+    lock.lock();
+    logger.debug("Locked theme '{}'", id);
+
+    try {
+      Optional<Theme> themeOpt = getTheme(id, orgId, user);
+      Optional<Theme> updatedThemeOpt = updateFunction.apply(themeOpt);
+      if (updatedThemeOpt.isPresent()) {
+        addOrUpdate(updatedThemeOpt.get());
+      }
+      return updatedThemeOpt;
+    } finally {
+      lock.unlock();
+      logger.debug("Released locked theme '{}'", id);
+    }
+  }
+
+  /**
    * Adds or updates the theme in the search index.
    *
    * @param theme
@@ -262,7 +325,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *           Thrown if unable to add or update the theme.
    */
-  public void addOrUpdate(Theme theme) throws SearchIndexException {
+  protected void addOrUpdate(Theme theme) throws SearchIndexException {
     logger.debug("Adding theme {} to search index", theme.getIdentifier());
 
     // Add the resource to the index
@@ -295,9 +358,9 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     } catch (IOException e) {
       throw new SearchIndexException(e);
     } finally {
-    lock.unlock();
-    logger.debug("Released locked {} '{}'.", type, id);
-  }
+      lock.unlock();
+      logger.debug("Released locked {} '{}'.", type, id);
+    }
     return true;
   }
 
