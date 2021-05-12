@@ -31,7 +31,13 @@ import org.opencastproject.authorization.xacml.XACMLParsingException;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.impl.SearchResultImpl;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -83,9 +89,19 @@ public class AclScannerTest {
     final SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
 
-    final AbstractSearchIndex index = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    SearchResultImpl<Event> eventSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
+    EasyMock.expect(eventSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
 
-    EasyMock.replay(orgService, securityService, index, user);
+    SearchResultImpl<Series> seriesSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
+    EasyMock.expect(seriesSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
+
+    final AbstractSearchIndex index = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(eventSearchResult)
+            .anyTimes();
+    EasyMock.expect(index.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(seriesSearchResult)
+            .anyTimes();
+
+    EasyMock.replay(orgService, securityService, index, user, eventSearchResult, seriesSearchResult);
 
     AclServiceFactory aclServiceFactory = new AclServiceFactory() {
       @Override
