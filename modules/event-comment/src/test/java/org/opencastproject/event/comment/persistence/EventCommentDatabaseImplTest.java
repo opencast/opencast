@@ -49,6 +49,8 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class EventCommentDatabaseImplTest {
 
@@ -88,16 +90,16 @@ public class EventCommentDatabaseImplTest {
     AbstractSearchIndex adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
     EasyMock.expect(adminUiIndex.getIndexName()).andReturn("adminui").anyTimes();
     EasyMock.expect(adminUiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
-    adminUiIndex.addOrUpdate(event);
-    EasyMock.expectLastCall().andVoid().atLeastOnce();
+    EasyMock.expect(adminUiIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
+            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.of(event)).atLeastOnce();
     EasyMock.replay(adminUiIndex);
 
     AbstractSearchIndex externalApiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
     EasyMock.expect(externalApiIndex.getIndexName()).andReturn("externalapi").anyTimes();
     EasyMock.expect(externalApiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).
             anyTimes();
-    externalApiIndex.addOrUpdate(event);
-    EasyMock.expectLastCall().andVoid().atLeastOnce();
+    EasyMock.expect(externalApiIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
+            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.of(event)).atLeastOnce();
     EasyMock.replay(externalApiIndex);
 
     persistence = new EventCommentDatabaseServiceImpl();

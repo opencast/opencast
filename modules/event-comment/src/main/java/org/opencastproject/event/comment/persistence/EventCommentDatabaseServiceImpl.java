@@ -390,27 +390,27 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   private void updateIndex(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting,
           String organization, User user, AbstractSearchIndex index) {
     logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
-      if (!hasComments && hasOpenComments) {
-        throw new IllegalStateException(
-                "Invalid comment update request: You can't have open comments without having any comments!");
-      }
-      if (!hasOpenComments && needsCutting) {
-        throw new IllegalStateException(
-                "Invalid comment update request: You can't have an needs cutting comment without having any open "
-                        + "comments!");
-      }
+    if (!hasComments && hasOpenComments) {
+      throw new IllegalStateException(
+              "Invalid comment update request: You can't have open comments without having any comments!");
+    }
+    if (!hasOpenComments && needsCutting) {
+      throw new IllegalStateException(
+              "Invalid comment update request: You can't have an needs cutting comment without having any open "
+                      + "comments!");
+    }
 
-      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-        if (!eventOpt.isPresent()) {
-          logger.debug("Event {} not found for comment status updating", eventId);
-          return Optional.empty();
-        }
-        Event event = eventOpt.get();
-        event.setHasComments(hasComments);
-        event.setHasOpenComments(hasOpenComments);
-        event.setNeedsCutting(needsCutting);
-        return Optional.of(event);
-      };
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      if (!eventOpt.isPresent()) {
+        logger.debug("Event {} not found for comment status updating", eventId);
+        return Optional.empty();
+      }
+      Event event = eventOpt.get();
+      event.setHasComments(hasComments);
+      event.setHasOpenComments(hasOpenComments);
+      event.setNeedsCutting(needsCutting);
+      return Optional.of(event);
+    };
 
     try {
       index.addOrUpdateEvent(eventId, updateFunction, organization, user);
