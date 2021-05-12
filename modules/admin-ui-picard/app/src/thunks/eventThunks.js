@@ -13,7 +13,7 @@ import {
     transformMetadataCollection
 } from "../utils/resourceUtils";
 import axios from "axios";
-import {getTimezoneOffset, makeTwoDigest} from "../utils/utils";
+import {getTimezoneOffset, makeTwoDigits} from "../utils/utils";
 import {sourceMetadata, uploadAssetOptions} from "../configs/sourceConfig";
 import {NOTIFICATION_CONTEXT, weekdays, WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizardConfig";
 import {addNotification} from "./notificationThunks";
@@ -139,8 +139,11 @@ export const updateBulkMetadata = (metadataFields, values) => async dispatch => 
         })
         .catch(err => {
             console.log(err);
+            // if an internal server error occurred, then backend sends further information
             if (err.status === 500) {
-                if (!!err.data) {
+                // backend should send data containing further information about occurred internal error
+                // if this error data is undefined then an unexpected error occurred
+                if (!err.data) {
                     dispatch(addNotification('error', 'BULK_METADATA_UPDATE.UNEXPECTED_ERROR'));
                 } else {
                     if (err.data.updated && err.data.updated.length === 0) {
@@ -391,14 +394,14 @@ export const fetchScheduling = async events => {
             changedLocation: data[i].agentConfiguration['event.location'],
             deviceInputs: data[i].agentConfiguration['capture.device.names'],
             changedDeviceInputs: [],
-            startTimeHour: makeTwoDigest(startDate.getHours()),
-            changedStartTimeHour: makeTwoDigest(startDate.getHours()),
-            startTimeMinutes: makeTwoDigest(startDate.getMinutes()),
-            changedStartTimeMinutes: makeTwoDigest(startDate.getMinutes()),
-            endTimeHour: makeTwoDigest(endDate.getHours()),
-            changedEndTimeHour: makeTwoDigest(endDate.getHours()),
-            endTimeMinutes: makeTwoDigest(endDate.getMinutes()),
-            changedEndTimeMinutes: makeTwoDigest(endDate.getMinutes()),
+            startTimeHour: makeTwoDigits(startDate.getHours()),
+            changedStartTimeHour: makeTwoDigits(startDate.getHours()),
+            startTimeMinutes: makeTwoDigits(startDate.getMinutes()),
+            changedStartTimeMinutes: makeTwoDigits(startDate.getMinutes()),
+            endTimeHour: makeTwoDigits(endDate.getHours()),
+            changedEndTimeHour: makeTwoDigits(endDate.getHours()),
+            endTimeMinutes: makeTwoDigits(endDate.getMinutes()),
+            changedEndTimeMinutes: makeTwoDigits(endDate.getMinutes()),
             weekday: weekdays[startDate.getDay()].name,
             changedWeekday: weekdays[startDate.getDay()].name
         }
@@ -459,7 +462,7 @@ export const updateScheduledEventsBulk = values => async dispatch => {
         let eventChanges = values.editedEvents.find(event => event.eventId === values.changedEvents[i]);
         let originalEvent = values.events.find(event => event.id === values.changedEvents[i]);
 
-        if (!!eventChanges || !! originalEvent) {
+        if (!eventChanges || !originalEvent) {
             dispatch(addNotification('error', 'EVENTS_NOT_UPDATED'));
             return;
         }

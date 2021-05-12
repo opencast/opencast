@@ -69,6 +69,9 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
         if (!selected) {
             setAllChecked(false);
         }
+        if (changedEvents.every(event => event.selected === true)) {
+            setAllChecked(true);
+        }
     };
 
     // Check validity for activating next button

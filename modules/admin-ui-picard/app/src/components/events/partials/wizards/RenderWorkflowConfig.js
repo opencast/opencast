@@ -16,6 +16,7 @@ import {
 const RenderWorkflowConfig = (props) => {
     // Get html for configuration panel
     const configurationPanel = props.configuration_panel;
+    const description = props.description;
 
     // Use sanitizer that sanitize html used in dangerouslySetInnerHTML
     // In order to it is protected against XSS attacks
@@ -26,8 +27,31 @@ const RenderWorkflowConfig = (props) => {
    if (ref.current?.childNodes !== undefined) {
        let array = [...ref.current?.childNodes];
    }
+
+    const descriptionBoxStyle = {
+        margin: '15px 0 0 0',
+        position: 'relative',
+        border: 'solid #c9d0d3',
+        borderWidth: '1px',
+        backgroundColor: '#fafafa',
+        overflow: 'hidden',
+        borderRadius: '4px'
+    };
+
+    const descriptionTextStyle = {
+        margin: '10px',
+        fontFamily: '"Open sans", Helvetica,sans-serif',
+        fontSize: '12px',
+        whiteSpace: 'pre-line'
+    };
+
     return (
         <>
+            {description.length > 0 && (
+                <div className="collapsible-box" style={descriptionBoxStyle}>
+                    <div style={descriptionTextStyle}>{description}</div>
+                </div>
+            )}
             <div id="testing_something" dangerouslySetInnerHTML={{__html: sanitizer(configurationPanel)}} ref={ref} />
 
         </>

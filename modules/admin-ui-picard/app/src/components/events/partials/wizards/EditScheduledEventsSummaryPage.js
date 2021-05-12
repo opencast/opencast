@@ -72,7 +72,7 @@ const EditScheduledEventsSummaryPage = ({ previousPage, formik }) => {
                 });
             }
 
-            // If there where changes push to changed array
+            // If there were changes push them to changed array
             if(eventChanges.changes.length > 0) {
 
                 changed.push(eventChanges);

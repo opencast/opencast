@@ -47,7 +47,7 @@ export const initArray = numberOfElements => {
 };
 
 // insert leading 0 for numbers smaller 10
-export const makeTwoDigest = number => {
+export const makeTwoDigits = number => {
     if (number < 10) {
         return '0' + number;
     } else {

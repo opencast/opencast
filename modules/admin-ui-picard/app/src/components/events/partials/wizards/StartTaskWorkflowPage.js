@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
+import {Field} from "formik";
 import {useTranslation} from "react-i18next";
 import RenderWorkflowConfig from "./RenderWorkflowConfig";
 import {fetchWorkflowDef} from "../../../../thunks/workflowThunks";
@@ -12,39 +13,11 @@ import cn from 'classnames';
 const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflowDef, workflowDef }) => {
     const { t } = useTranslation();
 
-    // Cache whole selected workflow definition for further use
-    const [selectedWorkflow, setSelectedWorkflow] = useState([]);
-    const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         // Load workflow definitions for selecting
         loadingWorkflowDef();
-        setLoading(false);
     }, []);
 
-    const handleChange = e => {
-        const workflowId = e.target.value;
-        formik.setFieldValue('workflow', workflowId);
-        const chosenWorkflow = workflowDef.find(workflow => workflow.id === workflowId);
-        setSelectedWorkflow(chosenWorkflow);
-    }
-
-    const descriptionBoxStyle = {
-        margin: '15px 0 0 0',
-        position: 'relative',
-        border: 'solid #c9d0d3',
-        borderWidth: '1px',
-        backgroundColor: '#fafafa',
-        overflow: 'hidden',
-        borderRadius: '4px'
-    };
-
-    const descriptionTextStyle = {
-        margin: '10px',
-        fontFamily: '"Open sans", Helvetica,sans-serif',
-        fontSize: '12px',
-        whiteSpace: 'pre-line'
-    };
     return (
         <>
             <div className="modal-content">
@@ -54,30 +27,20 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflow
                         <div className="obj list-obj">
                             <header>{t('BULK_ACTIONS.SCHEDULE_TASK.TASKS.SELECT')}</header>
                             <div className="obj-container">
-                                {!loading && (
-                                    workflowDef.length > 0 && (
-                                        <select tabIndex="99"
+                                {workflowDef.length > 0 && (
+                                        <Field tabIndex="99"
                                                 name="workflow"
-                                                onChange={e => handleChange(e)}
+                                                as="select"
                                                 placeholder={t('EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW')}
                                                 style={{width: '100%'}}>
                                             <option value="" />
                                             {workflowDef.map((workflow, key)=> (
                                                 <option key={key} value={workflow.id}>{workflow.title}</option>
                                             ))}
-                                        </select>
-                                    )
-                                )}
-
-
+                                        </Field>
+                                    )}
                                 {formik.values.workflow  && (
                                     <>
-                                        {/* Show description */}
-                                        {selectedWorkflow.description.length > 0 && (
-                                            <div className="collapsible-box" style={descriptionBoxStyle}>
-                                                <div style={descriptionTextStyle}>{selectedWorkflow.description}</div>
-                                            </div>
-                                        )}
                                         {/* Configuration panel of selected workflow */}
                                         {/*Todo: Needs to be implemented after adjustments in definition files done*/}
                                         <div id="new-event-workflow-configuration"

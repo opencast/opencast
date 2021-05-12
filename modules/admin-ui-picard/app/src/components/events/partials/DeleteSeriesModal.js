@@ -73,6 +73,9 @@ const DeleteSeriesModal = ({ close, selectedRows, deleteMultipleSeries }) => {
       if(!selected) {
           setAllChecked(false);
       }
+      if (changedSeries.every(series => series.selected === true)) {
+          setAllChecked(true);
+      }
   };
 
   const isAllowed = () => {

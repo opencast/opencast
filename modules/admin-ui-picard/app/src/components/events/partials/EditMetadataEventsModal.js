@@ -37,7 +37,7 @@ const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata}) => 
             // Get merged metadata from backend
             const responseMetadataFields = await postEditMetadata(eventIds);
 
-            // Set fatal error if response contain error
+            // Set fatal error if response contains error
             if (!!responseMetadataFields.fatalError) {
                 setFatalError(responseMetadataFields);
             } else {
@@ -242,10 +242,6 @@ const getInitialValues = metadataFields => {
     // Transform metadata fields provided by backend (saved in redux)
     let initialValues = {};
     metadataFields.mergedMetadata.forEach(field => {
-        /*initialValues[field.id] = {
-            value: field.value,
-            selected: false
-        };*/
         initialValues[field.id] = field.value;
     });
 

@@ -50,6 +50,9 @@ const DeleteEventsModal = ({ close, selectedRows, deleteMultipleEvent }) => {
         if (!selected) {
             setAllChecked(false);
         }
+        if (changedEvents.every(event => event.selected === true)) {
+            setAllChecked(true);
+        }
     }
     return (
         <>

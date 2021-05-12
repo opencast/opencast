@@ -55,8 +55,7 @@ const RenderField = ({ field, metadataField, form, showCheck=false }) => {
                                          editMode={editMode}
                                          setEditMode={setEditMode}
                                          form={form}
-                                         showCheck={showCheck}
-                                         handleKeyDown={handleKeyDown}/>
+                                         showCheck={showCheck}/>
             )}
             {((metadataField.type === "text" && !!metadataField.collection && metadataField.collection.length !== 0) ||
                 metadataField.type === "ordered_text") ? (
@@ -92,8 +91,7 @@ const RenderField = ({ field, metadataField, form, showCheck=false }) => {
                                    form={form}
                                    editMode={editMode}
                                    setEditMode={setEditMode}
-                                   showCheck={showCheck}
-                                   handleKeyDown={handleKeyDown}/>
+                                   showCheck={showCheck}/>
             )}
             {metadataField.type === "boolean" && (
                 <EditableBooleanValue field={field}
@@ -109,7 +107,7 @@ const RenderField = ({ field, metadataField, form, showCheck=false }) => {
 };
 
 // Renders editable field for a boolean value
-const EditableBooleanValue = ({ field, text, editMode, setEditMode, handleKeyDown, form: { initialValues }, handleOnClick, showCheck }) => {
+const EditableBooleanValue = ({ field, text, editMode, setEditMode, handleKeyDown, form: { initialValues }, showCheck }) => {
     return (
         editMode ? (
             <div onBlur={() => setEditMode(false)}
@@ -131,7 +129,7 @@ const EditableBooleanValue = ({ field, text, editMode, setEditMode, handleKeyDow
 };
 
 // Renders editable field for a data value
-const EditableDateValue = ({ field, text, form: { setFieldValue, initialValues }, editMode, setEditMode, handleKeyDown, showCheck }) => {
+const EditableDateValue = ({ field, text, form: { setFieldValue, initialValues }, editMode, setEditMode, showCheck }) => {
     const { t } = useTranslation();
 
     const theme = createMuiTheme({
@@ -254,8 +252,7 @@ const EditableSingleValue = ({ field, form: { initialValues }, text, editMode, s
 };
 
 // Renders editable field for time value
-const EditableSingleValueTime = ({ field, text, form: { setFieldValue, initialValues }, editMode, setEditMode,
-                                     handleKeyDown, showCheck }) => {
+const EditableSingleValueTime = ({ field, text, form: { setFieldValue, initialValues }, editMode, setEditMode, showCheck }) => {
     const { t } = useTranslation();
 
     const theme = createMuiTheme({

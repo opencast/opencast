@@ -40,7 +40,7 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, loadingIn
             const responseSeriesOptions = await fetchSeriesOptions();
             setSeriesOptions(responseSeriesOptions);
 
-            // Only load schedule info about event, when not load before
+            // Only load schedule info about event, when not loaded before
             if (formik.values.editedEvents.length === 0) {
                 let initialData = await fetchScheduling(formik.values.events);
                 formik.setFieldValue('editedEvents', initialData);
@@ -179,12 +179,11 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, loadingIn
                                                             <tr>
                                                                 <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME')}</td>
                                                                 <td>
-                                                                    {/* One options for each entry in hours*/}
+                                                                    {/* One option for each entry in hours*/}
                                                                     <Field tabIndex="5"
                                                                            as="select"
                                                                            name={`editedEvents.${key}.changedStartTimeHour`}
                                                                            placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
-                                                                        <option value=""/>
                                                                         {hours.map((i, key) => (
                                                                             <option key={key}
                                                                                     value={i.value}>
@@ -192,12 +191,11 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, loadingIn
                                                                             </option>
                                                                         ))}
                                                                     </Field>
-                                                                    {/* One options for each entry in minutes*/}
+                                                                    {/* One option for each entry in minutes*/}
                                                                     <Field tabIndex="5"
                                                                            as="select"
                                                                            name={`editedEvents.${key}.changedStartTimeMinutes`}
                                                                            placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
-                                                                        <option value=""/>
                                                                         {minutes.map((i, key) => (
                                                                             <option key={key}
                                                                                     value={i.value}>
@@ -210,12 +208,11 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, loadingIn
                                                             <tr>
                                                                 <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME')}</td>
                                                                 <td>
-                                                                    {/* One options for each entry in hours*/}
+                                                                    {/* One option for each entry in hours*/}
                                                                     <Field tabIndex="7"
                                                                            as="select"
                                                                            name={`editedEvents.${key}.changedEndTimeHour`}
                                                                            placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
-                                                                        <option value=""/>
                                                                         {hours.map((i, key) => (
                                                                             <option key={key}
                                                                                     value={i.value}>
@@ -223,12 +220,11 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, loadingIn
                                                                             </option>
                                                                         ))}
                                                                     </Field>
-                                                                    {/* One options for each entry in minutes*/}
+                                                                    {/* One option for each entry in minutes*/}
                                                                     <Field tabIndex="8"
                                                                            as="select"
                                                                            name={`editedEvents.${key}.changedEndTimeMinutes`}
                                                                            placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
-                                                                        <option value=""/>
                                                                         {minutes.map((i, key) => (
                                                                             <option key={key}
                                                                                     value={i.value}>

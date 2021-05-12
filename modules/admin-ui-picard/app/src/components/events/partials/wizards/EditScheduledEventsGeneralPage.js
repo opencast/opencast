@@ -80,6 +80,9 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
         if (!selected) {
             setAllChecked(false);
         }
+        if (changedEvents.every(event => event.selected === true)) {
+            setAllChecked(true);
+        }
     };
 
     // Check validity for activating next button
@@ -108,7 +111,7 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
                                 <p>{t('BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTSTART')}</p>
                             </div>
                         )}
-                        {/* Show only if not have access to all agents*/}
+                        {/* Show only if user doesn't have access to all agents*/}
                         {!isAgentAccess(selectedEvents) && (
                             <div className="alert sticky info">
                                 <p>{t('BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTEDITSCHEDULE')}</p>
