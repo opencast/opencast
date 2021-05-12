@@ -34,7 +34,7 @@ export const fetchUsersAndUsernames = async () => {
 
 // new user to backend
 export const postNewUser = async values => {
-    let data = new FormData();
+    let data = new URLSearchParams();
     // fill form data with user inputs
     data.append('username', values.username);
     data.append('name', values.name);

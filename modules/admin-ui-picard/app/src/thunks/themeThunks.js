@@ -25,7 +25,7 @@ export const fetchThemes = () => async (dispatch, getState) => {
 export const postNewTheme = async values => {
 
     // fill form data depending on user inputs
-    let data = new FormData();
+    let data = new URLSearchParams();
     data.append('name', values.name);
     data.append('description', values.description);
     data.append('bumperActive', values.bumperActive);

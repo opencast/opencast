@@ -135,7 +135,7 @@ export const postNewAcl = values => {
 
     let acls = prepareAccessPolicyRulesForPost(values.acls);
 
-    let data = new FormData();
+    let data = new URLSearchParams();
     data.append('name', values.name);
     data.append('acl', JSON.stringify(acls));
 

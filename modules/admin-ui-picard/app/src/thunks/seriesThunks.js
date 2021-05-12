@@ -6,7 +6,7 @@ import {
 } from "../actions/seriesActions";
 import {
     getURLParams, prepareAccessPolicyRulesForPost,
-    prepareMetadataFieldsForPost,
+    prepareSeriesMetadataFieldsForPost,
     transformMetadataCollection
 } from "../utils/resourceUtils";
 import {transformToObjectArray} from "../utils/utils";
@@ -75,23 +75,29 @@ export const postNewSeries = async (values, metadataInfo) => {
 
     let metadataFields, metadata, access;
 
-    metadataFields = prepareMetadataFieldsForPost(metadataInfo.fields, values);
+    metadataFields = prepareSeriesMetadataFieldsForPost(metadataInfo.fields, values);
 
     // metadata for post request
-    metadata = {
+    metadata = [{
         flavor: metadataInfo.flavor,
         title: metadataInfo.title,
         fields: metadataFields
-    };
+    }];
 
     access = prepareAccessPolicyRulesForPost(values.policies);
 
     let jsonData = {
             metadata: metadata,
             options: {},
-            access: access,
-            theme: values.theme,
+            access: access
         };
+
+    if (values.theme !== '') {
+        jsonData = {
+            ...jsonData,
+            theme: values.theme
+        };
+    }
 
     let data = new URLSearchParams();
     data.append("metadata", JSON.stringify(jsonData));

@@ -131,7 +131,7 @@ export const fetchStats = () => async dispatch => {
             // add count to status information fetched before
             statsResponse[i] = {
                 ...statsResponse[i],
-                count: response.total
+                count: response.count
             };
 
             // fill stats array for redux state

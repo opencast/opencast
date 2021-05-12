@@ -15,13 +15,17 @@ const Stats = ({ loadingStats, stats, filterMap, editFilterValue, loadEvents, lo
     const { t } = useTranslation();
 
     // Filter with value of clicked status
-    const showStatsFilter = (name) => {
-        let filter = filterMap.find(({ name }) => name === "status");
-        if (!!filter) {
-            editFilterValue(filter.name, name);
+    const showStatsFilter = stats => {
+            let filterValue;
+            stats.filters.forEach(f => {
+                let filter = filterMap.find(({ name }) => name === f.name);
+                filterValue = f.value
+                if (!!filter) {
+                    editFilterValue(filter.name, filterValue);
+                }
+            })
             loadEvents();
             loadEventsIntoTable();
-        }
     }
 
     const loadStats = async () => {
@@ -43,7 +47,7 @@ const Stats = ({ loadingStats, stats, filterMap, editFilterValue, loadEvents, lo
                 {/* Show one counter for each status */}
                 {stats.map((st, key) => (
                     <div className="col" key={key}>
-                        <div className="stat" onClick={() => showStatsFilter(st.description)} title={t(st.description)}>
+                        <div className="stat" onClick={() => showStatsFilter(st)} title={t(st.description)}>
                             <h1>{st.count}</h1>
                             {/* Show the description of the status, if defined,
                             else show name of filter and its value*/}

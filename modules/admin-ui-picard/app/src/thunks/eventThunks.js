@@ -119,7 +119,6 @@ export const postNewEvent = async (values, metadataInfo) => {
             type: values.sourceMode
         }
         for (let i = 0; sourceMetadata.UPLOAD.metadata.length > i; i++) {
-            console.log(sourceMetadata.UPLOAD.metadata[i].id);
             metadataFields = metadataFields.concat({
                 id: sourceMetadata.UPLOAD.metadata[i].id,
                 value: values[sourceMetadata.UPLOAD.metadata[i].id],
@@ -130,11 +129,11 @@ export const postNewEvent = async (values, metadataInfo) => {
     }
 
     // metadata for post request
-    metadata = {
+    metadata = [{
         flavor: metadataInfo.flavor,
         title: metadataInfo.title,
         fields: metadataFields
-    };
+    }];
 
     // transform date data for post request if source mode is SCHEDULE_*
     if (values.sourceMode === 'SCHEDULE_SINGLE' || values.sourceMode === 'SCHEDULE_MULTIPLE') {
@@ -196,14 +195,16 @@ export const postNewEvent = async (values, metadataInfo) => {
         if (uploadAssetOptions[i].type === 'track' && values.sourceMode === 'UPLOAD') {
             let asset = values.uploadAssetsTrack.find(asset => asset.id === uploadAssetOptions[i].id);
             if (!!asset.file) {
-                formData.append(asset.id, asset.file);
+                formData.append(asset.id + '.0', asset.file);
             }
+            assets.options = assets.options.concat(uploadAssetOptions[i]);
         } else {
             if (!!values[uploadAssetOptions[i].id] && values.sourceMode === 'UPLOAD') {
-                formData.append(uploadAssetOptions[i].id, values[uploadAssetOptions[i].id])
+                formData.append(uploadAssetOptions[i].id + '.0', values[uploadAssetOptions[i].id]);
+                assets.options = assets.options.concat(uploadAssetOptions[i]);
             }
         }
-        assets.options = assets.options.concat(uploadAssetOptions[i]);
+
     }
 
     // prepare access rules provided by user
@@ -215,9 +216,10 @@ export const postNewEvent = async (values, metadataInfo) => {
         processing: {
             workflow: values.processingWorkflow,
             configuration: {
-                'placeholderKey': 'placeholderValue'
+                published: false
             }
         },
+        options: {},
         access: access,
         source: source,
         assets: assets

@@ -26,7 +26,7 @@ export const postNewGroup = async values => {
     let roles = [], users = [];
 
     // fill form data depending on user inputs
-    let data = new FormData();
+    let data = new URLSearchParams();
     data.append('name', values.name);
     data.append('description', values.description);
 
