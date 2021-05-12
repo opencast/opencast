@@ -21,7 +21,6 @@
 
 package org.opencastproject.workflow.impl;
 
-import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.getOrCreateEvent;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Collections.mkString;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.FAILED;
@@ -144,6 +143,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
@@ -2471,15 +2471,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           DublinCoreCatalog episodeDublincoreCatalog, AbstractSearchIndex index) {
     final long workflowInstanceId = workflowInstance.getId();
     final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
-
     final String organization = securityService.getOrganization().getId();
     final User user = securityService.getUser();
 
-    // Load or create the corresponding event
-    try {
-      logger.debug("Updating workflow instance {} of event {} in the {} index.", workflowInstanceId, eventId,
-              index.getIndexName());
-      Event event = getOrCreateEvent(eventId, organization, user, index);
+    logger.debug("Updating workflow instance {} of event {} in the {} index.", workflowInstanceId, eventId,
+            index.getIndexName());
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      Event event = eventOpt.orElse(new Event(eventId, organization));
       event.setCreator(user.getName());
       event.setWorkflowId(workflowInstanceId);
       event.setWorkflowDefinitionId(workflowInstance.getTemplate());
@@ -2487,16 +2485,17 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       event.setAccessPolicy(AccessControlParser.toJsonSilent(accessControlList));
 
       // Update metadata
-      DublinCoreCatalog dcCatalog = episodeDublincoreCatalog;
-      if (dcCatalog != null) {
-        EventIndexUtils.updateEvent(event, dcCatalog);
+      if (episodeDublincoreCatalog != null) {
+        event = EventIndexUtils.updateEvent(event, episodeDublincoreCatalog);
       }
 
-      // Update publications
-      EventIndexUtils.updateEvent(event, workflowInstance.getMediaPackage());
+      // update publications
+      event = EventIndexUtils.updateEvent(event, workflowInstance.getMediaPackage());
+      return Optional.of(event);
+    };
 
-      // Persist updated event in index
-      index.addOrUpdate(event);
+    try {
+      index.addOrUpdateEvent(eventId, updateFunction, organization, user);
       logger.debug("Workflow instance {} of event {} updated in the {} index.", workflowInstanceId, eventId,
               index.getIndexName());
     } catch (SearchIndexException e) {
