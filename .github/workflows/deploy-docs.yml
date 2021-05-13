@@ -29,6 +29,7 @@ jobs:
       working-directory: docs/guides/
       run: |
         pip install -q -r requirements.txt
+        pip install -q markdown-inline-graphviz-extension-png
 
     - name: build admin docs
       working-directory: docs/guides/admin/
