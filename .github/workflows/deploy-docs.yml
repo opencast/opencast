@@ -28,6 +28,7 @@ jobs:
     - name: install dependencies
       working-directory: docs/guides/
       run: |
+        sed -i /markdown-inline-graphviz-extension-png/d  requirements.txt
         pip install -q -r requirements.txt
         pip install -q markdown-inline-graphviz-extension-png
 
