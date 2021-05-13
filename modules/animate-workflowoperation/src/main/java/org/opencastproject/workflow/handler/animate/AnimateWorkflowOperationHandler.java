@@ -36,6 +36,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
@@ -91,12 +92,6 @@ public class AnimateWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /** Animation fps configuration property name. */
   private static final String FPS_PROPERTY = "fps";
-
-  /** Target flavor configuration property name. */
-  private static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
-
-  /** Target tags configuration property name. */
-  private static final String TARGET_TAGS_PROPERTY = "target-tags";
 
   /** The animate service. */
   private AnimateService animateService = null;
@@ -166,16 +161,12 @@ public class AnimateWorkflowOperationHandler extends AbstractWorkflowOperationHa
     }
     URI animation = animationFile.toURI();
 
-    final MediaPackageElementFlavor targetFlavor;
-    try {
-      targetFlavor = MediaPackageElementFlavor.parseFlavor(StringUtils.trimToNull(
-              operation.getConfiguration(TARGET_FLAVOR_PROPERTY)));
-    } catch (IllegalArgumentException e) {
-      throw new WorkflowOperationException("Invalid target flavor", e);
-    }
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+    final MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
 
     // Get optional options
-    String targetTagsProperty = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS_PROPERTY));
+    List<String> targetTagsProperty = tagsAndFlavors.getTargetTags();
 
     // Check if we have custom command line options
     String cmd = operation.getConfiguration(COMMANDLINE_ARGUMENTS_PROPERTY);
@@ -228,7 +219,7 @@ public class AnimateWorkflowOperationHandler extends AbstractWorkflowOperationHa
       track = (TrackImpl) MediaPackageElementParser.getFromXml(inspection.getPayload());
 
       // add track to media package
-      for (String tag : asList(targetTagsProperty)) {
+      for (String tag : targetTagsProperty) {
         track.addTag(tag);
       }
       mediaPackage.add(track);

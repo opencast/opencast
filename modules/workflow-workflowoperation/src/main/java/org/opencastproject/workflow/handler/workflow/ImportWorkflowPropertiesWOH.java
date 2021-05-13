@@ -32,6 +32,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
@@ -75,9 +76,11 @@ public class ImportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
   @Override
   public WorkflowOperationResult start(WorkflowInstance wi, JobContext context) throws WorkflowOperationException {
     logger.info("Start importing workflow properties for workflow {}", wi);
-    final String sourceFlavor = getConfig(wi, SOURCE_FLAVOR_PROPERTY);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
+        Configuration.none, Configuration.one, Configuration.none, Configuration.none);
+    final MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
     Opt<Attachment> propertiesElem = loadPropertiesElementFromMediaPackage(
-            MediaPackageElementFlavor.parseFlavor(sourceFlavor), wi);
+            sourceFlavor, wi);
     if (propertiesElem.isSome()) {
       Properties properties = loadPropertiesFromXml(workspace, propertiesElem.get().getURI());
       final Set<String> keys = $(getOptConfig(wi, KEYS_PROPERTY)).bind(Strings.splitCsv).toSet();

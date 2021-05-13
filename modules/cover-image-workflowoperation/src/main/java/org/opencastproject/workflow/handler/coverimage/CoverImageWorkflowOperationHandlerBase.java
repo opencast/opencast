@@ -41,6 +41,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -80,8 +81,6 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
   private static final String HEIGHT = "height";
   private static final String POSTERIMAGE_FLAVOR = "posterimage-flavor";
   private static final String POSTERIMAGE_URL = "posterimage";
-  private static final String TARGET_FLAVOR = "target-flavor";
-  private static final String TARGET_TAGS = "target-tags";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CoverImageWorkflowOperationHandlerBase.class);
@@ -135,23 +134,17 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       logger.debug("Poster image found at '{}'", posterImgUri);
     }
 
+    //Get tags and flavors
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+
     // Read target flavor
-    String targetFlavor = operation.getConfiguration(TARGET_FLAVOR);
-    if (StringUtils.isBlank(targetFlavor)) {
-      logger.warn("Required configuration key '{}' is blank", TARGET_FLAVOR);
-      throw new WorkflowOperationException("Configuration key '" + TARGET_FLAVOR + "' must be set");
-    }
-    try {
-      MediaPackageElementFlavor.parseFlavor(targetFlavor);
-    } catch (IllegalArgumentException e) {
-      logger.warn("Given target flavor '{}' is not a valid flavor", targetFlavor);
-      throw new WorkflowOperationException(e);
-    }
+    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
 
     Job generate;
     try {
       generate = getCoverImageService().generateCoverImage(xml, xsl, String.valueOf(width), String.valueOf(height),
-              posterImgUri, targetFlavor);
+              posterImgUri, targetFlavor.toString());
       logger.debug("Job for cover image generation created");
 
       if (!waitForStatus(generate).isSuccess()) {
@@ -168,14 +161,9 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       coverImage.setMimeType(MimeTypes.PNG);
 
       // Add tags
-      final String targetTags = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS));
-      if (targetTags != null) {
-        for (String tag : asList(targetTags)) {
-          logger.trace("Tagging image with '{}'", tag);
-          if (StringUtils.trimToNull(tag) != null) {
-            coverImage.addTag(tag);
-          }
-        }
+      for (String tag : tagsAndFlavors.getTargetTags()) {
+        logger.trace("Tagging image with '{}'", tag);
+        coverImage.addTag(tag);
       }
 
       mediaPackage.add(coverImage);
