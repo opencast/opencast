@@ -129,7 +129,8 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     if (smilTargetFlavor != null) {
       finalSourceFlavors = sourceFlavors.get(sourceFlavors.size()).toString();
     } else {
-      finalSourceFlavors = sourceFlavors.stream().map(MediaPackageElementFlavor::toString).collect(Collectors.joining(","));
+      finalSourceFlavors = sourceFlavors.stream().map(MediaPackageElementFlavor::toString)
+          .collect(Collectors.joining(","));
     }
 
     String referenceTracksFlavor = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(

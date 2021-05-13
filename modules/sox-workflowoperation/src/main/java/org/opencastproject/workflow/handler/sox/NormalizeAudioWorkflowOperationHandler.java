@@ -132,7 +132,8 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
 
     // Check which tags have been configured
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many, Configuration.many, Configuration.many, Configuration.many);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many,
+        Configuration.many, Configuration.many, Configuration.many);
     List<String> targetTagsOption = tagsAndFlavors.getTargetTags();
     List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();

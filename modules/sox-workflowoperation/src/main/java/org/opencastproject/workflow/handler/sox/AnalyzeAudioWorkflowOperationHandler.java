@@ -121,7 +121,8 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
           IOException, NotFoundException, MediaPackageException, WorkflowOperationException, EncoderException {
     MediaPackage mediaPackage = (MediaPackage) src.clone();
 
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflow, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflow, Configuration.many, Configuration.many,
+        Configuration.none, Configuration.none);
 
     boolean forceTranscode = BooleanUtils.toBoolean(workflow.getCurrentOperation().getConfiguration("force-transcode"));
 
