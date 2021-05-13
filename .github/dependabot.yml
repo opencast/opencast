@@ -20,11 +20,6 @@ updates:
   schedule:
     interval: weekly
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: typescript
-    versions:
-    - ">= 4.a"
-    - "< 5"
 - package-ecosystem: npm
   directory: "/modules/runtime-info-ui-ng"
   schedule:
