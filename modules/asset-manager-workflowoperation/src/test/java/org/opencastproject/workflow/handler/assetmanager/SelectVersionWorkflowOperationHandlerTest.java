@@ -181,14 +181,24 @@ public class SelectVersionWorkflowOperationHandlerTest {
     mockAssetManager(1);
     operationHandler.setAssetManager(assetManager);
     operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_VERSION, "invalid");
-    WorkflowOperationResult result = operationHandler.start(wfInstance, null);
+    operationHandler.start(wfInstance, null);
   }
 
   @Test(expected = WorkflowOperationException.class)
   public void testSelectWithNoConfiguration() throws Exception {
     mockAssetManager(2);
     operationHandler.setAssetManager(assetManager);
-    WorkflowOperationResult result = operationHandler.start(wfInstance, null);
+    operationHandler.start(wfInstance, null);
+  }
+
+  @Test(expected = WorkflowOperationException.class)
+  public void testSelectWithBothConfiguration() throws Exception {
+    mockAssetManager(1);
+    operationHandler.setAssetManager(assetManager);
+    operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_VERSION, "0");
+    operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_NO_TAGS, "hls");
+    operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_SOURCE_FLAVORS, "presenter/delivery");
+    operationHandler.start(wfInstance, null);
   }
 
 }

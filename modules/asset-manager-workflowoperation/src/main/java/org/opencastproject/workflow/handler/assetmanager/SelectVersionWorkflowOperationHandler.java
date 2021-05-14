@@ -48,8 +48,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Replaces the media package in the current workflow with a previous version from the asset manager. There are two ways
@@ -67,18 +65,7 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
   public static final String OPT_NO_TAGS = "no-tags";
   public static final String OPT_SOURCE_FLAVORS = "source-flavors";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
   private AssetManager assetManager;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(OPT_VERSION,
-            "Select the specific version. If informed, takes precedence over the other options.");
-    CONFIG_OPTIONS.put(OPT_NO_TAGS, "Select first version where elements of the flavor passed do not have these tags.");
-    CONFIG_OPTIONS.put(OPT_SOURCE_FLAVORS, "The flavor of elements to compare.");
-  }
 
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -92,33 +79,38 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
     MediaPackage mp = workflowInstance.getMediaPackage();
     MediaPackage resultMp = null;
 
+    // Make sure operation configuration is valid.
+    String version = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_VERSION));
+    String noTagsOpt = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_NO_TAGS));
+    String sourceFlavorsOpt = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_SOURCE_FLAVORS));
+    if (version != null && (noTagsOpt != null || sourceFlavorsOpt != null)) {
+      throw new WorkflowOperationException(
+              String.format("Configuration error: '%s' cannot be used with '%s' and '%s'.",
+              OPT_VERSION, OPT_NO_TAGS, OPT_SOURCE_FLAVORS));
+    }
+
     // Specific version informed? If yes, use it.
-    String version = null;
-    if (!StringUtils.isEmpty(currentOperation.getConfiguration(OPT_VERSION))) {
+    if (version != null) {
       try {
-        version = currentOperation.getConfiguration(OPT_VERSION).trim();
         // Validate the number
         Integer.parseInt(version);
+        resultMp = findVersion(mp.getIdentifier().toString(), version);
+        if (resultMp == null) {
+          throw new WorkflowOperationException(
+                  String.format("Could not find version %d of mp %s in the archive", mp.getIdentifier(), version));
+        }
       } catch (NumberFormatException e) {
         throw new WorkflowOperationException("Invalid version passed: " + version);
       }
-    }
-    if (version != null) {
-      resultMp = findVersion(mp.getIdentifier().toString(), version);
-      if (resultMp == null) {
-        throw new WorkflowOperationException(
-                String.format("Could not find version %d of mp %s in the archive", mp.getIdentifier(), version));
-      }
     } else {
-      if (StringUtils.isEmpty(currentOperation.getConfiguration(OPT_NO_TAGS))) {
-        throw new WorkflowOperationException("Configuration missing: " + OPT_NO_TAGS);
+      if (noTagsOpt == null || sourceFlavorsOpt == null) {
+        throw new WorkflowOperationException(String.format("Configuration error: both '%s' and '%s' must be passed.",
+                OPT_NO_TAGS, OPT_SOURCE_FLAVORS));
       }
-      String noTagsOpt = currentOperation.getConfiguration(OPT_NO_TAGS);
       Collection<String> noTags = Arrays.asList(noTagsOpt.split(","));
 
-      String flavorStr = currentOperation.getConfiguration(OPT_SOURCE_FLAVORS);
       SimpleElementSelector elementSelector = new SimpleElementSelector();
-      for (MediaPackageElementFlavor flavor : parseFlavors(flavorStr)) {
+      for (MediaPackageElementFlavor flavor : parseFlavors(sourceFlavorsOpt)) {
         elementSelector.addFlavor(flavor);
       }
 
@@ -126,7 +118,7 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
       if (resultMp == null) {
         throw new WorkflowOperationException(String.format(
                 "Could not find in the archive a version of mp %s that does not have the tags %s in element flavors %s",
-                mp.getIdentifier(), noTagsOpt, flavorStr));
+                mp.getIdentifier(), noTagsOpt, sourceFlavorsOpt));
       }
     }
     return createResult(resultMp, Action.CONTINUE);
@@ -151,6 +143,7 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
       if (optSnap.isNone()) {
         continue;
       }
+      logger.info("Replacing current media package with version: {}", version);
       return optSnap.get().getMediaPackage();
     }
     return null;
@@ -172,7 +165,8 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
       if (optSnap.isNone()) {
         continue;
       }
-      MediaPackage mp = optSnap.get().getMediaPackage();
+      Snapshot snapshot = optSnap.get();
+      MediaPackage mp = snapshot.getMediaPackage();
       for (MediaPackageElement el : elementSelector.select(mp, false)) {
         for (String t : el.getTags()) {
           if (tags.contains(t)) {
@@ -180,6 +174,7 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
           }
         }
       }
+      logger.info("Replacing current media package with version: {}", snapshot.getVersion());
       return mp;
     }
     return null;
