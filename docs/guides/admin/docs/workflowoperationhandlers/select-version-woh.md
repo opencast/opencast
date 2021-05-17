@@ -19,13 +19,7 @@ There are currently two ways of specifying which version to select, which are **
 
 ### How to find the desired version of the media package?
 
-Every time a workflow runs a _snapshot_ operation, a new version of the media package is saved to the Asset Manager, starting with version 0.
-
-There isn't currently an easy way to list all the versions of a media package so here are some tips:
-
-1. Open the event details, go to the _Workflows_ tab, and count all _snapshot_ operations that were run until you reach the one you want. To get to the operation list, for each workflow, choose _Details,_ and then _Operations_ > _Details_.
-
-2. If you have access to the database, you can query it with:
+There isn't currently an easy way to list all the versions of a media package. If you have access to the database, you can query it with:
 
 ```
     select version, archival_date, mediapackage_xml
