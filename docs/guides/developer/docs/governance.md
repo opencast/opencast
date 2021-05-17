@@ -157,13 +157,13 @@ governance processes and must be communicated on list for greater participation 
 
 The last board elections took place during the Opencast Summit 2021. The current board consists of:
 
-* Olaf A. Schulte, ETH Zurich, Chair
-* Jody Fanto, Harvard University DCE
-* Vicente Goyanes, University of Vigo
-* Greg Logan, Opencast Consultant
-* Stephen Marquard, University of Cape Town
-* Carlos Turró Ribalta, Universitat Politécnica de Valencia
-* Rüdiger Rolf, Osnabrück University
-* Lars Kiesow, ELAN e.V.
-* Daniel Ebbert, University of Cologne / educast.nrw
-* Matthew Coupe, University of Manchester
+- Olaf A. Schulte, ETH Zurich, Chair
+- Jody Fanto, Harvard University DCE
+- Vicente Goyanes, University of Vigo
+- Greg Logan, Opencast Consultant
+- Stephen Marquard, University of Cape Town
+- Carlos Turró Ribalta, Universitat Politécnica de Valencia
+- Rüdiger Rolf, Osnabrück University
+- Lars Kiesow, ELAN e.V.
+- Daniel Ebbert, University of Cologne / educast.nrw
+- Matthew Coupe, University of Manchester
