@@ -720,7 +720,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
           String fileName) throws DistributionException {
     String objectName = null;
     if (StringUtils.isNotBlank(fileName)) {
-      objectName = buildObjectName(channelId, mediaPackage.getIdentifier().toString(), elementId, fileName);
+      final String orgId = securityService.getOrganization().getId();
+      objectName = buildObjectName(orgId, channelId, mediaPackage.getIdentifier().toString(), elementId, fileName);
     } else {
       objectName = buildObjectName(channelId, mediaPackage.getIdentifier().toString(),
               mediaPackage.getElementById(elementId));
@@ -771,23 +772,25 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
    * @return
    */
   protected String buildObjectName(String channelId, String mpId, MediaPackageElement element) {
-    // Something like CHANNEL_ID/MP_ID/ELEMENT_ID/FILE_NAME.EXTENSION
+    // Something like ORG_ID/CHANNEL_ID/MP_ID/ELEMENT_ID/FILE_NAME.EXTENSION
+    final String orgId = securityService.getOrganization().getId();
     String uriString = element.getURI().toString();
     String fileName = FilenameUtils.getName(uriString);
-    return buildObjectName(channelId, mpId, element.getIdentifier(), fileName);
+    return buildObjectName(orgId, channelId, mpId, element.getIdentifier(), fileName);
   }
 
   /**
    * Builds the aws s3 object name using the raw elementID and filename
    *
+   * @param orgId
    * @param channelId
    * @param mpId
    * @param elementId
    * @param fileName
    * @return
    */
-  protected String buildObjectName(String channelId, String mpId, String elementId, String fileName) {
-    return StringUtils.join(new String[] { channelId, mpId, elementId, fileName }, "/");
+  protected String buildObjectName(String orgId, String channelId, String mpId, String elementId, String fileName) {
+    return StringUtils.join(new String[] { orgId, channelId, mpId, elementId, fileName }, "/");
   }
 
   /**
@@ -798,7 +801,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
    *           if the concrete implementation tries to create a malformed uri
    */
   protected URI getDistributionUri(String objectName) throws URISyntaxException {
-    // Something like https://OPENCAST_DOWNLOAD_URL/CHANNEL_ID/MP_ID/ELEMENT_ID/FILE_NAME.EXTENSION
+    // Something like https://OPENCAST_DOWNLOAD_URL/ORG_ID/CHANNEL_ID/MP_ID/ELEMENT_ID/FILE_NAME.EXTENSION
     return new URI(opencastDistributionUrl + objectName);
   }
 
@@ -808,7 +811,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
    * @return The distributed object name
    */
   protected String getDistributedObjectName(MediaPackageElement element) {
-    // Something like https://OPENCAST_DOWNLOAD_URL/CHANNEL_ID/MP_ID/ORIGINAL_ELEMENT_ID/FILE_NAME.EXTENSION
+    // Something like https://OPENCAST_DOWNLOAD_URL/ORG_ID/CHANNEL_ID/MP_ID/ORIGINAL_ELEMENT_ID/FILE_NAME.EXTENSION
     String uriString = element.getURI().toString();
 
     // String directoryName = distributionDirectory.getAbsolutePath();
@@ -818,7 +821,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       // Cannot retract
       logger.warn(
           "Cannot retract {}. Uri must be in the format "
-              + "https://host/bucketName/channelId/mpId/originalElementId/fileName.extension",
+              + "https://host/bucketName/orgId/channelId/mpId/originalElementId/fileName.extension",
           uriString);
       return null;
     }
