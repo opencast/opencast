@@ -113,6 +113,14 @@ API changes
   different types of events in one request
 - The Series API can now return ACLs within its response, if you tell it to
 
+Additional Notes about 9.5
+--------------------------
+
+This release contains many bugfixes. In particular, a long standing issue
+with 9's automatic database schema generation is finally resolved.
+
+There is also a "Download" dropdown in the LTI tools, now.
+
 Additional Notes about 9.4
 --------------------------
 
