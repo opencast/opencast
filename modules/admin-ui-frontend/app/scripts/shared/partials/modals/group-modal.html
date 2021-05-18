@@ -32,11 +32,17 @@
                    placeholder="{{ 'USERS.GROUPS.DETAILS.FORM.NAME' | translate }}..."
                    name="name"
                    ng-class="blurred.name == true && !groupForm.name.$valid ? 'error' : ''"
-                   ng-blur="blurred.name=true">
+                   ng-blur="blurred.name=true"
+                   sanitize-xml="group.name">
           </div>
           <div class="row">
             <label translate="USERS.GROUPS.DETAILS.FORM.DESCRIPTION"><!-- Description --></label>
-            <textarea ng-model="group.description" placeholder="Description..." rows="4" name="description"></textarea>
+            <textarea ng-model="group.description"
+                      placeholder="Description..."
+                      rows="4"
+                      name="description"
+                      sanitize-xml="group.description">
+            </textarea>
           </div>
         </div>
       </div>

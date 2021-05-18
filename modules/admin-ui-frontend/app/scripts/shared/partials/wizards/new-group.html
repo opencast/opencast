@@ -5,14 +5,14 @@
       <div class="form-container">
         <div class="row">
           <label translate="USERS.GROUPS.DETAILS.FORM.NAME" class="required"><!-- Group Name --></label>
-          <input ng-init="blurred.name = false" ng-model="wizard.step.metadata.name" type="text" ng-required="true"
+          <input ng-init="blurred.name = false" ng-model="wizard.step.metadata.name" type="text" ng-required="true" sanitize-xml="wizard.step.metadata.name"
                                                                                                  placeholder="{{ 'USERS.GROUPS.DETAILS.FORM.NAME' | translate }}..." name="name"
                                                                                                                                                                      ng-class="blurred.name == true && !groupForm.name.$valid ? 'error' : ''" ng-blur="blurred.name=true"
                                                                                                                                                                                                                                               tabindex="1" focushere>
         </div>
         <div class="row">
           <label translate="USERS.GROUPS.DETAILS.FORM.DESCRIPTION"><!-- Group Description --></label>
-          <textarea ng-model="wizard.step.metadata.description"
+          <textarea ng-model="wizard.step.metadata.description" sanitize-xml="wizard.step.metadata.description"
                     placeholder="{{ 'USERS.GROUPS.DETAILS.FORM.DESCRIPTION' | translate }}..." rows="4"
                                                                                                name="description" tabindex="2"></textarea>
         </div>
