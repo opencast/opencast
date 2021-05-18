@@ -5,16 +5,17 @@ import {
 import {
 } from "../../../../selectors/eventDetailsSelectors";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
-import {fetchAclActions, fetchAclTemplates} from "../../../../thunks/aclThunks";
+import {fetchAclActions, fetchAclTemplates, fetchRolesWithTarget} from "../../../../thunks/aclThunks";
+import {fetchAccessPolicies} from "../../../../thunks/eventDetailsThunks";
 import Notifications from "../../../shared/Notifications";
 import {Formik} from "formik";
 
 /**
  * This component manages the access policy tab of the event details modal
  */
-const EventDetailsAccessPolicyTab = ({ eventId, header, t
+const EventDetailsAccessPolicyTab = ({ eventId, header, t,
 
-                                      }) => {
+                                      fetchAccessPolicies, fetchRoles}) => {
 
     {/* todo: get real values */}
     const transactions = {
@@ -22,41 +23,7 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t
     };
 
     const baseAclId = "No clue!";
-    const roles = [{
-        name: "ROLE_USER_ADMIN"
-    }];
-    const policies = [{
-        "episode_access": {
-            "privileges": {
-                "ROLE_USER_ADMIN": {
-                    "read": true,
-                    "write": true
-                }
-            },
-            "acl": "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_USER_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_USER_ADMIN\",\"action\":\"write\"}]}}",
-            "current_acl": 0
-        },
-        "system_acls": [
-            {
-                "id": 451,
-                "name": "authenticated"
-            },
-            {
-                "id": 452,
-                "name": "private"
-            },
-            {
-                "id": 453,
-                "name": "public"
-            }
-        ],
-        role: roles[0].name,
-        read: false,
-        write: true,
-        actions: {value: ["None!"]}
-    }];
 
-    const hasActions = false;
 
 
 
@@ -65,14 +32,52 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t
     const [aclTemplates, setAclTemplates] = useState([]);
     const [aclActions, setAclActions] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [hasActions, setHasActions] = useState(false);
+    const [roles, setRoles] = useState(false);
+    const [policies, setPolicies] = useState([]);
 
     useEffect( () => {
+
+        const createPolicy = (role) => {
+            return {
+                role: role,
+                read: false,
+                write: false,
+                actions: {
+                    name: 'event-acl-actions',
+                    value: []
+                }
+            };
+        };
+
         async function fetchData() {
             setLoading(true);
             const responseTemplates = await fetchAclTemplates();
             setAclTemplates(responseTemplates);
             const responseActions = await fetchAclActions();
             setAclActions(responseActions);
+            setHasActions(responseActions.length > 0);
+            fetchAccessPolicies(eventId).then(accessPolicies => {
+                if(!!accessPolicies.episode_access){
+                    const json = JSON.parse(accessPolicies.episode_access.acl).acl.ace;
+                    let newPolicies = {};
+                    let policyRoles = [];
+                    for(let i = 0; i < json.length; i++){
+                        const policy = json[i];
+                        if(!newPolicies[policy.role]){
+                            newPolicies[policy.role] = createPolicy(policy.role);
+                            policyRoles.push(policy.role);
+                        }
+                        if (policy.action === 'read' || policy.action === 'write') {
+                            newPolicies[policy.role][policy.action] = policy.allow;
+                        } else if (policy.allow === true || policy.allow === 'true'){
+                            newPolicies[policy.role].actions.value.push(policy.action);
+                        }
+                    }
+                    setPolicies(policyRoles.map(role => newPolicies[role]));
+                }
+            });
+            fetchRoles().then(roles => setRoles(roles));
             setLoading(false);
         }
 
@@ -276,37 +281,39 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t
                                                             <tr>
                                                                 <td>
                                                                     {!transactions.read_only ? (
-                                                                        <select key={key}
-                                                                                className="chosen-single chosen-default"
-                                                                                chosen
-                                                                                style={{width: '360px'}}
-                                                                                onChange={role => changeAccess(role)}>
-                                                                            {/*pre-select-from="roles"
-                                                                                ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"
-                                                                                call-on-search="getMatchingRoles"*/}
-                                                                            {(roles && roles.length > 0) ?
-                                                                                (
-                                                                                    <>
-                                                                                        <option value="" disabled selected
-                                                                                                hidden>
-                                                                                            {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL')}
+                                                                        <div className="obj-container padded chosen-container chosen-container-single">
+                                                                            <select key={key}
+                                                                                    className="chosen-single"
+                                                                                    chosen
+                                                                                    style={{width: '360px'}}
+                                                                                    onChange={role => changeAccess(role)}>
+                                                                                {/*pre-select-from="roles"
+                                                                                    ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"
+                                                                                    call-on-search="getMatchingRoles"*/}
+                                                                                {(roles && roles.length > 0) ?
+                                                                                    (
+                                                                                        <>
+                                                                                            <option value="" disabled selected
+                                                                                                    hidden>
+                                                                                                {policy.role || t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL')}
+                                                                                            </option>
+                                                                                            {
+                                                                                                roles.map((role, roleKey) => (
+                                                                                                    <option value={role.name}
+                                                                                                            key={roleKey}>
+                                                                                                        {role.name}
+                                                                                                    </option>
+                                                                                                ))
+                                                                                            }
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        <option value="" disabled selected hidden>
+                                                                                            {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY')}
                                                                                         </option>
-                                                                                        {
-                                                                                            roles.map((role, roleKey) => (
-                                                                                                <option value={role.name}
-                                                                                                        key={roleKey}>
-                                                                                                    {role.name}
-                                                                                                </option>
-                                                                                            ))
-                                                                                        }
-                                                                                    </>
-                                                                                ) : (
-                                                                                    <option value="" disabled selected hidden>
-                                                                                        {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY')}
-                                                                                    </option>
-                                                                                )
-                                                                            }
-                                                                        </select>
+                                                                                    )
+                                                                                }
+                                                                            </select>
+                                                                        </div>
                                                                     ) : (
                                                                         <p>{policy.role}</p>
                                                                     )
@@ -343,7 +350,7 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t
                                                                                 saveAccess(values).then(r => {})
                                                                             }}
                                                                         >
-                                                                            { !transactions.read_only /*ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')*/ && (
+                                                                            { !transactions.read_only /* && ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')*/ && (
                                                                                 <div>
                                                                                     <RenderMultiField fieldInformation={
                                                                                         {
@@ -355,7 +362,7 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t
                                                                                 </div>
                                                                             )}
                                                                         </Formik>
-                                                                        {transactions.read_only /*ng-if="((!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"*/ && (
+                                                                        {transactions.read_only /* || ng-if="((!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"*/ && (
                                                                             policy.actions.value.map((customAction, actionKey) => (
                                                                                 <div key={actionKey}>
                                                                                     {customAction}
@@ -376,7 +383,7 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t
                                                             )
                                                         )
                                                     }
-                                                    { !transactions.read_only /* ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" */ && (
+                                                    { !transactions.read_only /* && ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" */ && (
                                                         <tr>
                                                             <td colSpan="5">
 
@@ -409,6 +416,8 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
+    fetchAccessPolicies: (eventId) => dispatch(fetchAccessPolicies(eventId)),
+    fetchRoles: () => fetchRolesWithTarget("ACL"),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsAccessPolicyTab);

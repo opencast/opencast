@@ -9,6 +9,19 @@ import {
 } from '../actions/eventDetailsActions';
 import axios from "axios";
 
+export const fetchAccessPolicies = (eventId) => async (dispatch) => {
+    try {
+        const getData = async () => {
+            const policyData = await axios.get(`admin-ng/event/${eventId}/access.json`);
+            const policies = await policyData.data;
+            return policies;
+        }
+        return getData();
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 export const fetchComments = (eventId) => async (dispatch) => {
     try {
         dispatch(loadEventCommentsInProgress());
