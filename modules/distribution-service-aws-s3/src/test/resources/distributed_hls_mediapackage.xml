@@ -11,7 +11,7 @@
 	<media>
 		<track type="presenter/delivery" id="presenter-mp4">
 			<mimetype>video/mp4</mimetype>
-			<url>http://XYZ.cloudfront.net/channelId/efd6e4df-63b6-49af-be5f-15f598778877/presenter-mp4/video-presenter-delivery.mp4</url>
+			<url>http://XYZ.cloudfront.net/mh_default_org/channelId/efd6e4df-63b6-49af-be5f-15f598778877/presenter-mp4/video-presenter-delivery.mp4</url>
 			<duration>14226</duration>
 			<audio id="audio-1">
 				<device />
@@ -31,7 +31,7 @@
 		</track>
 		<track type="presenter/delivery" id="presenter-m3u8">
 			<mimetype>application/x-mpegURL</mimetype>
-			<url>http://XYZ.cloudfront.net/channelId/efd6e4df-63b6-49af-be5f-15f598778877/presenter-m3u8/video-presenter-delivery.m3u8</url>
+			<url>http://XYZ.cloudfront.net/mh_default_org/channelId/efd6e4df-63b6-49af-be5f-15f598778877/presenter-m3u8/video-presenter-delivery.m3u8</url>
 			<duration>14226</duration>
 			<audio id="audio-1">
 				<device />
@@ -53,11 +53,11 @@
 	<metadata>
 		<catalog type="dublincore/episode" id="episode-dc-distributed">
 			<mimetype>text/xml</mimetype>
-			<url>http://XYZ.cloudfront.net/channelId/efd6e4df-63b6-49af-be5f-15f598778877/episode-dce/episode-dublincore.xml</url>
+			<url>http://XYZ.cloudfront.net/mh_default_org/channelId/efd6e4df-63b6-49af-be5f-15f598778877/episode-dce/episode-dublincore.xml</url>
 		</catalog>
 		<catalog type="dublincore/series" id="series-dc-distributed">
 			<mimetype>text/xml</mimetype>
-			<url>http://XYZ.cloudfront.net/channelId/efd6e4df-63b6-49af-be5f-15f598778877/series-dc/series-dublincore.xml</url>
+			<url>http://XYZ.cloudfront.net/mh_default_org/channelId/efd6e4df-63b6-49af-be5f-15f598778877/series-dc/series-dublincore.xml</url>
 		</catalog>
 	</metadata>
 	<attachments />

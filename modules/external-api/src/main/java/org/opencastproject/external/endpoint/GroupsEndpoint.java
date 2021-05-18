@@ -34,36 +34,44 @@ import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_6_0;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.group.Group;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.index.ExternalIndex;
-import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
+import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.userdirectory.ConflictException;
+import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
 
-import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.ComparatorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -81,7 +89,8 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
+            ApiMediaType.VERSION_1_6_0 })
 @RestService(name = "externalapigroups", title = "External API Groups Service", notes = {}, abstractText = "Provides resources and operations related to the groups")
 public class GroupsEndpoint {
 
@@ -90,16 +99,22 @@ public class GroupsEndpoint {
 
   /* OSGi service references */
   private ExternalIndex externalIndex;
-  private IndexService indexService;
+  private JpaGroupRoleProvider jpaGroupRoleProvider;
+  private SecurityService securityService;
 
   /** OSGi DI */
   void setExternalIndex(ExternalIndex externalIndex) {
     this.externalIndex = externalIndex;
   }
 
+  /** OSGi DI. */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
   /** OSGi DI */
-  void setIndexService(IndexService indexService) {
-    this.indexService = indexService;
+  public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
+    this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
   /** OSGi activation method */
@@ -117,28 +132,106 @@ public class GroupsEndpoint {
                   @RestResponse(description = "A (potentially empty) list of groups.", responseCode = HttpServletResponse.SC_OK) })
   public Response getGroups(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
-    Opt<Integer> optLimit = Opt.nul(limit);
-    if (optLimit.isSome() && limit <= 0)
-      optLimit = Opt.none();
-    Opt<Integer> optOffset = Opt.nul(offset);
-    if (optOffset.isSome() && offset < 0)
-      optOffset = Opt.none();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
+    Optional<Integer> optLimit = Optional.ofNullable(limit);
+    Optional<Integer> optOffset = Optional.ofNullable(offset);
 
-    SearchResult<Group> results;
-    try {
-      results = indexService.getGroups(filter, optLimit, optOffset, Opt.nul(StringUtils.trimToNull(sort)),
-              externalIndex);
-    } catch (SearchIndexException e) {
-      logger.error("The External Search Index was not able to get the groups list:", e);
-      return ApiResponses.serverError("Could not retrieve groups, reason: '%s'", getMessage(e));
+    if (optLimit.isPresent() && limit <= 0) {
+      optLimit = Optional.empty();
+    }
+    if (optOffset.isPresent() && offset < 0) {
+      optOffset = Optional.empty();
     }
 
-    // If the results list if empty, we return already a response.
-    List<JValue> groupsList = new ArrayList<>();
-    for (SearchResultItem<Group> item : results.getItems()) {
-      groupsList.add(groupToJSON(item.getSource()));
+    // The API currently does not offer full text search for groups
+    Map<String, String> filters = RestUtils.parseFilter(filter);
+    Optional<String> optNameFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_NAME_NAME));
+
+    Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
+
+    // sorting by members & roles is not supported by the database, so we do this afterwards
+    Set<SortCriterion> deprecatedSortCriteria = new HashSet<>();
+    if (requestedVersion.isSmallerThan(VERSION_1_6_0)) {
+      deprecatedSortCriteria = sortCriteria.stream().filter(
+              sortCriterion -> sortCriterion.getFieldName().equals("members")
+                      || sortCriterion.getFieldName().equals("roles")).collect(Collectors.toSet());
+      sortCriteria.removeAll(deprecatedSortCriteria);
     }
-    return ApiResponses.Json.ok(acceptHeader, arr(groupsList));
+
+    List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter, Optional.empty(),
+            sortCriteria);
+
+    // sorting by members & roles is only available for api versions < 1.6.0
+    if (requestedVersion.isSmallerThan(VERSION_1_6_0)) {
+      List<Comparator<JpaGroup>> comparators = new ArrayList<>();
+      for (SortCriterion sortCriterion : deprecatedSortCriteria) {
+        Comparator<JpaGroup> comparator;
+        switch (sortCriterion.getFieldName()) {
+          case "members":
+            comparator = new GroupComparator() {
+              @Override
+              public Set<String> getGroupAttribute(JpaGroup jpaGroup) {
+                return jpaGroup.getMembers();
+              }
+            };
+            break;
+          case "roles":
+            comparator = new GroupComparator() {
+              @Override
+              public Set<String> getGroupAttribute(JpaGroup jpaGroup) {
+                return jpaGroup.getRoleNames();
+              }
+            };
+            break;
+          default:
+            continue;
+        }
+
+        if (sortCriterion.getOrder() == SortCriterion.Order.Descending) {
+          comparator = comparator.reversed();
+        }
+        comparators.add(comparator);
+      }
+      Collections.sort(results, ComparatorUtils.chainedComparator(comparators));
+    }
+
+    List<JValue> groupsJSON = new ArrayList<>();
+    for (JpaGroup group : results) {
+      List<Field> fields = new ArrayList<>();
+      fields.add(f("identifier", v(group.getGroupId())));
+      fields.add(f("organization", v(group.getOrganization().getId())));
+      fields.add(f("role", v(group.getRole())));
+      fields.add(f("name", v(group.getName(), Jsons.BLANK)));
+      fields.add(f("description", v(group.getDescription(), Jsons.BLANK)));
+      fields.add(f("roles", v(join(group.getRoleNames(), ","), Jsons.BLANK)));
+      fields.add(f("members", v(join(group.getMembers(), ","), Jsons.BLANK)));
+      groupsJSON.add(obj(fields));
+    }
+    return ApiResponses.Json.ok(acceptHeader, arr(groupsJSON));
+  }
+
+  /**
+   * Compare groups by set attributes like members or roles.
+   */
+  private abstract class GroupComparator implements Comparator<JpaGroup> {
+
+    public abstract Set<String> getGroupAttribute(JpaGroup jpaGroup);
+
+    @Override
+    public int compare(JpaGroup group1, JpaGroup group2) {
+      List<String> members1 = new ArrayList<>(getGroupAttribute(group1));
+      List<String> members2 = new ArrayList<>(getGroupAttribute(group2));
+
+      for (int i = 0; i < members1.size() && i < members2.size(); i++) {
+        String member1 = members1.get(i);
+        String member2 = members2.get(i);
+        int result = member1.compareTo(member2);
+        if (result != 0) {
+          return result;
+        }
+      }
+      return (members1.size() - members2.size());
+    }
   }
 
   @GET
@@ -147,12 +240,23 @@ public class GroupsEndpoint {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The group is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
-          throws Exception {
-    for (final Group group : indexService.getGroup(id, externalIndex)) {
-      return ApiResponses.Json.ok(acceptHeader, groupToJSON(group));
+  public Response getGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id) {
+    JpaGroup group = jpaGroupRoleProvider.getGroup(id);
+
+    if (group == null) {
+      return ApiResponses.notFound("Cannot find a group with id '%s'.", id);
     }
-    return ApiResponses.notFound("Cannot find a group with id '%s'.", id);
+
+    return ApiResponses.Json.ok(acceptHeader,
+            obj(
+                    f("identifier", v(group.getGroupId())),
+                    f("organization", v(group.getOrganization().getId())),  f("role", v(group.getRole())),
+                    f("name", v(group.getName(), Jsons.BLANK)),
+                    f("description", v(group.getDescription(), Jsons.BLANK)),
+                    f("roles", v(join(group.getRoleNames(), ","), Jsons.BLANK)),
+                    f("members", v(join(group.getMembers(), ","), Jsons.BLANK))
+            )
+    );
   }
 
   @DELETE
@@ -164,7 +268,7 @@ public class GroupsEndpoint {
   public Response deleteGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
           throws NotFoundException {
     try {
-      indexService.removeGroup(id);
+      jpaGroupRoleProvider.removeGroup(id);
       return Response.noContent().build();
     } catch (NotFoundException e) {
       return Response.status(SC_NOT_FOUND).build();
@@ -190,7 +294,7 @@ public class GroupsEndpoint {
           @FormParam("name") String name, @FormParam("description") String description,
           @FormParam("roles") String roles, @FormParam("members") String members) throws Exception {
     try {
-      indexService.updateGroup(id, name, description, roles, members);
+      jpaGroupRoleProvider.updateGroup(id, name, description, roles, members);
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to update group id {}: {}", id, e.getMessage());
       return Response.status(SC_BAD_REQUEST).build();
@@ -213,7 +317,7 @@ public class GroupsEndpoint {
           @FormParam("description") String description, @FormParam("roles") String roles,
           @FormParam("members") String members) {
     try {
-      indexService.createGroup(name, description, roles, members);
+      jpaGroupRoleProvider.createGroup(name, description, roles, members);
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to create group {}: {}", name, e.getMessage());
       return Response.status(SC_BAD_REQUEST).build();
@@ -236,34 +340,21 @@ public class GroupsEndpoint {
   public Response addGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @FormParam("member") String member) {
     try {
-      Opt<Group> groupOpt = indexService.getGroup(id, externalIndex);
-      if (groupOpt.isSome()) {
-        Group group = groupOpt.get();
-        Set<String> members = group.getMembers();
-        if (!members.contains(member)) {
-          group.addMember(member);
-          try {
-            indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
-                    StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
-          } catch (IllegalArgumentException e) {
-            logger.warn("Unable to add member to group id '{}': {}", id, e.getMessage());
-            return Response.status(SC_BAD_REQUEST).build();
-          } catch (UnauthorizedException ex) {
-            return Response.status(SC_FORBIDDEN).build();
-          }
-          return Response.ok().build();
-        } else {
-          return ApiResponses.Json.ok(acceptHeader, "Member is already member of group");
-        }
+      if (jpaGroupRoleProvider.addMemberToGroup(id, member)) {
+        return Response.ok().build();
       } else {
-        return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+        return ApiResponses.Json.ok(acceptHeader, "Member is already member of group.");
       }
-    } catch (SearchIndexException e) {
-      logger.warn("The external search index was not able to retrieve the group with id '{}', reason: ", id, e);
-      return ApiResponses.serverError("Could not retrieve group with id '%s', reason: '%s'", id, getMessage(e));
+    } catch (IllegalArgumentException e) {
+      logger.warn("Unable to add member to group id {}.", id, e);
+      return Response.status(SC_BAD_REQUEST).build();
+    } catch (UnauthorizedException ex) {
+      return Response.status(SC_FORBIDDEN).build();
     } catch (NotFoundException e) {
-      logger.warn("The external search index was not able to update the group with id {}, ", id, e);
-      return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
+      return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+    } catch (Exception e) {
+      logger.warn("Could not update the group with id {}.",id, e);
+      return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'",id,getMessage(e));
     }
   }
 
@@ -277,55 +368,21 @@ public class GroupsEndpoint {
   public Response removeGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @PathParam("memberId") String memberId) {
     try {
-      Opt<Group> groupOpt = indexService.getGroup(id, externalIndex);
-      if (groupOpt.isSome()) {
-        Group group = groupOpt.get();
-        Set<String> members = group.getMembers();
-        if (members.contains(memberId)) {
-          members.remove(memberId);
-          group.setMembers(members);
-          try {
-            indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
-                    StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
-          } catch (IllegalArgumentException e) {
-            logger.warn("Unable to remove member from group id '{}': {}", id, e.getMessage());
-            return Response.status(SC_BAD_REQUEST).build();
-          } catch (UnauthorizedException ex) {
-            return Response.status(SC_FORBIDDEN).build();
-          }
-          return Response.ok().build();
-        } else {
-          return ApiResponses.notFound("Cannot find member '%s' in group '%s'.", memberId, id);
-        }
+      if (jpaGroupRoleProvider.removeMemberFromGroup(id, memberId)) {
+        return Response.ok().build();
       } else {
-        return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+        return ApiResponses.Json.ok(acceptHeader, "Member is already not member of group.");
       }
-    } catch (SearchIndexException e) {
-      logger.warn("The external search index was not able to retrieve the group with id {}, ", id, e);
-      return ApiResponses.serverError("Could not retrieve groups, reason: '%s'", getMessage(e));
+    } catch (IllegalArgumentException e) {
+      logger.warn("Unable to remove member from group id {}.", id, e);
+      return Response.status(SC_BAD_REQUEST).build();
+    } catch (UnauthorizedException ex) {
+      return Response.status(SC_FORBIDDEN).build();
     } catch (NotFoundException e) {
-      logger.warn("The external search index was not able to update the group with id {}, ", id, e);
+      return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+    } catch (Exception e) {
+      logger.warn("Could not update the group with id {}.", id, e);
       return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
     }
   }
-
-  /**
-   * Transform an {@link Group} to Json
-   *
-   * @param group
-   *          The group to transform.
-   * @return The group in json format.
-   */
-  protected JValue groupToJSON(Group group) {
-    List<Field> fields = new ArrayList<>();
-    fields.add(f("identifier", v(group.getIdentifier())));
-    fields.add(f("organization", v(group.getOrganization())));
-    fields.add(f("role", v(group.getRole())));
-    fields.add(f("name", v(group.getName(), Jsons.BLANK)));
-    fields.add(f("description", v(group.getDescription(), Jsons.BLANK)));
-    fields.add(f("roles", v(join(group.getRoles(), ","), Jsons.BLANK)));
-    fields.add(f("members", v(join(group.getMembers(), ","), Jsons.BLANK)));
-    return obj(fields);
-  }
-
 }

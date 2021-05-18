@@ -37,6 +37,7 @@ import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
@@ -52,6 +53,8 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * workflowoperationhandler for silencedetection executes the silencedetection and adds a SMIL document to the
@@ -96,20 +99,20 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     MediaPackage mp = workflowInstance.getMediaPackage();
     logger.debug("Start silence detection workflow operation for mediapackage {}", mp.getIdentifier().toString());
 
-    String sourceFlavors = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
-            SOURCE_FLAVORS_PROPERTY));
-    String sourceFlavor = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
-            SOURCE_FLAVOR_PROPERTY));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.many, Configuration.none, Configuration.none);
+    List<MediaPackageElementFlavor> sourceFlavors = tagsAndFlavors.getSrcFlavors();
     String smilFlavorSubType = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
             SMIL_FLAVOR_SUBTYPE_PROPERTY));
     String smilTargetFlavorString = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
             SMIL_TARGET_FLAVOR_PROPERTY));
 
     MediaPackageElementFlavor smilTargetFlavor = null;
-    if (smilTargetFlavorString != null)
+    if (smilTargetFlavorString != null) {
       smilTargetFlavor = MediaPackageElementFlavor.parseFlavor(smilTargetFlavorString);
+    }
 
-    if (sourceFlavor == null && sourceFlavors == null) {
+    if (sourceFlavors.isEmpty()) {
       throw new WorkflowOperationException(String.format("No %s or %s have been specified", SOURCE_FLAVOR_PROPERTY,
               SOURCE_FLAVORS_PROPERTY));
     }
@@ -124,15 +127,17 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
 
     final String finalSourceFlavors;
     if (smilTargetFlavor != null) {
-      finalSourceFlavors = sourceFlavor;
+      finalSourceFlavors = sourceFlavors.get(sourceFlavors.size()).toString();
     } else {
-      finalSourceFlavors = sourceFlavors;
+      finalSourceFlavors = sourceFlavors.stream().map(MediaPackageElementFlavor::toString)
+          .collect(Collectors.joining(","));
     }
 
     String referenceTracksFlavor = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
             REFERENCE_TRACKS_FLAVOR_PROPERTY));
-    if (referenceTracksFlavor == null)
+    if (referenceTracksFlavor == null) {
       referenceTracksFlavor = finalSourceFlavors;
+    }
 
     TrackSelector trackSelector = new TrackSelector();
     for (String flavor : asList(finalSourceFlavors)) {
@@ -175,8 +180,9 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
           is = IOUtils.toInputStream(smil.toXML(), "UTF-8");
           URI smilURI = workspace.put(mp.getIdentifier().toString(), smil.getId(), TARGET_FILE_NAME, is);
           MediaPackageElementFlavor smilFlavor = smilTargetFlavor;
-          if (smilFlavor == null)
+          if (smilFlavor == null) {
             smilFlavor = new MediaPackageElementFlavor(sourceTrack.getFlavor().getType(), smilFlavorSubType);
+          }
           Catalog catalog = (Catalog) mpeBuilder.elementFromURI(smilURI, MediaPackageElement.Type.Catalog, smilFlavor);
           catalog.setIdentifier(smil.getId());
           mp.add(catalog);

@@ -25,6 +25,7 @@ package org.opencastproject.elasticsearch.index.theme;
 import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.impl.AbstractSearchQuery;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.apache.commons.lang3.StringUtils;
 

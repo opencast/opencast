@@ -25,6 +25,7 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.message.broker.api.MessageReceiver;
@@ -107,19 +108,19 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   }
 
   @Override
-  public void repopulate(final String indexName) {
-    final String destinationId = AclItem.ACL_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+  public void repopulate(final AbstractSearchIndex index) {
+    final String destinationId = AclItem.ACL_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName());
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
       SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
         AclService aclService = serviceFor(organization);
         List<ManagedAcl> acls = aclService.getAcls();
         int total = aclService.getAcls().size();
-        logIndexRebuildBegin(logger, indexName, total, "ACLs", organization);
+        logIndexRebuildBegin(logger, index.getIndexName(), total, "ACLs", organization);
         int current = 1;
         for (ManagedAcl acl : acls) {
           messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                   AclItem.create(acl.getName()));
-          logIndexRebuildProgress(logger, indexName, total, current);
+          logIndexRebuildProgress(logger, index.getIndexName(), total, current);
           current++;
         }
       });

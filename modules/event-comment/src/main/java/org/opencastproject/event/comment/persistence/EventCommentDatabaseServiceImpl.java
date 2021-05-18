@@ -22,6 +22,7 @@ package org.opencastproject.event.comment.persistence;
 
 import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
@@ -398,13 +399,13 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   };
 
   @Override
-  public void repopulate(final String indexName) throws IndexRebuildException {
-    final String destinationId = CommentItem.COMMENT_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
+    final String destinationId = CommentItem.COMMENT_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName());
     try {
       final int total = countComments();
       final int[] current = new int[1];
       current[0] = 0;
-      logIndexRebuildBegin(logger, indexName, total, "events with comment");
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "events with comment");
       final Map<String, List<String>> eventsWithComments = getEventsWithComments();
       for (String orgId : eventsWithComments.keySet()) {
         Organization organization = organizationDirectoryService.getOrganization(orgId);
@@ -419,7 +420,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                               CommentItem.update(eventId, !comments.isEmpty(), hasOpenComments, needsCutting));
 
                       current[0] += comments.size();
-                      logIndexRebuildProgress(logger, indexName, total, current[0]);
+                      logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
                     } catch (Throwable t) {
                       logSkippingElement(logger, "comment of event", eventId, organization, t);
                     }
@@ -427,8 +428,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                 });
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, indexName, e);
-      throw new IndexRebuildException(indexName, getService(), e);
+      logIndexRebuildError(logger, index.getIndexName(), e);
+      throw new IndexRebuildException(index.getIndexName(), getService(), e);
     }
   }
 

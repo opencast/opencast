@@ -43,13 +43,16 @@ public class PolicyUtilsTest {
     policy = Policy.mkPolicyValidFromWithIP("http://mh-allinone/", before, new DateTime(2015, 02, 28, 00, 46, 19, 0,
             DateTimeZone.UTC), EXAMPLE_IP);
     assertEquals(
-            "{\"Statement\":{\"Condition\":{\"DateGreaterThan\":1425084379000,\"DateLessThan\":1425170777000,\"IpAddress\":\"10.0.0.1\"},\"Resource\":\"http:\\/\\/mh-allinone\\/\"}}",
-            PolicyUtils.toJson(policy).toJSONString());
+        "{\"Statement\":{\"Condition\":{\"DateGreaterThan\":1425084379000,\"DateLessThan\":"
+            + "1425170777000,\"IpAddress\":\"10.0.0.1\"},\"Resource\":\"http:\\/\\/mh-allinone\\/\"}}",
+        PolicyUtils.toJson(policy).toJSONString());
   }
 
   @Test
   public void testFromJson() throws UnsupportedEncodingException {
-    String policyJson = "{\"Statement\": {\"Resource\":\"http://mh-allinone/engage/url/to/resource.mp4\",\"Condition\":{\"DateLessThan\":1425170777000,\"DateGreaterThan\":1425084379000,\"IpAddress\": \"10.0.0.1\"}}}";
+    String policyJson = "{\"Statement\": {\"Resource\":\"http://mh-allinone/engage/url/to/resource"
+        + ".mp4\",\"Condition\":{\"DateLessThan\":1425170777000,\"DateGreaterThan\":1425084379000,"
+        + "\"IpAddress\": \"10.0.0.1\"}}}";
     Policy policy = PolicyUtils.fromJson(policyJson);
     assertEquals("http://mh-allinone/engage/url/to/resource.mp4", policy.getBaseUrl());
     assertEquals(EXAMPLE_IP, policy.getClientIpAddress().get().getHostAddress());
@@ -71,7 +74,9 @@ public class PolicyUtilsTest {
 
   @Test
   public void testFromBase64EncodedPolicy() throws UnsupportedEncodingException {
-    String examplePolicy = "{\"Statement\": {\"Resource\":\"http://mh-allinone/engage/url/to/resource.mp4\",\"Condition\":{\"DateLessThan\":1425170777000,\"DateGreaterThan\":1425084379000,\"IpAddress\": \"10.0.0.1\"}}}";
+    String examplePolicy = "{\"Statement\": {\"Resource\":\"http://mh-allinone/engage/url/to/"
+        + "resource.mp4\",\"Condition\":{\"DateLessThan\":1425170777000,\"DateGreaterThan\":"
+        + "1425084379000,\"IpAddress\": \"10.0.0.1\"}}}";
     Policy policy = PolicyUtils.fromBase64EncodedPolicy(PolicyUtils.base64Encode(examplePolicy));
     assertEquals("http://mh-allinone/engage/url/to/resource.mp4", policy.getBaseUrl());
     assertEquals(EXAMPLE_IP, policy.getClientIpAddress().get().getHostAddress());

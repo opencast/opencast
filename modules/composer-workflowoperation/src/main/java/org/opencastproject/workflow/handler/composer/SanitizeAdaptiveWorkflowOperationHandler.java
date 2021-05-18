@@ -32,6 +32,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -39,7 +40,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +106,7 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
           throws WorkflowOperationException {
     logger.debug("Running HLS Check workflow operation on workflow {}", workflowInstance.getId());
     try {
-      return sanitizeHLS(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());
+      return sanitizeHLS(workflowInstance);
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
@@ -116,10 +116,8 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
    * Checks the references in the playists and make sure that the playlists can pass though an ffmpeg inspection. If the
    * file references are off, they will be rewritten. The problem is mainly the media package elementID.
    *
-   * @param src
-   *          The source media package
-   * @param operation
-   *          the sanitizeHLS workflow operation
+   * @param wi
+   *          the sanitizeHLS workflow instance
    * @return the operation result containing the updated mediapackage
    * @throws EncoderException
    *           if encoding fails
@@ -129,24 +127,29 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
    *           if the workspace does not contain the requested element
    * @throws URISyntaxException
    */
-  private WorkflowOperationResult sanitizeHLS(MediaPackage src, WorkflowOperationInstance operation)
+  private WorkflowOperationResult sanitizeHLS(WorkflowInstance wi)
           throws EncoderException,
           WorkflowOperationException, NotFoundException, MediaPackageException, IOException, URISyntaxException {
+    MediaPackage src = wi.getMediaPackage();
     MediaPackage mediaPackage = (MediaPackage) src.clone();
 
-    // Read the configuration properties
-    String sourceFlavorName = StringUtils.trimToNull(operation.getConfiguration("source-flavor"));
-    String targetTrackTags = StringUtils.trimToNull(operation.getConfiguration("target-tags"));
-    String targetTrackFlavorName = StringUtils.trimToNull(operation.getConfiguration("target-flavor"));
+    WorkflowOperationInstance operation = wi.getCurrentOperation();
 
-    String[] targetTags = StringUtils.split(targetTrackTags, ",");
+    // Check which tags have been configured
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
+        Configuration.none, Configuration.one, Configuration.many, Configuration.one);
+
+    // Read the configuration properties
+    MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
+    List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
+    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
 
     List<String> removeTags = new ArrayList<String>();
     List<String> addTags = new ArrayList<String>();
     List<String> overrideTags = new ArrayList<String>();
 
-    if (targetTags != null) {
-      for (String tag : targetTags) {
+    if (!targetTrackTags.isEmpty()) {
+      for (String tag : targetTrackTags) {
         if (tag.startsWith(MINUS)) {
           removeTags.add(tag);
         } else if (tag.startsWith(PLUS)) {
@@ -156,16 +159,6 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
         }
       }
     }
-
-    // Make sure the source flavor is properly set
-    if (sourceFlavorName == null)
-      throw new IllegalStateException("Source flavor must be specified");
-    MediaPackageElementFlavor sourceFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavorName);
-
-    // Make sure the target flavor is properly set
-    if (targetTrackFlavorName == null)
-      throw new IllegalStateException("Target flavor must be specified");
-    MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetTrackFlavorName);
 
     // Select those tracks that have matching flavors
     Track[] tracks = mediaPackage.getTracks(sourceFlavor);

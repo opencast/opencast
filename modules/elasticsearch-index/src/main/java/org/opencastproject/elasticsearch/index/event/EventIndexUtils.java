@@ -206,7 +206,7 @@ public final class EventIndexUtils {
     }
 
     if (StringUtils.isNotBlank(event.getAccessPolicy())) {
-      metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), false);
+      metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), true);
       addAuthorization(metadata, event.getAccessPolicy());
     }
 

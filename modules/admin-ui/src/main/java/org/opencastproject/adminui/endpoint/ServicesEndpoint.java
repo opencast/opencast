@@ -26,8 +26,6 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.api.SearchQuery;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.index.service.resources.list.query.ServicesListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.serviceregistry.api.HostRegistration;
@@ -40,6 +38,8 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
@@ -174,7 +174,7 @@ public class ServicesEndpoint {
           SortCriterion sortCriterion = sortCriteria.iterator().next();
           Collections.sort(services, new ServiceStatisticsComparator(
                   sortCriterion.getFieldName(),
-                  sortCriterion.getOrder() == SearchQuery.Order.Ascending));
+                  sortCriterion.getOrder() == Order.Ascending));
         } catch (Exception ex) {
           logger.warn("Failed to sort services collection.", ex);
         }

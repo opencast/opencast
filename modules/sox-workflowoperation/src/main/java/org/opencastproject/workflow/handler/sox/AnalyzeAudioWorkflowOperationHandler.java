@@ -37,15 +37,14 @@ import org.opencastproject.sox.api.SoxException;
 import org.opencastproject.sox.api.SoxService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
-import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,63 +106,47 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
     this.workspace = workspace;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     logger.debug("Running analyze audio workflow operation on workflow {}", workflowInstance.getId());
 
     try {
-      return analyze(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());
+      return analyze(workflowInstance.getMediaPackage(), workflowInstance);
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
   }
 
-  private WorkflowOperationResult analyze(MediaPackage src, WorkflowOperationInstance operation) throws SoxException,
+  private WorkflowOperationResult analyze(MediaPackage src, WorkflowInstance workflow) throws SoxException,
           IOException, NotFoundException, MediaPackageException, WorkflowOperationException, EncoderException {
     MediaPackage mediaPackage = (MediaPackage) src.clone();
 
-    // Check which tags have been configured
-    String sourceTagsOption = StringUtils.trimToNull(operation.getConfiguration("source-tags"));
-    String sourceFlavorOption = StringUtils.trimToNull(operation.getConfiguration("source-flavor"));
-    String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("source-flavors"));
-    boolean forceTranscode = BooleanUtils.toBoolean(operation.getConfiguration("force-transcode"));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflow, Configuration.many, Configuration.many,
+        Configuration.none, Configuration.none);
+
+    boolean forceTranscode = BooleanUtils.toBoolean(workflow.getCurrentOperation().getConfiguration("force-transcode"));
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Make sure either one of tags or flavors are provided
-    if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorOption)
-            && StringUtils.isBlank(sourceFlavorsOption)) {
+    List<MediaPackageElementFlavor> sourceFlavors = tagsAndFlavors.getSrcFlavors();
+    List<String> sourceTags = tagsAndFlavors.getSrcTags();
+    if (sourceFlavors.isEmpty() && sourceTags.isEmpty()) {
       logger.info("No source tags or flavors have been specified, not matching anything");
       return createResult(mediaPackage, Action.CONTINUE);
     }
 
     // Select the source flavors
-    for (String flavor : asList(sourceFlavorsOption)) {
+    for (MediaPackageElementFlavor flavor : sourceFlavors) {
       try {
-        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
+        elementSelector.addFlavor(flavor);
       } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed");
-      }
-    }
-
-    // Support legacy "source-flavor" option
-    if (StringUtils.isNotBlank(sourceFlavorOption)) {
-      String flavor = StringUtils.trim(sourceFlavorOption);
-      try {
-        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed");
+        throw new WorkflowOperationException("Source flavor '" + flavor.toString() + "' is malformed");
       }
     }
 
     // Select the source tags
-    for (String tag : asList(sourceTagsOption)) {
+    for (String tag : sourceTags) {
       elementSelector.addTag(tag);
     }
 
@@ -197,8 +180,9 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
       }
 
       // Wait for the jobs to return
-      if (!waitForStatus(analyzeJobs.keySet().toArray(new Job[analyzeJobs.size()])).isSuccess())
+      if (!waitForStatus(analyzeJobs.keySet().toArray(new Job[analyzeJobs.size()])).isSuccess()) {
         throw new WorkflowOperationException("One of the analyze jobs did not complete successfully");
+      }
 
       // Process the result
       for (Map.Entry<Job, Track> entry : analyzeJobs.entrySet()) {
@@ -244,8 +228,9 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
           MediaPackageException {
     logger.info("Extract audio stream from track {}", videoTrack);
     Job job = composerService.encode(videoTrack, SOX_AONLY_PROFILE);
-    if (!waitForStatus(job).isSuccess())
+    if (!waitForStatus(job).isSuccess()) {
       throw new WorkflowOperationException("Extracting audio track from video track " + videoTrack + " failed");
+    }
 
     return (Track) MediaPackageElementParser.getFromXml(job.getPayload());
   }

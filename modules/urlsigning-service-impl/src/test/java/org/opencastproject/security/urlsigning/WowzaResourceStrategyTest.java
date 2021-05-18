@@ -40,19 +40,19 @@ public class WowzaResourceStrategyTest {
 
     // With path, delimiter, no extension
     URI pathDelimiterNoExtension = new URI(
-            "rtmp://hostname.com/matterhorn-engage/_definst_/mp4:path/to/video/myvideo");
+        "rtmp://hostname.com/matterhorn-engage/_definst_/mp4:path/to/video/myvideo");
     result = WowzaResourceStrategyImpl.getRTMPResource(pathDelimiterNoExtension);
     assertEquals("mp4:path/to/video/myvideo", result);
 
     // With path, delimiter, extension
     URI pathDelimiterExtension = new URI(
-            "rtmp://hostname.com/matterhorn-engage/_definst_/mp4:path/to/video/myvideo.mov");
+        "rtmp://hostname.com/matterhorn-engage/_definst_/mp4:path/to/video/myvideo.mov");
     result = WowzaResourceStrategyImpl.getRTMPResource(pathDelimiterExtension);
     assertEquals("mp4:path/to/video/myvideo.mov", result);
 
     // With path, delimiter, extension and query string
     URI pathDelimiterExtensionQueryString = new URI(
-            "rtmp://hostname.com/matterhorn-engage/_definst_/mp4:path/to/video/myvideo.mov?param1=value1&param2=value2");
+        "rtmp://hostname.com/matterhorn-engage/_definst_/mp4:path/to/video/myvideo.mov?param1=value1&param2=value2");
     result = WowzaResourceStrategyImpl.getRTMPResource(pathDelimiterExtensionQueryString);
     assertEquals("mp4:path/to/video/myvideo.mov?param1=value1&param2=value2", result);
 
@@ -66,37 +66,37 @@ public class WowzaResourceStrategyTest {
 
     // With path, no delimiter, no extension and format
     URI noPathNoDelimiterNoExtensionFormat = new URI(
-            "rtmp://hostname.com/matterhorn-engage/mp4:path/to/video/myvideo");
+        "rtmp://hostname.com/matterhorn-engage/mp4:path/to/video/myvideo");
     result = WowzaResourceStrategyImpl.getRTMPResource(noPathNoDelimiterNoExtensionFormat);
     assertEquals("mp4:path/to/video/myvideo", result);
 
     // With path, no delimiter, extension and format
     URI pathNoDelimiterExtensionFormat = new URI(
-            "rtmp://hostname.com/matterhorn-engage/mp4:path/to/video/myvideo.mov");
+        "rtmp://hostname.com/matterhorn-engage/mp4:path/to/video/myvideo.mov");
     result = WowzaResourceStrategyImpl.getRTMPResource(pathNoDelimiterExtensionFormat);
     assertEquals("mp4:path/to/video/myvideo.mov", result);
 
     // With path, no delimiter, extension, format and query string
     URI pathNoDelimiterExtensionFormatQueryString = new URI(
-            "rtmp://hostname.com/matterhorn-engage/mp4:path/to/video/myvideo.mov?param1=value1&param2=value2");
+        "rtmp://hostname.com/matterhorn-engage/mp4:path/to/video/myvideo.mov?param1=value1&param2=value2");
     result = WowzaResourceStrategyImpl.getRTMPResource(pathNoDelimiterExtensionFormatQueryString);
     assertEquals("mp4:path/to/video/myvideo.mov?param1=value1&param2=value2", result);
 
     // FLV with extension
     URI flvWithExtension = new URI(
-            "rtmp://hostname.com/matterhorn-engage/flv:path/to/video/myvideo.flv?param1=value1&param2=value2");
+        "rtmp://hostname.com/matterhorn-engage/flv:path/to/video/myvideo.flv?param1=value1&param2=value2");
     result = WowzaResourceStrategyImpl.getRTMPResource(flvWithExtension);
     assertEquals("flv:path/to/video/myvideo.flv?param1=value1&param2=value2", result);
 
     // FLV without extension
     URI flvWithoutExtension = new URI(
-            "rtmp://hostname.com/matterhorn-engage/flv:path/to/video/myvideo?param1=value1&param2=value2");
+        "rtmp://hostname.com/matterhorn-engage/flv:path/to/video/myvideo?param1=value1&param2=value2");
     result = WowzaResourceStrategyImpl.getRTMPResource(flvWithoutExtension);
     assertEquals("flv:path/to/video/myvideo?param1=value1&param2=value2", result);
 
     // Without format
     URI withoutFormat = new URI(
-            "rtmp://hostname.com/matterhorn-engage/path/to/video/myvideo.mp4?param1=value1&param2=value2");
+        "rtmp://hostname.com/matterhorn-engage/path/to/video/myvideo.mp4?param1=value1&param2=value2");
     result = WowzaResourceStrategyImpl.getRTMPResource(withoutFormat);
     assertEquals("path/to/video/myvideo.mp4?param1=value1&param2=value2", result);
   }

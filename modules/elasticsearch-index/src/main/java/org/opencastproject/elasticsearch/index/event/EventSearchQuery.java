@@ -25,6 +25,7 @@ import org.opencastproject.elasticsearch.impl.AbstractSearchQuery;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.apache.commons.lang3.StringUtils;
 

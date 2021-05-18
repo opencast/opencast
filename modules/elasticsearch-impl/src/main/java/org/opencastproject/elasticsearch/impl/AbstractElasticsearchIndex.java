@@ -25,7 +25,7 @@ package org.opencastproject.elasticsearch.impl;
 import org.opencastproject.elasticsearch.api.SearchIndex;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchQuery;
-import org.opencastproject.elasticsearch.api.SearchQuery.Order;
+import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -434,8 +434,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     searchSource.size(limit);
 
     // Sort orders
-    final Map<String, Order> sortCriteria = query.getSortOrders();
-    for (Entry<String, Order> sortCriterion : sortCriteria.entrySet()) {
+    final Map<String, SortCriterion.Order> sortCriteria = query.getSortOrders();
+    for (Entry<String, SortCriterion.Order> sortCriterion : sortCriteria.entrySet()) {
       ScriptSortBuilder sortBuilder = null;
       logger.debug("Event sort criteria: {}", sortCriterion.getKey());
       if ("publication".equals(sortCriterion.getKey())) {

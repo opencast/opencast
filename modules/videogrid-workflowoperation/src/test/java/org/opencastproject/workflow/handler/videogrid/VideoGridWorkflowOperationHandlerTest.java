@@ -117,15 +117,18 @@ public class VideoGridWorkflowOperationHandlerTest {
     MediaPackage mediaPackage = new MediaPackageBuilderImpl().createNew();
     mediaPackage.setIdentifier(new IdImpl("123-456"));
     mediaPackage.add(track);
-    mediaPackage.add(mpSmilURI, MediaPackageElement.Type.Catalog, MediaPackageElementFlavor.parseFlavor(SOURCE_SMIL_FLAVOR_KEY));
+    mediaPackage.add(mpSmilURI, MediaPackageElement.Type.Catalog,
+        MediaPackageElementFlavor.parseFlavor(SOURCE_SMIL_FLAVOR_KEY));
 
     /** Create Mocks **/
     instance = EasyMock.createNiceMock(WorkflowOperationInstanceImpl.class);
     EasyMock.expect(instance.getConfiguration("target-flavor")).andReturn(TARGET_FLAVOR_RETURN).anyTimes();
 
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(mpSmilURI)).andReturn(new File(mpSmilURI)).anyTimes();  // To avoid NullPointerEx when the SMIL is parsed
-    EasyMock.expect(workspace.get(trackURI)).andReturn(new File(trackURI)).anyTimes();    // To avoid NullPointerEx when grabbing Absolute Track Path
+    // To avoid NullPointerEx when the SMIL is parsed
+    EasyMock.expect(workspace.get(mpSmilURI)).andReturn(new File(mpSmilURI)).anyTimes();
+    // To avoid NullPointerEx when grabbing Absolute Track Path
+    EasyMock.expect(workspace.get(trackURI)).andReturn(new File(trackURI)).anyTimes();
 
     workflow = EasyMock.createNiceMock(WorkflowInstanceImpl.class);
     EasyMock.expect(workflow.getMediaPackage()).andReturn(mediaPackage).anyTimes();
@@ -162,7 +165,10 @@ public class VideoGridWorkflowOperationHandlerTest {
     // Mocking a function with varargs (triple dot notation) is not trivial
     // So this will only works for exactly three tracks
     // If it needs to work for another number of tracks, you'll have to mock the function again
-    EasyMock.expect(composerService.concat(anyString(), anyObject(), anyBoolean(), anyObject(), anyObject(), anyObject())).andReturn(concatJob).anyTimes();
+    EasyMock.expect(
+        composerService.concat(anyString(), anyObject(), anyBoolean(), anyObject(), anyObject(), anyObject()))
+        .andReturn(concatJob)
+        .anyTimes();
 
     EasyMock.replay(videoGridService, workspace, workflow, mediaInspectionService, composerService);
 

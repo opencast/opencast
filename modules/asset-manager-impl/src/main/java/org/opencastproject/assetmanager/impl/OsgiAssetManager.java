@@ -34,6 +34,7 @@ import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.storage.AssetStore;
 import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
@@ -439,7 +440,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate(final String indexName) throws IndexRebuildException {
+  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
     final Organization org = secSvc.getOrganization();
     final User user = (org != null ? secSvc.getUser() : null);
     try {
@@ -452,7 +453,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
       final int total = r.countSnapshots();
       int current = 0;
-      logIndexRebuildBegin(logger, indexName, total, "snapshot(s)");
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
 
       final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
       for (String orgId : byOrg.keySet()) {
@@ -467,16 +468,16 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
             try {
               AssetManagerItem.TakeSnapshot takeSnapshot = withMessaging.mkTakeSnapshotMessage(snapshot, null);
               messageSender.sendObjectMessage(
-                      AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName),
+                      AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName()),
                       MessageSender.DestinationType.Queue, takeSnapshot);
             } catch (Throwable t) {
               logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
             }
-            logIndexRebuildProgress(logger, indexName, total, current);
+            logIndexRebuildProgress(logger, index.getIndexName(), total, current);
           }
         } catch (Throwable t) {
-          logIndexRebuildError(logger, indexName, t, org);
-          throw new IndexRebuildException(indexName, getService(), org, t);
+          logIndexRebuildError(logger, index.getIndexName(), t, org);
+          throw new IndexRebuildException(index.getIndexName(), getService(), org, t);
         } finally {
           secSvc.setOrganization(defaultOrg);
           secSvc.setUser(systemUser);

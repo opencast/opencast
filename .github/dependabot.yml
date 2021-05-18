@@ -45,3 +45,10 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
+
+# Java dependencies
+- package-ecosystem: maven
+  directory: "/modules/metrics-exporter"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
