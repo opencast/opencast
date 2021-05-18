@@ -124,6 +124,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -231,14 +232,10 @@ public class SeriesEndpoint implements ManagedService {
     }
 
     dictionaryValue = properties.get(SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY);
-    if (dictionaryValue != null) {
-      onlySeriesWithWriteAccessSeriesTab = BooleanUtils.toBoolean(dictionaryValue.toString());
-    }
+    onlySeriesWithWriteAccessSeriesTab = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
 
     dictionaryValue = properties.get(EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY);
-    if (dictionaryValue != null) {
-      onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(dictionaryValue.toString());
-    }
+    onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
   }
 
   @GET
