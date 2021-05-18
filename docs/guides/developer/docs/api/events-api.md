@@ -481,10 +481,11 @@ In case of a conflict (when updating `scheduling`):
 
 ### DELETE /api/events/{event_id}
 
-Deletes an event.
+Retracts possible publications and deletes an event.
 
 __Response__
 
+`202 (ACCEPTED)`: The retraction of publications has started.<br/>
 `204 (NO CONTENT)`: The event has been deleted.<br/>
 `404 (NOT FOUND)`: The specified event does not exist.
 
