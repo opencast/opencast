@@ -14,10 +14,6 @@
              interface="org.opencastproject.message.broker.api.MessageReceiver"
              bind="setMessageReceiver"/>
 
-  <reference name="message-receiver-lock-service"
-             interface="org.opencastproject.index.service.message.MessageReceiverLockService"
-             bind="setMessageReceiverLockService"/>
-
   <reference name="search-index"
              interface="org.opencastproject.adminui.index.AdminUISearchIndex"
              bind="setSearchIndex"/>

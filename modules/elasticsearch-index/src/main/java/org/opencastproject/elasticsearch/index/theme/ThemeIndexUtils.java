@@ -22,12 +22,8 @@
 
 package org.opencastproject.elasticsearch.index.theme;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchMetadata;
-import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.impl.SearchMetadataCollection;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
 
 import org.apache.commons.io.IOUtils;
@@ -140,35 +136,4 @@ public final class ThemeIndexUtils {
     }
     return metadata;
   }
-
-  /**
-   * Loads the theme from the search index or creates a new one that can then be persisted.
-   *
-   * @param themeId
-   *          the theme identifier
-   * @param organization
-   *          the organization
-   * @param user
-   *          the user
-   * @param searchIndex
-   *          the AdminUISearchIndex to search in
-   * @return the theme
-   * @throws SearchIndexException
-   *           if querying the search index fails
-   * @throws IllegalStateException
-   *           if multiple themes with the same identifier are found
-   */
-  public static Theme getOrCreate(long themeId, String organization, User user, AbstractSearchIndex searchIndex)
-          throws SearchIndexException {
-    ThemeSearchQuery query = new ThemeSearchQuery(organization, user).withIdentifier(themeId);
-    SearchResult<Theme> searchResult = searchIndex.getByQuery(query);
-    if (searchResult.getDocumentCount() == 0) {
-      return new Theme(themeId, organization);
-    } else if (searchResult.getDocumentCount() == 1) {
-      return searchResult.getItems()[0].getSource();
-    } else {
-      throw new IllegalStateException("Multiple themes with identifier " + themeId + " found in search index");
-    }
-  }
-
 }

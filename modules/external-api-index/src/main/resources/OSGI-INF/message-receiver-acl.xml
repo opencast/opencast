@@ -16,12 +16,6 @@
              policy="static"
              bind="setMessageReceiver"/>
 
-  <reference name="message-receiver-lock-service"
-             cardinality="1..1"
-             interface="org.opencastproject.index.service.message.MessageReceiverLockService"
-             policy="static"
-             bind="setMessageReceiverLockService"/>
-
   <reference name="search-index"
              cardinality="1..1"
              interface="org.opencastproject.external.index.ExternalIndex"

@@ -21,7 +21,6 @@
 
 package org.opencastproject.index.service.message;
 
-import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.getOrCreateEvent;
 import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.updateEvent;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -35,6 +34,9 @@ import org.opencastproject.util.NotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<WorkflowItem> {
 
@@ -88,25 +90,27 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
 
     // Load or create the corresponding recording event
     try {
-      Event event = getOrCreateEvent(eventId, organization, user, getSearchIndex());
-      event.setCreator(user.getName());
-      event.setWorkflowId(workflowItem.getWorkflowInstanceId());
-      event.setWorkflowDefinitionId(workflowItem.getWorkflowDefinitionId());
-      event.setWorkflowState(workflowItem.getState());
-      event.setAccessPolicy(workflowItem.getAccessControlListJSON());
+      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+        Event event = eventOpt.orElse(new Event(eventId, organization));
+        event.setCreator(user.getName());
+        event.setWorkflowId(workflowItem.getWorkflowInstanceId());
+        event.setWorkflowDefinitionId(workflowItem.getWorkflowDefinitionId());
+        event.setWorkflowState(workflowItem.getState());
+        event.setAccessPolicy(workflowItem.getAccessControlListJSON());
 
-      // Update metadata
-      DublinCoreCatalog dcCatalog = workflowItem.getEpisodeDublincoreCatalog();
-      if (dcCatalog != null) {
-        updateEvent(event, dcCatalog);
-      }
+        // Update metadata
+        DublinCoreCatalog dcCatalog = workflowItem.getEpisodeDublincoreCatalog();
+        if (dcCatalog != null) {
+          event = updateEvent(event, dcCatalog);
+        }
 
-      // update publications
-      updateEvent(event, mediaPackage);
-
+        // update publications
+        event = updateEvent(event, mediaPackage);
+        return Optional.of(event);
+      };
 
       // Persist event
-      getSearchIndex().addOrUpdate(event);
+      getSearchIndex().addOrUpdateEvent(eventId, updateFunction, organization, user);
       logger.debug("Workflow instance {} updated in the search index", eventId);
     } catch (SearchIndexException e) {
       logger.error("Error retrieving the recording event from the search index", e);

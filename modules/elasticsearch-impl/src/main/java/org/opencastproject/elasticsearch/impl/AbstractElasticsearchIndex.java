@@ -32,13 +32,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -191,36 +188,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     } catch (SearchIndexException e) {
       logger.error("Unable to re-create the index after a clear", e);
     }
-  }
-
-  /**
-   * Removes the given document from the index.
-   *
-   * @param type
-   *          the document type
-   * @param uid
-   *          the identifier
-   * @return <code>true</code> if the element was found and deleted
-   * @throws SearchIndexException
-   *           if deletion fails
-   */
-  protected boolean delete(String type, String uid) throws SearchIndexException {
-    try {
-      if (!preparedIndices.contains(getIndexName(type))) {
-        createSubIndex(type, getIndexName(type));
-      }
-      logger.debug("Removing element with id '{}' from searching index", uid);
-      final DeleteRequest deleteRequest = new DeleteRequest(getIndexName(type), uid)
-              .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
-      final DeleteResponse delete = client.delete(deleteRequest, RequestOptions.DEFAULT);
-      if (delete.getResult().equals(DocWriteResponse.Result.NOT_FOUND)) {
-        logger.trace("Document {} to delete was not found", uid);
-        return false;
-      }
-    } catch (IOException e) {
-      throw new SearchIndexException(e);
-    }
-    return true;
   }
 
   /**
