@@ -4,6 +4,45 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.5
+
+*Released on May 17th, 2021*
+
+- [[#2602](https://github.com/opencast/opencast/pull/2602)] -
+  Fix Graphs in Documentation
+- [[#2575](https://github.com/opencast/opencast/pull/2575)] -
+  Fixing unchecked directory list() call
+- [[#2565](https://github.com/opencast/opencast/pull/2565)] -
+  Organization Fallback for UI Configuration
+- [[#2544](https://github.com/opencast/opencast/pull/2544)] -
+  Remove unused `org.opencastproject.export.distribution.ExportUi.cfg`
+- [[#2536](https://github.com/opencast/opencast/pull/2536)] -
+  Tesseract Option Documentation
+- [[#2530](https://github.com/opencast/opencast/pull/2530)] -
+  macOS installation update
+- [[#2526](https://github.com/opencast/opencast/pull/2526)] -
+  LTI Service Docs
+- [[#2525](https://github.com/opencast/opencast/pull/2525)] -
+  Fix checkstyle violations in 11 modules
+- [[#2516](https://github.com/opencast/opencast/pull/2516)] -
+  Fix Default Password
+- [[#2512](https://github.com/opencast/opencast/pull/2512)] -
+  Add Build Date in User Interface
+- [[#2502](https://github.com/opencast/opencast/pull/2502)] -
+  Handle multiple creators in Paella player
+- [[#2501](https://github.com/opencast/opencast/pull/2501)] -
+  Handle multiple creators in Media Module
+- [[#2493](https://github.com/opencast/opencast/pull/2493)] -
+  Fixed "No response from service" for videogrid
+- [[#2489](https://github.com/opencast/opencast/pull/2489)] -
+  Attachment is not a function LTI error fixed
+- [[#2435](https://github.com/opencast/opencast/pull/2435)] -
+  Added Download Dropdown to Series LTI-Tools
+- [[#2344](https://github.com/opencast/opencast/pull/2344)] -
+  Auto-generate OAI-PMH database
+- [[#2103](https://github.com/opencast/opencast/pull/2103)] -
+  Only persist users with specific LTI role
+
 ### Opencast 9.4
 
 *Released on April 19th, 2021*

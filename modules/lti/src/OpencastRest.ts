@@ -210,10 +210,14 @@ export async function searchEpisode(
             licenseKey: result.dcLicense,
             mediapackage: {
                 creators: result.mediapackage.creators !== undefined ? result.mediapackage.creators.creator : [],
-                attachments: result.mediapackage.attachments.attachment.map((attachment: any) => ({
-                    type: attachment.type,
-                    url: attachment.url
-                })),
+                attachments: Array.from(
+                    Array.isArray(result.mediapackage.attachments.attachment) ?
+                        result.mediapackage.attachments.attachment :
+                        Array.of(result.mediapackage.attachments.attachment),
+                    (attachment: any) => ({
+                        type: attachment.type,
+                        url: attachment.url
+                    })),
                 tracks: parseTracksFromResult(result)
             }
         })),
