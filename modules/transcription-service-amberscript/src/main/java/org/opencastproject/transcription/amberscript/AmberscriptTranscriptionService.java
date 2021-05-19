@@ -63,9 +63,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -74,7 +71,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -362,20 +358,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   }
 
   void createRecognitionsJob(String mpId, Track track, String languageCode, String jobtype) throws TranscriptionServiceException, IOException {
-    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    credentialsProvider.setCredentials(AuthScope.ANY,
-      new UsernamePasswordCredentials(clientKey, ""));
-
     // Timeout 3 hours (needs to include the time for the remote service to fetch the media URL before sending final response)
-    RequestConfig config = RequestConfig.custom()
-     .setConnectTimeout(CONNECTION_TIMEOUT)
-     .setSocketTimeout(3 * 3600 * 1000).build();
-
-    CloseableHttpClient httpClient = HttpClientBuilder.create()
-     .setDefaultCredentialsProvider(credentialsProvider)
-     .setDefaultRequestConfig(config)
-     .build();
-
+    CloseableHttpClient httpClient = makeHttpClient(CONNECTION_TIMEOUT, 3 * 3600 * 1000, CONNECTION_TIMEOUT);
     CloseableHttpResponse response = null;
 
     String submitUrl = BASE_URL + "/jobs/upload-media?transcriptionType=transcription&jobType="
@@ -613,18 +597,32 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return "Unknown";
   }
 
+  /**
+   * Creates a closable http client with default configuration.
+   *
+   * @return closable http client
+   */
   protected CloseableHttpClient makeHttpClient() {
+    return makeHttpClient(CONNECTION_TIMEOUT, SOCKET_TIMEOUT, CONNECTION_TIMEOUT);
+  }
 
-    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-
-    RequestConfig reqConfig = RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT)
-            .setSocketTimeout(SOCKET_TIMEOUT).setConnectionRequestTimeout(CONNECTION_TIMEOUT).build();
-
+  /**
+   * Creates a closable http client.
+   *
+   * @param conectionTimeout http connection timeout value in milliseconds
+   * @param socketTimeout http socket timeout value in milliseconds
+   * @param connectionRequestTimeout http connection request timeout value in milliseconds
+   * @return
+   */
+  protected CloseableHttpClient makeHttpClient(int conectionTimeout, int socketTimeout, int connectionRequestTimeout) {
+    RequestConfig reqConfig = RequestConfig.custom().setConnectTimeout(conectionTimeout)
+        .setSocketTimeout(socketTimeout)
+        .setConnectionRequestTimeout(connectionRequestTimeout)
+        .build();
     CloseableHttpClient httpClient = HttpClientBuilder.create()
-     .setDefaultCredentialsProvider(credentialsProvider)
-     .setDefaultRequestConfig(reqConfig)
-     .build();
-
+        .useSystemProperties()
+        .setDefaultRequestConfig(reqConfig)
+        .build();
     return httpClient;
   }
 
