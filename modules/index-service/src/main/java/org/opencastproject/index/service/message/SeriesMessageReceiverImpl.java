@@ -39,9 +39,6 @@ import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.fns.Strings;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +47,6 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesItem> {
-
-  private static final String THEME_PROPERTY_NAME = "theme";
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesMessageReceiverImpl.class);
 
@@ -109,19 +104,6 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
             series.setManagedAcl(managedAcl.get().getName());
 
           series.setAccessPolicy(AccessControlParser.toJsonSilent(seriesItem.getAcl()));
-          return Optional.of(series);
-        };
-        break;
-      case UpdateProperty:
-        logger.debug("Received update property of series {} for index {}", seriesItem.getSeriesId(),
-                getSearchIndex().getIndexName());
-
-        if (!THEME_PROPERTY_NAME.equals(seriesItem.getPropertyName()))
-          break;
-
-        updateFunction = (Optional<Series> seriesOpt) -> {
-          Series series = seriesOpt.orElse(new Series(seriesItem.getSeriesId(), organization));
-          series.setTheme(Opt.nul(seriesItem.getPropertyValue()).bind(Strings.toLong).orNull());
           return Optional.of(series);
         };
         break;
