@@ -31,9 +31,8 @@ const StartTaskWorkflowPage = ({ formik, previousPage, nextPage, loadingWorkflow
                                         <Field tabIndex="99"
                                                 name="workflow"
                                                 as="select"
-                                                placeholder={t('EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW')}
                                                 style={{width: '100%'}}>
-                                            <option value="" />
+                                            <option value="" hidden>{t('EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW')}</option>
                                             {workflowDef.map((workflow, key)=> (
                                                 <option key={key} value={workflow.id}>{workflow.title}</option>
                                             ))}
