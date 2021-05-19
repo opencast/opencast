@@ -107,18 +107,6 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
           return Optional.of(series);
         };
         break;
-      case Delete:
-        logger.debug("Received Delete Series Event {} for index {}", seriesItem.getSeriesId(),
-                getSearchIndex().getIndexName());
-
-        // Remove the series from the search index
-        try {
-          getSearchIndex().delete(Series.DOCUMENT_TYPE, seriesItem.getSeriesId(), organization);
-          logger.debug("Series {} removed from search index", seriesItem.getSeriesId());
-        } catch (SearchIndexException e) {
-          logger.error("Error deleting the series {} from the search index", seriesItem.getSeriesId(), e);
-        }
-        return;
       case UpdateElement:
         // nothing to do
         break;
