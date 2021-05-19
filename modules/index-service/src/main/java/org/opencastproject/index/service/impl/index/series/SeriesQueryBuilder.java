@@ -23,7 +23,6 @@ package org.opencastproject.index.service.impl.index.series;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
-import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
 import org.opencastproject.matterhorn.search.SearchTerms;
 import org.opencastproject.matterhorn.search.SearchTerms.Quantifier;
 import org.opencastproject.matterhorn.search.impl.AbstractElasticsearchQueryBuilder;
@@ -81,7 +80,7 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
       if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
         for (Role role : user.getRoles()) {
           for (String action : query.getActions()) {
-            and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
+            and(SeriesIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
           }
         }
       }

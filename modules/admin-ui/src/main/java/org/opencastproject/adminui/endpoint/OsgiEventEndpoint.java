@@ -54,7 +54,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   private EventCommentService eventCommentService;
   private IndexService indexService;
   private JobEndpoint jobService;
-  private SeriesEndpoint seriesService;
+  private SeriesEndpoint seriesEndpoint;
   private SchedulerService schedulerService;
   private SecurityService securityService;
   private UrlSigningService urlSigningService;
@@ -95,13 +95,13 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
-  public void setSeriesService(SeriesEndpoint seriesService) {
-    this.seriesService = seriesService;
+  public void setSeriesEndpoint(SeriesEndpoint seriesEndpoint) {
+    this.seriesEndpoint = seriesEndpoint;
   }
 
   @Override
-  public SeriesEndpoint getSeriesService() {
-    return seriesService;
+  public SeriesEndpoint getSeriesEndpoint() {
+    return seriesEndpoint;
   }
 
   /** OSGi DI. */
