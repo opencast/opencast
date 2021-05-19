@@ -42,8 +42,7 @@ import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesIndexUtils;
 import org.opencastproject.elasticsearch.index.series.SeriesQueryBuilder;
 import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.theme.Theme;
-import org.opencastproject.elasticsearch.index.theme.ThemeIndexUtils;
+import org.opencastproject.elasticsearch.index.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.theme.ThemeQueryBuilder;
 import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.User;
@@ -269,10 +268,10 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws IllegalStateException
    *           if multiple themes with the same identifier are found
    */
-  protected Optional<Theme> getTheme(long themeId, String organization, User user)
+  protected Optional<IndexTheme> getTheme(long themeId, String organization, User user)
           throws SearchIndexException {
     ThemeSearchQuery query = new ThemeSearchQuery(organization, user).withIdentifier(themeId);
-    SearchResult<Theme> searchResult = getByQuery(query);
+    SearchResult<IndexTheme> searchResult = getByQuery(query);
     if (searchResult.getDocumentCount() == 0) {
       return Optional.empty();
     } else if (searchResult.getDocumentCount() == 1) {
@@ -298,15 +297,15 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *           Thrown if unable to update the theme.
    */
-  public Optional<Theme> addOrUpdateTheme(long id, Function<Optional<Theme>, Optional<Theme>> updateFunction,
-          String orgId, User user) throws SearchIndexException {
+  public Optional<IndexTheme> addOrUpdateTheme(long id, Function<Optional<IndexTheme>,
+          Optional<IndexTheme>> updateFunction, String orgId, User user) throws SearchIndexException {
     final Lock lock = this.locks.get(id);
     lock.lock();
     logger.debug("Locked theme '{}'", id);
 
     try {
-      Optional<Theme> themeOpt = getTheme(id, orgId, user);
-      Optional<Theme> updatedThemeOpt = updateFunction.apply(themeOpt);
+      Optional<IndexTheme> themeOpt = getTheme(id, orgId, user);
+      Optional<IndexTheme> updatedThemeOpt = updateFunction.apply(themeOpt);
       if (updatedThemeOpt.isPresent()) {
         addOrUpdate(updatedThemeOpt.get());
       }
@@ -325,11 +324,11 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *           Thrown if unable to add or update the theme.
    */
-  protected void addOrUpdate(Theme theme) throws SearchIndexException {
+  protected void addOrUpdate(IndexTheme theme) throws SearchIndexException {
     logger.debug("Adding theme {} to search index", theme.getIdentifier());
 
     // Add the resource to the index
-    SearchMetadataCollection inputDocument = ThemeIndexUtils.toSearchMetadata(theme);
+    SearchMetadataCollection inputDocument = theme.toSearchMetadata();
     List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
     ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
             inputDocument.getDocumentType(), resourceMetadata);
@@ -526,11 +525,11 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   /**
    * @param query
    *          The query to use to retrieve the themes that match the query
-   * @return {@link SearchResult} collection of {@link Theme} from a query.
+   * @return {@link SearchResult} collection of {@link IndexTheme} from a query.
    * @throws SearchIndexException
    *           Thrown if there is an error getting the results.
    */
-  public SearchResult<Theme> getByQuery(ThemeSearchQuery query) throws SearchIndexException {
+  public SearchResult<IndexTheme> getByQuery(ThemeSearchQuery query) throws SearchIndexException {
     logger.debug("Searching index using theme query '{}'", query);
     // Create the request
     final SearchRequest searchRequest = getSearchRequest(query, new ThemeQueryBuilder(query));
@@ -538,7 +537,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     try {
       return executeQuery(query, searchRequest, metadata -> {
         try {
-          return ThemeIndexUtils.toTheme(metadata);
+          return IndexTheme.fromSearchMetadata(metadata);
         } catch (IOException e) {
           return chuck(e);
         }
