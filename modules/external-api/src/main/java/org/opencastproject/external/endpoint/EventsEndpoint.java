@@ -444,7 +444,7 @@ public class EventsEndpoint implements ManagedService {
     }
     final Runnable doOnNotFound = () -> {
       try {
-        externalIndex.delete(Event.DOCUMENT_TYPE,id.concat(getSecurityService().getOrganization().getId()));
+        externalIndex.delete(Event.DOCUMENT_TYPE, id, getSecurityService().getOrganization().getId());
       } catch (SearchIndexException e) {
         logger.error("error removing event {}: {}", id, e);
       }
