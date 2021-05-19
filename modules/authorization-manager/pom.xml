@@ -47,7 +47,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-index-rebuild</artifactId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-elasticsearch-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
