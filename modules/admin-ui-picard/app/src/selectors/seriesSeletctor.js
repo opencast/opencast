@@ -7,3 +7,4 @@ export const getVisibilitySeriesColumns = state => state.series.columns;
 export const isShowActions = state => state.series.showActions;
 export const getSeriesMetadata = state => state.series.metadata;
 export const getSeriesThemes = state => state.series.themes;
+export const getTotalSeries = state => state.series.total;

@@ -12,16 +12,17 @@ import {fetchJobs} from "../../thunks/jobThunks";
 import {loadJobsIntoTable, loadServersIntoTable, loadServicesIntoTable} from "../../thunks/tableThunks";
 import {fetchServers} from "../../thunks/serverThunks";
 import {servicesTemplateMap} from "../../configs/tableConfigs/servicesTableConfig";
-import {getServices} from "../../selectors/serviceSelector";
+import {getTotalServices} from "../../selectors/serviceSelector";
 import {fetchServices} from "../../thunks/serviceThunks";
 import Notifications from "../shared/Notifications";
+import {editTextFilter} from "../../actions/tableFilterActions";
 
 /**
  * This component renders the table view of services
  */
 const Services = ({ loadingServices, loadingServicesIntoTable, services, loadingFilters,
                       loadingJobs, loadingJobsIntoTable, loadingServers,
-                      loadingServersIntoTable }) => {
+                      loadingServersIntoTable, resetTextFilter }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -50,6 +51,8 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
     }
 
     useEffect(() => {
+        resetTextFilter();
+
         // Load services on mount
         loadServices().then(r => console.log(r));
 
@@ -112,7 +115,7 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
                                   loadResourceIntoTable={loadingServicesIntoTable}
                                   resource={'services'}/>
                     <h1>{t('SYSTEMS.SERVICES.TABLE.CAPTION')}</h1>
-                    <h4>{t('TABLE_SUMMARY', { numberOfRows: services.length})}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: services })}</h4>
                 </div>
                 {/* Include table component */}
                 <Table templateMap={servicesTemplateMap} />
@@ -123,7 +126,7 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    services: getServices(state)
+    services: getTotalServices(state)
 });
 
 // Mapping actions to dispatch
@@ -134,7 +137,8 @@ const mapDispatchToProps = dispatch => ({
     loadingJobs: () => dispatch(fetchJobs()),
     loadingJobsIntoTable: () => dispatch(loadJobsIntoTable()),
     loadingServers: () => dispatch(fetchServers()),
-    loadingServersIntoTable: () => dispatch(loadServersIntoTable())
+    loadingServersIntoTable: () => dispatch(loadServersIntoTable()),
+    resetTextFilter: () => dispatch(editTextFilter(''))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Services));

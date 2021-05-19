@@ -9,20 +9,21 @@ import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {usersTemplateMap} from "../../configs/tableConfigs/usersTableConfig";
-import {getUsers} from "../../selectors/userSelectors";
+import {getTotalUsers} from "../../selectors/userSelectors";
 import {fetchUsers} from "../../thunks/userThunks";
 import {loadAclsIntoTable, loadGroupsIntoTable, loadUsersIntoTable} from "../../thunks/tableThunks";
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
+import {editTextFilter} from "../../actions/tableFilterActions";
 
 /**
  * This component renders the table view of users
  */
 const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                    loadingGroups, loadingGroupsIntoTable, loadingAcls,
-                   loadingAclsIntoTable }) => {
+                   loadingAclsIntoTable, resetTextFilter }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewUserModal, setNewUserModal] = useState(false);
@@ -53,6 +54,8 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     }
 
     useEffect(() => {
+        resetTextFilter();
+
         // Load users on mount
         loadUsers().then(r => console.log(r));
 
@@ -137,7 +140,7 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                                   loadResourceIntoTable={loadingUsersIntoTable}
                                   resource={'users'}/>
                     <h1>{t('USERS.USERS.TABLE.CAPTION')}</h1>
-                    <h4>{t('TABLE_SUMMARY', { numberOfRows: users.length})}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: users })}</h4>
                 </div>
                 {/* Include table component */}
                 <Table templateMap={usersTemplateMap} />
@@ -148,7 +151,7 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    users: getUsers(state)
+    users: getTotalUsers(state)
 });
 
 // Mapping actions to dispatch
@@ -159,7 +162,8 @@ const mapDispatchToProps = dispatch => ({
     loadingGroups: () => dispatch(fetchGroups()),
     loadingGroupsIntoTable: () => dispatch(loadGroupsIntoTable()),
     loadingAcls: () => dispatch(fetchAcls()),
-    loadingAclsIntoTable: () => dispatch(loadAclsIntoTable())
+    loadingAclsIntoTable: () => dispatch(loadAclsIntoTable()),
+    resetTextFilter: () => dispatch(editTextFilter(''))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Users));

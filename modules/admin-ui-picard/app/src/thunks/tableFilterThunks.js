@@ -1,5 +1,6 @@
 import {loadFiltersSuccess, loadFiltersFailure, loadFiltersInProgress, loadStats} from '../actions/tableFilterActions';
 import axios from "axios";
+import {relativeDateSpanToFilterValue} from "../utils/dateUtils";
 /**
 * This file contains methods/thunks used to query the REST-API of Opencast to get the filters of a certain resource type.
 * This information is used to filter the entries of the table in the main view.
@@ -117,11 +118,17 @@ export const fetchStats = () => async dispatch => {
         for (let i in statsResponse) {
             let filter = [];
             for (let j in statsResponse[i].filters) {
-                filter.push(statsResponse[i].filters[j].name + ':' + statsResponse[i].filters[j].value)
+                let value = statsResponse[i].filters[j].value;
+                let name = statsResponse[i].filters[j].name;
+
+                if (Object.prototype.hasOwnProperty.call(value, 'relativeDateSpan')) {
+                    value = relativeDateSpanToFilterValue(value.relativeDateSpan.from, value.relativeDateSpan.to, value.relativeDateSpan.unit);
+                }
+                filter.push(name + ':' + value);
             }
             let data = await axios.get('admin-ng/event/events.json', {
                 params: {
-                    filters: filter.join(','),
+                    filter: filter.join(','),
                     limit: 1
                 }
             });
@@ -131,12 +138,14 @@ export const fetchStats = () => async dispatch => {
             // add count to status information fetched before
             statsResponse[i] = {
                 ...statsResponse[i],
-                count: response.count
+                count: response.total
             };
 
             // fill stats array for redux state
             stats.push(statsResponse[i]);
         }
+
+        stats.sort(compareOrder);
 
         dispatch(loadStats(stats));
 
@@ -175,5 +184,16 @@ function transformResponse(data) {
     } catch (e) {  console.log(e.message);}
 
     return {filters: filters};
+}
+
+// compare function for sort stats array by order property
+const compareOrder = (a, b) => {
+    if (a.order < b.order) {
+        return -1;
+    }
+    if (a.order > b.order) {
+        return 1;
+    }
+    return 0;
 }
 

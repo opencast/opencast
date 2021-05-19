@@ -32,7 +32,7 @@ export const getURLParams = state => {
     if (filters.length) {
         params = {
             ...params,
-            filters: filters.join(','),
+            filter: filters.join(','),
         };
     }
 

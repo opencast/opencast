@@ -95,11 +95,11 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
             setFilterSelector(false);
             removeSelectedFilter();
             removeSecondFilter();
-            // Reload of resource
-            loadResource();
-            loadResourceIntoTable();
-        }
 
+        }
+        // Reload of resource
+        loadResource();
+        loadResourceIntoTable();
     }
 
     // Set the sate of startDate and endDate picked with datepicker
@@ -117,7 +117,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
             let filter = filterMap.find(({ name }) => name === selectedFilter);
             // Todo: better way to save the period
             // Todo: maybe need action for this
-            editFilterValue(filter.name, startDate);
+            editFilterValue(filter.name, startDate.toDateString());
             setFilterSelector(false);
             removeSelectedFilter();
         }
@@ -128,7 +128,6 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
     return (
         <div className="filters-container">
             {/* Text filter - Search Query */}
-            {/* todo: Search icon is not showing yet*/}
             <input type="text"
                    className="search expand"
                    placeholder={t('TABLE_FILTERS.PLACEHOLDER')}

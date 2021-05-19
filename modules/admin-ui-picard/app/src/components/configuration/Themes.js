@@ -9,16 +9,17 @@ import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {themesTemplateMap} from "../../configs/tableConfigs/themesTableConfig";
-import {getThemes} from "../../selectors/themeSelectors";
+import {getTotalThemes} from "../../selectors/themeSelectors";
 import {fetchThemes} from "../../thunks/themeThunks";
 import {loadThemesIntoTable} from "../../thunks/tableThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
+import {editTextFilter} from "../../actions/tableFilterActions";
 
 /**
  * This component renders the table view of events
  */
-const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters }) => {
+const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters, resetTextFilter }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewThemesModal, setNewThemesModal] = useState(false);
@@ -32,6 +33,8 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters 
     };
 
     useEffect(() => {
+        resetTextFilter();
+
         // Load themes on mount
         loadThemes().then(r => console.log(r));
 
@@ -105,7 +108,7 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters 
                                   loadResourceIntoTable={loadingThemesIntoTable}
                                   resource={'themes'}/>
                     <h1>{t('CONFIGURATION.THEMES.TABLE.CAPTION')}</h1>
-                    <h4>{t('TABLE_SUMMARY', { numberOfRows: themes.length})}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: themes})}</h4>
                 </div>
                 {/* Include table component */}
                 <Table templateMap={themesTemplateMap} />
@@ -116,14 +119,15 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters 
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    themes: getThemes(state)
+    themes: getTotalThemes(state)
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingThemes: () => dispatch(fetchThemes()),
-    loadingThemesIntoTable: () => dispatch(loadThemesIntoTable())
+    loadingThemesIntoTable: () => dispatch(loadThemesIntoTable()),
+    resetTextFilter: () => dispatch(editTextFilter(''))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Themes));

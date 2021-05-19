@@ -13,16 +13,17 @@ import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {aclsTemplateMap} from "../../configs/tableConfigs/aclsTableConfig";
 import {fetchAcls} from "../../thunks/aclThunks";
-import {getAcls} from "../../selectors/aclSelectors";
+import {getTotalAcls} from "../../selectors/aclSelectors";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
+import {editTextFilter} from "../../actions/tableFilterActions";
 
 /**
  * This component renders the table view of acls
  */
 const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                     loadingUsers, loadingUsersIntoTable, loadingGroups,
-                    loadingGroupsIntoTable }) => {
+                    loadingGroupsIntoTable, resetTextFilter }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewAclModal, setNewAclModal] = useState(false);
@@ -52,6 +53,8 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     };
 
     useEffect(() => {
+        resetTextFilter();
+
         // Load acls on mount
         loadAcls().then(r => console.log(r));
 
@@ -136,7 +139,7 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                                   loadResourceIntoTable={loadingAclsIntoTable}
                                   resource={'acls'}/>
                     <h1>{t('USERS.ACLS.TABLE.CAPTION')}</h1>
-                    <h4>{t('TABLE_SUMMARY', { numberOfRows: acls.length})}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: acls })}</h4>
                 </div>
                 {/* Include table component */}
                 <Table templateMap={aclsTemplateMap} />
@@ -147,7 +150,7 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    acls: getAcls(state)
+    acls: getTotalAcls(state)
 });
 
 // Mapping actions to dispatch
@@ -159,6 +162,7 @@ const mapDispatchToProps = dispatch => ({
     loadingUsersIntoTable: () => dispatch(loadUsersIntoTable()),
     loadingGroups: () => dispatch(fetchGroups()),
     loadingGroupsIntoTable: () => dispatch(loadGroupsIntoTable()),
+    resetTextFilter: () => dispatch(editTextFilter(''))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Acls));
