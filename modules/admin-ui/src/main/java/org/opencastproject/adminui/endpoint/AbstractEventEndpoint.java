@@ -86,7 +86,7 @@ import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
-import org.opencastproject.index.service.util.AccessInformationUtil;
+import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.Attachment;

@@ -15,7 +15,4 @@
              cardinality="1..1" policy="static" bind="setSearchIndex"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
              cardinality="1..1" policy="static" bind="setSecurityService"/>
-  <reference name="aclServiceFactory"
-             interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
-             cardinality="1..1" policy="dynamic" bind="setAclServiceFactory"/>
 </scr:component>
