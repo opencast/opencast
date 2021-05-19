@@ -21,7 +21,7 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
-import static org.opencastproject.authorization.xacml.manager.impl.Util.toAcl;
+import static org.opencastproject.authorization.xacml.manager.util.Util.toAcl;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;

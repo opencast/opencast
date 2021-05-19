@@ -27,6 +27,9 @@ import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Option.some;
 
+import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
+import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.series.Series;
@@ -126,6 +129,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   private AbstractSearchIndex adminUiIndex;
   private AbstractSearchIndex externalApiIndex;
 
+  private AclServiceFactory aclServiceFactory;
+
   /** OSGi callback for setting index. */
   @Reference(name = "series-index")
   public void setIndex(SeriesServiceIndex index) {
@@ -171,6 +176,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   @Reference(name = "external-api-index", target = "(index.name=externalapi)")
   public void setExternalApiIndex(AbstractSearchIndex index) {
     this.externalApiIndex = index;
+  }
+
+  @Reference
+  public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
+    this.aclServiceFactory = aclServiceFactory;
   }
 
   /**
@@ -326,8 +336,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       try {
         updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
+        // still sent for other asynchronous updates
         messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
                 SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
+        //update ES indices
+        updateSeriesAclInIndex(seriesId, adminUiIndex, accessControl);
+        updateSeriesAclInIndex(seriesId, externalApiIndex, accessControl);
       } catch (SeriesServiceDatabaseException e) {
         logger.error("Could not update series {} with access control rules: {}", seriesId, e.getMessage());
         throw new SeriesException(e);
@@ -362,6 +376,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       // still sent for other asynchronous updates
       messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
               SeriesItem.delete(seriesID));
+      // remove from ES indices
       removeSeriesFromIndex(seriesID, adminUiIndex);
       removeSeriesFromIndex(seriesID, externalApiIndex);
     } catch (SeriesServiceDatabaseException e1) {
@@ -456,6 +471,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       persistence.updateSeriesProperty(seriesID, propertyName, propertyValue);
 
+      // update ES indices
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
         updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue), adminUiIndex);
         updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue), externalApiIndex);
@@ -474,6 +490,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       persistence.deleteSeriesProperty(seriesID, propertyName);
 
+      // update ES indices
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
         updateThemePropertyInIndex(seriesID, Optional.empty(), adminUiIndex);
         updateThemePropertyInIndex(seriesID, Optional.empty(), externalApiIndex);
@@ -607,8 +624,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                   if (StringUtils.isNotBlank(aclStr)) {
                     try {
                       AccessControlList acl = AccessControlParser.parseAcl(aclStr);
-                      messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                              SeriesItem.updateAcl(id, acl, false));
+                      updateSeriesAclInIndex(id, index, acl);
                     } catch (Exception ex) {
                       logger.error("Unable to parse series {} access control list", id, ex);
                     }
@@ -657,7 +673,42 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series property in Elasticsearch index
+   * Update series acl in Elasticsearch index
+   *
+   * @param seriesId
+   *          The series id
+   * @param index
+   *          The Elasticsearch index to update
+   * @param acl
+   *          The acl to update
+   */
+  private void updateSeriesAclInIndex(String seriesId, AbstractSearchIndex index, AccessControlList acl) {
+    String orgId = securityService.getOrganization().getId();
+    User user = securityService.getUser();
+    logger.debug("Received Update Series ACL for index {}", index.getIndexName());
+
+    Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
+      Series series = seriesOpt.orElse(new Series(seriesId, orgId));
+
+      List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
+      Option<ManagedAcl> managedAcl = AccessInformationUtil.matchAcls(acls, acl);
+      if (managedAcl.isSome())
+        series.setManagedAcl(managedAcl.get().getName());
+
+      series.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
+      return Optional.of(series);
+    };
+
+    try {
+      index.addOrUpdateSeries(seriesId, updateFunction, orgId, user);
+      logger.debug("Series {} updated in the search index", seriesId);
+    } catch (SearchIndexException e) {
+      logger.error("Error storing the series {} to the search index", seriesId, e);
+    }
+  }
+
+  /**
+   * Update series theme property in Elasticsearch index
    *
    * @param seriesId
    *          The series id
@@ -668,7 +719,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    */
   private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt,
           AbstractSearchIndex index) {
-
     String orgId = securityService.getOrganization().getId();
     User user = securityService.getUser();
     logger.debug("Updating theme property of series {} in index {}", seriesId, index.getIndexName());

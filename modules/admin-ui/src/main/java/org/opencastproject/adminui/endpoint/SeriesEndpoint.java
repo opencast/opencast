@@ -69,7 +69,7 @@ import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
-import org.opencastproject.index.service.util.AccessInformationUtil;
+import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;

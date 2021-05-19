@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.index.service.util;
+package org.opencastproject.authorization.xacml.manager.util;
 
 import static org.opencastproject.util.data.Monadics.mlist;
 
