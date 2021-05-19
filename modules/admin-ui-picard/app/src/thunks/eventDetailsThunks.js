@@ -22,6 +22,16 @@ export const fetchAccessPolicies = (eventId) => async (dispatch) => {
     }
 }
 
+export const fetchHasActiveTransactions = (eventId) => async (dispatch) => {
+    try {
+        const transactionsData = await axios.get(`admin-ng/event/${eventId}/hasActiveTransaction`);
+        const hasActiveTransactions = await transactionsData.data;
+        return hasActiveTransactions;
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 export const fetchComments = (eventId) => async (dispatch) => {
     try {
         dispatch(loadEventCommentsInProgress());

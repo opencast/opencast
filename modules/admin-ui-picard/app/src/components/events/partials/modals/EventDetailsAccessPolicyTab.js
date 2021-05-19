@@ -5,8 +5,15 @@ import {
 import {
 } from "../../../../selectors/eventDetailsSelectors";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
-import {fetchAclActions, fetchAclTemplates, fetchRolesWithTarget} from "../../../../thunks/aclThunks";
-import {fetchAccessPolicies} from "../../../../thunks/eventDetailsThunks";
+import {
+    fetchAclActions,
+    fetchAclTemplates,
+    fetchRolesWithTarget
+} from "../../../../thunks/aclThunks";
+import {
+    fetchAccessPolicies,
+    fetchHasActiveTransactions
+} from "../../../../thunks/eventDetailsThunks";
 import Notifications from "../../../shared/Notifications";
 import {Formik} from "formik";
 
@@ -15,19 +22,9 @@ import {Formik} from "formik";
  */
 const EventDetailsAccessPolicyTab = ({ eventId, header, t,
 
-                                      fetchAccessPolicies, fetchRoles}) => {
+                                      fetchAclTemplates, fetchHasActiveTransactions, fetchAccessPolicies, fetchRoles}) => {
 
-    {/* todo: get real values */}
-    const transactions = {
-        read_only: false
-    };
-
-    const baseAclId = "No clue!";
-
-
-
-
-
+    const baseAclId = "";
 
     const [aclTemplates, setAclTemplates] = useState([]);
     const [aclActions, setAclActions] = useState([]);
@@ -35,20 +32,21 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
     const [hasActions, setHasActions] = useState(false);
     const [roles, setRoles] = useState(false);
     const [policies, setPolicies] = useState([]);
+    const [transactions, setTransactions] = useState({read_only: true});
+
+    const createPolicy = (role) => {
+        return {
+            role: role,
+            read: false,
+            write: false,
+            actions: {
+                name: 'event-acl-actions',
+                value: []
+            }
+        };
+    };
 
     useEffect( () => {
-
-        const createPolicy = (role) => {
-            return {
-                role: role,
-                read: false,
-                write: false,
-                actions: {
-                    name: 'event-acl-actions',
-                    value: []
-                }
-            };
-        };
 
         async function fetchData() {
             setLoading(true);
@@ -78,6 +76,10 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
                 }
             });
             fetchRoles().then(roles => setRoles(roles));
+            const fetchTransactionResult = await fetchHasActiveTransactions(eventId);
+            fetchTransactionResult.active !== undefined?
+                setTransactions({read_only: fetchTransactionResult.active})
+                : setTransactions({read_only: true});
             setLoading(false);
         }
 
@@ -100,7 +102,11 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
     };
 
     const addPolicy = async (e) => {
-
+        let oldPolicies = policies;
+        const newPolicy = createPolicy("");
+        oldPolicies.push(newPolicy);
+        setPolicies(oldPolicies);
+        console.log(policies);
     };
 
     const saveAccess = async (e) => {
@@ -417,7 +423,9 @@ const mapStateToProps = state => ({
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     fetchAccessPolicies: (eventId) => dispatch(fetchAccessPolicies(eventId)),
+    fetchHasActiveTransactions: (eventId) => dispatch(fetchHasActiveTransactions(eventId)),
     fetchRoles: () => fetchRolesWithTarget("ACL"),
+    fetchAclTemplates: () => fetchAclTemplates(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsAccessPolicyTab);
