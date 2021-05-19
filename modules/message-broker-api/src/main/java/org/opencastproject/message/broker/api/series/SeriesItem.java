@@ -53,7 +53,7 @@ public final class SeriesItem implements MessageItem, Serializable {
   private final String overrideEpisodeAcl;
 
   public enum Type {
-    UpdateCatalog, UpdateElement, UpdateAcl, UpdateProperty, Delete
+    UpdateCatalog, UpdateElement, UpdateAcl, Delete
   };
 
   /**
@@ -90,19 +90,6 @@ public final class SeriesItem implements MessageItem, Serializable {
   public static SeriesItem updateAcl(String seriesId, AccessControlList acl, boolean overrideEpisodeAcl) {
     return new SeriesItem(Type.UpdateAcl, seriesId, null, AccessControlParser.toJsonSilent(acl), null, null, null,
             null, overrideEpisodeAcl);
-  }
-
-  /**
-   * @param seriesId
-   *          The unique id for the series to update.
-   * @param propertyName
-   *          the property name
-   * @param propertyValue
-   *          the property value
-   * @return Builds {@link SeriesItem} for updating a series property.
-   */
-  public static SeriesItem updateProperty(String seriesId, String propertyName, String propertyValue) {
-    return new SeriesItem(Type.UpdateProperty, seriesId, null, null, propertyName, propertyValue, null, null, null);
   }
 
   /**
