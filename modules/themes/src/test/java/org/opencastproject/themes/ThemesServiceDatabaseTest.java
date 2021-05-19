@@ -23,7 +23,9 @@ package org.opencastproject.themes;
 
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
-import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -41,7 +43,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -68,17 +69,20 @@ public class ThemesServiceDatabaseTest {
     EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(user).anyTimes();
     EasyMock.replay(userDirectoryService);
 
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    messageSender.sendObjectMessage(EasyMock.anyObject(String.class),
-            EasyMock.anyObject(MessageSender.DestinationType.class), EasyMock.anyObject(Serializable.class));
-    EasyMock.expectLastCall().anyTimes();
-    EasyMock.replay(messageSender);
+    SearchResult result = EasyMock.createMock(SearchResult.class);
+    EasyMock.expect(result.getDocumentCount()).andReturn(0L).anyTimes();
+    EasyMock.replay(result);
+
+    AbstractSearchIndex adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(adminUiIndex.getIndexName()).andReturn("adminui").anyTimes();
+    EasyMock.expect(adminUiIndex.getByQuery(EasyMock.anyObject(ThemeSearchQuery.class))).andReturn(result).anyTimes();
+    EasyMock.replay(adminUiIndex);
 
     themesDatabase = new ThemesServiceDatabaseImpl();
     themesDatabase.setEntityManagerFactory(newTestEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
     themesDatabase.setSecurityService(securityService);
     themesDatabase.setUserDirectoryService(userDirectoryService);
-    themesDatabase.setMessageSender(messageSender);
+    themesDatabase.setAdminUiIndex(adminUiIndex);
     themesDatabase.activate(null);
   }
 

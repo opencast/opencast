@@ -77,7 +77,7 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    *           null, or user is null.
    */
   public ThemeSearchQuery(String organization, User user) {
-    super(Theme.DOCUMENT_TYPE);
+    super(IndexTheme.DOCUMENT_TYPE);
 
     if (organization == null) {
       throw new IllegalStateException("The organization for this query was null.");

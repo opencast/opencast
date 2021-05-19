@@ -64,7 +64,7 @@ import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesIndexSchema;
 import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.theme.Theme;
+import org.opencastproject.elasticsearch.index.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
@@ -449,7 +449,7 @@ public class SeriesEndpoint implements ManagedService {
     query.withLimit(Integer.MAX_VALUE);
     query.withOffset(0);
     query.sortByName(Order.Ascending);
-    SearchResult<Theme> results = null;
+    SearchResult<IndexTheme> results = null;
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
@@ -458,9 +458,9 @@ public class SeriesEndpoint implements ManagedService {
     }
 
     JSONObject themesJson = new JSONObject();
-    for (SearchResultItem<Theme> item : results.getItems()) {
+    for (SearchResultItem<IndexTheme> item : results.getItems()) {
       JSONObject themeInfoJson = new JSONObject();
-      Theme theme = item.getSource();
+      IndexTheme theme = item.getSource();
       themeInfoJson.put("name", theme.getName());
       themeInfoJson.put("description", theme.getDescription());
       themesJson.put(theme.getIdentifier(), themeInfoJson);
@@ -847,7 +847,7 @@ public class SeriesEndpoint implements ManagedService {
    *          The theme to get the id and name from.
    * @return A {@link Response} with the theme id and name as json contents
    */
-  private Response getSimpleThemeJsonResponse(Theme theme) {
+  private Response getSimpleThemeJsonResponse(IndexTheme theme) {
     return okJson(obj(f(Long.toString(theme.getIdentifier()), v(theme.getName()))));
   }
 
@@ -875,7 +875,7 @@ public class SeriesEndpoint implements ManagedService {
       return okJson(obj());
 
     try {
-      Opt<Theme> themeOpt = getTheme(themeId);
+      Opt<IndexTheme> themeOpt = getTheme(themeId);
       if (themeOpt.isNone())
         return notFound("Cannot find a theme with id {}", themeId);
 
@@ -895,7 +895,7 @@ public class SeriesEndpoint implements ManagedService {
   public Response updateSeriesTheme(@PathParam("seriesId") String seriesID, @FormParam("themeId") long themeId)
           throws UnauthorizedException, NotFoundException {
     try {
-      Opt<Theme> themeOpt = getTheme(themeId);
+      Opt<IndexTheme> themeOpt = getTheme(themeId);
       if (themeOpt.isNone())
         return notFound("Cannot find a theme with id {}", themeId);
 
@@ -1034,12 +1034,12 @@ public class SeriesEndpoint implements ManagedService {
    * @return a theme or none if not found, wrapped in an option
    * @throws SearchIndexException
    */
-  private Opt<Theme> getTheme(long id) throws SearchIndexException {
-    SearchResult<Theme> result = searchIndex.getByQuery(new ThemeSearchQuery(securityService.getOrganization().getId(),
+  private Opt<IndexTheme> getTheme(long id) throws SearchIndexException {
+    SearchResult<IndexTheme> result = searchIndex.getByQuery(new ThemeSearchQuery(securityService.getOrganization().getId(),
             securityService.getUser()).withIdentifier(id));
     if (result.getPageSize() == 0) {
       logger.debug("Didn't find theme with id {}", id);
-      return Opt.<Theme> none();
+      return Opt.<IndexTheme> none();
     }
     return Opt.some(result.getItems()[0].getSource());
   }
