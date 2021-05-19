@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.index.service.util;
+package org.opencastproject.authorization.xacml.manager.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

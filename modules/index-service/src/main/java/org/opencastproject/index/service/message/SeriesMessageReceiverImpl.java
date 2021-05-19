@@ -21,36 +21,28 @@
 
 package org.opencastproject.index.service.message;
 
-import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.data.Option;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesItem> {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesMessageReceiverImpl.class);
-
-  private AclServiceFactory aclServiceFactory;
 
   /**
    * Creates a new message receiver that is listening to the admin ui destination of the series queue.
@@ -92,21 +84,6 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
           return Optional.of(series);
         };
         break;
-      case UpdateAcl:
-        logger.debug("Received Update Series ACL for index {}", getSearchIndex().getIndexName());
-
-        updateFunction = (Optional<Series> seriesOpt) -> {
-          Series series = seriesOpt.orElse(new Series(seriesItem.getSeriesId(), organization));
-
-          List<ManagedAcl> acls = aclServiceFactory.serviceFor(getSecurityService().getOrganization()).getAcls();
-          Option<ManagedAcl> managedAcl = AccessInformationUtil.matchAcls(acls, seriesItem.getAcl());
-          if (managedAcl.isSome())
-            series.setManagedAcl(managedAcl.get().getName());
-
-          series.setAccessPolicy(AccessControlParser.toJsonSilent(seriesItem.getAcl()));
-          return Optional.of(series);
-        };
-        break;
       case UpdateElement:
         // nothing to do
         break;
@@ -145,10 +122,5 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
         logger.error("Error storing the series {} in the search index", seriesId, e);
       }
     }
-  }
-
-  /** OSGi callback for acl services. */
-  public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
-    this.aclServiceFactory = aclServiceFactory;
   }
 }
