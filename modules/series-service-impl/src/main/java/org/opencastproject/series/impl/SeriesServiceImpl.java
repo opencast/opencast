@@ -27,7 +27,9 @@ import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Option.some;
 
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
@@ -49,6 +51,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
@@ -74,8 +77,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -94,6 +98,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(SeriesServiceImpl.class);
+
+  private static final String THEME_PROPERTY_NAME = "theme";
 
   /** Index for searching */
   protected SeriesServiceIndex index;
@@ -446,8 +452,13 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
           throws SeriesException, NotFoundException, UnauthorizedException {
     try {
       persistence.updateSeriesProperty(seriesID, propertyName, propertyValue);
-      messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-              SeriesItem.updateProperty(seriesID, propertyName, propertyValue));
+
+      if (propertyName.equals(THEME_PROPERTY_NAME)) {
+        updateThemePropertyInIndex(seriesID, propertyName, Optional.ofNullable(propertyValue), adminUiIndex,
+                Optional.empty(), Optional.empty());
+        updateThemePropertyInIndex(seriesID, propertyName, Optional.ofNullable(propertyValue), externalApiIndex,
+                Optional.empty(), Optional.empty());
+      }
     } catch (SeriesServiceDatabaseException e) {
       logger.error(
               "Failed to get series property for series with series id '{}' and property name '{}' and value '{}'",
@@ -461,8 +472,13 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
           throws SeriesException, NotFoundException, UnauthorizedException {
     try {
       persistence.deleteSeriesProperty(seriesID, propertyName);
-      messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-              SeriesItem.updateProperty(seriesID, propertyName, null));
+
+      if (propertyName.equals(THEME_PROPERTY_NAME)) {
+        updateThemePropertyInIndex(seriesID, propertyName, Optional.empty(), adminUiIndex, Optional.empty(),
+                Optional.empty());
+        updateThemePropertyInIndex(seriesID, propertyName, Optional.empty(), externalApiIndex, Optional.empty(),
+                Optional.empty());
+      }
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Failed to delete series property for series with series id '{}' and property name '{}'",
               seriesID, propertyName, e);
@@ -573,7 +589,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       int current = 1;
       for (SeriesEntity series: databaseSeries) {
         Organization organization = orgDirectory.getOrganization(series.getOrganization());
-        SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
+        User systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
+        SecurityUtil.runAs(securityService, organization, systemUser,
                 () -> {
                   String id = series.getSeriesId();
                   logger.trace("Adding series '{}' for org '{}'", id, series.getOrganization());
@@ -598,9 +615,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     }
                   }
                   try {
-                    for (Entry<String, String> property : persistence.getSeriesProperties(id).entrySet()) {
-                      messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                              SeriesItem.updateProperty(id, property.getKey(), property.getValue()));
+                    Map<String, String> properties = persistence.getSeriesProperties(id);
+                    if (properties.containsKey(THEME_PROPERTY_NAME)) {
+                      updateThemePropertyInIndex(id, THEME_PROPERTY_NAME,
+                              Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)), index,
+                              Optional.of(organization.getId()), Optional.of(systemUser));
                     }
                   } catch (NotFoundException | SeriesServiceDatabaseException e) {
                     logger.error("Error requesting series properties", e);
@@ -618,5 +637,46 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   @Override
   public IndexRebuildService.Service getService() {
     return IndexRebuildService.Service.Series;
+  }
+
+  /**
+   * Update series property in index
+   *
+   * @param seriesId
+   *          The series id
+   * @param propertyName
+   *          The name of the property
+   * @param propertyValueOpt
+   *          The value of the property (optional)
+   * @param index
+   *          The index to update
+   * @param orgIdOpt (optional)
+   *          The organization
+   * @param userOpt (optional)
+   *          The user
+   */
+  private void updateThemePropertyInIndex(String seriesId, String propertyName, Optional<String> propertyValueOpt,
+          AbstractSearchIndex index, Optional<String> orgIdOpt, Optional<User> userOpt) {
+
+    String orgId = orgIdOpt.orElse(securityService.getOrganization().getId());
+    User user = userOpt.orElse(securityService.getUser());
+    logger.debug("Updating theme property of series {} in index {}", seriesId, index.getIndexName());
+
+    Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
+      Series series = seriesOpt.orElse(new Series(seriesId, orgId));
+      if (propertyValueOpt.isPresent()) {
+        series.setTheme(Long.valueOf(propertyValueOpt.get()));
+      } else {
+        series.setTheme(null);
+      }
+      return Optional.of(series);
+    };
+
+    try {
+      index.addOrUpdateSeries(seriesId, updateFunction, orgId, user);
+      logger.debug("Series {} updated in the search index", seriesId);
+    } catch (SearchIndexException e) {
+      logger.error("Error storing the series {} to the search index", seriesId, e);
+    }
   }
 }
