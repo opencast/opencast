@@ -359,8 +359,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   public void deleteSeries(final String seriesID) throws SeriesException, NotFoundException {
     try {
       persistence.deleteSeries(seriesID);
+      // still sent for other asynchronous updates
       messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
               SeriesItem.delete(seriesID));
+      removeSeriesFromIndex(seriesID, adminUiIndex);
+      removeSeriesFromIndex(seriesID, externalApiIndex);
     } catch (SeriesServiceDatabaseException e1) {
       logger.error("Could not delete series with id {} from persistence storage", seriesID);
       throw new SeriesException(e1);
@@ -454,10 +457,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       persistence.updateSeriesProperty(seriesID, propertyName, propertyValue);
 
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
-        updateThemePropertyInIndex(seriesID, propertyName, Optional.ofNullable(propertyValue), adminUiIndex,
-                Optional.empty(), Optional.empty());
-        updateThemePropertyInIndex(seriesID, propertyName, Optional.ofNullable(propertyValue), externalApiIndex,
-                Optional.empty(), Optional.empty());
+        updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue), adminUiIndex);
+        updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue), externalApiIndex);
       }
     } catch (SeriesServiceDatabaseException e) {
       logger.error(
@@ -474,10 +475,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       persistence.deleteSeriesProperty(seriesID, propertyName);
 
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
-        updateThemePropertyInIndex(seriesID, propertyName, Optional.empty(), adminUiIndex, Optional.empty(),
-                Optional.empty());
-        updateThemePropertyInIndex(seriesID, propertyName, Optional.empty(), externalApiIndex, Optional.empty(),
-                Optional.empty());
+        updateThemePropertyInIndex(seriesID, Optional.empty(), adminUiIndex);
+        updateThemePropertyInIndex(seriesID, Optional.empty(), externalApiIndex);
       }
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Failed to delete series property for series with series id '{}' and property name '{}'",
@@ -617,9 +616,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                   try {
                     Map<String, String> properties = persistence.getSeriesProperties(id);
                     if (properties.containsKey(THEME_PROPERTY_NAME)) {
-                      updateThemePropertyInIndex(id, THEME_PROPERTY_NAME,
-                              Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)), index,
-                              Optional.of(organization.getId()), Optional.of(systemUser));
+                      updateThemePropertyInIndex(id, Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)), index);
                     }
                   } catch (NotFoundException | SeriesServiceDatabaseException e) {
                     logger.error("Error requesting series properties", e);
@@ -640,26 +637,40 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series property in index
+   * Remove series from Elasticsearch index
    *
    * @param seriesId
    *          The series id
-   * @param propertyName
-   *          The name of the property
+   * @param index
+   *          The Elasticsearch index to update
+   */
+  private void removeSeriesFromIndex(String seriesId, AbstractSearchIndex index) {
+    String orgId = securityService.getOrganization().getId();
+    logger.debug("Received Delete Series Event {} for index {}", seriesId, index.getIndexName());
+
+    try {
+      index.delete(Series.DOCUMENT_TYPE, seriesId, orgId);
+      logger.debug("Series {} removed from search index", seriesId);
+    } catch (SearchIndexException e) {
+      logger.error("Error deleting the series {} from the search index", seriesId, e);
+    }
+  }
+
+  /**
+   * Update series property in Elasticsearch index
+   *
+   * @param seriesId
+   *          The series id
    * @param propertyValueOpt
    *          The value of the property (optional)
    * @param index
-   *          The index to update
-   * @param orgIdOpt (optional)
-   *          The organization
-   * @param userOpt (optional)
-   *          The user
+   *          The Elasticsearch index to update
    */
-  private void updateThemePropertyInIndex(String seriesId, String propertyName, Optional<String> propertyValueOpt,
-          AbstractSearchIndex index, Optional<String> orgIdOpt, Optional<User> userOpt) {
+  private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt,
+          AbstractSearchIndex index) {
 
-    String orgId = orgIdOpt.orElse(securityService.getOrganization().getId());
-    User user = userOpt.orElse(securityService.getUser());
+    String orgId = securityService.getOrganization().getId();
+    User user = securityService.getUser();
     logger.debug("Updating theme property of series {} in index {}", seriesId, index.getIndexName());
 
     Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
