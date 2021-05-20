@@ -935,7 +935,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       // Is the element referencing anything?
       MediaPackageReference reference = element.getReference();
       if (reference != null) {
-        Map<String, String> referenceProperties = reference.getProperties();
         MediaPackageElement referencedElement = mediaPackage.getElementByReference(reference);
 
         // if we are distributing the referenced element, everything is fine. Otherwise...
@@ -956,13 +955,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
           // Done. Let's cut the path but keep references to the mediapackage itself
           if (reference != null && reference.getType().equals(MediaPackageReference.TYPE_MEDIAPACKAGE)) {
             element.setReference(reference);
-          } else if (reference != null && (referenceProperties == null || referenceProperties.size() == 0)) {
-            element.clearReference();
           } else {
-            // Ok, there is more to that reference than just pointing at an element. Let's keep the original,
-            // you never know.
-            referencedElement.setURI(null);
-            referencedElement.setChecksum(null);
+            element.clearReference();
           }
         }
       }

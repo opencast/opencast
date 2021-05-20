@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Workflow operation for taking a snapshot of a media package.
@@ -144,7 +143,6 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
       // Is the element referencing anything?
       MediaPackageReference reference = element.getReference();
       if (reference != null) {
-        Map<String, String> referenceProperties = reference.getProperties();
         MediaPackageElement referencedElement = mp.getElementByReference(reference);
 
         // if we are distributing the referenced element, everything is fine. Otherwise...
@@ -165,14 +163,8 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
           // Done. Let's cut the path but keep references to the mediapackage itself
           if (reference != null && reference.getType().equals(MediaPackageReference.TYPE_MEDIAPACKAGE)) {
             element.setReference(reference);
-          } else if (reference != null && (referenceProperties == null || referenceProperties.size() == 0)) {
-            element.clearReference();
           } else {
-            // Ok, there is more to that reference than just pointing at an element. Let's keep the original,
-            // you never know.
-            removals.remove(referencedElement);
-            referencedElement.setURI(null);
-            referencedElement.setChecksum(null);
+            element.clearReference();
           }
         }
       }
