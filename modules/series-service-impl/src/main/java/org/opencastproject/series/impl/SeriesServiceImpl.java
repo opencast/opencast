@@ -42,7 +42,6 @@ import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.EName;
-import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -123,9 +122,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   /** The message broker service sender */
   protected MessageSender messageSender;
 
-  /** The message broker service receiver */
-  protected MessageReceiver messageReceiver;
-
   /** The system user name */
   private String systemUserName;
 
@@ -163,12 +159,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   @Reference(name = "message-broker-sender")
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
-  }
-
-  /** OSGi callback for setting the message receiver. */
-  @Reference(name = "message-broker-receiver")
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
   }
 
   /** OSGi callbacks for setting the Elasticsearch indices. */
