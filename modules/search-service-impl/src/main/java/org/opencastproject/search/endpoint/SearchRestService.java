@@ -33,6 +33,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -182,6 +183,50 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     } catch (Exception e) {
       logger.info("Unable to remove mediapackage {} from search index: {}", mediaPackageId, e.getMessage());
       return Response.serverError().build();
+    }
+  }
+
+  @DELETE
+  @Path("/seriesId/{seriesid}")
+  @Produces(MediaType.APPLICATION_XML)
+  @RestQuery(
+      name = "removeSeries",
+      description = "Removes a series from the search index, if there are no episodes left connected to the series.",
+      pathParameters = {
+          @RestParameter(
+              description = "The series ID to remove from the search index.",
+              isRequired = true,
+              name = "seriesid",
+              type = RestParameter.Type.STRING
+          )
+      },
+      responses = {
+          @RestResponse(description = "The removing job.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(
+              description = "There has been an internal error and the series could not be deleted",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+            )
+      },
+      returnDescription = "The job receipt")
+  public Response removeSeries(@PathParam("seriesid") String seriesId) throws SearchException {
+    try {
+      SearchQuery searchQuery = new SearchQuery();
+      searchQuery.withText(seriesId);
+      SearchResult searchResult = searchService.getForAdministrativeRead(searchQuery);
+      if (searchResult.size() > 0) {
+        logger.error("Can not delete series: '{}', it still contains episodes.", seriesId);
+        return Response.status(Response.Status.FORBIDDEN)
+            .entity("Can not delete series it still contains episodes.")
+            .build();
+      }
+
+      Job job = searchService.deleteSeries(seriesId);
+      return Response.ok(new JaxbJob(job)).build();
+    } catch (Exception e) {
+      logger.info(e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+          .entity("Unable to start job delete Series.")
+          .build();
     }
   }
 

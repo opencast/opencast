@@ -203,7 +203,6 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
     }
   }
 
-
   /**
    * {@inheritDoc}
    *

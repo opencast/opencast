@@ -214,6 +214,49 @@ public class SolrIndexManager {
   }
 
   /**
+   * Removes the entry with the given <code>id</code> from the database.
+   *
+   * @param seriesid
+   *          identifier of the series or episode to delete
+   * @param deletionDate
+   *          the deletion date
+   * @throws SolrServerException
+   *           if an errors occurs while talking to solr
+   */
+  public boolean deleteSeries(String seriesid, Date deletionDate) throws SolrServerException {
+    try {
+      QueryResponse solrResponse = null;
+      try {
+        SolrQuery query = new SolrQuery(Schema.ID + ":" + ClientUtils.escapeQueryChars(seriesid) + " AND -"
+                + Schema.OC_DELETED + ":[* TO *]");
+        solrResponse = solrServer.query(query);
+      } catch (Exception e1) {
+        throw new SolrServerException(e1);
+      }
+
+      if (solrResponse.getResults().size() == 0) {
+        logger.warn("Trying to delete non-existing Series {} from the search index", seriesid);
+        return false;
+      }
+
+      // Use all existing fields
+      SolrDocument doc = solrResponse.getResults().get(0);
+      SolrInputDocument inputDocument = new SolrInputDocument();
+      for (String field : doc.getFieldNames()) {
+        inputDocument.setField(field, doc.get(field));
+      }
+
+      // Set the oc_deleted field to the current date, then update
+      Schema.setOcDeleted(inputDocument, deletionDate);
+      solrServer.add(inputDocument);
+      solrServer.commit();
+      return true;
+    } catch (IOException e) {
+      throw new SolrServerException(e);
+    }
+  }
+
+  /**
    * Removes the entry with the given <code>id</code> from the database. The entry can either be a series or an episode.
    *
    * @param id
