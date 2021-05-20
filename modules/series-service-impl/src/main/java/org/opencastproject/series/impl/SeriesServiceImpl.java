@@ -31,7 +31,11 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
@@ -280,6 +284,10 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         }
         // Make sure store to persistence comes after index, return value can be null
         DublinCoreCatalog updated = persistence.storeSeries(dublinCore);
+        // update ES indices
+        updateSeriesMetadataInIndex(id, adminUiIndex, dublinCore, true);
+        updateSeriesMetadataInIndex(id, externalApiIndex, dublinCore, true);
+        // still sent for other asynchronous updates
         messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
                 SeriesItem.updateCatalog(dublinCore));
         return (updated == null) ? null : dublinCore;
@@ -336,12 +344,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       try {
         updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
-        // still sent for other asynchronous updates
-        messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-                SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
         //update ES indices
         updateSeriesAclInIndex(seriesId, adminUiIndex, accessControl);
         updateSeriesAclInIndex(seriesId, externalApiIndex, accessControl);
+        // still sent for other asynchronous updates
+        messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
+                SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
       } catch (SeriesServiceDatabaseException e) {
         logger.error("Could not update series {} with access control rules: {}", seriesId, e.getMessage());
         throw new SeriesException(e);
@@ -373,12 +381,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   public void deleteSeries(final String seriesID) throws SeriesException, NotFoundException {
     try {
       persistence.deleteSeries(seriesID);
-      // still sent for other asynchronous updates
-      messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-              SeriesItem.delete(seriesID));
       // remove from ES indices
       removeSeriesFromIndex(seriesID, adminUiIndex);
       removeSeriesFromIndex(seriesID, externalApiIndex);
+      // still sent for other asynchronous updates
+      messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
+              SeriesItem.delete(seriesID));
     } catch (SeriesServiceDatabaseException e1) {
       logger.error("Could not delete series with id {} from persistence storage", seriesID);
       throw new SeriesException(e1);
@@ -617,8 +625,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     logger.error("Could not read dublincore XML", e);
                     return;
                   }
-                  messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                          SeriesItem.updateCatalog(catalog));
+                  updateSeriesMetadataInIndex(id, index, catalog, false);
 
                   String aclStr = series.getAccessControl();
                   if (StringUtils.isNotBlank(aclStr)) {
@@ -653,7 +660,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Remove series from Elasticsearch index
+   * Remove series from Elasticsearch index.
    *
    * @param seriesId
    *          The series id
@@ -673,7 +680,89 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series acl in Elasticsearch index
+   * Update series metadata in Elasticsearch index. Also update events if series title has changed (optional).
+   *
+   * @param seriesId
+   *          The series id
+   * @param index
+   *          The Elasticsearch index to update
+   * @param dc
+   *          The dublin core catalog
+   */
+  private void updateSeriesMetadataInIndex(String seriesId, AbstractSearchIndex index, DublinCoreCatalog dc,
+          boolean updateEvents) {
+    String orgId = securityService.getOrganization().getId();
+    User user = securityService.getUser();
+    logger.debug("Received Update Series for index {}", index.getIndexName());
+
+    Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
+      Series series = seriesOpt.orElse(new Series(seriesId, orgId));
+      series.setCreator(securityService.getUser().getName());
+
+      // update from dublin core catalog
+      series.setTitle(dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
+      series.setDescription(dc.getFirst(DublinCore.PROPERTY_DESCRIPTION));
+      series.setSubject(dc.getFirst(DublinCore.PROPERTY_SUBJECT));
+      series.setLanguage(dc.getFirst(DublinCoreCatalog.PROPERTY_LANGUAGE));
+      series.setLicense(dc.getFirst(DublinCoreCatalog.PROPERTY_LICENSE));
+      series.setRightsHolder(dc.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER));
+      String createdDateStr = dc.getFirst(DublinCoreCatalog.PROPERTY_CREATED);
+      if (createdDateStr != null) {
+        series.setCreatedDateTime(EncodingSchemeUtils.decodeDate(createdDateStr));
+      }
+      series.setPublishers(dc.get(DublinCore.PROPERTY_PUBLISHER, DublinCore.LANGUAGE_ANY));
+      series.setContributors(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY));
+      series.setOrganizers(dc.get(DublinCoreCatalog.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY));
+      return Optional.of(series);
+    };
+
+    // update series
+    Optional<Series> updatedSeriesOpt;
+    try {
+      updatedSeriesOpt = index.addOrUpdateSeries(seriesId, updateFunction, orgId,
+              user);
+      logger.debug("Series {} updated in the search index", seriesId);
+    } catch (SearchIndexException e) {
+      logger.error("Error storing the series {} to the search index", seriesId, e);
+      return;
+    }
+
+    // update series title for events
+    if (updateEvents && updatedSeriesOpt.isPresent() && updatedSeriesOpt.get().isSeriesTitleUpdated()) {
+      Series updatedSeries = updatedSeriesOpt.get();
+      SearchResult<Event> events;
+      try {
+        events = index.getByQuery(
+                new EventSearchQuery(orgId, user).withoutActions().withSeriesId(updatedSeries.getIdentifier()));
+      } catch (SearchIndexException e) {
+        logger.error("Error requesting the events of the series {} from the index", seriesId, e);
+        return;
+      }
+
+      for (SearchResultItem<Event> searchResultItem : events.getItems()) {
+        String eventId = searchResultItem.getSource().getIdentifier();
+
+        Function<Optional<Event>, Optional<Event>> eventUpdateFunction = (Optional<Event> eventOpt) -> {
+          if (eventOpt.isPresent() && eventOpt.get().getSeriesId().equals(updatedSeries.getIdentifier())) {
+            Event event = eventOpt.get();
+            event.setSeriesName(updatedSeries.getTitle());
+            return Optional.of(event);
+          }
+          return Optional.empty();
+        };
+
+        try {
+          index.addOrUpdateEvent(eventId, eventUpdateFunction, orgId, user);
+          logger.debug("Series title of series {} updated for event {} in the index", seriesId, eventId);
+        } catch (SearchIndexException e) {
+          logger.error("Error updating the series title for event {} to the index", eventId, e);
+        }
+      }
+    }
+  }
+
+  /**
+   * Update series acl in Elasticsearch index.
    *
    * @param seriesId
    *          The series id
@@ -708,7 +797,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series theme property in Elasticsearch index
+   * Update series theme property in Elasticsearch index.
    *
    * @param seriesId
    *          The series id
