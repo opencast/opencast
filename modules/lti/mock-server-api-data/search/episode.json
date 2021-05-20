@@ -3734,7 +3734,10 @@
           "start": "2019-09-19T05:45:53Z",
           "title": "Opencast Studio",
           "creators": {
-            "creator": "Firefox"
+            "creator": [
+              "Firefox",
+              "Chromium"
+            ]
           },
           "media": {
             "track": {
