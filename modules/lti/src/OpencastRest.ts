@@ -209,11 +209,15 @@ export async function searchEpisode(
             languageShortCode: result.dcLanguage,
             licenseKey: result.dcLicense,
             mediapackage: {
-                creators: result.mediapackage.creators !== undefined ? result.mediapackage.creators.creator : [],
+                creators: result.mediapackage.creators !== undefined
+                    ? Array.isArray(result.mediapackage.creators.creator)
+                        ? result.mediapackage.creators.creator
+                        : [result.mediapackage.creators.creator]
+                    : [],
                 attachments: Array.from(
-                    Array.isArray(result.mediapackage.attachments.attachment) ?
-                        result.mediapackage.attachments.attachment :
-                        Array.of(result.mediapackage.attachments.attachment),
+                    Array.isArray(result.mediapackage.attachments.attachment)
+                        ? result.mediapackage.attachments.attachment
+                        : Array.of(result.mediapackage.attachments.attachment),
                     (attachment: any) => ({
                         type: attachment.type,
                         url: attachment.url
