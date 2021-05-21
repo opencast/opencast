@@ -71,6 +71,8 @@ import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
@@ -121,7 +123,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -174,6 +175,7 @@ public class SeriesEndpoint implements ManagedService {
   private SecurityService securityService;
   private AclServiceFactory aclServiceFactory;
   private IndexService indexService;
+  private ListProvidersService listProvidersService;
   private AdminUISearchIndex searchIndex;
 
   /** Default server URL */
@@ -192,6 +194,11 @@ public class SeriesEndpoint implements ManagedService {
   /** OSGi DI. */
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
+  }
+
+  /** OSGi callback for the list provider service */
+  public void setListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = listProvidersService;
   }
 
   /** OSGi callback for the security service */
@@ -689,27 +696,26 @@ public class SeriesEndpoint implements ManagedService {
    * @return user series with write or read-only access,
    *         depending on the parameter
    */
-  public HashMap<String, String> getUserSeriesByAccess(boolean writeAccess) {
+  public Map<String, String> getUserSeriesByAccess(boolean writeAccess) {
+    String listProviderName = null;
+    MetadataField seriesMetadataField = indexService.getCommonEventCatalogUIAdapter().getRawFields().getOutputFields()
+        .get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
+    if (seriesMetadataField != null && StringUtils.isNotEmpty(seriesMetadataField.getListprovider())) {
+      listProviderName = seriesMetadataField.getListprovider();
+    }
+    if (StringUtils.isEmpty(listProviderName)) {
+      listProviderName = "SERIES";
+    }
+    SeriesListQuery query = new SeriesListQuery();
+    if (writeAccess) {
+      query.withoutPermissions();
+      query.withReadPermission(true);
+      query.withWritePermission(true);
+    }
     try {
-      SeriesSearchQuery query = new SeriesSearchQuery(
-      securityService.getOrganization().getId(), securityService.getUser());
-
-      if (writeAccess) {
-        query.withoutActions();
-        query.withAction(Permissions.Action.WRITE);
-        query.withAction(Permissions.Action.READ);
-      }
-
-      SearchResult<Series> result = searchIndex.getByQuery(query);
-      HashMap<String, String> seriesMap = new HashMap<String, String>();
-      for (SearchResultItem<Series> item : result.getItems()) {
-        Series series = item.getSource();
-        seriesMap.put(series.getTitle(), series.getIdentifier());
-      }
-
-      return seriesMap;
-    } catch (SearchIndexException e) {
-      logger.warn("Could not perform search query: {}", e);
+      return listProvidersService.getList(listProviderName, query, true);
+    } catch (ListProviderException e) {
+      logger.warn("Could not perform search query.", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
   }

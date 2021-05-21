@@ -156,9 +156,10 @@ angular.module('adminNg.directives')
             // "filter.period.to" and "filter.period.from" are local Date formated into string "YY-MM-DD"
             // Parse back into local Date obj by adding timezone offset
             // -- Get the current local timezone offset in MS --
-            var localTimeZoneOffSetInMs = new Date().getTimezoneOffset() * 60 * 1000;
-            var localOffsetFrom = new Date(Date.parse(filter.period.from) + localTimeZoneOffSetInMs);
-            var localOffsetTo = new Date(Date.parse(filter.period.to) + localTimeZoneOffSetInMs);
+            var localFromTimeZoneOffSetInMs = new Date(Date.parse(filter.period.from)).getTimezoneOffset() * 60 * 1000;
+            var localToTimeZoneOffSetInMs = new Date(Date.parse(filter.period.to)).getTimezoneOffset() * 60 * 1000;
+            var localOffsetFrom = new Date(Date.parse(filter.period.from) + localFromTimeZoneOffSetInMs);
+            var localOffsetTo = new Date(Date.parse(filter.period.to) + localToTimeZoneOffSetInMs);
             // -- Set "From" date to start of day (00:01) and "To" date to end of day (23:59) --
             var from = new Date(localOffsetFrom.setHours(0, 0, 0, 1));
             var to = new Date(localOffsetTo.setHours(23, 59, 59, 999));
