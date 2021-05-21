@@ -39,6 +39,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,6 +97,8 @@ public class ScheduledDataCollector extends TimerTask {
   /** System admin user */
   private User systemAdminUser;
 
+  /** The Opencast version this is running in */
+  private String version;
 
   //================================================================================
   // Scheduler methods
@@ -111,6 +114,9 @@ public class ScheduledDataCollector extends TimerTask {
     this.defaultOrganization = new DefaultOrganization();
     String systemAdminUserName = ctx.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
     this.systemAdminUser = SecurityUtil.createSystemUser(systemAdminUserName, defaultOrganization);
+
+    final Version ctxVersion = ctx.getBundle().getVersion();
+    this.version = ctxVersion.toString();
 
     // We read this key for testing but don't ever expect this to be set.
     final String serverBaseUrl = ctx.getProperty(PROP_KEY_STATISTIC_SERVER_ADDRESS);
@@ -193,6 +199,7 @@ public class ScheduledDataCollector extends TimerTask {
 
     statisticData.setSeriesCount(seriesService.getSeriesCount());
     statisticData.setUserCount(userAndRoleProvider.countAllUsers());
+    statisticData.setVersion(version);
     return statisticData.jsonify();
   }
 
