@@ -161,7 +161,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
     final Collection<MediaPackageElement> downloadElements = downloadElementSelector.select(mediaPackage, false);
 
     final Collection<MediaPackageElement> streamingElements;
-    if (streamingDistributionService.publishToStreaming()) {
+    if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()) {
       final SimpleElementSelector streamingElementSelector = new SimpleElementSelector();
       for (String flavor : sourceStreamingFlavors) {
         streamingElementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
