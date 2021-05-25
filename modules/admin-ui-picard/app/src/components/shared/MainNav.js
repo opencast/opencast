@@ -15,16 +15,20 @@ import {fetchUsers} from "../../thunks/userThunks";
 import {fetchThemes} from "../../thunks/themeThunks";
 import {connect} from "react-redux";
 import {fetchStats} from "../../thunks/tableFilterThunks";
+import {setOffset} from "../../actions/tableActions";
 
 /**
  * This component renders the main navigation that opens when the burger button is clicked
  */
 const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, loadingStats, loadingRecordings,
                      loadingRecordingsIntoTable, loadingJobs, loadingJobsIntoTable, loadingUsers, loadingUsersIntoTable,
-                     loadingThemes, loadingThemesIntoTable }) => {
+                     loadingThemes, loadingThemesIntoTable, resetOffset }) => {
     const { t } = useTranslation();
 
     const loadEvents = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching stats from server
         loadingStats();
 
@@ -36,6 +40,9 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadRecordings = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching recordings from server
         loadingRecordings();
 
@@ -44,6 +51,9 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadJobs = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching jobs from server
         loadingJobs();
 
@@ -52,6 +62,9 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadUsers = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching users from server
         loadingUsers();
 
@@ -60,6 +73,9 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     }
 
     const loadThemes = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching themes from server
         loadingThemes();
 
@@ -114,7 +130,8 @@ const mapDispatchToProps = dispatch => ({
     loadingUsers: () => dispatch(fetchUsers()),
     loadingUsersIntoTable: () => dispatch(loadUsersIntoTable()),
     loadingThemes: () => dispatch(fetchThemes()),
-    loadingThemesIntoTable: () => dispatch(loadThemesIntoTable())
+    loadingThemesIntoTable: () => dispatch(loadThemesIntoTable()),
+    resetOffset: () => dispatch(setOffset(0))
 });
 
 export default connect(null, mapDispatchToProps)(MainNav);

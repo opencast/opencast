@@ -17,6 +17,7 @@ import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
 import {editTextFilter} from "../../actions/tableFilterActions";
+import {setOffset} from "../../actions/tableActions";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -26,13 +27,17 @@ const containerAction = React.createRef();
  * This component renders the table view of series
  */
 const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEvents, loadingEventsIntoTable,
-                    series, loadingFilters, loadingStats, loadingSeriesMetadata, loadingSeriesThemes, resetTextFilter }) => {
+                    series, loadingFilters, loadingStats, loadingSeriesMetadata, loadingSeriesThemes, resetTextFilter,
+                    resetOffset }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewSeriesModal, setNewSeriesModal] = useState(false);
 
     const loadEvents = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching stats from server
         loadingStats()
 
@@ -195,7 +200,8 @@ const mapDispatchToProps = dispatch => ({
     loadingStats: () => dispatch(fetchStats()),
     loadingSeriesMetadata: () => dispatch(fetchSeriesMetadata()),
     loadingSeriesThemes: () => dispatch(fetchSeriesThemes()),
-    resetTextFilter: () => dispatch(editTextFilter(''))
+    resetTextFilter: () => dispatch(editTextFilter('')),
+    resetOffset: () => dispatch(setOffset(0))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Series));

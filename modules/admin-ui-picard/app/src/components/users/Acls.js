@@ -17,13 +17,14 @@ import {getTotalAcls} from "../../selectors/aclSelectors";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
 import {editTextFilter} from "../../actions/tableFilterActions";
+import {setOffset} from "../../actions/tableActions";
 
 /**
  * This component renders the table view of acls
  */
 const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                     loadingUsers, loadingUsersIntoTable, loadingGroups,
-                    loadingGroupsIntoTable, resetTextFilter }) => {
+                    loadingGroupsIntoTable, resetTextFilter, resetOffset }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewAclModal, setNewAclModal] = useState(false);
@@ -37,6 +38,9 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     };
 
     const loadUsers = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching users from server
         loadingUsers();
 
@@ -45,6 +49,9 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     };
 
     const loadGroups = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching groups from server
         loadingGroups();
 
@@ -162,7 +169,8 @@ const mapDispatchToProps = dispatch => ({
     loadingUsersIntoTable: () => dispatch(loadUsersIntoTable()),
     loadingGroups: () => dispatch(fetchGroups()),
     loadingGroupsIntoTable: () => dispatch(loadGroupsIntoTable()),
-    resetTextFilter: () => dispatch(editTextFilter(''))
+    resetTextFilter: () => dispatch(editTextFilter('')),
+    resetOffset: () => dispatch(setOffset(0))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Acls));

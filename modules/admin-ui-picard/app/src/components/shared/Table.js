@@ -274,7 +274,6 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
 
 // get all pages directly accessible from current page
 const getDirectAccessiblePages = (pages, pagination) => {
-    console.log('in get Direct Accessible');
 
     let startIndex = pagination.offset - pagination.directAccessibleNo,
         endIndex = pagination.offset + pagination.directAccessibleNo,
@@ -321,8 +320,7 @@ const getDirectAccessiblePages = (pages, pagination) => {
     }
 
     //todo: in old code is here something with maxLabel (Check if this is also needed)
-    console.log(directAccessible);
-    console.log(pages);
+
     return directAccessible;
 }
 

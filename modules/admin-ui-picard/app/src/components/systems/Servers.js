@@ -16,13 +16,14 @@ import {fetchJobs} from "../../thunks/jobThunks";
 import {fetchServices} from "../../thunks/serviceThunks";
 import Notifications from "../shared/Notifications";
 import {editTextFilter} from "../../actions/tableFilterActions";
+import {setOffset} from "../../actions/tableActions";
 
 /**
  * This component renders the table view of servers
  */
 const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilters,
                      loadingJobs, loadingJobsIntoTable, loadingServices,
-                     loadingServicesIntoTable, resetTextFilter }) => {
+                     loadingServicesIntoTable, resetTextFilter, resetOffset }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -35,6 +36,9 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     }
 
     const loadJobs = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching jobs from server
         loadingJobs();
 
@@ -43,6 +47,9 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     }
 
     const loadServices = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching services from server
         loadingServices();
 
@@ -138,7 +145,8 @@ const mapDispatchToProps = dispatch => ({
     loadingJobsIntoTable: () => dispatch(loadJobsIntoTable()),
     loadingServices: () => dispatch(fetchServices()),
     loadingServicesIntoTable: () => dispatch(loadServicesIntoTable()),
-    resetTextFilter: () => dispatch(editTextFilter(''))
+    resetTextFilter: () => dispatch(editTextFilter('')),
+    resetOffset: () => dispatch(setOffset(0))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Servers));

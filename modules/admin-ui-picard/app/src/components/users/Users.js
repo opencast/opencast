@@ -17,13 +17,14 @@ import {fetchAcls} from "../../thunks/aclThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
 import {editTextFilter} from "../../actions/tableFilterActions";
+import {setOffset} from "../../actions/tableActions";
 
 /**
  * This component renders the table view of users
  */
 const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                    loadingGroups, loadingGroupsIntoTable, loadingAcls,
-                   loadingAclsIntoTable, resetTextFilter }) => {
+                   loadingAclsIntoTable, resetTextFilter, resetOffset }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewUserModal, setNewUserModal] = useState(false);
@@ -38,6 +39,9 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     }
 
     const loadGroups = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching groups from server
         loadingGroups();
 
@@ -46,6 +50,9 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     }
 
     const loadAcls = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching acls from server
         loadingAcls();
 
@@ -163,7 +170,8 @@ const mapDispatchToProps = dispatch => ({
     loadingGroupsIntoTable: () => dispatch(loadGroupsIntoTable()),
     loadingAcls: () => dispatch(fetchAcls()),
     loadingAclsIntoTable: () => dispatch(loadAclsIntoTable()),
-    resetTextFilter: () => dispatch(editTextFilter(''))
+    resetTextFilter: () => dispatch(editTextFilter('')),
+    resetOffset: () => dispatch(setOffset(0))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Users));
