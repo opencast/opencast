@@ -165,6 +165,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         }
 
         searchEntity.setDeletionDate(deletionDate);
+        searchEntity.setModificationDate(deletionDate);
         em.merge(searchEntity);
       }
       tx.commit();
