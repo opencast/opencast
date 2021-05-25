@@ -80,6 +80,8 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -275,8 +277,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         // Make sure store to persistence comes after index, return value can be null
         DublinCoreCatalog updated = persistence.storeSeries(dublinCore);
         // update ES indices
-        updateSeriesMetadataInIndex(id, adminUiIndex, dublinCore, true);
-        updateSeriesMetadataInIndex(id, externalApiIndex, dublinCore, true);
+        updateSeriesMetadataInIndex(id, adminUiIndex, dublinCore);
+        updateSeriesMetadataInIndex(id, externalApiIndex, dublinCore);
         // still sent for other asynchronous updates
         messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
                 SeriesItem.updateCatalog(dublinCore));
@@ -595,46 +597,53 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
   @Override
   public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
-    final String destinationId = SeriesItem.SERIES_QUEUE_PREFIX + index.getIndexName().substring(0, 1).toUpperCase()
-            + index.getIndexName().substring(1);
     try {
-      final int total = persistence.countSeries();
-      logIndexRebuildBegin(logger, index.getIndexName(), total, "series");
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
+      final int total = databaseSeries.size();
       int current = 1;
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "series");
+
       for (SeriesEntity series: databaseSeries) {
         Organization organization = orgDirectory.getOrganization(series.getOrganization());
         User systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
         SecurityUtil.runAs(securityService, organization, systemUser,
                 () -> {
-                  String id = series.getSeriesId();
-                  logger.trace("Adding series '{}' for org '{}'", id, series.getOrganization());
+                  String seriesId = series.getSeriesId();
+                  logger.trace("Adding series {} for organization {} to the {} index.", seriesId,
+                          series.getOrganization(), index.getIndexName());
+                  List<Function<Optional<Series>, Optional<Series>>> updateFunctions = new ArrayList<>();
+
                   DublinCoreCatalog catalog;
                   try {
                     catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
+                    updateFunctions.add(getMetadataUpdateFunction(seriesId, catalog, organization.getId()));
                   } catch (IOException | ParserConfigurationException | SAXException e) {
-                    logger.error("Could not read dublincore XML", e);
+                    logger.error("Could not read dublincore XML of series {}.", seriesId, e);
                     return;
                   }
-                  updateSeriesMetadataInIndex(id, index, catalog, false);
 
                   String aclStr = series.getAccessControl();
                   if (StringUtils.isNotBlank(aclStr)) {
                     try {
                       AccessControlList acl = AccessControlParser.parseAcl(aclStr);
-                      updateSeriesAclInIndex(id, index, acl);
+                      updateFunctions.add(getAclUpdateFunction(seriesId, acl, organization.getId()));
                     } catch (Exception ex) {
-                      logger.error("Unable to parse series {} access control list", id, ex);
+                      logger.error("Unable to parse ACL of series {}.", seriesId, ex);
                     }
                   }
+
                   try {
-                    Map<String, String> properties = persistence.getSeriesProperties(id);
-                    if (properties.containsKey(THEME_PROPERTY_NAME)) {
-                      updateThemePropertyInIndex(id, Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)), index);
-                    }
+                    Map<String, String> properties = persistence.getSeriesProperties(seriesId);
+                    getThemePropertyUpdateFunction(seriesId, Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)),
+                            organization.getId());
                   } catch (NotFoundException | SeriesServiceDatabaseException e) {
-                    logger.error("Error requesting series properties", e);
+                    logger.error("Error reading properties of series {}", seriesId, e);
                   }
+
+                  // do the actual index update
+                  updateSeriesInIndex(seriesId, index, organization.getId(),
+                          updateFunctions.toArray(new Function[updateFunctions.size()]));
+
                 });
         logIndexRebuildProgress(logger, index.getIndexName(), total, current);
         current++;
@@ -660,13 +669,13 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    */
   private void removeSeriesFromIndex(String seriesId, AbstractSearchIndex index) {
     String orgId = securityService.getOrganization().getId();
-    logger.debug("Received Delete Series Event {} for index {}", seriesId, index.getIndexName());
+    logger.debug("Removing series {} from the {} index.", seriesId, index.getIndexName());
 
     try {
       index.delete(Series.DOCUMENT_TYPE, seriesId, orgId);
-      logger.debug("Series {} removed from search index", seriesId);
+      logger.debug("Series {} removed from the {} index.", seriesId);
     } catch (SearchIndexException e) {
-      logger.error("Error deleting the series {} from the search index", seriesId, e);
+      logger.error("Series {} couldn't be removed from the {} index.", seriesId, index.getIndexName(), e);
     }
   }
 
@@ -680,53 +689,25 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param dc
    *          The dublin core catalog
    */
-  private void updateSeriesMetadataInIndex(String seriesId, AbstractSearchIndex index, DublinCoreCatalog dc,
-          boolean updateEvents) {
+  private void updateSeriesMetadataInIndex(String seriesId, AbstractSearchIndex index, DublinCoreCatalog dc) {
     String orgId = securityService.getOrganization().getId();
-    User user = securityService.getUser();
-    logger.debug("Received Update Series for index {}", index.getIndexName());
-
-    Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
-      Series series = seriesOpt.orElse(new Series(seriesId, orgId));
-      series.setCreator(securityService.getUser().getName());
-
-      // update from dublin core catalog
-      series.setTitle(dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
-      series.setDescription(dc.getFirst(DublinCore.PROPERTY_DESCRIPTION));
-      series.setSubject(dc.getFirst(DublinCore.PROPERTY_SUBJECT));
-      series.setLanguage(dc.getFirst(DublinCoreCatalog.PROPERTY_LANGUAGE));
-      series.setLicense(dc.getFirst(DublinCoreCatalog.PROPERTY_LICENSE));
-      series.setRightsHolder(dc.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER));
-      String createdDateStr = dc.getFirst(DublinCoreCatalog.PROPERTY_CREATED);
-      if (createdDateStr != null) {
-        series.setCreatedDateTime(EncodingSchemeUtils.decodeDate(createdDateStr));
-      }
-      series.setPublishers(dc.get(DublinCore.PROPERTY_PUBLISHER, DublinCore.LANGUAGE_ANY));
-      series.setContributors(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY));
-      series.setOrganizers(dc.get(DublinCoreCatalog.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY));
-      return Optional.of(series);
-    };
+    logger.debug("Updating metadata of series {} in the {} index.", seriesId, index.getIndexName());
 
     // update series
-    Optional<Series> updatedSeriesOpt;
-    try {
-      updatedSeriesOpt = index.addOrUpdateSeries(seriesId, updateFunction, orgId,
-              user);
-      logger.debug("Series {} updated in the search index", seriesId);
-    } catch (SearchIndexException e) {
-      logger.error("Error storing the series {} to the search index", seriesId, e);
-      return;
-    }
+    Function updateFunction = getMetadataUpdateFunction(seriesId, dc, orgId);
+    Optional<Series> updatedSeriesOpt = updateSeriesInIndex(seriesId, index, orgId, updateFunction);
 
-    // update series title for events
-    if (updateEvents && updatedSeriesOpt.isPresent() && updatedSeriesOpt.get().isSeriesTitleUpdated()) {
+    // update series title for events?
+    if (updatedSeriesOpt.isPresent() && updatedSeriesOpt.get().isSeriesTitleUpdated()) {
       Series updatedSeries = updatedSeriesOpt.get();
+      User user = securityService.getUser();
       SearchResult<Event> events;
       try {
         events = index.getByQuery(
                 new EventSearchQuery(orgId, user).withoutActions().withSeriesId(updatedSeries.getIdentifier()));
       } catch (SearchIndexException e) {
-        logger.error("Error requesting the events of the series {} from the index", seriesId, e);
+        logger.error("Error requesting the events of the series {} from the {} index.", seriesId, index.getIndexName(),
+                e);
         return;
       }
 
@@ -744,12 +725,47 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
         try {
           index.addOrUpdateEvent(eventId, eventUpdateFunction, orgId, user);
-          logger.debug("Series title of series {} updated for event {} in the index", seriesId, eventId);
+          logger.debug("Series title of series {} updated for event {} in the index.", seriesId, eventId);
         } catch (SearchIndexException e) {
-          logger.error("Error updating the series title for event {} to the index", eventId, e);
+          logger.error("Error updating the series title for event {} of series {} to the index.", eventId, seriesId, e);
         }
       }
     }
+  }
+
+  /**
+   * Get the function to update the metadata for a series in an Elasticsearch index.
+   *
+   * @param seriesId
+   *          The series id
+   * @param dc
+   *          The dublin core catalog
+   * @param orgId
+   *          The id of the current organization
+   * @return the function to do the update
+   */
+  private Function<Optional<Series>, Optional<Series>> getMetadataUpdateFunction(String seriesId, DublinCoreCatalog dc,
+          String orgId) {
+    Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
+      Series series = seriesOpt.orElse(new Series(seriesId, orgId));
+      series.setCreator(securityService.getUser().getName()); // TODO only for new series, no?
+
+      series.setTitle(dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
+      series.setDescription(dc.getFirst(DublinCore.PROPERTY_DESCRIPTION));
+      series.setSubject(dc.getFirst(DublinCore.PROPERTY_SUBJECT));
+      series.setLanguage(dc.getFirst(DublinCoreCatalog.PROPERTY_LANGUAGE));
+      series.setLicense(dc.getFirst(DublinCoreCatalog.PROPERTY_LICENSE));
+      series.setRightsHolder(dc.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER));
+      String createdDateStr = dc.getFirst(DublinCoreCatalog.PROPERTY_CREATED);
+      if (createdDateStr != null) {
+        series.setCreatedDateTime(EncodingSchemeUtils.decodeDate(createdDateStr));
+      }
+      series.setPublishers(dc.get(DublinCore.PROPERTY_PUBLISHER, DublinCore.LANGUAGE_ANY));
+      series.setContributors(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY));
+      series.setOrganizers(dc.get(DublinCoreCatalog.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY));
+      return Optional.of(series);
+    };
+    return updateFunction;
   }
 
   /**
@@ -764,9 +780,24 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    */
   private void updateSeriesAclInIndex(String seriesId, AbstractSearchIndex index, AccessControlList acl) {
     String orgId = securityService.getOrganization().getId();
-    User user = securityService.getUser();
-    logger.debug("Received Update Series ACL for index {}", index.getIndexName());
+    logger.debug("Updating ACL of series {} in the {} index.", seriesId, index.getIndexName());
+    Function updateFunction = getAclUpdateFunction(seriesId, acl, orgId);
+    updateSeriesInIndex(seriesId, index, orgId, updateFunction);
+  }
 
+  /**
+   * Get the function to update the acl for a series in an Elasticsearch index.
+   *
+   * @param seriesId
+   *          The series id
+   * @param acl
+   *          The acl to update
+   * @param orgId
+   *          The id of the current organization
+   * @return the function to do the update
+   */
+  private Function<Optional<Series>, Optional<Series>> getAclUpdateFunction(String seriesId, AccessControlList acl,
+          String orgId) {
     Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
       Series series = seriesOpt.orElse(new Series(seriesId, orgId));
 
@@ -778,17 +809,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       series.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
       return Optional.of(series);
     };
-
-    try {
-      index.addOrUpdateSeries(seriesId, updateFunction, orgId, user);
-      logger.debug("Series {} updated in the search index", seriesId);
-    } catch (SearchIndexException e) {
-      logger.error("Error storing the series {} to the search index", seriesId, e);
-    }
+    return updateFunction;
   }
 
   /**
-   * Update series theme property in Elasticsearch index.
+   * Update series theme property in an Elasticsearch index.
    *
    * @param seriesId
    *          The series id
@@ -800,9 +825,24 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt,
           AbstractSearchIndex index) {
     String orgId = securityService.getOrganization().getId();
-    User user = securityService.getUser();
-    logger.debug("Updating theme property of series {} in index {}", seriesId, index.getIndexName());
+    logger.debug("Updating theme property of series {} in the {} index.", seriesId, index.getIndexName());
+    Function updateFunction = getThemePropertyUpdateFunction(seriesId, propertyValueOpt, orgId);
+    updateSeriesInIndex(seriesId, index, orgId, updateFunction);
+  }
 
+  /**
+   * Get the function to update the theme property for a series in an Elasticsearch index.
+   *
+   * @param seriesId
+   *          The series id
+   * @param propertyValueOpt
+   *          The value of the property (optional)
+   * @param orgId
+   *          The id of the current organization
+   * @return the function to do the update
+   */
+  private Function<Optional<Series>, Optional<Series>> getThemePropertyUpdateFunction(String seriesId,
+          Optional<String> propertyValueOpt, String orgId) {
     Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
       Series series = seriesOpt.orElse(new Series(seriesId, orgId));
       if (propertyValueOpt.isPresent()) {
@@ -812,12 +852,34 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       }
       return Optional.of(series);
     };
+    return updateFunction;
+  }
+
+  /**
+   * Update a series in an Elasticsearch index.
+   *
+   * @param seriesId
+   *          The series id
+   * @param updateFunctions
+   *          The function(s) to do the actual updating
+   * @param index
+   *          The Elasticsearch index to update
+   * @param orgId
+   *          The id of the current organization
+   * @return the updated series (optional)
+   */
+  private Optional<Series> updateSeriesInIndex(String seriesId, AbstractSearchIndex index, String orgId,
+          Function<Optional<Series>, Optional<Series>>... updateFunctions) {
+    User user = securityService.getUser();
+    Function updateFunction = Arrays.stream(updateFunctions).reduce(Function.identity(), Function::andThen);
 
     try {
-      index.addOrUpdateSeries(seriesId, updateFunction, orgId, user);
-      logger.debug("Series {} updated in the search index", seriesId);
+      Optional<Series> seriesOpt = index.addOrUpdateSeries(seriesId, updateFunction, orgId, user);
+      logger.debug("Series {} updated in the {} index", seriesId, index.getIndexName());
+      return seriesOpt;
     } catch (SearchIndexException e) {
-      logger.error("Error storing the series {} to the search index", seriesId, e);
+      logger.error("Series {} couldn't be updated in the {} index.", seriesId, index.getIndexName(), e);
+      return Optional.empty();
     }
   }
 }
