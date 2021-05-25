@@ -358,7 +358,6 @@ export const goToPage = pageNumber => (dispatch, getState) => {
     dispatch(setPageActive(pages[offset].number));
 
     // Get resources of page and load them into table
-    // todo: Check for all other type of resource
     // eslint-disable-next-line default-case
     switch (getResourceType(state)) {
         case 'events': {
@@ -425,7 +424,6 @@ export const updatePages = () => (dispatch,getState) => {
     dispatch(setPages(pages));
 
     // Get resources of page and load them into table
-    // todo: Check for all other type of resource
     // eslint-disable-next-line default-case
     switch (getResourceType(state)) {
         case 'events': {

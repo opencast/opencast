@@ -27,7 +27,7 @@ export const getCurrentLanguageInformation = () => {
 }
 
 // fills an array from 00 to number of elements specified
-export const initArray = (numberOfElements) => {
+export const initArray = numberOfElements => {
     let i, result = [];
     for (i = 0; i < numberOfElements; i++) {
         if (i < 10) {
@@ -44,7 +44,16 @@ export const initArray = (numberOfElements) => {
         }
     }
     return result;
-}
+};
+
+// insert leading 0 for numbers smaller 10
+export const makeTwoDigits = number => {
+    if (number < 10) {
+        return '0' + number;
+    } else {
+        return number;
+    }
+};
 
 /*
  * transforms an object of form { id1: value1, id2: value2 }

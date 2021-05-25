@@ -1,16 +1,32 @@
 import React, {useState} from 'react';
 import {useTranslation} from "react-i18next";
+import ConfirmModal from "../../shared/ConfirmModal";
+import {deleteEvent} from "../../../thunks/eventThunks";
+import {connect} from "react-redux";
 import EventDetailsModal from "./modals/EventDetailsModal";
+
 
 
 /**
  * This component renders the action cells of events in the table view
  */
-const EventActionCell = ({ row })  => {
+const EventActionCell = ({ row, deleteEvent })  => {
     const { t } = useTranslation();
 
+
+    const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
     const [displayEventDetailsModal, setEventDetailsModal] = useState(false);
     const [eventDetailsTabIndex, setEventDetailsTabIndex] = useState(0);
+
+    const hideDeleteConfirmation = () => {
+        setDeleteConfirmation(false);
+    };
+
+    const deletingEvent = id => {
+        deleteEvent(id);
+    };
+
+    
 
     const showEventDetailsModal = () => {
         setEventDetailsModal(true);
@@ -68,11 +84,20 @@ const EventActionCell = ({ row })  => {
             )}
 
             {/* Delete an event */}
-            {/*TODO: implement and properly call function, needs to be checked if event is published */}
+            {/*TODO: needs to be checked if event is published */}
             {/*TODO: with-Role ROLE_UI_EVENTS_DELETE*/}
-            <a onClick={() => onClickDelete()}
+            <a onClick={() => setDeleteConfirmation(true)}
                className="remove"
                title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DELETE')}/>
+
+            {/* Confirmation for deleting an event*/}
+            {displayDeleteConfirmation && (
+                <ConfirmModal close={hideDeleteConfirmation}
+                              resourceName={row.title}
+                              resourceType="EVENT"
+                              resourceId={row.id}
+                              deleteMethod={deletingEvent}/>
+            )}
 
             {/* If the event has an preview then the editor can be opened and status if it needs to be cut is shown */}
             {!!row.has_preview && (
@@ -128,7 +153,7 @@ const EventActionCell = ({ row })  => {
               className="fa fa-link"/>
         </>
     );
-};
+}
 
 //todo: implement!
 const onClickSeriesDetails = () => {
@@ -136,14 +161,13 @@ const onClickSeriesDetails = () => {
 }
 
 //todo: implement!
-const onClickDelete = () => {
-    console.log("Should delete the event.");
-}
-
-//todo: implement!
 const onClickEmbeddedCode = () => {
     console.log("Should open dialog for embedded code.");
 }
 
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    deleteEvent: (id) => dispatch(deleteEvent(id))
+});
 
-export default EventActionCell;
+export default connect(null, mapDispatchToProps)(EventActionCell);

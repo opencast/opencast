@@ -20,6 +20,7 @@
     "i18next-browser-languagedetector": "^4.0.2",
     "i18next-xhr-backend": "^3.2.2",
     "moment": "^2.27.0",
+    "moment-timezone": "^0.5.33",
     "node-sass": "^4.13.1",
     "react": "^16.13.1",
     "react-datepicker": "^2.14.1",

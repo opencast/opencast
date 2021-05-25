@@ -1,6 +1,7 @@
 import {loadThemesFailure, loadThemesInProgress, loadThemesSuccess} from "../actions/themeActions";
 import {getURLParams} from "../utils/resourceUtils";
 import axios from "axios";
+import {addNotification} from "./notificationThunks";
 
 // fetch themes from server
 export const fetchThemes = () => async (dispatch, getState) => {
@@ -53,4 +54,16 @@ export const postNewTheme = async values => {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }).then(response => console.log(response)).catch(response => console.log(response));
+};
+
+export const deleteTheme = id => async dispatch => {
+    axios.delete(`/admin-ng/themes/${id}`).then(res => {
+        console.log(res);
+        // add success notification
+        dispatch(addNotification('success', 'THEME_DELETED'));
+    }).catch(res => {
+        console.log(res);
+        // add error notification
+        dispatch(addNotification('error', 'THEME_NOT_DELETED'));
+    })
 }

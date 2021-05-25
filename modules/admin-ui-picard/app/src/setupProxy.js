@@ -1,6 +1,13 @@
 const {createProxyMiddleware} = require('http-proxy-middleware');
 module.exports = function (app) {
     app.use(
+        '/admin-ng/j_spring_security_check',
+        createProxyMiddleware({
+            target:'http://localhost:8080',
+            changeOrigin: true
+       })
+    )
+    app.use(
         '/admin-ng/event/new/conflicts',
         createProxyMiddleware({
             target: 'http://localhost:5000',
