@@ -135,7 +135,7 @@ public class OaiPmhPersistenceTest {
     Assert.assertEquals(mp1, searchResultItem.getMediaPackage());
     Assert.assertFalse(searchResultItem.isDeleted());
     Assert.assertEquals(DefaultOrganization.DEFAULT_ORGANIZATION_ID, searchResultItem.getOrganization());
-    Assert.assertTrue(searchResultItem.getModificationDate() != null);
+    Assert.assertNotNull(searchResultItem.getModificationDate());
     Date modificationDate = searchResultItem.getModificationDate();
     Assert.assertEquals(2, searchResultItem.getElements().size());
     for (SearchResultElementItem catalogItem : searchResultItem.getElements()) {

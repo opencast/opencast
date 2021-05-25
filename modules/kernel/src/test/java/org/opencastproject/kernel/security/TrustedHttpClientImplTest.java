@@ -137,7 +137,7 @@ public class TrustedHttpClientImplTest {
   @Test
   public void noDefaultHttpConnectionFactoryResultsInException() {
     try {
-      client.execute(new HttpPost("http://localhost:8080/fakeEndpoint"));
+      client.execute(new HttpPost("http://localhost:9/fakeEndpoint"));
       // It should fail without a default http connection factory
       Assert.fail();
     } catch (TrustedHttpClientException e) {

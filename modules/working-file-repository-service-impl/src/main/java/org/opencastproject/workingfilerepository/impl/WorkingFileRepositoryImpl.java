@@ -59,7 +59,9 @@ import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.management.ObjectInstance;
@@ -85,6 +87,12 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
   /** Working file repository JMX type */
   private static final String JMX_WORKING_FILE_REPOSITORY_TYPE = "WorkingFileRepository";
+  /** Configuration key for garbage collection period. */
+  public static final String WORKING_FILE_REPOSITORY_CLEANUP_PERIOD_KEY = "org.opencastproject.working.file.repository.cleanup.period";
+  /** Configuration key for garbage collection max age. */
+  public static final String WORKING_FILE_REPOSITORY_CLEANUP_MAX_AGE_KEY = "org.opencastproject.working.file.repository.cleanup.max.age";
+  /** Configuration key for collections to clean up. */
+  private static final String WORKING_FILE_REPOSITORY_CLEANUP_COLLECTIONS_KEY = "org.opencastproject.working.file.repository.cleanup.collections";
 
   /** The JMX working file repository bean */
   private WorkingFileRepositoryBean workingFileRepositoryBean = new WorkingFileRepositoryBean(this);
@@ -106,6 +114,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
   /** The security service to get current organization from */
   protected SecurityService securityService;
+
+  /** The working file repository cleaner */
+  private WorkingFileRepositoryCleaner workingFileRepositoryCleaner;
 
   /**
    * Activate the component
@@ -141,6 +152,46 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
     registeredMXBean = JmxUtil.registerMXBean(workingFileRepositoryBean, JMX_WORKING_FILE_REPOSITORY_TYPE);
 
+    // Determine garbage collection period
+    int garbageCollectionPeriodInSeconds = -1;
+    String period = StringUtils.trimToNull(
+            cc.getBundleContext().getProperty(WORKING_FILE_REPOSITORY_CLEANUP_PERIOD_KEY));
+    if (period != null) {
+      try {
+        garbageCollectionPeriodInSeconds = Integer.parseInt(period);
+      } catch (NumberFormatException e) {
+        logger.error("The garbage collection period for the working file repository is not an integer {}", period);
+        throw e;
+      }
+    }
+
+    // Determine the max age of garbage collection entries
+    int maxAgeInDays = -1;
+    String age = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKING_FILE_REPOSITORY_CLEANUP_MAX_AGE_KEY));
+    if (age != null) {
+      try {
+        maxAgeInDays = Integer.parseInt(age);
+      } catch (NumberFormatException e) {
+        logger.error("The max age for the working file repository garbage collection is not an integer {}", age);
+        throw e;
+      }
+    }
+
+    // Determine which collections should be garbage collected
+    List<String> collectionsToCleanUp = null;
+    String[] cleanupCollections = StringUtils.split(StringUtils.trimToNull(
+            cc.getBundleContext().getProperty(WORKING_FILE_REPOSITORY_CLEANUP_COLLECTIONS_KEY)));
+    if (cleanupCollections != null) {
+      collectionsToCleanUp = Arrays.asList(cleanupCollections);
+    }
+
+    // Start cleanup scheduler if we have sensible cleanup values:
+    if (garbageCollectionPeriodInSeconds > 0 && maxAgeInDays > 0 && collectionsToCleanUp != null) {
+      workingFileRepositoryCleaner = new WorkingFileRepositoryCleaner(this,
+              garbageCollectionPeriodInSeconds, maxAgeInDays, collectionsToCleanUp);
+      workingFileRepositoryCleaner.schedule();
+    }
+
     logger.info(getDiskSpace());
   }
 
@@ -149,6 +200,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    */
   public void deactivate() {
     JmxUtil.unregisterMXBean(registeredMXBean);
+    if (workingFileRepositoryCleaner != null) {
+      workingFileRepositoryCleaner.shutdown();
+    }
   }
 
   /**

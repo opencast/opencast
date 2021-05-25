@@ -33,6 +33,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.waveform.api.WaveformService;
 import org.opencastproject.waveform.api.WaveformServiceException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
@@ -61,12 +62,6 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /** Source tags configuration property name. */
   private static final String SOURCE_TAGS_PROPERTY = "source-tags";
-
-  /** Target flavor configuration property name. */
-  private static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
-
-  /** Target tags configuration property name. */
-  private static final String TARGET_TAGS_PROPERTY = "target-tags";
 
   /** Default value of pixel per minute configuration. */
   private static final int DEFAULT_PIXELS_PER_MINUTE = 200;
@@ -122,23 +117,19 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     logger.info("Start waveform workflow operation for mediapackage {}", mediaPackage);
 
-    String sourceFlavorProperty = StringUtils.trimToNull(
-        workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
-    String sourceTagsProperty = StringUtils.trimToNull(
-        workflowInstance.getCurrentOperation().getConfiguration(SOURCE_TAGS_PROPERTY));
-    if (StringUtils.isEmpty(sourceFlavorProperty) && StringUtils.isEmpty(sourceTagsProperty)) {
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.many, Configuration.many, Configuration.many, Configuration.one);
+
+    List<MediaPackageElementFlavor> sourceFlavorList = tagsAndFlavors.getSrcFlavors();
+    List<String> sourceTagList = tagsAndFlavors.getSrcTags();
+    if (sourceFlavorList.isEmpty() && sourceTagList.isEmpty()) {
       throw new WorkflowOperationException(
           String.format("Required property %s or %s not set", SOURCE_FLAVOR_PROPERTY, SOURCE_TAGS_PROPERTY));
     }
 
-    String targetFlavorProperty = StringUtils.trimToNull(
-        workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
-    if (targetFlavorProperty == null) {
-      throw new WorkflowOperationException(String.format("Required property %s not set", TARGET_FLAVOR_PROPERTY));
-    }
+    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
+    List<String> targetTagList = tagsAndFlavors.getTargetTags();
 
-    String targetTagsProperty = StringUtils.trimToNull(
-        workflowInstance.getCurrentOperation().getConfiguration(TARGET_TAGS_PROPERTY));
 
     int pixelsPerMinute = NumberUtils.toInt(
         StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(PIXELS_PER_MINUTE_PROPERTY)),
@@ -164,16 +155,16 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
 
     try {
       TrackSelector trackSelector = new TrackSelector();
-      for (String flavor : asList(sourceFlavorProperty)) {
+      for (MediaPackageElementFlavor flavor : sourceFlavorList) {
         trackSelector.addFlavor(flavor);
       }
-      for (String tag : asList(sourceTagsProperty)) {
+      for (String tag : sourceTagList) {
         trackSelector.addTag(tag);
       }
       Collection<Track> sourceTracks = trackSelector.select(mediaPackage, false);
       if (sourceTracks.isEmpty()) {
         logger.info("No tracks found in mediapackage {} with specified {} = {}", mediaPackage, SOURCE_FLAVOR_PROPERTY,
-                sourceFlavorProperty);
+                sourceFlavorList);
         return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
       }
 
@@ -230,7 +221,6 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
         }
 
         // set the waveform attachment flavor and add it to the media package
-        MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorProperty);
         if ("*".equals(targetFlavor.getType())) {
           targetFlavor = new MediaPackageElementFlavor(waveformMpe.getFlavor().getType(), targetFlavor.getSubtype());
         }
@@ -238,7 +228,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
           targetFlavor = new MediaPackageElementFlavor(targetFlavor.getType(), waveformMpe.getFlavor().getSubtype());
         }
         waveformMpe.setFlavor(targetFlavor);
-        for (String tag : asList(targetTagsProperty)) {
+        for (String tag : targetTagList) {
           waveformMpe.addTag(tag);
         }
         mediaPackage.add(waveformMpe);

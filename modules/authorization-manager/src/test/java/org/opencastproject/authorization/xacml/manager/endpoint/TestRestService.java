@@ -40,6 +40,14 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.impl.AclDb;
 import org.opencastproject.authorization.xacml.manager.impl.AclServiceImpl;
 import org.opencastproject.authorization.xacml.manager.impl.persistence.JpaAclDb;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.impl.SearchResultImpl;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
@@ -86,8 +94,9 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   public static final SeriesService seriesService;
   public static final AuthorizationService authorizationService;
   public static final AssetManager assetManager;
-  public static final MessageSender messageSender;
   public static final Workspace workspace;
+  public static final AbstractSearchIndex adminUiIndex;
+  public static final AbstractSearchIndex externalApiIndex;
   public static final EntityManagerFactory authorizationEMF = newTestEntityManagerFactory(
           "org.opencastproject.authorization.xacml.manager");
 
@@ -102,13 +111,37 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     authorizationService = newAuthorizationService();
     seriesService = newSeriesService();
     assetManager = newAssetManager();
-    messageSender = newMessageSender();
     workspace = newWorkspace();
+
+    SearchResultImpl<Event> eventSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
+    EasyMock.expect(eventSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
+    SearchResultImpl<Series> seriesSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
+    EasyMock.expect(seriesSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
+
+    adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    externalApiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+
+    try {
+      EasyMock.expect(adminUiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class)))
+              .andReturn(eventSearchResult).anyTimes();
+      EasyMock.expect(adminUiIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class)))
+              .andReturn(seriesSearchResult).anyTimes();
+      EasyMock.expect(externalApiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class)))
+              .andReturn(eventSearchResult).anyTimes();
+      EasyMock.expect(externalApiIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class)))
+              .andReturn(seriesSearchResult).anyTimes();
+    } catch (SearchIndexException e) {
+      // should never happen
+    }
+
+    EasyMock.replay(adminUiIndex, externalApiIndex, eventSearchResult, seriesSearchResult);
+
     aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
         return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(),
-                seriesService, assetManager, authorizationService, messageSender);
+                seriesService, assetManager, authorizationService, adminUiIndex, externalApiIndex,
+                securityService);
       }
     };
   }

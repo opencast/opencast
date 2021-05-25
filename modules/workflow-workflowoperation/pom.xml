@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -77,6 +77,12 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-asset-manager-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-workflow-condition-parser</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -158,6 +164,7 @@
               OSGI-INF/operations/analyze-tracks.xml,
               OSGI-INF/operations/cleanup.xml,
               OSGI-INF/operations/clone.xml,
+              OSGI-INF/operations/conditional-config.xml,
               OSGI-INF/operations/configure-by-dcterm.xml,
               OSGI-INF/operations/copy.xml,
               OSGI-INF/operations/defaults.xml,

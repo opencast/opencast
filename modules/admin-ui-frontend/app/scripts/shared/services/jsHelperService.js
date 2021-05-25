@@ -398,7 +398,8 @@ angular.module('adminNg.services')
             }
           });
         });
-      }
+      },
+
     };
   }
 ]);

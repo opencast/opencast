@@ -312,6 +312,7 @@ angular.module('adminNg.controllers')
       if (Object.prototype.hasOwnProperty.call(catalog, 'fields')) {
         for (var fieldNo in catalog.fields) {
           var field = catalog.fields[fieldNo];
+
           if (Object.prototype.hasOwnProperty.call(field, 'collection')) {
             field.collection = [];
           }

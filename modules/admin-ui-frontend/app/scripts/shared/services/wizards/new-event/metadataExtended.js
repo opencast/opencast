@@ -21,137 +21,139 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('NewEventMetadataExtended', ['NewEventMetadataResource', function (NewEventMetadataResource) {
-  var MetadataExtended = function () {
-    var me = this, i;
-    this.ud = {};
-    this.requiredMetadata = {};
+.factory('NewEventMetadataExtended', ['NewEventMetadataResource',
+  function (NewEventMetadataResource) {
+    var MetadataExtended = function () {
+      var me = this, i;
+      this.ud = {};
+      this.requiredMetadata = {};
 
-    me.isMetadataExtendedState = true;
+      me.isMetadataExtendedState = true;
 
-    this.updateRequiredMetadata = function(fieldId, value) {
-      if (angular.isDefined(value) && value.length > 0) {
-        me.requiredMetadata[fieldId] = true;
-      } else {
-        me.requiredMetadata[fieldId] = false;
-      }
-    };
-
-    // As soon as the required metadata fields arrive from the backend,
-    // we check which are mandatory.
-    // This information will be needed in order to tell if we can move
-    // on to the next page of the wizard.
-    this.postProcessMetadata = function (data) {
-      var fields = [], chunk;
-      for (chunk in data) {
-        if (Object.prototype.hasOwnProperty.call(data, chunk)) {
-          // extended metadata is every object in the returned data which
-          // does not start with a dollar sign and which isn't dublincore/episode
-          if (chunk !== 'dublincore/episode' && chunk.charAt(0) !== '$') {
-            me.ud[chunk] = {fields: data[chunk].fields};
-            me.ud[chunk].flavor = data[chunk].flavor;
-            me.ud[chunk].title = data[chunk].title;
-            fields = fields.concat(data[chunk].fields);
-          }
+      this.updateRequiredMetadata = function(fieldId, value) {
+        if (angular.isDefined(value) && value.length > 0) {
+          me.requiredMetadata[fieldId] = true;
+        } else {
+          me.requiredMetadata[fieldId] = false;
         }
-      }
-      // we go for the extended metadata here
-      if (fields.length > 0) {
-        for (i = 0; i < fields.length; i++) {
-          // just hooking the tab index up here, as this is already running through all elements
-          fields[i].tabindex = i + 1;
-          if (fields[i].required) {
-            me.updateRequiredMetadata(fields[i].id, fields[i].value);
-            if (fields[i].type === 'boolean') {
-              // set all boolean fields to false by default
-              fields[i].value = false;
-              // remark: since booleans are always present, we
-              // do not add this property to the required fields.
+      };
+
+      // As soon as the required metadata fields arrive from the backend,
+      // we check which are mandatory.
+      // This information will be needed in order to tell if we can move
+      // on to the next page of the wizard.
+      this.postProcessMetadata = function (data) {
+        var fields = [], chunk;
+        for (chunk in data) {
+          if (Object.prototype.hasOwnProperty.call(data, chunk)) {
+            // extended metadata is every object in the returned data which
+            // does not start with a dollar sign and which isn't dublincore/episode
+            if (chunk !== 'dublincore/episode' && chunk.charAt(0) !== '$') {
+              me.ud[chunk] = {fields: data[chunk].fields};
+              me.ud[chunk].flavor = data[chunk].flavor;
+              me.ud[chunk].title = data[chunk].title;
+              fields = fields.concat(data[chunk].fields);
             }
           }
         }
-        me.visible = true;
-      }
-      else {
-        me.visible = false;
-      }
-    };
-
-    this.metadata = NewEventMetadataResource.get(this.postProcessMetadata);
-
-    // Checks if the current state of this wizard is valid and we are
-    // ready to move on.
-    this.isValid = function () {
-      var result = true;
-      //FIXME: The angular validation should rather be used,
-      // unfortunately it didn't work in this context.
-      angular.forEach(me.requiredMetadata, function (item) {
-        if (item === false) {
-          result = false;
+        // we go for the extended metadata here
+        if (fields.length > 0) {
+          for (i = 0; i < fields.length; i++) {
+            // just hooking the tab index up here, as this is already running through all elements
+            fields[i].tabindex = i + 1;
+            if (fields[i].required) {
+              me.updateRequiredMetadata(fields[i].id, fields[i].value);
+              if (fields[i].type === 'boolean') {
+                // set all boolean fields to false by default
+                fields[i].value = false;
+                // remark: since booleans are always present, we
+                // do not add this property to the required fields.
+              }
+            }
+          }
+          me.visible = true;
         }
-      });
-      return result;
-    };
+        else {
+          me.visible = false;
+        }
+      };
 
-    this.save = function (scope) {
-      //FIXME: This should be nicer, rather propagate the id and values instead of looking for them in the parent scope.
-      var field = scope.$parent.params,
-          target = scope.$parent.target;
+      this.metadata = NewEventMetadataResource.get(this.postProcessMetadata);
 
-      if (field.collection) {
-        if (angular.isArray(field.value)) {
-          field.presentableValue = field.value;
+      // Checks if the current state of this wizard is valid and we are
+      // ready to move on.
+      this.isValid = function () {
+        var result = true;
+        //FIXME: The angular validation should rather be used,
+        // unfortunately it didn't work in this context.
+        angular.forEach(me.requiredMetadata, function (item) {
+          if (item === false) {
+            result = false;
+          }
+        });
+        return result;
+      };
+
+      this.save = function (scope) {
+        //FIXME: This should be nicer,
+        //rather propagate the id and values instead of looking for them in the parent scope.
+        var field = scope.$parent.params,
+            target = scope.$parent.target;
+
+        if (field.collection) {
+          if (angular.isArray(field.value)) {
+            field.presentableValue = field.value;
+          } else {
+            field.presentableValue = field.collection[field.value];
+          }
         } else {
-          field.presentableValue = field.collection[field.value];
+          field.presentableValue = field.value;
         }
-      } else {
-        field.presentableValue = field.value;
-      }
 
-      if (angular.isDefined(me.requiredMetadata[field.id])) {
-        me.updateRequiredMetadata(field.id, field.value);
-      }
+        if (angular.isDefined(me.requiredMetadata[field.id])) {
+          me.updateRequiredMetadata(field.id, field.value);
+        }
 
-      me.ud[target].fields[field.tabindex - 1] = field;
-    };
+        me.ud[target].fields[field.tabindex - 1] = field;
+      };
 
-    this.reset = function () {
-      me.ud = {};
-      me.metadata = NewEventMetadataResource.get(me.postProcessMetadata);
-    };
+      this.reset = function () {
+        me.ud = {};
+        me.metadata = NewEventMetadataResource.get(me.postProcessMetadata);
+      };
 
-    this.getFiledCatalogs = function () {
-      var catalogs = [];
+      this.getFiledCatalogs = function () {
+        var catalogs = [];
 
-      angular.forEach(me.ud, function(catalog) {
-        var empty = true;
-        angular.forEach(catalog.fields, function (field) {
-          if (angular.isDefined(field.presentableValue) && field.presentableValue !== '') {
-            empty = false;
+        angular.forEach(me.ud, function(catalog) {
+          var empty = true;
+          angular.forEach(catalog.fields, function (field) {
+            if (angular.isDefined(field.presentableValue) && field.presentableValue !== '') {
+              empty = false;
+            }
+          });
+
+          if (!empty) {
+            catalogs.push(catalog);
           }
         });
 
-        if (!empty) {
-          catalogs.push(catalog);
-        }
-      });
+        return catalogs;
+      };
 
-      return catalogs;
-    };
-
-    this.getUserEntries = function () {
-      angular.forEach(me.ud, function(catalog) {
-        catalog.empty = true;
-        angular.forEach(catalog.fields, function (field) {
-          if (angular.isDefined(field.presentableValue) && field.presentableValue !== '') {
-            catalog.empty = false;
-          }
+      this.getUserEntries = function () {
+        angular.forEach(me.ud, function(catalog) {
+          catalog.empty = true;
+          angular.forEach(catalog.fields, function (field) {
+            if (angular.isDefined(field.presentableValue) && field.presentableValue !== '') {
+              catalog.empty = false;
+            }
+          });
         });
-      });
 
-      return me.ud;
+        return me.ud;
+      };
     };
-  };
 
-  return new MetadataExtended();
-}]);
+    return new MetadataExtended();
+  }]);

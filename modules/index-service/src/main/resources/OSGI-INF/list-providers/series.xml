@@ -7,11 +7,14 @@
   <property name="opencast.service.type"
             value="org.opencastproject.index.service.resources.list.provider.SeriesListProvider"/>
 
-  <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
-             cardinality="1..1" policy="static" bind="setSeriesService"/>
-
   <service>
     <provide interface="org.opencastproject.list.api.ResourceListProvider"/>
   </service>
 
+  <reference name="AdminUISearchIndex"
+             interface="org.opencastproject.adminui.index.AdminUISearchIndex"
+             bind="setSearchIndex"/>
+  <reference name="SecurityService"
+             interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
 </scr:component>

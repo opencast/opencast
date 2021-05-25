@@ -51,7 +51,6 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
   private MessageReceiver messageReceiver;
   private MessageWatcher messageWatcher;
   private AbstractSearchIndex index;
-  private MessageReceiverLockService lockService;
   private String destinationId;
   private MessageSender.DestinationType destinationType;
 
@@ -63,7 +62,7 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
     logger.info("Activating {}", this.getClass().getName());
     destinationId = OsgiUtil.getComponentContextProperty(cc, DESTINATION_ID_KEY);
     logger.info("The {} for this message receiver is '{}'", DESTINATION_ID_KEY, destinationId);
-    messageWatcher = new MessageWatcher(lockService);
+    messageWatcher = new MessageWatcher();
     singleThreadExecutor.execute(messageWatcher);
   }
 
@@ -101,10 +100,8 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
     private FutureTask<Serializable> future;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final String clazzName = BaseMessageReceiverImpl.this.getClass().getName();
-    private final MessageReceiverLockService lockService;
 
-    MessageWatcher(MessageReceiverLockService lockService) {
-      this.lockService = lockService;
+    MessageWatcher() {
     }
 
     public void stopListening() {
@@ -125,7 +122,7 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
           }
           securityService.setOrganization(baseMessage.getOrganization());
           securityService.setUser(baseMessage.getUser());
-          lockService.synchronize(baseMessage.getId().get(), execute.curry(baseMessage.getObject()).toFn());
+          execute.curry(baseMessage.getObject()).toFn().apply(baseMessage.getId().get());
         } catch (InterruptedException e) {
           logger.error("Problem while getting {} message events", clazzName, e);
         } catch (ExecutionException e) {
@@ -161,10 +158,6 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
 
   public void setSearchIndex(AbstractSearchIndex index) {
     this.index = index;
-  }
-
-  public void setMessageReceiverLockService(MessageReceiverLockService lockService) {
-    this.lockService = lockService;
   }
 
 }

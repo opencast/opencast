@@ -33,6 +33,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
@@ -222,13 +223,11 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
           throws WorkflowOperationException, EncoderException, MediaPackageException, NotFoundException, IOException {
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
-    final MediaPackageElementFlavor sourceFlavor = getConfiguration(workflowInstance, "source-flavor")
-            .map(MediaPackageElementFlavor::parseFlavor)
-            .orElseThrow(() -> new IllegalStateException("Source flavor must be specified"));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.one, Configuration.none, Configuration.one);
 
-    final MediaPackageElementFlavor targetTrackFlavor = MediaPackageElementFlavor.parseFlavor(StringUtils.trimToNull(
-            getConfiguration(workflowInstance, "target-flavor")
-                    .orElseThrow(() -> new IllegalStateException("Target flavor not specified"))));
+    final MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
+    final MediaPackageElementFlavor targetTrackFlavor = tagsAndFlavors.getSingleTargetFlavor();
 
     final Track[] tracks = mediaPackage.getTracks(sourceFlavor);
 
