@@ -748,7 +748,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
           String orgId) {
     Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
       Series series = seriesOpt.orElse(new Series(seriesId, orgId));
-      series.setCreator(securityService.getUser().getName()); // TODO only for new series, no?
+
+      // only for new series
+      if (!seriesOpt.isPresent()) {
+        series.setCreator(securityService.getUser().getName());
+      }
 
       series.setTitle(dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
       series.setDescription(dc.getFirst(DublinCore.PROPERTY_DESCRIPTION));
