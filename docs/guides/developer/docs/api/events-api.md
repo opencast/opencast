@@ -481,10 +481,12 @@ In case of a conflict (when updating `scheduling`):
 
 ### DELETE /api/events/{event_id}
 
-Deletes an event.
+Retracts possible publications and deletes an event. Since version 1.6.0 published events will be retracted by this 
+endpoint, if you use a version previous to 1.6.0 don't call this endpoint before retracting published events.  
 
 __Response__
 
+`202 (ACCEPTED)`: The retraction of publications has started.<br/>
 `204 (NO CONTENT)`: The event has been deleted.<br/>
 `404 (NOT FOUND)`: The specified event does not exist.
 
