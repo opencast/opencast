@@ -68,8 +68,9 @@ public final class AccessInformationUtil {
    *           if the <code>managedAcl</code> parameter is null
    */
   public static JSONObject serializeManagedAcl(ManagedAcl managedAcl) {
-    if (managedAcl == null)
+    if (managedAcl == null) {
       throw new IllegalArgumentException("The parameter managedAcl must not be null");
+    }
 
     JSONObject systemAclJson = new JSONObject();
 
@@ -107,8 +108,9 @@ public final class AccessInformationUtil {
    *           if the <code>acl</code> parameter is null
    */
   public static JSONObject serializePrivilegesByRole(AccessControlList acl) {
-    if (acl == null)
+    if (acl == null) {
       throw new IllegalArgumentException("The parameter trans must not be null");
+    }
 
     Map<String, JSONObject> privilegesByRole = new HashMap<String, JSONObject>();
     for (AccessControlEntry entry : acl.getEntries()) {
