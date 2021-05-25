@@ -2,6 +2,7 @@ import {loadAclsFailure, loadAclsInProgress, loadAclsSuccess} from "../actions/a
 import {getURLParams, prepareAccessPolicyRulesForPost} from "../utils/resourceUtils";
 import axios from "axios";
 import {transformToIdValueArray} from "../utils/utils";
+import {addNotification} from "./notificationThunks";
 
 // fetch acls from server
 export const fetchAcls = () => async (dispatch, getState) => {
@@ -149,3 +150,15 @@ export const postNewAcl = values => {
     ).then(response => console.log(response)).catch(response => console.log(response));
 
 };
+// delete acl with provided id
+export const deleteAcl = id => async dispatch => {
+    axios.delete(`/admin-ng/acl/${id}`).then(res => {
+        console.log(res);
+        //add success notification
+        dispatch(addNotification('success', 'ACL_DELETED'));
+    }).catch(res => {
+        console.log(res);
+        // add error notification
+        dispatch(addNotification('error', 'ACL_NOT_DELETED'));
+    })
+}

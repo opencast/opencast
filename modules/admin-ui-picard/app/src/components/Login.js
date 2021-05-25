@@ -57,7 +57,7 @@ const Login = () => {
         e.preventDefault();
         const data = new FormData(e.target);
 
-        fetch('/j_spring_security_check', {
+        fetch('/admin-ng/j_spring_security_check', {
             method: 'POST',
             body: data
         }).then(r => console.log(r))

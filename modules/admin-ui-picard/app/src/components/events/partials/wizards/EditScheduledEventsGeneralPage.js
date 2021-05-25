@@ -1,0 +1,187 @@
+import React, {useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
+import cn from "classnames";
+import {getSelectedRows} from "../../../../selectors/tableSelectors";
+import {connect} from "react-redux";
+
+/**
+ * This component renders the table overview of selected events in edit scheduled events bulk action
+ */
+const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
+    const { t } = useTranslation();
+
+    const [allChecked, setAllChecked] = useState(true);
+    const [selectedEvents, setSelectedEvents] = useState(selectedRows);
+
+    useEffect(() => {
+        // Set field value for formik on mount, because initially all events are selected
+        formik.setFieldValue('events', selectedEvents);
+    }, []);
+
+    // Check if an event is scheduled and therefore editable
+    const isEditable = event => {
+        return event.event_status.toUpperCase().indexOf('SCHEDULED') > -1
+            || !event.selected;
+    };
+
+    // Check if multiple events are scheduled and therefore editable
+    const isAllEditable = events => {
+        for (let i = 0; i < events.length; i++) {
+            if(!isEditable(events[i])) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // todo: implement when user management and authentication is implemented
+    const isAgentAccess = events => {
+        for (let i = 0; i < events.length; i++) {
+            if(!events[i].selected || !isEditable(events[i])) {
+                continue;
+            }
+            /*if (!) {
+                return false;
+            }*/
+        }
+        return true;
+    }
+
+    // Select or deselect all rows in table
+    const onChangeAllSelected = e => {
+        const selected = e.target.checked;
+        setAllChecked(selected);
+        let changedSelection = selectedEvents.map(event => {
+            return {
+                ...event,
+                selected: selected
+            }
+        });
+        setSelectedEvents(changedSelection);
+        formik.setFieldValue('events', changedSelection);
+    };
+
+    // Handle change of checkboxes indicating which events to consider further
+    const onChangeSelected = (e, id) => {
+        const selected = e.target.checked;
+        let changedEvents = selectedEvents.map(event => {
+            if (event.id === id) {
+                return {
+                    ...event,
+                    selected: selected
+                }
+            } else {
+                return event
+            }
+        });
+        setSelectedEvents(changedEvents);
+        formik.setFieldValue('events', changedEvents);
+
+        if (!selected) {
+            setAllChecked(false);
+        }
+        if (changedEvents.every(event => event.selected === true)) {
+            setAllChecked(true);
+        }
+    };
+
+    // Check validity for activating next button
+    const checkValidity = () => {
+        if (formik.values.events.length > 0) {
+            if (isAllEditable(formik.values.events)
+                && isAgentAccess(formik.values.events)
+                && formik.isValid) {
+                return formik.values.events.some(event => event.selected === true);
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    };
+
+    return (
+        <>
+            <div className="modal-content active">
+                <div className="modal-body">
+                    <div className="row">
+                        {/* Show only if non-scheduled event is selected*/}
+                        {!isAllEditable(selectedEvents) && (
+                            <div className="alert sticky warning">
+                                <p>{t('BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTSTART')}</p>
+                            </div>
+                        )}
+                        {/* Show only if user doesn't have access to all agents*/}
+                        {!isAgentAccess(selectedEvents) && (
+                            <div className="alert sticky info">
+                                <p>{t('BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTEDITSCHEDULE')}</p>
+                            </div>
+                        )}
+                    </div>
+                    <div className="full-col">
+                        <div className="obj tbl-list">
+                            <header>{t('BULK_ACTIONS.EDIT_EVENTS.GENERAL.CAPTION')}</header>
+                            <div className="obj-container">
+                                <table className="main-tbl">
+                                    <thead>
+                                    <tr>
+                                        <th className="small">
+                                            <input type="checkbox"
+                                                   className="select-all-cbox"
+                                                   checked={allChecked}
+                                                   onChange={e => onChangeAllSelected(e)}/>
+                                        </th>
+                                        <th className="full-width">{t('EVENTS.EVENTS.TABLE.TITLE')}</th>
+                                        <th className="nowrap">{t('EVENTS.EVENTS.TABLE.SERIES')}</th>
+                                        <th className="nowrap">{t('EVENTS.EVENTS.TABLE.STATUS')}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {/* Repeat for each selected event */}
+                                    {selectedEvents.map((event, key) => (
+                                        <tr key={key} className={cn({error: !isEditable(event)},{info: !isAgentAccess(selectedEvents)})}>
+                                            <td>
+                                                <input type="checkbox"
+                                                       name="events"
+                                                       onChange={e => onChangeSelected(e, event.id)}
+                                                       checked={event.selected}/>
+                                            </td>
+                                            <td>{event.title}</td>
+                                            <td className="nowrap">{event.series ? event.series.title : ''}</td>
+                                            <td className="nowrap">{t(event.event_status)}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Button for navigation to next page */}
+            <footer>
+                <button type="submit"
+                        className={cn("submit",
+                            {
+                                active: checkValidity(),
+                                inactive: !checkValidity()
+                            })}
+                        disabled={!checkValidity()}
+                        onClick={() => {
+                            nextPage(formik.values);
+                        }}
+                        tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
+            </footer>
+
+            <div className="btm-spacer"/>
+        </>
+    );
+};
+
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    selectedRows: getSelectedRows(state),
+})
+
+export default connect(mapStateToProps)(EditScheduledEventsGeneralPage);

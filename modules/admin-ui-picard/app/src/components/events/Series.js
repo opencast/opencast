@@ -5,7 +5,6 @@ import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
-
 import {fetchSeries, fetchSeriesMetadata, fetchSeriesThemes} from "../../thunks/seriesThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
 import {seriesTemplateMap} from "../../configs/tableConfigs/seriesTableConfig";
@@ -18,6 +17,7 @@ import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import DeleteSeriesModal from "./partials/DeleteSeriesModal";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -33,6 +33,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewSeriesModal, setNewSeriesModal] = useState(false);
+    const [displayDeleteSeriesModal, setDeleteSeriesModal] = useState(false);
 
     const loadEvents = () => {
         // Reset the current page to first page
@@ -92,18 +93,22 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     const handleActionMenu = e => {
         e.preventDefault();
         setActionMenu(!displayActionMenu);
-    }
+    };
 
     const showNewSeriesModal = async () => {
         await loadingSeriesMetadata();
         await loadingSeriesThemes();
 
         setNewSeriesModal(true);
-    }
+    };
 
     const hideNewSeriesModal = () => {
         setNewSeriesModal(false);
-    }
+    };
+
+    const hideDeleteModal = () => {
+        setDeleteSeriesModal(false);
+    };
 
     const styleNavOpen = {
         marginLeft: '130px',
@@ -126,6 +131,10 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                 <NewResourceModal showModal={displayNewSeriesModal}
                                   handleClose={hideNewSeriesModal}
                                   resource={"series"}/>
+
+                {displayDeleteSeriesModal && (
+                    <DeleteSeriesModal close={hideDeleteModal}/>
+                )}
 
                 {/* Include Burger-button menu */}
                 <MainNav  isOpen={displayNavigation}
@@ -162,7 +171,9 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                                     {/*todo: show only if user has right to delete resource (with-role ROLE_UI_{{ table.resource }}_DELETE*/}
                                     <li>
                                         {/*todo: open overlay for deletion */}
-                                        <a>{t('BULK_ACTIONS.DELETE.SERIES.CAPTION')}</a>
+                                        <a onClick={() => setDeleteSeriesModal(true)}>
+                                            {t('BULK_ACTIONS.DELETE.SERIES.CAPTION')}
+                                        </a>
                                     </li>
                                 </ul>
                             )}
@@ -182,7 +193,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
             </div>
         </>
     )
-};
+}
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({

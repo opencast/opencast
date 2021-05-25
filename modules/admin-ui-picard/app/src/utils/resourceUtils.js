@@ -47,16 +47,32 @@ export const getURLParams = state => {
 }
 
 // transform collection of metadata into object with name and value
-export const transformMetadataCollection = metadata => {
-
-    for (let i = 0; metadata.fields.length > i; i++) {
-        if (!!metadata.fields[i].collection) {
-            metadata.fields[i].collection = Object.keys(metadata.fields[i].collection).map(key => {
-                return {
-                    name: key,
-                    value: metadata.fields[i].collection[key]
-                }
-            })
+export const transformMetadataCollection = (metadata, noField) => {
+    if (noField) {
+        for (let i = 0; metadata.length > i; i++) {
+            if (!!metadata[i].collection) {
+                metadata[i].collection = Object.keys(metadata[i].collection).map(key => {
+                    return {
+                        name: key,
+                        value: metadata[i].collection[key]
+                    }
+                })
+            }
+            metadata[i] = {
+                ...metadata[i],
+                selected: false
+            }
+        }
+    } else {
+        for (let i = 0; metadata.fields.length > i; i++) {
+            if (!!metadata.fields[i].collection) {
+                metadata.fields[i].collection = Object.keys(metadata.fields[i].collection).map(key => {
+                    return {
+                        name: key,
+                        value: metadata.fields[i].collection[key]
+                    }
+                })
+            }
         }
     }
 

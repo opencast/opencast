@@ -1,11 +1,24 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from "react-i18next";
+import {connect} from "react-redux";
+import ConfirmModal from "../../shared/ConfirmModal";
+import {deleteUser} from "../../../thunks/userThunks";
 
 /**
  * This component renders the action cells of users in the table view
  */
-const UsersActionCell = ({ row }) => {
+const UsersActionCell = ({ row, deleteUser }) => {
     const { t } = useTranslation();
+
+    const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
+
+    const hideDeleteConfirmation = () => {
+        setDeleteConfirmation(false);
+    };
+
+    const deletingUser = id => {
+        deleteUser(id);
+    };
 
     return (
         <>
@@ -16,11 +29,21 @@ const UsersActionCell = ({ row }) => {
                title={t('USERS.USERS.TABLE.TOOLTIP.DETAILS')}/>
 
             {row.manageable ? (
-                // TODO: When user action for deleting is implemented, remove placeholder
                 // TODO: with-Role
-                <a onClick={() => onClickPlaceholder()}
-                   className="remove"
-                   title={t('USERS.USERS.TABLE.TOOLTIP.DETAILS')}/>
+                <>
+                    <a onClick={() => setDeleteConfirmation(true)}
+                       className="remove"
+                       title={t('USERS.USERS.TABLE.TOOLTIP.DETAILS')}/>
+
+                    {/* Confirmation for deleting a user */}
+                    {displayDeleteConfirmation && (
+                        <ConfirmModal close={hideDeleteConfirmation}
+                                      resourceName={row.name}
+                                      resourceId={row.username}
+                                      resourceType="USER"
+                                      deleteMethod={deletingUser}/>
+                    )}
+                </>
             ) : null }
         </>
     );
@@ -31,4 +54,9 @@ const onClickPlaceholder = () => {
     console.log("In the Future here opens an other component, which is not implemented yet");
 }
 
-export default UsersActionCell;
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    deleteUser: (id) => dispatch(deleteUser(id))
+});
+
+export default connect(null, mapDispatchToProps)(UsersActionCell);

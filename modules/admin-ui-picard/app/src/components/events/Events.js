@@ -19,6 +19,10 @@ import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import DeleteEventsModal from "./partials/DeleteEventsModal";
+import StartTaskModal from "./partials/StartTaskModal";
+import EditScheduledEventsModal from "./partials/EditScheduledEventsModal";
+import EditMetadataEventsModal from "./partials/EditMetadataEventsModal";
 
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
@@ -33,6 +37,10 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewEventModal, setNewEventModal] = useState(false);
+    const [displayDeleteModal, setDeleteModal] = useState(false);
+    const [displayStartTaskModal, setStartTaskModal] = useState(false);
+    const [displayEditScheduledEventsModal, setEditScheduledEventsModal] = useState(false);
+    const [displayEditMetadataEventsModal, setEditMetadataEventsModal] = useState(false);
 
     const loadEvents = async () => {
         // Fetching stats from server
@@ -104,7 +112,23 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
     const hideNewEventModal = () => {
         setNewEventModal(false);
-    }
+    };
+
+    const hideDeleteModal = () => {
+        setDeleteModal(false);
+    };
+
+    const hideStartTaskModal = () => {
+        setStartTaskModal(false);
+    };
+
+    const hideEditScheduledEventsModal = () => {
+        setEditScheduledEventsModal(false);
+    };
+
+    const hideEditMetadataEventsModal = () => {
+        setEditMetadataEventsModal(false);
+    };
 
     const styleNavOpen = {
         marginLeft: '130px',
@@ -127,6 +151,23 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                 <NewResourceModal showModal={displayNewEventModal}
                                   handleClose={hideNewEventModal}
                                   resource={"events"} />
+
+                {/* Display bulk actions modal if one is chosen from dropdown */}
+                {displayDeleteModal && (
+                    <DeleteEventsModal close={hideDeleteModal}/>
+                )}
+
+                {displayStartTaskModal && (
+                    <StartTaskModal close={hideStartTaskModal}/>
+                )}
+
+                {displayEditScheduledEventsModal && (
+                    <EditScheduledEventsModal  close={hideEditScheduledEventsModal}/>
+                )}
+
+                {displayEditMetadataEventsModal && (
+                    <EditMetadataEventsModal close={hideEditMetadataEventsModal}/>
+                )}
 
                 {/* Include Burger-button menu */}
                 <MainNav  isOpen={displayNavigation}
@@ -167,30 +208,33 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                                 <ul className="dropdown-ul">
                                     {/*todo: show only if user has right to delete resource (with-role ROLE_UI_{{ table.resource }}_DELETE*/}
                                     <li>
-                                        {/*todo: open overlay for deletion */}
-                                        <a>{t('BULK_ACTIONS.DELETE.EVENTS.CAPTION')}</a>
+                                        <a onClick={() => setDeleteModal(true)}>
+                                            {t('BULK_ACTIONS.DELETE.EVENTS.CAPTION')}
+                                        </a>
                                     </li>
                                     {/*todo: show only  with-Role ROLE_UI_TASKS_CREATE*/}
                                     <li>
-                                        {/*todo: open overlay for schedule task */}
-                                        <a>{t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}</a>
+                                        <a onClick={() => setStartTaskModal(true)}>
+                                            {t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}
+                                        </a>
                                     </li>
                                     {/*todo: show only if  user is admin with roles
                                     ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT and ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT */}
                                     <li>
-                                        {/*todo: open overlay for edit events */}
-                                        <a>{t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}</a>
+                                        <a onClick={() => setEditScheduledEventsModal(true)}>
+                                            {t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}
+                                        </a>
                                     </li>
-                                    {/*todo: show  user is admin with roles
-                                    ROLE_UI_EVENTS_DETAILS_METADATA_EDIT*/}
+                                    {/*todo: show  user is admin with roles ROLE_UI_EVENTS_DETAILS_METADATA_EDIT*/}
                                     <li>
-                                        {/*todo: open overlay for edit metadata of events */}
-                                        <a>{t('BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION')}</a>
+                                        <a onClick={() => setEditMetadataEventsModal(true)}>
+                                            {t('BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION')}
+                                        </a>
                                     </li>
                                 </ul>
                             )}
-
                         </div>
+
                         {/* Include filters component*/}
                         <TableFilters loadResource={loadingEvents}
                                       loadResourceIntoTable={loadingEventsIntoTable}
@@ -200,11 +244,11 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                     <h4>{t('TABLE_SUMMARY', { numberOfRows: events })}</h4>
                 </div>
                 {/*Include table component*/}
-                <Table templateMap={eventsTemplateMap} />
+                <Table templateMap={eventsTemplateMap} resourceType="events"/>
             </div>
         </>
     );
-};
+}
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({

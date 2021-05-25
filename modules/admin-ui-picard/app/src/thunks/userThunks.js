@@ -2,6 +2,7 @@ import {loadUsersFailure, loadUsersInProgress, loadUsersSuccess} from "../action
 import {getURLParams} from "../utils/resourceUtils";
 import axios from "axios";
 import {transformToIdValueArray} from "../utils/utils";
+import {addNotification} from "./notificationThunks";
 
 // fetch users from server
 export const fetchUsers = () => async (dispatch, getState) => {
@@ -49,4 +50,18 @@ export const postNewUser = async values => {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }).then(response => console.log(response)).catch(response => console.log(response));
+};
+
+// delete user with provided id
+export const deleteUser = id => async dispatch => {
+    // API call for deleting an user
+    axios.delete(`/admin-ng/user/${id}`).then(res => {
+        console.log(res);
+        // add success notification
+        dispatch(addNotification('success', 'USER_DELETED'));
+    }).catch(res => {
+        console.log(res);
+        // add error notification
+        dispatch(addNotification('error', 'USER_NOT_DELETED'));
+    });
 };

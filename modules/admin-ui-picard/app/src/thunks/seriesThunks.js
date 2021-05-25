@@ -1,16 +1,22 @@
 import {
     loadSeriesFailure,
     loadSeriesInProgress,
-    loadSeriesMetadataInProgress, loadSeriesMetadataSuccess,
-    loadSeriesSuccess, loadSeriesThemesFailure, loadSeriesThemesInProgress, loadSeriesThemesSuccess
+    loadSeriesMetadataInProgress,
+    loadSeriesMetadataSuccess,
+    loadSeriesSuccess,
+    loadSeriesThemesFailure,
+    loadSeriesThemesInProgress,
+    loadSeriesThemesSuccess
 } from "../actions/seriesActions";
 import {
     getURLParams, prepareAccessPolicyRulesForPost,
     prepareSeriesMetadataFieldsForPost,
+    prepareMetadataFieldsForPost,
     transformMetadataCollection
 } from "../utils/resourceUtils";
-import {transformToObjectArray} from "../utils/utils";
+import {transformToIdValueArray, transformToObjectArray} from "../utils/utils";
 import axios from "axios";
+import {addNotification} from "./notificationThunks";
 
 
 // fetch series from server
@@ -111,4 +117,65 @@ export const postNewSeries = async (values, metadataInfo) => {
         }
     ).then(response => console.log(response)).catch(response => console.log(response));
 
-}
+};
+
+// delete series with provided id
+export const deleteSeries = id => async dispatch => {
+    // API call for deleting a series
+    axios.delete(`/admin-ng/series/${id}`).then(res => {
+        console.log(res);
+        // add success notification
+        dispatch(addNotification('success', 'SERIES_DELETED'));
+    }).catch(res => {
+        console.log(res);
+        // add error notification
+        dispatch(addNotification('error', 'SERIES_NOT_DELETED'));
+    });
+};
+
+// delete series with provided ids
+export const deleteMultipleSeries = series => async dispatch => {
+
+    let data = [];
+
+    for (let i = 0; i < series.length; i++) {
+        if (series[i].selected) {
+            data.push(series[i].id)
+        }
+    }
+
+    axios.post('/admin-ng/series/deleteSeries', data).then(res => {
+        console.log(res);
+        //add success notification
+        dispatch(addNotification('success', 'SERIES_DELETED'));
+    }).catch(res => {
+        console.log(res);
+        //add error notification
+        dispatch(addNotification('error', 'SERIES_NOT_DELETED'));
+    });
+};
+
+// Get names and ids of selectable series
+export const fetchSeriesOptions = async () => {
+    let data = await axios.get('/admin-ng/resources/SERIES.json');
+
+    const response = await data.data;
+
+    return transformToIdValueArray(response);
+};
+
+// Check if a series has events
+export const hasEvents = async seriesId => {
+    let data = await axios.get(`/admin-ng/series/${seriesId}/hasEvents.json`);
+
+    return (await data.data).hasEvents;
+};
+
+// Get series configuration and flag indicating if series with events is allowed to delete
+export const getSeriesConfig = async () => {
+    let data = await axios.get('/admin-ng/series/configuration.json');
+
+    const response = await data.data;
+
+    return !!response.deleteSeriesWithEventsAllowed;
+};
