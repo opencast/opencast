@@ -227,7 +227,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
                   + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
           ),
@@ -368,7 +368,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
                   + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
           ),
@@ -543,7 +543,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
                   + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
           ),
@@ -686,6 +686,16 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     } else {
       enumKey = sort;
       ascending = true;
+    }
+
+    // Backwards compatibility check. The enum variant was changed from
+    // `DATE_PUBLISHED` to `DATE_MODIFIED`. To not break existing applications,
+    // we fix an old `sort` value. This will be removed in a future version
+    // of Opencast.
+    if ("DATE_PUBLISHED".equals(enumKey)) {
+      enumKey = "DATE_MODIFIED";
+      logger.warn("Search API was used with deprecated sort parameter 'DATE_PUBLISHED'. "
+          + "Update all applications using this API to switch to 'DATE_MODIFIED'");
     }
 
     try {
