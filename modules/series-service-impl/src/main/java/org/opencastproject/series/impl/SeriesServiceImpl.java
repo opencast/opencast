@@ -807,8 +807,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
       Option<ManagedAcl> managedAcl = AccessInformationUtil.matchAcls(acls, acl);
-      if (managedAcl.isSome())
+      if (managedAcl.isSome()) {
         series.setManagedAcl(managedAcl.get().getName());
+      }
 
       series.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
       return Optional.of(series);
