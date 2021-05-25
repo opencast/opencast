@@ -77,6 +77,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * The workflow definition for handling multiple videos that have overlapping playtime, e.g. webcam videos from
@@ -558,7 +559,8 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     }
 
     // Create ffmpeg command for each section
-    List<List<String>> commands = new ArrayList<>();
+    List<List<String>> commands = new ArrayList<>();          // FFmpeg command
+    List<List<Track>> tracksForCommands = new ArrayList<>();  // Tracks used in the FFmpeg command
     for (EditDecisionListSection edl : videoEdl) {
       // A too small duration will result in ffmpeg producing a faulty video, so avoid any section smaller than 50ms
       if (edl.nextTimeStamp - edl.timeStamp < 50) {
@@ -567,22 +569,28 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       }
       // Create command for section
       commands.add(compositeSection(layoutArea, edl));
+      tracksForCommands.add(edl.getAreas().stream().map(m -> m.getVideo()).collect(Collectors.toList()));
     }
 
     // Create video tracks for each section
-    Job job;
-    try {
-      job = videoGridService.createPartialTracks(commands, videoSourceTracks.toArray(new Track[videoSourceTracks.size()]));
-    } catch (VideoGridServiceException | org.apache.commons.codec.EncoderException | MediaPackageException e) {
-      throw new WorkflowOperationException(e);
-    }
+    List<URI> uris = new ArrayList<>();
+    for (int i = 0; i < commands.size(); i++) {
+      logger.info("Sending command {} of {} to service. Command: {}", i + 1, commands.size(), commands.get(i));
 
-    if (!waitForStatus(job).isSuccess()) {
-      throw new WorkflowOperationException(String.format("VideoGrid job for media package '%s' failed", mediaPackage));
-    }
+      Job job;
+      try {
+        job = videoGridService.createPartialTrack(commands.get(i), tracksForCommands.get(i).toArray(new Track[tracksForCommands.get(i).size()]));
+      } catch (VideoGridServiceException | org.apache.commons.codec.EncoderException | MediaPackageException e) {
+        throw new WorkflowOperationException(e);
+      }
 
-    Gson gson = new Gson();
-    List<URI> uris = gson.fromJson(job.getPayload(), new TypeToken<List<URI>>() { }.getType());
+      if (!waitForStatus(job).isSuccess()) {
+        throw new WorkflowOperationException(String.format("VideoGrid job for media package '%s' failed", mediaPackage));
+      }
+
+      Gson gson = new Gson();
+      uris.add(gson.fromJson(job.getPayload(), new TypeToken<URI>() { }.getType()));
+    }
 
     // Parse uris into tracks and enrich them with metadata
     List<Track> tracks = new ArrayList<>();

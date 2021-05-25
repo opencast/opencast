@@ -38,7 +38,7 @@ public class SearchResultItemImpl<T> implements SearchResultItem<T> {
   /**
    * Creates a new search result item with the given uri. The <code>source</code> is the object that created the item,
    * usually, this will be the site itself but it could very well be a module that added to a search result.
-   * 
+   *
    * @param relevance
    *          the score inside the search result
    * @param source
@@ -51,7 +51,7 @@ public class SearchResultItemImpl<T> implements SearchResultItem<T> {
 
   /**
    * Sets the relevance value, representing the score in the search result.
-   * 
+   *
    * @param relevance
    *          the relevance value
    */
@@ -81,8 +81,7 @@ public class SearchResultItemImpl<T> implements SearchResultItem<T> {
   public int compareTo(SearchResultItem<T> sr) {
     if (score < sr.getRelevance()) {
       return 1;
-    }
-    else if (score > sr.getRelevance()) {
+    } else if (score > sr.getRelevance()) {
       return -1;
     }
     return 0;
@@ -90,7 +89,7 @@ public class SearchResultItemImpl<T> implements SearchResultItem<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -100,7 +99,7 @@ public class SearchResultItemImpl<T> implements SearchResultItem<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override

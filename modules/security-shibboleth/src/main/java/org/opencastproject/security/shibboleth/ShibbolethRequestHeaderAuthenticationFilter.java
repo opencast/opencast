@@ -70,8 +70,9 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
   @Override
   protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
     String o = (String) (super.getPreAuthenticatedPrincipal(request));
-    if (debug)
+    if (debug) {
       debug(request);
+    }
     if (o != null && !"".equals(o.trim())) {
       try {
         if (userDetailsService.loadUserByUsername(o) != null) {
@@ -100,8 +101,9 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
       Enumeration<String> hv = request.getHeaders(headerName);
       boolean first = true;
       while (hv.hasMoreElements()) {
-        if (!first)
+        if (!first) {
           buf.append(", ");
+        }
         buf.append(hv.nextElement());
         first = false;
       }

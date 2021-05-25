@@ -90,7 +90,10 @@ public final class TestOrganization implements Organization {
   }
 
   private boolean eqFields(TestOrganization that) {
-    return eq(id, that.id) && eq(anonymousRole, that.anonymousRole) && eq(adminRole, that.adminRole) && eq(name, that.name);
+    return eq(id, that.id)
+        && eq(anonymousRole, that.anonymousRole)
+        && eq(adminRole, that.adminRole)
+        && eq(name, that.name);
   }
 
   @Override public String toString() {

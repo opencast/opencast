@@ -55,8 +55,9 @@ public class SilenceDetectorTest {
   public static void setupClass() {
     try {
       Process p = new ProcessBuilder(FFmpegSilenceDetector.FFMPEG_BINARY_DEFAULT, "-version").start();
-      if (p.waitFor() != 0)
+      if (p.waitFor() != 0) {
         throw new IllegalStateException();
+      }
     } catch (Throwable t) {
       logger.warn("Skipping composer tests due to missing ffmpeg");
       ffmpegInstalled = false;

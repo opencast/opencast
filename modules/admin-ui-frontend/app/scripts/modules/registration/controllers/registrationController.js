@@ -73,7 +73,7 @@ angular.module('adminNg.controllers')
       if($scope.adopterRegistrationForm.$valid) {
         AuthService.getUser().$promise.then(function() {
           $scope.adopter.registered = true;
-          AdopterRegistrationResource.save($scope.adopter,
+          AdopterRegistrationResource.create({}, $scope.adopter,
             function ($response, header) {
               // success callback
               $scope.nextState(0);
@@ -89,7 +89,7 @@ angular.module('adminNg.controllers')
     $scope.notNow = function () {
       AuthService.getUser().$promise.then(function() {
         $scope.registered = false;
-        AdopterRegistrationResource.save($scope.adopter,
+        AdopterRegistrationResource.create({}, $scope.adopter,
           function ($response, header) {
             // success callback
           }, function(error) {

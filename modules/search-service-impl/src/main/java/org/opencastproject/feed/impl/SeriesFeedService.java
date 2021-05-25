@@ -88,19 +88,22 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
   @Override
   public boolean accept(String[] query) {
     boolean generalChecksPassed = super.accept(query);
-    if (!generalChecksPassed)
+    if (!generalChecksPassed) {
       return false;
+    }
 
     // Build the series id, first parameter is the selector. Note that if the series identifier
     // contained slashes (e. g. in the case of a handle or doi), we need to reassemble the
     // identifier
     StringBuffer sId = new StringBuffer();
     int idparts = query.length - 1;
-    if (idparts < 1)
+    if (idparts < 1) {
       return false;
+    }
     for (int i = 1; i <= idparts; i++) {
-      if (sId.length() > 0)
+      if (sId.length() > 0) {
         sId.append("/");
+      }
       sId.append(query[i]);
     }
 
@@ -113,8 +116,9 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
       // Check the series service to see if the series exists
       // but has not yet had anything published from it
       Object result = seriesCache.getUnchecked(seriesId);
-      if (result == nullToken)
+      if (result == nullToken) {
         return false;
+      }
 
       SearchResult searchResult = (SearchResult) result;
       seriesData.set(searchResult);

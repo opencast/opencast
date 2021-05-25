@@ -214,68 +214,99 @@ public final class Schema {
    * Fill a solr document. Return a "some" if you want a field to get copied to the solr document.
    */
   public static void fill(SolrInputDocument doc, FieldCollector fields) {
-    if (fields.getId().isSome())
+    if (fields.getId().isSome()) {
       setId(doc, fields.getId().get());
-    if (fields.getOrganization().isSome())
+    }
+    if (fields.getOrganization().isSome()) {
       setOrganization(doc, fields.getOrganization().get());
-    if (fields.getDcCreated().isSome())
+    }
+    if (fields.getDcCreated().isSome()) {
       setDcCreated(doc, fields.getDcCreated().get());
-    if (fields.getDcExtent().isSome())
+    }
+    if (fields.getDcExtent().isSome()) {
       setDcExtent(doc, fields.getDcExtent().get());
-    if (fields.getDcLanguage().isSome())
+    }
+    if (fields.getDcLanguage().isSome()) {
       setDcLanguage(doc, fields.getDcLanguage().get());
-    if (fields.getDcIsPartOf().isSome())
+    }
+    if (fields.getDcIsPartOf().isSome()) {
       setDcIsPartOf(doc, fields.getDcIsPartOf().get());
-    if (fields.getDcReplaces().isSome())
+    }
+    if (fields.getDcReplaces().isSome()) {
       setDcReplaces(doc, fields.getDcReplaces().get());
-    if (fields.getDcType().isSome())
+    }
+    if (fields.getDcType().isSome()) {
       setDcType(doc, fields.getDcType().get());
-    if (fields.getDcAvailableFrom().isSome())
+    }
+    if (fields.getDcAvailableFrom().isSome()) {
       setDcAvailableFrom(doc, fields.getDcAvailableFrom().get());
-    if (fields.getDcAvailableTo().isSome())
+    }
+    if (fields.getDcAvailableTo().isSome()) {
       setDcAvailableTo(doc, fields.getDcAvailableTo().get());
-    for (DField<String> v : fields.getDcTitle())
+    }
+    for (DField<String> v : fields.getDcTitle()) {
       setDcTitle(doc, v);
-    for (DField<String> v : fields.getDcSubject())
+    }
+    for (DField<String> v : fields.getDcSubject()) {
       setDcSubject(doc, v);
-    for (DField<String> v : fields.getDcCreator())
+    }
+    for (DField<String> v : fields.getDcCreator()) {
       setDcCreator(doc, v);
-    for (DField<String> v : fields.getDcPublisher())
+    }
+    for (DField<String> v : fields.getDcPublisher()) {
       setDcPublisher(doc, v);
-    for (DField<String> v : fields.getDcContributor())
+    }
+    for (DField<String> v : fields.getDcContributor()) {
       setDcContributor(doc, v);
-    for (DField<String> v : fields.getDcDescription())
+    }
+    for (DField<String> v : fields.getDcDescription()) {
       setDcDescription(doc, v);
-    for (DField<String> v : fields.getDcRightsHolder())
+    }
+    for (DField<String> v : fields.getDcRightsHolder()) {
       setDcRightsHolder(doc, v);
-    for (DField<String> v : fields.getDcSpatial())
+    }
+    for (DField<String> v : fields.getDcSpatial()) {
       setDcSpatial(doc, v);
-    for (DField<String> v : fields.getDcAccessRights())
+    }
+    for (DField<String> v : fields.getDcAccessRights()) {
       setDcAccessRights(doc, v);
-    for (DField<String> v : fields.getDcLicense())
+    }
+    for (DField<String> v : fields.getDcLicense()) {
       setDcLicense(doc, v);
-    if (fields.getOcMediatype().isSome())
+    }
+    if (fields.getOcMediatype().isSome()) {
       setOcMediatype(doc, fields.getOcMediatype().get());
-    if (fields.getOcMediapackage().isSome())
+    }
+    if (fields.getOcMediapackage().isSome()) {
       setOcMediapackage(doc, fields.getOcMediapackage().get());
-    if (fields.getOcKeywords().isSome())
+    }
+    if (fields.getOcKeywords().isSome()) {
       setOcKeywords(doc, fields.getOcKeywords().get());
-    if (fields.getOcCover().isSome())
+    }
+    if (fields.getOcCover().isSome()) {
       setOcCover(doc, fields.getOcCover().get());
-    if (fields.getOcModified().isSome())
+    }
+    if (fields.getOcModified().isSome()) {
       setOcModified(doc, fields.getOcModified().get());
-    if (fields.getOcDeleted().isSome())
+    }
+    if (fields.getOcDeleted().isSome()) {
       setOcDeleted(doc, fields.getOcDeleted().get());
-    if (fields.getOcElementtags().isSome())
+    }
+    if (fields.getOcElementtags().isSome()) {
       setOcElementtags(doc, fields.getOcElementtags().get());
-    if (fields.getOcElementflavors().isSome())
+    }
+    if (fields.getOcElementflavors().isSome()) {
       setOcElementflavors(doc, fields.getOcElementflavors().get());
-    for (DField<String> v : fields.getOcAcl())
+    }
+    for (DField<String> v : fields.getOcAcl()) {
       setOcAcl(doc, v);
-    for (DField<String> v : fields.getSegmentText())
+    }
+    for (DField<String> v : fields.getSegmentText()) {
       setSegmentText(doc, v);
-    for (DField<String> v : fields.getSegmentHint())
+    }
+    for (DField<String> v : fields.getSegmentHint()) {
       setSegmentHint(doc, v);
+    }
   }
 
   /**

@@ -73,7 +73,8 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
   }
 
   /**
-   * If, after deleting versions of an episode at least one version remains, no properties of the episode should be deleted.
+   * If, after deleting versions of an episode at least one version remains, no
+   * properties of the episode should be deleted.
    */
   @Test
   public void testDeleteOneVersionOfOne() throws Exception {
@@ -84,17 +85,33 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
     assertTotals(6, 6, 3);
     assertStoreSize(6 * 2);
     if (RUN_RAW_QUERIES) {
-      assertEquals(3, delete(Q_ASSET,
-                             Q_ASSET.snapshot.id.in(
-                                     new JPASubQuery().from(Q_SNAPSHOT).where(
-                                             Q_SNAPSHOT.version.eq(
-                                                     new JPASubQuery().from(Q_SNAPSHOT).unique(Q_SNAPSHOT.version.min())))
-                                             .list(Q_SNAPSHOT.id))));
-      assertEquals(3, delete(Q_SNAPSHOT,
-                             Q_SNAPSHOT.version.eq(
-                                     new JPASubQuery().from(Q_SNAPSHOT).unique(Q_SNAPSHOT.version.min()))));
+      assertEquals(
+          3,
+          delete(
+              Q_ASSET,
+              Q_ASSET.snapshot.id.in(
+                  new JPASubQuery().from(Q_SNAPSHOT)
+                      .where(
+                          Q_SNAPSHOT.version
+                              .eq(new JPASubQuery().from(Q_SNAPSHOT).unique(Q_SNAPSHOT.version.min()))
+                      )
+                      .list(Q_SNAPSHOT.id)
+              )
+          )
+      );
+      assertEquals(
+          3,
+          delete(
+              Q_SNAPSHOT,
+              Q_SNAPSHOT.version.eq(new JPASubQuery().from(Q_SNAPSHOT).unique(Q_SNAPSHOT.version.min()))
+          )
+      );
     } else {
-      assertEquals("Three snapshots should be deleted", 3, q.delete(OWNER, q.snapshot()).where(q.version().isFirst()).run());
+      assertEquals(
+          "Three snapshots should be deleted",
+          3,
+          q.delete(OWNER, q.snapshot()).where(q.version().isFirst()).run()
+      );
     }
     assertTotals(3, 3, 3);
     assertStoreSize(3 * 2);
@@ -111,7 +128,11 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
     am.setProperty(p.agent.mk(mp[2], "agent-2"));
     assertTotals(6, 6, 3);
     assertStoreSize(6 * 2);
-    assertEquals("Three snapshots should be deleted", 3, q.delete(OWNER, q.snapshot()).where(q.version().isFirst()).run());
+    assertEquals(
+        "Three snapshots should be deleted",
+        3,
+        q.delete(OWNER, q.snapshot()).where(q.version().isFirst()).run()
+    );
     assertTotals(3, 3, 3);
     assertStoreSize(3 * 2);
   }
@@ -135,7 +156,12 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
     final String[] mp = createAndAddMediaPackagesSimple(3, 1, 1);
     am.setProperty(p.agent.mk(mp[0], "agent-1"));
     assertTotals(3, 3, 1);
-    assertEquals(2, q.delete(OWNER, q.snapshot()).where(q.organizationId(DefaultOrganization.DEFAULT_ORGANIZATION_ID).and(q.hasProperties().not())).run());
+    assertEquals(
+        2,
+        q.delete(OWNER, q.snapshot())
+            .where(q.organizationId(DefaultOrganization.DEFAULT_ORGANIZATION_ID).and(q.hasProperties().not()))
+            .run()
+    );
     assertTotals(1, 1, 1);
   }
 

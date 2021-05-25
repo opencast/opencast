@@ -258,7 +258,8 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
                                 options={this.seriesItems()}
                                 isSearchable={true}
                                 value={this.state.copySeries}
-                                onChange={(value: ValueType<OptionType>) => this.onChangeCopyTarget(value as OptionType)}
+                                onChange={(value: ValueType<OptionType, false>) =>
+                                    this.onChangeCopyTarget(value as OptionType)}
                                 placeholder={this.props.t("LTI.SELECT_COPY_TARGET")} />
                         </div>
                         <button

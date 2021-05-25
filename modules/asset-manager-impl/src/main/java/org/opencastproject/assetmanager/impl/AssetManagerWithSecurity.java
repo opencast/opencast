@@ -129,7 +129,9 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
     if (isAuthorized(mpId, READ_ACTION)) {
       return super.getAsset(version, mpId, mpElementId);
     }
-    return chuck(new UnauthorizedException(format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)));
+    return chuck(new UnauthorizedException(
+        format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)
+    ));
   }
 
   @Override public AQueryBuilder createQuery() {
@@ -166,7 +168,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
     return chuck(new UnauthorizedException(format("Not allowed to read properties of event %s", mediaPackageId)));
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* -------------------------------------------------------------------------------------------------------------- */
 
   /** Create a new query builder. */
   private AQueryBuilder q() {

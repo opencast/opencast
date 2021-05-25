@@ -206,7 +206,10 @@ public class LtiServlet extends HttpServlet {
     try {
       String customTool = URLDecoder
               .decode(StringUtils.trimToEmpty(req.getParameter(LTI_CUSTOM_TOOL)), StandardCharsets.UTF_8.displayName());
-      customTool = customTool.replaceAll("/?ltitools/(?<tool>[^/]*)/index.html\\??", "/ltitools/index.html?subtool=${tool}&");
+      customTool = customTool.replaceAll(
+          "/?ltitools/(?<tool>[^/]*)/index.html\\??",
+          "/ltitools/index.html?subtool=${tool}&"
+      );
       URI toolUri = new URI(customTool);
 
       if (toolUri.getPath().isEmpty()) {

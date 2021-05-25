@@ -33,7 +33,10 @@ public abstract class AbstractPredicate implements Predicate, QueryContributor {
   /**
    * Join two predicates by <code>op</code>.
    */
-  private Predicate binaryOp(final Predicate right, final Fn2<BooleanExpression, BooleanExpression, BooleanExpression> op) {
+  private Predicate binaryOp(
+      final Predicate right,
+      final Fn2<BooleanExpression, BooleanExpression, BooleanExpression> op
+  ) {
     return new AbstractPredicate() {
       @Override public SelectQueryContribution contributeSelect(JPAQueryFactory f) {
         final SelectQueryContribution cLeft = self.contributeSelect(f);

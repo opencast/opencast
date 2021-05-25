@@ -115,43 +115,49 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
    * org.opencastproject.job.api.JobContext)
    */
   @Override
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(
+      WorkflowInstance workflowInstance, JobContext context
+  ) throws WorkflowOperationException {
 
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     logger.info("Start waveform workflow operation for mediapackage {}", mediaPackage);
 
-    String sourceFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
-    String sourceTagsProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(SOURCE_TAGS_PROPERTY));
+    String sourceFlavorProperty = StringUtils.trimToNull(
+        workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
+    String sourceTagsProperty = StringUtils.trimToNull(
+        workflowInstance.getCurrentOperation().getConfiguration(SOURCE_TAGS_PROPERTY));
     if (StringUtils.isEmpty(sourceFlavorProperty) && StringUtils.isEmpty(sourceTagsProperty)) {
       throw new WorkflowOperationException(
-              String.format("Required property %s or %s not set", SOURCE_FLAVOR_PROPERTY, SOURCE_TAGS_PROPERTY));
+          String.format("Required property %s or %s not set", SOURCE_FLAVOR_PROPERTY, SOURCE_TAGS_PROPERTY));
     }
 
-    String targetFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
+    String targetFlavorProperty = StringUtils.trimToNull(
+        workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
     if (targetFlavorProperty == null) {
       throw new WorkflowOperationException(String.format("Required property %s not set", TARGET_FLAVOR_PROPERTY));
     }
 
-    String targetTagsProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(TARGET_TAGS_PROPERTY));
+    String targetTagsProperty = StringUtils.trimToNull(
+        workflowInstance.getCurrentOperation().getConfiguration(TARGET_TAGS_PROPERTY));
 
     int pixelsPerMinute = NumberUtils.toInt(
-      StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(PIXELS_PER_MINUTE_PROPERTY)),
-      DEFAULT_PIXELS_PER_MINUTE
+        StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(PIXELS_PER_MINUTE_PROPERTY)),
+        DEFAULT_PIXELS_PER_MINUTE
     );
 
     int minWidth = NumberUtils.toInt(
-      StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(MIN_WIDTH_PROPERTY)),
-      DEFAULT_MIN_WIDTH
+        StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(MIN_WIDTH_PROPERTY)),
+        DEFAULT_MIN_WIDTH
     );
 
     int maxWidth = NumberUtils.toInt(
-      StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(MAX_WIDTH_PROPERTY)),
-      DEFAULT_MAX_WIDTH
+        StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(MAX_WIDTH_PROPERTY)),
+        DEFAULT_MAX_WIDTH
     );
 
     int height = NumberUtils.toInt(
-      StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(HEIGHT_PROPERTY)),
-      DEFAULT_HEIGHT
+        StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(HEIGHT_PROPERTY)),
+        DEFAULT_HEIGHT
     );
 
     String color = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(COLOR_PROPERTY));
@@ -180,19 +186,22 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
         }
         try {
           // generate waveform
-          logger.info("Creating waveform extraction job for track '{}' in mediapackage '{}'", sourceTrack.getIdentifier(), mediaPackage);
+          logger.info("Creating waveform extraction job for track '{}' in mediapackage '{}'",
+              sourceTrack.getIdentifier(), mediaPackage);
 
           Job waveformJob = waveformService.createWaveformImage(sourceTrack, pixelsPerMinute, minWidth, maxWidth,
-            height, color);
+              height, color);
           waveformJobs.add(waveformJob);
         } catch (MediaPackageException | WaveformServiceException e) {
-          logger.error("Creating waveform extraction job for track '{}' in media package '{}' failed", sourceTrack.getIdentifier(), mediaPackage, e);
+          logger.error("Creating waveform extraction job for track '{}' in media package '{}' failed",
+              sourceTrack.getIdentifier(), mediaPackage, e);
         }
       }
 
       logger.debug("Waiting for waveform jobs for media package {}", mediaPackage);
       if (!waitForStatus(waveformJobs.toArray(new Job[waveformJobs.size()])).isSuccess()) {
-        throw new WorkflowOperationException(String.format("Waveform extraction jobs for media package '%s' have not completed successfully",
+        throw new WorkflowOperationException(
+            String.format("Waveform extraction jobs for media package '%s' have not completed successfully",
                 mediaPackage.getIdentifier()));
       }
 
@@ -205,8 +214,10 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
         MediaPackageElement waveformMpe = null;
         try {
           waveformMpe = MediaPackageElementParser.getFromXml(jobPayload);
-          URI newURI = workspace.moveTo(waveformMpe.getURI(), mediaPackage.getIdentifier().toString(), waveformMpe.getIdentifier(),
-                  "waveform.png");
+          URI newURI = workspace.moveTo(waveformMpe.getURI(),
+              mediaPackage.getIdentifier().toString(),
+              waveformMpe.getIdentifier(),
+              "waveform.png");
           waveformMpe.setURI(newURI);
         } catch (MediaPackageException ex) {
           // unexpected job payload
@@ -214,7 +225,8 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
         } catch (NotFoundException ex) {
           throw new WorkflowOperationException("Waveform image file '" + waveformMpe.getURI() + "' not found", ex);
         } catch (IOException ex) {
-          throw new WorkflowOperationException("Can't get workflow image file '" + waveformMpe.getURI() + "' from workspace");
+          throw new WorkflowOperationException("Can't get workflow image file '"
+              + waveformMpe.getURI() + "' from workspace");
         }
 
         // set the waveform attachment flavor and add it to the media package

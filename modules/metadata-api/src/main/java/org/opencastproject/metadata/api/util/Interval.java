@@ -107,12 +107,15 @@ public abstract class Interval {
    *            if boths bounds are null
    */
   public static Interval fromValues(final Date leftBound, final Date rightBound) {
-    if (leftBound != null && rightBound != null)
+    if (leftBound != null && rightBound != null) {
       return boundedInterval(leftBound, rightBound);
-    if (leftBound != null)
+    }
+    if (leftBound != null) {
       return leftBoundedInterval(leftBound);
-    if (rightBound != null)
+    }
+    if (rightBound != null) {
       return rightBoundedInterval(rightBound);
+    }
     throw new IllegalArgumentException("Please give at least one bound");
   }
 
