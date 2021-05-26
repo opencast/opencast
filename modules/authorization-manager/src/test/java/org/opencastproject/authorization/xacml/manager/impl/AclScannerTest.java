@@ -106,8 +106,7 @@ public class AclScannerTest {
     AclServiceFactory aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
-        return new AclServiceImpl(new DefaultOrganization(), aclDb, null, null, null,
-                index, index, securityService);
+        return new AclServiceImpl(new DefaultOrganization(), aclDb, index, index, securityService);
       }
     };
 
