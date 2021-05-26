@@ -23,7 +23,6 @@ package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
-import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -234,7 +233,9 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   }
 
   private static AclDb newAclPersistence() {
-    return new JpaAclDb(persistenceEnvironment(authorizationEMF));
+    JpaAclDb db = new JpaAclDb();
+    db.setEntityManagerFactory(authorizationEMF);
+    return db;
   }
 
   private static SeriesService newSeriesService() {

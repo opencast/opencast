@@ -225,7 +225,6 @@
               org.opencastproject.authorization.xacml.manager.util;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/acl-jpa-db.xml,
               OSGI-INF/acl-scanner.xml,
               OSGI-INF/acl-service-rest.xml
             </Service-Component>
