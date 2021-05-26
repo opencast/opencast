@@ -208,8 +208,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     AclService aclService = EasyMock.createNiceMock(AclService.class);
     EasyMock.expect(aclService.getAcls()).andReturn(managedAcls).anyTimes();
     EasyMock.expect(aclService.getAcl(EasyMock.anyLong())).andReturn(Option.some(managedAcl1)).anyTimes();
-    EasyMock.expect(aclService.applyAclToSeries(EasyMock.anyString(), EasyMock.anyObject(AccessControlList.class),
-            EasyMock.anyBoolean())).andReturn(true).anyTimes();
     EasyMock.replay(aclService);
 
     AclServiceFactory aclServiceFactory = EasyMock.createNiceMock(AclServiceFactory.class);

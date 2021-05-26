@@ -27,7 +27,6 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestService;
@@ -55,7 +54,6 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   private AuthorizationService authorizationService;
   private String endpointBaseUrl;
   private AssetManager assetManager;
-  private SeriesService seriesService;
 
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
@@ -89,11 +87,6 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
     this.assetManager = assetManager;
   }
 
-  /** OSGi DI callback. */
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
-  }
-
   @Override
   protected AclServiceFactory getAclServiceFactory() {
     return aclServiceFactory;
@@ -107,20 +100,5 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   @Override
   protected SecurityService getSecurityService() {
     return securityService;
-  }
-
-  @Override
-  protected AuthorizationService getAuthorizationService() {
-    return authorizationService;
-  }
-
-  @Override
-  protected SeriesService getSeriesService() {
-    return seriesService;
-  }
-
-  @Override
-  public AssetManager getAssetManager() {
-    return assetManager;
   }
 }

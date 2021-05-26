@@ -21,14 +21,11 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.series.api.SeriesService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -43,37 +40,18 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class OsgiAclServiceFactory implements AclServiceFactory {
   private AclDb aclDb;
-  private SeriesService seriesService;
-  private AssetManager assetManager;
-  private AuthorizationService authorizationService;
   private SecurityService securityService;
   protected AbstractSearchIndex adminUiIndex;
   protected AbstractSearchIndex externalApiIndex;
 
   @Override
   public AclService serviceFor(Organization org) {
-    return new AclServiceImpl(org, aclDb, seriesService, assetManager,
-            authorizationService, adminUiIndex, externalApiIndex, securityService);
+    return new AclServiceImpl(org, aclDb, adminUiIndex, externalApiIndex, securityService);
   }
 
   @Reference
   public void setAclDb(AclDb aclDb) {
     this.aclDb = aclDb;
-  }
-
-  @Reference
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
-  }
-
-  @Reference
-  public void setAssetManager(AssetManager assetManager) {
-    this.assetManager = assetManager;
-  }
-
-  @Reference
-  public void setAuthorizationService(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
   }
 
   @Reference
