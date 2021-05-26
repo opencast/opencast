@@ -327,7 +327,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.activate(null);
     logger.info("Undispatachable job 1 " + undispatchableJob1.getId());
     undispatchableJob1 = serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
-    assertEquals(Status.CANCELED, undispatchableJob1.getStatus());
+    assertEquals(Status.CANCELLED, undispatchableJob1.getStatus());
     logger.info("Undispatachable job 1 " + undispatchableJob2.getId());
     undispatchableJob2 = serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());

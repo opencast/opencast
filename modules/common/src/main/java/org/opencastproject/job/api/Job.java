@@ -33,12 +33,12 @@ public interface Job {
 
   /** The status of the job that this receipt represents */
   enum Status {
-    QUEUED, PAUSED, RUNNING, FINISHED, FAILED, DELETED, INSTANTIATED, DISPATCHING, RESTART, CANCELED, WAITING;
+    QUEUED, PAUSED, RUNNING, FINISHED, FAILED, DELETED, INSTANTIATED, DISPATCHING, RESTART, CANCELLED, WAITING;
 
     /** Return if the job is terminated. */
     public boolean isTerminated() {
       switch (this) {
-        case CANCELED:
+        case CANCELLED:
         case DELETED:
         case FAILED:
         case FINISHED:

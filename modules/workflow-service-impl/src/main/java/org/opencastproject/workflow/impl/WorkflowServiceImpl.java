@@ -1304,7 +1304,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             job.setStatus(Status.RUNNING);
             break;
           case STOPPED:
-            job.setStatus(Status.CANCELED);
+            job.setStatus(Status.CANCELLED);
             break;
           case SUCCEEDED:
             job.setStatus(Status.FINISHED);
