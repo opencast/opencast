@@ -3,6 +3,7 @@ import {getURLParams} from "../utils/resourceUtils";
 import axios from "axios";
 import {transformToIdValueArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
+import {loadUsersIntoTable} from "./tableThunks";
 
 // fetch users from server
 export const fetchUsers = () => async (dispatch, getState) => {
@@ -34,7 +35,7 @@ export const fetchUsersAndUsernames = async () => {
 };
 
 // new user to backend
-export const postNewUser = async values => {
+export const postNewUser = values => async dispatch => {
     let data = new URLSearchParams();
     // fill form data with user inputs
     data.append('username', values.username);
@@ -49,13 +50,21 @@ export const postNewUser = async values => {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-    }).then(response => console.log(response)).catch(response => console.log(response));
+    }).then(response => {
+        console.log(response);
+        dispatch(fetchUsers());
+        dispatch(loadUsersIntoTable());
+        dispatch(addNotification('success', 'USER_ADDED'));
+    }).catch(response => {
+        console.log(response);
+        dispatch(addNotification('error', 'USER_NOT_SAVED'));
+    });
 };
 
 // delete user with provided id
 export const deleteUser = id => async dispatch => {
     // API call for deleting an user
-    axios.delete(`/admin-ng/user/${id}`).then(res => {
+    axios.delete(`/admin-ng/users/${id}.json`).then(res => {
         console.log(res);
         // add success notification
         dispatch(addNotification('success', 'USER_DELETED'));

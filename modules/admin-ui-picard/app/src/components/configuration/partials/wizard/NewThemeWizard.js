@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {Formik} from "formik";
 import {NewThemeSchema} from "../../../shared/wizard/validate";
+import {connect} from "react-redux";
 import GeneralPage from "./GeneralPage";
 import BumperPage from "./BumperPage";
 import TitleSlidePage from "./TitleSlidePage";
@@ -13,7 +14,7 @@ import {initialFormValuesNewThemes} from "../../../../configs/wizardConfig";
 /**
  * This component manages the pages of the new theme wizard and the submission of values
  */
-const NewThemeWizard = ({ close }) => {
+const NewThemeWizard = ({ close, postNewTheme }) => {
 
     const initialValues = initialFormValuesNewThemes;
 
@@ -114,4 +115,8 @@ const NewThemeWizard = ({ close }) => {
     );
 };
 
-export default NewThemeWizard;
+const mapDispatchToProps = dispatch => ({
+    postNewTheme: values => dispatch(postNewTheme(values))
+})
+
+export default connect(null, mapDispatchToProps)(NewThemeWizard);

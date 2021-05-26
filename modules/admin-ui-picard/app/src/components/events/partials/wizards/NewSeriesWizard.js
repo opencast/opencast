@@ -16,7 +16,7 @@ import {initialFormValuesNewSeries} from "../../../../configs/wizardConfig";
 /**
  * This component manages the pages of the new series wizard and the submission of values
  */
-const NewSeriesWizard = ({ metadataFields, close}) => {
+const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
 
     const initialValues = getInitialValues(metadataFields);
 
@@ -134,4 +134,8 @@ const mapStateToProps = state => ({
     metadataFields: getSeriesMetadata(state)
 });
 
-export default connect(mapStateToProps)(NewSeriesWizard);
+const mapDispatchToProps = dispatch => ({
+    postNewSeries: (values, metadataFields) => dispatch(postNewSeries(values,metadataFields))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewSeriesWizard);

@@ -13,7 +13,7 @@ import {postNewUser} from "../../../../thunks/userThunks";
 /**
  * This component renders the new user wizard
  */
-const NewUserWizard = ({ close, usernames }) => {
+const NewUserWizard = ({ close, usernames, postNewUser }) => {
     const { t } = useTranslation();
 
     const [tab, setTab] = useState(0);
@@ -87,4 +87,8 @@ const mapStateToProps = state => ({
     usernames: getUsernames(state)
 });
 
-export default connect(mapStateToProps)(NewUserWizard);
+const mapDispatchToProps = dispatch => ({
+    postNewUser: values => dispatch(postNewUser(values))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewUserWizard);

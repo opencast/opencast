@@ -77,7 +77,7 @@ export const fetchSeriesThemes = () => async dispatch => {
 };
 
 // post new series to backend
-export const postNewSeries = async (values, metadataInfo) => {
+export const postNewSeries = (values, metadataInfo) => async dispatch => {
 
     let metadataFields, metadata, access;
 
@@ -115,7 +115,13 @@ export const postNewSeries = async (values, metadataInfo) => {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         }
-    ).then(response => console.log(response)).catch(response => console.log(response));
+    ).then(response => {
+        console.log(response);
+        dispatch(addNotification('success', 'SERIES_ADDED'));
+    }).catch(response => {
+        console.log(response);
+        dispatch(addNotification('error', 'SERIES_NOT_SAVED'));
+    });
 
 };
 

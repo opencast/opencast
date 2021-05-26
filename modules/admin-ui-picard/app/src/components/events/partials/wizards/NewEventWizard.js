@@ -25,7 +25,7 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manages the pages of the new event wizard and the submission of values
  */
-const NewEventWizard = ({ metadataFields, close }) => {
+const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
 
     const initialValues = getInitialValues(metadataFields);
 
@@ -209,6 +209,9 @@ const mapStateToProps = state => ({
     metadataFields: getEventMetadata(state)
 });
 
+const mapDispatchToProps = dispatch => ({
+    postNewEvent: (values, metadataFields) => dispatch(postNewEvent(values, metadataFields))
+});
 
 
-export default connect(mapStateToProps)(NewEventWizard);
+export default connect(mapStateToProps, mapDispatchToProps)(NewEventWizard);
