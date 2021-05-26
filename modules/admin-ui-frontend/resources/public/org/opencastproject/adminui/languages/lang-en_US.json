@@ -429,7 +429,7 @@
            "LAST_NAME": "Last name",
            "STREET": "Street",
            "NUMBER": "Number",
-           "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+           "ADDITIONAL_ADDRESS_INFO": "Add. address information",
            "MAIL": "Email",
            "CONTACT_ME": "Contact me for updates and security issues",
            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
@@ -647,7 +647,7 @@
          "PROCESSED": "Finished",
          "RECORDING_FAILURE": "Recording failure",
          "PROCESSING_FAILURE": "Processing failure",
-         "PROCESSING_CANCELED": "Processing canceled"
+         "PROCESSING_CANCELLED": "Processing cancelled"
        },
        "STATE_MAPPING":{
          "RETRACTING": "Retracting",
@@ -895,7 +895,7 @@
              "REVIEW" : "Review required",
              "ASYNC" : "A/V tracks asynchronous",
              "AUDIO_ISSUE" : "Missing or defective audio track",
-             "CANCELED" : "Canceled event",
+             "CANCELLED" : "Cancelled event",
              "CONFLICTING_METADATA" : "Conflicting metadata",
              "IMPROPER_POINT" : "Improper in or out point",
              "MISSING_AGREEMENT" : "Missing agreement",
@@ -1610,7 +1610,7 @@
          "INSTANTIATED": "Instantiated",
          "DISPATCHING": "Dispatching",
          "RESTART": "Restart",
-         "CANCELED": "Canceled",
+         "CANCELLED": "Cancelled",
          "WAITING": "Waiting"
        }
      },
