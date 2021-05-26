@@ -23,6 +23,7 @@ package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -49,6 +50,7 @@ import javax.ws.rs.Path;
 public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedService {
 
   private AclServiceFactory aclServiceFactory;
+  private AssetManager assetManager;
   private AdminUISearchIndex index;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
@@ -158,6 +160,16 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   /** OSGi DI. */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
+  }
+
+  @Override
+  public AssetManager getAssetManager() {
+    return assetManager;
+  }
+
+  /** OSGi DI. */
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
   @Override
