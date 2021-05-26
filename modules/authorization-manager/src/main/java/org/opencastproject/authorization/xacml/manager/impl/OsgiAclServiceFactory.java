@@ -30,7 +30,17 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /** OSGi implementation of {@link org.opencastproject.authorization.xacml.manager.api.AclServiceFactory}. */
+@Component(
+        property = {
+                "service.description=Factory to create ACL services"
+        },
+        immediate = true,
+        service = { AclServiceFactory.class }
+)
 public class OsgiAclServiceFactory implements AclServiceFactory {
   private AclDb aclDb;
   private SeriesService seriesService;
@@ -46,37 +56,37 @@ public class OsgiAclServiceFactory implements AclServiceFactory {
             authorizationService, adminUiIndex, externalApiIndex, securityService);
   }
 
-  /** OSGi DI callback. */
+  @Reference
   public void setAclDb(AclDb aclDb) {
     this.aclDb = aclDb;
   }
 
-  /** OSGi DI callback. */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
-  /** OSGi DI callback. */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
-  /** OSGi DI callback. */
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
-  /** OSGi DI callback. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  /** OSGi DI callback. */
+  @Reference(target = "(index.name=adminui)")
   public void setAdminUiIndex(AbstractSearchIndex index) {
     this.adminUiIndex = index;
   }
 
-  /** OSGi DI callback. */
+  @Reference(target = "(index.name=externalapi)")
   public void setExternalApiIndex(AbstractSearchIndex index) {
     this.externalApiIndex = index;
   }
