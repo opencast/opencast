@@ -295,7 +295,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     final String id = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
     if (id != null) {
       try {
-        return equals(persistence.getSeries(id), dc) ? Option.<DublinCoreCatalog> none() : some(dc);
+        return equals(persistence.getSeries(id), dc) ? Option.none() : some(dc);
       } catch (NotFoundException e) {
         return some(dc);
       }
@@ -633,15 +633,15 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
                   try {
                     Map<String, String> properties = persistence.getSeriesProperties(seriesId);
-                    getThemePropertyUpdateFunction(seriesId, Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)),
-                            organization.getId());
+                    updateFunctions.add(getThemePropertyUpdateFunction(seriesId,
+                            Optional.ofNullable(properties.get(THEME_PROPERTY_NAME)), organization.getId()));
                   } catch (NotFoundException | SeriesServiceDatabaseException e) {
                     logger.error("Error reading properties of series {}", seriesId, e);
                   }
 
                   // do the actual index update
                   updateSeriesInIndex(seriesId, index, organization.getId(),
-                          updateFunctions.toArray(new Function[updateFunctions.size()]));
+                          updateFunctions.toArray(new Function[0]));
 
                 });
         logIndexRebuildProgress(logger, index.getIndexName(), total, current);
@@ -672,7 +672,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
     try {
       index.delete(Series.DOCUMENT_TYPE, seriesId, orgId);
-      logger.debug("Series {} removed from the {} index.", seriesId);
+      logger.debug("Series {} removed from the {} index.", seriesId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Series {} couldn't be removed from the {} index.", seriesId, index.getIndexName(), e);
     }
@@ -693,7 +693,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     logger.debug("Updating metadata of series {} in the {} index.", seriesId, index.getIndexName());
 
     // update series
-    Function updateFunction = getMetadataUpdateFunction(seriesId, dc, orgId);
+    Function<Optional<Series>, Optional<Series>> updateFunction = getMetadataUpdateFunction(seriesId, dc, orgId);
     Optional<Series> updatedSeriesOpt = updateSeriesInIndex(seriesId, index, orgId, updateFunction);
 
     // update series title for events?
@@ -745,7 +745,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    */
   private Function<Optional<Series>, Optional<Series>> getMetadataUpdateFunction(String seriesId, DublinCoreCatalog dc,
           String orgId) {
-    Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
+    return (Optional<Series> seriesOpt) -> {
       Series series = seriesOpt.orElse(new Series(seriesId, orgId));
 
       // only for new series
@@ -768,7 +768,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       series.setOrganizers(dc.get(DublinCoreCatalog.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY));
       return Optional.of(series);
     };
-    return updateFunction;
   }
 
   /**
@@ -784,7 +783,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   private void updateSeriesAclInIndex(String seriesId, AbstractSearchIndex index, AccessControlList acl) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating ACL of series {} in the {} index.", seriesId, index.getIndexName());
-    Function updateFunction = getAclUpdateFunction(seriesId, acl, orgId);
+    Function<Optional<Series>, Optional<Series>> updateFunction = getAclUpdateFunction(seriesId, acl, orgId);
     updateSeriesInIndex(seriesId, index, orgId, updateFunction);
   }
 
@@ -801,7 +800,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    */
   private Function<Optional<Series>, Optional<Series>> getAclUpdateFunction(String seriesId, AccessControlList acl,
           String orgId) {
-    Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
+    return (Optional<Series> seriesOpt) -> {
       Series series = seriesOpt.orElse(new Series(seriesId, orgId));
 
       List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
@@ -813,7 +812,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       series.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
       return Optional.of(series);
     };
-    return updateFunction;
   }
 
   /**
@@ -830,7 +828,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
           AbstractSearchIndex index) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating theme property of series {} in the {} index.", seriesId, index.getIndexName());
-    Function updateFunction = getThemePropertyUpdateFunction(seriesId, propertyValueOpt, orgId);
+    Function<Optional<Series>, Optional<Series>> updateFunction =
+            getThemePropertyUpdateFunction(seriesId, propertyValueOpt, orgId);
     updateSeriesInIndex(seriesId, index, orgId, updateFunction);
   }
 
@@ -847,7 +846,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    */
   private Function<Optional<Series>, Optional<Series>> getThemePropertyUpdateFunction(String seriesId,
           Optional<String> propertyValueOpt, String orgId) {
-    Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
+    return (Optional<Series> seriesOpt) -> {
       Series series = seriesOpt.orElse(new Series(seriesId, orgId));
       if (propertyValueOpt.isPresent()) {
         series.setTheme(Long.valueOf(propertyValueOpt.get()));
@@ -856,7 +855,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       }
       return Optional.of(series);
     };
-    return updateFunction;
   }
 
   /**
@@ -872,10 +870,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The id of the current organization
    * @return the updated series (optional)
    */
-  private Optional<Series> updateSeriesInIndex(String seriesId, AbstractSearchIndex index, String orgId,
+  @SafeVarargs
+  private final Optional<Series> updateSeriesInIndex(String seriesId, AbstractSearchIndex index, String orgId,
           Function<Optional<Series>, Optional<Series>>... updateFunctions) {
     User user = securityService.getUser();
-    Function updateFunction = Arrays.stream(updateFunctions).reduce(Function.identity(), Function::andThen);
+    Function<Optional<Series>, Optional<Series>> updateFunction = Arrays.stream(updateFunctions)
+            .reduce(Function.identity(), Function::andThen);
 
     try {
       Optional<Series> seriesOpt = index.addOrUpdateSeries(seriesId, updateFunction, orgId, user);
