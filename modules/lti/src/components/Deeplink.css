@@ -1,0 +1,25 @@
+
+.searchfield {
+    margin: 0.5rem;
+}
+
+#item-form-submit {
+    display: none;
+}
+
+.selectitem {
+    margin: 0.25rem;
+}
+
+.seriesindicator {
+    height: 1rem;
+    width: 100%;
+}
+
+.tile {
+    width: 100%;
+    display: inline-block;
+    margin-bottom: 2rem;
+    border: 1px solid gray;
+    height: 12rem;
+}

@@ -20,6 +20,8 @@ export interface MediaPackage {
     readonly attachments: Attachment[];
     readonly creators: string[];
     readonly tracks: Track[] | undefined;
+    readonly seriestitle?: string;
+    readonly duration?: number;
 }
 
 export interface SearchEpisodeResult {
@@ -63,6 +65,7 @@ export interface EventMetadataContainer {
 
 export interface LtiData {
     readonly roles: string[];
+    readonly context_label: string;
 }
 
 export function findField(
@@ -189,7 +192,9 @@ export async function searchEpisode(
     offset: number,
     episodeId?: string,
     seriesId?: string,
-    seriesName?: string): Promise<SearchEpisodeResults> {
+    seriesName?: string,
+    query?: string,
+    series: boolean = false): Promise<SearchEpisodeResults> {
     let urlSuffix = "";
     if (seriesId !== undefined)
         urlSuffix += "&sid=" + seriesId;
@@ -197,7 +202,9 @@ export async function searchEpisode(
         urlSuffix += "&sname=" + seriesName;
     if (episodeId !== undefined)
         urlSuffix += "&id=" + episodeId;
-    const response = await axios.get(`${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`);
+    if (query !== undefined)
+        urlSuffix += "&q=" + query;
+    const response = await axios.get(`${hostAndPort()}/search/${series ? 'series' : 'episode'}.json?limit=${limit}&offset=${offset}${urlSuffix}`);
     const resultsRaw = response.data["search-results"]["result"];
     const results = Array.isArray(resultsRaw) ? resultsRaw : resultsRaw !== undefined ? [resultsRaw] : [];
     return {
@@ -208,21 +215,23 @@ export async function searchEpisode(
             dcCreated: result.dcCreated,
             languageShortCode: result.dcLanguage,
             licenseKey: result.dcLicense,
-            mediapackage: {
-                creators: result.mediapackage.creators !== undefined
-                    ? Array.isArray(result.mediapackage.creators.creator)
-                        ? result.mediapackage.creators.creator
-                        : [result.mediapackage.creators.creator]
-                    : [],
+            mediapackage: result.mediapackage !== undefined ? {
+                creators: result.mediapackage.creators !== undefined ? result.mediapackage.creators.creator : [],
                 attachments: Array.from(
-                    Array.isArray(result.mediapackage.attachments.attachment)
-                        ? result.mediapackage.attachments.attachment
-                        : Array.of(result.mediapackage.attachments.attachment),
+                    Array.isArray(result.mediapackage.attachments.attachment) ?
+                        result.mediapackage.attachments.attachment :
+                        Array.of(result.mediapackage.attachments.attachment),
                     (attachment: any) => ({
                         type: attachment.type,
                         url: attachment.url
                     })),
-                tracks: parseTracksFromResult(result)
+                tracks: series ? undefined : parseTracksFromResult(result),
+                seriestitle: result.mediapackage.seriestitle,
+                duration: result.mediapackage.duration
+            } : {
+                creators: [],
+                attachments: [],
+                tracks: series ? undefined : parseTracksFromResult(result)
             }
         })),
         total: response.data["search-results"].total,
@@ -239,6 +248,7 @@ export async function getLti(): Promise<LtiData> {
     const response = await axios.get(hostAndPort() + "/lti");
     return {
         roles: response.data.roles !== undefined ? response.data.roles.split(",") : [],
+        context_label: response.data.context_label
     }
 }
 
@@ -270,5 +280,36 @@ export async function uploadFile(
         setUploadPogress !== undefined ? {
             onUploadProgress: progressEvent => setUploadPogress(Math.round(progressEvent.loaded * percentage / progressEvent.total))
         } : {}
+    );
+}
+
+export async function postDeeplinkData(
+    contentItems: string,
+    contentItemReturnUrl?: string,
+    consumerKey?: string,
+    data?: string,
+    test?: string): Promise<any> {
+    const formdata = new URLSearchParams();
+    if(contentItemReturnUrl !== undefined){
+        formdata.append("content_item_return_url", contentItemReturnUrl);
+    }
+    if(consumerKey !== undefined){
+        formdata.append("consumer_key", consumerKey);
+    }
+    if(data !== undefined){
+        formdata.append("data", data);
+    }
+    if(test !== undefined){
+        formdata.append("test", test);
+    }
+    if(contentItems !== undefined){
+        formdata.append("content_items", contentItems);
+    }
+    return axios.post(
+        hostAndPort() + "/lti/ci",
+        formdata,
+        {
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        }
     );
 }

@@ -22,6 +22,7 @@ export function Welcome() {
                 <li>Use the <code>?series_name=[series-name]</code> URL parameter to set the series name the upload belongs to. The series name has to be unique.</li>
                 <li>Use the <code>?episode_id=[episode-id]</code> URL parameter to set an episode ID (do not use other than for testing).</li>
             </ul>
+            <li>Use the deeplinking in the <a href="index.html?subtool=deeplink">Deeplink LTI Tool</a>.</li>
         </ul>
     </>;
 }
