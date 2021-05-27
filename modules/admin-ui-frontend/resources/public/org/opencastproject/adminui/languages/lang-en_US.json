@@ -39,7 +39,7 @@
      "PRESENTER": "Presenter",
      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
      "CAPTION": "Captions",
-     "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+     "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
      "UPLOAD": "Upload",
      "UPLOADING": "Uploading",
      "EDIT": "Save",
