@@ -38,6 +38,8 @@
      "CURRENT_JOBS": "Today's jobs",
      "PRESENTER": "Presenter",
      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
+     "VIDEOFILE": "Videofile",
+     "VIDEOFILE_DESCRIPTION": "Video file for upload",
      "CAPTION": "Captions",
      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
      "UPLOAD": "Upload",
