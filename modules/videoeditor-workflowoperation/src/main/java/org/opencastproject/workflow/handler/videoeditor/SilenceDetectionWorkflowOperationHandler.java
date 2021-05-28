@@ -36,6 +36,9 @@ import org.opencastproject.silencedetection.api.SilenceDetectionService;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
+import org.opencastproject.smil.entity.media.api.SmilMediaObject;
+import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
+import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -44,6 +47,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -52,6 +56,9 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * workflowoperationhandler for silencedetection executes the silencedetection and adds a SMIL document to the
@@ -76,6 +83,10 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
 
   /** Name of the configuration option for track flavors to reference in generated smil. */
   private static final String REFERENCE_TRACKS_FLAVOR_PROPERTY = "reference-tracks-flavor";
+
+  /** Name of the configuration option whether to set workflow properties with sum of
+   * segments duration in seconds and relation to the whole track length for each track.*/
+  private static final String EXPORT_SEGMENTS_DURATION = "export-segments-duration";
 
   /** Name of the configuration option that provides the smil file name */
   private static final String TARGET_FILE_NAME = "smil.smil";
@@ -104,6 +115,19 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
             SMIL_FLAVOR_SUBTYPE_PROPERTY));
     String smilTargetFlavorString = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
             SMIL_TARGET_FLAVOR_PROPERTY));
+    String exportSegmentsDurationString = StringUtils.trimToNull(
+        workflowInstance.getCurrentOperation().getConfiguration(EXPORT_SEGMENTS_DURATION));
+    boolean exportSegmentsDuration = false;
+
+    if (StringUtils.isNotBlank(exportSegmentsDurationString)) {
+      try {
+        exportSegmentsDuration = BooleanUtils.toBoolean(exportSegmentsDurationString);
+      } catch (IllegalArgumentException e) {
+        exportSegmentsDuration = false;
+        logger.warn("Unable to parse %s option value %s. Deactivating export of workflow properties.",
+                EXPORT_SEGMENTS_DURATION, exportSegmentsDurationString);
+      }
+    }
 
     MediaPackageElementFlavor smilTargetFlavor = null;
     if (smilTargetFlavorString != null) {
@@ -157,7 +181,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
               referenceTracksFlavor));
     }
     MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-
+    Map<String, String> exportWorkflowProperties = new HashMap<>();
     for (Track sourceTrack : sourceTracks) {
       // Skip over track with no audio stream
       if (!sourceTrack.hasAudio()) {
@@ -190,7 +214,29 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
         } finally {
           IOUtils.closeQuietly(is);
         }
-
+        if (exportSegmentsDuration) {
+          long durationMS = 0;
+          for (SmilMediaObject smilElement : smil.getBody().getMediaElements()) {
+            durationMS += getSegmentDurationMS(smilElement);
+          }
+          String durationWfPropertyName = String.format("%s_%s_active_audio_duration",
+                  sourceTrack.getFlavor().getType(),
+                  sourceTrack.getFlavor().getSubtype());
+          exportWorkflowProperties.put(durationWfPropertyName,
+                  Long.toString(TimeUnit.MILLISECONDS.toSeconds(durationMS)));
+          String relationWfPropertyName = String.format("%s_%s_active_audio_duration_percent",
+                  sourceTrack.getFlavor().getType(),
+                  sourceTrack.getFlavor().getSubtype());
+          double durationTrackLengthRelation = 0;
+          if (sourceTrack.getDuration() > 0) {
+            durationTrackLengthRelation = (double)durationMS / (double)sourceTrack.getDuration();
+            durationTrackLengthRelation *= 100;
+          }
+          durationTrackLengthRelation = Math.floor(durationTrackLengthRelation);
+          durationTrackLengthRelation = Math.min(100, durationTrackLengthRelation);
+          durationTrackLengthRelation = Math.max(0, durationTrackLengthRelation);
+          exportWorkflowProperties.put(relationWfPropertyName, String.format("%.0f", durationTrackLengthRelation));
+        }
         logger.info("Finished silence detection on track {}", sourceTrack.getIdentifier());
       } catch (SilenceDetectionFailedException ex) {
         throw new WorkflowOperationException(String.format("Failed to create silence detection job for track %s",
@@ -201,7 +247,24 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
       }
     }
     logger.debug("Finished silence detection workflow operation for mediapackage {}", mp.getIdentifier().toString());
-    return createResult(mp, Action.CONTINUE);
+    return createResult(mp, exportWorkflowProperties, Action.CONTINUE, 0);
+  }
+
+  /**
+   * Return first media segment length in milliseconds. If smilElement is a container, look for sub elements and
+   * return duration from the first matching element.
+   * @param smilElement smil media or container element to query duration
+   * @return media duration in milliseconds
+   * @throws SmilException on smil parsing error
+   */
+  protected long getSegmentDurationMS(SmilMediaObject smilElement) throws SmilException {
+    if (smilElement.isContainer()) {
+      for (SmilMediaObject element : ((SmilMediaContainer) smilElement).getElements()) {
+        return getSegmentDurationMS(element);
+      }
+    }
+    SmilMediaElement smilMediaElement = (SmilMediaElement) smilElement;
+    return smilMediaElement.getClipEndMS() - smilMediaElement.getClipBeginMS();
   }
 
   @Override
