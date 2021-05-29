@@ -79,7 +79,7 @@ custom publication channels in the configuration files `etc/listproviders/public
       exception-handler-workflow="partial-error"
       description="Publish to internal channel">
       <configurations>
-        <configuration key="source-tags">engage,atom,rss</configuration>
+        <configuration key="download-source-tags">engage,atom,rss</configuration>
         <configuration key="channel-id">internal</configuration>
         <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
       </configurations>
@@ -94,7 +94,7 @@ custom publication channels in the configuration files `etc/listproviders/public
       <configurations>
         <configuration key="channel-id">api</configuration>
         <configuration key="mimetype">application/json</configuration>
-        <configuration key="source-tags">engage-download,engage-streaming</configuration>
+        <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
         <configuration key="url-pattern">http://api.oc.org/api/events/${event_id}</configuration>
         <configuration key="check-availability">true</configuration>
       </configurations>
