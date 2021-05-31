@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.impl;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
+import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNoChecksum;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
@@ -41,6 +42,7 @@ import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.Enrichments;
+import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
@@ -59,22 +61,29 @@ import org.opencastproject.assetmanager.impl.persistence.AssetDtos;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.persistence.SnapshotDto;
 import org.opencastproject.assetmanager.impl.query.AQueryBuilderImpl;
-import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery.DeleteSnapshotHandler;
+import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexProducer;
+import org.opencastproject.index.rebuild.IndexRebuildException;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
-import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeTypes;
@@ -96,7 +105,15 @@ import com.google.common.collect.Sets;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,18 +127,30 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManagerFactory;
+
 /**
- * Bind an asset manager to ActiveMQ messaging.
- * <p>
- * Please make sure to {@link #close()} the AssetManager.
+ * // TODO
  */
-public class AssetManagerImpl implements AssetManager, DeleteSnapshotHandler, AutoCloseable {
-  /** Log facility */
+@Component(
+    property = {
+        "service.description=Opencast Asset Manager"
+    },
+    immediate = true,
+    service = { AssetManager.class, IndexProducer.class }
+)
+public class AssetManagerImpl extends AbstractIndexProducer implements AssetManager,
+        AbstractADeleteQuery.DeleteSnapshotHandler {
+  /**
+   * Log facility
+   */
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerImpl.class);
 
   public static final String WRITE_ACTION = "write";
@@ -130,13 +159,15 @@ public class AssetManagerImpl implements AssetManager, DeleteSnapshotHandler, Au
   // Base name of manifest file
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
-  private final MessageSender messageSender;
-  private final AuthorizationService authorizationService;
-  private final SecurityService securityService;
-  private final Database db;
-  private final HttpAssetProvider httpAssetProvider;
-  private final AssetStore assetStore;
-  private final Workspace workspace;
+  private SecurityService securityService;
+  private AuthorizationService authorizationService;
+  private OrganizationDirectoryService orgDir;
+  private Workspace workspace;
+  private AssetStore assetStore;
+  private HttpAssetProvider httpAssetProvider;
+  private MessageSender messageSender;
+  private String systemUserName;
+  private Database db;
 
   // Settings for role filter
   private boolean includeAPIRoles;
@@ -151,26 +182,137 @@ public class AssetManagerImpl implements AssetManager, DeleteSnapshotHandler, Au
 
   private HashMap<String, RemoteAssetStore> remoteStores = new LinkedHashMap<>();
 
-  public AssetManagerImpl(final MessageSender messageSender,
-          AuthorizationService authorizationService, Workspace workspace, SecurityService securityService,
-          final boolean includeAPIRoles,
-          final boolean includeCARoles,
-          final boolean includeUIRoles, Database db, HttpAssetProvider httpAssetProvider, AssetStore assetStore) {
-    this.messageSender = messageSender;
-    this.authorizationService = authorizationService;
-    this.workspace = workspace;
+
+  /**
+   * OSGi callback.
+   */
+  @Activate
+  public synchronized void activate(ComponentContext cc) {
+    logger.info("Activating AssetManager");
+    systemUserName = SecurityUtil.getSystemUserName(cc);
+
+    includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
+    includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
+    includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
+  }
+
+
+  //
+  // OSGi depedency injection
+  //
+
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.assetmanager.impl)")
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.db = new Database(emf);
+  }
+
+  @Reference(name = "securityService")
+  public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-    this.db = db;
-    this.httpAssetProvider = httpAssetProvider;
+  }
+
+  @Reference(name = "authSvc")
+  public void setAuthSvc(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
+  }
+
+  @Reference(name = "orgDir")
+  public void setOrgDir(OrganizationDirectoryService orgDir) {
+    this.orgDir = orgDir;
+  }
+
+  @Reference(name = "workspace")
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
+  @Reference(name = "assetStore")
+  public void setAssetStore(AssetStore assetStore) {
     this.assetStore = assetStore;
-    this.includeAPIRoles = includeAPIRoles;
-    this.includeCARoles = includeCARoles;
-    this.includeUIRoles = includeUIRoles;
+  }
+
+  @Reference(
+      name = "remoteAssetStores",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeRemoteAssetStore"
+  )
+  @Override
+  public synchronized void addRemoteAssetStore(RemoteAssetStore assetStore) {
+    remoteStores.put(assetStore.getStoreType(), assetStore);
+
+  }
+
+  @Reference(name = "httpAssetProvider")
+  public void setHttpAssetProvider(HttpAssetProvider httpAssetProvider) {
+    this.httpAssetProvider = httpAssetProvider;
+  }
+
+  @Reference(name = "messageSender")
+  public void setMessageSender(MessageSender messageSender) {
+    this.messageSender = messageSender;
+  }
+
+  /**
+   * AbstractIndexProducer Implementation
+   */
+
+  @Override
+  public IndexRebuildService.Service getService() {
+    return IndexRebuildService.Service.AssetManager;
   }
 
   @Override
-  public void close() throws Exception {
+  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
+    final Organization org = securityService.getOrganization();
+    final User user = (org != null ? securityService.getUser() : null);
+    try {
+      final Organization defaultOrg = new DefaultOrganization();
+      final User systemUser = SecurityUtil.createSystemUser(systemUserName, defaultOrg);
+      securityService.setOrganization(defaultOrg);
+      securityService.setUser(systemUser);
+
+      final AQueryBuilder q = createQuery();
+      final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
+      final int total = r.countSnapshots();
+      int current = 0;
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
+
+      final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
+      for (String orgId : byOrg.keySet()) {
+        final Organization snapshotOrg;
+        try {
+          snapshotOrg = orgDir.getOrganization(orgId);
+          securityService.setOrganization(snapshotOrg);
+          securityService.setUser(SecurityUtil.createSystemUser(systemUserName, snapshotOrg));
+
+          for (Snapshot snapshot : byOrg.get(orgId)) {
+            current += 1;
+            try {
+              AssetManagerItem.TakeSnapshot takeSnapshot = mkTakeSnapshotMessage(snapshot, null);
+              messageSender.sendObjectMessage(
+                      AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName()),
+                      MessageSender.DestinationType.Queue, takeSnapshot);
+            } catch (Throwable t) {
+              logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
+            }
+            logIndexRebuildProgress(logger, index.getIndexName(), total, current);
+          }
+        } catch (Throwable t) {
+          logIndexRebuildError(logger, index.getIndexName(), t, org);
+          throw new IndexRebuildException(index.getIndexName(), getService(), org, t);
+        } finally {
+          securityService.setOrganization(defaultOrg);
+          securityService.setUser(systemUser);
+        }
+      }
+    } finally {
+      securityService.setOrganization(org);
+      securityService.setUser(user);
+    }
   }
+
+  /////////////////////////////////// NEW
 
   @Override public Snapshot takeSnapshot(MediaPackage mp) {
     return takeSnapshot(null, mp);
@@ -281,30 +423,30 @@ public class AssetManagerImpl implements AssetManager, DeleteSnapshotHandler, Au
   public void notifyTakeSnapshot(Snapshot snapshot, MediaPackage mp) {
     logger.info("Send update message for snapshot {}, {} to ActiveMQ",
             snapshot.getMediaPackage().getIdentifier().toString(), snapshot.getVersion());
-    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, DestinationType.Queue,
+    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
             mkTakeSnapshotMessage(snapshot, mp));
   }
 
   @Override
   public void notifyDeleteSnapshot(String mpId, VersionImpl version) {
     logger.info("Send delete message for snapshot {}, {} to ActiveMQ", mpId, version);
-    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, DestinationType.Queue,
+    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
             AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
   }
 
   @Override
   public void notifyDeleteEpisode(String mpId) {
     logger.info("Send delete message for episode {} to ActiveMQ", mpId);
-    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, DestinationType.Queue,
+    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
             AssetManagerItem.deleteEpisode(mpId, new Date()));
   }
 
   /**
-   * Create a {@link TakeSnapshot} message.
+   * Create a {@link AssetManagerItem.TakeSnapshot} message.
    * <p>
    * Do not call outside of a security context.
    */
-  TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot, MediaPackage mp) {
+  AssetManagerItem.TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot, MediaPackage mp) {
     final MediaPackage chosenMp;
     if (mp != null) {
       chosenMp = mp;
@@ -332,7 +474,7 @@ public class AssetManagerImpl implements AssetManager, DeleteSnapshotHandler, Au
    */
 
   /**
-   * Call {@link org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(DeleteSnapshotHandler)} with a
+   * Call {@link org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(AbstractADeleteQuery.DeleteSnapshotHandler)} with a
    * delete handler that sends messages to ActiveMQ. Also make sure to propagate the behaviour to subsequent instances.
    */
   private final class ADeleteQueryWithMessaging extends ADeleteQueryDecorator {
@@ -423,11 +565,6 @@ public class AssetManagerImpl implements AssetManager, DeleteSnapshotHandler, Au
     } else {
       return Opt.none();
     }
-  }
-
-  @Override
-  public void addRemoteAssetStore(RemoteAssetStore store) {
-    remoteStores.put(store.getStoreType(), store);
   }
 
   @Override
@@ -1280,5 +1417,4 @@ public class AssetManagerImpl implements AssetManager, DeleteSnapshotHandler, Au
             snapshot.getOwner(),
             mpCopy);
   }
-
 }
