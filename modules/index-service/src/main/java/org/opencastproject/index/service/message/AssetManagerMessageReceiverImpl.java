@@ -21,7 +21,6 @@
 package org.opencastproject.index.service.message;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.getOrCreateEvent;
 import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.updateEvent;
 
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -51,6 +50,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Handler for messages from the {@link org.opencastproject.assetmanager.api.AssetManager}.
@@ -81,11 +82,11 @@ public class AssetManagerMessageReceiverImpl extends BaseMessageReceiverImpl<Ass
     final Opt<DublinCoreCatalog> episodeDublincore = msg.getEpisodeDublincore();
     final String organization = getSecurityService().getOrganization().getId();
     final User user = getSecurityService().getUser();
+    String eventId = msg.getId();
 
-    // Load or create the corresponding recording event
-    final Event event;
-    try {
-      event = getOrCreateEvent(msg.getId(), organization, user, getSearchIndex());
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      Event event = eventOpt.orElse(new Event(eventId, organization));
+
       final AccessControlList acl = msg.getAcl();
       List<ManagedAcl> acls = aclServiceFactory.serviceFor(getSecurityService().getOrganization()).getAcls();
       for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
@@ -99,23 +100,20 @@ public class AssetManagerMessageReceiverImpl extends BaseMessageReceiverImpl<Ass
       if (episodeDublincore.isSome()) {
         updateEvent(event, episodeDublincore.get());
       }
-    } catch (SearchIndexException e) {
-      logger.error("Error retrieving the recording event from the search index: {}", e.getMessage());
-      return;
-    }
 
-    // Update series name if not already done
-    try {
-      EventIndexUtils.updateSeriesName(event, organization, user, getSearchIndex());
-    } catch (SearchIndexException e) {
-      logger.error("Error updating the series name of the event to index", e);
-    }
+      // Update series name if not already done
+      try {
+        EventIndexUtils.updateSeriesName(event, organization, user, getSearchIndex());
+      } catch (SearchIndexException e) {
+        logger.error("Error updating the series name of the event to index", e);
+      }
+      return Optional.of(event);
+    };
 
     // Persist the scheduling event
     try {
-      getSearchIndex().addOrUpdate(event);
-      logger.debug("Asset manager entry {} updated in the {} search index", event.getIdentifier(),
-              getSearchIndex().getIndexName());
+      getSearchIndex().addOrUpdateEvent(eventId, updateFunction, organization, user);
+      logger.debug("Asset manager entry {} updated in the {} search index", eventId, getSearchIndex().getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error retrieving the recording event from the search index: {}", e.getMessage());
     }

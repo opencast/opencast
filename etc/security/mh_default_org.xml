@@ -767,7 +767,7 @@
     <!-- Uncomment the following line if using LDAP -->
     <!-- <sec:authentication-provider ref="ldapAuthProvider" /> -->
     <sec:authentication-provider user-service-ref="userDetailsService">
-      <!-- The JPA user directory stores bcrypt hashed passwords, but can still decrypt legacy md5 hashes -->
+      <!-- The JPA user directory stores bcrypt hashed passwords, but still works with legacy md5 hashes -->
       <sec:password-encoder ref="passwordEncoder">
         <!-- This salt is used only for decoding legacy MD5 hased passwords -->
         <sec:salt-source user-property="username" />

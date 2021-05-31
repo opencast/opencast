@@ -5,6 +5,19 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* This is used to prevent margin collapse outside of the body. This is
+     undesirable because we use the iframe resizer library, which in turn uses
+     the body height to determine the optimal iframe size. If the body has an
+     incorrect size due to margin collapse, part of the page might be hidden.
+
+     One of the ways to prevent margin collapse is adding padding to the
+     parent. This of course is a hack with a visible change, but a very minor
+     one. This could also be `0.005px` but I fear that might lead to lots of
+     elements missing the pixel grid and being blurry. And 1px really isn't too
+     noticeable.
+  */
+  padding: 1px;
 }
 
 code {

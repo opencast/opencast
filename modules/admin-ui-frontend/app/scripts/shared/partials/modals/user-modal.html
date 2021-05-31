@@ -51,6 +51,7 @@
                    name="username"
                    required
                    placeholder="{{ 'USERS.USERS.DETAILS.FORM.USERNAME' | translate }}..."
+                   sanitize-xml="user.username"
                    ng-disabled="action == 'edit'"
                    ng-init="blurred.username = false"
                    ng-model="user.username"
@@ -64,6 +65,7 @@
                    name="name"
                    required
                    placeholder="{{ 'USERS.USERS.DETAILS.FORM.NAME' | translate }}..."
+                   sanitize-xml="user.name"
                    ng-disabled="!manageable"
                    ng-init="blurred.name = false"
                    ng-model="user.name"

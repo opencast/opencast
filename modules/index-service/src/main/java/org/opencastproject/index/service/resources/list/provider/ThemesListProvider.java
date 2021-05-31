@@ -25,7 +25,7 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.theme.Theme;
+import org.opencastproject.elasticsearch.index.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListProvider;
@@ -85,7 +85,7 @@ public class ThemesListProvider implements ResourceListProvider {
       int limit = query.getLimit().getOrElse(Integer.MAX_VALUE - themeQuery.getOffset());
       themeQuery.withLimit(limit);
       themeQuery.sortByName(Order.Ascending);
-      SearchResult<Theme> results = null;
+      SearchResult<IndexTheme> results = null;
       try {
         results = searchIndex.getByQuery(themeQuery);
       } catch (SearchIndexException e) {
@@ -93,8 +93,8 @@ public class ThemesListProvider implements ResourceListProvider {
         throw new ListProviderException("No themes list for list name " + listName + " found!");
       }
 
-      for (SearchResultItem<Theme> item : results.getItems()) {
-        Theme theme = item.getSource();
+      for (SearchResultItem<IndexTheme> item : results.getItems()) {
+        IndexTheme theme = item.getSource();
         list.put(Long.toString(theme.getIdentifier()), theme.getName());
       }
     }
@@ -105,7 +105,7 @@ public class ThemesListProvider implements ResourceListProvider {
       int limit = query.getLimit().getOrElse(Integer.MAX_VALUE - themeQuery.getOffset());
       themeQuery.withLimit(limit);
       themeQuery.sortByName(Order.Ascending);
-      SearchResult<Theme> results = null;
+      SearchResult<IndexTheme> results = null;
       try {
         results = searchIndex.getByQuery(themeQuery);
       } catch (SearchIndexException e) {
@@ -113,8 +113,8 @@ public class ThemesListProvider implements ResourceListProvider {
         throw new ListProviderException("No themes list for list name " + listName + " found!");
       }
 
-      for (SearchResultItem<Theme> item : results.getItems()) {
-        Theme theme = item.getSource();
+      for (SearchResultItem<IndexTheme> item : results.getItems()) {
+        IndexTheme theme = item.getSource();
         if (theme.getDescription() == null) {
           theme.setDescription("");
         }

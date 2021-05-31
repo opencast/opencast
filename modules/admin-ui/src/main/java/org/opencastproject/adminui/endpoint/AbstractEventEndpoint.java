@@ -250,7 +250,7 @@ public abstract class AbstractEventEndpoint {
 
   public abstract JobEndpoint getJobService();
 
-  public abstract SeriesEndpoint getSeriesService();
+  public abstract SeriesEndpoint getSeriesEndpoint();
 
   public abstract AclService getAclService();
 
@@ -401,7 +401,7 @@ public abstract class AbstractEventEndpoint {
     }
     final Runnable doOnNotFound = () -> {
       try {
-        getIndex().delete(Event.DOCUMENT_TYPE,id.concat(getSecurityService().getOrganization().getId()));
+        getIndex().delete(Event.DOCUMENT_TYPE,id,getSecurityService().getOrganization().getId());
       } catch (SearchIndexException e) {
         logger.error("error removing event {}: {}", id, e);
       }
@@ -461,7 +461,7 @@ public abstract class AbstractEventEndpoint {
       final String eventId = eventIdObject.toString();
       final Runnable doOnNotFound = () -> {
         try {
-          getIndex().delete(Event.DOCUMENT_TYPE,eventId.concat(getSecurityService().getOrganization().getId()));
+          getIndex().delete(Event.DOCUMENT_TYPE,eventId, getSecurityService().getOrganization().getId());
         } catch (SearchIndexException e) {
           logger.error("error removing event {}: {}", eventId, e);
         }
@@ -1140,12 +1140,12 @@ public abstract class AbstractEventEndpoint {
     for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
       metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
     }
-
     DublinCoreMetadataCollection metadataCollection = EventUtils.getEventMetadata(event, getIndexService().getCommonEventCatalogUIAdapter());
     if (getOnlySeriesWithWriteAccessEventModal()) {
       MetadataField seriesField = metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-      Map<String, String> seriesWithWriteAccess = getSeriesService().getUserSeriesByAccess(true);
-      seriesField.setCollection(seriesWithWriteAccess);
+      if (seriesField != null) {
+        seriesField.setCollection(getSeriesEndpoint().getUserSeriesByAccess(true));
+      }
     }
     metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), metadataCollection);
 
@@ -1197,7 +1197,7 @@ public abstract class AbstractEventEndpoint {
     //get once instead of for each event
     Map<String, String> seriesWithWriteAccess = null;
     if (getOnlySeriesWithWriteAccessEventModal()) {
-      seriesWithWriteAccess = getSeriesService().getUserSeriesByAccess(true);
+      seriesWithWriteAccess = getSeriesEndpoint().getUserSeriesByAccess(true);
     }
 
     // collect the metadata of all events
@@ -2061,8 +2061,12 @@ public abstract class AbstractEventEndpoint {
         publisher.setValue(loggedInUser);
       }
 
-      collection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName())
-        .setCollection(getSeriesService().getUserSeriesByAccess(getOnlySeriesWithWriteAccessEventModal()));
+      if (getOnlySeriesWithWriteAccessEventModal()) {
+        MetadataField seriesField = collection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
+        if (seriesField != null) {
+          seriesField.setCollection(getSeriesEndpoint().getUserSeriesByAccess(true));
+        }
+      }
 
       metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
     }
