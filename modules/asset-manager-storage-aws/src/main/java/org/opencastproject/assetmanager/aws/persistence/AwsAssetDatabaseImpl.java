@@ -21,7 +21,7 @@
 
 package org.opencastproject.assetmanager.aws.persistence;
 
-import org.opencastproject.assetmanager.impl.storage.StoragePath;
+import org.opencastproject.assetmanager.api.storage.StoragePath;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;

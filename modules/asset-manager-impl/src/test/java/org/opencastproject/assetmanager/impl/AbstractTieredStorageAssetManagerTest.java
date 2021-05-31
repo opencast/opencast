@@ -24,12 +24,12 @@ import static com.entwinemedia.fn.fns.Booleans.eq;
 
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.impl.persistence.Database;
-import org.opencastproject.assetmanager.impl.storage.AssetStore;
-import org.opencastproject.assetmanager.impl.storage.AssetStoreException;
-import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
-import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
-import org.opencastproject.assetmanager.impl.storage.Source;
-import org.opencastproject.assetmanager.impl.storage.StoragePath;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.AssetStoreException;
+import org.opencastproject.assetmanager.api.storage.DeletionSelector;
+import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
+import org.opencastproject.assetmanager.api.storage.Source;
+import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.persistencefn.PersistenceEnvs;
