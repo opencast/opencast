@@ -53,10 +53,10 @@ import java.net.URI;
 /**
  * Test message sending to ActiveMQ.
  */
-public class AssetManagerWithMessagingTest extends AbstractTieredStorageAssetManagerTest<AssetManagerWithMessaging> {
+public class AssetManagerWithMessagingTest extends AbstractTieredStorageAssetManagerTest<AssetManagerImpl> {
   private MessageSender ms;
 
-  public AssetManagerWithMessaging mkTestEnvironment() throws Exception {
+  public AssetManagerImpl mkTestEnvironment() throws Exception {
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
             .andReturn(new File(getClass().getResource("/dublincore-a.xml").toURI())).anyTimes();
@@ -70,7 +70,7 @@ public class AssetManagerWithMessagingTest extends AbstractTieredStorageAssetMan
         .anyTimes();
     EasyMock.replay(authSvc);
     ms = EasyMock.createMock(MessageSender.class);
-    return new AssetManagerWithMessaging(mkTieredStorageAM(), ms, authSvc, workspace);
+    return new AssetManagerImpl(mkTieredStorageAM(), ms, authSvc, workspace);
   }
 
   @Override public AssetManager getAbstractAssetManager() {

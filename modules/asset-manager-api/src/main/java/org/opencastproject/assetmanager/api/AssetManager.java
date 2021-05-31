@@ -301,8 +301,4 @@ public interface AssetManager {
   Opt<String> getSnapshotStorageLocation(Version version, String mpId) throws NotFoundException;
 
   Opt<String> getSnapshotStorageLocation(Snapshot snap) throws NotFoundException;
-
-  Opt<String> getSnapshotRetrievalTime(Version version, String mpId);
-
-  Opt<String> getSnapshotRetrievalCost(Version version, String mpId);
 }

@@ -21,14 +21,14 @@
 package org.opencastproject.assetmanager.impl.endpoint;
 
 import static org.apache.commons.io.FilenameUtils.getBaseName;
-import static org.opencastproject.assetmanager.impl.AssetManager.getFileNameFromUrn;
+import static org.opencastproject.assetmanager.api.AssetManager.getFileNameFromUrn;
 import static org.opencastproject.util.MimeTypeUtil.Fns.suffix;
 import static org.opencastproject.util.OsgiUtil.getComponentContextProperty;
 import static org.opencastproject.util.OsgiUtil.getContextProperty;
 import static org.opencastproject.util.UrlSupport.uri;
 
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.impl.AssetManager;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.security.api.Organization;
