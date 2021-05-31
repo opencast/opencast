@@ -25,16 +25,16 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.junit.Before;
 
 /**
- * Base class for tests that only test {@link AbstractAssetManager}.
+ * Base class for tests that only test {@link AssetManager}.
  * Implements a setup method that runs prior to each test case.
  */
-public class AbstractAssetManagerTestBase extends AssetManagerTestBase<AbstractAssetManager> {
+public class AbstractAssetManagerTestBase extends AssetManagerTestBase<AssetManager> {
   @Before
   public void setUp() throws Exception {
     setUp(mkAbstractAssetManager());
   }
 
-  @Override public AbstractAssetManager getAbstractAssetManager() {
+  @Override public AssetManager getAbstractAssetManager() {
     return am;
   }
 

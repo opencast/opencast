@@ -24,7 +24,6 @@ import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.fns.Booleans.eq;
 import static org.junit.Assert.assertEquals;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.Snapshots;
@@ -79,13 +78,13 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 
 /**
- * Base class for {@link AssetManager} tests.
+ * Base class for {@link org.opencastproject.assetmanager.api.AssetManager} tests.
  * <p>
  * See {@link org.opencastproject.util.persistencefn.PersistenceUtil
  * #mkTestEntityManagerFactoryFromSystemProperties(String)} for command line
  * configuration options.
  * <p>
- * Implementations of this class need to call {@link #setUp(AssetManager)} to setup the necessary variables prior to
+ * Implementations of this class need to call {@link #setUp(org.opencastproject.assetmanager.api.AssetManager)} to setup the necessary variables prior to
  * running a test. You may implement a {@link org.junit.Before} annotated method like this:
  * <pre>
  *   |@Before
@@ -95,7 +94,7 @@ import javax.persistence.EntityManager;
  * </pre>
  */
 // CHECKSTYLE:OFF
-public abstract class AssetManagerTestBase<A extends AssetManager> {
+public abstract class AssetManagerTestBase<A extends org.opencastproject.assetmanager.api.AssetManager> {
   protected static final Logger logger = LoggerFactory.getLogger(AssetManagerTestBase.class);
   public static final String PERSISTENCE_UNIT = "org.opencastproject.assetmanager.impl";
 
@@ -112,10 +111,10 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
   protected PersistenceEnv penv;
 
   /**
-   * Return the underlying instance of {@link AbstractAssetManager}.
+   * Return the underlying instance of {@link AssetManager}.
    * If the asset manager under test is of type AbstractAssetManager just return that instance.
    */
-  public abstract AbstractAssetManager getAbstractAssetManager();
+  public abstract AssetManager getAbstractAssetManager();
 
   public abstract String getCurrentOrgId();
 
@@ -283,7 +282,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
   /**
    * Create a new test asset manager.
    */
-  protected AbstractAssetManager mkAbstractAssetManager() throws Exception {
+  protected AssetManager mkAbstractAssetManager() throws Exception {
     penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT);
     // empty database
     penv.tx(new Fn<EntityManager, Object>() {
@@ -311,7 +310,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
     //
     final AssetStore assetStore = mkAssetStore("test-store-type");
     //
-    return new AbstractAssetManager() {
+    return new AssetManager() {
       @Override public Database getDb() {
         return db;
       }

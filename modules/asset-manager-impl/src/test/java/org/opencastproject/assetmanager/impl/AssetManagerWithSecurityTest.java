@@ -101,8 +101,8 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
     return new AssetManagerWithSecurity(mkTieredStorageAM(), authSvc, secSvc, false, false, false);
   }
 
-  @Override public AbstractAssetManager getAbstractAssetManager() {
-    return (AbstractAssetManager) am.withMessaging;
+  @Override public AssetManager getAbstractAssetManager() {
+    return (AssetManager) am.withMessaging;
   }
 
   @Override public String getCurrentOrgId() {

@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Test suite for {@link AbstractAssetManager}.
+ * Test suite for {@link AssetManager}.
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

@@ -58,14 +58,13 @@ import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.RichAResult;
-import org.opencastproject.assetmanager.impl.AbstractAssetManager;
+import org.opencastproject.assetmanager.impl.AssetManager;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.Database;
@@ -207,7 +206,7 @@ public class SchedulerServiceImplTest {
 
   private SeriesService seriesService;
   private static UnitTestWorkspace workspace;
-  private AssetManager assetManager;
+  private org.opencastproject.assetmanager.api.AssetManager assetManager;
   private static OrganizationDirectoryService orgDirectoryService;
   private SecurityService securityService;
 
@@ -1722,10 +1721,10 @@ public class SchedulerServiceImplTest {
     return minutes(a * 60);
   }
 
-  AssetManager mkAssetManager() throws Exception {
+  org.opencastproject.assetmanager.api.AssetManager mkAssetManager() throws Exception {
     final PersistenceEnv penv = PersistenceEnvs.mk(mkEntityManagerFactory("org.opencastproject.assetmanager.impl"));
     final Database db = new Database(null, penv);
-    return new AbstractAssetManager() {
+    return new AssetManager() {
 
       @Override
       public HttpAssetProvider getHttpAssetProvider() {
@@ -1733,7 +1732,7 @@ public class SchedulerServiceImplTest {
         return new HttpAssetProvider() {
           @Override
           public Snapshot prepareForDelivery(Snapshot snapshot) {
-            return AbstractAssetManager.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
+            return AssetManager.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
               @Override public URI apply(MediaPackageElement mpe) {
                 String baseName = getFileNameFromUrn(mpe).getOr(mpe.getElementType().toString());
 

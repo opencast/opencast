@@ -73,8 +73,8 @@ public class AssetManagerWithMessagingTest extends AbstractTieredStorageAssetMan
     return new AssetManagerWithMessaging(mkTieredStorageAM(), ms, authSvc, workspace);
   }
 
-  @Override public AbstractAssetManager getAbstractAssetManager() {
-    return (AbstractAssetManager) am.delegate;
+  @Override public AssetManager getAbstractAssetManager() {
+    return (AssetManager) am.delegate;
   }
 
   @Override public String getCurrentOrgId() {

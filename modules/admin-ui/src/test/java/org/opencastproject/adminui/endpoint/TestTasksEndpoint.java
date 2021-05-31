@@ -27,9 +27,8 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.impl.AbstractAssetManager;
+import org.opencastproject.assetmanager.impl.AssetManager;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.storage.AssetStore;
@@ -126,25 +125,25 @@ public class TestTasksEndpoint extends TasksEndpoint {
             anyObject(Map.class))).andReturn(wI2);
     replay(workspace, workflowService);
 
-    AssetManager assetManager = mkAssetManager(workspace);
+    org.opencastproject.assetmanager.api.AssetManager assetManager = mkAssetManager(workspace);
     MediaPackage mp1 = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new IdImpl("id1"));
     AttachmentImpl attachment = new AttachmentImpl();
     attachment.setFlavor(MediaPackageElements.PROCESSING_PROPERTIES);
     mp1.add(attachment);
 
     MediaPackage mp2 = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new IdImpl("id2"));
-    assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, mp1);
-    assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, mp2);
+    assetManager.takeSnapshot(org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER, mp1);
+    assetManager.takeSnapshot(org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER, mp2);
 
     this.setWorkflowService(workflowService);
     this.setAssetManager(assetManager);
     this.activate(null);
   }
 
-  AssetManager mkAssetManager(final Workspace workspace) throws Exception {
+  org.opencastproject.assetmanager.api.AssetManager mkAssetManager(final Workspace workspace) throws Exception {
     final PersistenceEnv penv = PersistenceEnvs.mk(mkEntityManagerFactory("org.opencastproject.assetmanager.impl"));
     final Database db = new Database(null, penv);
-    return new AbstractAssetManager() {
+    return new AssetManager() {
       @Override
       public HttpAssetProvider getHttpAssetProvider() {
         // identity provider
