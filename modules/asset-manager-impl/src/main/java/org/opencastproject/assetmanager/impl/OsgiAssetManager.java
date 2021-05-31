@@ -108,12 +108,10 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
   private EntityManagerFactory emf;
   private List<RemoteAssetStore> remotes = new LinkedList<>();
   private String systemUserName;
-  private AssetManagerWithMessaging withMessaging;
 
   // collect all objects that need to be closed on service deactivation
   private AutoCloseable toClose;
-
-  private TieredStorageAssetManager delegate;
+  private AssetManagerWithMessaging delegate;
 
   /**
    * OSGi callback.
@@ -176,14 +174,16 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
         return secSvc.getOrganization().getId();
       }
     };
-    // compose with ActiveMQ messaging
-    withMessaging = new AssetManagerWithMessaging(core, messageSender, authSvc, workspace);
+
     // compose with security
     boolean includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
     boolean includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     boolean includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
-    delegate = new AssetManagerWithSecurity(
-        withMessaging, authSvc, secSvc, includeAPIRoles, includeCARoles, includeUIRoles);
+
+    // compose with ActiveMQ messaging
+    delegate = new AssetManagerWithMessaging(core, messageSender, authSvc, workspace, secSvc, includeAPIRoles,
+            includeCARoles, includeUIRoles);
+
     for (RemoteAssetStore ras : remotes) {
       delegate.addRemoteAssetStore(ras);
     }
@@ -192,7 +192,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
     toClose = new AutoCloseable() {
       @Override
       public void close() throws Exception {
-        withMessaging.close();
+        delegate.close();
       }
     };
   }
@@ -466,7 +466,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
           for (Snapshot snapshot : byOrg.get(orgId)) {
             current += 1;
             try {
-              AssetManagerItem.TakeSnapshot takeSnapshot = withMessaging.mkTakeSnapshotMessage(snapshot, null);
+              AssetManagerItem.TakeSnapshot takeSnapshot = delegate.mkTakeSnapshotMessage(snapshot, null);
               messageSender.sendObjectMessage(
                       AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName()),
                       MessageSender.DestinationType.Queue, takeSnapshot);

@@ -102,7 +102,7 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
   }
 
   @Override public AbstractAssetManager getAbstractAssetManager() {
-    return (AbstractAssetManager) am.delegate;
+    return (AbstractAssetManager) am.withMessaging;
   }
 
   @Override public String getCurrentOrgId() {
