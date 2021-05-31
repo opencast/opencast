@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package org.opencastproject.assetmanager.impl.storage;
+package org.opencastproject.assetmanager.api.storage;
 
 import org.opencastproject.storage.StorageUsage;
 

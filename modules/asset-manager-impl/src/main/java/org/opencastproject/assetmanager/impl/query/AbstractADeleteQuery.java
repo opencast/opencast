@@ -23,16 +23,16 @@ package org.opencastproject.assetmanager.impl.query;
 import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.impl.AssetManager;
+import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.Conversions;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.assetmanager.impl.persistence.QPropertyDto;
 import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
-import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.SetB;

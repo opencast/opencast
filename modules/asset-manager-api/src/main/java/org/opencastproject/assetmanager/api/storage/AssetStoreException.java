@@ -18,11 +18,23 @@
  * the License.
  *
  */
+package org.opencastproject.assetmanager.api.storage;
 
-package org.opencastproject.assetmanager.impl.storage;
+public class AssetStoreException extends RuntimeException {
+  private static final long serialVersionUID = -5519744635333639394L;
 
-public interface RemoteAssetStore extends AssetStore {
-  // Defines the root directory to be used for any caching done by a remote
-  // asset store.  Caches should live as directories under this directory.
-  String ASSET_STORE_CACHE_ROOT = "org.opencastproject.assetmanager.storage.cache.rootdir";
+  public AssetStoreException() {
+  }
+
+  public AssetStoreException(String message) {
+    super(message);
+  }
+
+  public AssetStoreException(Throwable cause) {
+    super(cause);
+  }
+
+  public AssetStoreException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

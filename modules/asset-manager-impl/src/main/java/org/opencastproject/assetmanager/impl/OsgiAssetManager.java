@@ -32,8 +32,8 @@ import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.impl.persistence.Database;
-import org.opencastproject.assetmanager.impl.storage.AssetStore;
-import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
@@ -87,9 +87,9 @@ import javax.persistence.EntityManagerFactory;
         "service.description=Opencast Asset Manager"
     },
     immediate = true,
-    service = { AssetManager.class, TieredStorageAssetManager.class, IndexProducer.class }
+    service = { AssetManager.class, IndexProducer.class }
 )
-public class OsgiAssetManager extends AbstractIndexProducer implements AssetManager, TieredStorageAssetManager {
+public class OsgiAssetManager extends AbstractIndexProducer implements AssetManager {
   /**
    * Log facility
    */
@@ -131,8 +131,6 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
     // compose with ActiveMQ messaging
     delegate = new AssetManagerWithMessaging(core, messageSender, authSvc, workspace, secSvc, includeAPIRoles,
             includeCARoles, includeUIRoles);
-
-
 
     for (RemoteAssetStore ras : remotes) {
       delegate.addRemoteAssetStore(ras);

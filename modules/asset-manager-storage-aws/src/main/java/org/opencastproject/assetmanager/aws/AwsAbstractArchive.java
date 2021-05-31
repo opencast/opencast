@@ -27,11 +27,11 @@ import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseException;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
 import org.opencastproject.assetmanager.impl.VersionImpl;
-import org.opencastproject.assetmanager.impl.storage.AssetStore;
-import org.opencastproject.assetmanager.impl.storage.AssetStoreException;
-import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
-import org.opencastproject.assetmanager.impl.storage.Source;
-import org.opencastproject.assetmanager.impl.storage.StoragePath;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.AssetStoreException;
+import org.opencastproject.assetmanager.api.storage.DeletionSelector;
+import org.opencastproject.assetmanager.api.storage.Source;
+import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
@@ -106,7 +106,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
     this.database = db;
   }
 
-  /** @see org.opencastproject.assetmanager.impl.storage.AssetStore#copy(StoragePath, StoragePath) */
+  /** @see AssetStore#copy(StoragePath, StoragePath) */
   public boolean copy(final StoragePath from, final StoragePath to) throws AssetStoreException {
     try {
       AwsAssetMapping map = database.findMapping(from);
@@ -165,7 +165,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
   }
 
   /**
-   * @see org.opencastproject.assetmanager.impl.storage.AssetStore#put(StoragePath, Source)
+   * @see AssetStore#put(StoragePath, Source)
    */
   public void put(StoragePath storagePath, Source source) throws AssetStoreException {
     // If the workspace  to asset manager hard-linking is enabled then this is just a
@@ -195,7 +195,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
 
   protected abstract AwsUploadOperationResult uploadObject(File origin, String objectName) throws AssetStoreException;
 
-  /** @see org.opencastproject.assetmanager.impl.storage.AssetStore#get(StoragePath) */
+  /** @see AssetStore#get(StoragePath) */
   public Opt<InputStream> get(final StoragePath path) throws AssetStoreException {
     try {
       AwsAssetMapping map = database.findMapping(path);
@@ -216,7 +216,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
 
   protected abstract InputStream getObject(AwsAssetMapping map) throws AssetStoreException;
 
-  /** @see org.opencastproject.assetmanager.impl.storage.AssetStore#delete(DeletionSelector) */
+  /** @see AssetStore#delete(DeletionSelector) */
   public boolean delete(DeletionSelector sel) throws AssetStoreException {
     // Build path, version may be null if all versions are desired
     StoragePath path = new StoragePath(
