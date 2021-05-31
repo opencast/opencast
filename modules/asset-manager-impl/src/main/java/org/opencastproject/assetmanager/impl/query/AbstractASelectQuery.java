@@ -22,6 +22,7 @@ package org.opencastproject.assetmanager.impl.query;
 
 import static com.entwinemedia.fn.Stream.$;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.ARecord;
@@ -29,7 +30,6 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Order;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.impl.AbstractAssetManager;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.assetmanager.impl.persistence.PropertyDto;
@@ -63,9 +63,9 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
   protected static final Logger logger = LoggerFactory.getLogger(AbstractASelectQuery.class);
 
   private final AbstractASelectQuery self = this;
-  private final AbstractAssetManager am;
+  private final AssetManager am;
 
-  public AbstractASelectQuery(AbstractAssetManager am) {
+  public AbstractASelectQuery(AssetManager am) {
     this.am = am;
   }
 
