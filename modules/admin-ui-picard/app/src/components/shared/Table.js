@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
 import styled from "styled-components";
-import {getPageOffset, getTablePages} from "../../selectors/tableSelectors";
+import {getPageOffset, getTable, getTablePages, getTablePagination, getTableRows} from "../../selectors/tableSelectors";
 import {reverseTable, setOffset, setSortBy, updatePageSize} from "../../actions/tableActions";
 import {changeAllSelected, changeRowSelection, goToPage, updatePages} from "../../thunks/tableThunks";
 import {connect} from "react-redux";
@@ -40,11 +40,11 @@ const containerPageSize = React.createRef();
  * This component renders the table in the table views of resources
  */
 const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOffset, pages,
-                   goToPage, updatePages, setOffset, changeSelectAll, setSortBy, reverseTable}) => {
+                   goToPage, updatePages, setOffset, changeSelectAll, setSortBy, reverseTable, pagination, rows }) => {
     // Size options for pagination
     const sizeOptions = [10, 20, 50, 100];
 
-    const directAccessible = getDirectAccessiblePages(pages, table.pagination);
+    const directAccessible = getDirectAccessiblePages(pages, pagination);
 
     const { t } = useTranslation();
 
@@ -52,7 +52,7 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
     const [showPageSizes, setShowPageSizes] = useState(false);
     const [displayEditTableViewModal, setEditTableViewModal] = useState(false);
 
-    const {resources, requestSort, sortConfig } = useSortRows(table.rows);
+    const {resources, requestSort, sortConfig } = useSortRows(rows);
 
 
     useEffect(() => {
@@ -191,14 +191,14 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
                     </tr>
                 </thead>
                 <tbody>
-                {(table.loading && table.rows.length === 0) ? (
+                {(table.loading && rows.length === 0) ? (
                     // todo: put Loading in Redux state of table
                     <tr>
                         <td colSpan={table.columns.length} style={loadingTdStyle}>
                             <i className="fa fa-spinner fa-spin fa-2x fa-fw"/>
                         </td>
                     </tr>
-                ) : ((!table.loading && table.rows.length === 0) ? (
+                ) : ((!table.loading && rows.length === 0) ? (
                     //Show if no results and table is not loading
                     <tr>
                         <td colSpan={table.columns.length}>{t('TABLE_NO_RESULT')}</td>
@@ -241,7 +241,7 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
             {/* Selection of page size */}
             <div id="tbl-view-controls-container">
                 <div className="drop-down-container small flipped" onClick={() => setShowPageSizes(!showPageSizes)} ref={containerPageSize}>
-                    <span>{table.pagination.limit}</span>
+                    <span>{pagination.limit}</span>
                     {/* Drop down menu for selection of page size */}
                     {showPageSizes && (
                         <ul className="dropdown-ul">
@@ -356,9 +356,11 @@ const useSortRows = (resources, config = null) => {
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    table: state.table,
+    table: getTable(state),
     pageOffset: getPageOffset(state),
-    pages: getTablePages(state)
+    pages: getTablePages(state),
+    pagination: getTablePagination(state),
+    rows: getTableRows(state)
 });
 
 // Mapping actions to dispatch

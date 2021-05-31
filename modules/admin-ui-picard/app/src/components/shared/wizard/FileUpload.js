@@ -33,7 +33,6 @@ const FileUpload = ({ descriptionKey, labelKey, buttonKey, acceptableTypes, form
     const upload = file => {
         const data = new FormData();
         data.append('BODY', file, file.name);
-        console.log(file);
         axios.post('/staticfiles', data, {
             headers: {
                 "Content-type": "multipart/form-data"
@@ -43,8 +42,6 @@ const FileUpload = ({ descriptionKey, labelKey, buttonKey, acceptableTypes, form
                 setLoaded((ProgressEvent.loaded / ProgressEvent.total * 100))
             }
         }).then(res => {
-            console.log(res.statusText);
-            console.log(res.data);
             if (res.status === 201) {
                 // set information about file later needed for POST request and summary
                 helpers.setValue({

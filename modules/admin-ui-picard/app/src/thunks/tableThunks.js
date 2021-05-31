@@ -47,7 +47,6 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
     const { events, table } = getState();
     const total = events.total;
 
-    console.log('in Load events into Table');
     const pagination = table.pagination;
     const resource = events.results.map((result) => {
         return {
@@ -87,7 +86,6 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
         }
     }
     dispatch(loadResourceIntoTable(tableData));
-    console.log('table data was dispatched');
 }
 
 // Method to load series into the table
@@ -461,7 +459,7 @@ export const loadThemesIntoTable = () => (dispatch, getState) => {
 
 
 // Navigate between pages
-export const goToPage = pageNumber => (dispatch, getState) => {
+export const goToPage = pageNumber => async (dispatch, getState) => {
 
     dispatch(deselectAll());
     dispatch(setOffset(pageNumber));
@@ -477,52 +475,52 @@ export const goToPage = pageNumber => (dispatch, getState) => {
     // eslint-disable-next-line default-case
     switch (getResourceType(state)) {
         case 'events': {
-            dispatch(fetchEvents());
+            await dispatch(fetchEvents());
             dispatch(loadEventsIntoTable());
             break;
         }
         case 'series': {
-            dispatch(fetchSeries());
+            await dispatch(fetchSeries());
             dispatch(loadSeriesIntoTable());
             break;
         }
         case 'recordings': {
-            dispatch(fetchRecordings());
+            await dispatch(fetchRecordings());
             dispatch(loadRecordingsIntoTable());
             break;
         }
         case 'jobs': {
-            dispatch(fetchJobs());
+            await dispatch(fetchJobs());
             dispatch(loadJobsIntoTable());
             break;
         }
         case 'servers': {
-            dispatch(fetchServers());
+            await dispatch(fetchServers());
             dispatch(loadServersIntoTable());
             break;
         }
         case 'services': {
-            dispatch(fetchServices());
+            await dispatch(fetchServices());
             dispatch(loadServicesIntoTable());
             break;
         }
         case 'users': {
-            dispatch(fetchUsers());
+            await dispatch(fetchUsers());
             dispatch(loadUsersIntoTable());
             break;
         }
         case 'groups': {
-            dispatch(fetchGroups());
+            await dispatch(fetchGroups());
             dispatch(loadGroupsIntoTable());
             break;
         }
         case 'acls': {
-            dispatch(fetchAcls());
+            await dispatch(fetchAcls());
             dispatch(loadAclsIntoTable());
             break;
         }
         case 'themes': {
-            dispatch(fetchThemes());
+            await dispatch(fetchThemes());
             dispatch(loadThemesIntoTable());
             break;
         }
@@ -530,7 +528,7 @@ export const goToPage = pageNumber => (dispatch, getState) => {
 }
 
 // Update pages for example if page size was changed
-export const updatePages = () => (dispatch,getState) => {
+export const updatePages = () => async (dispatch,getState) => {
     const state = getState();
 
     const pagination = getTablePagination(state);
@@ -543,52 +541,52 @@ export const updatePages = () => (dispatch,getState) => {
     // eslint-disable-next-line default-case
     switch (getResourceType(state)) {
         case 'events': {
-            dispatch(fetchEvents());
+            await dispatch(fetchEvents());
             dispatch(loadEventsIntoTable());
             break;
         }
         case 'series': {
-            dispatch(fetchSeries());
+            await dispatch(fetchSeries());
             dispatch(loadSeriesIntoTable());
             break;
         }
         case 'recordings': {
-            dispatch(fetchRecordings());
+            await dispatch(fetchRecordings());
             dispatch(loadRecordingsIntoTable());
             break;
         }
         case 'jobs': {
-            dispatch(fetchJobs());
+            await dispatch(fetchJobs());
             dispatch(loadJobsIntoTable());
             break;
         }
         case 'servers': {
-            dispatch(fetchServers());
+            await dispatch(fetchServers());
             dispatch(loadServersIntoTable());
             break;
         }
         case 'services': {
-            dispatch(fetchServices());
+            await dispatch(fetchServices());
             dispatch(loadServicesIntoTable());
             break;
         }
         case 'users': {
-            dispatch(fetchUsers());
+            await dispatch(fetchUsers());
             dispatch(loadUsersIntoTable());
             break;
         }
         case 'groups': {
-            dispatch(fetchGroups());
+            await dispatch(fetchGroups());
             dispatch(loadGroupsIntoTable());
             break;
         }
         case 'acls': {
-            dispatch(fetchAcls());
+            await dispatch(fetchAcls());
             dispatch(loadAclsIntoTable());
             break;
         }
         case 'themes': {
-            dispatch(fetchThemes());
+            await dispatch(fetchThemes());
             dispatch(loadThemesIntoTable());
             break;
         }

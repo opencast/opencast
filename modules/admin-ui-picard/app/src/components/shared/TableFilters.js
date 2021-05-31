@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-import styled from "styled-components";
 import {connect} from 'react-redux';
 import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
@@ -51,7 +50,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
     }, []);
 
     // Remove all selected filters, no filter should be "active" anymore
-    const removeFilters = () => {
+    const removeFilters = async () => {
         removeTextFilter();
         removeSelectedFilter();
         removeSelectedFilter();
@@ -60,22 +59,22 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
         resetFilterMap();
 
         // Reload resources when filters are removed
-        loadResource();
+        await loadResource();
         loadResourceIntoTable();
 
     }
 
     // Remove a certain filter
-    const removeFilter = filter => {
+    const removeFilter = async filter => {
         editFilterValue(filter.name, "");
 
         // Reload resources when filter is removed
-        loadResource();
+        await loadResource();
         loadResourceIntoTable();
     }
 
     // Handle changes when a item of the component is clicked
-    const handleChange = e => {
+    const handleChange = async e => {
         const itemName = e.target.name;
         const itemValue = e.target.value;
 
@@ -98,7 +97,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
 
         }
         // Reload of resource
-        loadResource();
+        await loadResource();
         loadResourceIntoTable();
     }
 

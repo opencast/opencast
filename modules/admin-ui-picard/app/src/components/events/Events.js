@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
-
 import TableFilters from "../shared/TableFilters";
 import MainNav from "../shared/MainNav";
 import Stats from "../shared/Stats";

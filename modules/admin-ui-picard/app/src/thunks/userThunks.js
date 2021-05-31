@@ -3,7 +3,6 @@ import {getURLParams} from "../utils/resourceUtils";
 import axios from "axios";
 import {transformToIdValueArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
-import {loadUsersIntoTable} from "./tableThunks";
 
 // fetch users from server
 export const fetchUsers = () => async (dispatch, getState) => {
@@ -45,15 +44,12 @@ export const postNewUser = values => async dispatch => {
     data.append('roles', JSON.stringify(values.roles));
 
     // POST request
-    // todo: notification
     axios.post('/admin-ng/users', data, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }).then(response => {
         console.log(response);
-        dispatch(fetchUsers());
-        dispatch(loadUsersIntoTable());
         dispatch(addNotification('success', 'USER_ADDED'));
     }).catch(response => {
         console.log(response);

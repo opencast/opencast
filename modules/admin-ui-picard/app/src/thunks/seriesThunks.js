@@ -11,7 +11,6 @@ import {
 import {
     getURLParams, prepareAccessPolicyRulesForPost,
     prepareSeriesMetadataFieldsForPost,
-    prepareMetadataFieldsForPost,
     transformMetadataCollection
 } from "../utils/resourceUtils";
 import {transformToIdValueArray, transformToObjectArray} from "../utils/utils";

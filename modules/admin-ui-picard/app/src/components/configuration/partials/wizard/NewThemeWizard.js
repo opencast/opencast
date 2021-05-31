@@ -115,8 +115,9 @@ const NewThemeWizard = ({ close, postNewTheme }) => {
     );
 };
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     postNewTheme: values => dispatch(postNewTheme(values))
-})
+});
 
 export default connect(null, mapDispatchToProps)(NewThemeWizard);

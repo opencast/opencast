@@ -41,7 +41,6 @@ export const postNewGroup = values => async dispatch => {
     data.append('users', users.join(','));
 
     // POST request
-    // todo: notification
     axios.post('/admin-ng/groups', data, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'

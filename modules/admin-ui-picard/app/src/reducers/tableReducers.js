@@ -70,7 +70,6 @@ const table = (state=initialState, action) => {
     switch (type) {
         case LOAD_RESOURCE_INTO_TABLE: {
             const { multiSelect, columns, resource, pages, rows, sortBy, totalItems } = payload;
-            console.log('in resource in table reducer');
             return {
                 ...state,
                 multiSelect: multiSelect,

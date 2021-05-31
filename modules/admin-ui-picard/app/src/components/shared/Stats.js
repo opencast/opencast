@@ -39,8 +39,6 @@ const Stats = ({ loadingStats, stats, filterMap, editFilterValue, loadEvents, lo
 
     }, [])
 
-
-    // TODO: How get actual number of events in individual stat
     return (
         <>
             <div className="main-stats">

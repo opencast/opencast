@@ -1,6 +1,6 @@
 import React from 'react';
 import {useTranslation} from "react-i18next";
-import {editFilterValue, setEndDate, setStartDate} from "../../../actions/tableFilterActions";
+import {editFilterValue} from "../../../actions/tableFilterActions";
 import {fetchEvents} from "../../../thunks/eventThunks";
 import {loadEventsIntoTable} from "../../../thunks/tableThunks";
 import {getFilters} from "../../../selectors/tableFilterSelectors";
