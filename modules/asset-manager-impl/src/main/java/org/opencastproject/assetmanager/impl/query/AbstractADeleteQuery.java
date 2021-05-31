@@ -25,7 +25,7 @@ import static java.lang.String.format;
 
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.impl.AbstractAssetManager;
+import org.opencastproject.assetmanager.impl.AssetManager;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import org.opencastproject.assetmanager.impl.TieredStorageAssetManager;
 import org.opencastproject.assetmanager.impl.VersionImpl;
@@ -55,10 +55,10 @@ import java.util.Set;
 public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryContributor, EntityPaths {
   private static final Logger logger = LoggerFactory.getLogger(AbstractADeleteQuery.class);
 
-  private AbstractAssetManager am;
+  private AssetManager am;
   private String owner;
 
-  public AbstractADeleteQuery(AbstractAssetManager am, String owner) {
+  public AbstractADeleteQuery(AssetManager am, String owner) {
     this.am = am;
     this.owner = owner;
   }

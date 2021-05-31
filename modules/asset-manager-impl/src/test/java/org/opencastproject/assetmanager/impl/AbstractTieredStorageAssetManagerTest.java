@@ -152,8 +152,8 @@ public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetM
     };
   }
 
-  @Override public AbstractAssetManager getAbstractAssetManager() {
-    return (AbstractAssetManager) am;
+  @Override public AssetManager getAbstractAssetManager() {
+    return (AssetManager) am;
   }
 
   @Override
