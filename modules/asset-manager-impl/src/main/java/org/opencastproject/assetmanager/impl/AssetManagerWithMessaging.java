@@ -37,8 +37,11 @@ import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.PropertyField;
+import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery.DeleteSnapshotHandler;
+import org.opencastproject.assetmanager.impl.storage.AssetStore;
+import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
@@ -51,6 +54,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
@@ -60,6 +64,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -67,10 +72,11 @@ import java.util.stream.Collectors;
  * <p>
  * Please make sure to {@link #close()} the AssetManager.
  */
-public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStorageAssetManager>
-        implements DeleteSnapshotHandler, AutoCloseable {
+public class AssetManagerWithMessaging implements DeleteSnapshotHandler, AutoCloseable, TieredStorageAssetManager {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerWithMessaging.class);
+
+  protected final TieredStorageAssetManager delegate;
 
   public static final String WRITE_ACTION = "write";
   public static final String READ_ACTION = "read";
@@ -91,7 +97,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
           final boolean includeAPIRoles,
           final boolean includeCARoles,
           final boolean includeUIRoles) {
-    super(delegate);
+    this.delegate = delegate;
     this.messageSender = messageSender;
     this.authSvc = authSvc;
     this.workspace = workspace;
@@ -118,7 +124,12 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
       deleteProperties(mediaPackageId);
     }
     if (firstSnapshot || isAuthorized(mediaPackageId, WRITE_ACTION)) {
-      final Snapshot snapshot = super.takeSnapshot(owner, mp);
+      final Snapshot snapshot;
+      if (owner == null) {
+        snapshot = delegate.takeSnapshot(mp);
+      } else {
+        snapshot = delegate.takeSnapshot(owner, mp);
+      }
       // We pass the original media package here, instead of using
       // snapshot.getMediaPackage(), for security reasons. The original media
       // package has elements with URLs of type http://.../files/... in it. These
@@ -138,8 +149,12 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
     return chuck(new UnauthorizedException("Not allowed to take snapshot of media package " + mediaPackageId));
   }
 
+  @Override public Snapshot takeSnapshot(MediaPackage mp) {
+    return takeSnapshot(null, mp);
+  }
+
   private AQueryBuilder createQueryWithoutSecurityCheck() {
-    return new AQueryBuilderDecorator(super.createQuery()) {
+    return new AQueryBuilderDecorator(delegate.createQuery()) {
       @Override
       public ADeleteQuery delete(String owner, Target target) {
         return new ADeleteQueryWithMessaging(super.delete(owner, target));
@@ -249,7 +264,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
 
   @Override public void setAvailability(Version version, String mpId, Availability availability) {
     if (isAuthorized(mpId, WRITE_ACTION)) {
-      super.setAvailability(version, mpId, availability);
+      delegate.setAvailability(version, mpId, availability);
     } else {
       chuck(new UnauthorizedException("Not allowed to set availability of episode " + mpId));
     }
@@ -258,14 +273,14 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
   @Override public boolean setProperty(Property property) {
     final String mpId = property.getId().getMediaPackageId();
     if (isAuthorized(mpId, WRITE_ACTION)) {
-      return super.setProperty(property);
+      return delegate.setProperty(property);
     }
     return chuck(new UnauthorizedException("Not allowed to set property on episode " + mpId));
   }
 
   @Override public Opt<Asset> getAsset(Version version, String mpId, String mpElementId) {
     if (isAuthorized(mpId, READ_ACTION)) {
-      return super.getAsset(version, mpId, mpElementId);
+      return delegate.getAsset(version, mpId, mpElementId);
     }
     return chuck(new UnauthorizedException(
             format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)
@@ -275,9 +290,132 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
   @Override
   public List<Property> selectProperties(final String mediaPackageId, String namespace) {
     if (isAuthorized(mediaPackageId, READ_ACTION)) {
-      return super.selectProperties(mediaPackageId, namespace);
+      return delegate.selectProperties(mediaPackageId, namespace);
     }
     return chuck(new UnauthorizedException(format("Not allowed to read properties of event %s", mediaPackageId)));
+  }
+
+  @Override
+  public Set<String> getRemoteAssetStoreIds() {
+    return delegate.getRemoteAssetStoreIds();
+  }
+
+  @Override
+  public void addRemoteAssetStore(RemoteAssetStore assetStore) {
+    delegate.addRemoteAssetStore(assetStore);
+  }
+
+  @Override
+  public void removeRemoteAssetStore(RemoteAssetStore assetStore) {
+    delegate.removeRemoteAssetStore(assetStore);
+  }
+
+  @Override public Opt<MediaPackage> getMediaPackage(String mediaPackageId) {
+    return delegate.getMediaPackage(mediaPackageId);
+  }
+
+  @Override
+  public int deleteProperties(final String mediaPackageId) {
+    return delegate.deleteProperties(mediaPackageId);
+  }
+
+  @Override
+  public int deleteProperties(final String mediaPackageId, final String namespace) {
+    return delegate.deleteProperties(mediaPackageId, namespace);
+  }
+
+  @Override
+  public long countEvents(String organization) {
+    return delegate.countEvents(organization);
+  }
+
+  @Override
+  public boolean snapshotExists(final String mediaPackageId, final String organization) {
+    return delegate.snapshotExists(mediaPackageId, organization);
+  }
+
+  @Override
+  public boolean snapshotExists(final String mediaPackageId) {
+    return delegate.snapshotExists(mediaPackageId);
+  }
+
+  @Override public Opt<Version> toVersion(String version) {
+    return delegate.toVersion(version);
+  }
+
+  @Override
+  public Opt<AssetStore> getRemoteAssetStore(String id) {
+    return delegate.getRemoteAssetStore(id);
+  }
+
+  @Override
+  public Opt<AssetStore> getAssetStore(String storeId) {
+    return delegate.getAssetStore(storeId);
+  }
+
+  @Override
+  public void moveSnapshotToStore(Version version, String mpId, String storeId) throws NotFoundException {
+    delegate.moveSnapshotToStore(version, mpId, storeId);
+  }
+
+  @Override
+  public RichAResult getSnapshotsById(String mpId) {
+    return delegate.getSnapshotsById(mpId);
+  }
+
+  @Override
+  public void moveSnapshotsById(String mpId, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsById(mpId, targetStore);
+  }
+
+  @Override
+  public RichAResult getSnapshotsByIdAndVersion(String mpId, Version version) {
+    return delegate.getSnapshotsByIdAndVersion(mpId, version);
+  }
+
+  @Override
+  public void moveSnapshotsByIdAndVersion(String mpId, Version version, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsByIdAndVersion(mpId, version, targetStore);
+  }
+
+  @Override
+  public RichAResult getSnapshotsByDate(Date start, Date end) {
+    return delegate.getSnapshotsByDate(start, end);
+  }
+
+  @Override
+  public void moveSnapshotsByDate(Date start, Date end, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsByDate(start, end, targetStore);
+  }
+
+  @Override
+  public RichAResult getSnapshotsByIdAndDate(String mpId, Date start, Date end) {
+    return delegate.getSnapshotsByIdAndDate(mpId, start, end);
+  }
+
+  @Override
+  public void moveSnapshotsByIdAndDate(String mpId, Date start, Date end, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsByIdAndDate(mpId, start, end, targetStore);
+  }
+
+  @Override
+  public Opt<String> getSnapshotStorageLocation(Version version, String mpId) throws NotFoundException {
+    return delegate.getSnapshotStorageLocation(version, mpId);
+  }
+
+  @Override
+  public Opt<String> getSnapshotStorageLocation(Snapshot snap) throws NotFoundException {
+    return delegate.getSnapshotStorageLocation(snap);
+  }
+
+  @Override
+  public Opt<String> getSnapshotRetrievalTime(Version version, String mpId) {
+    return delegate.getSnapshotRetrievalTime(version, mpId);
+  }
+
+  @Override
+  public Opt<String> getSnapshotRetrievalCost(Version version, String mpId) {
+    return delegate.getSnapshotRetrievalCost(version, mpId);
   }
 
   /* -------------------------------------------------------------------------------------------------------------- */
@@ -328,7 +466,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
                 .filter(roleFilter)
                 .map((role) -> mkPropertyName(role.getName(), action))
                 .collect(Collectors.toList());
-        return super.selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
+        return delegate.selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
                 .map(p -> p.getId().getName())
                 .anyMatch(p -> roles.parallelStream().anyMatch(r -> r.equals(p)));
     }
@@ -366,7 +504,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
     deleteProperties(mediaPackageId, SECURITY_NAMESPACE);
     // Set new ACL rules
     for (final AccessControlEntry ace : acl.getEntries()) {
-      super.setProperty(Property.mk(
+      delegate.setProperty(Property.mk(
               PropertyId.mk(
                       mediaPackageId,
                       SECURITY_NAMESPACE,
@@ -396,7 +534,4 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
             && (includeCARoles  || !name.startsWith("ROLE_CAPTURE_AGENT_"))
             && (includeUIRoles  || !name.startsWith("ROLE_UI_"));
   };
-
-
-
 }
