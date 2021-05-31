@@ -21,11 +21,17 @@
 package org.opencastproject.assetmanager.api;
 
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.RichAResult;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.data.Opt;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The AssetManager stores versioned {@linkplain Snapshot snapshots} of media packages.
@@ -178,4 +184,125 @@ public interface AssetManager {
    * @return Number of events
    */
   long countEvents(String organization);
+
+  Set<String> getRemoteAssetStoreIds();
+
+  void addRemoteAssetStore(RemoteAssetStore assetStore);
+
+  void removeRemoteAssetStore(RemoteAssetStore assetStore);
+
+  Opt<AssetStore> getRemoteAssetStore(String id);
+
+  Opt<AssetStore> getAssetStore(String storeId);
+
+  void moveSnapshotToStore(Version version, String mpId, String storeId) throws NotFoundException;
+
+  /**
+   * Returns a stream of {@link RichAResult} filtered by mediapackage IDs
+   *
+   * @param mpId
+   *   The mediapackage ID to filter results for
+   * @return
+   *   The {@link RichAResult} stream filtered by mediapackage ID
+   */
+  RichAResult getSnapshotsById(String mpId);
+
+  /**
+   * Moves all versions of a given mediapackage ID from their respective source stores to a single target store
+   * @param mpId
+   *   The mediapackage ID to move
+   * @param targetStore
+   *   The store ID to move all versions of this mediapackage to
+   * @throws NotFoundException
+   */
+  void moveSnapshotsById(String mpId, String targetStore) throws NotFoundException;
+
+  /**
+   * Returns a stream of {@link RichAResult} filtered by mediapackage ID and version
+   *
+   * @param mpId
+   *   The mediapackage ID to filter results for
+   * @param version
+   *   The version to filter results for
+   * @return
+   *   The {@link RichAResult} stream filtered by mediapackage ID
+   */
+  RichAResult getSnapshotsByIdAndVersion(String mpId, Version version);
+
+  /**
+   * Moves a specific version of a given mediapackage ID to a new store
+   *
+   * @param mpId
+   *   The mediapackage ID to move
+   * @param version
+   *   The version to move
+   * @param targetStore
+   *   The store ID to move this version of the mediapackage to
+   * @throws NotFoundException
+   */
+  void moveSnapshotsByIdAndVersion(String mpId, Version version, String targetStore) throws NotFoundException;
+
+  /**
+   * Returns a stream of {@link RichAResult} filtered by date. This stream consists of all versions of all mediapackages
+   * archived within the date range.
+   *
+   * @param start
+   *   The start {@link Date} to filter by
+   * @param end
+   *   The end{@link Date} to filter by
+   * @return
+   *   The {@link RichAResult} stream filtered by date
+   */
+  RichAResult getSnapshotsByDate(Date start, Date end);
+
+  /**
+   * Moves all versions of all mediapackages archived within a data range to a new storage location.
+   *
+   * @param start
+   *   The start {@link Date} to filter by
+   * @param end
+   *   The end{@link Date} to filter by
+   * @param targetStore
+   *   THe store ID to move the snapshots to
+   * @throws NotFoundException
+   */
+  void moveSnapshotsByDate(Date start, Date end, String targetStore) throws NotFoundException;
+
+  /**
+   * Returns a stream of {@link RichAResult} filtered by date and mediapackage. This stream consists of all versions of
+   * a mediapackage archived within the date range.
+   *
+   * @param mpId
+   *   The mediapackage ID to filter for
+   * @param start
+   *   The start {@link Date} to filter by
+   * @param end
+   *   The end{@link Date} to filter by
+   * @return
+   *   The {@link RichAResult} stream filtered by date
+   */
+  RichAResult getSnapshotsByIdAndDate(String mpId, Date start, Date end);
+
+  /**
+   * Moves all versions of a mediapackage archived within a data range to a new storage location.
+   *
+   * @param mpId
+   *   The mediapackage ID to filter for
+   * @param start
+   *   The start {@link Date} to filter by
+   * @param end
+   *   The end{@link Date} to filter by
+   * @param targetStore
+   *   THe store ID to move the snapshots to
+   * @throws NotFoundException
+   */
+  void moveSnapshotsByIdAndDate(String mpId, Date start, Date end, String targetStore) throws NotFoundException;
+
+  Opt<String> getSnapshotStorageLocation(Version version, String mpId) throws NotFoundException;
+
+  Opt<String> getSnapshotStorageLocation(Snapshot snap) throws NotFoundException;
+
+  Opt<String> getSnapshotRetrievalTime(Version version, String mpId);
+
+  Opt<String> getSnapshotRetrievalCost(Version version, String mpId);
 }

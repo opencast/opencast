@@ -26,6 +26,7 @@ import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_RO
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 
 import org.opencastproject.assetmanager.api.Asset;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
@@ -39,9 +40,9 @@ import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.api.query.Target;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery.DeleteSnapshotHandler;
-import org.opencastproject.assetmanager.impl.storage.AssetStore;
-import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
@@ -72,11 +73,11 @@ import java.util.stream.Collectors;
  * <p>
  * Please make sure to {@link #close()} the AssetManager.
  */
-public class AssetManagerWithMessaging implements DeleteSnapshotHandler, AutoCloseable, TieredStorageAssetManager {
+public class AssetManagerWithMessaging implements AssetManager, DeleteSnapshotHandler, AutoCloseable {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerWithMessaging.class);
 
-  protected final TieredStorageAssetManager delegate;
+  protected final AssetManager delegate;
 
   public static final String WRITE_ACTION = "write";
   public static final String READ_ACTION = "read";
@@ -92,7 +93,7 @@ public class AssetManagerWithMessaging implements DeleteSnapshotHandler, AutoClo
   private boolean includeCARoles;
   private boolean includeUIRoles;
 
-  public AssetManagerWithMessaging(final TieredStorageAssetManager delegate, final MessageSender messageSender,
+  public AssetManagerWithMessaging(final AssetManager delegate, final MessageSender messageSender,
           AuthorizationService authSvc, Workspace workspace, SecurityService secSvc,
           final boolean includeAPIRoles,
           final boolean includeCARoles,

@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package org.opencastproject.assetmanager.impl.storage;
+package org.opencastproject.assetmanager.api.storage;
 
 import static com.entwinemedia.fn.Equality.eq;
 import static java.lang.String.format;

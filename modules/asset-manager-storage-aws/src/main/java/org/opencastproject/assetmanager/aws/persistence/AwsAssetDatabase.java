@@ -21,7 +21,7 @@
 
 package org.opencastproject.assetmanager.aws.persistence;
 
-import org.opencastproject.assetmanager.impl.storage.StoragePath;
+import org.opencastproject.assetmanager.api.storage.StoragePath;
 
 import java.util.List;
 

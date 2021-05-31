@@ -25,7 +25,8 @@ import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.RichAResult;
-import org.opencastproject.assetmanager.impl.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -136,7 +137,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    * @param mpId
    *  The mediapackage ID of the snapshot to move
    * @param targetStorage
-   *  The {@link org.opencastproject.assetmanager.impl.storage.RemoteAssetStore} ID where the snapshot should be moved
+   *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    */
   public Job moveByIdAndVersion(final Version version, final String mpId, final String targetStorage) {
@@ -163,7 +164,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    * @param mpId
    *  The mediapackage ID of the snapshot to move
    * @param targetStorage
-   *  The {@link org.opencastproject.assetmanager.impl.storage.RemoteAssetStore} ID where the snapshot should be moved
+   *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    *  The string "OK"
    * @throws NotFoundException
@@ -183,7 +184,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    * @param mpId
    *  The mediapackage ID of the snapshot to move
    * @param targetStorage
-   *  The {@link org.opencastproject.assetmanager.impl.storage.RemoteAssetStore} ID where the snapshot should be moved
+   *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    *  The {@link Job}
    */
@@ -207,7 +208,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    * @param mpId
    *  The mediapackage ID of the snapshot to move
    * @param targetStorage
-   *  The {@link org.opencastproject.assetmanager.impl.storage.RemoteAssetStore} ID where the snapshot should be moved
+   *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    *  The number of subjobs spawned
    */
@@ -227,7 +228,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    * @param end
    *  The end {@link Date}
    * @param targetStorage
-   *  The {@link org.opencastproject.assetmanager.impl.storage.RemoteAssetStore} ID where the snapshot should be moved
+   *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    *  The {@link Job}
    */
@@ -256,7 +257,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    * @param end
    *  The end {@link Date}
    * @param targetStorage
-   *  The {@link org.opencastproject.assetmanager.impl.storage.RemoteAssetStore} ID where the snapshot should be moved
+   *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    *  The number of subjobs spawned
    */
@@ -277,7 +278,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    * @param end
    *  The end {@link Date}
    * @param targetStorage
-   *  The {@link org.opencastproject.assetmanager.impl.storage.RemoteAssetStore} ID where the snapshot should be moved
+   *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    *  The {@link Job}
    */
@@ -310,7 +311,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    * @param end
    *  The end {@link Date}
    * @param targetStorage
-   *  The {@link org.opencastproject.assetmanager.impl.storage.RemoteAssetStore} ID where the snapshot should be moved
+   *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    *  The number of subjobs spawned
    */
@@ -331,7 +332,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
    * @param records
    *  The stream of records containing the snapshots to move to the new target storage
    * @param targetStorage
-   *  The {@link org.opencastproject.assetmanager.impl.storage.RemoteAssetStore} ID where the snapshot should be moved
+   *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    *  The set of subjobs
    */
