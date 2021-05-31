@@ -34,15 +34,19 @@ import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.impl.persistence.AssetDtos;
+import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.storage.AssetStore;
 import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
+import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.assetmanager.impl.storage.Source;
 import org.opencastproject.assetmanager.impl.storage.StoragePath;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
@@ -59,13 +63,80 @@ import java.io.InputStream;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public abstract class AbstractAssetManagerWithTieredStorage
+public class AssetManagerWithTieredStorage
     extends AbstractAssetManager
     implements TieredStorageAssetManager {
+
+  private final Database db;
+  private final HttpAssetProvider httpAssetProvider;
+  private final AssetStore assetStore;
+  private final Workspace workspace;
+  private final SecurityService securityService;
+
+  private HashMap<String, RemoteAssetStore> remoteStores = new LinkedHashMap<>();
+
+  public AssetManagerWithTieredStorage(Database db, HttpAssetProvider httpAssetProvider, AssetStore assetStore,
+          Workspace workspace, SecurityService securityService) {
+    this.db = db;
+    this.httpAssetProvider = httpAssetProvider;
+    this.assetStore = assetStore;
+    this.workspace = workspace;
+    this.securityService = securityService;
+  }
+  @Override
+  public Database getDb() {
+    return db;
+  }
+
+  @Override
+  public HttpAssetProvider getHttpAssetProvider() {
+    return httpAssetProvider;
+  }
+
+  @Override
+  public AssetStore getLocalAssetStore() {
+    return assetStore;
+  }
+
+  @Override
+  public Set<String> getRemoteAssetStoreIds() {
+    return remoteStores.keySet();
+  }
+
+  @Override
+  public Opt<AssetStore> getRemoteAssetStore(String id) {
+    if (remoteStores.containsKey(id)) {
+      return Opt.some(remoteStores.get(id));
+    } else {
+      return Opt.none();
+    }
+  }
+
+  @Override
+  public void addRemoteAssetStore(RemoteAssetStore store) {
+    remoteStores.put(store.getStoreType(), store);
+  }
+
+  @Override
+  public void removeRemoteAssetStore(RemoteAssetStore store) {
+    remoteStores.remove(store.getStoreType());
+  }
+
+  @Override
+  protected Workspace getWorkspace() {
+    return workspace;
+  }
+
+  @Override
+  protected String getCurrentOrgId() {
+    return securityService.getOrganization().getId();
+  }
 
   public static final Set<MediaPackageElement.Type> MOVABLE_TYPES = Sets.newHashSet(
       MediaPackageElement.Type.Attachment,
@@ -74,7 +145,7 @@ public abstract class AbstractAssetManagerWithTieredStorage
   );
 
   /** Log facility */
-  private static final Logger logger = LoggerFactory.getLogger(AbstractAssetManagerWithTieredStorage.class);
+  private static final Logger logger = LoggerFactory.getLogger(AssetManagerWithTieredStorage.class);
 
   // Base name of manifest file
   private static final String MANIFEST_DEFAULT_NAME = "manifest";

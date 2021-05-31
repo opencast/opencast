@@ -68,8 +68,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -122,58 +120,8 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
     final Database db = new Database(emf);
     systemUserName = SecurityUtil.getSystemUserName(cc);
     // create the core asset manager
-    final AbstractAssetManagerWithTieredStorage core = new AbstractAssetManagerWithTieredStorage() {
-      private HashMap<String, RemoteAssetStore> remoteStores = new LinkedHashMap<>();
-
-      @Override
-      public Database getDb() {
-        return db;
-      }
-
-      @Override
-      public HttpAssetProvider getHttpAssetProvider() {
-        return httpAssetProvider;
-      }
-
-      @Override
-      public AssetStore getLocalAssetStore() {
-        return assetStore;
-      }
-
-      @Override
-      public Set<String> getRemoteAssetStoreIds() {
-        return remoteStores.keySet();
-      }
-
-      @Override
-      public Opt<AssetStore> getRemoteAssetStore(String id) {
-        if (remoteStores.containsKey(id)) {
-          return Opt.some(remoteStores.get(id));
-        } else {
-          return Opt.none();
-        }
-      }
-
-      @Override
-      public void addRemoteAssetStore(RemoteAssetStore store) {
-        remoteStores.put(store.getStoreType(), store);
-      }
-
-      @Override
-      public void removeRemoteAssetStore(RemoteAssetStore store) {
-        remoteStores.remove(store.getStoreType());
-      }
-
-      @Override
-      protected Workspace getWorkspace() {
-        return workspace;
-      }
-
-      @Override
-      protected String getCurrentOrgId() {
-        return secSvc.getOrganization().getId();
-      }
-    };
+    final AssetManagerWithTieredStorage core = new AssetManagerWithTieredStorage(db, httpAssetProvider, assetStore,
+            workspace, secSvc);
 
     // compose with security
     boolean includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
@@ -183,6 +131,8 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
     // compose with ActiveMQ messaging
     delegate = new AssetManagerWithMessaging(core, messageSender, authSvc, workspace, secSvc, includeAPIRoles,
             includeCARoles, includeUIRoles);
+
+
 
     for (RemoteAssetStore ras : remotes) {
       delegate.addRemoteAssetStore(ras);
