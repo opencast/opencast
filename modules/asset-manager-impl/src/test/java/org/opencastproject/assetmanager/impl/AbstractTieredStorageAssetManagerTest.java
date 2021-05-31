@@ -66,7 +66,7 @@ public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetM
   protected RemoteAssetStore remoteAssetStore1;
   protected RemoteAssetStore remoteAssetStore2;
 
-  public AbstractAssetManagerWithTieredStorage mkTieredStorageAM() throws Exception {
+  public AssetManagerWithTieredStorage mkTieredStorageAM() throws Exception {
     penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT);
     // empty database
     penv.tx(new Fn<EntityManager, Object>() {
@@ -97,7 +97,7 @@ public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetM
     remoteAssetStore2 = mkRemoteAssetStore(REMOTE_STORE_2_ID);
 
     //
-    return new AbstractAssetManagerWithTieredStorage() {
+    return new AssetManagerWithTieredStorage() {
       private HashMap<String, RemoteAssetStore> remoteStores = new LinkedHashMap<>();
 
       @Override public Database getDb() {

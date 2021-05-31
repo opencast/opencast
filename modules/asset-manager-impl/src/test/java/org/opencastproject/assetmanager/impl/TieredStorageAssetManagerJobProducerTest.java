@@ -42,7 +42,7 @@ import junitparams.JUnitParamsRunner;
 
 @RunWith(JUnitParamsRunner.class)
 public class TieredStorageAssetManagerJobProducerTest
-    extends AbstractTieredStorageAssetManagerTest<AbstractAssetManagerWithTieredStorage> {
+    extends AbstractTieredStorageAssetManagerTest<AssetManagerWithTieredStorage> {
 
   private TieredStorageAssetManagerJobProducer tsamjp = null;
   private ServiceRegistry sr = null;
