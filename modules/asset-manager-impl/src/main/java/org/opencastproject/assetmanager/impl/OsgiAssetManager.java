@@ -79,7 +79,7 @@ import javax.persistence.EntityManagerFactory;
 /**
  * Ties the asset manager to the OSGi environment.
  * <p>
- * Composes the core asset manager with the {@link AssetManagerWithMessaging} and {@link AssetManagerWithSecurity}
+ * Composes the core asset manager with the {@link AssetManagerImpl} and {@link AssetManagerWithSecurity}
  * implementations.
  */
 @Component(
@@ -109,7 +109,7 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
 
   // collect all objects that need to be closed on service deactivation
   private AutoCloseable toClose;
-  private AssetManagerWithMessaging delegate;
+  private AssetManagerImpl delegate;
 
   /**
    * OSGi callback.
@@ -119,9 +119,6 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
     logger.info("Activating AssetManager");
     final Database db = new Database(emf);
     systemUserName = SecurityUtil.getSystemUserName(cc);
-    // create the core asset manager
-    final AssetManagerWithTieredStorage core = new AssetManagerWithTieredStorage(db, httpAssetProvider, assetStore,
-            workspace, secSvc);
 
     // compose with security
     boolean includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
@@ -129,8 +126,8 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
     boolean includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
 
     // compose with ActiveMQ messaging
-    delegate = new AssetManagerWithMessaging(core, messageSender, authSvc, workspace, secSvc, includeAPIRoles,
-            includeCARoles, includeUIRoles);
+    delegate = new AssetManagerImpl(messageSender, authSvc, workspace, secSvc, includeAPIRoles,
+            includeCARoles, includeUIRoles, db, httpAssetProvider, assetStore);
 
     for (RemoteAssetStore ras : remotes) {
       delegate.addRemoteAssetStore(ras);
@@ -366,16 +363,6 @@ public class OsgiAssetManager extends AbstractIndexProducer implements AssetMana
   @Override
   public Opt<String> getSnapshotStorageLocation(Snapshot snap) throws NotFoundException {
     return delegate.getSnapshotStorageLocation(snap);
-  }
-
-  @Override
-  public Opt<String> getSnapshotRetrievalTime(Version version, String mpId) {
-    return delegate.getSnapshotRetrievalTime(version, mpId);
-  }
-
-  @Override
-  public Opt<String> getSnapshotRetrievalCost(Version version, String mpId) {
-    return delegate.getSnapshotRetrievalCost(version, mpId);
   }
 
   /**
