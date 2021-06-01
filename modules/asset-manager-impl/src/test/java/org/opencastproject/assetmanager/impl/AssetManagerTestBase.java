@@ -34,6 +34,7 @@ import org.opencastproject.assetmanager.api.query.PropertySchema;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
+import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
@@ -59,9 +60,7 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import org.opencastproject.util.persistencefn.PersistenceUtil;
-import org.opencastproject.util.persistencefn.Queries;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
@@ -96,15 +95,6 @@ import javax.persistence.EntityManager;
  * #mkTestEntityManagerFactoryFromSystemProperties(String)} for command line
  * configuration options.
  * <p>
- * Implementations of this class need to call {@link #setUp(org.opencastproject.assetmanager.impl.AssetManagerImpl)}
- * to setup the necessary variables prior to
- * running a test. You may implement a {@link org.junit.Before} annotated method like this:
- * <pre>
- *   |@Before
- *   |public void setUp() throws Exception {
- *   |  setUp(mkAbstractAssetManager());
- *   |}
- * </pre>
  */
 // CHECKSTYLE:OFF
 public abstract class AssetManagerTestBase {
@@ -112,6 +102,10 @@ public abstract class AssetManagerTestBase {
   public static final String PERSISTENCE_UNIT = "org.opencastproject.assetmanager.impl";
 
   protected static final String OWNER = "test";
+
+  public static final String LOCAL_STORE_ID = "local-test";
+  public static final String REMOTE_STORE_1_ID = "remote-1-test";
+  public static final String REMOTE_STORE_2_ID = "remote-2-test";
 
   @Rule
   public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -135,20 +129,23 @@ public abstract class AssetManagerTestBase {
    * Create a new test asset manager.
    */
   protected AssetManagerImpl makeAssetManager() throws Exception {
-    penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT); // TODO for what do we need this?
-    // empty database
-    penv.tx(new Fn<EntityManager, Object>() {
-      @Override public Object apply(EntityManager entityManager) {
-        Queries.sql.update(entityManager, "delete from oc_assets_asset");
-        Queries.sql.update(entityManager, "delete from oc_assets_properties");
-        Queries.sql.update(entityManager, "delete from oc_assets_snapshot");
-        Queries.sql.update(entityManager, "delete from oc_assets_version_claim");
-        return null;
-      }
-    });
+//    penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT); // TODO for what do we need this?
+//    // empty database
+//    penv.tx(new Fn<EntityManager, Object>() {
+//      @Override public Object apply(EntityManager entityManager) {
+//        Queries.sql.update(entityManager, "delete from oc_assets_asset");
+//        Queries.sql.update(entityManager, "delete from oc_assets_properties");
+//        Queries.sql.update(entityManager, "delete from oc_assets_snapshot");
+//        Queries.sql.update(entityManager, "delete from oc_assets_version_claim");
+//        return null;
+//      }
+//    });
 
-    Database db = new Database(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
-            penv);
+    final Database db = new Database(
+            PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT));
+
+    //final Database db = new Database(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
+    //        penv);
 
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
@@ -162,9 +159,10 @@ public abstract class AssetManagerTestBase {
     }).anyTimes();
     EasyMock.replay(workspace);
 
-    //
-    final AssetStore assetStore = mkAssetStore("test-store-type");
-    //
+    //final AssetStore assetStore = mkAssetStore("test-store-type"); // TODO remove
+    AssetStore localAssetStore = mkAssetStore(LOCAL_STORE_ID);
+    RemoteAssetStore remoteAssetStore1 = mkRemoteAssetStore(REMOTE_STORE_1_ID);
+    RemoteAssetStore remoteAssetStore2 = mkRemoteAssetStore(REMOTE_STORE_2_ID);
 
     HttpAssetProvider httpAssetProvider =  new HttpAssetProvider() {
       @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
@@ -191,7 +189,9 @@ public abstract class AssetManagerTestBase {
     EasyMock.replay(ms);
 
     AssetManagerImpl am = new AssetManagerImpl();
-    am.setAssetStore(assetStore);
+    am.setAssetStore(localAssetStore);
+    am.addRemoteAssetStore(remoteAssetStore1);
+    am.addRemoteAssetStore(remoteAssetStore2);
     am.setHttpAssetProvider(httpAssetProvider);
     am.setWorkspace(workspace);
     am.setSecurityService(securityService);
@@ -397,6 +397,76 @@ public abstract class AssetManagerTestBase {
           if (!(sel.getOrganizationId().equals(s.getOrganizationId())
               && sel.getMediaPackageId().equals(s.getMediaPackageId())
               && sel.getVersion().map(eq(s.getVersion())).getOr(true))) {
+            newStore.add(s);
+          } else {
+            deleted = true;
+          }
+        }
+        store = newStore;
+        logSize();
+        return deleted;
+      }
+
+      @Override public Option<Long> getTotalSpace() {
+        return Option.none();
+      }
+
+      @Override public Option<Long> getUsableSpace() {
+        return Option.none();
+      }
+
+      @Override public Option<Long> getUsedSpace() {
+        return Option.some((long) store.size());
+      }
+
+      @Override public String getStoreType() {
+        return storeType;
+      }
+    };
+  }
+
+  /**
+   * Create a test asset store.
+   */
+  protected RemoteAssetStore mkRemoteAssetStore(String storeType) {
+    return new RemoteAssetStore() {
+      private Set<StoragePath> store = new HashSet<>();
+
+      private void logSize() {
+        logger.debug("Store contains {} asset/s", store.size());
+      }
+
+      @Override public void put(StoragePath path, Source source) throws AssetStoreException {
+        store.add(path);
+        logSize();
+      }
+
+      @Override public boolean copy(StoragePath from, StoragePath to) throws AssetStoreException {
+        if (store.contains(from)) {
+          store.add(to);
+          logSize();
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      @Override public Opt<InputStream> get(StoragePath path) throws AssetStoreException {
+        return IoSupport.openClassPathResource("/dublincore-a.xml").toOpt();
+      }
+
+      @Override public boolean contains(StoragePath path) throws AssetStoreException {
+        return store.contains(path);
+      }
+
+      @Override public boolean delete(DeletionSelector sel) throws AssetStoreException {
+        logger.info("Delete from asset store " + sel);
+        final Set<StoragePath> newStore = new HashSet<>();
+        boolean deleted = false;
+        for (StoragePath s : store) {
+          if (!(sel.getOrganizationId().equals(s.getOrganizationId())
+                  && sel.getMediaPackageId().equals(s.getMediaPackageId())
+                  && sel.getVersion().map(eq(s.getVersion())).getOr(true))) {
             newStore.add(s);
           } else {
             deleted = true;

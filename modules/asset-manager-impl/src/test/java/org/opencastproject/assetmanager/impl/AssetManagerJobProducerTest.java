@@ -42,7 +42,7 @@ import junitparams.JUnitParamsRunner;
 
 @RunWith(JUnitParamsRunner.class)
 public class AssetManagerJobProducerTest
-    extends AbstractTieredStorageAssetManagerTest {
+    extends AssetManagerTestBase {
 
   private TieredStorageAssetManagerJobProducer tsamjp = null;
   private ServiceRegistry sr = null;
@@ -50,7 +50,6 @@ public class AssetManagerJobProducerTest
   @Before
   public void setup() throws Exception {
     super.setUp();
-    am.addRemoteAssetStore(remoteAssetStore1);
 
     tsamjp = new TieredStorageAssetManagerJobProducer();
     tsamjp.setOrganizationDirectoryService(null);
