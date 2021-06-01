@@ -48,7 +48,6 @@ import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
-import org.opencastproject.assetmanager.impl.TieredStorageAssetManager;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageImpl;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
@@ -108,7 +107,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
 
   private final java.lang.reflect.Type stringMapType = new TypeToken<Map<String, String>>() { }.getType();
 
-  public abstract TieredStorageAssetManager getAssetManager();
+  public abstract AssetManager getAssetManager();
 
   /**
    * @deprecated use {@link #snapshot} instead
