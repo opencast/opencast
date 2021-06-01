@@ -24,18 +24,19 @@ import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.fns.Booleans.eq;
 import static org.junit.Assert.assertEquals;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.PropertySchema;
-import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
+import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -43,6 +44,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.data.Collections;
@@ -63,6 +65,7 @@ import com.mysema.query.jpa.impl.JPAQuery;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
@@ -94,7 +97,7 @@ import javax.persistence.EntityManager;
  * </pre>
  */
 // CHECKSTYLE:OFF
-public abstract class AssetManagerTestBase<A extends org.opencastproject.assetmanager.api.AssetManager> {
+public abstract class AssetManagerTestBase<A extends AssetManager> {
   protected static final Logger logger = LoggerFactory.getLogger(AssetManagerTestBase.class);
   public static final String PERSISTENCE_UNIT = "org.opencastproject.assetmanager.impl";
 
@@ -114,9 +117,18 @@ public abstract class AssetManagerTestBase<A extends org.opencastproject.assetma
    * Return the underlying instance of {@link AssetManager}.
    * If the asset manager under test is of type AbstractAssetManager just return that instance.
    */
-  public abstract AssetManager getAbstractAssetManager();
+  public AssetManager getAbstractAssetManager() {
+    return am;
+  }
 
-  public abstract String getCurrentOrgId();
+  public String getCurrentOrgId() {
+    return DefaultOrganization.DEFAULT_ORGANIZATION_ID;
+  }
+
+  @Before
+  public void setUp() throws Exception {
+    setUp(mkAbstractAssetManager());
+  }
 
   public final void setUp(A assetManager) {
     am = assetManager;

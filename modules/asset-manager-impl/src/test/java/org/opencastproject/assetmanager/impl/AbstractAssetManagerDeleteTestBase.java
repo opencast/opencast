@@ -34,7 +34,7 @@ import com.mysema.query.types.Predicate;
 
 import javax.persistence.EntityManager;
 
-public class AbstractAssetManagerDeleteTestBase extends AbstractAssetManagerTestBase implements EntityPaths {
+public class AbstractAssetManagerDeleteTestBase extends AssetManagerTestBase implements EntityPaths {
   void assertPropertiesTotal(long count) {
 //    assertEquals("[AssetManager] There should be " + count + " properties total",
 //                 count,

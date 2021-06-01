@@ -70,7 +70,7 @@ import junitparams.Parameters;
 @RunWith(JUnitParamsRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 // CHECKSTYLE:OFF
-public class AbstractAssetManagerSelectTest extends AbstractAssetManagerTestBase {
+public class AbstractAssetManagerSelectTest extends AssetManagerTestBase {
   @Test
   public void testSelectSnapshots() throws Exception {
     final MediaPackage mp = mkMediaPackage();
