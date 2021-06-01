@@ -25,7 +25,6 @@ import static com.entwinemedia.fn.fns.Booleans.eq;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.Snapshots;
@@ -124,24 +123,82 @@ public abstract class AssetManagerTestBase {
   protected Props p2;
   protected PersistenceEnv penv;
 
-  /**
-   * Return the underlying instance of {@link AssetManager}.
-   * If the asset manager under test is of type AbstractAssetManager just return that instance.
-   */
-  public AssetManagerImpl getAssetManager() {
-    return am;
-  }
-
   @Before
   public void setUp() throws Exception {
-    setUp(mkAbstractAssetManager());
-  }
-
-  public final void setUp(AssetManagerImpl assetManager) {
-    am = assetManager;
+    this.am = makeAssetManager();
     q = am.createQuery();
     p = new Props(q, "org.opencastproject.service");
     p2 = new Props(q, "org.opencastproject.service.sub");
+  }
+
+  /**
+   * Create a new test asset manager.
+   */
+  protected AssetManagerImpl makeAssetManager() throws Exception {
+    penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT); // TODO for what do we need this?
+    // empty database
+    penv.tx(new Fn<EntityManager, Object>() {
+      @Override public Object apply(EntityManager entityManager) {
+        Queries.sql.update(entityManager, "delete from oc_assets_asset");
+        Queries.sql.update(entityManager, "delete from oc_assets_properties");
+        Queries.sql.update(entityManager, "delete from oc_assets_snapshot");
+        Queries.sql.update(entityManager, "delete from oc_assets_version_claim");
+        return null;
+      }
+    });
+
+    Database db = new Database(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
+            penv);
+
+    final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
+            .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
+            .andAnswer(() -> getClass().getResourceAsStream("/dublincore-a.xml")).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
+      File tmp = tempFolder.newFile();
+      FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
+      return tmp;
+    }).anyTimes();
+    EasyMock.replay(workspace);
+
+    //
+    final AssetStore assetStore = mkAssetStore("test-store-type");
+    //
+
+    HttpAssetProvider httpAssetProvider =  new HttpAssetProvider() {
+      @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
+        return snapshot;
+      }
+    };
+
+    Organization org = new DefaultOrganization();
+    User currentUser = TestUser.mk(org, org.getAdminRole());
+
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.expect(securityService.getUser()).andAnswer(() -> currentUser).anyTimes();
+    EasyMock.replay(securityService);
+
+    final AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
+    final AccessControlList acl = new AccessControlList(new AccessControlEntry("admin", "write", true));
+    EasyMock.expect(authorizationService.getActiveAcl(EasyMock.<MediaPackage>anyObject()))
+            .andReturn(tuple(acl, AclScope.Episode))
+            .anyTimes();
+    EasyMock.replay(authorizationService);
+
+    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(ms);
+
+    AssetManagerImpl am = new AssetManagerImpl();
+    am.setAssetStore(assetStore);
+    am.setHttpAssetProvider(httpAssetProvider);
+    am.setWorkspace(workspace);
+    am.setSecurityService(securityService);
+    am.setDatabase(db);
+    am.setAuthSvc(authorizationService);
+    am.setMessageSender(ms);
+    return am;
   }
 
   public static MediaPackage mkMediaPackage(MediaPackageElement... elements) throws Exception {
@@ -256,10 +313,10 @@ public abstract class AssetManagerTestBase {
           @Override public Snapshot apply(Integer versionCount) {
             if (!continuousVersions) {
               // insert a gap into the version claim
-              getAssetManager().getDb().claimVersion(mp.getIdentifier().toString());
+              am.getDb().claimVersion(mp.getIdentifier().toString());
             }
             logger.debug("Taking snapshot {} of media package {}", versionCount + 1, mpId);
-            return getAssetManager().takeSnapshot(OWNER, mp);
+            return am.takeSnapshot(OWNER, mp);
           }
         });
       }
@@ -296,74 +353,6 @@ public abstract class AssetManagerTestBase {
 
     public final PropertyField<Version> versionId = versionProp("version");
     // CHECKSTYLE:ON
-  }
-
-  /**
-   * Create a new test asset manager.
-   */
-  protected AssetManagerImpl mkAbstractAssetManager() throws Exception {
-    penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT);
-    // empty database
-    penv.tx(new Fn<EntityManager, Object>() {
-      @Override public Object apply(EntityManager entityManager) {
-        Queries.sql.update(entityManager, "delete from oc_assets_asset");
-        Queries.sql.update(entityManager, "delete from oc_assets_properties");
-        Queries.sql.update(entityManager, "delete from oc_assets_snapshot");
-        Queries.sql.update(entityManager, "delete from oc_assets_version_claim");
-        return null;
-      }
-    });
-    //
-    final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
-            .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
-    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
-            .andAnswer(() -> getClass().getResourceAsStream("/dublincore-a.xml")).anyTimes();
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
-      File tmp = tempFolder.newFile();
-      FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
-      return tmp;
-    }).anyTimes();
-    EasyMock.replay(workspace);
-
-    //
-    final AssetStore assetStore = mkAssetStore("test-store-type");
-    //
-
-    HttpAssetProvider httpAssetProvider =  new HttpAssetProvider() {
-      @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
-        return snapshot;
-      }
-    };
-
-    Organization org = new DefaultOrganization();
-    User currentUser = TestUser.mk(org, org.getAdminRole());
-
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
-    EasyMock.expect(securityService.getUser()).andAnswer(() -> currentUser).anyTimes();
-    EasyMock.replay(securityService);
-
-    final AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
-    final AccessControlList acl = new AccessControlList(new AccessControlEntry("admin", "write", true));
-    EasyMock.expect(authorizationService.getActiveAcl(EasyMock.<MediaPackage>anyObject()))
-            .andReturn(tuple(acl, AclScope.Episode))
-            .anyTimes();
-    EasyMock.replay(authorizationService);
-
-    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(ms);
-
-    AssetManagerImpl am = new AssetManagerImpl();
-    am.setAssetStore(assetStore);
-    am.setHttpAssetProvider(httpAssetProvider);
-    am.setWorkspace(workspace);
-    am.setSecurityService(securityService);
-    am.setDatabase(new Database(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
-            penv));
-    am.setAuthSvc(authorizationService);
-    am.setMessageSender(ms);
-    return am;
   }
 
   /**
@@ -445,7 +434,7 @@ public abstract class AssetManagerTestBase {
   }
 
   void assertStoreSize(long size) {
-    assertEquals("Assets in store", size, (long) getAssetManager().getLocalAssetStore().getUsedSpace().get());
+    assertEquals("Assets in store", size, (long) am.getLocalAssetStore().getUsedSpace().get());
   }
 
   String getStoreType() {
