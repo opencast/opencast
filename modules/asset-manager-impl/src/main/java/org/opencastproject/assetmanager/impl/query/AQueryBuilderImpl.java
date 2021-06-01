@@ -24,7 +24,6 @@ import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.assetmanager.impl.query.PropertyPredicates.NONE;
 import static org.opencastproject.assetmanager.impl.query.PropertyPredicates.NO_VALUE;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.PropertyName;
 import org.opencastproject.assetmanager.api.Value.ValueType;
@@ -36,6 +35,7 @@ import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.api.query.VersionField;
+import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.assetmanager.impl.persistence.QPropertyDto;
@@ -57,9 +57,9 @@ import javax.annotation.Nonnull;
 public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
   private static final Stream<QSnapshotDto> FROM_SNAPSHOT = $Q_SNAPSHOT;
 
-  private final AssetManager am;
+  private final AssetManagerImpl am;
 
-  public AQueryBuilderImpl(AssetManager am) {
+  public AQueryBuilderImpl(AssetManagerImpl am) {
     this.am = am;
   }
 
