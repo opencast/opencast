@@ -469,6 +469,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     }
   }
 
+  // used for testing
+  public void setDatabase(Database database) {
+    this.db = database;
+  }
+
   /*
    * ------------------------------------------------------------------------------------------------------------------
    */
