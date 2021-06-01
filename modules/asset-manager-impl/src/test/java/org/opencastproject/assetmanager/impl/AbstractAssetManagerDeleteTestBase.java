@@ -36,9 +36,6 @@ import javax.persistence.EntityManager;
 
 public class AbstractAssetManagerDeleteTestBase extends AssetManagerTestBase implements EntityPaths {
   void assertPropertiesTotal(long count) {
-//    assertEquals("[AssetManager] There should be " + count + " properties total",
-//                 count,
-//                 enrich(q.select(q.properties()).run()).countProperties());
     assertEquals(format("[SQL] There should be %d properties total", count),
                  count,
                  runCount(new JPAQuery().from(Q_PROPERTY)));

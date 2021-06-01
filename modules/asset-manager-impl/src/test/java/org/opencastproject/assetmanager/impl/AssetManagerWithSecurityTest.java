@@ -35,6 +35,7 @@ import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.impl.util.TestOrganization;
 import org.opencastproject.assetmanager.impl.util.TestUser;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -45,6 +46,8 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.IoSupport;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.P1;
 import com.entwinemedia.fn.P1Lazy;
@@ -53,11 +56,14 @@ import com.entwinemedia.fn.ProductBuilder;
 import com.entwinemedia.fn.Unit;
 import com.entwinemedia.fn.data.Opt;
 
+import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.File;
+import java.net.URI;
 import java.util.HashSet;
 
 import junitparams.JUnitParamsRunner;
@@ -98,9 +104,26 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
     EasyMock.expect(secSvc.getOrganization()).andAnswer(() -> currentUser.getOrganization()).anyTimes();
     EasyMock.replay(secSvc);
 
+    final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
+            .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
+            .andAnswer(() -> getClass().getResourceAsStream("/dublincore-a.xml")).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
+      File tmp = tempFolder.newFile();
+      FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
+      return tmp;
+    }).anyTimes();
+    EasyMock.replay(workspace);
+
+    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(ms);
+
     AssetManagerImpl am = mkTieredStorageAM();
     am.setAuthSvc(authSvc);
     am.setSecurityService(secSvc);
+    am.setWorkspace(workspace);
+    am.setMessageSender(ms);
     // new AssetManagerImpl(false, false, false);
     return am;
   }
