@@ -35,11 +35,6 @@
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/smil-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-export-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-provider-influx/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-service-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-aws/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory/.+\.(java|properties)"/>
@@ -77,8 +72,6 @@
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="Indentation" files="modules/smil-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/statistics-export-service-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/statistics-service-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory-canvas/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory-sakai/.+\.java"/>
