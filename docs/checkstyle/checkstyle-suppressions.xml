@@ -35,8 +35,6 @@
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/smil-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/termination-state-aws/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/termination-state-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-brightspace/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-canvas/.+\.(java|properties)"/>
