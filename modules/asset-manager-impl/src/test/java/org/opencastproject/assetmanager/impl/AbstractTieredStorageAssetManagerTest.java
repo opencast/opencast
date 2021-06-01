@@ -37,7 +37,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import java.io.InputStream;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 public class AbstractTieredStorageAssetManagerTest
@@ -116,110 +115,6 @@ public class AbstractTieredStorageAssetManagerTest
         store = newStore;
         logSize();
         return deleted;
-      }
-
-      @Override public Option<Long> getTotalSpace() {
-        return Option.none();
-      }
-
-      @Override public Option<Long> getUsableSpace() {
-        return Option.none();
-      }
-
-      @Override public Option<Long> getUsedSpace() {
-        return Option.some((long) store.size());
-      }
-
-      @Override public String getStoreType() {
-        return storeType;
-      }
-    };
-  }
-
-  /**
-   * Create a test asset store.
-   */
-  protected RemoteAssetStore mkFaultyRemoteAssetStore(String storeType, Float faultyness) { // TODO
-    return new RemoteAssetStore() {
-      private Set<StoragePath> store = new HashSet<>();
-      private Random r = new Random(System.nanoTime());
-
-      private void logSize() {
-        logger.debug("Store contains {} asset/s", store.size());
-      }
-
-      private void logFault() throws AssetStoreException {
-        logger.debug("Store Fault!");
-        throw new AssetStoreException();
-      }
-
-      private boolean shouldFault() {
-        return r.nextFloat() > faultyness;
-      }
-
-      @Override public void put(StoragePath path, Source source) throws AssetStoreException {
-        if (shouldFault()) {
-          store.add(path);
-          logSize();
-        } else {
-          logFault();
-        }
-      }
-
-      @Override public boolean copy(StoragePath from, StoragePath to) throws AssetStoreException {
-        if (shouldFault()) {
-          if (store.contains(from)) {
-            store.add(to);
-            logSize();
-            return true;
-          } else {
-            return false;
-          }
-        } else {
-          logFault();
-          return false;
-        }
-      }
-
-      @Override public Opt<InputStream> get(StoragePath path) throws AssetStoreException {
-        if (shouldFault()) {
-          return IoSupport.openClassPathResource("/dublincore-a.xml").toOpt();
-        } else {
-          logFault();
-          return null;
-        }
-      }
-
-      @Override public boolean contains(StoragePath path) throws AssetStoreException {
-        if (shouldFault()) {
-          return store.contains(path);
-        } else {
-          logFault();
-          return false;
-        }
-      }
-
-      @Override public boolean delete(DeletionSelector sel) throws AssetStoreException {
-        if (shouldFault()) {
-          logger.info("Delete from asset store " + sel);
-          final Set<StoragePath> newStore = new HashSet<>();
-          boolean deleted = false;
-          for (StoragePath s : store) {
-            if (!(sel.getOrganizationId().equals(s.getOrganizationId())
-                    && sel.getMediaPackageId().equals(s.getMediaPackageId())
-                    && sel.getVersion().map(eq(s.getVersion())).getOr(true))) {
-              newStore.add(s);
-            } else {
-              deleted = true;
-            }
-          }
-          store = newStore;
-          logSize();
-          return deleted;
-        } else {
-          logFault();
-          return false;
-        }
       }
 
       @Override public Option<Long> getTotalSpace() {
