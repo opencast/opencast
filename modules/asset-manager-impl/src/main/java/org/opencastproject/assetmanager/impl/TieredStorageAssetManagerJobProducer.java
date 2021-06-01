@@ -20,6 +20,7 @@
  */
 package org.opencastproject.assetmanager.impl;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
@@ -63,7 +64,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
 
   private static final String OK = "OK";
 
-  private TieredStorageAssetManager tsam = null;
+  private AssetManager tsam = null;
   private ServiceRegistry serviceRegistry = null;
   private SecurityService securityService = null;
   private UserDirectoryService userDirectoryService = null;
@@ -157,7 +158,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
   }
 
   /**
-   * Triggers the move operation inside the {@link TieredStorageAssetManager}
+   * Triggers the move operation inside the {@link AssetManager}
    *
    * @param version
    *  The {@link Version} to move
@@ -361,7 +362,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
     return this.serviceRegistry;
   }
 
-  protected void setAssetManager(TieredStorageAssetManager assetManager) {
+  protected void setAssetManager(AssetManager assetManager) {
     this.tsam = assetManager;
   }
 
