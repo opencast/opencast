@@ -453,7 +453,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     } else {
       chosenMp = snapshot.getMediaPackage();
     }
-    return AssetManagerItem.add(workspace, chosenMp, authorizationService.getActiveAcl(chosenMp).getA(), getVersionLong(snapshot),
+    return AssetManagerItem.add(workspace, chosenMp, authorizationService.getActiveAcl(chosenMp).getA(),
+            getVersionLong(snapshot),
             snapshot.getArchivalDate());
   }
 
@@ -479,8 +480,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    */
 
   /**
-   * Call {@link org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(AbstractADeleteQuery.DeleteSnapshotHandler)} with a
-   * delete handler that sends messages to ActiveMQ. Also make sure to propagate the behaviour to subsequent instances.
+   * Call {@link
+   * org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(AbstractADeleteQuery.DeleteSnapshotHandler)}
+   * with a delete handler that sends messages to ActiveMQ. Also make sure to propagate the behaviour to subsequent
+   * instances.
    */
   private final class ADeleteQueryWithMessaging extends ADeleteQueryDecorator {
     ADeleteQueryWithMessaging(ADeleteQuery delegate) {
@@ -1059,7 +1062,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 existingAsset.getMediaPackageElementId(), e.getChecksum(), store.getStoreType());
         if (!store.copy(existingAsset, storagePath)) {
           throw new AssetManagerException(format(
-                  "An asset with checksum %s has already been archived but trying to copy or link asset %s to it failed",
+                  "An asset with checksum %s has already been archived but trying to copy or link asset %s to it "
+                          + "failed",
                   e.getChecksum(),
                   existingAsset
           ));
@@ -1239,7 +1243,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 existingAsset.getMediaPackageElementId(), e.getChecksum());
         if (!getLocalAssetStore().copy(existingAsset, storagePath)) {
           throw new AssetManagerException(format(
-                  "An asset with checksum %s has already been archived but trying to copy or link asset %s to it failed",
+                  "An asset with checksum %s has already been archived but trying to copy or link asset %s to it "
+                          + "failed",
                   e.getChecksum(),
                   existingAsset
           ));
