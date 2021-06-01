@@ -23,8 +23,8 @@ package org.opencastproject.assetmanager.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.opencastproject.assetmanager.impl.AssetManagerWithSecurity.READ_ACTION;
-import static org.opencastproject.assetmanager.impl.AssetManagerWithSecurity.WRITE_ACTION;
+import static org.opencastproject.assetmanager.impl.AssetManagerImpl.READ_ACTION;
+import static org.opencastproject.assetmanager.impl.AssetManagerImpl.WRITE_ACTION;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.Availability;
@@ -64,7 +64,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
 @RunWith(JUnitParamsRunner.class)
-public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetManagerTest<AssetManagerWithSecurity> {
+public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetManagerTest {
   public static final String ROLE_TEACHER = "ROLE_TEACHER";
   public static final String ROLE_USER = "ROLE_USER";
   public static final String ROLE_STUDENT = "ROLE_STUDENT";
@@ -87,7 +87,7 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
   /**
    * Setup the test environment.
    */
-  public AssetManagerWithSecurity mkTestEnvironment() throws Exception {
+  public AssetManagerImpl mkTestEnvironment() throws Exception {
     final AuthorizationService authSvc = EasyMock.createMock(AuthorizationService.class);
     EasyMock.expect(authSvc.getActiveAcl(EasyMock.anyObject(MediaPackage.class))).andAnswer(
             () -> tuple(currentMediaPackageAcl, AclScope.Episode)).anyTimes();
@@ -97,12 +97,12 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
     EasyMock.expect(secSvc.getUser()).andAnswer(() -> currentUser).anyTimes();
     EasyMock.expect(secSvc.getOrganization()).andAnswer(() -> currentUser.getOrganization()).anyTimes();
     EasyMock.replay(secSvc);
-    //
-    return new AssetManagerWithSecurity(mkTieredStorageAM(), authSvc, secSvc, false, false, false);
-  }
 
-  @Override public AssetManager getAbstractAssetManager() {
-    return (AssetManager) am.withMessaging;
+    AssetManagerImpl am = mkTieredStorageAM();
+    am.setAuthSvc(authSvc);
+    am.setSecurityService(secSvc);
+    // new AssetManagerImpl(false, false, false);
+    return am;
   }
 
   @Override public String getCurrentOrgId() {

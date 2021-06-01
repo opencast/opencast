@@ -53,7 +53,7 @@ import java.net.URI;
 /**
  * Test message sending to ActiveMQ.
  */
-public class AssetManagerWithMessagingTest extends AbstractTieredStorageAssetManagerTest<AssetManagerImpl> {
+public class AssetManagerWithMessagingTest extends AbstractTieredStorageAssetManagerTest {
   private MessageSender ms;
 
   public AssetManagerImpl mkTestEnvironment() throws Exception {
@@ -70,11 +70,11 @@ public class AssetManagerWithMessagingTest extends AbstractTieredStorageAssetMan
         .anyTimes();
     EasyMock.replay(authSvc);
     ms = EasyMock.createMock(MessageSender.class);
-    return new AssetManagerImpl(mkTieredStorageAM(), ms, authSvc, workspace);
-  }
-
-  @Override public AssetManager getAbstractAssetManager() {
-    return (AssetManager) am.delegate;
+    AssetManagerImpl am = mkTieredStorageAM();
+    am.setAuthSvc(authSvc);
+    am.setWorkspace(workspace);
+    am.setMessageSender(ms);
+    return am;
   }
 
   @Override public String getCurrentOrgId() {

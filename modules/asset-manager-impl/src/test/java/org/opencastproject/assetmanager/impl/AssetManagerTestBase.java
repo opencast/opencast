@@ -45,6 +45,8 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.data.Collections;
@@ -87,7 +89,8 @@ import javax.persistence.EntityManager;
  * #mkTestEntityManagerFactoryFromSystemProperties(String)} for command line
  * configuration options.
  * <p>
- * Implementations of this class need to call {@link #setUp(org.opencastproject.assetmanager.api.AssetManager)} to setup the necessary variables prior to
+ * Implementations of this class need to call {@link #setUp(org.opencastproject.assetmanager.impl.AssetManagerImpl)}
+ * to setup the necessary variables prior to
  * running a test. You may implement a {@link org.junit.Before} annotated method like this:
  * <pre>
  *   |@Before
@@ -97,7 +100,7 @@ import javax.persistence.EntityManager;
  * </pre>
  */
 // CHECKSTYLE:OFF
-public abstract class AssetManagerTestBase<A extends AssetManager> {
+public abstract class AssetManagerTestBase {
   protected static final Logger logger = LoggerFactory.getLogger(AssetManagerTestBase.class);
   public static final String PERSISTENCE_UNIT = "org.opencastproject.assetmanager.impl";
 
@@ -107,7 +110,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
   public TemporaryFolder tempFolder = new TemporaryFolder();
 
   /** The asset manager under test. */
-  protected A am;
+  protected AssetManagerImpl am;
   protected AQueryBuilder q;
   protected Props p;
   protected Props p2;
@@ -117,7 +120,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
    * Return the underlying instance of {@link AssetManager}.
    * If the asset manager under test is of type AbstractAssetManager just return that instance.
    */
-  public AssetManager getAbstractAssetManager() {
+  public AssetManagerImpl getAssetManager() {
     return am;
   }
 
@@ -130,7 +133,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
     setUp(mkAbstractAssetManager());
   }
 
-  public final void setUp(A assetManager) {
+  public final void setUp(AssetManagerImpl assetManager) {
     am = assetManager;
     q = am.createQuery();
     p = new Props(q, "org.opencastproject.service");
@@ -249,10 +252,10 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
           @Override public Snapshot apply(Integer versionCount) {
             if (!continuousVersions) {
               // insert a gap into the version claim
-              getAbstractAssetManager().getDb().claimVersion(mp.getIdentifier().toString());
+              getAssetManager().getDb().claimVersion(mp.getIdentifier().toString());
             }
             logger.debug("Taking snapshot {} of media package {}", versionCount + 1, mpId);
-            return am.takeSnapshot(OWNER, mp);
+            return getAssetManager().takeSnapshot(OWNER, mp);
           }
         });
       }
@@ -294,7 +297,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
   /**
    * Create a new test asset manager.
    */
-  protected AssetManager mkAbstractAssetManager() throws Exception {
+  protected AssetManagerImpl mkAbstractAssetManager() throws Exception {
     penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT);
     // empty database
     penv.tx(new Fn<EntityManager, Object>() {
@@ -306,9 +309,6 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
         return null;
       }
     });
-    final Database db = new Database(
-            PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
-            penv);
     //
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
@@ -322,32 +322,29 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
     //
     final AssetStore assetStore = mkAssetStore("test-store-type");
     //
-    return new AssetManager() {
-      @Override public Database getDb() {
-        return db;
-      }
 
-      @Override public AssetStore getLocalAssetStore() {
-        return assetStore;
-      }
-
-      @Override public HttpAssetProvider getHttpAssetProvider() {
-        // identity provider
-        return new HttpAssetProvider() {
-          @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
-            return snapshot;
-          }
-        };
-      }
-
-      @Override protected Workspace getWorkspace() {
-        return workspace;
-      }
-
-      @Override protected String getCurrentOrgId() {
-        return AssetManagerTestBase.this.getCurrentOrgId();
+    HttpAssetProvider httpAssetProvider =  new HttpAssetProvider() {
+      @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
+        return snapshot;
       }
     };
+
+    Organization org = EasyMock.niceMock(Organization.class);
+    EasyMock.expect(org.getId()).andReturn(getCurrentOrgId()).anyTimes();
+    EasyMock.replay(org);
+
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.replay(securityService);
+
+    AssetManagerImpl am = new AssetManagerImpl();
+    am.setAssetStore(assetStore);
+    am.setHttpAssetProvider(httpAssetProvider);
+    am.setWorkspace(workspace);
+    am.setSecurityService(securityService);
+    am.setDatabase(new Database(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
+            penv));
+    return am;
   }
 
   /**
@@ -429,7 +426,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
   }
 
   void assertStoreSize(long size) {
-    assertEquals("Assets in store", size, (long) getAbstractAssetManager().getLocalAssetStore().getUsedSpace().get());
+    assertEquals("Assets in store", size, (long) getAssetManager().getLocalAssetStore().getUsedSpace().get());
   }
 
   String getStoreType() {
