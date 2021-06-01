@@ -114,7 +114,7 @@ public class AssetManagerPropertyRetrievalTest extends AssetManagerTestBase {
       assertThat("Number of records", r.getSize(), params.expectRecords);
       final Stream<Property> allProps = r.getRecords().bind(ARecords.getProperties);
       assertThat(
-          "Total number of properties: " + allProps.mkString(", "), // TODO Assertion doesn't match
+          "Total number of properties: " + allProps.mkString(", "),
           sizeOf(allProps),
           params.expectPropertiesTotal
       );
@@ -194,7 +194,7 @@ public class AssetManagerPropertyRetrievalTest extends AssetManagerTestBase {
                   }
                 })
                 .expectRecords(equalTo(1L))
-                .expectPropertiesTotal(equalTo(5)) //TODo but was 6
+                .expectPropertiesTotal(equalTo(5))
                 .expectSnapshotsTotal(equalTo(0))
                 .expectContainsSavedProperty(true),
             //
