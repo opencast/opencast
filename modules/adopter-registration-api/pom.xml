@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>opencast-adopter-statistics-api</artifactId>
+  <artifactId>opencast-adopter-registration-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Opencast :: adopter-statistics-api</name>
+  <name>Opencast :: adopter-registration-api</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>

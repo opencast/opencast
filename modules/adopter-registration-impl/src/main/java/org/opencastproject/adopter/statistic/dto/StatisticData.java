@@ -70,6 +70,8 @@ public class StatisticData {
   /** The hosts of an adopter.*/
   private List<Host> hosts;
 
+  /** The Opencast version */
+  private String version;
 
   //================================================================================
   // Methods
@@ -151,4 +153,11 @@ public class StatisticData {
     this.hosts.add(host);
   }
 
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  public String getVersion() {
+    return version;
+  }
 }
