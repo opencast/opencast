@@ -22,89 +22,36 @@ package org.opencastproject.assetmanager.impl;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.assetmanager.impl.util.TestUser;
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteEpisode;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteSnapshot;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
-import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
-import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fx;
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.Serializable;
-import java.net.URI;
 
 /**
  * Test message sending to ActiveMQ.
  */
-public class AssetManagerWithMessagingTest extends AbstractTieredStorageAssetManagerTest {
+public class AssetManagerMessagingTest extends AbstractTieredStorageAssetManagerTest {
   private MessageSender ms;
 
-  public AssetManagerImpl mkTestEnvironment() throws Exception {
-    final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
-            .andReturn(new File(getClass().getResource("/dublincore-a.xml").toURI())).anyTimes();
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
-      File tmp = tempFolder.newFile();
-      FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
-      return tmp;
-    }).anyTimes();
-    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
-            .andAnswer(() -> getClass().getResourceAsStream("/dublincore-a.xml")).anyTimes();
-    EasyMock.replay(workspace);
-
-    final AuthorizationService authSvc = EasyMock.createNiceMock(AuthorizationService.class);
-    final AccessControlList acl = new AccessControlList(new AccessControlEntry("admin", "write", true));
-    EasyMock.expect(authSvc.getActiveAcl(EasyMock.<MediaPackage>anyObject()))
-        .andReturn(tuple(acl, AclScope.Episode))
-        .anyTimes();
-    EasyMock.replay(authSvc);
+  @Override
+  public AssetManagerImpl makeAssetManager() throws Exception {
     ms = EasyMock.createMock(MessageSender.class);
 
-    Organization org = new DefaultOrganization();
-    User currentUser = TestUser.mk(org, org.getAdminRole());
-
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
-    EasyMock.expect(securityService.getUser()).andAnswer(() -> currentUser).anyTimes();
-    EasyMock.replay(securityService);
-
-    AssetManagerImpl am = mkTieredStorageAM();
-    am.setAuthSvc(authSvc);
-    am.setWorkspace(workspace);
+    AssetManagerImpl am = super.makeAssetManager();
     am.setMessageSender(ms);
-    am.setSecurityService(securityService);
     return am;
-  }
-
-  @Override public String getCurrentOrgId() {
-    return DefaultOrganization.DEFAULT_ORGANIZATION_ID;
-  }
-
-  @Before
-  public void setUp() throws Exception {
-    setUp(mkTestEnvironment());
   }
 
   /* -------------------------------------------------------------------------------------------------------------- */

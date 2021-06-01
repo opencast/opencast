@@ -133,7 +133,7 @@ public class AbstractAssetManagerPropertyRetrievalTest extends AssetManagerTestB
   }
 
   private Object parametersForTestPropertyRetrieval() throws Exception {
-    setUp(mkAbstractAssetManager());
+    super.setUp();
     return $a(
             // Fetch one property of the latest version of a media package.
             new Params()
