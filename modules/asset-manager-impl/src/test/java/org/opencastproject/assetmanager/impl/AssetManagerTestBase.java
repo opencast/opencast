@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.impl;
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.fns.Booleans.eq;
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
@@ -37,6 +38,7 @@ import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
+import org.opencastproject.assetmanager.impl.util.TestUser;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -44,9 +46,15 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.data.Collections;
@@ -122,10 +130,6 @@ public abstract class AssetManagerTestBase {
    */
   public AssetManagerImpl getAssetManager() {
     return am;
-  }
-
-  public String getCurrentOrgId() {
-    return DefaultOrganization.DEFAULT_ORGANIZATION_ID;
   }
 
   @Before
@@ -313,12 +317,15 @@ public abstract class AssetManagerTestBase {
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
             .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
+            .andAnswer(() -> getClass().getResourceAsStream("/dublincore-a.xml")).anyTimes();
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
       File tmp = tempFolder.newFile();
       FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
       return tmp;
     }).anyTimes();
     EasyMock.replay(workspace);
+
     //
     final AssetStore assetStore = mkAssetStore("test-store-type");
     //
@@ -329,13 +336,23 @@ public abstract class AssetManagerTestBase {
       }
     };
 
-    Organization org = EasyMock.niceMock(Organization.class);
-    EasyMock.expect(org.getId()).andReturn(getCurrentOrgId()).anyTimes();
-    EasyMock.replay(org);
+    Organization org = new DefaultOrganization();
+    User currentUser = TestUser.mk(org, org.getAdminRole());
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.expect(securityService.getUser()).andAnswer(() -> currentUser).anyTimes();
     EasyMock.replay(securityService);
+
+    final AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
+    final AccessControlList acl = new AccessControlList(new AccessControlEntry("admin", "write", true));
+    EasyMock.expect(authorizationService.getActiveAcl(EasyMock.<MediaPackage>anyObject()))
+            .andReturn(tuple(acl, AclScope.Episode))
+            .anyTimes();
+    EasyMock.replay(authorizationService);
+
+    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(ms);
 
     AssetManagerImpl am = new AssetManagerImpl();
     am.setAssetStore(assetStore);
@@ -344,6 +361,8 @@ public abstract class AssetManagerTestBase {
     am.setSecurityService(securityService);
     am.setDatabase(new Database(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
             penv));
+    am.setAuthSvc(authorizationService);
+    am.setMessageSender(ms);
     return am;
   }
 
