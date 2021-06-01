@@ -99,3 +99,18 @@ custom publication channels in the configuration files `etc/listproviders/public
         <configuration key="check-availability">true</configuration>
       </configurations>
     </operation>
+
+### Meta publication
+Meta publications are URL only publications as reference to external systems like media portal.
+
+    <operation
+      id="publish-configure"
+      exception-handler-workflow="partial-error"
+      description="Publish to meta publication channel">
+      <configurations>
+        <configuration key="channel-id">edu-reference</configuration>
+        <configuration key="mimetype">text/html</configuration>
+        <configuration key="url-pattern">https://org.mediaportal.edu/events/${event_id}</configuration>
+        <configuration key="check-availability">false</configuration>
+      </configurations>
+    </operation>
