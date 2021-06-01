@@ -22,7 +22,6 @@ package org.opencastproject.assetmanager.impl;
 
 import static com.entwinemedia.fn.fns.Booleans.eq;
 
-import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
@@ -30,100 +29,41 @@ import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import org.opencastproject.util.persistencefn.PersistenceUtil;
-import org.opencastproject.util.persistencefn.Queries;
-import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.FileUtils;
-import org.easymock.EasyMock;
-
-import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-
-import javax.persistence.EntityManager;
 
 public class AbstractTieredStorageAssetManagerTest
     extends AssetManagerTestBase {
   public static final String LOCAL_STORE_ID = "local-test";
   public static final String REMOTE_STORE_1_ID = "remote-1-test";
   public static final String REMOTE_STORE_2_ID = "remote-2-test";
-  private static final String ORG_ID = "fake_org_id";
 
   private AssetStore localAssetStore;
   //We're using local asset stores here to make things easier, RemoteAssetStore just adds a cache directory config key
   protected RemoteAssetStore remoteAssetStore1;
   protected RemoteAssetStore remoteAssetStore2;
 
-  public AssetManagerImpl mkTieredStorageAM() throws Exception {
-    penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT);
-    // empty database
-    penv.tx(new Fn<EntityManager, Object>() {
-      @Override public Object apply(EntityManager entityManager) {
-        Queries.sql.update(entityManager, "delete from oc_assets_asset");
-        Queries.sql.update(entityManager, "delete from oc_assets_properties");
-        Queries.sql.update(entityManager, "delete from oc_assets_snapshot");
-        Queries.sql.update(entityManager, "delete from oc_assets_version_claim");
-        return null;
-      }
-    });
-
+  @Override
+  public AssetManagerImpl makeAssetManager() throws Exception {
     final Database db = new Database(
             PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT));
-    //
-    final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
-            .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
-      File tmp = tempFolder.newFile();
-      FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
-      return tmp;
-    }).anyTimes();
-    EasyMock.replay(workspace);
-    //
+
     localAssetStore = mkAssetStore(LOCAL_STORE_ID);
     remoteAssetStore1 = mkRemoteAssetStore(REMOTE_STORE_1_ID);
     remoteAssetStore2 = mkRemoteAssetStore(REMOTE_STORE_2_ID);
 
-    HttpAssetProvider httpAssetProvider =  new HttpAssetProvider() {
-      @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
-        return snapshot;
-      }
-    };
-
-    Organization org = EasyMock.niceMock(Organization.class);
-    EasyMock.expect(org.getId()).andReturn(getCurrentOrgId()).anyTimes();
-
-    SecurityService securityService = EasyMock.niceMock(SecurityService.class);
-    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
-    EasyMock.replay(org, securityService);
-
-    AssetManagerImpl am = new AssetManagerImpl();
+    AssetManagerImpl am = super.makeAssetManager();
     am.setDatabase(db);
-    am.setHttpAssetProvider(httpAssetProvider);
-    am.setWorkspace(workspace);
-    am.setSecurityService(securityService);
-    am.setAssetStore(localAssetStore);
+    am.setAssetStore(localAssetStore); // TODO
     return am;
-  }
-
-  @Override public AssetManagerImpl getAssetManager() {
-    return am;
-  }
-
-  public String getCurrentOrgId() {
-    return ORG_ID;
   }
 
   /**
@@ -199,7 +139,7 @@ public class AbstractTieredStorageAssetManagerTest
   /**
    * Create a test asset store.
    */
-  protected RemoteAssetStore mkFaultyRemoteAssetStore(String storeType, Float faultyness) {
+  protected RemoteAssetStore mkFaultyRemoteAssetStore(String storeType, Float faultyness) { // TODO
     return new RemoteAssetStore() {
       private Set<StoragePath> store = new HashSet<>();
       private Random r = new Random(System.nanoTime());

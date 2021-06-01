@@ -35,7 +35,6 @@ import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.impl.util.TestOrganization;
 import org.opencastproject.assetmanager.impl.util.TestUser;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -46,90 +45,52 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.IoSupport;
-import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.P1;
 import com.entwinemedia.fn.P1Lazy;
 import com.entwinemedia.fn.Prelude;
-import com.entwinemedia.fn.ProductBuilder;
 import com.entwinemedia.fn.Unit;
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.File;
-import java.net.URI;
 import java.util.HashSet;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
 @RunWith(JUnitParamsRunner.class)
-public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetManagerTest {
+public class AssetManagerSecurityTest extends AbstractTieredStorageAssetManagerTest {
   public static final String ROLE_TEACHER = "ROLE_TEACHER";
   public static final String ROLE_USER = "ROLE_USER";
   public static final String ROLE_STUDENT = "ROLE_STUDENT";
   public static final String ROLE_ANONYMOUS = "ROLE_ANONYMOUS";
   public static final String ROLE_ORG_ADMIN = "ROLE_ORG_ADMIN";
 
-  private static ProductBuilder p = com.entwinemedia.fn.Products.E;
-
-  private SecurityService secSvc;
+  private SecurityService securityService;
 
   // Yikes, mutable state! Watch out...
   private User currentUser = TestUser.mk(TestOrganization.mkDefault(), new HashSet<Role>());
   private AccessControlList currentMediaPackageAcl = acl();
 
-  @Before
-  public void setUp() throws Exception {
-    setUp(mkTestEnvironment());
-  }
-
-  /**
-   * Setup the test environment.
-   */
-  public AssetManagerImpl mkTestEnvironment() throws Exception {
+  @Override
+  public AssetManagerImpl makeAssetManager() throws Exception {
     final AuthorizationService authSvc = EasyMock.createMock(AuthorizationService.class);
     EasyMock.expect(authSvc.getActiveAcl(EasyMock.anyObject(MediaPackage.class))).andAnswer(
             () -> tuple(currentMediaPackageAcl, AclScope.Episode)).anyTimes();
     EasyMock.replay(authSvc);
-    //
-    secSvc = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(secSvc.getUser()).andAnswer(() -> currentUser).anyTimes();
-    EasyMock.expect(secSvc.getOrganization()).andAnswer(() -> currentUser.getOrganization()).anyTimes();
-    EasyMock.replay(secSvc);
 
-    final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
-            .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
-    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
-            .andAnswer(() -> getClass().getResourceAsStream("/dublincore-a.xml")).anyTimes();
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
-      File tmp = tempFolder.newFile();
-      FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
-      return tmp;
-    }).anyTimes();
-    EasyMock.replay(workspace);
+    securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andAnswer(() -> currentUser).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andAnswer(() -> currentUser.getOrganization()).anyTimes();
+    EasyMock.replay(securityService);
 
-    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(ms);
-
-    AssetManagerImpl am = mkTieredStorageAM();
+    AssetManagerImpl am = super.makeAssetManager();
+    am.setSecurityService(securityService);
     am.setAuthSvc(authSvc);
-    am.setSecurityService(secSvc);
-    am.setWorkspace(workspace);
-    am.setMessageSender(ms);
-    // new AssetManagerImpl(false, false, false);
     return am;
-  }
-
-  @Override public String getCurrentOrgId() {
-    return secSvc.getOrganization().getId();
   }
 
   /**
