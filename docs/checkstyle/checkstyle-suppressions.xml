@@ -25,7 +25,6 @@
     <suppress checks="LineLength" files="modules/ingest-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/inspection-service-ffmpeg/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/kernel/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/live-schedule-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/mpeg7/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh-persistence/.+\.(java|properties)"/>
@@ -94,7 +93,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/ingest-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/inspection-service-ffmpeg/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/kernel/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/live-schedule-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/mpeg7/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh-persistence/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh/.+\.java"/>
