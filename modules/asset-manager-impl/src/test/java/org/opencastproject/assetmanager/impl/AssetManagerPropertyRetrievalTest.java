@@ -58,7 +58,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
 @RunWith(JUnitParamsRunner.class)
-public class AbstractAssetManagerPropertyRetrievalTest extends AssetManagerTestBase {
+public class AssetManagerPropertyRetrievalTest extends AssetManagerTestBase {
   /**
    * Create some media packages and associate some random properties to each of them.
    * Then iterate all created properties and create a query for each of them.
