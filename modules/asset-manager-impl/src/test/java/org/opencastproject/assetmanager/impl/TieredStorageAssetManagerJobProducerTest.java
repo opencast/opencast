@@ -20,20 +20,38 @@
  */
 package org.opencastproject.assetmanager.impl;
 
+import static org.opencastproject.util.data.Tuple.tuple;
+
+import org.opencastproject.assetmanager.impl.util.TestUser;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
+import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 
+import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.File;
+import java.net.URI;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,7 +68,42 @@ public class TieredStorageAssetManagerJobProducerTest
   @Before
   public void before() throws Exception {
     setUp(mkTieredStorageAM());
+
+    final AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
+    final AccessControlList acl = new AccessControlList(new AccessControlEntry("admin", "write", true));
+    EasyMock.expect(authorizationService.getActiveAcl(EasyMock.<MediaPackage>anyObject()))
+            .andReturn(tuple(acl, AclScope.Episode))
+            .anyTimes();
+    EasyMock.replay(authorizationService);
+
+    final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
+            .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
+            .andAnswer(() -> getClass().getResourceAsStream("/dublincore-a.xml")).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
+      File tmp = tempFolder.newFile();
+      FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
+      return tmp;
+    }).anyTimes();
+    EasyMock.replay(workspace);
+
+    Organization org = new DefaultOrganization();
+    User currentUser = TestUser.mk(org, org.getAdminRole());
+
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.expect(securityService.getUser()).andAnswer(() -> currentUser).anyTimes();
+    EasyMock.replay(securityService);
+
+    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(ms);
+
     am.addRemoteAssetStore(remoteAssetStore1);
+    am.setAuthSvc(authorizationService);
+    am.setWorkspace(workspace);
+    am.setMessageSender(ms);
+    am.setSecurityService(securityService);
 
     tsamjp = new TieredStorageAssetManagerJobProducer();
     tsamjp.setOrganizationDirectoryService(null);

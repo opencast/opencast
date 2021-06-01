@@ -122,7 +122,6 @@ public class AbstractTieredStorageAssetManagerTest
     return am;
   }
 
-  @Override
   public String getCurrentOrgId() {
     return ORG_ID;
   }
