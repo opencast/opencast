@@ -25,6 +25,10 @@ import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
+import org.opencastproject.util.persistencefn.PersistenceEnv;
+import org.opencastproject.util.persistencefn.PersistenceEnvs;
+import org.opencastproject.util.persistencefn.PersistenceUtil;
+import org.opencastproject.util.persistencefn.Queries;
 
 import com.entwinemedia.fn.Fn;
 import com.mysema.query.jpa.impl.JPADeleteClause;
@@ -35,6 +39,38 @@ import com.mysema.query.types.Predicate;
 import javax.persistence.EntityManager;
 
 public class AssetManagerDeleteTestBase extends AssetManagerTestBase implements EntityPaths {
+
+  protected PersistenceEnv penv;
+
+  @Override
+  public AssetManagerImpl makeAssetManager() throws Exception {
+    penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT);
+    // empty database
+    penv.tx(new Fn<EntityManager, Object>() {
+      @Override public Object apply(EntityManager entityManager) {
+        Queries.sql.update(entityManager, "delete from oc_assets_asset");
+        Queries.sql.update(entityManager, "delete from oc_assets_properties");
+        Queries.sql.update(entityManager, "delete from oc_assets_snapshot");
+        Queries.sql.update(entityManager, "delete from oc_assets_version_claim");
+        return null;
+      }
+    });
+
+    final Database db = new Database(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
+            penv);
+    am = super.makeAssetManager();
+    am.setDatabase(db);
+    return am;
+  }
+
+  long runCount(final JPAQuery q) {
+    return penv.tx(new Fn<EntityManager, Long>() {
+      @Override public Long apply(EntityManager em) {
+        return q.clone(em, Database.TEMPLATES).count();
+      }
+    });
+  }
+
   void assertPropertiesTotal(long count) {
     assertEquals(format("[SQL] There should be %d properties total", count),
                  count,

@@ -47,7 +47,6 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -59,7 +58,6 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
 import org.opencastproject.util.persistencefn.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -69,7 +67,6 @@ import com.entwinemedia.fn.P1;
 import com.entwinemedia.fn.P1Lazy;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.jpa.impl.JPAQuery;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -85,8 +82,6 @@ import java.net.URI;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.persistence.EntityManager;
 
 /**
  * Base class for {@link org.opencastproject.assetmanager.api.AssetManager} tests.
@@ -115,7 +110,6 @@ public abstract class AssetManagerTestBase {
   protected AQueryBuilder q;
   protected Props p;
   protected Props p2;
-  protected PersistenceEnv penv;
 
   @Before
   public void setUp() throws Exception {
@@ -129,23 +123,8 @@ public abstract class AssetManagerTestBase {
    * Create a new test asset manager.
    */
   protected AssetManagerImpl makeAssetManager() throws Exception {
-//    penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT); // TODO for what do we need this?
-//    // empty database
-//    penv.tx(new Fn<EntityManager, Object>() {
-//      @Override public Object apply(EntityManager entityManager) {
-//        Queries.sql.update(entityManager, "delete from oc_assets_asset");
-//        Queries.sql.update(entityManager, "delete from oc_assets_properties");
-//        Queries.sql.update(entityManager, "delete from oc_assets_snapshot");
-//        Queries.sql.update(entityManager, "delete from oc_assets_version_claim");
-//        return null;
-//      }
-//    });
-
     final Database db = new Database(
             PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT));
-
-    //final Database db = new Database(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
-    //        penv);
 
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
@@ -159,7 +138,6 @@ public abstract class AssetManagerTestBase {
     }).anyTimes();
     EasyMock.replay(workspace);
 
-    //final AssetStore assetStore = mkAssetStore("test-store-type"); // TODO remove
     AssetStore localAssetStore = mkAssetStore(LOCAL_STORE_ID);
     RemoteAssetStore remoteAssetStore1 = mkRemoteAssetStore(REMOTE_STORE_1_ID);
     RemoteAssetStore remoteAssetStore2 = mkRemoteAssetStore(REMOTE_STORE_2_ID);
@@ -179,9 +157,8 @@ public abstract class AssetManagerTestBase {
     EasyMock.replay(securityService);
 
     final AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
-    final AccessControlList acl = new AccessControlList(new AccessControlEntry("admin", "write", true));
     EasyMock.expect(authorizationService.getActiveAcl(EasyMock.<MediaPackage>anyObject()))
-            .andReturn(tuple(acl, AclScope.Episode))
+            .andReturn(tuple(new AccessControlList(), AclScope.Episode))
             .anyTimes();
     EasyMock.replay(authorizationService);
 
@@ -493,14 +470,6 @@ public abstract class AssetManagerTestBase {
         return storeType;
       }
     };
-  }
-
-  long runCount(final JPAQuery q) {
-    return penv.tx(new Fn<EntityManager, Long>() {
-      @Override public Long apply(EntityManager em) {
-        return q.clone(em, Database.TEMPLATES).count();
-      }
-    });
   }
 
   void assertStoreSize(long size) {
