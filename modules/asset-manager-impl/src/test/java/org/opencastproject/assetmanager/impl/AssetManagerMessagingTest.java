@@ -42,7 +42,7 @@ import java.io.Serializable;
 /**
  * Test message sending to ActiveMQ.
  */
-public class AssetManagerMessagingTest extends AbstractTieredStorageAssetManagerTest {
+public class AssetManagerMessagingTest extends AssetManagerTestBase {
   private MessageSender ms;
 
   @Override

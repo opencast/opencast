@@ -62,7 +62,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
 @RunWith(JUnitParamsRunner.class)
-public class AssetManagerSecurityTest extends AbstractTieredStorageAssetManagerTest {
+public class AssetManagerSecurityTest extends AssetManagerTestBase {
   public static final String ROLE_TEACHER = "ROLE_TEACHER";
   public static final String ROLE_USER = "ROLE_USER";
   public static final String ROLE_STUDENT = "ROLE_STUDENT";
