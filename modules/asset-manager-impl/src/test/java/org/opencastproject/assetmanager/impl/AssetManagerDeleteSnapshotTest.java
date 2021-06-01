@@ -30,7 +30,7 @@ import com.mysema.query.jpa.JPASubQuery;
 
 import org.junit.Test;
 
-public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManagerDeleteTestBase implements EntityPaths {
+public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase implements EntityPaths {
   // run asset manager or raw JPA queries
   private static final boolean RUN_RAW_QUERIES = false;
 

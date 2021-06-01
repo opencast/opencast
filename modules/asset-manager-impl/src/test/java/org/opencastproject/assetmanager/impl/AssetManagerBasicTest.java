@@ -50,7 +50,7 @@ import java.net.URI;
 import java.util.Date;
 
 // CHECKSTYLE:OFF
-public class AbstractAssetManagerBasicTest extends AssetManagerTestBase {
+public class AssetManagerBasicTest extends AssetManagerTestBase {
   @Test
   public void testAddToStore() {
     createAndAddMediaPackagesSimple(1, 1, 1);
