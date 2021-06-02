@@ -93,7 +93,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     am.calcChecksumsForMediaPackageElements(AssetManagerImpl.assetsOnly(mpCopy));
     assertEquals("Media package should be set up with a single catalog", 1, mpCopy.getCatalogs().length);
     final String checksum = mpCopy.getCatalogs()[0].getChecksum().toString();
-    assertTrue("Media package element should be retrievable by checksum", am.getDb().findAssetByChecksum(checksum).isSome());
+    assertTrue("Media package element should be retrievable by checksum", am.getDatabase().findAssetByChecksum(checksum).isSome());
     // issue some queries
     {
       logger.info("Run a failing query");

@@ -103,7 +103,7 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
   }
 
   @Override public AResult run() {
-    return am.getDb().run(new Fn<JPAQueryFactory, AResult>() {
+    return am.getDatabase().run(new Fn<JPAQueryFactory, AResult>() {
       @Override public AResult apply(JPAQueryFactory f) {
         return run(f);
       }
@@ -198,7 +198,7 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
     final Stream<ARecordImpl> records;
     {
       // run query
-      am.getDb().logQuery(q);
+      am.getDatabase().logQuery(q);
       final List<Tuple> result = q.list(JpaFns.toExpressionArray(fetch));
       logger.debug("Pure query ms " + (System.nanoTime() - startTime) / 1000000);
       // map result based on the fact whether properties have been fetched or not
