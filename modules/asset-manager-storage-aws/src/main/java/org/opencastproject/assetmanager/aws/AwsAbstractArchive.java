@@ -23,15 +23,15 @@ package org.opencastproject.assetmanager.aws;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 
-import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase;
-import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseException;
-import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
-import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
+import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase;
+import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabaseException;
+import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
+import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
