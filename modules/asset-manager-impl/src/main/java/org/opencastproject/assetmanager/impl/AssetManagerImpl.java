@@ -145,7 +145,7 @@ import javax.persistence.EntityManagerFactory;
     service = { AssetManager.class, IndexProducer.class }
 )
 public class AssetManagerImpl extends AbstractIndexProducer implements AssetManager,
-        AbstractADeleteQuery.DeleteSnapshotHandler { // TODO ?
+        AbstractADeleteQuery.DeleteSnapshotHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerImpl.class);
 
@@ -813,7 +813,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   public HttpAssetProvider getHttpAssetProvider() {
     return httpAssetProvider;
   }
-  
+
   /*
    * Security handling
    */
@@ -982,15 +982,15 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       // find asset in versions & stores
       final Opt<StoragePath> existingAssetOpt = getDatabase().findAssetByChecksumAndStore(e.getChecksum().toString(),
               store.getStoreType()).map(new Fn<AssetDtos.Full, StoragePath>() {
-        @Override public StoragePath apply(AssetDtos.Full dto) {
-          return StoragePath.mk(
-                  dto.getOrganizationId(),
-                  dto.getMediaPackageId(),
-                  dto.getVersion(),
-                  dto.getAssetDto().getMediaPackageElementId()
-          );
-        }
-      });
+                @Override public StoragePath apply(AssetDtos.Full dto) {
+                  return StoragePath.mk(
+                    dto.getOrganizationId(),
+                    dto.getMediaPackageId(),
+                    dto.getVersion(),
+                    dto.getAssetDto().getMediaPackageElementId()
+                  );
+                }
+              });
 
       if (existingAssetOpt.isSome()) {
         final StoragePath existingAsset = existingAssetOpt.get();
