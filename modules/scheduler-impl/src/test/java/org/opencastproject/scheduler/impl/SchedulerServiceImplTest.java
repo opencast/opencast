@@ -1768,7 +1768,7 @@ public class SchedulerServiceImplTest {
     am.setDatabase(db);
     am.setWorkspace(workspace);
     am.setAssetStore(mkAssetStore());
-    am.setAuthSvc(authorizationService);
+    am.setAuthorizationService(authorizationService);
     am.setSecurityService(securityService);
     am.setMessageSender(ms);
     return am;

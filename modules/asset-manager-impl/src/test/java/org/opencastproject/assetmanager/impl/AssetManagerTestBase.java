@@ -173,7 +173,7 @@ public abstract class AssetManagerTestBase {
     am.setWorkspace(workspace);
     am.setSecurityService(securityService);
     am.setDatabase(db);
-    am.setAuthSvc(authorizationService);
+    am.setAuthorizationService(authorizationService);
     am.setMessageSender(ms);
     return am;
   }
@@ -290,7 +290,7 @@ public abstract class AssetManagerTestBase {
           @Override public Snapshot apply(Integer versionCount) {
             if (!continuousVersions) {
               // insert a gap into the version claim
-              am.getDb().claimVersion(mp.getIdentifier().toString());
+              am.getDatabase().claimVersion(mp.getIdentifier().toString());
             }
             logger.debug("Taking snapshot {} of media package {}", versionCount + 1, mpId);
             return am.takeSnapshot(OWNER, mp);

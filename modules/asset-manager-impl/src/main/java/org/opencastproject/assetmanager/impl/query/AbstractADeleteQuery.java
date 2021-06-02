@@ -95,7 +95,7 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
     // resolve AST
     final DeleteQueryContribution c = contributeDelete(owner);
     // run all queries in a single transaction
-    final DeletionResult deletion = am.getDb().run(new Fn<JPAQueryFactory, DeletionResult>() {
+    final DeletionResult deletion = am.getDatabase().run(new Fn<JPAQueryFactory, DeletionResult>() {
       @Override public DeletionResult apply(final JPAQueryFactory jpa) {
         return runQueries(jpa, c);
       }
@@ -185,7 +185,7 @@ HAVING v = (SELECT count(*)
 // </BLOCK>
       // main delete query
       final JPADeleteClause qMain = jpa.delete(Q_SNAPSHOT).where(where);
-      am.getDb().logDelete(formatQueryName(c.name, "main"), qMain);
+      am.getDatabase().logDelete(formatQueryName(c.name, "main"), qMain);
       final long deletedItems = qMain.execute();
       // <BLOCK>
       // TODO Bad solution. Yields all media package IDs which can easily be thousands
@@ -248,7 +248,7 @@ HAVING v = (SELECT count(*)
         }
       }
       final JPADeleteClause qProperties = jpa.delete(from).where(Expressions.allOf(c.targetPredicate.orNull(), where));
-      am.getDb().logDelete(formatQueryName(c.name, "main"), qProperties);
+      am.getDatabase().logDelete(formatQueryName(c.name, "main"), qProperties);
       final long deletedItems = qProperties.execute();
       return new DeletionResult(deletedItems, Collections.<Tuple>emptyList(), Collections.<String>emptySet());
     } else {
