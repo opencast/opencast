@@ -28,7 +28,7 @@ Parameter Table
 ¹If source-flavour**s** are specified, media of these flavors are considered, if not, media matching the source-flavour
 configuration option is considered.
 
-As explained in the ["Encoding Profile Example"](#encoding) section, every media file created by an encode operation
+As explained in the ["Encoding Profile Example" section](#encoding-profile-example), every media file created by an encode operation
 has its own named suffix. The suffix name is defined in the encode profile definition. It will be added as a tag to the
 corresponding track in the media package. This is different from the `target-tags` workflow operation parameter, which
 will cause the specified tag list to be added to every media file created by the operation.
@@ -58,8 +58,6 @@ Operation Example
 
 Encoding Profile Example
 ------------------------
-
-<a name="encoding"></a>
 
 Unlike a regular compose operation, this operation can generate more than one output file and, therefore, more than one
 media package track elements. In order to distinguish these tracks, the encoding profile syntax for this operation
