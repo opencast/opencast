@@ -44,14 +44,14 @@ import junitparams.JUnitParamsRunner;
 public class AssetManagerJobProducerTest
     extends AssetManagerTestBase {
 
-  private TieredStorageAssetManagerJobProducer tsamjp = null;
+  private AssetManagerJobProducer tsamjp = null;
   private ServiceRegistry sr = null;
 
   @Before
   public void setup() throws Exception {
     super.setUp();
 
-    tsamjp = new TieredStorageAssetManagerJobProducer();
+    tsamjp = new AssetManagerJobProducer();
     tsamjp.setOrganizationDirectoryService(null);
     tsamjp.setUserDirectoryService(null);
     tsamjp.setSecurityService(null);
@@ -245,11 +245,11 @@ public class AssetManagerJobProducerTest
     args.add(REMOTE_STORE_1_ID);
     args.add(mpId);
     createExpectation(
-        TieredStorageAssetManagerJobProducer.Operation.MoveById.toString(),
+        AssetManagerJobProducer.Operation.MoveById.toString(),
         args,
-        TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD
+        AssetManagerJobProducer.NONTERMINAL_JOB_LOAD
     );
-    return createTriggerJob(args, TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD);
+    return createTriggerJob(args, AssetManagerJobProducer.NONTERMINAL_JOB_LOAD);
   }
 
   private List<Job> createIdAndVersionExpectation(String mpId, int start, int end) throws ServiceRegistryException {
@@ -259,11 +259,11 @@ public class AssetManagerJobProducerTest
       args.add(REMOTE_STORE_1_ID);
       args.add(mpId);
       args.add(VersionImpl.mk(i).toString());
-      jobs.add(createTriggerJob(args, TieredStorageAssetManagerJobProducer.JOB_LOAD));
+      jobs.add(createTriggerJob(args, AssetManagerJobProducer.JOB_LOAD));
       createExpectation(
-          TieredStorageAssetManagerJobProducer.Operation.MoveByIdAndVersion.toString(),
+          AssetManagerJobProducer.Operation.MoveByIdAndVersion.toString(),
           args,
-          TieredStorageAssetManagerJobProducer.JOB_LOAD
+          AssetManagerJobProducer.JOB_LOAD
       );
     }
     return jobs;
@@ -275,9 +275,9 @@ public class AssetManagerJobProducerTest
     args.add(Long.toString(start.getTime()));
     args.add(Long.toString(end.getTime()));
     createExpectation(
-        TieredStorageAssetManagerJobProducer.Operation.MoveByDate.toString(),
+        AssetManagerJobProducer.Operation.MoveByDate.toString(),
         args,
-        TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD
+        AssetManagerJobProducer.NONTERMINAL_JOB_LOAD
     );
   }
 
@@ -288,9 +288,9 @@ public class AssetManagerJobProducerTest
     args.add(Long.toString(start.getTime()));
     args.add(Long.toString(end.getTime()));
     createExpectation(
-        TieredStorageAssetManagerJobProducer.Operation.MoveByIdAndDate.toString(),
+        AssetManagerJobProducer.Operation.MoveByIdAndDate.toString(),
         args,
-        TieredStorageAssetManagerJobProducer.NONTERMINAL_JOB_LOAD
+        AssetManagerJobProducer.NONTERMINAL_JOB_LOAD
     );
   }
 
@@ -307,7 +307,7 @@ public class AssetManagerJobProducerTest
   private void createExpectation(String operation, List<String> args, float jobload) throws ServiceRegistryException {
     EasyMock.expect(
             sr.createJob(
-                    EasyMock.eq(TieredStorageAssetManagerJobProducer.JOB_TYPE),
+                    EasyMock.eq(AssetManagerJobProducer.JOB_TYPE),
                     EasyMock.eq(operation),
                     EasyMock.eq(args),
                     EasyMock.isNull(String.class),
@@ -318,7 +318,7 @@ public class AssetManagerJobProducerTest
   }
 
   /**
-   * Creates a {@link Job} which can be used to test the process method in {@link TieredStorageAssetManagerJobProducer}
+   * Creates a {@link Job} which can be used to test the process method in {@link AssetManagerJobProducer}
    * @param args
    *   The job's args value
    * @param jobload
@@ -328,9 +328,9 @@ public class AssetManagerJobProducerTest
    */
   private Job createTriggerJob(List<String> args, float jobload) {
     Job triggerJob = new JobImpl();
-    triggerJob.setJobType(TieredStorageAssetManagerJobProducer.JOB_TYPE);
+    triggerJob.setJobType(AssetManagerJobProducer.JOB_TYPE);
     //Note, all of the methods which use these returned jobs are expecting terminal jobs!
-    triggerJob.setOperation(TieredStorageAssetManagerJobProducer.Operation.MoveByIdAndVersion.toString());
+    triggerJob.setOperation(AssetManagerJobProducer.Operation.MoveByIdAndVersion.toString());
     triggerJob.setArguments(args);
     triggerJob.setPayload(null);
     triggerJob.setDispatchable(true);
@@ -339,7 +339,7 @@ public class AssetManagerJobProducerTest
   }
 
   /**
-   * Creates a {@link Job} which can be used to test the process method in {@link TieredStorageAssetManagerJobProducer}
+   * Creates a {@link Job} which can be used to test the process method in {@link AssetManagerJobProducer}
    * @param mps
    *   The mediapackage ids
    * @param numVersions
@@ -355,7 +355,7 @@ public class AssetManagerJobProducerTest
         args.add(REMOTE_STORE_1_ID);
         args.add(mp);
         args.add(VersionImpl.mk(i).toString());
-        jobs.add(createTriggerJob(args, TieredStorageAssetManagerJobProducer.JOB_LOAD));
+        jobs.add(createTriggerJob(args, AssetManagerJobProducer.JOB_LOAD));
       }
     }
     return jobs;

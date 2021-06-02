@@ -49,10 +49,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
+public class AssetManagerJobProducer extends AbstractJobProducer {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(TieredStorageAssetManagerJobProducer.class);
+  private static final Logger logger = LoggerFactory.getLogger(AssetManagerJobProducer.class);
 
   public static final String JOB_TYPE = "org.opencastproject.assetmanager";
   public static final Float JOB_LOAD = 0.1f;
@@ -70,7 +70,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
   private UserDirectoryService userDirectoryService = null;
   private OrganizationDirectoryService organizationDirectoryService = null;
 
-  public TieredStorageAssetManagerJobProducer() {
+  public AssetManagerJobProducer() {
     super(JOB_TYPE);
   }
 
