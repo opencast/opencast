@@ -26,7 +26,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.RestUtil.R.badRequest;
 import static org.opencastproject.util.RestUtil.R.ok;
 
-import org.opencastproject.assetmanager.impl.TieredStorageAssetManagerJobProducer;
+import org.opencastproject.assetmanager.impl.AssetManagerJobProducer;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
@@ -53,10 +53,10 @@ import javax.ws.rs.core.Response;
 public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends AbstractAssetManagerRestEndpoint {
   public static final String SDF_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-  protected TieredStorageAssetManagerJobProducer tsamjp = null;
+  protected AssetManagerJobProducer tsamjp = null;
   protected ServiceRegistry serviceRegistry = null;
 
-  public void setJobProducer(TieredStorageAssetManagerJobProducer producer) {
+  public void setJobProducer(AssetManagerJobProducer producer) {
     tsamjp = producer;
   }
 
