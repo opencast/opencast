@@ -89,7 +89,7 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
 
     AssetManagerImpl am = super.makeAssetManager();
     am.setSecurityService(securityService);
-    am.setAuthSvc(authSvc);
+    am.setAuthorizationService(authSvc);
     return am;
   }
 

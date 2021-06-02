@@ -49,7 +49,6 @@ import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
@@ -131,13 +130,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
 
 /**
- * // TODO
+ * The Asset Manager implementation.
  */
 @Component(
     property = {
@@ -147,16 +145,18 @@ import javax.persistence.EntityManagerFactory;
     service = { AssetManager.class, IndexProducer.class }
 )
 public class AssetManagerImpl extends AbstractIndexProducer implements AssetManager,
-        AbstractADeleteQuery.DeleteSnapshotHandler {
-  /**
-   * Log facility
-   */
+        AbstractADeleteQuery.DeleteSnapshotHandler { // TODO ?
+
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerImpl.class);
+
+  enum AdminRole {
+    GLOBAL, ORGANIZATION, NONE
+  }
 
   public static final String WRITE_ACTION = "write";
   public static final String READ_ACTION = "read";
   public static final String SECURITY_NAMESPACE = "org.opencastproject.assetmanager.security";
-  // Base name of manifest file
+
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
   private SecurityService securityService;
@@ -180,15 +180,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           MediaPackageElement.Type.Track
   );
 
-  private HashMap<String, RemoteAssetStore> remoteStores = new LinkedHashMap<>();
-
+  private final HashMap<String, RemoteAssetStore> remoteStores = new LinkedHashMap<>();
 
   /**
    * OSGi callback.
    */
   @Activate
   public synchronized void activate(ComponentContext cc) {
-    logger.info("Activating AssetManager");
+    logger.info("Activating AssetManager.");
     systemUserName = SecurityUtil.getSystemUserName(cc);
 
     includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
@@ -197,9 +196,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
 
-  //
-  // OSGi depedency injection
-  //
+  /**
+   * OSGi dependencies
+   */
 
   @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.assetmanager.impl)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -211,8 +210,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     this.securityService = securityService;
   }
 
-  @Reference(name = "authSvc")
-  public void setAuthSvc(AuthorizationService authorizationService) {
+  @Reference(name = "authorizationService")
+  public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
@@ -237,10 +236,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeRemoteAssetStore"
   )
-  @Override
   public synchronized void addRemoteAssetStore(RemoteAssetStore assetStore) {
     remoteStores.put(assetStore.getStoreType(), assetStore);
+  }
 
+  public void removeRemoteAssetStore(RemoteAssetStore store) {
+    remoteStores.remove(store.getStoreType());
   }
 
   @Reference(name = "httpAssetProvider")
@@ -251,6 +252,484 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference(name = "messageSender")
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
+  }
+
+  /**
+   * AssetManager implementation
+   */
+
+  @Override
+  public Opt<MediaPackage> getMediaPackage(String mediaPackageId) {
+    final AQueryBuilder q = createQuery();
+    final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
+            .run();
+
+    if (r.getSize() == 0) {
+      return Opt.none();
+    }
+    return Opt.some(r.getRecords().head2().getSnapshot().get().getMediaPackage());
+  }
+
+  @Override
+  public Opt<Asset> getAsset(Version version, String mpId, String mpElementId) {
+    if (isAuthorized(mpId, READ_ACTION)) {
+      // try to fetch the asset
+      for (final AssetDtos.Medium asset : getDatabase().getAsset(RuntimeTypes.convert(version), mpId, mpElementId)) {
+        for (final String storageId : getSnapshotStorageLocation(version, mpId)) {
+          for (final AssetStore store : getAssetStore(storageId)) {
+            for (final InputStream assetStream
+                    : store.get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpElementId))) {
+
+              Checksum checksum = null;
+              try {
+                checksum = Checksum.fromString(asset.getAssetDto().getChecksum());
+              } catch (NoSuchAlgorithmException e) {
+                logger.warn("Invalid checksum for asset {} of media package {}", mpElementId, mpId, e);
+              }
+
+              final Asset a = new AssetImpl(
+                      AssetId.mk(version, mpId, mpElementId),
+                      assetStream,
+                      asset.getAssetDto().getMimeType(),
+                      asset.getAssetDto().getSize(),
+                      asset.getStorageId(),
+                      asset.getAvailability(),
+                      checksum);
+              return Opt.some(a);
+            }
+          }
+        }
+      }
+      return Opt.none();
+    }
+    return chuck(new UnauthorizedException(
+            format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)
+    ));
+  }
+
+  @Override
+  public Opt<AssetStore> getAssetStore(String storeId) {
+    if (getLocalAssetStore().getStoreType().equals(storeId)) {
+      return Opt.some(getLocalAssetStore());
+    } else {
+      return getRemoteAssetStore(storeId);
+    }
+  }
+
+  public AssetStore getLocalAssetStore() {
+    return assetStore;
+  }
+
+  public Opt<AssetStore> getRemoteAssetStore(String id) {
+    if (remoteStores.containsKey(id)) {
+      return Opt.some(remoteStores.get(id));
+    } else {
+      return Opt.none();
+    }
+  }
+
+  /** Snapshots */
+
+  @Override
+  public boolean snapshotExists(final String mediaPackageId) {
+    return getDatabase().snapshotExists(mediaPackageId);
+  }
+
+  @Override
+  public boolean snapshotExists(final String mediaPackageId, final String organization) {
+    return getDatabase().snapshotExists(mediaPackageId, organization);
+  }
+
+  @Override
+  public Snapshot takeSnapshot(MediaPackage mp) {
+    return takeSnapshot(null, mp);
+  }
+
+  @Override
+  public Snapshot takeSnapshot(String owner, MediaPackage mp) {
+
+    final String mediaPackageId = mp.getIdentifier().toString();
+    final boolean firstSnapshot = !snapshotExists(mediaPackageId);
+
+    // Allow this if:
+    //  - no previous snapshot exists
+    //  - the user has write access to the previous snapshot
+    if (firstSnapshot) {
+      // if it's the first snapshot, ensure that old, leftover properties are removed
+      deleteProperties(mediaPackageId);
+    }
+    if (firstSnapshot || isAuthorized(mediaPackageId, WRITE_ACTION)) {
+      final Snapshot snapshot;
+      if (owner == null) {
+        snapshot = takeSnapshotInternal(mp);
+      } else {
+        snapshot = takeSnapshotInternal(owner, mp);
+      }
+      // We pass the original media package here, instead of using
+      // snapshot.getMediaPackage(), for security reasons. The original media
+      // package has elements with URLs of type http://.../files/... in it. These
+      // URLs will be pulled from the Workspace cache without a HTTP call.
+      //
+      // Were we to use snapshot.getMediaPackage(), we'd have a HTTP call on our
+      // hands that's secured via the asset manager security model. But the
+      // snapshot taken here doesn't have the necessary security properties
+      // installed (yet). This happens in AssetManagerWithSecurity, some layers
+      // higher up. So there's a weird loop in here.
+      logger.info("Send update message for snapshot {}, {} to ActiveMQ",
+              snapshot.getMediaPackage().getIdentifier().toString(), snapshot.getVersion());
+      messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
+              mkTakeSnapshotMessage(snapshot, mp));
+
+      final AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
+      // store acl as properties
+      // Drop old ACL rules
+      deleteProperties(mediaPackageId, SECURITY_NAMESPACE);
+      // Set new ACL rules
+      for (final AccessControlEntry ace : acl.getEntries()) {
+        getDatabase().saveProperty(Property.mk(PropertyId.mk(mediaPackageId, SECURITY_NAMESPACE,
+                mkPropertyName(ace.getRole(), ace.getAction())), Value.mk(ace.isAllow())));
+      }
+
+      return snapshot;
+    }
+    return chuck(new UnauthorizedException("Not allowed to take snapshot of media package " + mediaPackageId));
+  }
+
+  private Snapshot takeSnapshotInternal(MediaPackage mediaPackage) {
+    final String mediaPackageId = mediaPackage.getIdentifier().toString();
+    AQueryBuilder queryBuilder = createQuery();
+    AResult result = queryBuilder.select(queryBuilder.snapshot())
+            .where(queryBuilder.mediaPackageId(mediaPackageId).and(queryBuilder.version().isLatest())).run();
+    Opt<ARecord> record = result.getRecords().head();
+    if (record.isSome()) {
+      Opt<Snapshot> snapshot = record.get().getSnapshot();
+      if (snapshot.isSome()) {
+        return takeSnapshotInternal(snapshot.get().getOwner(), mediaPackage);
+      }
+    }
+    return takeSnapshotInternal(DEFAULT_OWNER, mediaPackage);
+  }
+
+  private Snapshot takeSnapshotInternal(final String owner, final MediaPackage mp) {
+    return handleException(new P1Lazy<Snapshot>() {
+      @Override public Snapshot get1() {
+        try {
+          final Snapshot archived = addInternal(owner, MediaPackageSupport.copy(mp)).toSnapshot();
+          return getHttpAssetProvider().prepareForDelivery(archived);
+        } catch (Exception e) {
+          return Prelude.chuck(e);
+        }
+      }
+    });
+  }
+
+  /**
+   * Create a {@link AssetManagerItem.TakeSnapshot} message.
+   * <p>
+   * Do not call outside of a security context.
+   */
+  private AssetManagerItem.TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot, MediaPackage mp) {
+    final MediaPackage chosenMp;
+    if (mp != null) {
+      chosenMp = mp;
+    } else {
+      chosenMp = snapshot.getMediaPackage();
+    }
+
+    long version;
+    try {
+      version = Long.parseLong(snapshot.getVersion().toString());
+    } catch (NumberFormatException e) {
+      // The index requires a version to be a long value.
+      // Since the asset manager default implementation uses long values that should be not a problem.
+      // However, a decent exception message is helpful if a different implementation of the asset manager
+      // is used.
+      throw new RuntimeException("The current implementation of the index requires versions being of type 'long'.");
+    }
+
+    return AssetManagerItem.add(workspace, chosenMp, authorizationService.getActiveAcl(chosenMp).getA(),
+            version, snapshot.getArchivalDate());
+  }
+
+  @Override
+  public RichAResult getSnapshotsById(final String mpId) {
+    RequireUtil.requireNotBlank(mpId, "mpId");
+    AQueryBuilder q = createQuery();
+    ASelectQuery query = baseQuery(q, mpId);
+    return Enrichments.enrich(query.run());
+  }
+
+  @Override
+  public RichAResult getSnapshotsByIdAndVersion(final String mpId, final Version version) {
+    RequireUtil.requireNotBlank(mpId, "mpId");
+    RequireUtil.notNull(version, "version");
+    AQueryBuilder q = createQuery();
+    ASelectQuery query = baseQuery(q, version, mpId);
+    return Enrichments.enrich(query.run());
+  }
+
+  @Override
+  public RichAResult getSnapshotsByDate(final Date start, final Date end) {
+    RequireUtil.notNull(start, "start");
+    RequireUtil.notNull(end, "end");
+    AQueryBuilder q = createQuery();
+    ASelectQuery query = baseQuery(q).where(q.archived().ge(start)).where(q.archived().le(end));
+    return Enrichments.enrich(query.run());
+  }
+
+  @Override
+  public RichAResult getSnapshotsByIdAndDate(final String mpId, final Date start, final Date end) {
+    RequireUtil.requireNotBlank(mpId, "mpId");
+    RequireUtil.notNull(start, "start");
+    RequireUtil.notNull(end, "end");
+    AQueryBuilder q = createQuery();
+    ASelectQuery query = baseQuery(q, mpId).where(q.archived().ge(start)).where(q.archived().le(end));
+    return Enrichments.enrich(query.run());
+  }
+
+  @Override
+  public void moveSnapshotsById(final String mpId, final String targetStore) throws NotFoundException {
+    RichAResult results = getSnapshotsById(mpId);
+
+    if (results.getRecords().isEmpty()) {
+      throw new NotFoundException("Mediapackage " + mpId + " not found!");
+    }
+
+    processOperations(results, targetStore);
+  }
+
+  @Override
+  public void moveSnapshotsByIdAndVersion(final String mpId, final Version version, final String targetStore)
+          throws NotFoundException {
+    RichAResult results = getSnapshotsByIdAndVersion(mpId, version);
+
+    if (results.getRecords().isEmpty()) {
+      throw new NotFoundException("Mediapackage " + mpId + "@" + version.toString() + " not found!");
+    }
+
+    processOperations(results, targetStore);
+  }
+
+  @Override
+  public void moveSnapshotsByDate(final Date start, final Date end, final String targetStore)
+          throws NotFoundException {
+    RichAResult results = getSnapshotsByDate(start, end);
+
+    if (results.getRecords().isEmpty()) {
+      throw new NotFoundException("No media packages found between " + start + " and " + end);
+    }
+
+    processOperations(results, targetStore);
+  }
+
+  @Override
+  public void moveSnapshotsByIdAndDate(final String mpId, final Date start, final Date end, final String targetStore)
+          throws NotFoundException {
+    RichAResult results = getSnapshotsByDate(start, end);
+
+    if (results.getRecords().isEmpty()) {
+      throw new NotFoundException("No media package with id " + mpId + " found between " + start + " and " + end);
+    }
+
+    processOperations(results, targetStore);
+  }
+
+  @Override
+  public void moveSnapshotToStore(final Version version, final String mpId, final String storeId)
+          throws NotFoundException {
+
+    //Find the snapshot
+    AQueryBuilder q = createQuery();
+    RichAResult results = Enrichments.enrich(baseQuery(q, version, mpId).run());
+
+    if (results.getRecords().isEmpty()) {
+      throw new NotFoundException("Mediapackage " + mpId + "@" + version.toString() + " not found!");
+    }
+    processOperations(results, storeId);
+  }
+
+  //Do the actual moving
+  private void processOperations(final RichAResult results, final String targetStoreId) {
+    results.getRecords().forEach(record -> {
+      Snapshot s = record.getSnapshot().get();
+      Opt<String> currentStoreId = getSnapshotStorageLocation(s);
+
+      if (currentStoreId.isNone()) {
+        logger.warn("IsNone store ID");
+        return;
+      }
+
+      //If this snapshot is already stored in the desired store
+      if (currentStoreId.get().equals(targetStoreId)) {
+        //return, since we don't need to move anything
+        return;
+      }
+
+      AssetStore currentStore;
+      AssetStore targetStore;
+
+      Opt<AssetStore> optCurrentStore = getAssetStore(currentStoreId.get());
+      Opt<AssetStore> optTargetStore = getAssetStore(targetStoreId);
+
+      if (!optCurrentStore.isNone()) {
+        currentStore = optCurrentStore.get();
+      } else {
+        logger.error("Unknown current store: " + currentStoreId.get());
+        return;
+      }
+      if (!optTargetStore.isNone()) {
+        targetStore = optTargetStore.get();
+      } else {
+        logger.error("Unknown target store: " + targetStoreId);
+        return;
+      }
+
+      //If the content is already local, or is moving from a remote to the local
+      // Returns true if the store id is equal to the local asset store's id
+      String localAssetStoreType = getLocalAssetStore().getStoreType();
+      if (localAssetStoreType.equals(currentStoreId.get()) || localAssetStoreType.equals(targetStoreId)) {
+        logger.debug("Moving {} from {} to {}", s, currentStoreId, targetStoreId);
+
+        try {
+          copyAssetsToStore(s, targetStore);
+          copyManifest(s, targetStore);
+        } catch (Exception e) {
+          Functions.chuck(e);
+        }
+        getDatabase().setStorageLocation(s, targetStoreId);
+        currentStore.delete(DeletionSelector.delete(s.getOrganizationId(),
+                s.getMediaPackage().getIdentifier().toString(), s.getVersion()
+        ));
+      } else {
+        //Else, the content is *not* local and is going to a *different* remote
+        String intermediateStore = getLocalAssetStore().getStoreType();
+        logger.debug("Moving {} from {} to {}, then to {}",
+                s, currentStoreId, intermediateStore, targetStoreId);
+        Version version = s.getVersion();
+        String mpId = s.getMediaPackage().getIdentifier().toString();
+        try {
+          moveSnapshotToStore(version, mpId, intermediateStore);
+          moveSnapshotToStore(version, mpId, targetStoreId);
+        } catch (NotFoundException e) {
+          Functions.chuck(e);
+        }
+      }
+    });
+  }
+
+  // Return the asset store ID that is currently storing the snapshot
+  public Opt<String> getSnapshotStorageLocation(final Version version, final String mpId) {
+    RichAResult result = getSnapshotsByIdAndVersion(mpId, version);
+
+    for (Snapshot snapshot : result.getSnapshots()) {
+      return Opt.some(snapshot.getStorageId());
+    }
+
+    logger.error("Mediapackage " + mpId + "@" + version + " not found!");
+    return Opt.none();
+  }
+
+  public Opt<String> getSnapshotStorageLocation(final Snapshot snap) {
+    return getSnapshotStorageLocation(snap.getVersion(), snap.getMediaPackage().getIdentifier().toString());
+  }
+
+  /** Properties */
+
+  @Override
+  public boolean setProperty(Property property) {
+    final String mpId = property.getId().getMediaPackageId();
+    if (isAuthorized(mpId, WRITE_ACTION)) {
+      return getDatabase().saveProperty(property);
+    }
+    return chuck(new UnauthorizedException("Not allowed to set property on episode " + mpId));
+  }
+
+  @Override
+  public List<Property> selectProperties(final String mediaPackageId, String namespace) {
+    if (isAuthorized(mediaPackageId, READ_ACTION)) {
+      return getDatabase().selectProperties(mediaPackageId, namespace);
+    }
+    return chuck(new UnauthorizedException(format("Not allowed to read properties of event %s", mediaPackageId)));
+  }
+
+  @Override
+  public int deleteProperties(final String mediaPackageId) {
+    return getDatabase().deleteProperties(mediaPackageId);
+  }
+
+  @Override
+  public int deleteProperties(final String mediaPackageId, final String namespace) {
+    return getDatabase().deleteProperties(mediaPackageId, namespace);
+  }
+
+  /** Misc. */
+
+  @Override
+  public AQueryBuilder createQuery() {
+    return new AQueryBuilderDecorator(createQueryWithoutSecurityCheck()) {
+      @Override public ASelectQuery select(Target... target) {
+        switch (isAdmin()) {
+          case GLOBAL:
+            return super.select(target);
+          case ORGANIZATION:
+            return super.select(target).where(restrictToUsersOrganization());
+          default:
+            return super.select(target).where(mkAuthPredicate(READ_ACTION));
+        }
+      }
+
+      @Override public ADeleteQuery delete(String owner, Target target) {
+        switch (isAdmin()) {
+          case GLOBAL:
+            return super.delete(owner, target);
+          case ORGANIZATION:
+            return super.delete(owner, target).where(restrictToUsersOrganization());
+          default:
+            return super.delete(owner, target).where(mkAuthPredicate(WRITE_ACTION));
+        }
+      }
+    };
+  }
+
+  private AQueryBuilder createQueryWithoutSecurityCheck() {
+    return new AQueryBuilderDecorator(new AQueryBuilderImpl(this)) {
+      @Override
+      public ADeleteQuery delete(String owner, Target target) {
+        return new ADeleteQueryWithMessaging(super.delete(owner, target));
+      }
+    };
+  }
+
+  @Override
+  public Opt<Version> toVersion(String version) {
+    try {
+      return Opt.some(VersionImpl.mk(Long.parseLong(version)));
+    } catch (NumberFormatException e) {
+      return Opt.none();
+    }
+  }
+
+  @Override
+  public long countEvents(final String organization) {
+    return getDatabase().countEvents(organization);
+  }
+
+  /**
+   * DeleteSnapshotHandler implementation
+   */
+
+  @Override
+  public void notifyDeleteSnapshot(String mpId, VersionImpl version) {
+    logger.info("Send delete message for snapshot {}, {} to ActiveMQ", mpId, version);
+    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
+            AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
+  }
+
+  @Override
+  public void notifyDeleteEpisode(String mpId) {
+    logger.info("Send delete message for episode {} to ActiveMQ", mpId);
+    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
+            AssetManagerItem.deleteEpisode(mpId, new Date()));
   }
 
   /**
@@ -312,413 +791,32 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     }
   }
 
-  /////////////////////////////////// NEW
-
-  @Override public Snapshot takeSnapshot(MediaPackage mp) {
-    return takeSnapshot(null, mp);
-  }
-
-  @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
-
-    final String mediaPackageId = mp.getIdentifier().toString();
-    final boolean firstSnapshot = !snapshotExists(mediaPackageId);
-
-    // Allow this if:
-    //  - no previous snapshot exists
-    //  - the user has write access to the previous snapshot
-    if (firstSnapshot) {
-      // if it's the first snapshot, ensure that old, leftover properties are removed
-      deleteProperties(mediaPackageId);
-    }
-    if (firstSnapshot || isAuthorized(mediaPackageId, WRITE_ACTION)) {
-      final Snapshot snapshot;
-      if (owner == null) {
-        snapshot = takeSnapshotInternal(mp);
-      } else {
-        snapshot = takeSnapshotInternal(owner, mp);
-      }
-      // We pass the original media package here, instead of using
-      // snapshot.getMediaPackage(), for security reasons. The original media
-      // package has elements with URLs of type http://.../files/... in it. These
-      // URLs will be pulled from the Workspace cache without a HTTP call.
-      //
-      // Were we to use snapshot.getMediaPackage(), we'd have a HTTP call on our
-      // hands that's secured via the asset manager security model. But the
-      // snapshot taken here doesn't have the necessary security properties
-      // installed (yet). This happens in AssetManagerWithSecurity, some layers
-      // higher up. So there's a weird loop in here.
-      notifyTakeSnapshot(snapshot, mp);
-
-      final AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
-      storeAclAsProperties(snapshot, acl);
-      return snapshot;
-    }
-    return chuck(new UnauthorizedException("Not allowed to take snapshot of media package " + mediaPackageId));
-  }
-
-  private Snapshot takeSnapshotInternal(MediaPackage mediaPackage) {
-    final String mediaPackageId = mediaPackage.getIdentifier().toString();
-    AQueryBuilder queryBuilder = createQuery();
-    AResult result = queryBuilder.select(queryBuilder.snapshot())
-            .where(queryBuilder.mediaPackageId(mediaPackageId).and(queryBuilder.version().isLatest())).run();
-    Opt<ARecord> record = result.getRecords().head();
-    if (record.isSome()) {
-      Opt<Snapshot> snapshot = record.get().getSnapshot();
-      if (snapshot.isSome()) {
-        return takeSnapshotInternal(snapshot.get().getOwner(), mediaPackage);
-      }
-    }
-    return takeSnapshotInternal(DEFAULT_OWNER, mediaPackage);
-  }
-
-  private Snapshot takeSnapshotInternal(final String owner, final MediaPackage mp) {
-    return handleException(new P1Lazy<Snapshot>() {
-      @Override public Snapshot get1() {
-        try {
-          final Snapshot archived = addInternal(owner, MediaPackageSupport.copy(mp)).toSnapshot();
-          return getHttpAssetProvider().prepareForDelivery(archived);
-        } catch (Exception e) {
-          return Prelude.chuck(e);
-        }
-      }
-    });
-  }
-
-  private AQueryBuilder createQueryWithoutSecurityCheck() {
-    return new AQueryBuilderDecorator(new AQueryBuilderImpl(this)) {
-      @Override
-      public ADeleteQuery delete(String owner, Target target) {
-        return new ADeleteQueryWithMessaging(super.delete(owner, target));
-      }
-    };
-  }
-
-  @Override
-  public AQueryBuilder createQuery() {
-    return new AQueryBuilderDecorator(createQueryWithoutSecurityCheck()) {
-      @Override public ASelectQuery select(Target... target) {
-        switch (isAdmin()) {
-          case GLOBAL:
-            return super.select(target);
-          case ORGANIZATION:
-            return super.select(target).where(restrictToUsersOrganization());
-          default:
-            return super.select(target).where(mkAuthPredicate(READ_ACTION));
-        }
-      }
-
-      @Override public ADeleteQuery delete(String owner, Target target) {
-        switch (isAdmin()) {
-          case GLOBAL:
-            return super.delete(owner, target);
-          case ORGANIZATION:
-            return super.delete(owner, target).where(restrictToUsersOrganization());
-          default:
-            return super.delete(owner, target).where(mkAuthPredicate(WRITE_ACTION));
-        }
-      }
-    };
-  }
-
-  public void notifyTakeSnapshot(Snapshot snapshot, MediaPackage mp) {
-    logger.info("Send update message for snapshot {}, {} to ActiveMQ",
-            snapshot.getMediaPackage().getIdentifier().toString(), snapshot.getVersion());
-    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-            mkTakeSnapshotMessage(snapshot, mp));
-  }
-
-  @Override
-  public void notifyDeleteSnapshot(String mpId, VersionImpl version) {
-    logger.info("Send delete message for snapshot {}, {} to ActiveMQ", mpId, version);
-    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-            AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
-  }
-
-  @Override
-  public void notifyDeleteEpisode(String mpId) {
-    logger.info("Send delete message for episode {} to ActiveMQ", mpId);
-    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-            AssetManagerItem.deleteEpisode(mpId, new Date()));
-  }
-
   /**
-   * Create a {@link AssetManagerItem.TakeSnapshot} message.
-   * <p>
-   * Do not call outside of a security context.
+   * Used for testing
    */
-  AssetManagerItem.TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot, MediaPackage mp) {
-    final MediaPackage chosenMp;
-    if (mp != null) {
-      chosenMp = mp;
-    } else {
-      chosenMp = snapshot.getMediaPackage();
-    }
-    return AssetManagerItem.add(workspace, chosenMp, authorizationService.getActiveAcl(chosenMp).getA(),
-            getVersionLong(snapshot),
-            snapshot.getArchivalDate());
-  }
-
-  private long getVersionLong(Snapshot snapshot) {
-    try {
-      return Long.parseLong(snapshot.getVersion().toString());
-    } catch (NumberFormatException e) {
-      // The index requires a version to be a long value.
-      // Since the asset manager default implementation uses long values that should be not a problem.
-      // However, a decent exception message is helpful if a different implementation of the asset manager
-      // is used.
-      throw new RuntimeException("The current implementation of the index requires versions being of type 'long'.");
-    }
-  }
-
-  // used for testing
-  public void setDatabase(Database database) {
-    this.db = database;
-  }
-
-  /*
-   * ------------------------------------------------------------------------------------------------------------------
-   */
-
-  /**
-   * Call {@link
-   * org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(AbstractADeleteQuery.DeleteSnapshotHandler)}
-   * with a delete handler that sends messages to ActiveMQ. Also make sure to propagate the behaviour to subsequent
-   * instances.
-   */
-  private final class ADeleteQueryWithMessaging extends ADeleteQueryDecorator {
-    ADeleteQueryWithMessaging(ADeleteQuery delegate) {
-      super(delegate);
-    }
-
-    @Override
-    public long run() {
-      return RuntimeTypes.convert(delegate).run(AssetManagerImpl.this);
-    }
-
-    @Override
-    protected ADeleteQueryDecorator mkDecorator(ADeleteQuery delegate) {
-      return new ADeleteQueryWithMessaging(delegate);
-    }
-  }
-
-  @Override public void setAvailability(Version version, String mpId, Availability availability) {
+  public void setAvailability(Version version, String mpId, Availability availability) {
     if (isAuthorized(mpId, WRITE_ACTION)) {
-      getDb().setAvailability(RuntimeTypes.convert(version), mpId, availability);
+      getDatabase().setAvailability(RuntimeTypes.convert(version), mpId, availability);
     } else {
       chuck(new UnauthorizedException("Not allowed to set availability of episode " + mpId));
     }
   }
 
-  @Override public boolean setProperty(Property property) {
-    final String mpId = property.getId().getMediaPackageId();
-    if (isAuthorized(mpId, WRITE_ACTION)) {
-      return getDb().saveProperty(property);
-    }
-    return chuck(new UnauthorizedException("Not allowed to set property on episode " + mpId));
+  public void setDatabase(Database database) {
+    this.db = database;
   }
 
-  @Override public Opt<Asset> getAsset(Version version, String mpId, String mpElementId) {
-    if (isAuthorized(mpId, READ_ACTION)) {
-      // try to fetch the asset
-      for (final AssetDtos.Medium asset : getDb().getAsset(RuntimeTypes.convert(version), mpId, mpElementId)) {
-        for (final String storageId : getSnapshotStorageLocation(version, mpId)) {
-          for (final AssetStore store : getAssetStore(storageId)) {
-            for (final InputStream assetStream
-                    : store.get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpElementId))) {
-
-              Checksum checksum = null;
-              try {
-                checksum = Checksum.fromString(asset.getAssetDto().getChecksum());
-              } catch (NoSuchAlgorithmException e) {
-                logger.warn("Invalid checksum for asset {} of media package {}", mpElementId, mpId, e);
-              }
-
-              final Asset a = new AssetImpl(
-                      AssetId.mk(version, mpId, mpElementId),
-                      assetStream,
-                      asset.getAssetDto().getMimeType(),
-                      asset.getAssetDto().getSize(),
-                      asset.getStorageId(),
-                      asset.getAvailability(),
-                      checksum);
-              return Opt.some(a);
-            }
-          }
-        }
-      }
-      return Opt.none();
-    }
-    return chuck(new UnauthorizedException(
-            format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)
-    ));
+  public Database getDatabase() {
+    return db;
   }
 
-  @Override
-  public List<Property> selectProperties(final String mediaPackageId, String namespace) {
-    if (isAuthorized(mediaPackageId, READ_ACTION)) {
-      return getDb().selectProperties(mediaPackageId, namespace);
-    }
-    return chuck(new UnauthorizedException(format("Not allowed to read properties of event %s", mediaPackageId)));
+  public HttpAssetProvider getHttpAssetProvider() {
+    return httpAssetProvider;
   }
-
-  @Override
-  public Set<String> getRemoteAssetStoreIds() {
-    return remoteStores.keySet();
-  }
-
-  @Override
-  public Opt<AssetStore> getRemoteAssetStore(String id) {
-    if (remoteStores.containsKey(id)) {
-      return Opt.some(remoteStores.get(id));
-    } else {
-      return Opt.none();
-    }
-  }
-
-  @Override
-  public void removeRemoteAssetStore(RemoteAssetStore store) {
-    remoteStores.remove(store.getStoreType());
-  }
-
-  @Override
-  public Opt<MediaPackage> getMediaPackage(String mediaPackageId) {
-    final AQueryBuilder q = createQuery();
-    final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
-            .run();
-
-    if (r.getSize() == 0) {
-      return Opt.none();
-    }
-    return Opt.some(r.getRecords().head2().getSnapshot().get().getMediaPackage());
-  }
-
-  @Override
-  public int deleteProperties(final String mediaPackageId) {
-    return getDb().deleteProperties(mediaPackageId);
-  }
-
-  @Override
-  public int deleteProperties(final String mediaPackageId, final String namespace) {
-    return getDb().deleteProperties(mediaPackageId, namespace);
-  }
-
-  @Override
-  public long countEvents(final String organization) {
-    return getDb().countEvents(organization);
-  }
-
-  @Override
-  public boolean snapshotExists(final String mediaPackageId) {
-    return getDb().snapshotExists(mediaPackageId);
-  }
-
-  @Override
-  public boolean snapshotExists(final String mediaPackageId, final String organization) {
-    return getDb().snapshotExists(mediaPackageId, organization);
-  }
-
-
-  @Override public Opt<Version> toVersion(String version) {
-    try {
-      return Opt.<Version>some(VersionImpl.mk(Long.parseLong(version)));
-    } catch (NumberFormatException e) {
-      return Opt.none();
-    }
-  }
-
-
-  public RichAResult getSnapshotsById(final String mpId) {
-    RequireUtil.requireNotBlank(mpId, "mpId");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q, mpId);
-    return Enrichments.enrich(query.run());
-  }
-
-  public void moveSnapshotsById(final String mpId, final String targetStore) throws NotFoundException {
-    RichAResult results = getSnapshotsById(mpId);
-
-    if (results.getRecords().isEmpty()) {
-      throw new NotFoundException("Mediapackage " + mpId + " not found!");
-    }
-
-    processOperations(results, targetStore);
-  }
-
-  public RichAResult getSnapshotsByIdAndVersion(final String mpId, final Version version) {
-    RequireUtil.requireNotBlank(mpId, "mpId");
-    RequireUtil.notNull(version, "version");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q, version, mpId);
-    return Enrichments.enrich(query.run());
-  }
-
-  public void moveSnapshotsByIdAndVersion(final String mpId, final Version version, final String targetStore)
-          throws NotFoundException {
-    RichAResult results = getSnapshotsByIdAndVersion(mpId, version);
-
-    if (results.getRecords().isEmpty()) {
-      throw new NotFoundException("Mediapackage " + mpId + "@" + version.toString() + " not found!");
-    }
-
-    processOperations(results, targetStore);
-  }
-
-  public RichAResult getSnapshotsByDate(final Date start, final Date end) {
-    RequireUtil.notNull(start, "start");
-    RequireUtil.notNull(end, "end");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q).where(q.archived().ge(start)).where(q.archived().le(end));
-    return Enrichments.enrich(query.run());
-  }
-
-  public void moveSnapshotsByDate(final Date start, final Date end, final String targetStore)
-          throws NotFoundException {
-    RichAResult results = getSnapshotsByDate(start, end);
-
-    if (results.getRecords().isEmpty()) {
-      throw new NotFoundException("No media packages found between " + start + " and " + end);
-    }
-
-    processOperations(results, targetStore);
-  }
-
-  public RichAResult getSnapshotsByIdAndDate(final String mpId, final Date start, final Date end) {
-    RequireUtil.requireNotBlank(mpId, "mpId");
-    RequireUtil.notNull(start, "start");
-    RequireUtil.notNull(end, "end");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q, mpId).where(q.archived().ge(start)).where(q.archived().le(end));
-    return Enrichments.enrich(query.run());
-  }
-
-  public void moveSnapshotsByIdAndDate(final String mpId, final Date start, final Date end, final String targetStore)
-          throws NotFoundException {
-    RichAResult results = getSnapshotsByDate(start, end);
-
-    if (results.getRecords().isEmpty()) {
-      throw new NotFoundException("No media package with id " + mpId + " found between " + start + " and " + end);
-    }
-
-    processOperations(results, targetStore);
-  }
-
-  // Return the asset store ID that is currently storing the snapshot
-  public Opt<String> getSnapshotStorageLocation(final Version version, final String mpId) {
-    RichAResult result = getSnapshotsByIdAndVersion(mpId, version);
-
-    for (Snapshot snapshot : result.getSnapshots()) {
-      return Opt.some(snapshot.getStorageId());
-    }
-
-    logger.error("Mediapackage " + mpId + "@" + version + " not found!");
-    return Opt.none();
-  }
-
-  public Opt<String> getSnapshotStorageLocation(final Snapshot snap) {
-    return getSnapshotStorageLocation(snap.getVersion(), snap.getMediaPackage().getIdentifier().toString());
-  }
-
-  /* -------------------------------------------------------------------------------------------------------------- */
+  
+  /*
+   * Security handling
+   */
 
   /**
    * Create an authorization predicate to be used with {@link #isAuthorized(String, String)},
@@ -731,7 +829,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     final AQueryBuilder q = createQueryWithoutSecurityCheck();
     return securityService.getUser().getRoles().stream()
             .filter(roleFilter)
-            .map((role) -> mkSecurityProperty(q, role.getName(), action).eq(true))
+            .map((role) -> q.property(Value.BOOLEAN, SECURITY_NAMESPACE, mkPropertyName(role.getName(), action))
+                    .eq(true))
             .reduce(Predicate::or)
             .orElseGet(() -> q.always().not())
             .and(restrictToUsersOrganization());
@@ -766,7 +865,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 .filter(roleFilter)
                 .map((role) -> mkPropertyName(role.getName(), action))
                 .collect(Collectors.toList());
-        return getDb().selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
+        return getDatabase().selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
                 .map(p -> p.getId().getName())
                 .anyMatch(p -> roles.parallelStream().anyMatch(r -> r.equals(p)));
     }
@@ -786,41 +885,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     }
   }
 
-  enum AdminRole {
-    GLOBAL, ORGANIZATION, NONE
-  }
-
-  /**
-   * Update the ACL properties. Note that this method assumes proper proper authorization.
-   *
-   * @param snapshot
-   *          Snapshot to reference the media package identifier
-   * @param acl
-   *          ACL to set
-   */
-  private void storeAclAsProperties(Snapshot snapshot, AccessControlList acl) {
-    final String mediaPackageId =  snapshot.getMediaPackage().getIdentifier().toString();
-    // Drop old ACL rules
-    deleteProperties(mediaPackageId, SECURITY_NAMESPACE);
-    // Set new ACL rules
-    for (final AccessControlEntry ace : acl.getEntries()) {
-      getDb().saveProperty(Property.mk(
-              PropertyId.mk(
-                      mediaPackageId,
-                      SECURITY_NAMESPACE,
-                      mkPropertyName(ace)),
-              Value.mk(ace.isAllow())));
-    }
-  }
-
-  private PropertyField<Boolean> mkSecurityProperty(AQueryBuilder q, String role, String action) {
-    return q.property(Value.BOOLEAN, SECURITY_NAMESPACE, mkPropertyName(role, action));
-  }
-
-  private String mkPropertyName(AccessControlEntry ace) {
-    return mkPropertyName(ace.getRole(), ace.getAction());
-  }
-
   private String mkPropertyName(String role, String action) {
     return role + " | " + action;
   }
@@ -828,125 +892,16 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   /**
    * Configurable filter for roles
    */
-  private java.util.function.Predicate<Role> roleFilter = (role) -> {
+  private final java.util.function.Predicate<Role> roleFilter = (role) -> {
     final String name = role.getName();
     return (includeAPIRoles || !name.startsWith("ROLE_API_"))
             && (includeCARoles  || !name.startsWith("ROLE_CAPTURE_AGENT_"))
             && (includeUIRoles  || !name.startsWith("ROLE_UI_"));
   };
 
-  //////////// ASSET MANAGER WITH TIERED STORAGE
-
-  public Database getDb() {
-    return db;
-  }
-
-  public HttpAssetProvider getHttpAssetProvider() {
-    return httpAssetProvider;
-  }
-
-  public AssetStore getLocalAssetStore() {
-    return assetStore;
-  }
-
-  protected Workspace getWorkspace() {
-    return workspace;
-  }
-
-  protected String getCurrentOrgId() {
-    return securityService.getOrganization().getId();
-  }
-
-  public Opt<AssetStore> getAssetStore(String storeId) {
-    if (getLocalAssetStore().getStoreType().equals(storeId)) {
-      return Opt.some(getLocalAssetStore());
-    } else {
-      return getRemoteAssetStore(storeId);
-    }
-  }
-
-  //Move snapshot from current store to this store
-  //Note: This may require downloading and re-uploading
-  public void moveSnapshotToStore(final Version version, final String mpId, final String storeId)
-          throws NotFoundException {
-
-    //Find the snapshot
-    AQueryBuilder q = createQuery();
-    RichAResult results = Enrichments.enrich(baseQuery(q, version, mpId).run());
-
-    if (results.getRecords().isEmpty()) {
-      throw new NotFoundException("Mediapackage " + mpId + "@" + version.toString() + " not found!");
-    }
-    processOperations(results, storeId);
-  }
-
-  //Do the actual moving
-  private void processOperations(final RichAResult results, final String targetStoreId) {
-    results.getRecords().forEach(new Consumer<ARecord>() {
-      @Override
-      public void accept(ARecord record) {
-        Snapshot s = record.getSnapshot().get();
-        Opt<String> currentStoreId = getSnapshotStorageLocation(s);
-
-        if (currentStoreId.isNone()) {
-          logger.warn("IsNone store ID");
-          return;
-        }
-
-        //If this snapshot is already stored in the desired store
-        if (currentStoreId.get().equals(targetStoreId)) {
-          //return, since we don't need to move anything
-          return;
-        }
-
-        AssetStore currentStore = null;
-        AssetStore targetStore = null;
-
-        Opt<AssetStore> optCurrentStore = getAssetStore(currentStoreId.get());
-        Opt<AssetStore> optTargetStore = getAssetStore(targetStoreId);
-
-        if (!optCurrentStore.isNone()) {
-          currentStore = optCurrentStore.get();
-        } else {
-          logger.error("Unknown current store: " + currentStoreId.get());
-          return;
-        }
-        if (!optTargetStore.isNone()) {
-          targetStore = optTargetStore.get();
-        } else {
-          logger.error("Unknown target store: " + targetStoreId);
-          return;
-        }
-
-        //If the content is already local, or is moving from a remote to the local
-        if (isLocalAssetStoreId(currentStoreId.get()) || isLocalAssetStoreId(targetStoreId)) {
-          logger.debug("Moving {} from {} to {}", s.toString(), currentStoreId, targetStoreId);
-
-          try {
-            copyAssetsToStore(s, targetStore);
-            copyManifest(s, targetStore);
-          } catch (Exception e) {
-            Functions.chuck(e);
-          }
-          getDb().setStorageLocation(s, targetStoreId);
-          deleteAssetsFromStore(s, currentStore);
-        } else {
-          //Else, the content is *not* local and is going to a *different* remote
-          String intermediateStore = getLocalAssetStore().getStoreType();
-          logger.debug("Moving {} from {} to {}, then to {}",
-                  s.toString(), currentStoreId, intermediateStore, targetStoreId);
-          Version version = s.getVersion();
-          String mpId = s.getMediaPackage().getIdentifier().toString();
-          try {
-            moveSnapshotToStore(version, mpId, intermediateStore);
-            moveSnapshotToStore(version, mpId, targetStoreId);
-          } catch (NotFoundException e) {
-            Functions.chuck(e);
-          }
-        }
-      }
-    });
-  }
+  /*
+   * Utility
+   */
 
   /**
    * Return a basic query which returns the snapshot and its current storage location
@@ -1004,38 +959,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     }
   }
 
-  /** Returns a query to find locally stored snapshots */
-  private ASelectQuery getStoredLocally(final AQueryBuilder q, final Version version, final String mpId) {
-    return baseQuery(q, version, mpId).where(q.storage(getLocalAssetStore().getStoreType()));
-  }
-
-  /** Returns a query to find remotely stored snapshots */
-  private ASelectQuery getStoredRemotely(final AQueryBuilder q, final Version version, final String mpId) {
-    return baseQuery(q, version, mpId).where(q.storage(getLocalAssetStore().getStoreType()).not());
-  }
-
-  /** Returns a query to find remotely stored snapshots in a specific store */
-  private ASelectQuery getStoredInStore(
-          final AQueryBuilder q,
-          final Version version,
-          final String mpId,
-          final String storeId
-  ) {
-    return baseQuery(q, version, mpId).where(q.storage(storeId));
-  }
-
-  /** Returns true if the store id is equal to the local asset store's id */
-  private boolean isLocalAssetStoreId(String storeId) {
-    return getLocalAssetStore().getStoreType().equals(storeId);
-  }
-
-  /** Returns true if the store id is not equal to the local asset store's id */
-  private boolean isRemoteAssetStoreId(String storeId) {
-    return !isLocalAssetStoreId(storeId);
-  }
-
   /** Move the assets for a snapshot to the target store */
-  private void copyAssetsToStore(Snapshot snap, AssetStore store) throws Exception {
+  private void copyAssetsToStore(Snapshot snap, AssetStore store) {
     final String mpId = snap.getMediaPackage().getIdentifier().toString();
     final String orgId = snap.getOrganizationId();
     final Version version = snap.getVersion();
@@ -1050,12 +975,23 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       final StoragePath storagePath = StoragePath.mk(orgId, mpId, version, e.getIdentifier());
       if (store.contains(storagePath)) {
         logger.debug("Element {} (version {}) is already in store {} so skipping it", e.getIdentifier(),
-                version.toString(),
-                store.getStoreType());
+                version, store.getStoreType());
         continue;
       }
-      final Opt<StoragePath> existingAssetOpt
-              = findAssetInVersionsAndStores(e.getChecksum().toString(), store.getStoreType());
+
+      // find asset in versions & stores
+      final Opt<StoragePath> existingAssetOpt = getDatabase().findAssetByChecksumAndStore(e.getChecksum().toString(),
+              store.getStoreType()).map(new Fn<AssetDtos.Full, StoragePath>() {
+        @Override public StoragePath apply(AssetDtos.Full dto) {
+          return StoragePath.mk(
+                  dto.getOrganizationId(),
+                  dto.getMediaPackageId(),
+                  dto.getVersion(),
+                  dto.getAssetDto().getMediaPackageElementId()
+          );
+        }
+      });
+
       if (existingAssetOpt.isSome()) {
         final StoragePath existingAsset = existingAssetOpt.get();
         logger.debug("Content of asset {} with checksum {} already exists in {}",
@@ -1069,34 +1005,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           ));
         }
       } else {
-        final Opt<Long> size = e.getSize() > 0 ? Opt.some(e.getSize()) : Opt.<Long>none();
+        final Opt<Long> size = e.getSize() > 0 ? Opt.some(e.getSize()) : Opt.none();
         store.put(storagePath, Source.mk(e.getURI(), size, Opt.nul(e.getMimeType())));
       }
-      getDb().setAssetStorageLocation(VersionImpl.mk(version), mpId, e.getIdentifier(), store.getStoreType());
+      getDatabase().setAssetStorageLocation(VersionImpl.mk(version), mpId, e.getIdentifier(), store.getStoreType());
     }
-  }
-
-  /** Deletes the content of a snapshot from a store */
-  private void deleteAssetsFromStore(Snapshot snap, AssetStore store) {
-    store.delete(DeletionSelector.delete(
-            snap.getOrganizationId(),
-            snap.getMediaPackage().getIdentifier().toString(),
-            snap.getVersion()
-    ));
-  }
-
-  /** Check if element <code>e</code> is already part of the history and in a specific store */
-  private Opt<StoragePath> findAssetInVersionsAndStores(final String checksum, final String storeId) throws Exception {
-    return getDb().findAssetByChecksumAndStore(checksum, storeId).map(new Fn<AssetDtos.Full, StoragePath>() {
-      @Override public StoragePath apply(AssetDtos.Full dto) {
-        return StoragePath.mk(
-                dto.getOrganizationId(),
-                dto.getMediaPackageId(),
-                dto.getVersion(),
-                dto.getAssetDto().getMediaPackageElementId()
-        );
-      }
-    });
   }
 
   private void copyManifest(Snapshot snap, AssetStore targetStore) throws IOException, NotFoundException {
@@ -1127,14 +1040,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         }
 
         inputStream = inputStreamOpt.get();
-        manifestFileName = UUID.randomUUID().toString() + ".xml";
-        URI manifestTmpUri = getWorkspace().putInCollection("archive", manifestFileName, inputStream);
-        targetStore.put(pathToManifest, Source.mk(manifestTmpUri, Opt.<Long> none(), Opt.some(MimeTypes.XML)));
+        manifestFileName = UUID.randomUUID() + ".xml";
+        URI manifestTmpUri = workspace.putInCollection("archive", manifestFileName, inputStream);
+        targetStore.put(pathToManifest, Source.mk(manifestTmpUri, Opt.none(), Opt.some(MimeTypes.XML)));
       } finally {
         IOUtils.closeQuietly(inputStream);
         try {
           // Make sure to clean up the temporary file
-          getWorkspace().deleteFromCollection("archive", manifestFileName);
+          workspace.deleteFromCollection("archive", manifestFileName);
         } catch (NotFoundException e) {
           // This is OK, we are deleting it anyway
         } catch (IOException e) {
@@ -1142,7 +1055,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           // because another process is running at the same time and wrote a file there
           // after it was tested but before it was actually deleted. We will consider this ok.
           // Does the error message mention the manifest file name?
-          if (e.getMessage().indexOf(manifestFileName) > -1) {
+          if (e.getMessage().contains(manifestFileName)) {
             logger.warn("The manifest file {} didn't get deleted from the archive collection: {}",
                     manifestBaseName, e);
           }
@@ -1174,6 +1087,25 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * Make sure each of the elements has a checksum.
    */
   void calcChecksumsForMediaPackageElements(PartialMediaPackage pmp) {
+    final Fx<MediaPackageElement> addChecksum = new Fx<MediaPackageElement>() {
+      @Override public void apply(MediaPackageElement mpe) {
+        File file = null;
+        try {
+          logger.trace("Calculate checksum for {}", mpe.getURI());
+          file = workspace.get(mpe.getURI(), true);
+          mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
+        } catch (IOException | NotFoundException e) {
+          throw new AssetManagerException(format(
+                  "Cannot calculate checksum for media package element %s",
+                  mpe.getURI()
+          ), e);
+        } finally {
+          if (file != null) {
+            FileUtils.deleteQuietly(file);
+          }
+        }
+      }
+    };
     pmp.getElements().filter(hasNoChecksum.toFn()).each(addChecksum).run();
   }
 
@@ -1182,7 +1114,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     final Date now = new Date();
     // claim a new version for the media package
     final String mpId = mp.getIdentifier().toString();
-    final VersionImpl version = getDb().claimVersion(mpId);
+    final VersionImpl version = getDatabase().claimVersion(mpId);
     logger.info("Creating new version {} of media package {}", version, mp);
     final PartialMediaPackage pmp = assetsOnly(mp);
     // make sure they have a checksum
@@ -1192,9 +1124,30 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     // store mediapackage in db
     final SnapshotDto snapshotDto;
     try {
-      rewriteUrisForArchival(pmp, version);
-      snapshotDto = getDb().saveSnapshot(
-              getCurrentOrgId(), pmp, now, version,
+      // rewrite URIs for archival
+      Fn<MediaPackageElement, URI> uriCreator = new Fn<MediaPackageElement, URI>() {
+        @Override
+        public URI apply(MediaPackageElement mpe) {
+          try {
+            String fileName = getFileName(mpe).getOr("unknown");
+            return new URI(
+                    "urn",
+                    "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName,
+                    null
+            );
+          } catch (URISyntaxException e) {
+            throw new AssetManagerException(e);
+          }
+        }
+      };
+
+      for (MediaPackageElement mpe : pmp.getElements()) {
+        mpe.setURI(uriCreator.apply(mpe));
+      }
+
+      String currentOrgId = securityService.getOrganization().getId();
+      snapshotDto = getDatabase().saveSnapshot(
+              currentOrgId, pmp, now, version,
               Availability.ONLINE, getLocalAssetStore().getStoreType(), owner
       );
     } catch (AssetManagerException e) {
@@ -1207,36 +1160,29 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     return snapshotDto;
   }
 
-  private final Fx<MediaPackageElement> addChecksum = new Fx<MediaPackageElement>() {
-    @Override public void apply(MediaPackageElement mpe) {
-      File file = null;
-      try {
-        logger.trace("Calculate checksum for {}", mpe.getURI());
-        file = getWorkspace().get(mpe.getURI(), true);
-        mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
-      } catch (IOException | NotFoundException e) {
-        throw new AssetManagerException(format(
-                "Cannot calculate checksum for media package element %s",
-                mpe.getURI()
-        ), e);
-      } finally {
-        if (file != null) {
-          FileUtils.deleteQuietly(file);
-        }
-      }
-    }
-  };
-
   /**
    * Store all elements of <code>pmp</code> under the given version.
    */
-  private void storeAssets(final PartialMediaPackage pmp, final Version version) throws Exception {
+  private void storeAssets(final PartialMediaPackage pmp, final Version version) {
     final String mpId = pmp.getMediaPackage().getIdentifier().toString();
-    final String orgId = getCurrentOrgId();
+    final String orgId = securityService.getOrganization().getId();
     for (final MediaPackageElement e : pmp.getElements()) {
       logger.debug("Archiving {} {} {}", e.getFlavor(), e.getMimeType(), e.getURI());
       final StoragePath storagePath = StoragePath.mk(orgId, mpId, version, e.getIdentifier());
-      final Opt<StoragePath> existingAssetOpt = findAssetInVersions(e.getChecksum().toString());
+      // find asset in versions
+      final Opt<StoragePath> existingAssetOpt = getDatabase().findAssetByChecksumAndStore(e.getChecksum().toString(),
+              getLocalAssetStore().getStoreType())
+              .map(new Fn<AssetDtos.Full, StoragePath>() {
+                @Override public StoragePath apply(AssetDtos.Full dto) {
+                  return StoragePath.mk(
+                          dto.getOrganizationId(),
+                          dto.getMediaPackageId(),
+                          dto.getVersion(),
+                          dto.getAssetDto().getMediaPackageElementId()
+                  );
+                }
+              });
+
       if (existingAssetOpt.isSome()) {
         final StoragePath existingAsset = existingAssetOpt.get();
         logger.debug("Content of asset {} with checksum {} has been archived before",
@@ -1250,47 +1196,32 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           ));
         }
       } else {
-        final Opt<Long> size = e.getSize() > 0 ? Opt.some(e.getSize()) : Opt.<Long>none();
+        final Opt<Long> size = e.getSize() > 0 ? Opt.some(e.getSize()) : Opt.none();
         getLocalAssetStore().put(storagePath, Source.mk(e.getURI(), size, Opt.nul(e.getMimeType())));
       }
     }
   }
 
-  /** Check if element <code>e</code> is already part of the history. */
-  private Opt<StoragePath> findAssetInVersions(final String checksum) throws Exception {
-    return getDb().findAssetByChecksumAndStore(checksum, getLocalAssetStore().getStoreType())
-            .map(new Fn<AssetDtos.Full, StoragePath>() {
-              @Override public StoragePath apply(AssetDtos.Full dto) {
-                return StoragePath.mk(
-                        dto.getOrganizationId(),
-                        dto.getMediaPackageId(),
-                        dto.getVersion(),
-                        dto.getAssetDto().getMediaPackageElementId()
-                );
-              }
-            });
-  }
-
   private void storeManifest(final PartialMediaPackage pmp, final Version version) throws Exception {
     final String mpId = pmp.getMediaPackage().getIdentifier().toString();
-    final String orgId = getCurrentOrgId();
+    final String orgId = securityService.getOrganization().getId();
     // store the manifest.xml
     // TODO make use of checksums
     logger.debug("Archiving manifest of media package {} version {}", mpId, version);
     // temporarily save the manifest XML into the workspace to
     // Fix file not found exception when several snapshots are taken at the same time
     final String manifestFileName = format("manifest_%s_%s.xml", pmp.getMediaPackage().getIdentifier(), version);
-    final URI manifestTmpUri = getWorkspace().putInCollection(
+    final URI manifestTmpUri = workspace.putInCollection(
             "archive",
             manifestFileName,
             IOUtils.toInputStream(MediaPackageParser.getAsXml(pmp.getMediaPackage()), "UTF-8"));
     try {
       getLocalAssetStore().put(
               StoragePath.mk(orgId, mpId, version, manifestAssetId(pmp, "manifest")),
-              Source.mk(manifestTmpUri, Opt.<Long>none(), Opt.some(MimeTypes.XML)));
+              Source.mk(manifestTmpUri, Opt.none(), Opt.some(MimeTypes.XML)));
     } finally {
       // make sure to clean up the temporary file
-      getWorkspace().deleteFromCollection("archive", manifestFileName);
+      workspace.deleteFromCollection("archive", manifestFileName);
     }
   }
 
@@ -1345,31 +1276,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * non-publication elements.
    */
   static PartialMediaPackage assetsOnly(MediaPackage mp) {
+    final Pred<MediaPackageElement> isAsset = Pred.mk(isNotPublication.toFn());
     return PartialMediaPackage.mk(mp, isAsset);
-  }
-
-  static final Pred<MediaPackageElement> isAsset = Pred.mk(isNotPublication.toFn());
-
-  /**
-   * Create a URN for a media package element of a certain version.
-   * Use this URN for the archived media package.
-   */
-  static Fn<MediaPackageElement, URI> createUrn(final String mpId, final Version version) {
-    return new Fn<MediaPackageElement, URI>() {
-      @Override
-      public URI apply(MediaPackageElement mpe) {
-        try {
-          String fileName = getFileName(mpe).getOr("unknown");
-          return new URI(
-                  "urn",
-                  "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName,
-                  null
-          );
-        } catch (URISyntaxException e) {
-          throw new AssetManagerException(e);
-        }
-      }
-    };
   }
 
   /**
@@ -1378,35 +1286,18 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @return the file name or none if it could not be determined
    */
   public static Opt<String> getFileNameFromUrn(MediaPackageElement mpe) {
+    Fn<URI, String> toString = new Fn<URI, String>() {
+      @Override
+      public String apply(URI uri) {
+        return uri.toString();
+      }
+    };
+
     Opt<URI> uri = Opt.nul(mpe.getURI());
     if (uri.isSome() && "urn".equals(uri.get().getScheme())) {
       return uri.toStream().map(toString).bind(Strings.split(":")).drop(1).reverse().head();
     }
     return Opt.none();
-  }
-
-  private static final Fn<URI, String> toString = new Fn<URI, String>() {
-    @Override
-    public String apply(URI uri) {
-      return uri.toString();
-    }
-  };
-
-  /**
-   * Rewrite URIs of assets of media package elements. Please note that this method modifies the given media package.
-   */
-  static void rewriteUrisForArchival(PartialMediaPackage pmp, Version version) {
-    rewriteUris(pmp, createUrn(pmp.getMediaPackage().getIdentifier().toString(), version));
-  }
-
-  /**
-   * Rewrite URIs of all asset elements of a media package.
-   * Please note that this method modifies the given media package.
-   */
-  static void rewriteUris(PartialMediaPackage pmp, Fn<MediaPackageElement, URI> uriCreator) {
-    for (MediaPackageElement mpe : pmp.getElements()) {
-      mpe.setURI(uriCreator.apply(mpe));
-    }
   }
 
   /**
@@ -1426,5 +1317,27 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
             snapshot.getStorageId(),
             snapshot.getOwner(),
             mpCopy);
+  }
+
+  /**
+   * Call {@link
+   * org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(AbstractADeleteQuery.DeleteSnapshotHandler)}
+   * with a delete handler that sends messages to ActiveMQ. Also make sure to propagate the behaviour to subsequent
+   * instances.
+   */
+  private final class ADeleteQueryWithMessaging extends ADeleteQueryDecorator {
+    ADeleteQueryWithMessaging(ADeleteQuery delegate) {
+      super(delegate);
+    }
+
+    @Override
+    public long run() {
+      return RuntimeTypes.convert(delegate).run(AssetManagerImpl.this);
+    }
+
+    @Override
+    protected ADeleteQueryDecorator mkDecorator(ADeleteQuery delegate) {
+      return new ADeleteQueryWithMessaging(delegate);
+    }
   }
 }

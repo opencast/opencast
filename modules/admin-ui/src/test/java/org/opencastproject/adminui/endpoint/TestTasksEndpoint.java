@@ -185,7 +185,7 @@ public class TestTasksEndpoint extends TasksEndpoint {
     am.setWorkspace(workspace);
     am.setAssetStore(mkAssetStore(workspace));
     am.setSecurityService(securityService);
-    am.setAuthSvc(authorizationService);
+    am.setAuthorizationService(authorizationService);
     am.setMessageSender(ms);
     return am;
   }
