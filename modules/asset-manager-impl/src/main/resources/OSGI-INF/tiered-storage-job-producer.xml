@@ -4,10 +4,10 @@
                activate="activate"
                immediate="true">
 
-  <implementation class="org.opencastproject.assetmanager.impl.TieredStorageAssetManagerJobProducer"/>
+  <implementation class="org.opencastproject.assetmanager.impl.AssetManagerJobProducer"/>
   <property name="service.description" value="Opencast Asset Manager Job Producer"/>
   <service>
-    <provide interface="org.opencastproject.assetmanager.impl.TieredStorageAssetManagerJobProducer"/>
+    <provide interface="org.opencastproject.assetmanager.impl.AssetManagerJobProducer"/>
   </service>
 
   <reference name="assetManager"
