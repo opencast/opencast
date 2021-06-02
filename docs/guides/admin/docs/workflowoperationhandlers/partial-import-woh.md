@@ -32,13 +32,12 @@ Parameter Table
 |**source-smil-flavor**\*| MediaPackageElementFlavor |The flavor of the SMIL file describing how to build the targets.</br>When using /ingest/addPartialTrack, the ingest service will create the SMIL file and add it to the media package as flavor *smil/source+partial*||
 |**target-presenter-flavor**\*| MediaPackageElementFlavor |The flavor to be used for the target presentation track.</br>Both the type and subtype must not be *\**||
 |**target-presentation-flavor**\*| MediaPackageElementFlavor |The flavor to be used for the target presentation track.</br>Both the type nor subtype must not be *\**||
+|**preencode-encoding-profile**\*|String|Encoding profile to for pre-processing videos. Must ensure same resolution, codec, framerate and samplerate. Must use the same framerate as the image-movie.work profile||
 |**concat-encoding-profile**\*|String|Encoding profile used for concatenating audio or video files||
 |concat-output-framerate|Float|The optional output framerate for concatenated video files||
 |**trim-encoding-profile**\*|String|Encoding profile using for trimming tracks|
 |force-encoding|Boolean|If set to *true*, all generated target files will be encoded using the encoding profile *force-encoding-profile*|false|
 |**force-encoding-profile**\*|String|Encoding profile to be used when *force-encoding* is set to *true* or a given target track has a file extension not included in *required-extensions*||
-|preencode-encoding|Boolean|If set to *true*, all source target files will be encoded using the encoding profile *preencode-encoding-profile* before they're processed further|false|
-|preencode-encoding-profile|String|Encoding profile to be used when *preencode-encoding* is set to *true* ||
 |required-extensions|String , { "," , String }|Comma-separated list of file extension names (case insensitive). All generated target files whose file extensions are not in this list will be encoded using the encoding profile *force-encoding-profile*|"mp4"|
 |enforce-divisible-by-two|Boolean|If set, all video targets will have widths and heights divisible by two. This might be necessary depending since some encoder fail when encountering uneven widths or heights.|false|
 
@@ -119,6 +118,7 @@ in the SMIL file:
     <configuration key="source-smil-flavor">smil/source+partial</configuration>
     <configuration key="target-presenter-flavor">presenter/standard</configuration>
     <configuration key="target-presentation-flavor">presentation/standard</configuration>
+    <configuration key="preencode-encoding-profile">partial-import-preencode</configuration>
     <configuration key="concat-encoding-profile">concat.work</configuration>
     <configuration key="trim-encoding-profile">trim.work</configuration>
     <configuration key="force-encoding-profile">editor.work</configuration>
@@ -251,7 +251,7 @@ supposed to be changed by the user.
 
 |configuration key|description|
 |-----------------|-----------|
+|preencode-encoding-profile|Used to encode all source video tracks before any processing happens, to avoid errors with non-uniform input and prepare them for lossless concatenation. Must ensure same resolution, codec, framerate and samplerate. Must use the same framerate as the image-movie.work profile. |
 |concat-encoding-profile|Used to concatenate partial tracks into tracks|
 |trim-encoding-profile|Used to trim the resulting concatenated single tracks if necessary|
 |force-encoding-profile|Used to re-encode target tracks in case the file extension of a given target track is not included in *required-extensions* or the configuration key *force-encoding* is set to *true* |
-|preencode-encoding-profile|Only used if *preencode-encoding* is set to true. Can be used to encode all source tracks before any processing happens, to avoid errors with non-uniform input. Should be used instead of [Encode](encode-woh.md), as the latter will break source-smil. |
