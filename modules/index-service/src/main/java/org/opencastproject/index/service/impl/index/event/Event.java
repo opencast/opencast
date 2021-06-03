@@ -876,6 +876,14 @@ public class Event implements IndexObject {
 
     if (getWorkflowId() != null && StringUtils.isNotBlank(getWorkflowState())) {
       eventStatus = workflowStatusMapping.get(getWorkflowState());
+    } else if ("EVENTS.EVENTS.STATUS.PROCESSED".equals(eventStatus)
+            && (RecordingState.CAPTURE_FINISHED.equals(getRecordingStatus())
+            || RecordingState.UPLOAD_FINISHED.equals(getRecordingStatus()))) {
+      eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
+    } else if ("EVENTS.EVENTS.STATUS.PROCESSING_FAILURE".equals(eventStatus)
+            && RecordingState.CAPTURE_ERROR.equals(getRecordingStatus())
+            || RecordingState.UPLOAD_ERROR.equals(getRecordingStatus())) {
+      eventStatus = recordingStatusMapping.get(getRecordingStatus());
     } else if (StringUtils.isNotBlank(getRecordingStatus())) {
       eventStatus = recordingStatusMapping.get(getRecordingStatus());
     } else if (isScheduledEvent()) {
