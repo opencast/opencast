@@ -610,9 +610,11 @@ public class EditorServiceImpl implements EditorService {
 
   @Override
   public EditingData getEditData(final String mediaPackageId) throws EditorServiceException {
-    // Select tracks
+
     Event event = getEvent(mediaPackageId);
     MediaPackage mp = getMediaPackage(event);
+
+    boolean workflowActive = WorkflowUtil.isActive(event.getWorkflowState());
 
     final Opt<Publication> internalPubOpt = getInternalPublication(mp);
     if (internalPubOpt.isNone() || internalPubOpt.isEmpty()) {
@@ -676,7 +678,7 @@ public class EditorServiceImpl implements EditorService {
     }).collect(Collectors.toList());
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName());
+            event.getSeriesId(), event.getSeriesName(), workflowActive);
   }
 
   private MediaPackage getMediaPackage(Event event) throws EditorServiceException {
