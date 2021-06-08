@@ -14,7 +14,7 @@
     "iframe-resizer": "^4.3.2",
     "query-string": "^7.0.0",
     "react": "^17.0.2",
-    "react-bootstrap": "^1.6.0",
+    "react-bootstrap": "^1.6.1",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.10.0",
@@ -65,9 +65,9 @@
   "devDependencies": {
     "http-mock-server": "^0.5.2",
     "@types/jest": "26.0.23",
-    "@types/node": "15.6.1",
-    "@types/react": "17.0.8",
-    "@types/react-dom": "17.0.5",
+    "@types/node": "15.12.1",
+    "@types/react": "17.0.9",
+    "@types/react-dom": "17.0.6",
     "@types/react-helmet": "^6.1.1",
     "@types/react-js-pagination": "^3.0.3",
     "@types/react-select": "^4.0.15"

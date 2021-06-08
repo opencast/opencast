@@ -137,8 +137,8 @@
     <module>modules/fileupload</module>
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
-    <module>modules/adopter-statistics-api</module>
-    <module>modules/adopter-statistics-impl</module>
+    <module>modules/adopter-registration-api</module>
+    <module>modules/adopter-registration-impl</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
     <module>modules/index-rebuild</module>

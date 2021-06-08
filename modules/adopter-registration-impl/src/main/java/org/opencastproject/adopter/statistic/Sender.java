@@ -45,8 +45,8 @@ public class Sender {
 
   // The suffixes for the base statistic server URL
   // they determine to which REST endpoint the data will be sent
-  private static final String GENERAL_DATA_URL_SUFFIX = "adopter";
-  private static final String STATISTIC_URL_SUFFIX = "statistic";
+  private static final String GENERAL_DATA_URL_SUFFIX = "api/1.0/adopter";
+  private static final String STATISTIC_URL_SUFFIX = "api/1.0/statistic";
 
   //================================================================================
   // Constructor
