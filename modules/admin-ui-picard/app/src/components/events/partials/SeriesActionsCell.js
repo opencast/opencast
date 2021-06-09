@@ -3,6 +3,7 @@ import {useTranslation} from "react-i18next";
 import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteSeries} from "../../../thunks/seriesThunks";
 import {connect} from "react-redux";
+import SeriesDetailsModal from "./modals/SeriesDetailsModal";
 
 /**
  * This component renders the action cells of series in the table view
@@ -11,6 +12,7 @@ const SeriesActionsCell = ({ row, deleteSeries }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
+    const [displaySeriesDetailsModal, setSeriesDetailsModal] = useState(false);
 
     const hideDeleteConfirmation = () => {
         setDeleteConfirmation(false);
@@ -20,13 +22,25 @@ const SeriesActionsCell = ({ row, deleteSeries }) => {
         deleteSeries(id)
     };
 
+    const hideSeriesDetailsModal = () => {
+        setSeriesDetailsModal(false);
+    }
+
     return (
         <>
+
             {/*TODO: When series details are implemented, remove placeholder
             {/*TODO: with-Role ROLE_UI_SERIES_DETAILS_VIEW*/}
-            <a onClick={() => onClickPlaceholder(row)}
+            <a onClick={() => setSeriesDetailsModal(true)}
                className="more-series"
                title={t('EVENTS.SERIES.TABLE.TOOLTIP.DETAILS')}/>
+
+
+            {displaySeriesDetailsModal && (
+                <SeriesDetailsModal handleClose={hideSeriesDetailsModal}
+                                    seriesId={row.id}
+                                    seriesTitle={row.title}/>
+            )}
 
             {/*TODO: with-Role ROLE_UI_SERIES_DELETE*/}
             <a onClick={() => setDeleteConfirmation(true)}
