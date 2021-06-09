@@ -57,6 +57,7 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.common.TextFormat;
+import io.prometheus.client.hotspot.DefaultExports;
 
 /**
  * Opencast metrics endpoint
@@ -138,6 +139,7 @@ public class MetricsExporter {
     final Version version = bundleContext.getBundle().getVersion();
     this.version.labels("major").set(version.getMajor());
     this.version.labels("minor").set(version.getMinor());
+    DefaultExports.initialize();
   }
 
   @GET
