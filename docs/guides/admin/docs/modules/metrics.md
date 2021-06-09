@@ -8,10 +8,11 @@ tools like [Prometheus](https://prometheus.io). The endpoint is available at `/m
 Available Metrics
 -----------------
 
-Metrics are retrieved directly from the service registry and describe the current work load of the Opencast cluster.
-There should usually be no need for monitoring several serves of a cluster. All will produce identical metrics.
+Opencast metrics are retrieved directly from the service registry and describe the current work load of the Opencast 
+cluster. There should usually be no need for monitoring Opencast metrics on several servers of a cluster. All will
+produce identical metrics. The standard JVM metrics, however, are specific to each server.
 
-This available metrics allow monitoring the current cluster state when it comes to processing
+These available metrics allow monitoring the current cluster state when it comes to processing
 and should allow for good alerting rules:
 
 - How many workflows are being processed
@@ -19,7 +20,7 @@ and should allow for good alerting rules:
 - Are there any services in a warning or error state
 - How many events are in the asset manager
 
-Here is a complete list of available metrics:
+Here is a complete list of the available metrics specific to Opencast:
 
 ```
 # HELP opencast_services_total Number of services in a cluster
@@ -51,6 +52,10 @@ requests_total 1.0
 opencast_asset_manager_events{organization="mh_default_org",} 1.0
 ```
 
+Additionally, standard JVM metrics are exported providing information about e.g. memory and CPU usage, threads,
+classloading, etc. The JVM metrics collectors are documented [here](https://prometheus.github.io/client_java/).
+A corresponding monitoring mixin with dashboards and alerting rules can be found
+[here](https://github.com/grafana/jsonnet-libs/tree/master/jvm-mixin).
 
 Access
 ------
