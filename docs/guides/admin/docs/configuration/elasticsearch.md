@@ -3,7 +3,6 @@ Elasticsearch Configuration
 
 Elasticsearch powers the external API as well as the administrative user interface of Opencast.
 
-
 Configuring External Nodes
 --------------------------
 
@@ -14,3 +13,11 @@ Relevant configuration keys are:
 * `org.opencastproject.elasticsearch.server.hostname`
 * `org.opencastproject.elasticsearch.server.scheme`
 * `org.opencastproject.elasticsearch.server.port`
+
+Threfore only `admin`, `adminpresentation`, and `allinone` need to connect to Elasticsearch.
+
+Version
+-------
+
+Please confer to the [Linux installation guide](../installation/source-linux.md#install-dependencies)
+for version information.
