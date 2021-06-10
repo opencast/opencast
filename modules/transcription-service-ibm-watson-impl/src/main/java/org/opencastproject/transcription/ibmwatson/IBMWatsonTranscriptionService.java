@@ -261,8 +261,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
         // Workflow to execute when getting callback (optional, with default)
         Option<String> wfOpt = OsgiUtil.getOptCfg(cc.getProperties(), WORKFLOW_CONFIG);
-        if (wfOpt.isSome())
+        if (wfOpt.isSome()) {
           workflowDefinitionId = wfOpt.get();
+        }
         logger.info("Workflow definition is {}", workflowDefinitionId);
         // Interval to check for completed transcription jobs and start workflows to attach transcripts
         Option<String> intervalOpt = OsgiUtil.getOptCfg(cc.getProperties(), DISPATCH_WORKFLOW_INTERVAL_CONFIG);
@@ -337,22 +338,25 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
         // Notification email passed in this service configuration?
         Option<String> optTo = OsgiUtil.getOptCfg(cc.getProperties(), NOTIFICATION_EMAIL_CONFIG);
-        if (optTo.isSome())
+        if (optTo.isSome()) {
           toEmailAddress = optTo.get();
-        else {
+        } else {
           // Use admin email informed in custom.properties
           optTo = OsgiUtil.getOptContextProperty(cc, ADMIN_EMAIL_PROPERTY);
-          if (optTo.isSome())
+          if (optTo.isSome()) {
             toEmailAddress = optTo.get();
+          }
         }
-        if (toEmailAddress != null)
+        if (toEmailAddress != null) {
           logger.info("Notification email set to {}", toEmailAddress);
-        else
+        } else {
           logger.warn("Email notification disabled");
+        }
 
         Option<String> optCluster = OsgiUtil.getOptContextProperty(cc, CLUSTER_NAME_PROPERTY);
-        if (optCluster.isSome())
+        if (optCluster.isSome()) {
           clusterName = optCluster.get();
+        }
         logger.info("Environment name is {}", clusterName);
 
         logger.info("Activated!");
@@ -360,15 +364,17 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       } else {
         logger.info("Service disabled. If you want to enable it, please update the service configuration.");
       }
-    } else
+    } else {
       throw new IllegalArgumentException("Missing component context");
+    }
   }
 
   @Override
   public Job startTranscription(String mpId, Track track) throws TranscriptionServiceException {
-    if (!enabled)
+    if (!enabled) {
       throw new TranscriptionServiceException(
               "This service is disabled. If you want to enable it, please update the service configuration.");
+    }
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(),
@@ -421,8 +427,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
 
       // Save results in file system if there
-      if (jsonObj.get("results") != null)
+      if (jsonObj.get("results") != null) {
         saveResults(jobId, jsonObj);
+      }
     } catch (IOException e) {
       logger.warn("Could not save transcription results file for mpId {}, jobId {}: {}",
               mpId, jobId, jsonObj == null ? "null" : jsonObj.toJSONString());
@@ -471,6 +478,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     return result;
   }
 
+  // Example URL is too long but needs to stay like this
+  // CHECKSTYLE:OFF
   /**
    * Register the callback url with the Speech-to-text service. From:
    * https://cloud.ibm.com/apidocs/speech-to-text#register-a-callback
@@ -479,16 +488,19 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
    * "https://stream.watsonplatform.net/speech-to-text/api/v1/register_callback?callback_url=http://{user_callback_path}/job_results&user_secret=ThisIsMySecret"
    * Response looks like: { "status": "created", "url": "http://{user_callback_path}/results" }
    */
+  // CHECKSTYLE:ON
   void registerCallback() throws TranscriptionServiceException {
-    if (callbackAlreadyRegistered)
+    if (callbackAlreadyRegistered) {
       return;
+    }
 
     Organization org = securityService.getOrganization();
     String adminUrl = StringUtils.trimToNull(org.getProperties().get(ADMIN_URL_PROPERTY));
-    if (adminUrl != null)
+    if (adminUrl != null) {
       callbackUrl = adminUrl + CALLBACK_PATH;
-    else
+    } else {
       callbackUrl = serverUrl + CALLBACK_PATH;
+    }
     logger.info("Callback url is {}", callbackUrl);
 
     CloseableHttpClient httpClient = makeHttpClient();
@@ -526,13 +538,16 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     } finally {
       try {
         httpClient.close();
-        if (response != null)
+        if (response != null) {
           response.close();
+        }
       } catch (IOException e) {
       }
     }
   }
 
+  // Example URL is too long but needs to stay like this
+  // CHECKSTYLE:OFF
   /**
    * From: https://cloud.ibm.com/apidocs/speech-to-text#create-a-job:
    *
@@ -542,9 +557,11 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
    * Response: { "id": "4bd734c0-e575-21f3-de03-f932aa0468a0", "status": "waiting", "url":
    * "http://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/4bd734c0-e575-21f3-de03-f932aa0468a0" }
    */
+  // CHECKSTYLE:ON
   void createRecognitionsJob(String mpId, Track track) throws TranscriptionServiceException {
-    if (!callbackAlreadyRegistered)
+    if (!callbackAlreadyRegistered) {
       registerCallback();
+    }
 
     // Get audio track file
     File audioFile = null;
@@ -619,8 +636,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     } finally {
       try {
         httpClient.close();
-        if (response != null)
+        if (response != null) {
           response.close();
+        }
       } catch (IOException e) {
       }
     }
@@ -658,8 +676,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           // user_token doesn't come back if this is not in the context of a callback so get the mpId from the db
           if (mpId == null) {
             TranscriptionJobControl jc = database.findByJob(jobId);
-            if (jc != null)
+            if (jc != null) {
               mpId = jc.getMediaPackageId();
+            }
           }
           logger.info("Recognitions job {} has been found, status {}", jobId, jobStatus);
           EntityUtils.consume(entity);
@@ -692,8 +711,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     } finally {
       try {
         httpClient.close();
-        if (response != null)
+        if (response != null) {
           response.close();
+        }
       } catch (IOException e) {
       }
     }
@@ -715,14 +735,16 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         jobId = null;
         for (TranscriptionJobControl jc : database.findByMediaPackage(mpId)) {
           if (TranscriptionJobControl.Status.Closed.name().equals(jc.getStatus())
-                  || TranscriptionJobControl.Status.TranscriptionComplete.name().equals(jc.getStatus()))
+                  || TranscriptionJobControl.Status.TranscriptionComplete.name().equals(jc.getStatus())) {
             jobId = jc.getTranscriptionJobId();
+          }
         }
       }
 
-      if (jobId == null)
+      if (jobId == null) {
         throw new TranscriptionServiceException(
                 "No completed or closed transcription job found in database for media package " + mpId);
+      }
 
       // Results already saved?
       URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId));
@@ -931,8 +953,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
                 }
                 continue; // Skip this one, exception was already logged
               }
-            } else
+            } else {
               continue; // Not time to check yet
+            }
           }
 
           // Jobs that get here have state TranscriptionCompleted.
@@ -950,8 +973,10 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
             logger.info("Attach transcription workflow {} scheduled for mp {}, watson job {}",
                     wfId, mpId, jobId);
           } catch (Exception e) {
-            logger.warn("Attach transcription workflow could NOT be scheduled for mp {}, watson job {}, {}: {}",
-                    mpId, jobId, e.getClass().getName(), e.getMessage());
+            logger.warn(
+                "Attach transcription workflow could NOT be scheduled for media package {}, watson job {}, {}: {}",
+                mpId, jobId, e.getClass().getName(), e.getMessage()
+            );
           }
         }
 
@@ -965,8 +990,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
             String jobId = j.getTranscriptionJobId();
             if (wfId == null) {
               logger.warn(
-                      "Retry transcription workflow could NOT be scheduled for mp {}, watson job {}. Will try again next time.",
-                      mpId, jobId);
+                  "Retry transcription workflow could NOT be scheduled for mp {}, watson job {}. "
+                      + "Will try again next time.",
+                  mpId, jobId);
               // Will try again next time
               continue;
             }
