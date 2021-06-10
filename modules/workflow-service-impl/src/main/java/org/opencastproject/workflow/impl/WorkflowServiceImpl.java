@@ -1259,16 +1259,21 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           // If the mediapackage contains a series, find the series ACLs and add the security information to the
           // mediapackage
 
-          AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
-          Tuple<AccessControlList, AclScope> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage,
-                  AclScope.Series);
-          if (!AclScope.Series.equals(activeSeriesAcl.getB()) || !AccessControlUtil.equals(activeSeriesAcl.getA(), acl))
-            authorizationService.setAcl(updatedMediaPackage, AclScope.Series, acl);
+          try {
+            AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
+            Tuple<AccessControlList, AclScope> activeAcl = authorizationService.getAcl(
+                updatedMediaPackage, AclScope.Series);
+            // Update series ACL if it differs from the active series ACL on the media package
+            if (!AclScope.Series.equals(activeAcl.getB()) || !AccessControlUtil.equals(activeAcl.getA(), acl)) {
+              authorizationService.setAcl(updatedMediaPackage, AclScope.Series, acl);
+            }
+          } catch (NotFoundException e) {
+            logger.debug("Not updating series ACL on event {} since series {} has no ACL set",
+                updatedMediaPackage, seriesId, e);
+          }
         }
       } catch (SeriesException e) {
         throw new WorkflowDatabaseException(e);
-      } catch (NotFoundException e) {
-        logger.warn("Metadata for mediapackage {} could not be updated because it wasn't found", updatedMediaPackage, e);
       } catch (Exception e) {
         logger.error("Metadata for mediapackage {} could not be updated", updatedMediaPackage, e);
       }
