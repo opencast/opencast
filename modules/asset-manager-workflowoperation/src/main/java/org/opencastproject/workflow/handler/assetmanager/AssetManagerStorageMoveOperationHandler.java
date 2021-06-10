@@ -21,7 +21,10 @@
 
 package org.opencastproject.workflow.handler.assetmanager;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Version;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.impl.TieredStorageAssetManagerJobProducer;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.job.api.Job;
@@ -33,6 +36,8 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
+import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +45,22 @@ import org.slf4j.LoggerFactory;
 public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerStorageMoveOperationHandler.class);
+  private static final String LATEST = "latest" ;
 
   /** The asset manager. */
   private TieredStorageAssetManagerJobProducer tsamjp;
 
+  /** The archive */
+  private AssetManager assetManager;
+
   /** OSGi DI */
   public void setJobProducer(TieredStorageAssetManagerJobProducer tsamjp) {
     this.tsamjp = tsamjp;
+  }
+
+  /** OSGi DI */
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
 
@@ -74,7 +88,11 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
     if (null != targetVersion) {
       Version version;
       try {
-        version = VersionImpl.mk(Long.parseLong(targetVersion));
+        if (targetVersion.equals(LATEST)) {
+          version = getLatestVersion(mp.getIdentifier().toString());
+        } else {
+          version = VersionImpl.mk(Long.parseLong(targetVersion));
+        }
       } catch (NumberFormatException e) {
         throw new WorkflowOperationException("Invalid version number", e);
       }
@@ -86,6 +104,17 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
       return createResult(WorkflowOperationResult.Action.CONTINUE);
     } else {
       throw new WorkflowOperationException("Archive operation did not complete successfully!");
+    }
+  }
+
+  private Version getLatestVersion(String mediaPackageId) throws WorkflowOperationException {
+    final AQueryBuilder q = assetManager.createQuery();
+    Opt<ARecord> result = q.select(q.snapshot())
+            .where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest())).run().getRecords().head();
+    if (result.isSome()) {
+      return result.get().getSnapshot().get().getVersion();
+    } else {
+      throw new WorkflowOperationException(String.format("No last version found for mpId: {}", mediaPackageId));
     }
   }
 }
