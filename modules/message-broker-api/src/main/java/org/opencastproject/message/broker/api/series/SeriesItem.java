@@ -142,8 +142,9 @@ public final class SeriesItem implements MessageItem, Serializable {
    */
   private SeriesItem(Type type, String seriesId, DublinCoreCatalog series, String acl, String propertyName,
           String propertyValue, String elementType, String element, Boolean overrideEpisodeAcl) {
-    if (seriesId != null && series != null && !seriesId.equals(series.getFirst(DublinCore.PROPERTY_IDENTIFIER)))
+    if (seriesId != null && series != null && !seriesId.equals(series.getFirst(DublinCore.PROPERTY_IDENTIFIER))) {
       throw new IllegalStateException("Provided series ID and dublincore series ID does not match");
+    }
 
     this.type = type;
     if (series != null) {
@@ -155,12 +156,13 @@ public final class SeriesItem implements MessageItem, Serializable {
     } else {
       this.series = null;
     }
-    if (seriesId != null)
+    if (seriesId != null) {
       this.seriesId = seriesId;
-    else if (series != null)
+    } else if (series != null) {
       this.seriesId = series.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-    else
+    } else {
       throw new IllegalStateException("Neither series nor series ID is provided");
+    }
     this.acl = acl;
     this.propertyName = propertyName;
     this.propertyValue = propertyValue;
