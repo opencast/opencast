@@ -66,7 +66,7 @@ function collectionToOptions(collection: EventMetadataCollection, translatable: 
         .map(([k, v]) => [parseMetadataCollectionKey(k).label, v])
         .map(([k, v]) => [translatable ? t(k) : k, v])
         .map(([k, v]) => ({ value: v, label: k}))
-        .sort((a,b) => a.label.localeCompare(b.label));
+        .sort((a,b) => a.label.localeCompare(b.label, i18next.language));
 }
 
 function MetadataFieldReadOnly(props: MetadataFieldProps) {
