@@ -175,7 +175,7 @@ angular.module('adminNg.directives')
             // Selecting "no option" will wrongly set param to `null` instead of the empty string.
             // The backend will ignore `null` submissions, so we set it to the empty string instead.
             if (scope.params.value === null) {
-              scope.params.value = "";
+              scope.params.value = '';
             }
             scope.save(scope.params.id);
             scope.oldValue = scope.params.value;
