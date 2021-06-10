@@ -8,7 +8,7 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 2. Replace Opencast with the new version
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
-5. [Install and configure a standlone Elasticsearch node](#install-and-confifure-a-standalone-elasticsearch-node)
+5. [Install and configure a standlone Elasticsearch node](#install-and-configure-a-standalone-elasticsearch-node)
 6. [Review the configuration changes and adjust your configuration accordingly](#configuration-changes)
 7. Remove search index data folder
 8. Start Opencast
