@@ -26,6 +26,7 @@ import org.opencastproject.util.data.Tuple;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.List;
  * Provides access to the parsed editing information
  */
 public final class EditingData {
+  public static final String WORKFLOW_ACTIVE = "workflow_active";
   private final List<SegmentData> segments;
   private final List<WorkflowData> workflows;
   private final List<TrackData> tracks;
@@ -41,10 +43,11 @@ public final class EditingData {
   private final String date;
   private final Long duration;
   private final SeriesData series;
+  @SerializedName(WORKFLOW_ACTIVE)
+  private final Boolean workflowActive;
 
-  public EditingData(List<SegmentData> segments, List<TrackData> tracks,
-          List<WorkflowData> workflows, Long duration, String title, String recordingStartDate, String seriesId,
-          String seriesName) {
+  public EditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows, Long duration,
+          String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive) {
     this.segments = segments;
     this.tracks = tracks;
     this.workflows = workflows;
@@ -52,6 +55,7 @@ public final class EditingData {
     this.title = title;
     this.date = recordingStartDate;
     this.series = new SeriesData(seriesId, seriesName);
+    this.workflowActive = workflowActive;
   }
 
   public static EditingData parse(String json) {
