@@ -51,6 +51,9 @@ public class StatisticData {
   @SerializedName("statistic_key")
   private String statisticKey;
 
+  @SerializedName("adopter_key")
+  private String adopterKey;
+
   /** The total number of jobs. */
   @SerializedName("job_count")
   private long jobCount;
@@ -66,6 +69,12 @@ public class StatisticData {
   /** The total number of users. */
   @SerializedName("user_count")
   private long userCount;
+
+  @SerializedName("ca_count")
+  private long caCount;
+
+  @SerializedName("total_minutes")
+  private long totalMinutes;
 
   /** The hosts of an adopter.*/
   private List<Host> hosts;
@@ -106,6 +115,14 @@ public class StatisticData {
     this.statisticKey = statisticKey;
   }
 
+  public String getAdopterKey() {
+    return adopterKey;
+  }
+
+  public void setAdopterKey(String adopterKey) {
+    this.adopterKey = adopterKey;
+  }
+
   public long getJobCount() {
     return jobCount;
   }
@@ -136,6 +153,22 @@ public class StatisticData {
 
   public void setUserCount(long userCount) {
     this.userCount = userCount;
+  }
+
+  public long getCACount() {
+    return caCount;
+  }
+
+  public void setCACount(long caCount) {
+    this.caCount = caCount;
+  }
+
+  public long getTotalMinutes() {
+    return totalMinutes;
+  }
+
+  public void setTotalMinutes(long totalMinutes) {
+    this.totalMinutes = totalMinutes;
   }
 
   public List<Host> getHosts() {

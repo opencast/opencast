@@ -19,6 +19,14 @@
              interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
              bind="setServiceRegistry"/>
 
+  <reference name="capture-admin"
+             interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
+             bind="setCaptureAdminService"/>
+
+  <reference name="search-service"
+             interface="org.opencastproject.search.api.SearchService"
+             bind="setSearchService"/>
+
   <reference name="asset-manager"
              interface="org.opencastproject.assetmanager.api.AssetManager"
              policy="dynamic" bind="setAssetManager"/>
@@ -27,7 +35,7 @@
              interface="org.opencastproject.series.api.SeriesService"
              bind="setSeriesService"/>
 
-  <reference name="user-and-role-rrovider"
+  <reference name="user-and-role-provider"
              interface="org.opencastproject.userdirectory.JpaUserAndRoleProvider"
              bind="setUserAndRoleProvider"/>
 

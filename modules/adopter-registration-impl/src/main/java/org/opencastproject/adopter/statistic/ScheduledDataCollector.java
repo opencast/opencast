@@ -29,8 +29,11 @@ import org.opencastproject.adopter.statistic.dto.StatisticData;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
@@ -71,11 +74,19 @@ public class ScheduledDataCollector extends TimerTask {
   /** Provides access to job and host information */
   private ServiceRegistry serviceRegistry;
 
+  /** Provides access to CA counts */
+  private CaptureAgentStateService caStateService;
+
+  private OrganizationDirectoryService organizationDirectoryService;
+
   /** Provides access to recording information */
   private AssetManager assetManager;
 
   /** Provides access to series information */
   private SeriesService seriesService;
+
+  /** Provides access to search information */
+  private SearchService searchService;
 
   /** User and role provider */
   protected JpaUserAndRoleProvider userAndRoleProvider;
@@ -156,7 +167,7 @@ public class ScheduledDataCollector extends TimerTask {
 
       if (adopter.allowsStatistics()) {
         try {
-          String statisticDataAsJson = collectStatisticData(adopter.getStatisticKey());
+          String statisticDataAsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
           sender.sendStatistics(statisticDataAsJson);
         } catch (Exception e) {
           logger.error("Error occurred while processing adopter statistic data.", e);
@@ -186,8 +197,9 @@ public class ScheduledDataCollector extends TimerTask {
    * @return The statistic data as JSON string.
    * @throws Exception General exception that can occur while gathering data.
    */
-  private String collectStatisticData(String statisticKey) throws Exception {
+  private String collectStatisticData(String adopterKey, String statisticKey) throws Exception {
     StatisticData statisticData = new StatisticData(statisticKey);
+    statisticData.setAdopterKey(adopterKey);
     serviceRegistry.getHostRegistrations().forEach(host -> statisticData.addHost(new Host(host)));
     statisticData.setJobCount(serviceRegistry.count(null, null));
 
@@ -199,6 +211,25 @@ public class ScheduledDataCollector extends TimerTask {
 
     statisticData.setSeriesCount(seriesService.getSeriesCount());
     statisticData.setUserCount(userAndRoleProvider.countAllUsers());
+
+    /*SecurityUtil.runAs(securityService, securityService.getOrganization(), or);
+    statisticData.setCACount(caStateService.getKnownAgents().size());
+    SearchQuery sq = new SearchQuery();
+    sq.withId("");
+    sq.withElementTags(new String[0]);
+    sq.withElementFlavors(new MediaPackageElementFlavor[0]);
+    sq.signURLs(false);
+    sq.includeEpisodes(true);
+    sq.includeSeries(false);
+    SearchResult sr = searchService.getForAdministrativeRead(sq);
+    long totalDuration = Arrays.stream(sr.getItems())
+                 .map(SearchResultItem::getMediaPackage)
+                 .map(MediaPackage::getDuration)
+                 .mapToLong(Long::valueOf).sum();
+    statisticData.setTotalMinutes(totalDuration / 1000L); */
+    statisticData.setCACount(-1);
+    statisticData.setTotalMinutes(-1L);
+
     statisticData.setVersion(version);
     return statisticData.jsonify();
   }
@@ -218,6 +249,10 @@ public class ScheduledDataCollector extends TimerTask {
     this.serviceRegistry = serviceRegistry;
   }
 
+  public void setCaptureAdminService(CaptureAgentStateService stateService) {
+    this.caStateService = stateService;
+  }
+
   /** OSGi setter for the asset manager. */
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
@@ -226,6 +261,10 @@ public class ScheduledDataCollector extends TimerTask {
   /** OSGi setter for the series service. */
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
+  }
+
+  public void setSearchService(SearchService searchService) {
+    this.searchService = searchService;
   }
 
   /** OSGi setter for the user provider. */
