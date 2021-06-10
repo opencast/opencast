@@ -46,7 +46,7 @@ public class SearchQuery {
 
   public enum Sort {
     DATE_CREATED,
-    DATE_PUBLISHED,
+    DATE_MODIFIED,
     TITLE,
     SERIES_ID,
     MEDIA_PACKAGE_ID,
