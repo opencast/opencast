@@ -21,9 +21,11 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
@@ -43,10 +45,13 @@ public class OsgiAclServiceFactory implements AclServiceFactory {
   private SecurityService securityService;
   protected AbstractSearchIndex adminUiIndex;
   protected AbstractSearchIndex externalApiIndex;
+  private AssetManager assetManager;
+  private AuthorizationService authorizationService;
 
   @Override
   public AclService serviceFor(Organization org) {
-    return new AclServiceImpl(org, aclDb, adminUiIndex, externalApiIndex, securityService);
+    return new AclServiceImpl(org, aclDb, assetManager,
+            authorizationService, adminUiIndex, externalApiIndex, securityService);
   }
 
   @Reference
@@ -67,5 +72,15 @@ public class OsgiAclServiceFactory implements AclServiceFactory {
   @Reference(target = "(index.name=externalapi)")
   public void setExternalApiIndex(AbstractSearchIndex index) {
     this.externalApiIndex = index;
+  }
+
+  @Reference
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
+  }
+
+  @Reference
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
   }
 }

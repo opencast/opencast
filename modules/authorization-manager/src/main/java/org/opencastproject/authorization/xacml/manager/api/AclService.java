@@ -33,6 +33,34 @@ import java.util.List;
 public interface AclService {
 
   /**
+   * Immediate ACL application to an episode.
+   *
+   * @param episodeId
+   *          the episode id
+   * @param managedAcl
+   *          the ACL to apply, <code>none</code> to delete the episode ACL from the media package to cause a fallback
+   *          to the series ACL
+   * @return true if the episode exists
+   * @throws AclServiceException
+   *           in case of any error
+   */
+  boolean applyAclToEpisode(String episodeId, Option<ManagedAcl> managedAcl) throws AclServiceException;
+
+  /**
+   * Immediate ACL application to an episode.
+   *
+   * @param episodeId
+   *          the episode id
+   * @param acl
+   *          the ACL to apply, <code>null</code> to delete the episode ACL from the media package to cause a fallback
+   *          to the series ACL
+   * @return true if the episode exists
+   * @throws AclServiceException
+   *           in case of any error
+   */
+  boolean applyAclToEpisode(String episodeId, AccessControlList acl) throws AclServiceException;
+
+  /**
    * Return all ACLs of this organization.
    */
   List<ManagedAcl> getAcls();
