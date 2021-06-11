@@ -92,13 +92,13 @@ jobs:
 
       - name: wait for elasticsearch to boot
         run: >
-          ./curl-amd64 -f --retry 60 --retry-delay 1 --retry-all-errors
+          ./curl-amd64 -fisS --retry 60 --retry-delay 1 --retry-all-errors
           http://localhost:9200/
 
       - name: integration test
         run: |
           ./build/opencast-dist-allinone/bin/start-opencast daemon &
-          ./curl-amd64 -f --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast http://localhost:8080/sysinfo/bundles/version
+          ./curl-amd64 -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast http://localhost:8080/sysinfo/bundles/version
 
       - name: show logs on failure
         if: ${{ failure() }}
