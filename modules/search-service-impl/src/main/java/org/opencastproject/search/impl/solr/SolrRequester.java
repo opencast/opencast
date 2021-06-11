@@ -870,7 +870,7 @@ public class SolrRequester {
         return Schema.DC_CONTRIBUTOR_SORT;
       case DATE_CREATED:
         return Schema.DC_CREATED;
-      case DATE_PUBLISHED:
+      case DATE_MODIFIED:
         return Schema.OC_MODIFIED;
       case CREATOR:
         return Schema.DC_CREATOR_SORT;
