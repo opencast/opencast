@@ -12,6 +12,7 @@ const SeriesDetailsModal = ({ handleClose, seriesTitle, seriesId }) => {
         handleClose();
     }
 
+    // todo: add hotkeys
     return (
         <>
             <div className="modal-animation modal-overlay"/>
