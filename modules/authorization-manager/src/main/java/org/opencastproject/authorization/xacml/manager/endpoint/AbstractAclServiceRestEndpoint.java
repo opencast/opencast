@@ -26,9 +26,14 @@ import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.opencastproject.authorization.xacml.manager.util.Util.getManagedAcl;
 import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.noContent;
+import static org.opencastproject.util.RestUtil.R.notFound;
+import static org.opencastproject.util.RestUtil.R.ok;
+import static org.opencastproject.util.RestUtil.R.serverError;
 import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -48,6 +53,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Functions;
+import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -286,6 +292,49 @@ public abstract class AbstractAclServiceRestEndpoint {
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
     return noContent();
+  }
+
+  @POST
+  @Path("/apply/episode/{episodeId}")
+  @RestQuery(
+          name = "applyAclToEpisode",
+          description = "Immediate application of an ACL to an episode (Attention: This endpoint is deprecated and "
+                  + " will be removed in future versions!)",
+          returnDescription = "Status code",
+          pathParameters = {
+                  @RestParameter(name = "episodeId", isRequired = true, description = "The episode ID", type = STRING)
+          },
+          restParameters = {
+                  @RestParameter(
+                          name = "aclId",
+                          isRequired = false,
+                          description = "The ID of the ACL to apply. If missing the episode ACL will be "
+                                  + "deleted to fall back to the series ACL",
+                          type = INTEGER
+                  )
+          },
+          responses = {
+                  @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL or the episode has not been found"),
+                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error")
+          }
+  )
+  public Response applyAclToEpisode(@PathParam("episodeId") String episodeId, @FormParam("aclId") Long aclId) {
+    final AclService aclService = aclService();
+    final Option<Option<ManagedAcl>> macl = option(aclId).map(getManagedAcl(aclService));
+    if (macl.isSome() && macl.get().isNone()) {
+      return notFound();
+    }
+    try {
+      if (aclService.applyAclToEpisode(episodeId, Options.join(macl))) {
+        return ok();
+      } else {
+        return notFound();
+      }
+    } catch (AclServiceException e) {
+      logger.error("Error applying acl to episode {}", episodeId);
+      return serverError();
+    }
   }
 
   private static final Function<String, AccessControlList> parseAcl = new Function<String, AccessControlList>() {
