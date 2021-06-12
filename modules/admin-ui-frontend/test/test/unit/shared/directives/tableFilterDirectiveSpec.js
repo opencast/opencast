@@ -194,7 +194,7 @@ describe('adminNg.directives.adminNgTableFilter', function () {
 
             it('sets the time period filter value (accounting for localized day)', function () {
                 // Get local time zone offset to verify user requested day range
-                var timeOffset = new Date().getTimezoneOffset();
+                var timeOffset = toDate.getTimezoneOffset();
                 var expectedFromDate = new Date(fromDateIsoStr);
                 // Adjust to local day
                 expectedFromDate = new Date(expectedFromDate.getTime() + timeOffset * 60 * 1000);
