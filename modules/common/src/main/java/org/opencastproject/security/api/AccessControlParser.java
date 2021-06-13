@@ -169,7 +169,7 @@ public final class AccessControlParser {
   private static AccessControlEntry getAce(JSONObject jsonAce) {
     String role = (String) jsonAce.get(ROLE);
     String action = (String) jsonAce.get(ACTION);
-    Boolean allow = (Boolean) jsonAce.get(ALLOW);
+    Boolean allow = (Boolean) jsonAce.getOrDefault(ALLOW, Boolean.TRUE);
     return new AccessControlEntry(role, action, allow);
   }
 
