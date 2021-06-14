@@ -77,9 +77,9 @@ server names:
 This file sets the default organization that is selected.  This is currently required because some Opencast components
 do not support multitenancy.
 
-Hosts can have different schemas (http / https) and port numbers, e.g. when you run behind proxy server. Note, however,
-that hostnames are uniquely mapped to an organization. You cannot use the same hostname but different port numbers for
-two different organizations.
+Hosts can have different schemas (http / https) and port numbers, e.g. when you run behind proxy server. Note, that
+the combination of hostname and port number is uniquely mapped to an organization.
+
 ### Step 2: Security Configuration
 
 Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual URLs that specify
