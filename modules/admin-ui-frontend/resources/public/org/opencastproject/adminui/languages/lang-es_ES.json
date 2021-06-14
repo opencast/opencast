@@ -235,7 +235,7 @@
       "SERVICE_UNAVAILABLE": "¡Uy! Parece que el servidor no responde. Por favor, inténtelo de nuevo más tarde.",
       "ACTIVE_TRANSACTION": "Este evento no puede editarse mientras exista un flujo de trabajo o una transacción activos.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "Se ha producido un error inesperado durante la actualización. Algunos eventos pueden haber sido actualizados.",
+         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
          "ALL_EVENTS_UPDATED": "Todos los eventos se han actualizado correctamente",
          "NO_EVENTS_UPDATED": "Todas las actualizaciones fallaron.",
          "SOME_EVENTS_NOT_UPDATED": "Algunos eventos no pudieron ser actualizados."
@@ -314,7 +314,7 @@
       },
       "EDIT_EVENTS_METADATA": {
          "CAPTION": "Editar los metadatos de múltiples eventos",
-         "FATAL_ERROR": "Se ha producido un error fatal: {{ fatalError }}",
+         "FATAL_ERROR": "A fatal error occurred: {{ fatalError }}",
          "REQUEST_ERRORS": {
             "CANNOT_EDIT_SOME": "No se pueden editar los eventos destacados.",
             "NOTHING_TO_EDIT": "No se pueden editar los eventos.",
@@ -428,12 +428,12 @@
             "LAST_NAME": "Apellido(s)",
             "STREET": "Calle",
             "NUMBER": "Número",
-            "ADDITIONAL_ADRESS_INFO": "Dirección",
+            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
             "MAIL": "E-Mail",
-            "CONTACT_ME": "Contactar conmigo para actualizaciones y problemas de seguridad",
+            "CONTACT_ME": "Contact me for updates and security issues",
             "WHICH_DATA_TO_SHARE": "¿Qué quieres compartir?",
             "POLICY_HEADLINE": "Política de privacidad y Términos de uso",
-            "USAGE_STATISTICS": "Estadísticas de uso",
+            "USAGE_STATISTICS": "Usage statistics",
             "ERROR_REPORTS": "Informes de errores",
             "READ_TERMS_OF_USE_BEFORE": "He leído y acepto la",
             "READ_TERMS_OF_USE_LINK": "Política de privacidad y Términos de uso",
@@ -646,7 +646,7 @@
             "PROCESSED": "Procesado",
             "RECORDING_FAILURE": "Fallo en la grabación",
             "PROCESSING_FAILURE": "Fallo en el procesamiento",
-            "PROCESSING_CANCELED": "Procesamiento cancelado"
+            "PROCESSING_CANCELLED": "Processing cancelled"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retirando",
@@ -894,7 +894,7 @@
                   "REVIEW": "Pendiente de revisar",
                   "ASYNC": "Pistas de A/V asíncronas",
                   "AUDIO_ISSUE": "Pista de audio no disponible o defectuosa",
-                  "CANCELED": "Evento cancelado",
+                  "CANCELLED": "Cancelled event",
                   "CONFLICTING_METADATA": "Conflicto de metadatos",
                   "IMPROPER_POINT": "Punto inicial o final incorrecto",
                   "MISSING_AGREEMENT": "Acuerdo no disponible",
@@ -1609,7 +1609,7 @@
             "INSTANTIATED": "Instanciado",
             "DISPATCHING": "Asignando",
             "RESTART": "Reiniciar",
-            "CANCELED": "Cancelado",
+            "CANCELLED": "Cancelled",
             "WAITING": "Esperando"
          }
       },

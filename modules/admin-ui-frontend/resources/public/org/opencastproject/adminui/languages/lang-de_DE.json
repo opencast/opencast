@@ -37,8 +37,8 @@
       "CURRENT_JOBS": "Heutige Jobs",
       "PRESENTER": "Vortragende(r)",
       "PRESENTER_DESCRIPTION": "Videodatei für die Vortragenden-Spur",
-      "VIDEOFILE": "Videofile",
-      "VIDEOFILE_DESCRIPTION": "Video file for upload",
+      "VIDEOFILE": "Videodatei",
+      "VIDEOFILE_DESCRIPTION": "Videodatei zum Hochladen",
       "CAPTION": "Untertitel",
       "CAPTION_DESCRIPTION": "Untertiteldatei; VTT- oder dxfp-Dateiformat wird unterstützt",
       "UPLOAD": "Hochladen",
@@ -428,12 +428,12 @@
             "LAST_NAME": "Nachname",
             "STREET": "Straße",
             "NUMBER": "Hausnummer",
-            "ADDITIONAL_ADRESS_INFO": "Adressinformationen hinzufügen",
+            "ADDITIONAL_ADDRESS_INFO": "Adressinformationen hinzufügen",
             "MAIL": "E-Mail-Adresse",
             "CONTACT_ME": "Kontaktiere mich für Aktualisierungen und Sicherheitsupdates",
             "WHICH_DATA_TO_SHARE": "Welche Daten möchtest du teilen?",
             "POLICY_HEADLINE": "Datenschutzerklärung und Nutzungsbedingungen",
-            "USAGE_STATISTICS": "Nutzungsstatistik",
+            "USAGE_STATISTICS": "Nutzungsstatistiken",
             "ERROR_REPORTS": "Fehlerberichte",
             "READ_TERMS_OF_USE_BEFORE": "Ich las und akzeptiere die",
             "READ_TERMS_OF_USE_LINK": "Datenschutzerklärung und Nutzungsbedingungen",
@@ -646,7 +646,7 @@
             "PROCESSED": "Verarbeitet",
             "RECORDING_FAILURE": "Aufnahme-Fehler",
             "PROCESSING_FAILURE": "Verarbeitungs-Fehler",
-            "PROCESSING_CANCELED": "Verarbeitung abgebrochen"
+            "PROCESSING_CANCELLED": "Verarbeitung abgebrochen"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Wird zurückgezogen",
@@ -894,7 +894,7 @@
                   "REVIEW": "Überprüfung erforderlich",
                   "ASYNC": "A/V Spuren asynchron",
                   "AUDIO_ISSUE": "Fehlende oder beschädigte Audiospur",
-                  "CANCELED": "Abgebrochenes Video",
+                  "CANCELLED": "Abgebrochene Aufzeichnung",
                   "CONFLICTING_METADATA": "Widersprüchliche Metadaten",
                   "IMPROPER_POINT": "Unpassender Start- oder Endzeitpunkt",
                   "MISSING_AGREEMENT": "Fehlende Vereinbarung",
@@ -1609,7 +1609,7 @@
             "INSTANTIATED": "Instanziiert",
             "DISPATCHING": "Wird angesandt",
             "RESTART": "Neustart",
-            "CANCELED": "Abgebrochen",
+            "CANCELLED": "Abgebrochen",
             "WAITING": "Wartend"
          }
       },
