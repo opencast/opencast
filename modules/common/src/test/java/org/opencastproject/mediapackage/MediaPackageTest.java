@@ -34,6 +34,7 @@ import static org.opencastproject.util.MimeType.mimeType;
 
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -49,7 +50,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
@@ -84,7 +84,7 @@ public class MediaPackageTest extends AbstractMediaPackageTest {
 
       // Test url
       String xmlString = MediaPackageParser.getAsXml(mediaPackage);
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
       Document xml = docBuilder.parse(new ByteArrayInputStream(xmlString.getBytes()));
       String expected = dcFile.toURI().toURL().toExternalForm();
       assertEquals(expected, xPath.evaluate("//url", xml));

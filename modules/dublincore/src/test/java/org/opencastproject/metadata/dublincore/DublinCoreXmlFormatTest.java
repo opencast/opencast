@@ -31,6 +31,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.Xpath;
 
 import org.junit.Test;
@@ -81,7 +82,7 @@ public class DublinCoreXmlFormatTest {
 
   @Test
   public void readFromNode() throws Exception {
-    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    final DocumentBuilderFactory dbf = XmlSafeParser.newDocumentBuilderFactory();
     dbf.setNamespaceAware(true);
     final Document doc = dbf.newDocumentBuilder().parse(
         IoSupport.classPathResourceAsFile("/matterhorn-inlined-list-records-response.xml").get());

@@ -24,6 +24,9 @@ package org.opencastproject.index.service.impl.index.theme;
 import org.opencastproject.index.service.impl.index.IndexObject;
 import org.opencastproject.util.DateTimeSupport.UtcTimestampAdapter;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
+
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +43,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Object wrapper for a theme.
@@ -326,9 +328,11 @@ public class Theme implements IndexObject {
         createJAXBContext();
       }
       Unmarshaller unmarshaller = context.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(xml), Theme.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(xml), Theme.class).getValue();
     } catch (JAXBException e) {
       throw new IOException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    } catch (SAXException e) {
+      throw new IOException(e);
     } finally {
       IoSupport.closeQuietly(xml);
     }

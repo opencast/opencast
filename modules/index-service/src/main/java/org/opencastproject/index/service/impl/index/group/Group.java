@@ -24,6 +24,9 @@ package org.opencastproject.index.service.impl.index.group;
 import org.opencastproject.index.service.impl.index.IndexObject;
 import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
+
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +44,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Object wrapper for a group.
@@ -250,9 +252,11 @@ public class Group implements IndexObject {
       if (context == null) {
         createJAXBContext();
       }
-      return unmarshaller.unmarshal(new StreamSource(xml), Group.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(xml), Group.class).getValue();
     } catch (JAXBException e) {
       throw new IOException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    } catch (SAXException e) {
+      throw new IOException(e);
     } finally {
       IoSupport.closeQuietly(xml);
     }

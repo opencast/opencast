@@ -22,6 +22,8 @@
 
 package org.opencastproject.metadata.mpeg7;
 
+import org.opencastproject.util.XmlSafeParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -148,7 +150,7 @@ public class Mpeg7Parser extends DefaultHandler {
   public Mpeg7CatalogImpl parse(InputStream is) throws ParserConfigurationException, SAXException, IOException {
     if (mpeg7Doc == null)
       mpeg7Doc = new Mpeg7CatalogImpl();
-    SAXParserFactory factory = SAXParserFactory.newInstance();
+    SAXParserFactory factory = XmlSafeParser.newSAXParserFactory();
     // REPLAY does not use a DTD here
     factory.setValidating(false);
     factory.setNamespaceAware(true);

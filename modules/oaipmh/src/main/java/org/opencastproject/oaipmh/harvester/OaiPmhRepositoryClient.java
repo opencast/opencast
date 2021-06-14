@@ -24,6 +24,7 @@ import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
 
 import org.opencastproject.oaipmh.Granularity;
 import org.opencastproject.oaipmh.OaiPmhConstants;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
@@ -57,7 +58,8 @@ public final class OaiPmhRepositoryClient {
    */
   private OaiPmhRepositoryClient(String baseUrl) {
     this.baseUrl = baseUrl;
-    this.builderFactory = DocumentBuilderFactory.newInstance();
+    this.builderFactory = XmlSafeParser.newDocumentBuilderFactory();
+
     this.builderFactory.setNamespaceAware(true);
     this.httpclient = new DefaultHttpClient();
   }
