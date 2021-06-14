@@ -25,6 +25,7 @@ import static java.lang.String.format;
 
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
@@ -107,10 +108,10 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
       final String mpId = t.get(Q_SNAPSHOT.mediaPackageId);
       final VersionImpl version = Conversions.toVersion(t.get(Q_SNAPSHOT.version));
       am.getLocalAssetStore().delete(DeletionSelector.delete(orgId, mpId, version));
-      deleteSnapshotHandler.notifyDeleteSnapshot(mpId, version);
+      deleteSnapshotHandler.handleDeletedSnapshot(mpId, version);
     }
     for (String mpId : deletion.deletedEpisodes) {
-      deleteSnapshotHandler.notifyDeleteEpisode(mpId);
+      deleteSnapshotHandler.handleDeletedEpisode(mpId);
     }
     final long searchTime = (System.nanoTime() - startTime) / 1000000;
     logger.debug("Complete query ms " + searchTime);
@@ -261,16 +262,16 @@ HAVING v = (SELECT count(*)
    * Call {@link #run(DeleteSnapshotHandler)} with a deletion handler to get notified about deletions.
    */
   public interface DeleteSnapshotHandler {
-    void notifyDeleteSnapshot(String mpId, VersionImpl version);
+    void handleDeletedSnapshot(String mpId, VersionImpl version);
 
-    void notifyDeleteEpisode(String mpId);
+    void handleDeletedEpisode(String mpId);
   }
 
   public static final DeleteSnapshotHandler NOP_DELETE_SNAPSHOT_HANDLER = new DeleteSnapshotHandler() {
-    @Override public void notifyDeleteSnapshot(String mpId, VersionImpl version) {
+    @Override public void handleDeletedSnapshot(String mpId, VersionImpl version) {
     }
 
-    @Override public void notifyDeleteEpisode(String mpId) {
+    @Override public void handleDeletedEpisode(String mpId) {
     }
   };
 

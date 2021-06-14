@@ -830,14 +830,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    */
 
   @Override
-  public void notifyDeleteSnapshot(String mpId, VersionImpl version) {
+  public void handleDeletedSnapshot(String mpId, VersionImpl version) {
     logger.info("Send delete message for snapshot {}, {} to ActiveMQ", mpId, version);
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
             AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
   }
 
   @Override
-  public void notifyDeleteEpisode(String mpId) {
+  public void handleDeletedEpisode(String mpId) {
     logger.info("Send delete message for episode {} to ActiveMQ", mpId);
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
             AssetManagerItem.deleteEpisode(mpId, new Date()));
