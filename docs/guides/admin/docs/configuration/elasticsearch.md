@@ -16,7 +16,12 @@ Relevant configuration keys are:
 * `org.opencastproject.elasticsearch.username`
 * `org.opencastproject.elasticsearch.password`
 
-Threfore only `admin`, `adminpresentation`, and `allinone` need to connect to Elasticsearch.
+Therefore only `admin`, `adminpresentation`, and `allinone` need to connect to Elasticsearch.
+
+`username` and `password` are optional. If configured, requests to Elasticsearch are secured by
+HTTP basic authentication (which is unsecure without TLS encryption). Refer to [the Elasticsearch
+documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-stack-security.html)
+to properly secure Elasticsearch.
 
 Version
 -------
