@@ -24,8 +24,9 @@
 angular.module('adminNg.controllers')
 .controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource',
   'ResourcesListResource', 'Notifications', 'ConfirmationModal', 'RelativeDatesService', 'AuthService',
+  'CommentResource',
   function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications,
-    ConfirmationModal, RelativeDatesService, AuthService) {
+    ConfirmationModal, RelativeDatesService, AuthService, CommentResource) {
 
     $scope.stats = Stats;
 
@@ -97,6 +98,9 @@ angular.module('adminNg.controllers')
       }, {
         template: 'modules/events/partials/eventActionsCell.html',
         label:    'EVENTS.EVENTS.TABLE.ACTION'
+      }, {
+         template: 'modules/events/partials/eventsNotesCell.html',
+         label: 'EVENTS.EVENTS.TABLE.ADMINUI_NOTES',
       }],
       caption:    'EVENTS.EVENTS.TABLE.CAPTION',
       resource:   'events',
@@ -123,6 +127,9 @@ angular.module('adminNg.controllers')
         row.embeddingCode = function() {
           ConfirmationModal.show('embedding-code',Table.fullScreenUrl,row);
         };
+
+        row.comments = CommentResource.query({ resource: 'event', resourceId: row.id, type: 'comments' });
+
         row.editorUrl = $scope.editorUrl.replace('$id', row.id);
       }
     });
@@ -153,5 +160,51 @@ angular.module('adminNg.controllers')
         }
       });
     };
+
+    // Text for events without notes
+    $scope.noCommentTextArea = '';
+    // Type of comments in the notes column
+    $scope.commentReason = 'EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ADMINUI_NOTES';
+
+    $scope.table.createComment = function(commentText, eventId) {
+      if (!commentText || !eventId) {
+        return;
+      }
+      CommentResource.save(
+        { resource: 'event', resourceId: eventId, type: 'comment' },
+        { text: commentText, reason: $scope.commentReason }
+      );
+    };
+
+    $scope.table.updateComment = function(comment, eventId) {
+      if (!comment || !eventId) {
+        return;
+      }
+      CommentResource.update(
+        { resource: 'event', resourceId: eventId, id: comment.id, type: 'comment' },
+        { text: comment.text, reason: comment.reason, resolved: comment.resolvedStatus }
+      );
+    };
+
+    $scope.table.deleteComment = function(comment, eventId) {
+      if (!comment || !eventId) {
+        return;
+      }
+      CommentResource.delete(
+        { resource: 'event', resourceId: eventId, id: comment.id, type: 'comment' }
+      );
+    };
+
+    // Stop automatic table refresh while performing an action in the table
+    $scope.table.stopRefresh = function() {
+      $scope.table.refreshScheduler.on = false;
+      $scope.table.refreshScheduler.cancel();
+    };
+
+    $scope.table.startRefresh = function() {
+      $scope.table.refreshScheduler.on = true;
+      $scope.table.refreshScheduler.newSchedule();
+    };
+
   }
 ]);

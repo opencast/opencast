@@ -1,0 +1,23 @@
+<div class="comment-container">
+  <textarea type="text" class="textarea"
+            ng-if="filtered.length === 0"
+            ng-model="noCommentTextArea"
+            ng-blur="table.createComment(noCommentTextArea, row.id)"> </textarea>
+
+  <div class="comment" ng-class="{ active : $parent.replyToId === comment.id }"
+       ng-repeat="comment in row.comments
+        | filter:{ reason : commentReason }
+        | filter:{ resolvedStatus : false }
+        as filtered
+        track by $index">
+    <hr>
+<!--    <div class="date">{{ comment.creationDate | localizeDate : 'dateTime' : 'short' }}</div>-->
+<!--    <h4>{{ comment.author.name }}</h4>-->
+<!--    <p>{{ comment.text }}</p>-->
+    <textarea type="text" class="textarea"
+              ng-model="comment.text"
+              ng-change="table.updateComment(comment, row.id)"
+              ng-focus="table.stopRefresh()"
+              ng-blur="table.startRefresh(); comment.text === '' && table.deleteComment(comment, row.id)"/>
+    </div>
+</div>
