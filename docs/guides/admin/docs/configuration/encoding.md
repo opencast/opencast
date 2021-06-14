@@ -18,7 +18,7 @@ at things you might want to change depending on your local set-up.
 
 ### A/V-Muxing: From lossless to safe
 
-The audio/video muxing (`profile.mux-av.work`) is applied if audio and video is sent to Opencast separately. The basic
+The audio/video muxing (`profile.mux-av.copy`) is applied if audio and video is sent to Opencast separately. The basic
 idea behind this is, to combine these separate files into one file which can later be converted in one step.
 
 Possible settings:

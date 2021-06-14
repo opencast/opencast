@@ -5,142 +5,24 @@
   <title>Publish</title>
   <tags>
     <tag>archive</tag>
+    <tag>editor</tag>
   </tags>
   <displayOrder>1000</displayOrder>
   <description/>
-  <configuration_panel>
-    <![CDATA[
-      <div id="workflow-configuration">
-
-        <fieldset>
-          <legend>Video Qualities</legend>
-          <ul>
-            <li>
-              <input id="flagQuality360p" name="flagQuality360p" type="checkbox" class="configField" value="false" />
-              <label for="flagQuality360p">360p resolution</label>
-            </li>
-            <li>
-              <input id="flagQuality480p" name="flagQuality480p" type="checkbox" class="configField" value="false" />
-              <label for="flagQuality480p">480p resolution</label>
-            </li>
-            <li>
-              <input id="flagQuality720p" name="flagQuality720p" type="checkbox" class="configField" value="true" checked="checked"/>
-              <label for="flagQuality720p">720p resolution (HDready)</label>
-            </li>
-            <li>
-              <input id="flagQuality1080p" name="flagQuality1080p" type="checkbox" class="configField" value="false" />
-              <label for="flagQuality1080p">1080p resolution (FullHD)</label>
-            </li>
-            <li>
-              <input id="flagQuality2160p" name="flagQuality2160p" type="checkbox" class="configField" value="false" />
-              <label for="flagQuality2160p">2160p resolution (UltraHD)</label>
-            </li>
-          </ul>
-        </fieldset>
-        <fieldset>
-          <legend>Publish to:</legend>
-            <ul id="publicationConfigurationPanel" class="workflow-configuration-subpanel">
-              <li>
-                <input id="publishToSearch" name="publishToSearch" type="checkbox" checked="checked" class="configField" value="true" />
-                <label for="publishToSearch">Opencast Index</label>
-                <fieldset>
-                  <ul id="searchConfigurationPanel" class="workflow-configuration-subpanel">
-                    <li>
-                      <input id="publishToEngage" name="searchPublishType" type="radio" checked="checked" class="configField" value="true" />
-                      <label for="publishToEngage">Opencast Media Module</label>
-                    </li>
-                    <li>
-                      <input id="publishToAws" name="searchPublishType" type="radio" class="configField" value="true"/>
-                      <label for="publishToAws">AWS</label>
-                    </li>
-                  </ul>
-                </fieldset>
-              </li>
-              <li>
-                <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
-                <label for="publishToApi">External Applications</label>
-              </li>
-              <li>
-                <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
-                <label for="publishToYouTube">YouTube</label>
-              </li>
-            </ul>
-        </fieldset>
-      </div>
-
-      <!-- Show or hide the hold and publication configuration panel -->
-      <script type="text/javascript">
-        // Remove the line below if you wish to publish to AWS S3
-        $('#publishToAws').prop('disabled', true);
-        // Remove the line above if you wish to publish to AWS S3
-
-        awsWasDisabled = $('#publishToAws').prop('disabled');
-        awsWasChecked = $('#publishToAws').prop('checked');
-        engageWasChecked = $('#publishToEngage').prop('checked');
-
-        $('input[name="publishToSearch"]').change(function(){
-            if ($(this).is(':checked')) {
-              $('#publishToAws').prop('checked', awsWasChecked);
-              $('#publishToEngage').prop('checked', engageWasChecked);
-              $('#publishToAws').prop('disabled', awsWasDisabled);
-              $('#publishToEngage').prop('disabled', false);
-            } else if (!$(this).is(':checked')) {
-              awsWasChecked = $('#publishToAws').prop('checked');
-              engageWasChecked = $('#publishToEngage').prop('checked');
-
-              $('#publishToAws').prop('disabled', true);
-              $('#publishToEngage').prop('disabled', true);
-              $('#publishToAws').prop('checked', false);
-              $('#publishToEngage').prop('checked', false);
-            }
-        });
-      </script>
-    ]]>
-  </configuration_panel>
-
+  <configuration_panel/>
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.PUBLISHING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.PUBLISHING</state-mapping>
+  </state-mappings>
   <operations>
 
-    <!-- Apply the default workflow configuration -->
-
-    <!--
-    The following operation allows you to import properties from
-    a Java properties file, which might have been created by the
-    upload-and-schedule workflow.
-    However, whatever you import here will override the choices
-    your users made in the configuration panel. That's why it is
-    commented.
-    -->
-    <!--
     <operation
-      id="import-wf-properties"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Import workflow settings from Java properties file">
+      id="comment"
+      description="Resolving the cutting marker">
       <configurations>
-        <configuration key="source-flavor">processing/defaults</configuration>
-        <configuration key="keys">publishToSearch</configuration>
-      </configurations>
-    </operation>
-    -->
-
-    <operation
-      id="defaults"
-      description="Applying default configuration values">
-      <configurations>
-        <configuration key="flagForCutting">false</configuration>
-        <configuration key="flagForReview">false</configuration>
-        <configuration key="flagQuality360p">false</configuration>
-        <configuration key="flagQuality480p">false</configuration>
-        <configuration key="flagQuality720p">true</configuration>
-        <configuration key="flagQuality1080p">false</configuration>
-        <configuration key="flagQuality2160p">false</configuration>
-        <configuration key="publishToEngage">true</configuration>
-        <configuration key="publishToApi">true</configuration>
-        <configuration key="publishToYouTube">false</configuration>
-        <configuration key="publishToAws">false</configuration>
-        <configuration key="uploadedSearchPreview">false</configuration>
-        <configuration key="thumbnailType">0</configuration>
-        <configuration key="thumbnailPosition">1</configuration>
+        <configuration key="description">Recording has not been cut yet.</configuration>
+        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
+        <configuration key="action">resolve</configuration>
       </configurations>
     </operation>
 
@@ -181,21 +63,17 @@
     <!-- Clean up work artifacts -->
 
     <operation
-        id="cleanup"
-        fail-on-error="false"
-        description="Remove temporary processing artifacts">
+      id="cleanup"
+      fail-on-error="false"
+      description="Remove temporary processing artifacts">
       <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
         <configuration key="delete-external">true</configuration>
-        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <!-- ACLs are required again when working through ActiveMQ messages -->
         <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 
   </operations>
-
-  <state-mappings>
-    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.PUBLISHING</state-mapping>
-    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.PUBLISHING</state-mapping>
-  </state-mappings>
-
 </definition>

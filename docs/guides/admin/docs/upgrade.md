@@ -178,3 +178,8 @@ in:
 ```
 etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
 ```
+
+Upgrade FFmpeg
+--------------
+The standard encoding profiles use new FFmpeg flags. These require upgrading your
+FFmpeg to at least version 4.3.2 on all your Opencast nodes.

@@ -38,14 +38,16 @@
       </script>
     ]]>
   </configuration_panel>
-
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.DUPLICATING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.DUPLICATING</state-mapping>
+  </state-mappings>
   <operations>
 
     <!-- Create the new events -->
 
     <operation
       id="duplicate-event"
-      fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="Duplicate Event">
       <configurations>
@@ -60,21 +62,17 @@
     <!-- Clean up work artifacts -->
 
     <operation
-        id="cleanup"
-        fail-on-error="false"
-        description="Remove temporary processing artifacts">
+      id="cleanup"
+      fail-on-error="false"
+      description="Remove temporary processing artifacts">
       <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
         <configuration key="delete-external">true</configuration>
-        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <!-- ACLs are required again when working through ActiveMQ messages -->
         <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 
   </operations>
-
-  <state-mappings>
-    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.DUPLICATING</state-mapping>
-    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.DUPLICATING</state-mapping>
-  </state-mappings>
-
 </definition>

@@ -10,40 +10,12 @@
     Updates the publications with the latest metadata.
   </description>
   <displayOrder>900</displayOrder>
-  <configuration_panel>
-    <![CDATA[
-      <div id="workflow-configuration">
-        <fieldset>
-          <legend>Update metadata at:</legend>
-          <ul>
-            <li>
-              <input id="publishToEngage" name="publishToEngage" type="checkbox" checked="checked" class="configField" value="true" />
-              <label for="publishToEngage">Opencast Media Module</label>
-            </li>
-            <!-- Fixme: uncomment as soon as the publish-youtube workflow operation handler supports merging
-            <li>
-              <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" />
-              <label for="publishToYouTube">YouTube</label>
-            </li>
-            -->
-          </ul>
-        </fieldset>
-      </div>
-    ]]>
-  </configuration_panel>
-
+  <configuration_panel/>
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA</state-mapping>
+  </state-mappings>
   <operations>
-
-    <!-- Apply the default workflow configuration -->
-
-    <operation
-      id="defaults"
-      description="Applying default configuration values">
-      <configurations>
-        <configuration key="publishToEngage">true</configuration>
-        <configuration key="publishToYouTube">false</configuration>
-      </configurations>
-    </operation>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Publish to publication channels                                   -->
@@ -55,7 +27,6 @@
 
     <operation
       id="publish-engage"
-      if="${publishToEngage}"
       exception-handler-workflow="partial-error"
       description="Update recording in Opencast Media Module">
       <configurations>
@@ -65,39 +36,20 @@
       </configurations>
     </operation>
 
-    <!-- Publish to YouTube -->
-
-    <!-- Fixme: activate as soon as the publish-youtube supports merging
-    <operation
-      id="publish-youtube"
-      if="${publishToYouTube}"
-      max-attempts="2"
-      exception-handler-workflow="partial-error"
-      description="Update recording in YouTube">
-      <configurations>
-        <configuration key="source-flavors">dublincore/*</configuration>
-      </configurations>
-    </operation>
-    -->
-
-    <!-- Clean up work artifacts -->
+    <!-- Here you can place operations to republish metadata to your publication channels -->
 
     <operation
-        id="cleanup"
-        fail-on-error="false"
-        description="Remove temporary processing artifacts">
+      id="cleanup"
+      fail-on-error="false"
+      description="Remove temporary processing artifacts">
       <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
         <configuration key="delete-external">true</configuration>
-        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <!-- ACLs are required again when working through ActiveMQ messages -->
         <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 
   </operations>
-
-  <state-mappings>
-    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA</state-mapping>
-    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA</state-mapping>
-  </state-mappings>
-
 </definition>

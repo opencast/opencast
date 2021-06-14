@@ -181,26 +181,6 @@ Example of a concat operation in a workflow definition.
 </operation>
 ```
 
-Example of a lossless concat operation for videos with identical formats in a workflow definition.
-
-```xml
-<!-- Concatenate chunked video from camera -->
-<operation
-  id="concat"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Concatenate the generated videos.">
-  <configurations>
-    <configuration key="source-flavor-numbered-files">multipart/chunkedsource</configuration>
-    <configuration key="target-flavor">presenter/concat</configuration>
-    <configuration key="target-tags">engage-download,engage-streaming</configuration>
-    <!-- do not encode before concatenation -->
-    <configuration key="same-codec">true</configuration>
-    <configuration key="encoding-profile">concat-samecodec</configuration>
-  </configurations>
-</operation>
-```
-
 Encoding Profile
 ----------------
 
