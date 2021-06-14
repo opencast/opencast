@@ -62,7 +62,8 @@ You can connect the remote debugger of your IDE on port `5005`.
 
 ### Enabling debugger for package installations
 
-Albeit you can use the afforemented method for package installations, you can't start the debug mode via system services (Without modifying the service). The recommended way is to enable the debug mode in the `setenv` file, normally found in:
+Albeit you can use the afforemented method for package installations, you can't start debug mode via system services.
+The recommended way is to enable the debug mode in the `setenv` file, normally found in:
 
     /usr/share/opencast/bin/
 
