@@ -11,7 +11,8 @@
   <description>
     A minimal workflow that transcodes the media into distribution formats, then
     sends the resulting distribution files, along with their associated metadata,
-    to the distribution channels.
+    to the distribution channels. WARNING: other Opencast workflows are
+    *incompatible* with archived recordings created from this testing workflow.
   </description>
 
   <configuration_panel>
@@ -239,4 +240,3 @@
   </operations>
 
 </definition>
-

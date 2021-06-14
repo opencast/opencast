@@ -143,7 +143,7 @@
                             ng-change="onTemporalValueChange(wd, 'start')"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                             ng-options="h.index as h.value for h in hours"
-                    />
+                    ></select>
                     <select chosen
                             ng-disabled="checkingConflicts"
                             data-width="'100px'"
@@ -151,7 +151,7 @@
                             ng-change="onTemporalValueChange(wd, 'start');"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                             ng-options="m.index as m.value for m in minutes"
-                    />
+                    ></select>
                   </td>
                 </tr>
                 <tr>
@@ -164,7 +164,7 @@
                             ng-change="onTemporalValueChange(wd, 'end');"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                             ng-options="h.index as h.value for h in hours"
-                    />
+                    ></select>
                     <select chosen
                             ng-disabled="checkingConflicts"
                             data-width="'100px'"
@@ -172,7 +172,7 @@
                             ng-change="onTemporalValueChange(wd, 'end');"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                             ng-options="m.index as m.value for m in minutes"
-                    />
+                    ></select>
                     <span ng-bind="scheduling.end.date"
                           ng-show="scheduling.end.date !== scheduling.start.date"
                     />
@@ -188,7 +188,7 @@
                             ng-model="scheduling[wd].location"
                             ng-options="ca.name for ca in captureAgents | filter:hasAgentAccess track by ca.id"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
-                            />
+                            ></select>
                   </td>
                   <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                     {{ source.device.name }}
