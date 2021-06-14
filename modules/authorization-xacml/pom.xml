@@ -28,12 +28,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-series-service-api</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.jboss.security</groupId>
       <artifactId>jboss-xacml</artifactId>
       <version>2.0.5.final</version>
@@ -56,6 +50,10 @@
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
     </dependency>
     <!-- Logging -->
     <dependency>
@@ -114,6 +112,7 @@
             <ignoredUnusedDeclaredDependency>net.sf.saxon:Saxon-HE</ignoredUnusedDeclaredDependency>
             <!-- provide a logger for tests -->
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.glassfish.jaxb:jaxb-runtime</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
