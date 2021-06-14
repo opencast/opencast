@@ -3,14 +3,6 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opencast-elasticsearch-api</artifactId>
   <name>Opencast :: elasticsearch-api</name>
-  <dependencies>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-common</artifactId>
-      <version>10-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
   <packaging>bundle</packaging>
   <parent>
     <groupId>org.opencastproject</groupId>
@@ -22,6 +14,13 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
