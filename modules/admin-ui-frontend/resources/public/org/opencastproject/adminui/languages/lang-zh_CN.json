@@ -3,10 +3,10 @@
    "NAV_HOME": "开始",
    "NAV_ABOUT": "关于",
    "BUILD": {
-      "BUILT_ON": "built on",
-      "DATE_DESC": "Date this system's kernel module was built on.",
-      "COMMIT": "Git commit this version was built from.",
-      "VERSION": "Common bundle version"
+      "BUILT_ON": "基于",
+      "DATE_DESC": "该系统内核模块构建时间。",
+      "COMMIT": "此版本构建时的Git提交。",
+      "VERSION": "通用打包版本"
    },
    "NO": "否",
    "SUBMIT": "提交",
@@ -37,10 +37,10 @@
       "CURRENT_JOBS": "今天的任务",
       "PRESENTER": "演讲者",
       "PRESENTER_DESCRIPTION": "拍摄演讲者的视频文件",
-      "VIDEOFILE": "Videofile",
-      "VIDEOFILE_DESCRIPTION": "Video file for upload",
+      "VIDEOFILE": "视频文件",
+      "VIDEOFILE_DESCRIPTION": "要上传的视频",
       "CAPTION": "字幕",
-      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
+      "CAPTION_DESCRIPTION": "标题文件; 支持VTT 或 dfxp 格式",
       "UPLOAD": "上传",
       "UPLOADING": "上传中",
       "EDIT": "保存",
