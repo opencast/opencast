@@ -43,4 +43,8 @@
              interface="org.opencastproject.security.api.SecurityService"
              bind="setSecurityService"/>
 
+  <reference name="org-service"
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             bind="setOrganizationDirectoryService"/>
+
 </scr:component>
