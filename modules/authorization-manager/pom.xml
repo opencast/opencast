@@ -113,7 +113,6 @@
     <dependency>
       <groupId>org.codehaus.jettison</groupId>
       <artifactId>jettison</artifactId>
-      <scope>compile</scope>
     </dependency>
     <!-- Logging -->
     <dependency>
@@ -222,7 +221,8 @@
               org.opencastproject.authorization.xacml.manager.api;version=${project.version},
               org.opencastproject.authorization.xacml.manager.impl;version=${project.version},
               org.opencastproject.authorization.xacml.manager.impl.persistence;version=${project.version},
-              org.opencastproject.authorization.xacml.manager.endpoint;version=${project.version}
+              org.opencastproject.authorization.xacml.manager.endpoint;version=${project.version},
+              org.opencastproject.authorization.xacml.manager.util;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/acl-jpa-db.xml,
