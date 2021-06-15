@@ -190,6 +190,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -1764,6 +1765,11 @@ public class SchedulerServiceImplTest {
     MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
     EasyMock.replay(ms);
 
+    AbstractSearchIndex esIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
+            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
+    EasyMock.replay(esIndex);
+
     AssetManagerImpl am = new AssetManagerImpl();
     am.setHttpAssetProvider(httpAssetProvider);
     am.setDatabase(db);
@@ -1772,6 +1778,8 @@ public class SchedulerServiceImplTest {
     am.setAuthorizationService(authorizationService);
     am.setSecurityService(securityService);
     am.setMessageSender(ms);
+    am.setAdminUiIndex(esIndex);
+    am.setExternalApiIndex(esIndex);
     return am;
   }
 
