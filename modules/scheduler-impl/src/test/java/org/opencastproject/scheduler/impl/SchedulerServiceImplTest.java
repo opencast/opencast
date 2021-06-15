@@ -61,6 +61,7 @@ import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
@@ -209,7 +210,7 @@ public class SchedulerServiceImplTest {
 
   private SeriesService seriesService;
   private static UnitTestWorkspace workspace;
-  private org.opencastproject.assetmanager.api.AssetManager assetManager;
+  private AssetManager assetManager;
   private static OrganizationDirectoryService orgDirectoryService;
   private SecurityService securityService;
 
@@ -1724,7 +1725,7 @@ public class SchedulerServiceImplTest {
     return minutes(a * 60);
   }
 
-  org.opencastproject.assetmanager.api.AssetManager mkAssetManager() throws Exception {
+  AssetManager mkAssetManager() throws Exception {
     final EntityManagerFactory emf = mkEntityManagerFactory("org.opencastproject.assetmanager.impl");
     final PersistenceEnv penv = PersistenceEnvs.mk(emf);
     final Database db = new Database(emf, penv);

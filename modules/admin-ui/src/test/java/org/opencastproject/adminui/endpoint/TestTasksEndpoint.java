@@ -27,6 +27,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
@@ -133,7 +134,7 @@ public class TestTasksEndpoint extends TasksEndpoint {
             anyObject(Map.class))).andReturn(wI2);
     replay(workspace, workflowService);
 
-    org.opencastproject.assetmanager.api.AssetManager assetManager = mkAssetManager(workspace);
+    AssetManager assetManager = mkAssetManager(workspace);
 
     MediaPackage mp1 = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new IdImpl("id1"));
     AttachmentImpl attachment = new AttachmentImpl();
@@ -142,15 +143,15 @@ public class TestTasksEndpoint extends TasksEndpoint {
 
     MediaPackage mp2 = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new IdImpl("id2"));
 
-    assetManager.takeSnapshot(org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER, mp1);
-    assetManager.takeSnapshot(org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER, mp2);
+    assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, mp1);
+    assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, mp2);
 
     this.setWorkflowService(workflowService);
     this.setAssetManager(assetManager);
     this.activate(null);
   }
 
-  org.opencastproject.assetmanager.api.AssetManager mkAssetManager(final Workspace workspace) throws Exception {
+  AssetManager mkAssetManager(final Workspace workspace) throws Exception {
     final EntityManagerFactory emf = mkEntityManagerFactory("org.opencastproject.assetmanager.impl");
     final PersistenceEnv penv = PersistenceEnvs.mk(emf);
     final Database db = new Database(emf, penv);
