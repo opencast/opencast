@@ -101,4 +101,14 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   protected SecurityService getSecurityService() {
     return securityService;
   }
+
+  @Override
+  protected AssetManager getAssetManager() {
+    return assetManager;
+  }
+
+  @Override
+  protected AuthorizationService getAuthorizationService() {
+    return authorizationService;
+  }
 }

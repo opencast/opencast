@@ -133,8 +133,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
-        return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(), assetManager, authorizationService,
-                adminUiIndex, externalApiIndex, securityService);
+        return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(), adminUiIndex, externalApiIndex,
+                securityService);
       }
     };
   }
@@ -147,6 +147,16 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   @Override
   protected SecurityService getSecurityService() {
     return securityService;
+  }
+
+  @Override
+  protected AssetManager getAssetManager() {
+    return assetManager;
+  }
+
+  @Override
+  protected AuthorizationService getAuthorizationService() {
+    return authorizationService;
   }
 
   private static Workspace newWorkspace() {
