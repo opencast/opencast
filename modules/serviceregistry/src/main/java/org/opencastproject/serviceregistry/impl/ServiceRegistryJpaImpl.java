@@ -3305,12 +3305,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                     logger.warn("Service {} is not working as expected: {}", service, response.getStatusLine());
                 }
               } else {
-                logger.warn("Service {} does not respond: {}", service.toString());
+                logger.warn("Service {} does not respond", service);
               }
             } catch (TrustedHttpClientException e) {
               if (!service.isOnline())
                 continue;
-              logger.warn("Unable to reach {} : {}", service, e);
+              logger.warn("Unable to reach {}", service, e);
             }
 
             // If we get here, the service did not respond as expected
@@ -3324,7 +3324,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                 logger.warn("Added {} to the watch list", service);
               }
             } catch (ServiceRegistryException e) {
-              logger.warn("Unable to unregister unreachable service: {} : {}", service, e);
+              logger.warn("Unable to unregister unreachable service: {}", service, e);
             }
           } finally {
             client.close(response);
