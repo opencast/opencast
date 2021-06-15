@@ -61,6 +61,11 @@
       <artifactId>opencast-elasticsearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-authorization-manager</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- -->
     <dependency>
       <groupId>com.entwinemedia.common</groupId>

@@ -61,19 +61,29 @@ import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.persistence.SnapshotDto;
 import org.opencastproject.assetmanager.impl.query.AQueryBuilderImpl;
 import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery;
+import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
+import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -106,7 +116,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -128,8 +137,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
@@ -168,6 +179,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private MessageSender messageSender;
   private String systemUserName;
   private Database db;
+  private AclServiceFactory aclServiceFactory;
+  private AbstractSearchIndex adminUiIndex;
+  private AbstractSearchIndex externalApiIndex;
 
   // Settings for role filter
   private boolean includeAPIRoles;
@@ -194,7 +208,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
   }
-
 
   /**
    * OSGi dependencies
@@ -252,6 +265,21 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference(name = "messageSender")
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
+  }
+
+  @Reference(name = "aclServiceFactory")
+  public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
+      this.aclServiceFactory = aclServiceFactory;
+  }
+
+  @Reference(name = "adminUiIndex", target = "(index.name=adminui)")
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
+  }
+
+  @Reference(name = "externalApiIndex", target = "(index.name=externalapi)")
+  public void setExternalApiIndex(AbstractSearchIndex index) {
+    this.externalApiIndex = index;
   }
 
   /**
@@ -380,6 +408,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
               mkTakeSnapshotMessage(snapshot, mp));
 
+      // update ES indices
+      updateEventInIndex(snapshot, adminUiIndex);
+      updateEventInIndex(snapshot, externalApiIndex);
+
       final AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
       // store acl as properties
       // Drop old ACL rules
@@ -449,6 +481,85 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
     return AssetManagerItem.add(workspace, chosenMp, authorizationService.getActiveAcl(chosenMp).getA(),
             version, snapshot.getArchivalDate());
+  }
+
+  /**
+   * Update the event in the Elasticsearch index.
+   *
+   * @param snapshot
+   *         The newest snapshot of the event to update
+   * @param index
+   *         The Elasticsearch index to update
+   */
+  private void updateEventInIndex(Snapshot snapshot, AbstractSearchIndex index) {
+    final MediaPackage mp = snapshot.getMediaPackage();
+    String eventId = mp.getIdentifier().toString();
+    final String organization = securityService.getOrganization().getId();
+    final User user = securityService.getUser();
+    logger.debug("Updating event {} in the {} index.", eventId, index.getIndexName());
+
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      Event event = eventOpt.orElse(new Event(eventId, organization));
+
+      AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
+      List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
+      for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
+        event.setManagedAcl(managedAcl.getName());
+      }
+      event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
+      event.setArchiveVersion(Long.parseLong(snapshot.getVersion().toString()));
+      if (StringUtils.isBlank(event.getCreator()))
+        event.setCreator(securityService.getUser().getName());
+      EventIndexUtils.updateEvent(event, mp);
+
+      for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
+        try (InputStream in = workspace.read(catalog.getURI())) {
+          EventIndexUtils.updateEvent(event, DublinCores.read(in));
+        } catch (IOException | NotFoundException e) {
+          throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
+                  mp.getIdentifier()), e);
+        }
+      }
+
+      // Update series name if not already done
+      try {
+        EventIndexUtils.updateSeriesName(event, organization, user, index);
+      } catch (SearchIndexException e) {
+        logger.error("Error updating the series name of the event {} in the {} index.", eventId, index.getIndexName(),
+                e);
+      }
+      return Optional.of(event);
+    };
+
+    // Persist the scheduling event
+    try {
+      index.addOrUpdateEvent(eventId, updateFunction, organization, user);
+      logger.debug("Event {} updated in the {} index.", eventId, index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error updating the event {} in the {} index.", eventId, index.getIndexName(), e);
+    }
+  }
+
+  /**
+   * Remove the event from the Elasticsearch index
+   *
+   * @param eventId
+   *         The id of the event to remove
+   * @param index
+   *         The Elasticsearch index to update
+   */
+  private void removeEventFromIndex(String eventId, AbstractSearchIndex index) {
+    final String organization = securityService.getOrganization().getId();
+    final User user = securityService.getUser();
+    logger.debug("Received AssetManager delete episode message {}", eventId);
+    try {
+      index.deleteAssets(organization, user, eventId);
+      logger.debug("Event {} removed from the {} index", eventId, index.getIndexName());
+    } catch (NotFoundException e) {
+      logger.warn("Event {} not found for deletion", eventId);
+    } catch (SearchIndexException e) {
+      logger.error("Error deleting the event {} from the {} index.", eventId, index.getIndexName(), e);
+    }
   }
 
   @Override
@@ -730,6 +841,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     logger.info("Send delete message for episode {} to ActiveMQ", mpId);
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
             AssetManagerItem.deleteEpisode(mpId, new Date()));
+
+    // update ES indices
+    removeEventFromIndex(mpId, adminUiIndex);
+    removeEventFromIndex(mpId, externalApiIndex);
   }
 
   /**
@@ -768,10 +883,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           for (Snapshot snapshot : byOrg.get(orgId)) {
             current += 1;
             try {
-              AssetManagerItem.TakeSnapshot takeSnapshot = mkTakeSnapshotMessage(snapshot, null);
-              messageSender.sendObjectMessage(
-                      AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(index.getIndexName()),
-                      MessageSender.DestinationType.Queue, takeSnapshot);
+              updateEventInIndex(snapshot, index);
             } catch (Throwable t) {
               logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(), org, t);
             }
