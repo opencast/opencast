@@ -294,7 +294,7 @@
          "TITLE": "Opsætning"
       },
       "STATISTICS": {
-         "TITLE": "Statistics"
+         "TITLE": "Statistik"
       }
    },
    "EVENTS": {
@@ -507,7 +507,7 @@
                "WORKFLOWS": "Arbejdsgange",
                "ACCESS": "Adgangspolitik",
                "COMMENTS": "Kommentarer",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "Statistik"
             },
             "PUBLICATIONS": {
                "CAPTION": "Udgivelser",
@@ -750,7 +750,7 @@
                }
             },
             "STATISTICS": {
-               "CAPTION": "Statistics"
+               "CAPTION": "Statistik"
             },
             "METADATA": {
                "CAPTION": "Begivenhedsoplysninger",
@@ -976,7 +976,7 @@
                "EVENTS": "Begivenheder",
                "PERMISSIONS": "Adgangspolitik",
                "THEME": "Tema",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "Statistik"
             },
             "ACCESS": {
                "CAPTION": "Adgangspolitik",
@@ -1429,7 +1429,7 @@
             "CREATED": "Oprettet",
             "CREATOR": "Opretter",
             "HOST_NAME": "Værtsnavn",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Node-navn",
             "OPERATION": "Handling",
             "STARTED": "Startet",
             "STATUS": "Status",
@@ -1455,7 +1455,7 @@
             "CAPTION": "Servere",
             "STATUS": "Status",
             "HOST_NAME": "Værtsnavn",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Node-navn",
             "CORES": "Kerner",
             "COMPLETED": "Jobs fuldført",
             "RUNNING": "Jobs kører",
@@ -1473,7 +1473,7 @@
             "STATUS": "Status",
             "NAME": "Tjenestenavn",
             "HOST_NAME": "Værtsnavn",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Node-navn",
             "COMPLETED": "Jobs fuldført",
             "RUNNING": "Jobs kører",
             "QUEUED": "Jobs i kø",
@@ -1519,8 +1519,8 @@
       },
       "ACTIONS": {
          "SPLIT": "Opdel",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
+         "SPLIT_TOOLTIP": "Opdel segment ved den aktuelle markørposition.",
+         "CUT": "Vis/Skjul",
          "CUT_TOOLTIP": "Hide or show the selected part of the video.",
          "REPLAY_SEGMENT": "Play Start of Segment",
          "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
@@ -1755,7 +1755,7 @@
             "LABEL": "Værtsnavn"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Node-navn"
          },
          "STATUS": {
             "LABEL": "Status",
@@ -1799,7 +1799,7 @@
             "LABEL": "Værtsnavn"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Node-navn"
          },
          "STATUS": {
             "LABEL": "Status",
@@ -1816,7 +1816,7 @@
             "LABEL": "Værtsnavn"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Node-navn"
          },
          "NAME": {
             "LABEL": "Navn"
@@ -1968,14 +1968,14 @@
       "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
       "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
       "FROM": "Fra",
-      "TO": "To",
+      "TO": "Til",
       "TOTAL": "Total",
       "GRANULARITY": "Granularity",
       "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
+         "ORGANIZATION": "Organisasjon"
       },
       "TITLE": {
-         "RANDOM": "Random Data",
+         "RANDOM": "Tilfældige Data",
          "VIEWS_SUM": "Total Number of Views",
          "VIEWS_AVG": "Average Number of Views",
          "PUBLISHEDHOURS": "Published Hours of Video"
