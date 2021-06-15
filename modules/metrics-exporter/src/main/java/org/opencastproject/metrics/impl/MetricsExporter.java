@@ -125,11 +125,7 @@ public class MetricsExporter {
       .help("Version of Opencast (based on metrics module)")
       .labelNames("part")
       .register();
-  private final Gauge eventsInAssetManager = Gauge.build()
-      .name("opencast_asset_manager_events")
-      .help("Events in Asset Manager")
-      .labelNames("organization")
-      .register();
+  private Gauge eventsInAssetManager;
 
   /** OSGi services */
   private ServiceRegistry serviceRegistry;
@@ -239,10 +235,16 @@ public class MetricsExporter {
   )
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
+    eventsInAssetManager = Gauge.build()
+        .name("opencast_asset_manager_events")
+        .help("Events in Asset Manager")
+        .labelNames("organization")
+        .register();
   }
 
   public void unsetAssetManager(AssetManager assetManager) {
     this.assetManager = null;
+    registry.unregister(eventsInAssetManager);
   }
 
 }
