@@ -84,6 +84,8 @@ public class ExportWorkflowPropertiesWOHTest {
     final WorkflowOperationInstance woi = createMock(WorkflowOperationInstance.class);
     expect(woi.getConfiguration("target-flavor")).andStubReturn(FLAVOR);
     expect(woi.getConfiguration("target-tags")).andStubReturn("archive");
+    expect(woi.getConfiguration("target-tag")).andStubReturn(null);
+    expect(woi.getConfiguration("target-flavors")).andStubReturn(null);
     expect(woi.getConfiguration("keys")).andStubReturn("chapter,presenter_position");
     replay(woi);
 

@@ -39,13 +39,9 @@ import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.group.Group;
-import org.opencastproject.elasticsearch.index.group.GroupIndexSchema;
-import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.event.comment.EventComment;
@@ -63,7 +59,6 @@ import org.opencastproject.index.service.impl.util.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.impl.util.Retraction;
 import org.opencastproject.index.service.impl.util.RetractionListener;
-import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.index.service.util.RestUtils;
@@ -109,8 +104,6 @@ import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.userdirectory.ConflictException;
-import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.DateTimeSupport;
@@ -218,7 +211,6 @@ public class IndexServiceImpl implements IndexService {
   private AssetManager assetManager;
   private SchedulerService schedulerService;
   private SecurityService securityService;
-  private JpaGroupRoleProvider jpaGroupRoleProvider;
   private SeriesService seriesService;
   private UserDirectoryService userDirectoryService;
   private WorkflowService workflowService;
@@ -417,16 +409,6 @@ public class IndexServiceImpl implements IndexService {
    */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
-  }
-
-  /**
-   * OSGi DI.
-   *
-   * @param jpaGroupRoleProvider
-   *          the provider to set
-   */
-  public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
-    this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
   /**
@@ -1412,96 +1394,6 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public Map<String, Map<String, String>> getEventWorkflowProperties(final List<String> eventIds) {
     return WorkflowPropertiesUtil.getLatestWorkflowPropertiesForEvents(assetManager, eventIds);
-  }
-
-  @Override
-  public SearchResult<Group> getGroups(String filter, Opt<Integer> optLimit, Opt<Integer> optOffset,
-          Opt<String> optSort, AbstractSearchIndex index) throws SearchIndexException, IllegalArgumentException {
-    GroupSearchQuery query = new GroupSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
-
-    // Parse the filters
-    if (StringUtils.isNotBlank(filter)) {
-      for (String f : filter.split(",")) {
-        String[] filterTuple = f.split(":");
-        if (filterTuple.length < 2) {
-          logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
-          continue;
-        }
-
-        String name = filterTuple[0];
-        String value = filterTuple[1];
-
-        if (GroupsListQuery.FILTER_NAME_NAME.equals(name))
-          query.withName(value);
-      }
-    }
-
-    if (optSort.isSome()) {
-      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
-      for (SortCriterion criterion : sortCriteria) {
-        switch (criterion.getFieldName()) {
-          case GroupIndexSchema.NAME:
-            query.sortByName(criterion.getOrder());
-            break;
-          case GroupIndexSchema.DESCRIPTION:
-            query.sortByDescription(criterion.getOrder());
-            break;
-          case GroupIndexSchema.ROLE:
-            query.sortByRole(criterion.getOrder());
-            break;
-          case GroupIndexSchema.MEMBERS:
-            query.sortByMembers(criterion.getOrder());
-            break;
-          case GroupIndexSchema.ROLES:
-            query.sortByRoles(criterion.getOrder());
-            break;
-          default:
-            throw new IllegalArgumentException("Unknown group index " + criterion.getFieldName());
-        }
-      }
-    }
-
-    if (optLimit.isSome())
-      query.withLimit(optLimit.get());
-    if (optOffset.isSome())
-      query.withOffset(optOffset.get());
-
-    return index.getByQuery(query);
-  }
-
-  @Override
-  public Opt<Group> getGroup(String id, AbstractSearchIndex index) throws SearchIndexException {
-    SearchResult<Group> result = index
-            .getByQuery(new GroupSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
-                    .withIdentifier(id));
-
-    // If the results list if empty, we return already a response.
-    if (result.getPageSize() == 0) {
-      logger.debug("Didn't find event with id {}", id);
-      return Opt.none();
-    }
-    return Opt.some(result.getItems()[0].getSource());
-  }
-
-  @Override
-  public void removeGroup(String id) throws NotFoundException, UnauthorizedException, Exception {
-    jpaGroupRoleProvider.removeGroup(id);
-  }
-
-  @Override
-  public void updateGroup(String id, String name, String description, String roles, String members)
-          throws NotFoundException, UnauthorizedException {
-    jpaGroupRoleProvider.updateGroup(id, name, description, roles, members);
-  }
-
-  @Override
-  public void createGroup(String name, String description, String roles, String members)
-          throws IllegalArgumentException, UnauthorizedException, ConflictException {
-    if (StringUtils.isEmpty(roles))
-      roles = "";
-    if (StringUtils.isEmpty(members))
-      members = "";
-    jpaGroupRoleProvider.createGroup(name, description, roles, members);
   }
 
   @Override

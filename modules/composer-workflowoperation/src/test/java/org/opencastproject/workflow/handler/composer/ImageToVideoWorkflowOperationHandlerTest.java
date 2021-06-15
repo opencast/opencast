@@ -122,7 +122,6 @@ public class ImageToVideoWorkflowOperationHandlerTest {
     String targetTags = "engage,rss";
     Map<String, String> configurations = new HashMap<String, String>();
     configurations.put("source-flavor", "image/intro");
-    configurations.put("source-tag", "intro");
     configurations.put("target-tags", targetTags);
     configurations.put("target-flavor", "video/intro");
     configurations.put("profile", "image-movie");

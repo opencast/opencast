@@ -34,6 +34,7 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -82,6 +83,14 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public static final String AWS_S3_BUCKET_CONFIG = "org.opencastproject.assetmanager.aws.s3.bucket";
   public static final String AWS_S3_ENDPOINT_CONFIG = "org.opencastproject.assetmanager.aws.s3.endpoint";
   public static final String AWS_S3_PATH_STYLE_CONFIG = "org.opencastproject.assetmanager.aws.s3.path.style";
+  public static final String AWS_S3_MAX_CONNECTIONS = "org.opencastproject.assetmanager.aws.s3.max.connections";
+  public static final String AWS_S3_CONNECTION_TIMEOUT = "org.opencastproject.assetmanager.aws.s3.connection.timeout";
+  public static final String AWS_S3_MAX_RETRIES = "org.opencastproject.assetmanager.aws.s3.max.retries";
+
+  // defaults
+  public static final int DEFAULT_MAX_CONNECTIONS = 50;
+  public static final int DEFAULT_CONNECTION_TIMEOUT = 10000;
+  public static final int DEFAULT_MAX_RETRIES = 100;
 
   /** The AWS client and transfer manager */
   private AmazonS3 s3 = null;
@@ -151,7 +160,6 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       pathStyle = BooleanUtils.toBoolean(OsgiUtil.getComponentContextProperty(cc, AWS_S3_PATH_STYLE_CONFIG, "false"));
       logger.info("AWS path style is {}", pathStyle);
 
-
       // Explicit credentials are optional.
       AWSCredentialsProvider provider = null;
       Option<String> accessKeyIdOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_ACCESS_KEY_ID_CONFIG);
@@ -167,10 +175,29 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
                 new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
       }
 
+      // S3 client configuration
+      ClientConfiguration clientConfiguration = new ClientConfiguration();
+
+      int maxConnections = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_CONNECTIONS)
+              .getOrElse(DEFAULT_MAX_CONNECTIONS);
+      logger.debug("Max Connections: {}", maxConnections);
+      clientConfiguration.setMaxConnections(maxConnections);
+
+      int connectionTimeout = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_CONNECTION_TIMEOUT)
+              .getOrElse(DEFAULT_CONNECTION_TIMEOUT);
+      logger.debug("Connection Output: {}", connectionTimeout);
+      clientConfiguration.setConnectionTimeout(connectionTimeout);
+
+      int maxRetries = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_RETRIES)
+              .getOrElse(DEFAULT_MAX_RETRIES);
+      logger.debug("Max Retry: {}", maxRetries);
+      clientConfiguration.setMaxErrorRetry(maxRetries);
+
       // Create AWS client.
       s3 = AmazonS3ClientBuilder.standard()
               .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
               , regionName))
+              .withClientConfiguration(clientConfiguration)
               .withPathStyleAccessEnabled(pathStyle)
               .withCredentials(provider)
               .build();

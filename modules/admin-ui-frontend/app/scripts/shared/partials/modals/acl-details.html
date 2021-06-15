@@ -39,7 +39,8 @@
                         ng-model="metadata.name"
                         ng-model-options="{ debounce: {'default': 500} }"
                         ng-required="true"
-                        placeholder="{{ 'USERS.ACLS.DETAILS.METADATA.NAME.PLACEHOLDER' | translate }}">
+                        placeholder="{{ 'USERS.ACLS.DETAILS.METADATA.NAME.PLACEHOLDER' | translate }}"
+                        sanitize-xml="metadata.name">
                     </td>
                   </tr>
                 </table>

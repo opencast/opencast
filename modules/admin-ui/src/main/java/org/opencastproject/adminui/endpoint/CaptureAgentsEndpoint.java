@@ -37,8 +37,6 @@ import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.elasticsearch.api.SearchQuery.Order;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.SecurityService;
@@ -51,6 +49,8 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;

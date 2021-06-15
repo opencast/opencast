@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -34,7 +35,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,11 +79,12 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
 
-    String configuredSourceFlavors = StringUtils
-            .trimToEmpty(currentOperation.getConfiguration(SOURCE_FLAVORS_PROPERTY));
-    String configuredSourceTags = StringUtils.trimToEmpty(currentOperation.getConfiguration(SOURCE_TAGS_PROPERTY));
-    String configuredTargetFlavor = StringUtils.trimToNull(currentOperation.getConfiguration(TARGET_FLAVOR_PROPERTY));
-    String configuredTargetTags = StringUtils.trimToEmpty(currentOperation.getConfiguration(TARGET_TAGS_PROPERTY));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.many, Configuration.many, Configuration.many, Configuration.many);
+    List<MediaPackageElementFlavor> configuredSourceFlavors = tagsAndFlavors.getSrcFlavors();
+    List<String> configuredSourceTags = tagsAndFlavors.getSrcTags();
+    List<MediaPackageElementFlavor> configuredTargetFlavor = tagsAndFlavors.getTargetFlavors();
+    List<String> configuredTargetTags = tagsAndFlavors.getTargetTags();
     boolean copy = BooleanUtils.toBoolean(currentOperation.getConfiguration(COPY_PROPERTY));
 
     if (copy) {
@@ -92,20 +93,16 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
       logger.info("Retagging mediapackage elements");
     }
 
-    String[] sourceTags = StringUtils.split(configuredSourceTags, ",");
-    String[] targetTags = StringUtils.split(configuredTargetTags, ",");
-    String[] sourceFlavors = StringUtils.split(configuredSourceFlavors, ",");
-
     SimpleElementSelector elementSelector = new SimpleElementSelector();
-    for (String flavor : sourceFlavors) {
-      elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
+    for (MediaPackageElementFlavor flavor : configuredSourceFlavors) {
+      elementSelector.addFlavor(flavor);
     }
 
     List<String> removeTags = new ArrayList<String>();
     List<String> addTags = new ArrayList<String>();
     List<String> overrideTags = new ArrayList<String>();
 
-    for (String tag : targetTags) {
+    for (String tag : configuredTargetTags) {
       if (tag.startsWith(MINUS)) {
         removeTags.add(tag);
       } else if (tag.startsWith(PLUS)) {
@@ -115,7 +112,7 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
       }
     }
 
-    for (String tag : sourceTags) {
+    for (String tag : configuredSourceTags) {
       elementSelector.addTag(tag);
     }
 
@@ -128,9 +125,9 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
         element.setURI(e.getURI()); // use the same URI as the original
       }
 
-      if (configuredTargetFlavor != null) {
+      if (!configuredTargetFlavor.isEmpty()) {
 
-        MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(configuredTargetFlavor);
+        MediaPackageElementFlavor targetFlavor = configuredTargetFlavor.get(0);
         String targetFlavorType = targetFlavor.getType();
         String targetFlavorSubtype = targetFlavor.getSubtype();
 

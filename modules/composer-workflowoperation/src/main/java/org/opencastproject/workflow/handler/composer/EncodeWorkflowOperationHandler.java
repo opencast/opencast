@@ -36,6 +36,7 @@ import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSele
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -100,7 +101,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
     logger.debug("Running parallel encoding workflow operation on workflow {}", workflowInstance.getId());
 
     try {
-      return encode(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());
+      return encode(workflowInstance);
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
@@ -109,10 +110,8 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /**
    * Encode tracks from MediaPackage using profiles stored in properties and updates current MediaPackage.
    *
-   * @param src
-   *          The source media package
-   * @param operation
-   *          the current workflow operation
+   * @param workflowInstance
+   *          the current workflow instance
    * @return the operation result containing the updated media package
    * @throws EncoderException
    *           if encoding fails
@@ -123,47 +122,34 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @throws NotFoundException
    *           if the workspace doesn't contain the requested file
    */
-  private WorkflowOperationResult encode(MediaPackage src, WorkflowOperationInstance operation)
+  private WorkflowOperationResult encode(WorkflowInstance workflowInstance)
           throws EncoderException, IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
+    MediaPackage src = workflowInstance.getMediaPackage();
     MediaPackage mediaPackage = (MediaPackage) src.clone();
-
+    WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     // Check which tags have been configured
-    String sourceTagsOption = StringUtils.trimToNull(operation.getConfiguration("source-tags"));
-    String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration("target-tags"));
-    String sourceFlavorOption = StringUtils.trimToNull(operation.getConfiguration("source-flavor"));
-    String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("source-flavors"));
-    String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration("target-flavor"));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.many, Configuration.many, Configuration.many, Configuration.one);
+    List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
+    List<String> targetTagsOption = tagsAndFlavors.getTargetTags();
+    List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
+    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Make sure either one of tags or flavors are provided
-    if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorOption)
-            && StringUtils.isBlank(sourceFlavorsOption)) {
+    if (sourceTagsOption.isEmpty() && sourceFlavorsOption.isEmpty()) {
       logger.info("No source tags or flavors have been specified, not matching anything");
       return createResult(mediaPackage, Action.CONTINUE);
     }
 
     // Select the source flavors
-    for (String flavor : asList(sourceFlavorsOption)) {
-      try {
-        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed");
-      }
-    }
-
-    // Support legacy "source-flavor" option
-    if (StringUtils.isNotBlank(sourceFlavorOption)) {
-      String flavor = StringUtils.trim(sourceFlavorOption);
-      try {
-        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed");
-      }
+    for (MediaPackageElementFlavor flavor : sourceFlavorsOption) {
+        elementSelector.addFlavor(flavor);
     }
 
     // Select the source tags
-    for (String tag : asList(sourceTagsOption)) {
+    for (String tag : sourceTagsOption) {
       elementSelector.addTag(tag);
     }
 
@@ -190,19 +176,6 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
     // Make sure there is at least one profile
     if (profiles.isEmpty())
       throw new WorkflowOperationException("No encoding profile was specified");
-
-    // Target tags
-    List<String> targetTags = asList(targetTagsOption);
-
-    // Target flavor
-    MediaPackageElementFlavor targetFlavor = null;
-    if (StringUtils.isNotBlank(targetFlavorOption)) {
-      try {
-        targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Target flavor '" + targetFlavorOption + "' is malformed");
-      }
-    }
 
     // Look for elements matching the tag
     Collection<Track> elements = elementSelector.select(mediaPackage, false);
@@ -255,7 +228,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
         // Adjust the target tags
         for (Track encodedTrack : composedTracks) {
-          for (String tag : targetTags) {
+          for (String tag : targetTagsOption) {
             logger.trace("Tagging composed track {} with '{}'", encodedTrack.toString(), tag);
             encodedTrack.addTag(tag);
           }

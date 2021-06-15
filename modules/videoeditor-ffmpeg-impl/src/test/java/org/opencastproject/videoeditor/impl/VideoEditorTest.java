@@ -257,11 +257,11 @@ public class VideoEditorTest {
     EasyMock.expect(workspace.get(track1.getURI())).andReturn(new File(track1.getURI())).anyTimes();
     EasyMock.expect(workspace.get(track2.getURI())).andReturn(new File(track2.getURI())).anyTimes();
     EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(),
-            EasyMock.anyObject(InputStream.class))).andAnswer(() -> {
-      InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
-      IOUtils.copy(in, new FileOutputStream(tempFile1));
-      return tempFile1.toURI();
-    });
+        EasyMock.anyObject(InputStream.class))).andAnswer(() -> {
+          InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
+          IOUtils.copy(in, new FileOutputStream(tempFile1));
+          return tempFile1.toURI();
+        });
 
     /* mock the role/org/security dependencies */
     User anonymous = new JaxbUser("anonymous", "test", new DefaultOrganization(), new JaxbRole(
@@ -291,13 +291,14 @@ public class VideoEditorTest {
 
     /* mock inspector output so that the job will alway pass */
     String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source' id='deadbeef-a926-4ba9-96d9-2fafbcc30d2a'>"
-            + "<audio id='audio-1'><encoder type='MP3 (MPEG audio layer 3)'/><channels>2</channels>"
-            + "<bitrate>96000.0</bitrate></audio><video id='video-1'><device/>"
-            + "<encoder type='FLV / Sorenson Spark / Sorenson H.263 (Flash Video)'/>"
-            + "<bitrate>512000.0</bitrate><framerate>15.0</framerate>"
-            + "<resolution>854x480</resolution></video>"
-            + "<mimetype>video/mpeg</mimetype><url>video.mp4</url></track>";
+        + "<track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source' "
+        + "id='deadbeef-a926-4ba9-96d9-2fafbcc30d2a'>"
+        + "<audio id='audio-1'><encoder type='MP3 (MPEG audio layer 3)'/><channels>2</channels>"
+        + "<bitrate>96000.0</bitrate></audio><video id='video-1'><device/>"
+        + "<encoder type='FLV / Sorenson Spark / Sorenson H.263 (Flash Video)'/>"
+        + "<bitrate>512000.0</bitrate><framerate>15.0</framerate>"
+        + "<resolution>854x480</resolution></video>"
+        + "<mimetype>video/mpeg</mimetype><url>video.mp4</url></track>";
 
     inspectedTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
     veditor = new VideoEditorServiceImpl() {

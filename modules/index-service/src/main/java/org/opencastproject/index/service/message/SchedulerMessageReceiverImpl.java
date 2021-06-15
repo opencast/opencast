@@ -22,7 +22,7 @@
 package org.opencastproject.index.service.message;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.opencastproject.elasticsearch.index.event.EventIndexUtils.getOrCreateEvent;
+import static org.opencastproject.message.broker.api.scheduler.SchedulerItem.Type.Delete;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.event.Event;
@@ -40,6 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<SchedulerItemList> {
 
@@ -61,119 +63,81 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
 
   private void executeSingle(final String mediaPackageId, final SchedulerItem schedulerItem) {
     DublinCoreCatalog dc = schedulerItem.getEvent();
-
-    Event event;
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
     logger.debug("Received message of type {} for event {}", schedulerItem.getType(), mediaPackageId);
+    Function<Optional<Event>, Optional<Event>> updateFunction;
 
-    try {
-      switch (schedulerItem.getType()) {
-        case UpdateCatalog:
-          // Load or create the corresponding recording event
-          event = getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
-          if (isBlank(event.getCreator()))
-            event.setCreator(getSecurityService().getUser().getName());
-          if (dc != null)
-            EventIndexUtils.updateEvent(event, dc);
+    if (schedulerItem.getType() == Delete) {
 
-          // Update series name if not already done
-          EventIndexUtils.updateSeriesName(event, organization, user, getSearchIndex());
-
-          // Persist the scheduling event
-          updateEvent(event);
-          return;
-        case UpdateAcl:
-          // Load the corresponding recording event
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
-          event.setAccessPolicy(AccessControlParser.toJsonSilent(schedulerItem.getAcl()));
-
-          // Persist the scheduling event
-          updateEvent(event);
-          return;
-        case UpdateAgentId:
-          // Load the corresponding recording event
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
-          event.setAgentId(schedulerItem.getAgentId());
-
-          // Persist the scheduling event
-          updateEvent(event);
-          return;
-        case UpdateProperties:
-          // Load the corresponding recording event
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
-          event.setAgentConfiguration(schedulerItem.getProperties());
-
-          // Persist the scheduling event
-          updateEvent(event);
-          return;
-        case UpdateRecordingStatus:
-          // Load the corresponding recording event
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
-          event.setRecordingStatus(schedulerItem.getRecordingState());
-
-          // Persist the scheduling event
-          updateEvent(event);
-          return;
-        case DeleteRecordingStatus:
-          // Load the corresponding recording event
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
-          event.setRecordingStatus(null);
-
-          // Persist the scheduling event
-          updateEvent(event);
-          return;
-        case UpdateEnd:
-          String endTime = schedulerItem.getEnd() == null ? null : DateTimeSupport.toUTC(schedulerItem.getEnd().getTime());
-          // Load the corresponding recording event
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
-          event.setTechnicalEndTime(endTime);
-
-          // Persist the scheduling event
-          updateEvent(event);
-          return;
-        case UpdateStart:
-          String startTime = schedulerItem.getStart() == null ? null : DateTimeSupport.toUTC(schedulerItem.getStart().getTime());
-          // Load the corresponding recording event
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
-          event.setTechnicalStartTime(startTime);
-
-          // Persist the scheduling event
-          updateEvent(event);
-          return;
-        case UpdatePresenters:
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
-          event.setTechnicalPresenters(new ArrayList<>(schedulerItem.getPresenters()));
-
-          // Persist the scheduling event
-          updateEvent(event);
-          return;
-        case Delete:
-          // Remove the scheduling from the search index
-          try {
-            getSearchIndex().deleteScheduling(organization, user, mediaPackageId);
-            logger.debug("Scheduled recording {} removed from the {} search index",
-              mediaPackageId, getSearchIndex().getIndexName());
-          } catch (NotFoundException e) {
-            logger.warn("Scheduled recording {} not found for deletion", mediaPackageId);
-          }
-          return;
-        default:
-          throw new IllegalArgumentException("Unhandled type of SchedulerItem");
+      // Remove the scheduling from the search index
+      try {
+        getSearchIndex().deleteScheduling(organization, user, mediaPackageId);
+        logger.debug("Scheduled recording {} removed from the {} search index", mediaPackageId, getSearchIndex().getIndexName());
+      } catch (NotFoundException e) {
+        logger.warn("Scheduled recording {} not found for deletion", mediaPackageId);
+      } catch (SearchIndexException e) {
+        logger.error("Error deleting the event {} from the search index:", mediaPackageId, e);
       }
-    } catch (SearchIndexException e) {
-      logger.error("Got {} message for event {} but failed to retrieve the event from the search index",
-              schedulerItem.getType(), mediaPackageId, e);
-    }
-  }
+    } else {
+      updateFunction = (Optional<Event> eventOpt) -> {
+        Event event = eventOpt.orElse(new Event(mediaPackageId, organization));
 
-  private void updateEvent(Event event) {
-    try {
-      getSearchIndex().addOrUpdate(event);
-      logger.debug("Scheduled recording {} updated in the {} search index",
-        event.getIdentifier(), getSearchIndex().getIndexName());
-    } catch (SearchIndexException e) {
-      logger.error("Error retrieving the recording event from the search index:", e);
+        switch (schedulerItem.getType()) {
+          case UpdateCatalog:
+            if (isBlank(event.getCreator()))
+              event.setCreator(getSecurityService().getUser().getName());
+            if (dc != null)
+              EventIndexUtils.updateEvent(event, dc);
+
+            // Update series name if not already done
+            try {
+              EventIndexUtils.updateSeriesName(event, organization, user, getSearchIndex());
+            } catch (SearchIndexException e) {
+              logger.error("Error updating the series name of the event to index", e);
+            }
+            break;
+          case UpdateAcl:
+            event.setAccessPolicy(AccessControlParser.toJsonSilent(schedulerItem.getAcl()));
+            break;
+          case UpdateAgentId:
+            event.setAgentId(schedulerItem.getAgentId());
+            break;
+          case UpdateProperties:
+            event.setAgentConfiguration(schedulerItem.getProperties());
+            break;
+          case UpdateRecordingStatus:
+            event.setRecordingStatus(schedulerItem.getRecordingState());
+            break;
+          case DeleteRecordingStatus:
+            event.setRecordingStatus(null);
+            break;
+          case UpdateEnd:
+            String endTime = schedulerItem.getEnd() == null ? null
+                    : DateTimeSupport.toUTC(schedulerItem.getEnd().getTime());
+            event.setTechnicalEndTime(endTime);
+            break;
+          case UpdateStart:
+            String startTime = schedulerItem.getStart() == null ? null
+                    : DateTimeSupport.toUTC(schedulerItem.getStart().getTime());
+            event.setTechnicalStartTime(startTime);
+            break;
+          case UpdatePresenters:
+            event.setTechnicalPresenters(new ArrayList<>(schedulerItem.getPresenters()));
+            break;
+          default:
+            throw new IllegalArgumentException("Unhandled type of SchedulerItem");
+        }
+        return Optional.of(event);
+      };
+
+      try {
+        getSearchIndex().addOrUpdateEvent(mediaPackageId, updateFunction, organization, user);
+        logger.debug("Scheduled recording {} updated in the {} search index", mediaPackageId,
+                getSearchIndex().getIndexName());
+      } catch (SearchIndexException e) {
+        logger.error("Error updating the event {} in the search index:", mediaPackageId, e);
+      }
     }
   }
 }

@@ -25,9 +25,6 @@
   <reference name="message-broker-receiver" cardinality="1..1"
              interface="org.opencastproject.message.broker.api.MessageReceiver" policy="static"
              bind="setMessageReceiver"/>
-  <reference name="message-receiver-lock-service"
-             interface="org.opencastproject.index.service.message.MessageReceiverLockService"
-             cardinality="1..1" policy="static" bind="setMessageReceiverLockService"/>
   <reference name="search-index" cardinality="1..1"
              interface="org.opencastproject.adminui.index.AdminUISearchIndex" policy="static"
              bind="setSearchIndex"/>

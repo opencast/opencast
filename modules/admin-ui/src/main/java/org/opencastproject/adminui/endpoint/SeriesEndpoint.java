@@ -57,22 +57,22 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesIndexSchema;
 import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.theme.Theme;
+import org.opencastproject.elasticsearch.index.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
@@ -99,6 +99,8 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
+import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.entwinemedia.fn.data.Opt;
@@ -121,9 +123,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -173,6 +175,7 @@ public class SeriesEndpoint implements ManagedService {
   private SecurityService securityService;
   private AclServiceFactory aclServiceFactory;
   private IndexService indexService;
+  private ListProvidersService listProvidersService;
   private AdminUISearchIndex searchIndex;
 
   /** Default server URL */
@@ -191,6 +194,11 @@ public class SeriesEndpoint implements ManagedService {
   /** OSGi DI. */
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
+  }
+
+  /** OSGi callback for the list provider service */
+  public void setListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = listProvidersService;
   }
 
   /** OSGi callback for the security service */
@@ -231,14 +239,10 @@ public class SeriesEndpoint implements ManagedService {
     }
 
     dictionaryValue = properties.get(SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY);
-    if (dictionaryValue != null) {
-      onlySeriesWithWriteAccessSeriesTab = BooleanUtils.toBoolean(dictionaryValue.toString());
-    }
+    onlySeriesWithWriteAccessSeriesTab = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
 
     dictionaryValue = properties.get(EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY);
-    if (dictionaryValue != null) {
-      onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(dictionaryValue.toString());
-    }
+    onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
   }
 
   @GET
@@ -451,8 +455,8 @@ public class SeriesEndpoint implements ManagedService {
     // need to set limit because elasticsearch limit results by 10 per default
     query.withLimit(Integer.MAX_VALUE);
     query.withOffset(0);
-    query.sortByName(SearchQuery.Order.Ascending);
-    SearchResult<Theme> results = null;
+    query.sortByName(Order.Ascending);
+    SearchResult<IndexTheme> results = null;
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
@@ -461,9 +465,9 @@ public class SeriesEndpoint implements ManagedService {
     }
 
     JSONObject themesJson = new JSONObject();
-    for (SearchResultItem<Theme> item : results.getItems()) {
+    for (SearchResultItem<IndexTheme> item : results.getItems()) {
       JSONObject themeInfoJson = new JSONObject();
-      Theme theme = item.getSource();
+      IndexTheme theme = item.getSource();
       themeInfoJson.put("name", theme.getName());
       themeInfoJson.put("description", theme.getDescription());
       themesJson.put(theme.getIdentifier(), themeInfoJson);
@@ -692,27 +696,26 @@ public class SeriesEndpoint implements ManagedService {
    * @return user series with write or read-only access,
    *         depending on the parameter
    */
-  public HashMap<String, String> getUserSeriesByAccess(boolean writeAccess) {
+  public Map<String, String> getUserSeriesByAccess(boolean writeAccess) {
+    String listProviderName = null;
+    MetadataField seriesMetadataField = indexService.getCommonEventCatalogUIAdapter().getRawFields().getOutputFields()
+        .get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
+    if (seriesMetadataField != null && StringUtils.isNotEmpty(seriesMetadataField.getListprovider())) {
+      listProviderName = seriesMetadataField.getListprovider();
+    }
+    if (StringUtils.isEmpty(listProviderName)) {
+      listProviderName = "SERIES";
+    }
+    SeriesListQuery query = new SeriesListQuery();
+    if (writeAccess) {
+      query.withoutPermissions();
+      query.withReadPermission(true);
+      query.withWritePermission(true);
+    }
     try {
-      SeriesSearchQuery query = new SeriesSearchQuery(
-      securityService.getOrganization().getId(), securityService.getUser());
-
-      if (writeAccess) {
-        query.withoutActions();
-        query.withAction(Permissions.Action.WRITE);
-        query.withAction(Permissions.Action.READ);
-      }
-
-      SearchResult<Series> result = searchIndex.getByQuery(query);
-      HashMap<String, String> seriesMap = new HashMap<String, String>();
-      for (SearchResultItem<Series> item : result.getItems()) {
-        Series series = item.getSource();
-        seriesMap.put(series.getTitle(), series.getIdentifier());
-      }
-
-      return seriesMap;
-    } catch (SearchIndexException e) {
-      logger.warn("Could not perform search query: {}", e);
+      return listProvidersService.getList(listProviderName, query, true);
+    } catch (ListProviderException e) {
+      logger.warn("Could not perform search query.", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -850,7 +853,7 @@ public class SeriesEndpoint implements ManagedService {
    *          The theme to get the id and name from.
    * @return A {@link Response} with the theme id and name as json contents
    */
-  private Response getSimpleThemeJsonResponse(Theme theme) {
+  private Response getSimpleThemeJsonResponse(IndexTheme theme) {
     return okJson(obj(f(Long.toString(theme.getIdentifier()), v(theme.getName()))));
   }
 
@@ -878,7 +881,7 @@ public class SeriesEndpoint implements ManagedService {
       return okJson(obj());
 
     try {
-      Opt<Theme> themeOpt = getTheme(themeId);
+      Opt<IndexTheme> themeOpt = getTheme(themeId);
       if (themeOpt.isNone())
         return notFound("Cannot find a theme with id {}", themeId);
 
@@ -898,7 +901,7 @@ public class SeriesEndpoint implements ManagedService {
   public Response updateSeriesTheme(@PathParam("seriesId") String seriesID, @FormParam("themeId") long themeId)
           throws UnauthorizedException, NotFoundException {
     try {
-      Opt<Theme> themeOpt = getTheme(themeId);
+      Opt<IndexTheme> themeOpt = getTheme(themeId);
       if (themeOpt.isNone())
         return notFound("Cannot find a theme with id {}", themeId);
 
@@ -1037,12 +1040,12 @@ public class SeriesEndpoint implements ManagedService {
    * @return a theme or none if not found, wrapped in an option
    * @throws SearchIndexException
    */
-  private Opt<Theme> getTheme(long id) throws SearchIndexException {
-    SearchResult<Theme> result = searchIndex.getByQuery(new ThemeSearchQuery(securityService.getOrganization().getId(),
+  private Opt<IndexTheme> getTheme(long id) throws SearchIndexException {
+    SearchResult<IndexTheme> result = searchIndex.getByQuery(new ThemeSearchQuery(securityService.getOrganization().getId(),
             securityService.getUser()).withIdentifier(id));
     if (result.getPageSize() == 0) {
       logger.debug("Didn't find theme with id {}", id);
-      return Opt.<Theme> none();
+      return Opt.<IndexTheme> none();
     }
     return Opt.some(result.getItems()[0].getSource());
   }

@@ -32,13 +32,13 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,25 +86,20 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
 
     logger.info("Start cropping workflow operation for mediapackage {}", mediaPackage.getIdentifier().toString());
 
-    List<String> targetTags = asList(operation.getConfiguration(PROP_TARGET_TAGS));
+    // Check which tags have been configured
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.one, Configuration.many, Configuration.many);
+    List<String> targetTags = tagsAndFlavors.getTargetTags();
+    List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
 
     MediaPackageElementFlavor targetFlavor = null;
-    String targetFlavourText = StringUtils.trimToNull(operation.getConfiguration(PROP_TARGET_FLAVOR));
-    if (targetFlavourText != null) {
-      try {
-        targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavourText);
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Target flavor is malformed");
-      }
+    if (!targetFlavorOption.isEmpty()) {
+      targetFlavor = targetFlavorOption.get(0);
     }
-
-    String trackFlavor = StringUtils.trimToNull(operation.getConfiguration(PROP_SOURCE_FLAVOR));
-    if (trackFlavor == null) {
-      throw new WorkflowOperationException(String.format("Required property %s not set", PROP_SOURCE_FLAVOR));
-    }
+    MediaPackageElementFlavor trackFlavor = tagsAndFlavors.getSingleSrcFlavor();
 
     List<Track> candidates = new ArrayList<>();
-    candidates.addAll(Arrays.asList(mediaPackage.getTracks(MediaPackageElementFlavor.parseFlavor(trackFlavor))));
+    candidates.addAll(Arrays.asList(mediaPackage.getTracks(trackFlavor)));
     candidates.removeIf(t -> !t.hasVideo());
 
     if (candidates.size() == 0) {

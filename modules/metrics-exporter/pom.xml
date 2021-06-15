@@ -7,13 +7,13 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <prometheus.version>0.9.0</prometheus.version>
+    <prometheus.version>0.11.0</prometheus.version>
   </properties>
   <dependencies>
     <!-- Opencast dependencies -->
@@ -95,12 +95,13 @@
             <Import-Package>
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
+              !io.opentelemetry.*,
               *
             </Import-Package>
             <Embed-Dependency>
-              simpleclient,
-              simpleclient_common
+              *;groupId=io.prometheus,
             </Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
           </instructions>
         </configuration>
       </plugin>

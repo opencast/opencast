@@ -12,9 +12,8 @@ General rules are:
 - Users communicate with Opencast via HTTP(S)
 - Capture agents communicate with Opencast via HTTP(S)
 - Opencast nodes communicate among each other via HTTP(S)
-- Often Elasticsearch and ActiveMQ are run on the admin node since most communication then happens on the server
-    - The admin node communicates with Elasticsearch exclusively
-    - Some messages are sent to ActiveMQ from other nodes
+- Often Elasticsearch and ActiveMQ are run on the admin node since this node communicates with these services
+  exclusively
 - All servers should get access to the storage infrastructure
 - All Opencast nodes need database access
 
@@ -42,8 +41,6 @@ digraph G {
   oc2 -> db [label = "3306²"];
   oc3 -> db [label = "3306²"];
   oc1 -> activemq [label = "61616"];
-  oc2 -> activemq [label = "61616"];
-  oc3 -> activemq [label = "61616"];
   oc1 -> es[label = "9300"];
   oc1 -> storage;
   oc2 -> storage;
@@ -79,6 +76,6 @@ For a very simple configuration catching most of the important attack vectors, i
 If you want a more complex, stricter set of rules:
 
 1. Allow external HTTP and HTTPS communication to admin, presentation and possibly ingest
-2. Allow all Opencast nodes to access ActiveMQ and the database
+2. Allow all Opencast nodes to access the database
 3. Allow the admin node to access Elasticsearch
 4. Allow all nodes access to the storage infrastructure

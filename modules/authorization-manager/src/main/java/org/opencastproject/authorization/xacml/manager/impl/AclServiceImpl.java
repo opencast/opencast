@@ -27,14 +27,22 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.acl.AclItem;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
@@ -45,6 +53,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 /** Organization bound impl. */
 public final class AclServiceImpl implements AclService {
@@ -59,16 +69,23 @@ public final class AclServiceImpl implements AclService {
   private final SeriesService seriesService;
   private final AssetManager assetManager;
   private final AuthorizationService authorizationService;
-  private final MessageSender messageSender;
+  private final SecurityService securityService;
+
+  /** The Elasticsearch indices */
+  protected AbstractSearchIndex adminUiIndex;
+  protected AbstractSearchIndex externalApiIndex;
 
   public AclServiceImpl(Organization organization, AclDb aclDb, SeriesService seriesService, AssetManager assetManager,
-          AuthorizationService authorizationService, MessageSender messageSender) {
+          AuthorizationService authorizationService, AbstractSearchIndex adminUiIndex,
+          AbstractSearchIndex externalApiIndex, SecurityService securityService) {
     this.organization = organization;
     this.aclDb = aclDb;
     this.seriesService = seriesService;
     this.assetManager = assetManager;
     this.authorizationService = authorizationService;
-    this.messageSender = messageSender;
+    this.adminUiIndex = adminUiIndex;
+    this.externalApiIndex = externalApiIndex;
+    this.securityService = securityService;
   }
 
   @Override
@@ -164,8 +181,9 @@ public final class AclServiceImpl implements AclService {
     boolean updateAcl = aclDb.updateAcl(acl);
     if (updateAcl) {
       if (oldName.isSome() && !(oldName.get().getName().equals(acl.getName()))) {
-        AclItem aclItem = AclItem.update(oldName.get().getName(), acl.getName());
-        messageSender.sendObjectMessage(AclItem.ACL_QUEUE, MessageSender.DestinationType.Queue, aclItem);
+        User user = securityService.getUser();
+        updateAclInIndex(oldName.get().getName(), acl.getName(), adminUiIndex, organization.getId(), user);
+        updateAclInIndex(oldName.get().getName(), acl.getName(), externalApiIndex, organization.getId(), user);
       }
     }
     return updateAcl;
@@ -173,12 +191,8 @@ public final class AclServiceImpl implements AclService {
 
   @Override
   public Option<ManagedAcl> createAcl(AccessControlList acl, String name) {
-    Option<ManagedAcl> createAcl = aclDb.createAcl(organization, acl, name);
-    if (createAcl.isSome()) {
-      AclItem aclItem = AclItem.create(createAcl.get().getName());
-      messageSender.sendObjectMessage(AclItem.ACL_QUEUE, MessageSender.DestinationType.Queue, aclItem);
-    }
-    return createAcl;
+    // we don't need to update the Elasticsearch indices in this case
+    return aclDb.createAcl(organization, acl, name);
   }
 
   @Override
@@ -186,11 +200,157 @@ public final class AclServiceImpl implements AclService {
     Option<ManagedAcl> deletedAcl = getAcl(id);
     if (aclDb.deleteAcl(organization, id)) {
       if (deletedAcl.isSome()) {
-        AclItem aclItem = AclItem.delete(deletedAcl.get().getName());
-        messageSender.sendObjectMessage(AclItem.ACL_QUEUE, MessageSender.DestinationType.Queue, aclItem);
+        User user = securityService.getUser();
+        removeAclFromIndex(deletedAcl.get().getName(), adminUiIndex, organization.getId(), user);
+        removeAclFromIndex(deletedAcl.get().getName(), externalApiIndex, organization.getId(), user);
       }
       return true;
     }
     throw new NotFoundException("Managed acl with id " + id + " not found.");
+  }
+
+  /**
+   * Update the Managed ACL in the events and series in the Elasticsearch index.
+   *
+   * @param currentAclName
+   *         the current name of the managed acl
+   * @param newAclName
+   *         the new name of the managed acl
+   * @param index
+   *         the index to update
+   * @param orgId
+   *         the organization the managed acl belongs to
+   * @param user
+   *         the current user
+   */
+  private void updateAclInIndex(String currentAclName, String newAclName, AbstractSearchIndex index, String orgId,
+          User user) {
+    logger.debug("Update the events to change the managed acl name from '{}' to '{}'.", currentAclName, newAclName);
+    updateManagedAclForEvents(currentAclName, Optional.of(newAclName), index, orgId, user);
+
+    logger.debug("Update the series to change the managed acl name from '{}' to '{}'.", currentAclName, newAclName);
+    updateManagedAclForSeries(currentAclName, Optional.of(newAclName), index, orgId, user);
+  }
+
+  /**
+   * Remove the Managed ACL from the events and series in the Elasticsearch index.
+   *
+   * @param currentAclName
+   *         the current name of the managed acl
+   * @param index
+   *         the index to update
+   * @param orgId
+   *         the organization the managed acl belongs to
+   * @param user
+   *         the current user
+   */
+  private void removeAclFromIndex(String currentAclName, AbstractSearchIndex index, String orgId,
+          User user) {
+    logger.debug("Update the events to remove the managed acl name '{}'.", currentAclName);
+    updateManagedAclForEvents(currentAclName, Optional.empty(), index, orgId, user);
+
+    logger.debug("Update the series to remove the managed acl name '{}'.", currentAclName);
+    updateManagedAclForSeries(currentAclName, Optional.empty(), index, orgId, user);
+  }
+
+  /**
+   * Update or remove the Managed Acl for the series in the Elasticsearch index.
+   *
+   * @param currentAclName
+   *         the current name of the managed acl
+   * @param newAclNameOpt
+   * @param index
+   *         the index to update
+   * @param orgId
+   *         the organization the managed acl belongs to
+   * @param user
+   *         the current user
+   */
+  private void updateManagedAclForSeries(String currentAclName, Optional<String> newAclNameOpt,
+          AbstractSearchIndex index, String orgId, User user) {
+    SearchResult<Series> result;
+    try {
+      result = index.getByQuery(new SeriesSearchQuery(orgId, user).withoutActions()
+              .withManagedAcl(currentAclName));
+    } catch (SearchIndexException e) {
+      logger.error("Unable to find the series in org '{}' with current managed acl name '{}'", orgId, currentAclName,
+              e);
+      return;
+    }
+
+    for (SearchResultItem<Series> seriesItem : result.getItems()) {
+      String seriesId = seriesItem.getSource().getIdentifier();
+
+      Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
+        if (seriesOpt.isPresent() && seriesOpt.get().getManagedAcl().equals(currentAclName)) {
+          Series series = seriesOpt.get();
+          series.setManagedAcl(newAclNameOpt.orElse(null));
+          return Optional.of(series);
+        }
+        return Optional.empty();
+      };
+
+      try {
+        index.addOrUpdateSeries(seriesId, updateFunction, orgId, user);
+      } catch (SearchIndexException e) {
+        if (newAclNameOpt.isPresent()) {
+          logger.warn("Unable to update series'{}' from current managed acl '{}' to new managed acl name '{}'",
+                  seriesId, currentAclName, newAclNameOpt.get(), e);
+        } else {
+          logger.warn("Unable to update series '{}' to remove managed acl '{}'", seriesId, currentAclName, e);
+        }
+      }
+    }
+  }
+
+  /**
+   * Update or remove the Managed Acl for the events in the Elasticsearch index.
+   *
+   * @param currentAclName
+   *         the current name of the managed acl
+   * @param newAclNameOpt
+   * @param index
+   *         the index to update
+   * @param orgId
+   *         the organization the managed acl belongs to
+   * @param user
+   *         the current user
+   */
+  private void updateManagedAclForEvents(String currentAclName, Optional<String> newAclNameOpt,
+          AbstractSearchIndex index, String orgId, User user) {
+    SearchResult<Event> result;
+    try {
+      result = index.getByQuery(new EventSearchQuery(orgId, user).withoutActions()
+              .withManagedAcl(currentAclName));
+    } catch (SearchIndexException e) {
+      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event",
+              orgId, currentAclName, e);
+      return;
+    }
+
+    for (SearchResultItem<Event> eventItem : result.getItems()) {
+      String eventId = eventItem.getSource().getIdentifier();
+
+      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+        if (eventOpt.isPresent() && eventOpt.get().getManagedAcl().equals(currentAclName)) {
+          Event event = eventOpt.get();
+          event.setManagedAcl(newAclNameOpt.orElse(null));
+          return Optional.of(event);
+        }
+        return Optional.empty();
+      };
+
+      try {
+        index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
+      } catch (SearchIndexException e) {
+        if (newAclNameOpt.isPresent()) {
+          logger.warn(
+                  "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}'",
+                  eventId, currentAclName, newAclNameOpt.get(), e);
+        } else {
+          logger.warn("Unable to update event '{}' to remove managed acl '{}'", eventId, currentAclName, e);
+        }
+      }
+    }
   }
 }

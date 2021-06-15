@@ -32,6 +32,7 @@ import org.opencastproject.transcription.amberscript.AmberscriptTranscriptionSer
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -44,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -105,27 +107,23 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     logger.debug("Start transcription for mediapackage '{}'.", mediaPackage);
 
     // Check which tags have been configured
-    String sourceTagOption = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAG));
-    String sourceFlavorOption = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+    List<String> sourceTagOption = tagsAndFlavors.getSrcTags();
+    List<MediaPackageElementFlavor> sourceFlavorOption = tagsAndFlavors.getSrcFlavors();
     String language = StringUtils.trimToEmpty(operation.getConfiguration(LANGUAGE));
     String jobtype = StringUtils.trimToEmpty(operation.getConfiguration(JOBTYPE));
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Make sure either one of tags or flavors are provided
-    if (StringUtils.isBlank(sourceTagOption) && StringUtils.isBlank(sourceFlavorOption))
+    if (sourceTagOption.isEmpty() && sourceFlavorOption.isEmpty())
       throw new WorkflowOperationException("No source tag or flavor have been specified!");
 
-    if (StringUtils.isNotBlank(sourceFlavorOption)) {
-      String flavor = StringUtils.trim(sourceFlavorOption);
-      try {
-        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed.");
-      }
+    if (!sourceFlavorOption.isEmpty()) {
+      elementSelector.addFlavor(sourceFlavorOption.get(0));
     }
-    if (sourceTagOption != null)
-      elementSelector.addTag(sourceTagOption);
+    if (!sourceTagOption.isEmpty())
+      elementSelector.addTag(sourceTagOption.get(0));
 
     Collection<Track> elements = elementSelector.select(mediaPackage, false);
     Job job = null;

@@ -38,6 +38,7 @@ import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -69,9 +70,6 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
   private static final String SOURCE_TAGS_PREFIX = "source-tags-part-";
   private static final String SOURCE_FLAVOR_PREFIX = "source-flavor-part-";
   private static final String MANDATORY_SUFFIX = "-mandatory";
-
-  private static final String TARGET_TAGS = "target-tags";
-  private static final String TARGET_FLAVOR = "target-flavor";
 
   private static final String ENCODING_PROFILE = "encoding-profile";
   private static final String OUTPUT_RESOLUTION = "output-resolution";
@@ -132,15 +130,17 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
     logger.debug("Running concat workflow operation on workflow {}", workflowInstance.getId());
 
     try {
-      return concat(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());
+      return concat(workflowInstance.getMediaPackage(), workflowInstance);
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
   }
 
-  private WorkflowOperationResult concat(MediaPackage src, WorkflowOperationInstance operation)
+  private WorkflowOperationResult concat(MediaPackage src, WorkflowInstance workflowInstance)
           throws EncoderException, IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
     MediaPackage mediaPackage = (MediaPackage) src.clone();
+
+    WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
 
     Map<Integer, Tuple<TrackSelector, Boolean>> trackSelectors = getTrackSelectors(operation);
     String outputResolution = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_RESOLUTION));
@@ -154,14 +154,12 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
       return createResult(mediaPackage, Action.SKIP);
     }
 
-    String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS));
-    String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
-
-    // Target tags
-    List<String> targetTags = asList(targetTagsOption);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+    List<String> targetTagsOption = tagsAndFlavors.getTargetTags();
+    List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
 
     // Target flavor
-    if (targetFlavorOption == null)
+    if (targetFlavorOption.isEmpty())
       throw new WorkflowOperationException("Target flavor must be set!");
 
     // Find the encoding profile
@@ -217,7 +215,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     MediaPackageElementFlavor targetFlavor = null;
     try {
-      targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
+      targetFlavor = targetFlavorOption.get(0);
       if ("*".equals(targetFlavor.getType()) || "*".equals(targetFlavor.getSubtype()))
         throw new WorkflowOperationException("Target flavor must have a type and a subtype, '*' are not allowed!");
     } catch (IllegalArgumentException e) {
@@ -285,7 +283,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
     } else if (tracks.size() == 1) {
       Track track = (Track) tracks.get(0).clone();
       track.setIdentifier(null);
-      addNewTrack(mediaPackage, track, targetTags, targetFlavor);
+      addNewTrack(mediaPackage, track, targetTagsOption, targetFlavor);
       logger.info("At least two tracks are needed for the concating operation, skipping concatenation!");
       return createResult(mediaPackage, Action.SKIP);
     }
@@ -310,7 +308,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
       concatTrack.setURI(workspace.moveTo(concatTrack.getURI(), mediaPackage.getIdentifier().toString(),
               concatTrack.getIdentifier(), "concat." + FilenameUtils.getExtension(concatTrack.getURI().toString())));
 
-      addNewTrack(mediaPackage, concatTrack, targetTags, targetFlavor);
+      addNewTrack(mediaPackage, concatTrack, targetTagsOption, targetFlavor);
 
       WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, concatJob.getQueueTime());
       logger.debug("Concat operation completed");

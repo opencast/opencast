@@ -25,7 +25,9 @@ public class VideoClip {
   private final int srcId;
   private final double start;
   private double end;
-  private String region; // if layout regions are supported, it will be resolved and stored here, defaults to root layout
+  // if layout regions are supported, it will be resolved and stored here,
+  // defaults to root layout
+  private String region;
 
   public VideoClip(int indx, double start, double end) {
     this.srcId = indx;
@@ -41,10 +43,20 @@ public class VideoClip {
     this.region = region;
   }
 
-  public int getSrc() { return srcId; }
-  public double getStart() { return start; }
-  public double getEnd() { return end; }
-  public String getRegion() { return region; }
-  public double getDuration() { return end - start; }
+  public int getSrc() {
+    return srcId;
+  }
+  public double getStart() {
+    return start;
+  }
+  public double getEnd() {
+    return end;
+  }
+  public String getRegion() {
+    return region;
+  }
+  public double getDuration() {
+    return end - start;
+  }
 
 }

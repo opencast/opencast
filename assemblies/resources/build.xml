@@ -1,0 +1,39 @@
+<project name="Selenium" basedir=".">
+  <target name="basic configuration">
+    <echo>Basic configuration</echo>
+    <!-- Make sure to deactivate JMX by default -->
+    <replaceregexp file="target/assembly/bin/karaf" match="-Dcom.sun.management.jmxremote" replace="" byline="true"/>
+    <replaceregexp file="target/assembly/bin/inc" match="-Dcom.sun.management.jmxremote" replace="" byline="true"/>
+    <!-- Correct the start script name -->
+    <replaceregexp file="target/assembly/bin/karaf" match="^KARAF_SCRIPT=.*$" replace="KARAF_SCRIPT='start-opencast'" byline="true"/>
+    <!-- Mitigation for https://issues.apache.org/jira/browse/KARAF-5526 -->
+    <replaceregexp file="target/assembly/bin/karaf" match=" init$" replace=" [ -z &quot;${TERM##*256color}&quot; ] &amp;&amp; export TERM=xterm-color&#x0A;    init" byline="true"/>
+    <!-- Make sure bundle cache gets cleared by default -->
+    <replaceregexp file="target/assembly/etc/system.properties" match="^karaf.clean.cache .*=.*$" replace="karaf.clean.cache = true" byline="true"/>
+    <!-- Additional config lines to system.properties -->
+    <concat destfile="target/assembly/etc/system.properties" append="true">
+      <filelist dir="../resources" files="system.properties.append"/>
+    </concat>
+    <concat destfile="target/assembly/etc/shell.init.script" append="true">
+      <filelist dir="resources" files="shell.init.script.append"/>
+    </concat>
+    <!-- Quick-fix for invalid Maven repository. Can be removed after upgrading to Karaf >4.2.8 -->
+    <replace file="target/assembly/etc/org.ops4j.pax.url.mvn.cfg" token="http:" value="https:"/>
+    <!-- Adding extra OSGi system packages to configuration -->
+    <replace file="target/assembly/etc/config.properties" token="org.osgi.framework.system.packages= \" value="org.osgi.framework.system.packages= com.sun.image.codec.jpeg, com.sun.jndi.ldap, \"/>
+    <!-- Disabled write permissions on karaf configuration by deactivating config saves -->
+    <replaceregexp file="target/assembly/etc/config.properties" match="^felix.fileinstall.enableConfigSave .*=.*$" replace="felix.fileinstall.enableConfigSave = false" byline="true"/>
+    <!-- Special configuration for development -->
+    <replaceregexp file="target/classes/package.xml" match="tar\.gz" replace="dir" byline="true"/>
+    <replaceregexp file="target/classes/package.xml" match="baseDirectory&gt;.*&lt;/baseDirectory&gt;" replace="includeBaseDirectory&gt;false&lt;/includeBaseDirectory&gt;" byline="true"/>
+  </target>
+
+  <target if="disableJobDispatching" name="job dispatching">
+    <echo>Disabling job dispatching</echo>
+    <replaceregexp
+      file="target/classes/etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg"
+      match="^#dispatch.interval=5$"
+      replace="dispatch.interval=0"
+      byline="true" />
+  </target>
+</project>
