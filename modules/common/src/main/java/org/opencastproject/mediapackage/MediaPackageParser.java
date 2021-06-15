@@ -24,6 +24,7 @@ package org.opencastproject.mediapackage;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.mapped.Configuration;
@@ -138,7 +139,7 @@ public final class MediaPackageParser {
 
   /** Create a new DOM document. */
   private static Document newDocument() {
-    final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    final DocumentBuilderFactory docBuilderFactory = XmlSafeParser.newDocumentBuilderFactory();
     docBuilderFactory.setNamespaceAware(true);
     try {
       return docBuilderFactory.newDocumentBuilder().newDocument();
@@ -164,7 +165,7 @@ public final class MediaPackageParser {
    */
   public static Document getAsXml(MediaPackage mediaPackage, MediaPackageSerializer serializer)
           throws MediaPackageException {
-    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    DocumentBuilderFactory docBuilderFactory = XmlSafeParser.newDocumentBuilderFactory();
     docBuilderFactory.setNamespaceAware(true);
 
     DocumentBuilder docBuilder = null;

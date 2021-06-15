@@ -132,6 +132,12 @@
       <artifactId>xml-matchers</artifactId>
       <version>1.0-RC1</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>Saxon-HE</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>

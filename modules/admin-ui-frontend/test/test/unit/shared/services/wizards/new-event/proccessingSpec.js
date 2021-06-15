@@ -117,6 +117,30 @@ describe('Processing Step in New Event Wizard', function () {
                     .toEqual({ testID: 'testvalueA' });
             });
         });
+
+        describe('with an email field', function () {
+            beforeEach(function () {
+                $('#new-event-workflow-configuration')
+                    .append('<input type="email" class="configField" id="testID" value="support@opencast.org">');
+            });
+
+            it('returns the field value', function () {
+                expect(NewEventProcessing.getWorkflowConfig())
+                    .toEqual({ testID: 'support@opencast.org' });
+            });
+        });
+
+        describe('with a range field', function () {
+            beforeEach(function () {
+                $('#new-event-workflow-configuration')
+                    .append('<input type="range" min="0" max="1" step="0.1" class="configField" id="testID" value="0.5">');
+            });
+
+            it('returns the field value', function () {
+                expect(NewEventProcessing.getWorkflowConfig())
+                    .toEqual({ testID: '0.5' });
+            });
+        });
     });
 
     describe('#getUserEntries', function () {

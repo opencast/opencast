@@ -23,6 +23,8 @@ package org.opencastproject.security.api;
 
 import static org.junit.Assert.assertEquals;
 
+import org.opencastproject.util.XmlSafeParser;
+
 import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
@@ -30,10 +32,10 @@ import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Tests JAXB un/marshalling of the role
@@ -70,8 +72,8 @@ public class RoleParsingTest {
   public void testUnmarshalUser() throws Exception {
     JaxbRole expectedRole = new JaxbRole("ROLE_TEST", ORGANIZATION, "This is a test role");
 
-    StreamSource streamSource = new StreamSource(getClass().getResourceAsStream(ROLE_XML_FILE));
-    JaxbRole role = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbRole.class).getValue();
+    InputStream is = getClass().getResourceAsStream(ROLE_XML_FILE);
+    JaxbRole role = jaxbContext.createUnmarshaller().unmarshal(XmlSafeParser.parse(is), JaxbRole.class).getValue();
 
     assertEquals(expectedRole.getName(), role.getName());
     assertEquals(expectedRole.getDescription(), role.getDescription());

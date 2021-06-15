@@ -22,6 +22,12 @@
 
 package org.opencastproject.silencedetection.api;
 
+import org.opencastproject.util.XmlSafeParser;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
@@ -110,11 +116,15 @@ public class MediaSegments {
    * @throws JAXBException if an error occures
    */
   public static MediaSegments fromXml(String mediaSegmentsXml) throws JAXBException {
-    StringReader sr = new StringReader(mediaSegmentsXml);
+    MediaSegments mediaSegments = null;
     JAXBContext jctx = JAXBContext.newInstance(MediaSegments.class);
     Unmarshaller unmarshaller = jctx.createUnmarshaller();
-    MediaSegments mediaSegments = (MediaSegments) unmarshaller.unmarshal(sr);
-    sr.close();
+    try (StringReader sr = new StringReader(mediaSegmentsXml)) {
+      InputSource is = new InputSource(sr);
+      mediaSegments = (MediaSegments) unmarshaller.unmarshal(XmlSafeParser.parse(is));
+    } catch (IOException | SAXException e) {
+      throw new JAXBException(e);
+    }
     return mediaSegments;
   }
 }

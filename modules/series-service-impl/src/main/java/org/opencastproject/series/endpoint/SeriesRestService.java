@@ -39,9 +39,12 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
+import org.opencastproject.mediapackage.EName;
+import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -79,6 +82,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -361,6 +365,13 @@ public class SeriesRestService {
     throw new WebApplicationException(INTERNAL_SERVER_ERROR);
   }
 
+  private void addDcData(final DublinCoreCatalog dc, final String field, final String value) {
+    if (StringUtils.isNotBlank(value)) {
+      EName en = new EName(DublinCore.TERMS_NS_URI, field);
+      dc.add(en, value);
+    }
+  }
+
   @POST
   @Path("/")
   @RestQuery(
@@ -370,9 +381,9 @@ public class SeriesRestService {
       restParameters = {
           @RestParameter(
               name = "series",
-              isRequired = true,
+              isRequired = false,
               defaultValue = SAMPLE_DUBLIN_CORE,
-              description = "The series document",
+              description = "The series document. Will take precedence over metadata fields",
               type = TEXT
           ),
           @RestParameter(
@@ -381,6 +392,174 @@ public class SeriesRestService {
               defaultValue = SAMPLE_ACCESS_CONTROL_LIST,
               description = "The access control list for the series",
               type = TEXT
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "abstract",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "accessRights",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "available",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "contributor",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "coverage",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "created",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "creator",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "date",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "description",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "extent",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "format",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "identifier",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "isPartOf",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "isReferencedBy",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "isReplacedBy",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "language",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "license",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "publisher",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "relation",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "replaces",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "rights",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "rightsHolder",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "source",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "spatial",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "subject",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "temporal",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "title",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "type",
+              type = RestParameter.Type.STRING
           ),
           @RestParameter(
               name = "override",
@@ -412,48 +591,109 @@ public class SeriesRestService {
   public Response addOrUpdateSeries(
       @FormParam("series") String series,
       @FormParam("acl") String accessControl,
+      @FormParam("abstract") String dcAbstract,
+      @FormParam("accessRights") String dcAccessRights,
+      @FormParam("available") String dcAvailable,
+      @FormParam("contributor") String dcContributor,
+      @FormParam("coverage") String dcCoverage,
+      @FormParam("created") String dcCreated,
+      @FormParam("creator") String dcCreator,
+      @FormParam("date") String dcDate,
+      @FormParam("description") String dcDescription,
+      @FormParam("extent") String dcExtent,
+      @FormParam("format") String dcFormat,
+      @FormParam("identifier") String dcIdentifier,
+      @FormParam("isPartOf") String dcIsPartOf,
+      @FormParam("isReferencedBy") String dcIsReferencedBy,
+      @FormParam("isReplacedBy") String dcIsReplacedBy,
+      @FormParam("language") String dcLanguage,
+      @FormParam("license") String dcLicense,
+      @FormParam("publisher") String dcPublisher,
+      @FormParam("relation") String dcRelation,
+      @FormParam("replaces") String dcReplaces,
+      @FormParam("rights") String dcRights,
+      @FormParam("rightsHolder") String dcRightsHolder,
+      @FormParam("source") String dcSource,
+      @FormParam("spatial") String dcSpatial,
+      @FormParam("subject") String dcSubject,
+      @FormParam("temporal") String dcTemporal,
+      @FormParam("title") String dcTitle,
+      @FormParam("type") String dcType,
       @DefaultValue("false") @FormParam("override") boolean override
   ) throws UnauthorizedException {
-    if (series == null) {
-      logger.warn("series that should be added is null");
-      return Response.status(BAD_REQUEST).build();
-    }
     DublinCoreCatalog dc;
-    try {
-      dc = this.dcService.load(new ByteArrayInputStream(series.getBytes("UTF-8")));
-    } catch (UnsupportedEncodingException e1) {
-      logger.error("Could not deserialize dublin core catalog: {}", e1);
-      throw new WebApplicationException(INTERNAL_SERVER_ERROR);
-    } catch (IOException e1) {
-      logger.warn("Could not deserialize dublin core catalog: {}", e1);
-      return Response.status(BAD_REQUEST).build();
+    if (StringUtils.isNotBlank(series)) {
+      try {
+        dc = this.dcService.load(new ByteArrayInputStream(series.getBytes(StandardCharsets.UTF_8)));
+      } catch (UnsupportedEncodingException e1) {
+        logger.error("Could not deserialize dublin core catalog", e1);
+        throw new WebApplicationException(INTERNAL_SERVER_ERROR);
+      } catch (IOException e1) {
+        logger.warn("Could not deserialize dublin core catalog", e1);
+        return Response.status(BAD_REQUEST).build();
+      }
+    } else if (StringUtils.isNotBlank(dcTitle)) {
+      dc = DublinCores.mkOpencastSeries().getCatalog();
+      addDcData(dc, "abstract", dcAbstract);
+      addDcData(dc, "accessRights", dcAccessRights);
+      addDcData(dc, "available", dcAvailable);
+      addDcData(dc, "contributor", dcContributor);
+      addDcData(dc, "coverage", dcCoverage);
+      addDcData(dc, "created", dcCreated);
+      addDcData(dc, "creator", dcCreator);
+      addDcData(dc, "date", dcDate);
+      addDcData(dc, "description", dcDescription);
+      addDcData(dc, "extent", dcExtent);
+      addDcData(dc, "format", dcFormat);
+      addDcData(dc, "identifier", dcIdentifier);
+      addDcData(dc, "isPartOf", dcIsPartOf);
+      addDcData(dc, "isReferencedBy", dcIsReferencedBy);
+      addDcData(dc, "isReplacedBy", dcIsReplacedBy);
+      addDcData(dc, "language", dcLanguage);
+      addDcData(dc, "license", dcLicense);
+      addDcData(dc, "publisher", dcPublisher);
+      addDcData(dc, "relation", dcRelation);
+      addDcData(dc, "replaces", dcReplaces);
+      addDcData(dc, "rights", dcRights);
+      addDcData(dc, "rightsHolder", dcRightsHolder);
+      addDcData(dc, "source", dcSource);
+      addDcData(dc, "spatial", dcSpatial);
+      addDcData(dc, "subject", dcSubject);
+      addDcData(dc, "temporal", dcTemporal);
+      addDcData(dc, "title", dcTitle);
+      addDcData(dc, "type", dcType);
+    } else {
+      return Response.status(BAD_REQUEST).entity("Required series metadata not provided").build();
     }
     try {
-      DublinCoreCatalog newSeries = seriesService.updateSeries(dc);
+      AccessControlList acl = null;
       if (StringUtils.isNotBlank(accessControl)) {
-        AccessControlList acl;
         try {
           acl = AccessControlParser.parseAcl(accessControl);
         } catch (Exception e) {
-          logger.warn("Could not parse ACL: {}", e.getMessage());
-          return Response.status(BAD_REQUEST).build();
+          logger.debug("Could not parse ACL", e);
+          return Response.status(BAD_REQUEST).entity("Could not parse ACL").build();
         }
-        seriesService.updateAccessControl(dc.getFirst(PROPERTY_IDENTIFIER), acl, override);
       }
+      DublinCoreCatalog newSeries = seriesService.updateSeries(dc);
+      seriesService.updateAccessControl(dc.getFirst(PROPERTY_IDENTIFIER), acl, override);
       if (newSeries == null) {
         logger.debug("Updated series {} ", dc.getFirst(PROPERTY_IDENTIFIER));
         return Response.status(NO_CONTENT).build();
       }
       String id = newSeries.getFirst(PROPERTY_IDENTIFIER);
       logger.debug("Created series {} ", id);
-      return Response.status(CREATED).header("Location", getSeriesXmlUrl(id)).header("Location", getSeriesJsonUrl(id))
-              .entity(newSeries.toXmlString()).build();
+      return Response.status(CREATED)
+          .header("Location", getSeriesXmlUrl(id))
+          .header("Location", getSeriesJsonUrl(id))
+          .entity(newSeries.toXmlString())
+          .build();
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not add/update series: {}", e.getMessage());
+      logger.error("Could not add/update series", e);
     }
-    throw new WebApplicationException(INTERNAL_SERVER_ERROR);
+    return Response.serverError().build();
   }
 
   @POST

@@ -21,8 +21,12 @@
 
 package org.opencastproject.security.api;
 
-import org.apache.commons.io.IOUtils;
+import org.opencastproject.util.XmlSafeParser;
 
+import org.apache.commons.io.IOUtils;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -31,7 +35,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Marshals and unmarshalls {@link Organization}s to/from XML.
@@ -60,9 +63,11 @@ public final class OrganizationParser {
     try {
       in = IOUtils.toInputStream(xml);
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), JaxbOrganization.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), JaxbOrganization.class).getValue();
     } catch (JAXBException e) {
       throw new IllegalStateException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    } catch (IOException | SAXException e) {
+      throw new IllegalStateException(e);
     } finally {
       IOUtils.closeQuietly(in);
     }
