@@ -4,7 +4,7 @@
   "devDependencies": {
     "autoprefixer": "^9.8.6",
     "bower": "^1.8.12",
-    "chromedriver": "^91.0.0",
+    "chromedriver": "^91.0.1",
     "eslint": "^7.28.0",
     "eslint-plugin-header": "^3.1.1",
     "grunt": "^1.4.1",
