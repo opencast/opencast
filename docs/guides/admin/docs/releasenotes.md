@@ -113,6 +113,16 @@ API changes
   different types of events in one request
 - The Series API can now return ACLs within its response, if you tell it to
 
+Additional Notes about 9.6
+--------------------------
+
+Another release with many bug fixes, but also some new features,
+including, but not limited to:
+
+- The LTI-Tools now inlude the iFrameResizer library
+  to let hosts control the size of the embedded tool.
+- Elasticsearch can now be used with basic authentication
+
 Additional Notes about 9.5
 --------------------------
 

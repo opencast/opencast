@@ -4,6 +4,83 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.6
+
+*Released on June 15th, 2021*
+
+- [[#2734](https://github.com/opencast/opencast/pull/2734)] -
+  Prepare AV fix for fast workflow: add textual warning to docs
+- [[#2719](https://github.com/opencast/opencast/pull/2719)] -
+  Closing tags for non-void elements in Admin UI
+- [[#2718](https://github.com/opencast/opencast/pull/2718)] -
+  Closing tags for consecutive select elements
+- [[#2715](https://github.com/opencast/opencast/pull/2715)] -
+  Update pull request template's URL
+- [[#2714](https://github.com/opencast/opencast/pull/2714)] -
+  Fix pagination in engage-ui
+- [[#2702](https://github.com/opencast/opencast/pull/2702)] -
+  Update Elasticsearch adopter documentation
+- [[#2697](https://github.com/opencast/opencast/pull/2697)] -
+  Admin UI theme wizard fixed (fixes #2460)
+- [[#2696](https://github.com/opencast/opencast/pull/2696)] -
+  Fix Media Package Series ACL Update
+- [[#2695](https://github.com/opencast/opencast/pull/2695)] -
+  Fixes removing a series from an event
+- [[#2692](https://github.com/opencast/opencast/pull/2692)] -
+  Admin UI editor segment list item delete button position fixed
+- [[#2676](https://github.com/opencast/opencast/pull/2676)] -
+  Event status will not change after removing the workflow
+- [[#2675](https://github.com/opencast/opencast/pull/2675)] -
+  Add workflow state for standalone editor
+- [[#2665](https://github.com/opencast/opencast/pull/2665)] -
+  Removing references to registering on pkg.opencast.org since this is no longer required
+- [[#2656](https://github.com/opencast/opencast/pull/2656)] -
+  Require EDIT role for editing metadata in Admin UI
+- [[#2654](https://github.com/opencast/opencast/pull/2654)] -
+  Update examples in publish-configure WOH's docs
+- [[#2653](https://github.com/opencast/opencast/pull/2653)] -
+  Meta publication handling by publish-configure WOH
+- [[#2652](https://github.com/opencast/opencast/pull/2652)] -
+  change translation for the video file upload from the lti tool
+- [[#2651](https://github.com/opencast/opencast/pull/2651)] -
+  fix language for the captions upload, als dfxp is supported now
+- [[#2646](https://github.com/opencast/opencast/pull/2646)] -
+  Wording error in release notes regarding Amberscript transcriptions?
+- [[#2630](https://github.com/opencast/opencast/pull/2630)] -
+  Update Adopter Registration
+- [[#2629](https://github.com/opencast/opencast/pull/2629)] -
+  Add missing new line in Elasticsearch admin docs
+- [[#2626](https://github.com/opencast/opencast/pull/2626)] -
+  Update new editor to release 2021-05-20
+- [[#2620](https://github.com/opencast/opencast/pull/2620)] -
+  Replacing remaining Freenode references with Matrix
+- [[#2617](https://github.com/opencast/opencast/pull/2617)] -
+  Estimate number of frames if not declared in file
+- [[#2615](https://github.com/opencast/opencast/pull/2615)] -
+  Ignore not found exception when automatically archiving to another storage
+- [[#2614](https://github.com/opencast/opencast/pull/2614)] -
+  Fix variable always resolving to the default value even when set
+- [[#2604](https://github.com/opencast/opencast/pull/2604)] -
+  Fix kernel test with running Opencast
+- [[#2594](https://github.com/opencast/opencast/pull/2594)] -
+  Series list provider should use admin UI index
+- [[#2574](https://github.com/opencast/opencast/pull/2574)] -
+  Silence detection should create media duration properties
+- [[#2571](https://github.com/opencast/opencast/pull/2571)] -
+  Fixed display error for the start date filter in the Admin UI
+- [[#2568](https://github.com/opencast/opencast/pull/2568)] -
+  Temporarily Ignore Failing Test
+- [[#2566](https://github.com/opencast/opencast/pull/2566)] -
+  Add support for basic authentication with Elasticsearch
+- [[#2563](https://github.com/opencast/opencast/pull/2563)] -
+  AmberScript WOH documentation updated
+- [[#2562](https://github.com/opencast/opencast/pull/2562)] -
+  Add "iFrame Resizer" library to LTI tools
+- [[#2490](https://github.com/opencast/opencast/pull/2490)] -
+  Multiple Creators in Series LTI Tool
+- [[#2489](https://github.com/opencast/opencast/pull/2489)] -
+  Attachment is not a function LTI error fixed
+
 ### Opencast 9.5
 
 *Released on May 17th, 2021*
