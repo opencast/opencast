@@ -327,13 +327,13 @@
                             ></select>
                       <span ng-bind="source.end.date"
                             ng-show="source.end.date !== source.start.date"
-                            />
+                            ></span>
                 </td>
                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                   {{ source.end.hour | addLeadingZeros : 2 }} : {{ source.end.minute | addLeadingZeros : 2}}
                   <span ng-bind="source.end.date"
                         ng-show="source.end.date !== source.start.date"
-                        />
+                        ></span>
                 </td>
               </tr>
               <tr>
@@ -1499,7 +1499,7 @@
                 <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTER"><!-- Submitter--></td>
                 <td>
                   {{ subNavData.creator.name }}
-                  <span ng-if="subNavData.creator.email">{{'<' + subNavData.creator.email + '>' }}</span>
+                  <span ng-if="subNavData.creator.email">{{'&lt;' + subNavData.creator.email + '&gt;' }}</span>
                 </td>
               </tr>
               <tr>
