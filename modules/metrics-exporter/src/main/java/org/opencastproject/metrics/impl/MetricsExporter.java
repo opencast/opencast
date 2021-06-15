@@ -38,6 +38,8 @@ import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,10 +208,12 @@ public class MetricsExporter {
     }
 
     // Get numbers from asset manager
-    for (Organization organization: organizationDirectoryService.getOrganizations()) {
-      eventsInAssetManager
-          .labels(organization.getId())
-          .set(assetManager.countEvents(organization.getId()));
+    if (assetManager != null) {
+      for (Organization organization: organizationDirectoryService.getOrganizations()) {
+        eventsInAssetManager
+            .labels(organization.getId())
+            .set(assetManager.countEvents(organization.getId()));
+      }
     }
 
     // collect metrics
@@ -228,8 +232,17 @@ public class MetricsExporter {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.OPTIONAL,
+      unbind = "unsetAssetManager"
+  )
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
+
+  public void unsetAssetManager(AssetManager assetManager) {
+    this.assetManager = null;
+  }
+
 }
