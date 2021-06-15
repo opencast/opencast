@@ -60,8 +60,27 @@ If you want to enable debug permanently you can export the variable in the shell
 
 You can connect the remote debugger of your IDE on port `5005`.
 
+### Enabling debugger for package installations
+
+Albeit you can use the afforemented method for package installations, you can't start debug mode via system services.
+The recommended way is to enable the debug mode in the `setenv` file, normally found in:
+
+    /usr/share/opencast/bin/
+
+And add this line:
+
+    export KARAF_DEBUG=true
+
+In case you need to change the port for debbuging, you can adding this another line:
+
+    export JAVA_DEBUG_PORT={{PORT}}
+
+Where `{{PORT}}` is the desired port.
+
+
+***
 For more information on remote debugging with Karaf you can visit [this
 site.](https://karaf.apache.org/manual/latest/#_debugging)
 
-It is not recommended to enable remote debugging on production systems!
+It is **not recommended** to enable remote debugging on production systems!
 
