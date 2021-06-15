@@ -269,7 +269,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Reference(name = "aclServiceFactory")
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
-      this.aclServiceFactory = aclServiceFactory;
+    this.aclServiceFactory = aclServiceFactory;
   }
 
   @Reference(name = "adminUiIndex", target = "(index.name=adminui)")
@@ -508,8 +508,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
       event.setArchiveVersion(Long.parseLong(snapshot.getVersion().toString()));
-      if (StringUtils.isBlank(event.getCreator()))
+      if (StringUtils.isBlank(event.getCreator())) {
         event.setCreator(securityService.getUser().getName());
+      }
       EventIndexUtils.updateEvent(event, mp);
 
       for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {

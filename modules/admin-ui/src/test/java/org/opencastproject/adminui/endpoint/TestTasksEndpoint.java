@@ -37,6 +37,7 @@ import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.persistence.Database;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
@@ -51,6 +52,7 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
@@ -78,7 +80,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Path;
@@ -180,6 +184,11 @@ public class TestTasksEndpoint extends TasksEndpoint {
     MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
     EasyMock.replay(ms);
 
+    AbstractSearchIndex esIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
+            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
+    EasyMock.replay(esIndex);
+
     AssetManagerImpl am = new AssetManagerImpl();
     am.setHttpAssetProvider(httpAssetProvider);
     am.setDatabase(db);
@@ -188,6 +197,9 @@ public class TestTasksEndpoint extends TasksEndpoint {
     am.setSecurityService(securityService);
     am.setAuthorizationService(authorizationService);
     am.setMessageSender(ms);
+    am.setAdminUiIndex(esIndex);
+    am.setExternalApiIndex(esIndex);
+
     return am;
   }
 
