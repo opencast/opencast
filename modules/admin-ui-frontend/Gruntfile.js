@@ -26,7 +26,8 @@ module.exports = function (grunt) {
   require('jit-grunt')(grunt, {
     useminPrepare: 'grunt-usemin',
     setupProxies: 'grunt-middleware-proxy',
-    run: 'grunt-run'
+    run: 'grunt-run',
+    htmlvalidate: 'grunt-html-validate'
   });
 
   // Configurable paths for the application
@@ -60,6 +61,10 @@ module.exports = function (grunt) {
       jsTest: {
         files: ['test/spec/{,*/}*.js'],
         tasks: ['newer:jshint:test', 'karma']
+      },
+      html: {
+        files: ["<%= yeoman.app %>/**/*.html"],
+        tasks: ['newer:htmlvalidate:default']
       },
       sass: {
         files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
@@ -474,7 +479,13 @@ module.exports = function (grunt) {
         singleRun : true,
         reporters : ['dots', 'coverage']
       }
-    }
+    },
+
+    htmlvalidate: {
+      default: {
+        src: ["<%= yeoman.app %>/**/*.html"],
+      },
+    },
   });
 
 
@@ -507,6 +518,7 @@ module.exports = function (grunt) {
     'concurrent:test',
     'postcss',
     'connect:test',
+    'htmlvalidate',
     'karma',
     'newer:jshint'
   ]);

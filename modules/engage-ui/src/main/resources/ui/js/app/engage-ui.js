@@ -301,7 +301,7 @@ function($, bootbox, _, alertify, jsyaml) {
 
           $('#nextPage').attr('href', pageNotGet
             ? location.href + prefix + (page + 1)
-            : location.href.replace(/(p=[\d]*)/, 'p=' + (page - 1)));
+            : location.href.replace(/(p=[\d]*)/, 'p=' + (page + 1)));
         } else {
           $($next).addClass('disabled');
         }

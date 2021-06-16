@@ -54,6 +54,7 @@ import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.XmlNamespaceContext;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -256,7 +257,7 @@ public class DublinCoreTest {
       }
 
       // Store the catalog
-      TransformerFactory transfac = TransformerFactory.newInstance();
+      TransformerFactory transfac = XmlSafeParser.newTransformerFactory();
       Transformer trans = transfac.newTransformer();
       trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
       trans.setOutputProperty(OutputKeys.METHOD, "xml");
