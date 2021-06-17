@@ -280,8 +280,8 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                                             })}
                                         </div>
                                         <div className="infos">
-                                            {episode.dcCreator !== undefined && <div className="creator">
-                                                {this.props.t("LTI.CREATOR", { creator: episode.dcCreator })}
+                                            {episode.mediapackage.creators !== undefined && <div className="creator">
+                                                {this.props.t("LTI.CREATOR", { creator: episode.mediapackage.creators })}
                                             </div>}
                                             {episode.mediapackage.seriestitle !== undefined && <div className="seriestitle">{episode.mediapackage.seriestitle}</div>}
                                             <div className="date">{this.formatDate(episode.dcCreated)}</div>
