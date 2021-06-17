@@ -393,6 +393,17 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       } else {
         snapshot = takeSnapshotInternal(owner, mp);
       }
+
+      final AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
+      // store acl as properties
+      // Drop old ACL rules
+      deleteProperties(mediaPackageId, SECURITY_NAMESPACE);
+      // Set new ACL rules
+      for (final AccessControlEntry ace : acl.getEntries()) {
+        getDatabase().saveProperty(Property.mk(PropertyId.mk(mediaPackageId, SECURITY_NAMESPACE,
+                mkPropertyName(ace.getRole(), ace.getAction())), Value.mk(ace.isAllow())));
+      }
+
       // We pass the original media package here, instead of using
       // snapshot.getMediaPackage(), for security reasons. The original media
       // package has elements with URLs of type http://.../files/... in it. These
@@ -411,16 +422,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       // update ES indices
       updateEventInIndex(snapshot, adminUiIndex);
       updateEventInIndex(snapshot, externalApiIndex);
-
-      final AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
-      // store acl as properties
-      // Drop old ACL rules
-      deleteProperties(mediaPackageId, SECURITY_NAMESPACE);
-      // Set new ACL rules
-      for (final AccessControlEntry ace : acl.getEntries()) {
-        getDatabase().saveProperty(Property.mk(PropertyId.mk(mediaPackageId, SECURITY_NAMESPACE,
-                mkPropertyName(ace.getRole(), ace.getAction())), Value.mk(ace.isAllow())));
-      }
 
       return snapshot;
     }
