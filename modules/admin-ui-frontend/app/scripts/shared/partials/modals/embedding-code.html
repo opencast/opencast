@@ -16,9 +16,35 @@
           if (typeof engageUrl === "undefined") {
             engageUrl = "<SERVER_URL>";
           }
+
+              //getting all available formats for direct download
+      var apiCall = engageUrl + "/api/events/" + $("#id_video").html() + "?withpublications=true";
+      var reply = $.ajax({
+      url: apiCall,
+      timeout: 3000,
+      success: function(result) {
+        var pubs = result["publications"];
+        for (var i = 0; i < pubs.length; i++) {
+          if (pubs[i]["channel"] == "engage-player") {
+            var mediaCnt = pubs[i]["media"].length;
+            var downloadLink = "";
+            for (var j = 0; j < mediaCnt; j++) {
+              downloadLink = pubs[i]["media"][j]["url"];
+              var newBox = document.createElement("div");
+              newBox.classList.add("size_540x304");
+              document.getElementById("directLinks").appendChild(newBox);
+            }
+          }
+        }
+      }
+      });
         }
       });
+
     });
+
+
+   
 
     var embs = $(".embedSizeButton");
     for (var i = 0; i < embs.length; i = i + 1) {
@@ -38,8 +64,13 @@
           var url = engageUrl + "/play/" + id;
           var size = value.trim().split("x");
           $("#social_embed-textarea")[0].value = '<iframe allowfullscreen src="' + url + '" style="border:0px #FFFFFF none;" name="Player" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" width="' + size[0] + '" height="' + size[1] + '"></iframe>';
+          }
         }
       };
+
+    var downloadButton = $(".downloadButton");
+    downloadButton.onclick = function(event) {
+
     }
 
     function copyToClipboard() {
@@ -47,10 +78,16 @@
         copyText.select();
         document.execCommand("copy");
         $("#copy_confirm").html( $(".embedSizeButtonSelected").attr('id') );
-        $("#copy_confirm_pre").css('visibility', 'visible');
-        $("#copy_confirm").css('visibility', 'visible');
+        $("#copy_link_confirm").css('display', 'none');
+        $("#copy_confirm_pre").css('display', 'block');
+        $("#copy_confirm").css('display', 'block');
     }
+
   </script>
+
+  <div class="header">
+    <h1>Einbettungslinks</h1>
+  </div>
 
   <div class="embedded-code-boxes">
     <div id=' 620x349 ' class="embedSizeButton size_620x349">
@@ -69,17 +106,29 @@
       <span class="span-embedded-code"> 300x169 </span>
     </div>
   </div>
+
+  <div class="header">
+    <h1>Direktlinks</h1>
+  </div>
+
+  <div class="embedded-code-boxes" id="directLinks">
+    
+  </div>
+  
+
   <span id="id_video" class="embedded-code-no-visible">{{id}}</span>
   <div id='' class="embedded-code-video"><textarea id='social_embed-textarea' class="social_embed-textarea embedded-code-textarea" rows='4' cols='1'></textarea></div>
 
   <div class='copyConfirm'>
+    <span id="copy_link_confirm" translate="CONFIRMATIONS.DOWNLOAD_LINK" class="embedded-code-no-visible"></span>
     <span id="copy_confirm_pre" translate="CONFIRMATIONS.EMBEDDING_CODE" class="embedded-code-no-visible"></span>
     <span id="copy_confirm" class="embedded-code-no-visible"></span>
   </div>
 
   <div class="embedded-code-copy-to-clipboard">
-    <div class="btn-container" style="margin-bottom: 20px;">
-      <a translate="COPY" class="cancel-btn" onclick="copyToClipboard()"><i><!--- Copy --></i></a>
+    <div class="btn-container" style="margin-bottom: 20px; text-align: center;">
+      <a translate="COPY.EMBED" class="cancel-btn" onclick="copyToClipboard()"><i><!--- Copy --></i></a>
     </div>
   </div>
+
 </section>
