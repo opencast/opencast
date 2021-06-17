@@ -146,6 +146,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -1412,8 +1413,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
 
-    try {
-      Event event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, index);
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      Event event = eventOpt.orElse(new Event(mediaPackageId, organization));
 
       if (acl.isSome()) {
         event.setAccessPolicy(AccessControlParser.toJsonSilent(acl.get()));
@@ -1424,7 +1425,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           event.setCreator(getSecurityService().getUser().getName());
 
         // Update series name if not already done
-        EventIndexUtils.updateSeriesName(event, organization, user, index);
+        try {
+          EventIndexUtils.updateSeriesName(event, organization, user, index);
+        } catch (SearchIndexException e) {
+          logger.error("Error updating the series name of the event {} in the {} index.", mediaPackageId,
+                  index.getIndexName(), e);
+        }
       }
       if (presenters.isSome()) {
         event.setTechnicalPresenters(new ArrayList<>(presenters.get()));
@@ -1446,7 +1452,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         String endTimeStr = endTime == null ? null : DateTimeSupport.toUTC(endTime.get().getTime());
         event.setTechnicalEndTime(endTimeStr);
       }
-      index.addOrUpdate(event);
+
+      return Optional.of(event);
+    };
+
+    try {
+      index.addOrUpdateEvent(mediaPackageId, updateFunction, organization, user);
       logger.debug("Scheduled event {} updated in the {} index.", mediaPackageId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error updating the scheduled event {} in the {} index.", mediaPackageId, index.getIndexName(), e);
@@ -1462,13 +1473,16 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private void removeRecordingStatusFromIndex(String mediaPackageId, AbstractSearchIndex index) {
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
-    try {
-      Event event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user, index);
-      event.setRecordingStatus(null);
 
-      index.addOrUpdate(event);
-      logger.debug("Recording state of event {} removed from the {} index.", event.getIdentifier(),
-              index.getIndexName());
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      Event event = eventOpt.orElse(new Event(mediaPackageId, organization));
+      event.setRecordingStatus(null);
+      return Optional.of(event);
+    };
+
+    try {
+      index.addOrUpdateEvent(mediaPackageId, updateFunction, organization, user);
+      logger.debug("Recording state of event {} removed from the {} index.", mediaPackageId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Failed to remove the recording state of event {} from the {} index.", mediaPackageId,
               index.getIndexName(), e);
