@@ -22,9 +22,7 @@
 package org.opencastproject.scheduler.impl;
 
 import static net.fortuna.ical4j.model.Component.VEVENT;
-import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
@@ -80,7 +78,6 @@ import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
