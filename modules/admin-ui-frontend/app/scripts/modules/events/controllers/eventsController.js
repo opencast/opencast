@@ -101,6 +101,7 @@ angular.module('adminNg.controllers')
       }, {
          template: 'modules/events/partials/eventsNotesCell.html',
          label: 'EVENTS.EVENTS.TABLE.ADMINUI_NOTES',
+         deactivated: true,
       }],
       caption:    'EVENTS.EVENTS.TABLE.CAPTION',
       resource:   'events',
