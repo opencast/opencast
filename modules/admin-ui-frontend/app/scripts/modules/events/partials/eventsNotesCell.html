@@ -6,7 +6,7 @@
 
   <div class="comment" ng-class="{ active : $parent.replyToId === comment.id }"
        ng-repeat="comment in row.comments
-        | filter:{ reason : commentReason }
+        | filter:{ reason : table.commentReason }
         | filter:{ resolvedStatus : false }
         as filtered
         track by $index">

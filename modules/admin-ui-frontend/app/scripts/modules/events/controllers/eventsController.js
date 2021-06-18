@@ -164,7 +164,7 @@ angular.module('adminNg.controllers')
     // Text for events without notes
     $scope.noCommentTextArea = '';
     // Type of comments in the notes column
-    $scope.commentReason = 'EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ADMINUI_NOTES';
+    $scope.table.commentReason = 'EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ADMINUI_NOTES';
 
     $scope.table.createComment = function(commentText, eventId) {
       if (!commentText || !eventId) {
