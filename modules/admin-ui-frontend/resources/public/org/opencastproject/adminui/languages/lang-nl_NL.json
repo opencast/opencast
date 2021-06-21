@@ -235,7 +235,7 @@
       "SERVICE_UNAVAILABLE": "Oeps! De server lijkt momenteel niet te reageren. Gelieve het later nogmaals te proberen.",
       "ACTIVE_TRANSACTION": "Het huidige event kan momenteel niet worden bewerkt aangezien het bij een actieve transactie betrokken is.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
+         "UNEXPECTED_ERROR": "Er is een onverwachte fout opgetreden tijdens het bijwerken. Sommige events zijn mogelijk bijgewerkt.",
          "ALL_EVENTS_UPDATED": "Alle events zijn met succes geüpdatet.",
          "NO_EVENTS_UPDATED": "Alle updates zijn mislukt.",
          "SOME_EVENTS_NOT_UPDATED": "Sommige events konden niet geüpdatet worden."
@@ -314,7 +314,7 @@
       },
       "EDIT_EVENTS_METADATA": {
          "CAPTION": "Bewerk de metadata van meerdere events",
-         "FATAL_ERROR": "A fatal error occurred: {{ fatalError }}",
+         "FATAL_ERROR": "Er is een belangrijke fout opgetreden: {{ fatalError }}",
          "REQUEST_ERRORS": {
             "CANNOT_EDIT_SOME": "De gemarkeerde events kunnen niet bewerkt worden.",
             "NOTHING_TO_EDIT": "Deze events kunnen niet bewerkt worden.",
@@ -428,12 +428,12 @@
             "LAST_NAME": "Familienaam",
             "STREET": "Straat",
             "NUMBER": "Nummer",
-            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
+            "ADDITIONAL_ADDRESS_INFO": "Bijkomende adresinformatie",
             "MAIL": "E-mail",
-            "CONTACT_ME": "Contact me for updates and security issues",
+            "CONTACT_ME": "Contacteer me bij updates en veiligheidsproblemen",
             "WHICH_DATA_TO_SHARE": "Welke data wil je delen?",
             "POLICY_HEADLINE": "Privacybeleid en gebruiksvoorwaarden",
-            "USAGE_STATISTICS": "Usage statistics",
+            "USAGE_STATISTICS": "Gebruiksstatistieken",
             "ERROR_REPORTS": "Foutmeldingen",
             "READ_TERMS_OF_USE_BEFORE": "Ik heb het gelezen en ga akkoord met de",
             "READ_TERMS_OF_USE_LINK": "privacybeleid en gebruiksvoorwaarden",
@@ -646,7 +646,7 @@
             "PROCESSED": "Voltooid",
             "RECORDING_FAILURE": "Opname mislukt",
             "PROCESSING_FAILURE": "Verwerking mislukt",
-            "PROCESSING_CANCELLED": "Processing cancelled"
+            "PROCESSING_CANCELLED": "Verwerking geannuleerd"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Intrekken",
@@ -894,7 +894,7 @@
                   "REVIEW": "Beoordeling vereist",
                   "ASYNC": "A/V tracks asynchroon",
                   "AUDIO_ISSUE": "Ontbrekend of gebrekkig audiokanaal",
-                  "CANCELLED": "Cancelled event",
+                  "CANCELLED": "Event annuleren",
                   "CONFLICTING_METADATA": "Conflicterende metadata",
                   "IMPROPER_POINT": "Ongepast in- of uitpunt",
                   "MISSING_AGREEMENT": "Ontbrekende overeenkomst",
@@ -1609,7 +1609,7 @@
             "INSTANTIATED": "Geïnstantieerd",
             "DISPATCHING": "Versturen",
             "RESTART": "Herstart",
-            "CANCELLED": "Cancelled",
+            "CANCELLED": "Geannuleerd",
             "WAITING": "Wachtend"
          }
       },
