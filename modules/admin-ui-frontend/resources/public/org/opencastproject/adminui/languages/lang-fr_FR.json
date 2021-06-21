@@ -50,7 +50,7 @@
       "SELECT_OPTION": "Sélectionnez une option",
       "JOB_TITLE": "Titre",
       "JOB_STATUS": "Statut",
-      "UPLOAD_SUCCESS": "Upload succeeded!",
+      "UPLOAD_SUCCESS": "Envoi réussi !",
       "UPLOAD_FAILURE": "Envoi échoué !",
       "UPLOAD_FAILURE_DESCRIPTION": "Veuillez réessayer plus tard.",
       "EDIT_SUCCESS": "Modification réussie, republication en cours.",
@@ -410,7 +410,7 @@
             "HEADER": "Terms of Service and Privacy Policy"
          },
          "INFORMATION_STATE": {
-            "HEADER": "Thank you for using Opencast!",
+            "HEADER": "Merci d'avoir utilisé Opencast!",
             "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
             "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
          },
@@ -433,7 +433,7 @@
             "CONTACT_ME": "Contact me for updates and secruity issues",
             "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
             "POLICY_HEADLINE": "Privacy policy and terms of use",
-            "USAGE_STATISTICS": "Usage statistcs",
+            "USAGE_STATISTICS": "Statistiques d'utilisation",
             "ERROR_REPORTS": "Error reports",
             "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
             "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
