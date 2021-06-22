@@ -36,6 +36,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
@@ -55,7 +56,11 @@ import javax.persistence.UniqueConstraint;
 @Entity(name = "SeriesEntity")
 @IdClass(SeriesEntityId.class)
 @Access(AccessType.FIELD)
-@Table(name = "oc_series")
+@Table(name = "oc_series",
+    indexes = {
+        @Index(name = "IX_oc_series_modified_date", columnList = ("modified_date")),
+    }
+)
 @NamedQueries({
     @NamedQuery(
         name = "Series.findAll",
