@@ -35,6 +35,7 @@ import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -462,7 +463,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         SearchQuery seriesSearch = new SearchQuery();
         seriesSearch.includeSeries(true)
             .includeEpisodes(false)
-            .withQuery("*:(dc_title___:" + seriesName + ")");
+            .withQuery("*:(dc_title___:" + SolrUtils.clean(seriesName) + ")");
         result = searchService.getByQuery(seriesSearch);
       } catch (SearchException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
