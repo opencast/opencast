@@ -38,7 +38,6 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
@@ -89,9 +88,6 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
 
   /** The security service */
   protected SecurityService securityService;
-
-  /** The series service */
-  protected SeriesService seriesService;
 
   /** The serializer for media pacakge */
   private MediaPackageSerializer serializer;
@@ -353,17 +349,6 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   @Reference(name = "security")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  /**
-   * Declarative services callback to set the series service.
-   *
-   * @param seriesService
-   *          the series service
-   */
-  @Reference(name = "series")
-  protected void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
   }
 
 }
