@@ -13,4 +13,7 @@
     <reference name="searchService"
                interface="org.opencastproject.search.api.SearchService"
                bind="setSearchService"/>
+    <reference name="seriesService"
+               interface="org.opencastproject.series.api.SeriesService"
+               bind="setSeriesService"/>
 </scr:component>
