@@ -117,9 +117,11 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
 const getInitialValues = metadataFields => {
     // Transform metadata fields provided by backend (saved in redux)
     let initialValues = {};
-    metadataFields.fields.forEach(field => {
-        initialValues[field.id] = field.value;
-    });
+    if (!!metadataFields.fields && metadataFields.fields.length > 0) {
+        metadataFields.fields.forEach(field => {
+            initialValues[field.id] = field.value;
+        });
+    }
 
     // Add all initial form values known upfront listed in newSeriesConfig
     for (const [key, value] of Object.entries(initialFormValuesNewSeries)) {

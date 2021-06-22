@@ -157,9 +157,12 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
 const getInitialValues = metadataFields => {
     // Transform metadata fields provided by backend (saved in redux)
     let initialValues = {};
-    metadataFields.fields.forEach(field => {
-        initialValues[field.id] = field.value;
-    });
+
+    if (!!metadataFields.fields && metadataFields.fields.length > 0) {
+        metadataFields.fields.forEach(field => {
+            initialValues[field.id] = field.value;
+        });
+    }
 
     // Transform additional metadata for source (provided by constant in newEventConfig)
     if (!!sourceMetadata.UPLOAD) {
