@@ -232,7 +232,8 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
         try {
           Files.createDirectories(distributionDirectory.toPath());
         } catch (IOException e) {
-          throw new ComponentException("Distribution directory does not exist and can't be created", e);
+          throw new ComponentException("Distribution directory " + distributionDirectory
+              + " does not exist and can't be created", e);
         }
       }
 
