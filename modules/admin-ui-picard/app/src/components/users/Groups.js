@@ -10,19 +10,21 @@ import {fetchUsers} from "../../thunks/userThunks";
 import {loadAclsIntoTable, loadGroupsIntoTable, loadUsersIntoTable} from "../../thunks/tableThunks";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
-import {getGroups} from "../../selectors/groupSelectors";
+import {getTotalGroups} from "../../selectors/groupSelectors";
 import {groupsTemplateMap} from "../../configs/tableConfigs/groupsTableConfig";
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
+import {editTextFilter} from "../../actions/tableFilterActions";
+import {setOffset} from "../../actions/tableActions";
 
 /**
  * This component renders the table view of groups
  */
 const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
                     loadingUsers, loadingUsersIntoTable, loadingAcls,
-                    loadingAclsIntoTable }) => {
+                    loadingAclsIntoTable, resetTextFilter, resetOffset }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewGroupModal, setNewGroupModal] = useState(false);
@@ -36,6 +38,9 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     const loadUsers = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching users from server
         loadingUsers();
 
@@ -44,6 +49,9 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     const loadAcls = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching acls from server
         loadingAcls();
 
@@ -52,6 +60,8 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     useEffect(() => {
+        resetTextFilter();
+
         // Load groups on mount
         loadGroups().then(r => console.log(r));
 
@@ -148,7 +158,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    groups: getGroups(state)
+    groups: getTotalGroups(state)
 });
 
 // Mapping actions to dispatch
@@ -159,7 +169,9 @@ const mapDispatchToProps = dispatch => ({
     loadingUsers: () => dispatch(fetchUsers()),
     loadingUsersIntoTable: () => dispatch(loadUsersIntoTable()),
     loadingAcls: () => dispatch(fetchAcls()),
-    loadingAclsIntoTable: () => dispatch(loadAclsIntoTable())
+    loadingAclsIntoTable: () => dispatch(loadAclsIntoTable()),
+    resetTextFilter: () => dispatch(editTextFilter('')),
+    resetOffset: () => dispatch(setOffset(0))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Groups));

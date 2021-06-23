@@ -11,10 +11,12 @@ import {seriesTemplateMap} from "../../configs/tableConfigs/seriesTableConfig";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
 import {fetchEvents} from "../../thunks/eventThunks";
-import {getSeries, isShowActions} from "../../selectors/seriesSeletctor";
+import {getTotalSeries, isShowActions} from "../../selectors/seriesSeletctor";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
+import {editTextFilter} from "../../actions/tableFilterActions";
+import {setOffset} from "../../actions/tableActions";
 import DeleteSeriesModal from "./partials/DeleteSeriesModal";
 
 
@@ -25,7 +27,8 @@ const containerAction = React.createRef();
  * This component renders the table view of series
  */
 const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEvents, loadingEventsIntoTable,
-                    series, loadingFilters, loadingStats, loadingSeriesMetadata, loadingSeriesThemes }) => {
+                    series, loadingFilters, loadingStats, loadingSeriesMetadata, loadingSeriesThemes, resetTextFilter,
+                    resetOffset }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -33,6 +36,9 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     const [displayDeleteSeriesModal, setDeleteSeriesModal] = useState(false);
 
     const loadEvents = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching stats from server
         loadingStats()
 
@@ -52,6 +58,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     }
 
     useEffect( () => {
+        resetTextFilter();
 
         // Load series on mount
         loadSeries().then(r => console.log(r));
@@ -180,7 +187,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                     </div>
                     <h1>{t('EVENTS.SERIES.TABLE.CAPTION')}</h1>
                     {/* Include table view */}
-                    <h4>{t('TABLE_SUMMARY', { numberOfRows: series.length})}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: series })}</h4>
                 </div>
                 <Table templateMap={seriesTemplateMap} />
             </div>
@@ -190,7 +197,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    series: getSeries(state),
+    series: getTotalSeries(state),
     showActions: isShowActions(state),
 });
 
@@ -203,7 +210,9 @@ const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingStats: () => dispatch(fetchStats()),
     loadingSeriesMetadata: () => dispatch(fetchSeriesMetadata()),
-    loadingSeriesThemes: () => dispatch(fetchSeriesThemes())
+    loadingSeriesThemes: () => dispatch(fetchSeriesThemes()),
+    resetTextFilter: () => dispatch(editTextFilter('')),
+    resetOffset: () => dispatch(setOffset(0))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Series));

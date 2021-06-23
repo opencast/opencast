@@ -188,6 +188,7 @@ const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata}) => 
                                                                             {(metadata.type === 'mixed_text' && !!metadata.collection && metadata.collection.length !== 0) ? (
                                                                                 <Field name={metadata.id}
                                                                                        fieldInfo={metadata}
+                                                                                       showCheck
                                                                                        component={RenderMultiField}/>
                                                                             ) : (
                                                                                 <Field name={metadata.id}

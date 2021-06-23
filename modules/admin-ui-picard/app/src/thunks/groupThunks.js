@@ -23,11 +23,11 @@ export const fetchGroups = () => async (dispatch, getState) => {
 };
 
 // post new group to backend
-export const postNewGroup = async values => {
+export const postNewGroup = values => async dispatch => {
     let roles = [], users = [];
 
     // fill form data depending on user inputs
-    let data = new FormData();
+    let data = new URLSearchParams();
     data.append('name', values.name);
     data.append('description', values.description);
 
@@ -41,12 +41,21 @@ export const postNewGroup = async values => {
     data.append('users', users.join(','));
 
     // POST request
-    // todo: notification
     axios.post('/admin-ng/groups', data, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-    }).then(response => console.log(response)).catch(response => console.log(response));
+    }).then(response => {
+        console.log(response);
+        dispatch(addNotification('success', 'GROUP_ADDED'));
+    }).catch(response => {
+        console.log(response);
+        if (response.status === 409) {
+            dispatch(addNotification('error', 'GROUP_CONFLICT'));
+        } else {
+            dispatch(addNotification('error', 'GROUP_NOT_SAVED'));
+        }
+    });
 };
 
 export const deleteGroup = id => async dispatch => {

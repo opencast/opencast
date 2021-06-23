@@ -8,20 +8,22 @@ import Table from "../shared/Table";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {serversTemplateMap} from "../../configs/tableConfigs/serversTableConfig";
-import {getServers} from "../../selectors/serverSelectors";
+import {getTotalServers} from "../../selectors/serverSelectors";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {fetchServers} from "../../thunks/serverThunks";
 import {loadJobsIntoTable, loadServersIntoTable, loadServicesIntoTable} from "../../thunks/tableThunks";
 import {fetchJobs} from "../../thunks/jobThunks";
 import {fetchServices} from "../../thunks/serviceThunks";
 import Notifications from "../shared/Notifications";
+import {editTextFilter} from "../../actions/tableFilterActions";
+import {setOffset} from "../../actions/tableActions";
 
 /**
  * This component renders the table view of servers
  */
 const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilters,
                      loadingJobs, loadingJobsIntoTable, loadingServices,
-                     loadingServicesIntoTable }) => {
+                     loadingServicesIntoTable, resetTextFilter, resetOffset }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -34,6 +36,9 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     }
 
     const loadJobs = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching jobs from server
         loadingJobs();
 
@@ -42,6 +47,9 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     }
 
     const loadServices = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching services from server
         loadingServices();
 
@@ -50,6 +58,8 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     }
 
     useEffect(() => {
+        resetTextFilter();
+
         // Load servers on mount
         loadServers().then(r => console.log(r));
 
@@ -112,7 +122,7 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
                                   loadResourceIntoTable={loadingServersIntoTable}
                                   resource={'servers'}/>
                     <h1>{t('SYSTEMS.SERVERS.TABLE.CAPTION')}</h1>
-                    <h4>{t('TABLE_SUMMARY', { numberOfRows: servers.length})}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: servers })}</h4>
                 </div>
                 {/* Include table component */}
                 <Table templateMap={serversTemplateMap} />
@@ -123,7 +133,7 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
 
 // Getting state data out of redux store
 const mapStateToProps = state =>({
-    servers: getServers(state)
+    servers: getTotalServers(state)
 });
 
 // Mapping actions to dispatch
@@ -134,7 +144,9 @@ const mapDispatchToProps = dispatch => ({
     loadingJobs: () => dispatch(fetchJobs()),
     loadingJobsIntoTable: () => dispatch(loadJobsIntoTable()),
     loadingServices: () => dispatch(fetchServices()),
-    loadingServicesIntoTable: () => dispatch(loadServicesIntoTable())
+    loadingServicesIntoTable: () => dispatch(loadServicesIntoTable()),
+    resetTextFilter: () => dispatch(editTextFilter('')),
+    resetOffset: () => dispatch(setOffset(0))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Servers));

@@ -23,7 +23,7 @@ const NewMetadataPage = ({ metadataFields, nextPage, formik, header }) => {
                                 <table className="main-tbl">
                                     <tbody>
                                     {/* Render table row for each metadata field depending on type*/}
-                                    {metadataFields.fields.map((field, key) =>
+                                    {!!metadataFields.fields && metadataFields.fields.map((field, key) =>
                                         (
                                             <tr key={key}>
                                                 <td>

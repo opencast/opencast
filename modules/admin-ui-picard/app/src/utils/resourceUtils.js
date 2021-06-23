@@ -12,6 +12,7 @@ export const getURLParams = state => {
     let filters = [];
     let filterMap = getFilters(state);
     let textFilter = getTextFilter(state);
+
     // check if textFilter has value and transform for use as URL param
     if (textFilter !== '') {
         filters.push('textFilter:' + textFilter);
@@ -23,20 +24,26 @@ export const getURLParams = state => {
         }
     }
 
+    let params = {
+        limit: getPageLimit(state),
+        offset: getPageOffset(state)
+    }
+
     if (filters.length) {
-        return {
-            filters: filters.join(','),
-            sort: getTableSorting(state) + ':' + getTableDirection(state),
-            limit: getPageLimit(state),
-            offset: getPageOffset(state)
-        };
-    } else {
-        return {
-            sort: getTableSorting(state) + ':' + getTableDirection(state),
-            limit: getPageLimit(state),
-            offset: getPageOffset(state)
+        params = {
+            ...params,
+            filter: filters.join(','),
         };
     }
+
+    if (getTableSorting(state) !== '') {
+        params = {
+            ...params,
+            sort: getTableSorting(state) + ':' + getTableDirection(state),
+        };
+    }
+
+    return params;
 }
 
 // transform collection of metadata into object with name and value
@@ -91,6 +98,50 @@ export const prepareMetadataFieldsForPost = (metadataInfo, values) => {
                 ...fieldValue,
                 translatable: metadataInfo[i].translatable
             }
+        }
+        metadataFields = metadataFields.concat(fieldValue);
+    }
+
+    return metadataFields;
+}
+
+export const prepareSeriesMetadataFieldsForPost = (metadataInfo, values) => {
+    let metadataFields = [];
+
+    // fill metadataField with field information sent by server previously and values provided by user
+    // Todo: What is hashkey?
+    for (let i = 0; metadataInfo.length > i; i++) {
+        let fieldValue = {
+            readOnly: metadataInfo[i].readOnly,
+            id: metadataInfo[i].id,
+            label: metadataInfo[i].label,
+            type: metadataInfo[i].type,
+            value: values[metadataInfo[i].id],
+            tabindex: i + 1,
+            $$hashKey: "object:123"
+        };
+        if (!!metadataInfo[i].translatable) {
+            fieldValue = {
+                ...fieldValue,
+                translatable: metadataInfo[i].translatable
+            };
+        }
+        if (!!metadataInfo[i].collection) {
+            fieldValue = {
+                ...fieldValue,
+                collection: [],
+            };
+        }
+        if (metadataInfo[i].type === 'mixed_text') {
+            fieldValue = {
+                ...fieldValue,
+                presentableValue: values[metadataInfo[i].id].join()
+            };
+        } else {
+            fieldValue = {
+                ...fieldValue,
+                presentableValue: values[metadataInfo[i].id]
+            };
         }
         metadataFields = metadataFields.concat(fieldValue);
     }

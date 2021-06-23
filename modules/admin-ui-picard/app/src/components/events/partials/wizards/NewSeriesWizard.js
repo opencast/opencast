@@ -16,7 +16,7 @@ import {initialFormValuesNewSeries} from "../../../../configs/wizardConfig";
 /**
  * This component manages the pages of the new series wizard and the submission of values
  */
-const NewSeriesWizard = ({ metadataFields, close}) => {
+const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
 
     const initialValues = getInitialValues(metadataFields);
 
@@ -117,9 +117,11 @@ const NewSeriesWizard = ({ metadataFields, close}) => {
 const getInitialValues = metadataFields => {
     // Transform metadata fields provided by backend (saved in redux)
     let initialValues = {};
-    metadataFields.fields.forEach(field => {
-        initialValues[field.id] = field.value;
-    });
+    if (!!metadataFields.fields && metadataFields.fields.length > 0) {
+        metadataFields.fields.forEach(field => {
+            initialValues[field.id] = field.value;
+        });
+    }
 
     // Add all initial form values known upfront listed in newSeriesConfig
     for (const [key, value] of Object.entries(initialFormValuesNewSeries)) {
@@ -134,4 +136,8 @@ const mapStateToProps = state => ({
     metadataFields: getSeriesMetadata(state)
 });
 
-export default connect(mapStateToProps)(NewSeriesWizard);
+const mapDispatchToProps = dispatch => ({
+    postNewSeries: (values, metadataFields) => dispatch(postNewSeries(values,metadataFields))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewSeriesWizard);

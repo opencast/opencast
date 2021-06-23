@@ -9,9 +9,8 @@ import {
     loadSeriesThemesSuccess
 } from "../actions/seriesActions";
 import {
-    getURLParams,
-    prepareAccessPolicyRulesForPost,
-    prepareMetadataFieldsForPost,
+    getURLParams, prepareAccessPolicyRulesForPost,
+    prepareSeriesMetadataFieldsForPost,
     transformMetadataCollection
 } from "../utils/resourceUtils";
 import {transformToIdValueArray, transformToObjectArray} from "../utils/utils";
@@ -77,27 +76,33 @@ export const fetchSeriesThemes = () => async dispatch => {
 };
 
 // post new series to backend
-export const postNewSeries = async (values, metadataInfo) => {
+export const postNewSeries = (values, metadataInfo) => async dispatch => {
 
     let metadataFields, metadata, access;
 
-    metadataFields = prepareMetadataFieldsForPost(metadataInfo.fields, values);
+    metadataFields = prepareSeriesMetadataFieldsForPost(metadataInfo.fields, values);
 
     // metadata for post request
-    metadata = {
+    metadata = [{
         flavor: metadataInfo.flavor,
         title: metadataInfo.title,
         fields: metadataFields
-    };
+    }];
 
     access = prepareAccessPolicyRulesForPost(values.policies);
 
     let jsonData = {
             metadata: metadata,
             options: {},
-            access: access,
-            theme: values.theme,
+            access: access
         };
+
+    if (values.theme !== '') {
+        jsonData = {
+            ...jsonData,
+            theme: values.theme
+        };
+    }
 
     let data = new URLSearchParams();
     data.append("metadata", JSON.stringify(jsonData));
@@ -109,7 +114,13 @@ export const postNewSeries = async (values, metadataInfo) => {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         }
-    ).then(response => console.log(response)).catch(response => console.log(response));
+    ).then(response => {
+        console.log(response);
+        dispatch(addNotification('success', 'SERIES_ADDED'));
+    }).catch(response => {
+        console.log(response);
+        dispatch(addNotification('error', 'SERIES_NOT_SAVED'));
+    });
 
 };
 

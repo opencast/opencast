@@ -7,8 +7,9 @@ import NewAclAccessPage from "./NewAclAccessPage";
 import NewAclSummaryPage from "./NewAclSummaryPage";
 import {postNewAcl} from "../../../../thunks/aclThunks";
 import {initialFormValuesNewAcl} from "../../../../configs/wizardConfig";
+import {connect} from "react-redux";
 
-const NewAclWizard = ({ close }) => {
+const NewAclWizard = ({ close, postNewAcl }) => {
     const initialValues = initialFormValuesNewAcl;
 
     const [page, setPage] = useState(0);
@@ -78,4 +79,9 @@ const NewAclWizard = ({ close }) => {
     );
 };
 
-export default NewAclWizard;
+const mapDispatchToProps = dispatch => ({
+    postNewAcl: values => dispatch(postNewAcl(values))
+});
+
+
+export default connect(null, mapDispatchToProps)(NewAclWizard);

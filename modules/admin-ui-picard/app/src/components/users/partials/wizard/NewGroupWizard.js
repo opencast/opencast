@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import {Formik} from "formik";
+import {connect} from "react-redux";
 import {initialFormValuesNewGroup} from "../../../../configs/wizardConfig";
 import {NewGroupSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
@@ -12,7 +13,7 @@ import {postNewGroup} from "../../../../thunks/groupThunks";
 /**
  * This component renders the new group wizard
  */
-const NewGroupWizard = ({ close }) => {
+const NewGroupWizard = ({ close, postNewGroup }) => {
 
     const initialValues = initialFormValuesNewGroup;
 
@@ -91,4 +92,8 @@ const NewGroupWizard = ({ close }) => {
     )
 };
 
-export default NewGroupWizard;
+const mapDispatchToProps = dispatch => ({
+    postNewGroup: values => dispatch(postNewGroup(values))
+});
+
+export default connect(null, mapDispatchToProps)(NewGroupWizard);

@@ -26,6 +26,7 @@ if (password === undefined) {
 }
 
 
+
 // Set up static files
 // TODO: maybe future adjustments necessary when code is further implemented
 app.use(
@@ -88,6 +89,7 @@ app.use('', (req, res, next) => {
             path: parsed.pathname + escapedQuery,
             method: req.method,
             headers: {
+                'content-type': req.headers['content-type'],
                 'X-Requested-Auth': 'Digest'
             },
             jar: true,
