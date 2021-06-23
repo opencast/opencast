@@ -97,7 +97,7 @@
       }
    },
    "CONFIRMATIONS": {
-      "EMBEDDING_CODE": "Einbettungscode wurde in die Zwischenablage kopiert:",
+      "EMBEDDING_CODE": "Einbettungscode/Direktlink wurde in die Zwischenablage kopiert:",
       "CONTINUE_ACTION": "Sind Sie sicher, dass Sie fortfahren möchten?",
       "METADATA": {
          "NOTICE": {

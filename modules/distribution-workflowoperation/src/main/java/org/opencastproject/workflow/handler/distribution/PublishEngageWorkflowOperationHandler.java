@@ -111,7 +111,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String CHECK_AVAILABILITY = "check-availability";
   private static final String STRATEGY = "strategy";
   private static final String MERGE_FORCE_FLAVORS = "merge-force-flavors";
-  private static final String INCLUDE_ADDITIONAL_DATA = "include-additional-data";
+  private static final String LIST_ELEMENTS = "list-elements";
 
   private static final String MERGE_FORCE_FLAVORS_DEFAULT = "dublincore/*,security/*";
 
@@ -214,7 +214,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     boolean checkAvailability = option(op.getConfiguration(CHECK_AVAILABILITY)).bind(trimToNone).map(toBool)
             .getOrElse(true);
 
-    boolean addData = option(op.getConfiguration(INCLUDE_ADDITIONAL_DATA)).bind(trimToNone).map(toBool)
+    boolean addData = option(op.getConfiguration(LIST_ELEMENTS)).bind(trimToNone).map(toBool)
         .getOrElse(true);
 
     String[] sourceDownloadTags = StringUtils.split(downloadSourceTags, ",");
@@ -330,7 +330,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
         throw new WorkflowOperationException("One of the distribution jobs did not complete successfully");
       }
-      //TESTING
+      //Prepare download artifacts to be added
       Set<MediaPackageElement> mediaPackageData = new HashSet<>();
       if (addData) {
         for (Job job : jobs) {
@@ -344,7 +344,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           }
         }
       }
-      //END TEST
+
       logger.debug("Distribute of mediapackage {} completed", mediaPackage);
 
       String engageUrlString = null;
@@ -394,14 +394,12 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_ID,
                 engageUri, MimeTypes.parseMimeType("text/html"));
 
-        //TESTING
         //Add download Artifacts
         for (MediaPackageElement element : mediaPackageData) {
           element.setIdentifier(null);
           logger.info("HERE URI " + element.getURI());
           PublicationImpl.addElementToPublication(publicationElement, element);
         }
-        //END TEST
         mediaPackage.add(publicationElement);
 
         // create publication URI for streaming

@@ -8,7 +8,7 @@
 
   <script>
     var engageUrl = "<SERVER_URL>";
-      var downloadLinks = [];
+    var downloadLinks = [];
 
     $(document).ready(function () {
       var reply = $.ajax({
@@ -35,7 +35,8 @@
 
                   //add all necessary divs
                   for (var j = 0; j < mediaCnt; j++) {
-                    downloadLinks[media[j]["width"] + "x" + media[j]["height"]] = media[j]["url"];
+                    var size = media[j]["width"] + "x" + media[j]["height"];
+                    downloadLinks[size] = media[j]["url"];
                     var newBox = document.createElement("div");
                     switch (j) {
                       case 0: newBox.classList.add("size_620x349"); break;
@@ -47,16 +48,16 @@
                     }
                     newBox.classList.add("embedSizeButton");
                     newBox.classList.add("directLinkButton");
-                    newBox.id = media[j]["width"] + "x" + media[j]["height"];
+                    newBox.id = size;
                     document.getElementById("directLinks").appendChild(newBox);
                     var newBoxText = document.createElement("span");
                     newBoxText.classList.add("span-embedded-code");
-                    newBoxText.textContent = media[j]["width"] + "x" + media[j]["height"];
+                    newBoxText.textContent = size;
                     newBox.appendChild(newBoxText);
                   }
                 }
               }
-
+              //check what button is clicked and show code/link
               var embs = $(".embedSizeButton");
               for (var i = 0; i < embs.length; i = i + 1) {
                 console.log(embs.length);
@@ -82,20 +83,13 @@
                         embedSizeButtons[j].classList.remove("embedSizeButtonSelected");
                       }
                     }
-
-
                   }
                 }
               };
-
             }
           });
         }
       });
-
-
-
-
     });
 
     function copyToClipboard() {
@@ -136,16 +130,14 @@
   </div>
 
   <div class="embedded-code-boxes" id="directLinks">
-
   </div>
-
 
   <span id="id_video" class="embedded-code-no-visible">{{id}}</span>
   <div id='' class="embedded-code-video"><textarea id='social_embed-textarea'
       class="social_embed-textarea embedded-code-textarea" rows='4' cols='1'></textarea></div>
 
   <div class='copyConfirm'>
-    <span id="copy_confirm_pre" translate="CONFIRMATIONS.EMBEDDING_CODE" class="embedded-code-no-visible"></span>
+    <span id="copy_confirm_pre" translate="CONFIRMATIONS.EMBEDDING_CODE" class="embedded-code-no-visible embed"></span>
     <span id="copy_confirm" class="embedded-code-no-visible"></span>
   </div>
 

@@ -99,7 +99,7 @@
       }
    },
    "CONFIRMATIONS": {
-     "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+     "EMBEDDING_CODE": "Embedding code / direct link has been copied to the clipboard:",
      "CONTINUE_ACTION" : "Are you sure you want to continue?",
      "METADATA": {
        "NOTICE" : {
