@@ -37,4 +37,8 @@ const SeriesDetailsMetadataTab = ({ }) => {
     );
 };
 
+const mapDispatchToProps = dispatch => ({
+    metadataFields: ''
+});
+
 export default SeriesDetailsMetadataTab;
