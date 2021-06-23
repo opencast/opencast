@@ -300,7 +300,7 @@ export const loadServicesIntoTable = () => (dispatch, getState) => {
 
 export const loadUsersIntoTable = () => (dispatch, getState) => {
     const { users, table} = getState();
-    const pagination = getTablePagination(getState());
+    const pagination = table.pagination;
     const resource = users.results;
     const total = users.total;
 

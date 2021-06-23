@@ -189,6 +189,7 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
                                 <option key={key} value={item.value}>{t(item.name)}</option>
                         ))
                     ) : (
+                        // if selection of series then use item name as option label else use item value
                         metadataField.id === "isPartOf" ? (
                             metadataField.collection.map((item, key) => (
                                 <option key={key} value={item.value}>{item.name}</option>

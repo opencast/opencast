@@ -108,7 +108,7 @@ export const prepareMetadataFieldsForPost = (metadataInfo, values) => {
 export const prepareSeriesMetadataFieldsForPost = (metadataInfo, values) => {
     let metadataFields = [];
 
-    // fill metadataField with field information send by server previously and values provided by user
+    // fill metadataField with field information sent by server previously and values provided by user
     // Todo: What is hashkey?
     for (let i = 0; metadataInfo.length > i; i++) {
         let fieldValue = {
