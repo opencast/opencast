@@ -100,7 +100,8 @@
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(episodeCatalog.flavor)">
+                    params="row" save="getSaveFunction(episodeCatalog.flavor)"
+                    sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
             </table>
@@ -126,7 +127,8 @@
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(catalog.flavor)">
+                    params="row" save="getSaveFunction(catalog.flavor)"
+                    sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
             </table>
@@ -267,7 +269,7 @@
                           ng-change="onTemporalValueChange('start')"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                           ng-options="h.index as h.value for h in hours"
-                          />
+                          ></select>
                     <select chosen
                             ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                             data-width="'100px'"
@@ -275,7 +277,7 @@
                             ng-change="onTemporalValueChange('start')"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                             ng-options="m.index as m.value for m in minutes"
-                            />
+                            ></select>
                 </td>
                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                   {{ source.start.hour | addLeadingZeros : 2 }} : {{ source.start.minute | addLeadingZeros : 2}}
@@ -291,7 +293,7 @@
                           ng-change="onTemporalValueChange('duration')"
                           placeholder-text-single="'{{ 'WIZARD.DURATION.HOURS' | translate }}'"
                           ng-options="h.index as h.value for h in hours"
-                          />
+                          ></select>
 
                     <select chosen
                             ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
@@ -300,7 +302,7 @@
                             ng-change="onTemporalValueChange('duration')"
                             placeholder-text-single="'{{ 'WIZARD.DURATION.MINUTES' | translate }}'"
                             ng-options="m.index as m.value for m in minutes"
-                            />
+                            ></select>
                 </td>
                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                   {{ source.duration.hour | addLeadingZeros : 2 }} : {{ source.duration.minute | addLeadingZeros : 2}}
@@ -316,7 +318,7 @@
                           ng-change="onTemporalValueChange('end')"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                           ng-options="h.index as h.value for h in hours"
-                          />
+                          ></select>
                     <select chosen
                             ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                             data-width="'100px'"
@@ -324,16 +326,16 @@
                             ng-change="onTemporalValueChange('end')"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                             ng-options="m.index as m.value for m in minutes"
-                            />
+                            ></select>
                       <span ng-bind="source.end.date"
                             ng-show="source.end.date !== source.start.date"
-                            />
+                            ></span>
                 </td>
                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                   {{ source.end.hour | addLeadingZeros : 2 }} : {{ source.end.minute | addLeadingZeros : 2}}
                   <span ng-bind="source.end.date"
                         ng-show="source.end.date !== source.start.date"
-                        />
+                        ></span>
                 </td>
               </tr>
               <tr>
@@ -347,7 +349,7 @@
                           ng-model="source.device"
                           ng-options="ca.name for ca in captureAgents | filter:currentAgentOrAccess track by ca.id"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
-                          />
+                          ></select>
                 </td>
                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                   {{ source.device.name }}
@@ -472,7 +474,7 @@
                                     ng-options="w.id as w.title for w in workflowDefinitions | orderBy: 'displayOrder':true"
                                     placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}'"
                                     no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
-                                    />
+                                    ></select>
                               <div class="obj-container padded">{{ workflows.workflow.description }}</div>
                           </div>
                         </td>
@@ -560,7 +562,7 @@
                                       ng-options="id as name for (id, name) in acls"
                                       placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                       no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                      />
+                                      ></select>
                             </div>
                             <p ng-show="transactions.read_only">{{baseAclId}}</p>
                           </div>
@@ -611,7 +613,7 @@
                                       call-on-search="getMatchingRoles"
                                       placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                       no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
-                                      />
+                                      ></select>
                             </td>
                             <td ng-show="transactions.read_only">
                               <p>{{policy.role}}</p>
@@ -1499,7 +1501,7 @@
                 <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTER"><!-- Submitter--></td>
                 <td>
                   {{ subNavData.creator.name }}
-                  <span ng-if="subNavData.creator.email">{{'<' + subNavData.creator.email + '>' }}</span>
+                  <span ng-if="subNavData.creator.email">{{'&lt;' + subNavData.creator.email + '&gt;' }}</span>
                 </td>
               </tr>
               <tr>

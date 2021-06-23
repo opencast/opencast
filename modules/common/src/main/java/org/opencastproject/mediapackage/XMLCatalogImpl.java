@@ -32,6 +32,7 @@ import static org.opencastproject.util.EqualsUtil.hash;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
+import org.opencastproject.util.XmlSafeParser;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fns;
@@ -456,7 +457,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *           If the xml parser environment is not correctly configured
    */
   protected Document newDocument() throws ParserConfigurationException {
-    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    DocumentBuilderFactory docBuilderFactory = XmlSafeParser.newDocumentBuilderFactory();
     docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     return docBuilder.newDocument();

@@ -24,6 +24,7 @@ package org.opencastproject.authorization.xacml;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.jboss.security.xacml.core.model.policy.ActionMatchType;
 import org.jboss.security.xacml.core.model.policy.ActionType;
@@ -114,7 +115,7 @@ public final class XACMLUtils {
       @SuppressWarnings("unchecked")
       final AccessControlList acl = new AccessControlList();
       final List<AccessControlEntry> entries = acl.getEntries();
-      final PolicyType policy = ((JAXBElement<PolicyType>) XACMLUtils.jBossXacmlJaxbContext.createUnmarshaller().unmarshal(xacml)).getValue();
+      final PolicyType policy = ((JAXBElement<PolicyType>) XACMLUtils.jBossXacmlJaxbContext.createUnmarshaller().unmarshal(XmlSafeParser.parse(xacml))).getValue();
       for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
 
         if (!(object instanceof RuleType)) {

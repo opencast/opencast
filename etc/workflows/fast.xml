@@ -11,7 +11,8 @@
   <description>
     A minimal workflow that transcodes the media into distribution formats, then
     sends the resulting distribution files, along with their associated metadata,
-    to the distribution channels.
+    to the distribution channels. WARNING: other Opencast workflows are
+    *incompatible* with archived recordings created from this testing workflow.
   </description>
 
   <configuration_panel>
@@ -190,7 +191,7 @@
         <configuration key="download-source-flavors">*/preview</configuration>
         <configuration key="channel-id">internal</configuration>
         <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
@@ -207,7 +208,7 @@
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
@@ -239,4 +240,3 @@
   </operations>
 
 </definition>
-

@@ -87,6 +87,7 @@
               !org.apache.lucene.*,
               !org.jboss.resource.adapter.jdbc.*,
               !org.hibernate.*,
+              !waffle.*,
               !com.sun.jna.platform.win32,
               org.w3c.dom;version=0,
               *

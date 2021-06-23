@@ -14,8 +14,8 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <lucene.version>8.6.2</lucene.version>
-    <elasticsearch.version>7.9.2</elasticsearch.version>
+    <lucene.version>8.7.0</lucene.version>
+    <elasticsearch.version>7.10.2</elasticsearch.version>
   </properties>
   <dependencies>
     <dependency>
@@ -86,6 +86,10 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore-osgi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient-osgi</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
@@ -160,7 +164,11 @@
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpclient-osgi</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
+          <ignoredUsedUndeclaredDependencies>
+            <ignoredUsedUndeclaredDependency>org.apache.httpcomponents:httpclient</ignoredUsedUndeclaredDependency>
+          </ignoredUsedUndeclaredDependencies>
         </configuration>
       </plugin>
       <plugin>

@@ -2,6 +2,12 @@
    "MATTERHORN": "Opencast",
    "NAV_HOME": "Zur Startseite",
    "NAV_ABOUT": "Über",
+   "BUILD": {
+      "BUILT_ON": "gebaut am",
+      "DATE_DESC": "Datum an welchem das Kernelmodul dieses Systems gebaut wurde.",
+      "COMMIT": "Git-Commit dieser Version.",
+      "VERSION": "Version der Opencast-Bundles des Systems"
+   },
    "NO": "Nein",
    "SUBMIT": "Speichern",
    "UPDATE": {
@@ -31,8 +37,10 @@
       "CURRENT_JOBS": "Heutige Jobs",
       "PRESENTER": "Vortragende(r)",
       "PRESENTER_DESCRIPTION": "Videodatei für die Vortragenden-Spur",
+      "VIDEOFILE": "Videodatei",
+      "VIDEOFILE_DESCRIPTION": "Videodatei zum Hochladen",
       "CAPTION": "Untertitel",
-      "CAPTION_DESCRIPTION": "Untertiteldatei; VTT-Dateiformat wird unterstützt",
+      "CAPTION_DESCRIPTION": "Untertiteldatei; VTT- oder dxfp-Dateiformat wird unterstützt",
       "UPLOAD": "Hochladen",
       "UPLOADING": "Lädt hoch",
       "EDIT": "Speichern",
@@ -420,12 +428,12 @@
             "LAST_NAME": "Nachname",
             "STREET": "Straße",
             "NUMBER": "Hausnummer",
-            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "ADDITIONAL_ADDRESS_INFO": "Adressinformationen hinzufügen",
             "MAIL": "E-Mail-Adresse",
             "CONTACT_ME": "Kontaktiere mich für Aktualisierungen und Sicherheitsupdates",
             "WHICH_DATA_TO_SHARE": "Welche Daten möchtest du teilen?",
             "POLICY_HEADLINE": "Datenschutzerklärung und Nutzungsbedingungen",
-            "USAGE_STATISTICS": "Nutzungsstatistik",
+            "USAGE_STATISTICS": "Nutzungsstatistiken",
             "ERROR_REPORTS": "Fehlerberichte",
             "READ_TERMS_OF_USE_BEFORE": "Ich las und akzeptiere die",
             "READ_TERMS_OF_USE_LINK": "Datenschutzerklärung und Nutzungsbedingungen",
@@ -594,7 +602,7 @@
             "CAPTION": "Videos",
             "TITLE": "Titel",
             "PRESENTERS": "Vortragende(r)",
-            "SERIES": "Serien",
+            "SERIES": "Serie",
             "DATE": "Datum",
             "START": "Beginn",
             "END": "Ende",
@@ -638,7 +646,7 @@
             "PROCESSED": "Verarbeitet",
             "RECORDING_FAILURE": "Aufnahme-Fehler",
             "PROCESSING_FAILURE": "Verarbeitungs-Fehler",
-            "PROCESSING_CANCELED": "Verarbeitung abgebrochen"
+            "PROCESSING_CANCELLED": "Verarbeitung abgebrochen"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Wird zurückgezogen",
@@ -886,7 +894,7 @@
                   "REVIEW": "Überprüfung erforderlich",
                   "ASYNC": "A/V Spuren asynchron",
                   "AUDIO_ISSUE": "Fehlende oder beschädigte Audiospur",
-                  "CANCELED": "Abgebrochenes Video",
+                  "CANCELLED": "Abgebrochene Aufzeichnung",
                   "CONFLICTING_METADATA": "Widersprüchliche Metadaten",
                   "IMPROPER_POINT": "Unpassender Start- oder Endzeitpunkt",
                   "MISSING_AGREEMENT": "Fehlende Vereinbarung",
@@ -923,7 +931,7 @@
                "PUBLISHER": "Herausgeber",
                "LICENSE": "Lizenz",
                "CONTRIBUTORS": "Mitwirkende",
-               "RIGHTS": "Rechte",
+               "RIGHTS": "Rech­te­in­ha­ber(in)",
                "PRESENTERS": "Vortragende(r)",
                "LANGUAGE": "Sprache",
                "COPYRIGHT": "Urheberrecht",
@@ -1151,7 +1159,7 @@
                   "DETAILS": "Details",
                   "REPLACE_EVENT_ACLS": "Zugriffsrechte des Videos aktualisieren",
                   "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Videos dieser Serie genau diese Zugriffsrechte haben",
-                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LIMIT": "angezeigte Richtlinien.",
                   "LOAD_MORE_LINK": "Mehr laden"
                },
                "ROLES": {
@@ -1168,7 +1176,7 @@
                "CONTRIBUTORS": "Mitwirkende",
                "RECORDING_DATE": "Aufnahmedatum",
                "CREATED_BY": "Erstellt von",
-               "RIGHTS": "Rechte",
+               "RIGHTS": "Rech­te­in­ha­ber(in)",
                "SUBJECT": "Betreff",
                "LANGUAGE": "Sprache",
                "LICENSE": "Lizenz",
@@ -1601,7 +1609,7 @@
             "INSTANTIATED": "Instanziiert",
             "DISPATCHING": "Wird angesandt",
             "RESTART": "Neustart",
-            "CANCELED": "Abgebrochen",
+            "CANCELLED": "Abgebrochen",
             "WAITING": "Wartend"
          }
       },

@@ -75,6 +75,7 @@ import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
 import org.opencastproject.assetmanager.impl.storage.Source;
 import org.opencastproject.assetmanager.impl.storage.StoragePath;
 import org.opencastproject.authorization.xacml.XACMLUtils;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -1544,7 +1545,11 @@ public class SchedulerServiceImplTest {
     currentOrg = currentUser.getOrganization();
     schedulerItemsCapture.reset();
 
-    schedSvc.repopulate("adminui");
+    AbstractSearchIndex index = EasyMock.createMock(AbstractSearchIndex.class);
+    EasyMock.expect(index.getIndexName()).andReturn("adminui").anyTimes();
+    EasyMock.replay(index);
+
+    schedSvc.repopulate(index);
     assertTrue(schedulerItemsCapture.hasCaptured());
     List<DublinCoreCatalog> dublincoreCatalogs = new ArrayList<>();
     for (SchedulerItemList schedulerItemList : schedulerItemsCapture.getValues()) {

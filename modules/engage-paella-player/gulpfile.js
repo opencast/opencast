@@ -29,7 +29,7 @@ var source = require('vinyl-source-stream');
 var gunzip = require('gulp-gunzip');
 var untar = require('gulp-untar');
 
-var PAELLA_VERSION = '6.4.3';
+var PAELLA_VERSION = '6.4.4';
 
 var buildPath = 'target/gulp',
     paellaSrc = 'src/main/paella-opencast',

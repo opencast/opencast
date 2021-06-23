@@ -1438,7 +1438,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     cleanRunningJobs(serviceType, baseUrl);
   }
 
-  /** Find all undispatchable jobs that were orphaned when this host was last deactivated and set them to CANCELED. */
+  /** Find all undispatchable jobs that were orphaned when this host was last deactivated and set them to CANCELLED. */
   private void cleanUndispatchableJobs(String hostName) {
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -1468,7 +1468,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
         } else {
           logger.info("Cancelling the running undispatchable job {}, it was orphaned on this host ({})", job, hostName);
-          job.setStatus(Status.CANCELED);
+          job.setStatus(Status.CANCELLED);
           em.merge(job);
         }
       }
@@ -1485,7 +1485,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Find all running jobs on this service and set them to RESET or CANCELED.
+   * Find all running jobs on this service and set them to RESET or CANCELLED.
    *
    * @param serviceType
    *          the service type
@@ -1519,7 +1519,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         if (job.isDispatchable()) {
           em.refresh(job);
           // If this job has already been treated
-          if (Status.CANCELED.equals(job.getStatus()) || Status.RESTART.equals(job.getStatus()))
+          if (Status.CANCELLED.equals(job.getStatus()) || Status.RESTART.equals(job.getStatus()))
             continue;
           if (job.getRootJob() != null && Status.PAUSED.equals(job.getRootJob().getStatus())) {
             JpaJob rootJob = job.getRootJob();
@@ -1554,7 +1554,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Go through all the children recursively to set them in {@link Status#CANCELED} status
+   * Go through all the children recursively to set them in {@link Status#CANCELLED} status
    *
    * @param job
    *          the parent job
@@ -1564,10 +1564,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   private void cancelAllChildren(JpaJob job, EntityManager em) {
     for (JpaJob child : job.getChildJobs()) {
       em.refresh(child);
-      if (Status.CANCELED.equals(job.getStatus()))
+      if (Status.CANCELLED.equals(job.getStatus()))
         continue;
       cancelAllChildren(child, em);
-      child.setStatus(Status.CANCELED);
+      child.setStatus(Status.CANCELLED);
       em.merge(child);
     }
   }
@@ -3305,12 +3305,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                     logger.warn("Service {} is not working as expected: {}", service, response.getStatusLine());
                 }
               } else {
-                logger.warn("Service {} does not respond: {}", service.toString());
+                logger.warn("Service {} does not respond", service);
               }
             } catch (TrustedHttpClientException e) {
               if (!service.isOnline())
                 continue;
-              logger.warn("Unable to reach {} : {}", service, e);
+              logger.warn("Unable to reach {}", service, e);
             }
 
             // If we get here, the service did not respond as expected
@@ -3324,7 +3324,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                 logger.warn("Added {} to the watch list", service);
               }
             } catch (ServiceRegistryException e) {
-              logger.warn("Unable to unregister unreachable service: {} : {}", service, e);
+              logger.warn("Unable to unregister unreachable service: {}", service, e);
             }
           } finally {
             client.close(response);

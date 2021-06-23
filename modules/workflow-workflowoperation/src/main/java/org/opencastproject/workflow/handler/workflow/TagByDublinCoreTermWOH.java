@@ -32,6 +32,7 @@ import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -59,12 +60,6 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
 
   /** Name of the configuration option that provides the source flavors we are looking for */
   public static final String SOURCE_FLAVORS_PROPERTY = "source-flavors";
-
-  /** Name of the configuration option that provides the source tags we are looking for */
-  public static final String SOURCE_TAGS_PROPERTY = "source-tags";
-
-  /** Name of the configuration option that provides the target flavors we are looking for */
-  public static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
 
   /** Name of the configuration option that provides the target tags we are looking for */
   public static final String TARGET_TAGS_PROPERTY = "target-tags";
@@ -111,26 +106,23 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
 
-    String configuredSourceFlavors = StringUtils
-            .trimToEmpty(currentOperation.getConfiguration(SOURCE_FLAVORS_PROPERTY));
-    String configuredSourceTags = StringUtils.trimToEmpty(currentOperation.getConfiguration(SOURCE_TAGS_PROPERTY));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.many, Configuration.many, Configuration.many, Configuration.many);
+    List<MediaPackageElementFlavor> configuredSourceFlavors = tagsAndFlavors.getSrcFlavors();
+    List<String> configuredSourceTags = tagsAndFlavors.getSrcTags();
     String configuredCatalog = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCCATALOG_PROPERTY));
     String configuredDCTerm = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCTERM_PROPERTY));
     String configuredDefaultValue = StringUtils.trimToNull(currentOperation.getConfiguration(DEFAULT_VALUE_PROPERTY));
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
-    String configuredTargetFlavor = StringUtils.trimToNull(currentOperation.getConfiguration(TARGET_FLAVOR_PROPERTY));
-    String configuredTargetTags = StringUtils.trimToEmpty(currentOperation.getConfiguration(TARGET_TAGS_PROPERTY));
+    List<MediaPackageElementFlavor> configuredTargetFlavor = tagsAndFlavors.getTargetFlavors();
+    List<String> configuredTargetTags = tagsAndFlavors.getTargetTags();
     boolean copy = BooleanUtils.toBoolean(currentOperation.getConfiguration(COPY_PROPERTY));
 
-    String[] sourceTags = StringUtils.split(configuredSourceTags, ",");
-    String[] targetTags = StringUtils.split(configuredTargetTags, ",");
-    String[] sourceFlavors = StringUtils.split(configuredSourceFlavors, ",");
-
     SimpleElementSelector elementSelector = new SimpleElementSelector();
-    for (String flavor : sourceFlavors) {
-      elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
+    for (MediaPackageElementFlavor flavor : configuredSourceFlavors) {
+      elementSelector.addFlavor(flavor);
     }
-    for (String tag : sourceTags) {
+    for (String tag : configuredSourceTags) {
       elementSelector.addTag(tag);
     }
 
@@ -138,7 +130,7 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
     List<String> addTags = new ArrayList<>();
     List<String> overrideTags = new ArrayList<>();
 
-    for (String tag : targetTags) {
+    for (String tag : configuredTargetTags) {
       if (tag.startsWith(MINUS)) {
         removeTags.add(tag);
       } else if (tag.startsWith(PLUS)) {
@@ -186,8 +178,8 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
             element.setIdentifier(null);
             element.setURI(e.getURI()); // use the same URI as the original
           }
-          if (configuredTargetFlavor != null) {
-            element.setFlavor(MediaPackageElementFlavor.parseFlavor(configuredTargetFlavor));
+          if (!configuredTargetFlavor.isEmpty()) {
+            element.setFlavor(configuredTargetFlavor.get(0));
           }
 
           if (overrideTags.size() > 0) {

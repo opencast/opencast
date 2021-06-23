@@ -6,7 +6,9 @@
   <tags>
     <tag>archive</tag>
   </tags>
-  <description/>
+  <description>
+    Updates the publications with the latest metadata.
+  </description>
   <displayOrder>900</displayOrder>
   <configuration_panel>
     <![CDATA[

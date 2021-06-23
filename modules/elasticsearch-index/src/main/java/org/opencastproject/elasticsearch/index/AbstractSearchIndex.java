@@ -38,21 +38,18 @@ import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.elasticsearch.index.event.EventQueryBuilder;
 import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.group.Group;
-import org.opencastproject.elasticsearch.index.group.GroupIndexUtils;
-import org.opencastproject.elasticsearch.index.group.GroupQueryBuilder;
-import org.opencastproject.elasticsearch.index.group.GroupSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesIndexUtils;
 import org.opencastproject.elasticsearch.index.series.SeriesQueryBuilder;
 import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.theme.Theme;
-import org.opencastproject.elasticsearch.index.theme.ThemeIndexUtils;
+import org.opencastproject.elasticsearch.index.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.theme.ThemeQueryBuilder;
 import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
+
+import com.google.common.util.concurrent.Striped;
 
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -75,6 +72,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 import javax.xml.bind.Unmarshaller;
@@ -83,8 +82,43 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractSearchIndex.class);
 
+  private final Striped<Lock> locks = Striped.lazyWeakLock(1024);
+
   @Override
   public abstract String getIndexName();
+
+  /**
+   * Adds or updates the event in the search index. Uses a locking mechanism to avoid issues like Lost Update.
+   *
+   * @param id
+   *          The id of the event to update
+   * @param updateFunction
+   *          The function that does the actual updating
+   * @param orgId
+   *           the organization the event belongs to
+   * @param user
+   *           the user
+   * @throws SearchIndexException
+   *           Thrown if unable to update the event.
+   */
+  public Optional<Event> addOrUpdateEvent(String id, Function<Optional<Event>, Optional<Event>> updateFunction,
+          String orgId, User user) throws SearchIndexException {
+    final Lock lock = this.locks.get(id);
+    lock.lock();
+    logger.debug("Locked event '{}'", id);
+
+    try {
+      Optional<Event> eventOpt = getEvent(id, orgId, user);
+      Optional<Event> updatedEventOpt = updateFunction.apply(eventOpt);
+      if (updatedEventOpt.isPresent()) {
+        addOrUpdate(updatedEventOpt.get());
+      }
+      return updatedEventOpt;
+    } finally {
+      lock.unlock();
+      logger.debug("Released locked event '{}'", id);
+    }
+  }
 
   /**
    * Adds the recording event to the search index or updates it accordingly if it is there.
@@ -94,7 +128,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *           if the event cannot be added or updated
    */
-  public void addOrUpdate(Event event) throws SearchIndexException {
+  protected void addOrUpdate(Event event) throws SearchIndexException {
     logger.debug("Adding event {} to search index", event.getIdentifier());
 
     // Add the resource to the index
@@ -110,25 +144,35 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   }
 
   /**
-   * Adds or updates the group in the search index.
+   * Adds or updates the series in the search index. Uses a locking mechanism to avoid issues like Lost Update.
    *
-   * @param group
-   *          The group to add
+   * @param id
+   *          The id of the series to add
+   * @param updateFunction
+   *          The function that does the actual updating
+   * @param orgId
+   *           the organization the series belongs to
+   * @param user
+   *           the user
    * @throws SearchIndexException
-   *           Thrown if unable to add or update the group.
+   *           Thrown if unable to add or update the series.
    */
-  public void addOrUpdate(Group group) throws SearchIndexException {
-    logger.debug("Adding group {} to search index", group.getIdentifier());
+  public Optional<Series> addOrUpdateSeries(String id, Function<Optional<Series>, Optional<Series>> updateFunction,
+          String orgId, User user) throws SearchIndexException {
+    final Lock lock = this.locks.get(id);
+    lock.lock();
+    logger.debug("Locked series '{}'", id);
 
-    // Add the resource to the index
-    SearchMetadataCollection inputDocument = GroupIndexUtils.toSearchMetadata(group);
-    List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
-    ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
-            inputDocument.getDocumentType(), resourceMetadata);
     try {
-      update(doc);
-    } catch (Throwable t) {
-      throw new SearchIndexException("Cannot write resource " + group + " to index", t);
+      Optional<Series> seriesOpt = getSeries(id, orgId, user);
+      Optional<Series> updatedSeriesOpt = updateFunction.apply(seriesOpt);
+      if (updatedSeriesOpt.isPresent()) {
+        addOrUpdate(updatedSeriesOpt.get());
+      }
+      return updatedSeriesOpt;
+    } finally {
+      lock.unlock();
+      logger.debug("Released locked series '{}'", id);
     }
   }
 
@@ -138,7 +182,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @param series
    * @throws SearchIndexException
    */
-  public void addOrUpdate(Series series) throws SearchIndexException {
+  protected void addOrUpdate(Series series) throws SearchIndexException {
     logger.debug("Adding series {} to search index", series.getIdentifier());
 
     // Add the resource to the index
@@ -154,6 +198,125 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   }
 
   /**
+   * Loads the event from the search index if it exists.
+   *
+   * @param mediapackageId
+   *          the mediapackage identifier
+   * @param organization
+   *          the organization
+   * @param user
+   *          the user
+   * @return the event (optional)
+   * @throws SearchIndexException
+   *           if querying the search index fails
+   * @throws IllegalStateException
+   *           if multiple events with the same identifier are found
+   */
+  public Optional<Event> getEvent(String mediapackageId, String organization, User user) throws SearchIndexException {
+    EventSearchQuery query = new EventSearchQuery(organization, user).withoutActions().withIdentifier(mediapackageId);
+    SearchResult<Event> searchResult = getByQuery(query);
+    if (searchResult.getDocumentCount() == 0) {
+      return Optional.empty();
+    } else if (searchResult.getDocumentCount() == 1) {
+      return Optional.of(searchResult.getItems()[0].getSource());
+    } else {
+      throw new IllegalStateException(
+              "Multiple events with identifier " + mediapackageId + " found in search index");
+    }
+  }
+
+  /**
+   * Loads the series from the search index if it exists.
+   *
+   * @param seriesId
+   *          the series identifier
+   * @param organization
+   *          the organization
+   * @param user
+   *          the user
+   * @return the series (optional)
+   * @throws SearchIndexException
+   *           if querying the search index fails
+   * @throws IllegalStateException
+   *           if multiple series with the same identifier are found
+   */
+  public Optional<Series> getSeries(String seriesId, String organization, User user)
+          throws SearchIndexException {
+    SeriesSearchQuery query = new SeriesSearchQuery(organization, user).withoutActions().withIdentifier(seriesId);
+    SearchResult<Series> searchResult = getByQuery(query);
+    if (searchResult.getDocumentCount() == 0) {
+      return Optional.empty();
+    } else if (searchResult.getDocumentCount() == 1) {
+      return Optional.of(searchResult.getItems()[0].getSource());
+    } else {
+      throw new IllegalStateException("Multiple series with identifier " + seriesId + " found in search index");
+    }
+  }
+
+  /**
+   * Loads the theme from the search index if it exists.
+   *
+   * @param themeId
+   *          the theme identifier
+   * @param organization
+   *          the organization
+   * @param user
+   *          the user
+   * @return the theme wrapped in an optional
+   * @throws SearchIndexException
+   *           if querying the search index fails
+   * @throws IllegalStateException
+   *           if multiple themes with the same identifier are found
+   */
+  protected Optional<IndexTheme> getTheme(long themeId, String organization, User user)
+          throws SearchIndexException {
+    ThemeSearchQuery query = new ThemeSearchQuery(organization, user).withIdentifier(themeId);
+    SearchResult<IndexTheme> searchResult = getByQuery(query);
+    if (searchResult.getDocumentCount() == 0) {
+      return Optional.empty();
+    } else if (searchResult.getDocumentCount() == 1) {
+      return Optional.of(searchResult.getItems()[0].getSource());
+    } else {
+      throw new IllegalStateException("Multiple themes with identifier " + themeId + " found in search index");
+    }
+  }
+
+
+
+  /**
+   * Adds or updates the theme in the search index. Uses a locking mechanism to avoid issues like Lost Update.
+   *
+   * @param id
+   *          The id of the theme to update
+   * @param updateFunction
+   *          The function that does the actual updating
+   * @param orgId
+   *           the organization the theme belongs to
+   * @param user
+   *           the user
+   * @throws SearchIndexException
+   *           Thrown if unable to update the theme.
+   */
+  public Optional<IndexTheme> addOrUpdateTheme(long id, Function<Optional<IndexTheme>,
+          Optional<IndexTheme>> updateFunction, String orgId, User user) throws SearchIndexException {
+    final Lock lock = this.locks.get(id);
+    lock.lock();
+    logger.debug("Locked theme '{}'", id);
+
+    try {
+      Optional<IndexTheme> themeOpt = getTheme(id, orgId, user);
+      Optional<IndexTheme> updatedThemeOpt = updateFunction.apply(themeOpt);
+      if (updatedThemeOpt.isPresent()) {
+        addOrUpdate(updatedThemeOpt.get());
+      }
+      return updatedThemeOpt;
+    } finally {
+      lock.unlock();
+      logger.debug("Released locked theme '{}'", id);
+    }
+  }
+
+  /**
    * Adds or updates the theme in the search index.
    *
    * @param theme
@@ -161,11 +324,11 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *           Thrown if unable to add or update the theme.
    */
-  public void addOrUpdate(Theme theme) throws SearchIndexException {
+  protected void addOrUpdate(IndexTheme theme) throws SearchIndexException {
     logger.debug("Adding theme {} to search index", theme.getIdentifier());
 
     // Add the resource to the index
-    SearchMetadataCollection inputDocument = ThemeIndexUtils.toSearchMetadata(theme);
+    SearchMetadataCollection inputDocument = theme.toSearchMetadata();
     List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
     ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
             inputDocument.getDocumentType(), resourceMetadata);
@@ -176,21 +339,27 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     }
   }
 
-  @Override
-  public boolean delete(String type, String uid) throws SearchIndexException {
-    logger.debug("Removing element with id '{}' from searching index '{}'", uid, getIndexName(type));
-    final DeleteRequest deleteRequest = new DeleteRequest(getIndexName(type), uid)
-            .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+  public boolean delete(String type, String id, String orgId) throws SearchIndexException {
+    final Lock lock = this.locks.get(id);
+    lock.lock();
+    logger.debug("Locked {} '{}'.", type, id);
     try {
+      String idWithOrgId = id.concat(orgId);
+      logger.debug("Removing element with id '{}' from search index '{}'", idWithOrgId, getIndexName(type));
+      final DeleteRequest deleteRequest = new DeleteRequest(getIndexName(type), idWithOrgId)
+              .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+
       final DeleteResponse delete = getClient().delete(deleteRequest, RequestOptions.DEFAULT);
       if (delete.getResult().equals(DocWriteResponse.Result.NOT_FOUND)) {
-        logger.trace("Document {} to delete was not found on index '{}'", uid, getIndexName(type));
+        logger.trace("Document {} to delete was not found on index '{}'", idWithOrgId, getIndexName(type));
         return false;
       }
     } catch (IOException e) {
       throw new SearchIndexException(e);
+    } finally {
+      lock.unlock();
+      logger.debug("Released locked {} '{}'.", type, id);
     }
-
     return true;
   }
 
@@ -221,15 +390,15 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *           Thrown if the event cannot be found.
    */
   public void deleteAssets(String organization, User user, String uid) throws SearchIndexException, NotFoundException {
-    Event event = EventIndexUtils.getEvent(uid, organization, user, this);
-    if (event == null) {
+    Optional<Event> eventOpt = getEvent(uid, organization, user);
+    if (!eventOpt.isPresent()) {
       throw new NotFoundException("No event with id " + uid + " found.");
     }
-
+    Event event = eventOpt.get();
     event.setArchiveVersion(null);
 
     if (toDelete(event)) {
-      delete(Event.DOCUMENT_TYPE, uid.concat(organization));
+      delete(Event.DOCUMENT_TYPE, uid, organization);
     } else {
       addOrUpdate(event);
     }
@@ -251,15 +420,15 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    */
   public void deleteScheduling(String organization, User user, String uid)
           throws SearchIndexException, NotFoundException {
-    Event event = EventIndexUtils.getEvent(uid, organization, user, this);
-    if (event == null) {
+    Optional<Event> eventOpt = getEvent(uid, organization, user);
+    if (!eventOpt.isPresent()) {
       throw new NotFoundException("No event with id " + uid + " found.");
     }
-
+    Event event = eventOpt.get();
     event.setAgentId(null);
 
     if (toDelete(event)) {
-      delete(Event.DOCUMENT_TYPE, uid.concat(organization));
+      delete(Event.DOCUMENT_TYPE, uid, organization);
     } else {
       addOrUpdate(event);
     }
@@ -283,11 +452,11 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    */
   public void deleteWorkflow(String organization, User user, String uid, Long workflowId)
           throws SearchIndexException, NotFoundException {
-    Event event = EventIndexUtils.getEvent(uid, organization, user, this);
-    if (event == null) {
+    Optional<Event> eventOpt = getEvent(uid, organization, user);
+    if (!eventOpt.isPresent()) {
       throw new NotFoundException("No event with id " + uid + " found.");
     }
-
+    Event event = eventOpt.get();
     if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowId)) {
       logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", uid, workflowId);
       event.setWorkflowId(null);
@@ -296,7 +465,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     }
 
     if (toDelete(event)) {
-      delete(Event.DOCUMENT_TYPE, uid.concat(organization));
+      delete(Event.DOCUMENT_TYPE, uid, organization);
     } else {
       addOrUpdate(event);
     }
@@ -330,34 +499,6 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
 
   /**
    * @param query
-   *          The query to use to retrieve the groups that match the query
-   * @return {@link SearchResult} collection of {@link Group} from a query.
-   * @throws SearchIndexException
-   *           Thrown if there is an error getting the results.
-   */
-  public SearchResult<Group> getByQuery(GroupSearchQuery query) throws SearchIndexException {
-
-    logger.debug("Searching index using group query '{}'", query);
-
-    // Create the request
-    final SearchRequest searchRequest = getSearchRequest(query, new GroupQueryBuilder(query));
-
-    try {
-      final Unmarshaller unmarshaller = Group.createUnmarshaller();
-      return executeQuery(query, searchRequest, metadata -> {
-        try {
-          return GroupIndexUtils.toGroup(metadata, unmarshaller);
-        } catch (IOException e) {
-          return chuck(e);
-        }
-      });
-    } catch (Throwable t) {
-      throw new SearchIndexException("Error querying series index", t);
-    }
-  }
-
-  /**
-   * @param query
    *          The query to use to retrieve the series that match the query
    * @return {@link SearchResult} collection of {@link Series} from a query.
    * @throws SearchIndexException
@@ -384,11 +525,11 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   /**
    * @param query
    *          The query to use to retrieve the themes that match the query
-   * @return {@link SearchResult} collection of {@link Theme} from a query.
+   * @return {@link SearchResult} collection of {@link IndexTheme} from a query.
    * @throws SearchIndexException
    *           Thrown if there is an error getting the results.
    */
-  public SearchResult<Theme> getByQuery(ThemeSearchQuery query) throws SearchIndexException {
+  public SearchResult<IndexTheme> getByQuery(ThemeSearchQuery query) throws SearchIndexException {
     logger.debug("Searching index using theme query '{}'", query);
     // Create the request
     final SearchRequest searchRequest = getSearchRequest(query, new ThemeQueryBuilder(query));
@@ -396,7 +537,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     try {
       return executeQuery(query, searchRequest, metadata -> {
         try {
-          return ThemeIndexUtils.toTheme(metadata);
+          return IndexTheme.fromSearchMetadata(metadata);
         } catch (IOException e) {
           return chuck(e);
         }

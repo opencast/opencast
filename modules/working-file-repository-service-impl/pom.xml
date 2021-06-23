@@ -89,6 +89,10 @@
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

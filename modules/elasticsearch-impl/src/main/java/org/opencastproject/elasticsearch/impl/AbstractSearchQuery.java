@@ -28,6 +28,7 @@ import static org.opencastproject.elasticsearch.api.SearchTerms.Quantifier.Any;
 import org.opencastproject.elasticsearch.api.SearchQuery;
 import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.api.SearchTerms.Quantifier;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.apache.commons.lang3.StringUtils;
 

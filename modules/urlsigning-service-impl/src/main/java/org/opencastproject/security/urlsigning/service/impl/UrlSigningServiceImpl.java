@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component(
-  immediate = true,
-  service = { UrlSigningService.class }
+    immediate = true,
+    service = { UrlSigningService.class }
 )
 public class UrlSigningServiceImpl implements UrlSigningService {
 
@@ -54,7 +54,12 @@ public class UrlSigningServiceImpl implements UrlSigningService {
   private final List<UrlSigningProvider> signingProviders = new CopyOnWriteArrayList<>();
 
   /** OSGi callback for registering {@link UrlSigningProvider} */
-  @Reference(name = "urlSigningProviders", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, unbind = "unregisterSigningProvider")
+  @Reference(
+      name = "urlSigningProviders",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unregisterSigningProvider"
+  )
   void registerSigningProvider(final UrlSigningProvider provider) {
     signingProviders.add(provider);
     logger.info("{} registered", provider);

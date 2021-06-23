@@ -56,8 +56,9 @@ public class FFmpegTest {
   public static void testForFFmpeg() {
     try {
       Process p = new ProcessBuilder(FFMPEG_BINARY, "-version").start();
-      if (p.waitFor() != 0)
+      if (p.waitFor() != 0) {
         throw new IllegalStateException();
+      }
     } catch (Throwable t) {
       logger.warn("Skipping composer tests due to missing FFmpeg");
       ffmpegInstalled = false;

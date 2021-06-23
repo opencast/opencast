@@ -107,11 +107,11 @@ public final class SolrUtils {
   }
 
   /**
-   * Return a date format suitable for solr. Format a date as UTC with a granularity of seconds.
-   * <code>yyyy-MM-dd'T'HH:mm:ss'Z'</code>
+   * Return a date format suitable for solr. Format a date as UTC with a granularity of
+   * milliseconds. <code>yyyy-MM-dd'T'HH:mm:ss.SSS'Z'</code>
    */
   public static DateFormat newSolrDateFormat() {
-    SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     f.setTimeZone(TimeZone.getTimeZone("UTC"));
     return f;
   }

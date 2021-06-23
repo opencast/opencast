@@ -84,7 +84,7 @@ public class JobBarrierTest {
 
   private static boolean hasJobTerminated(Job.Status status) {
     switch (status) {
-      case CANCELED:
+      case CANCELLED:
       case DELETED:
       case FAILED:
       case FINISHED:

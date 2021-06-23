@@ -27,6 +27,7 @@ import org.opencastproject.util.EqualsUtil;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -248,9 +249,43 @@ public final class JpaGroup implements Group {
     this.members = members;
   }
 
+  /**
+   * Add a member
+   *
+   * @param member
+   *          The member's name.
+   */
+  public void addMember(String member) {
+    if (members == null) {
+      members = new HashSet<>();
+    }
+    members.add(member);
+  }
+
+  /**
+   * Remove a member
+   *
+   * @param member
+   *          The member's name.
+   */
+  public void removeMember(String member) {
+    if (members != null) {
+      members.remove(member);
+    }
+  }
+
   @Override
   public Set<Role> getRoles() {
     return new HashSet<Role>(roles);
+  }
+
+  /**
+   * Get only the names of the roles
+   *
+   * @return the role names in a set
+   */
+  public Set<String> getRoleNames() {
+    return roles.stream().map(role -> role.getName()).collect(Collectors.toSet());
   }
 
   /**

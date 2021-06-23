@@ -24,46 +24,26 @@ package org.opencastproject.authorization.xacml.manager.impl;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexRebuildService;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.acl.AclItem;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 
-import org.apache.commons.lang3.text.WordUtils;
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
-
 /** OSGi implementation of {@link org.opencastproject.authorization.xacml.manager.api.AclServiceFactory}. */
-public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclServiceFactory {
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(OsgiAclServiceFactory.class);
-
+public class OsgiAclServiceFactory implements AclServiceFactory {
   private AclDb aclDb;
   private SeriesService seriesService;
   private AssetManager assetManager;
   private AuthorizationService authorizationService;
   private SecurityService securityService;
-  private MessageReceiver messageReceiver;
-  private MessageSender messageSender;
-  /** The organization directory service */
-  private OrganizationDirectoryService organizationDirectoryService;
-  private ComponentContext cc;
+  protected AbstractSearchIndex adminUiIndex;
+  protected AbstractSearchIndex externalApiIndex;
 
   @Override
   public AclService serviceFor(Organization org) {
     return new AclServiceImpl(org, aclDb, seriesService, assetManager,
-            authorizationService, messageSender);
+            authorizationService, adminUiIndex, externalApiIndex, securityService);
   }
 
   /** OSGi DI callback. */
@@ -92,52 +72,12 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   }
 
   /** OSGi DI callback. */
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
   }
 
   /** OSGi DI callback. */
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
-  }
-
-  /** OSGi DI callback. */
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
-    this.organizationDirectoryService = organizationDirectoryService;
-  }
-
-  @Override
-  public void repopulate(final String indexName) {
-    final String destinationId = AclItem.ACL_QUEUE_PREFIX + WordUtils.capitalize(indexName);
-    for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-        AclService aclService = serviceFor(organization);
-        List<ManagedAcl> acls = aclService.getAcls();
-        int total = aclService.getAcls().size();
-        logIndexRebuildBegin(logger, indexName, total, "ACLs", organization);
-        int current = 1;
-        for (ManagedAcl acl : acls) {
-          messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                  AclItem.create(acl.getName()));
-          logIndexRebuildProgress(logger, indexName, total, current);
-          current++;
-        }
-      });
-    }
-  }
-
-  /**
-   * Callback for activation of this component.
-   *
-   * @param cc
-   *          the component context
-   */
-  public void activate(ComponentContext cc) {
-    this.cc = cc;
-  }
-
-  @Override
-  public IndexRebuildService.Service getService() {
-    return IndexRebuildService.Service.Acl;
+  public void setExternalApiIndex(AbstractSearchIndex index) {
+    this.externalApiIndex = index;
   }
 }

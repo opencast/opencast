@@ -31,9 +31,12 @@ org.opencastproject.userdirectory.ldap.searchbase=
 ## Example: (uid={0})
 org.opencastproject.userdirectory.ldap.searchfilter=
 
-## The comma-separated list of attributes that will be translated into roles.
+## The comma-separated list of attributes that will be translated into roles/groups.
 ## Note that the attributes may be converted to uppercase and prefixed depending on the configuration below.
-## Please refer to the documentation of the "roleprefix" property.
+## Please refer to the documentation of the "roleprefix" and "groupcheckprefix" property.
+##   Additionally it is possible to specify a mapping between those attributes and roles/groups.
+##   If wanted the direct translation of attributes to roles can also be disabled.
+##   See the "Mapping configuration properties" below for more information.
 ## Example: berkeleyEduAffiliations,departmentNumber
 org.opencastproject.userdirectory.ldap.roleattributes=
 
@@ -72,13 +75,42 @@ org.opencastproject.userdirectory.ldap.roleattributes=
 ## Default: <empty>
 #org.opencastproject.userdirectory.ldap.exclude.prefixes=
 
+## A prefix which is used to CHECK whether a roleattribute value or extra role should be added as a group to a user
+## Default: ROLE_GROUP_
+#org.opencastproject.userdirectory.ldap.groupcheckprefix=ROLE_GROUP_
+
 ## Whether or not the role names should be converted to uppercase. It defaults to "true".
 ## Please note that this setting affects the prefix defined above.
 ## Default: true
 #org.opencastproject.userdirectory.ldap.uppercase=true
 
 ## A comma-separated list of extra roles to apply to all the users authenticated with this LDAP instance
-## The roles in this list are converted to uppercase if the corresponding parameter is set. However, the 'roleprefix'
-## setting does not affect them -i.e. they will not be further modified even if 'roleprefix' is set.
+## The roles in this list are converted to uppercase if the corresponding parameter is set and are also affected by the
+## groupcheckprefix. However, the 'roleprefix' setting does not affect them
+## -i.e. they will not be further modified even if 'roleprefix' is set.
 ## Defaut: <empty>
 #org.opencastproject.userdirectory.ldap.extra.roles=
+
+
+#########
+## Mapping configuration properties (also optional)
+######
+
+## The following properties can be used to define a mapping (affected by uppercase conversion)
+## of LDAP roleattribute values (defined above) to specific opencast roles/groups.
+##   For example the following lines add two mappings identified by 'examplemap1' and 'examplemap2':
+##     'examplemap1' applies the opencast role 'ROLE_EXAMPLE_1' to any user which has the roleattribute value 'example1'.
+##     'examplemap2' maps the roleattribute value 'example2' to the opencast roles 'ROLE_EXAMPLE_2' and 'ROLE_EXAMPLE_3',
+##       and additionally adds the group 'ROLE_GROUP_EXAMPLE'.
+#org.opencastproject.userdirectory.ldap.map.examplemap1.value=example1
+#org.opencastproject.userdirectory.ldap.map.examplemap1.roles=ROLE_EXAMPLE_1
+#org.opencastproject.userdirectory.ldap.map.examplemap2.value=example2
+#org.opencastproject.userdirectory.ldap.map.examplemap2.roles=ROLE_EXAMPLE_2,ROLE_EXAMPLE_3
+#org.opencastproject.userdirectory.ldap.map.examplemap2.groups=ROLE_GROUP_EXAMPLE
+
+## If the mapping is used there may be no need for the direct translation of roleattributes to roles/groups.
+## The direct translation can be disabled by setting the following properties to false
+## (if applyasroles is disabled applyasgroups can't be set to true):
+## Default: true
+#org.opencastproject.userdirectory.ldap.roleattributes.applyasroles=true
+#org.opencastproject.userdirectory.ldap.roleattributes.applyasgroups=true

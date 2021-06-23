@@ -36,8 +36,6 @@ import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.TextFilter;
-import org.opencastproject.elasticsearch.api.SearchQuery.Order;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.index.service.resources.list.query.UsersListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.Organization;
@@ -58,6 +56,8 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;

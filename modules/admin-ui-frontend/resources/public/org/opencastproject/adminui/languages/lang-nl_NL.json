@@ -2,6 +2,12 @@
    "MATTERHORN": "Opencast",
    "NAV_HOME": "Start",
    "NAV_ABOUT": "Over",
+   "BUILD": {
+      "BUILT_ON": "gebouwd op",
+      "DATE_DESC": "Datum waarop de kernel module van dit systeem is gebouwd.",
+      "COMMIT": "Git commit op basis waarvan deze versie is gemaakt.",
+      "VERSION": "Gewone bundelversie"
+   },
    "NO": "Neen",
    "SUBMIT": "Verzenden",
    "UPDATE": {
@@ -22,46 +28,48 @@
    "YES": "Ja",
    "COPY": "Naar klembord kopiëren",
    "LTI": {
-      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
+      "ERROR_LOADING_METADATA": "Fout bij het laden van de metadata van dit event. Probeer het later aub opnieuw.",
       "SERIES_TITLE": "Bekijk serie",
       "UPLOAD_TITLE": "Upload event",
-      "LOADING": "Loading…",
-      "NEW_UPLOAD": "Upload new event",
-      "EDIT_UPLOAD": "Edit event",
-      "CURRENT_JOBS": "Today's jobs",
-      "PRESENTER": "Presenter",
-      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
-      "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+      "LOADING": "Bezig met laden…",
+      "NEW_UPLOAD": "Upload nieuw event",
+      "EDIT_UPLOAD": "Bewerk event",
+      "CURRENT_JOBS": "Taken vandaag",
+      "PRESENTER": "Presentator",
+      "PRESENTER_DESCRIPTION": "Videobestand voor track van presentator",
+      "VIDEOFILE": "Videobestand",
+      "VIDEOFILE_DESCRIPTION": "Te uploaden videobestand",
+      "CAPTION": "Ondertitels",
+      "CAPTION_DESCRIPTION": "Ondersteunde formaten voor ondertiteling: VTT of dfxp",
       "UPLOAD": "Upload",
-      "UPLOADING": "Uploading",
-      "EDIT": "Save",
-      "EDIT_TITLE": "Edit event",
-      "NO_OPTION_SELECTED": "No option selected",
-      "EDITING": "Saving…",
-      "SELECT_OPTION": "Select option",
-      "JOB_TITLE": "Title",
+      "UPLOADING": "Aan het uploaden",
+      "EDIT": "Opslaan",
+      "EDIT_TITLE": "Bewerk event",
+      "NO_OPTION_SELECTED": "Geen optie geselecteerd",
+      "EDITING": "Opslaan…",
+      "SELECT_OPTION": "Selecteer optie",
+      "JOB_TITLE": "Titel",
       "JOB_STATUS": "Status",
-      "UPLOAD_SUCCESS": "Upload succeeded!",
-      "UPLOAD_FAILURE": "Upload failed!",
-      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
-      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
-      "EDIT_FAILURE": "Edit failed!",
-      "COPY_SUCCESS": "Copying started…",
-      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
-      "GENERIC_ERROR": "Error: {{message}}",
-      "DELETION_SUCCESS": "Event deletion successful",
-      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
-      "EVENT_LOCKED": "Deze evenement wordt momenteel verwerkt. Wacht tut u verdere wijzigingen aanbrengt...",
-      "DELETION_FAILURE": "Event deletion failed",
-      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
-      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
-      "CONFIRM_DELETION": "Really delete this event?",
-      "COPY_TO_SERIES": "Copy event to series",
-      "SELECT_COPY_TARGET": "Select destination series",
-      "COPY": "Copy",
-      "COPY_IN_PROGRESS": "Starting copy…",
-      "CREATOR": "by {{creator}}"
+      "UPLOAD_SUCCESS": "Upload geslaagd",
+      "UPLOAD_FAILURE": "Upload mislukt!",
+      "UPLOAD_FAILURE_DESCRIPTION": "Probeer het later aub opnieuw.",
+      "EDIT_SUCCESS": "Bewerking geslaagd. Gestart met opnieuw publiceren.",
+      "EDIT_FAILURE": "Bewerken mislukt!",
+      "COPY_SUCCESS": "Gestart met kopiëren…",
+      "COPY_SUCCESS_DESCRIPTION": "Even geduld aub…",
+      "GENERIC_ERROR": "Fout: {{message}}",
+      "DELETION_SUCCESS": "Verwijdering event gelukt",
+      "DELETION_SUCCESS_DESCRIPTION": "Het event zal binnen enkele ogenblikken verwijderd worden uit de lijst…",
+      "EVENT_LOCKED": "Dit event wordt momenteel verwerkt. Wacht tot u verdere wijzigingen aanbrengt...",
+      "DELETION_FAILURE": "Verwijdering event mislukt",
+      "DELETION_FAILURE_DESCRIPTION": "Probeer het later aub nog eens...",
+      "RESULT_HEADING": "Resultaten {{range.begin}}-{{range.end}} van {{total}}",
+      "CONFIRM_DELETION": "Zeker dat u dit event wilt verwijderen?",
+      "COPY_TO_SERIES": "Kopieer het event naar series",
+      "SELECT_COPY_TARGET": "Selecteer toekomstige series",
+      "COPY": "Kopieer",
+      "COPY_IN_PROGRESS": "Kopiëren starten…",
+      "CREATOR": "door {{creator}}"
    },
    "LANGUAGES": {
       "ARABIC": "Arabisch",
@@ -97,12 +105,12 @@
       }
    },
    "CONFIRMATIONS": {
-      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+      "EMBEDDING_CODE": "De embed code is gekopieerd naar het klembord:",
       "CONTINUE_ACTION": "Weet u zeker dat u wilt doorgaan?",
       "METADATA": {
          "NOTICE": {
             "UNKNOWN": "Het volgende element wordt verwijderd",
-            "EVENT": "Het volgende evenement wordt verwijderd",
+            "EVENT": "Het volgende event wordt verwijderd",
             "SERIES": "De volgende series worden verwijderd",
             "ACL": "De volgende permissie wordt verwijderd",
             "GROUP": "De volgende groep wordt verwijderd",
@@ -115,15 +123,15 @@
       "ACTIONS": {
          "CONFIRMATION": "Bevestiging",
          "SHOW": {
-            "EMBEDDING_CODE": "Embedding code"
+            "EMBEDDING_CODE": "Embed code"
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Deze serie bevat eventementen. Door verwijderen van de serie worden de eventementen niet verwijderd.",
-         "EVENT_WILL_BE_GONE": "Als u doorgaat, wordt deze opname onherroepelijk verwijdert."
+         "SERIES_HAS_EVENTS": "Deze serie bevat events. Door het verwijderen van de serie worden de events niet verwijderd.",
+         "EVENT_WILL_BE_GONE": "Als u doorgaat, wordt dit event onherroepelijk verwijderd."
       },
       "ERRORS": {
-         "SERIES_HAS_EVENTS": "Deze serie kan niet verwijdertd worden omdat deze serie nog eventementen bevat."
+         "SERIES_HAS_EVENTS": "Deze serie kan niet verwijderd worden omdat deze serie nog events bevat."
       }
    },
    "MEDIAMODULE": "Mediamodule",
@@ -135,7 +143,7 @@
       "DOCUMENTATION": "Documentatie",
       "REST_DOC": "REST API documentatie",
       "HOTKEY_CHEAT_SHEET": "Sneltoetsen",
-      "ADOPTER_REGISTRATION": "Adopter Registration"
+      "ADOPTER_REGISTRATION": "Adopter registratie"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "De toegangspolicy werd aangemaakt",
@@ -158,14 +166,14 @@
       "ACCESS_DENIED": "Toegang geweigerd. Je hebt geen rechten om deze pagina te bekijken",
       "SERIES_ADDED": "De series werden aangemaakt",
       "SERIES_NOT_SAVED": "De series konden niet bewaard worden",
-      "EVENTS_CREATED": "Het evenement werd aangemaakt",
-      "EVENTS_UPLOAD_STARTED": "Het evenement wordt geüpload…",
-      "EVENTS_NOT_CREATED": "Het evenement kon niet aangemaakt worden",
-      "EVENTS_UPDATED_NB": "{{ number }} evenementen zijn met succes geüpdatet",
-      "EVENTS_UPDATED_ALL": "Alle evenementen zijn met succes geüpdatet",
-      "EVENTS_NOT_UPDATED": "Het evenement kon niet bewaard worden",
-      "EVENTS_NOT_UPDATED_ID": "Het evenement {{ id }} kon niet bewaard worden",
-      "EVENTS_NOT_UPDATED_ALL": "Geen enkel evenement kon worden bewaard",
+      "EVENTS_CREATED": "Het event werd aangemaakt",
+      "EVENTS_UPLOAD_STARTED": "Het event wordt geüpload…",
+      "EVENTS_NOT_CREATED": "Het event kon niet aangemaakt worden",
+      "EVENTS_UPDATED_NB": "{{ number }} events zijn met succes geüpdatet",
+      "EVENTS_UPDATED_ALL": "Alle events zijn met succes geüpdatet",
+      "EVENTS_NOT_UPDATED": "Het event kon niet bewaard worden",
+      "EVENTS_NOT_UPDATED_ID": "Het event {{ id }} kon niet bewaard worden",
+      "EVENTS_NOT_UPDATED_ALL": "Geen enkel event kon worden bewaard",
       "EVENTS_PROCESSING_ACTION_RETRY": "De verwerking wordt hervat...",
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Verwerking kon niet worden hervat.",
       "EVENTS_PROCESSING_ACTION_NONE": "Verwerking wordt afgebroken...",
@@ -179,26 +187,26 @@
       "SERIES_NOT_UPDATED": "De series konden niet bewaard worden",
       "SERIES_NOT_UPDATED_ID": "De series {{ id }} konden niet worden bewaard",
       "SERIES_NOT_UPDATED_ALL": "Geen enkele serie kon bewaard worden",
-      "EVENT_DELETED": "Het event is verwijderd.",
-      "EVENT_WILL_BE_DELETED": "Het event werd verwijderd",
-      "EVENTS_DELETED": "Deze evenementen worden verwijderd.",
-      "EVENTS_NOT_DELETED": "Het/De event(s) konden niet verwijderd worden.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Deze gebeurtenis(sen) kan/kunnen niet verwijderd worden, omdat u niet gemachtigd bent om dit te doen.",
+      "EVENT_DELETED": "Het event werd verwijderd.",
+      "EVENT_WILL_BE_DELETED": "Het event wordt verwijderd",
+      "EVENTS_DELETED": "Deze events worden verwijderd.",
+      "EVENTS_NOT_DELETED": "De events konden niet verwijderd worden.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Deze events kunnen niet verwijderd worden omdat u niet gemachtigd bent.",
       "SERIES_DELETED": "De series werden verwijderd",
       "SERIES_NOT_DELETED": "De series konden niet verwijderd worden",
       "LOCATION_DELETED": "De locatie werd verwijderd",
       "LOCATION_NOT_DELETED": "De locatie kon niet verwijderd worden",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "De locatie kan niet verwijderd worden, omdat u niet gemachtigd bent om dit te doen.",
-      "CONFLICT_DETECTED": "Planning conflict: het nieuwe evenement overlapt met een reeds bestaand evenement. Gelieve de locatie, datum of tijdstippen aan te passen.",
-      "CONFLICT_BULK_DETECTED": "Planningsconflict: de wijzigingen aan de gebeurtenis resulteert in conflicten. Wijzig de locatie, datums of tijden.",
-      "CONFLICT_ALREADY_ENDED": "Planning fout: het evenement is reeds gestopt.",
+      "CONFLICT_DETECTED": "Planning conflict: het nieuwe event overlapt met een reeds bestaand event. Gelieve de locatie, datum of tijdstippen aan te passen.",
+      "CONFLICT_BULK_DETECTED": "Planningsconflict: de wijzigingen aan het event leidt tot conflicten. Wijzig de locatie, data of tijden.",
+      "CONFLICT_ALREADY_ENDED": "Planning fout: het event is reeds gestopt.",
       "CONFLICT_END_BEFORE_START": "Planning fout: het einde komt altijd later dan het begin.",
-      "CONFLICT_IN_THE_PAST": "De ingeplande data kan niet worden geupdate. Je kan geen opname inplannen in het verleden.",
+      "CONFLICT_IN_THE_PAST": "De planning kan niet worden geüpdatet. Je kan geen event inplannen in het verleden.",
       "INVALID_ACL_RULES": "Regels moeten een geldige rol en lees- en/of schrijfrechten hebben.",
       "MISSING_ACL_RULES": "Ten minste één rol met lees- en/of schrijfrechten is vereist!",
       "SAVED_ACL_RULES": "De toegangsregels werden bewaard.",
-      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "De bestaande evenementen in deze series zullen opnieuw verwerkt moeten worden",
-      "SERIES_ACL_LOCKED": "Bewerken van het toegangsbeleid is niet toegestaan wanneer er acties uitgevoerd worden op een evenement dat deel uitmaakt van de series",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "De bestaande events in deze series zullen opnieuw verwerkt moeten worden",
+      "SERIES_ACL_LOCKED": "Bewerken van het toegangsbeleid is niet toegestaan wanneer er acties uitgevoerd worden op een event dat deel uitmaakt van de series",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "De toegangspolicy vereist ten minste één rol met lees- en/of schrijfrechten.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "De toegangspolicy vereist minstens één rol met lees- en/of schrijfrechten.",
       "THEME_NAME_ALREADY_TAKEN": "Deze naam is reeds in gebruik",
@@ -225,17 +233,17 @@
       "VIDEO_TOO_MANY_AUDIOS": "Je kan niet meer dan 1 audio stream op een enkele video stream plaatsen",
       "SERVER_UNRESPONSIVE": "Oeps! De server lijkt momenteel niet te reageren. Gelieve het later nogmaals te proberen.",
       "SERVICE_UNAVAILABLE": "Oeps! De server lijkt momenteel niet te reageren. Gelieve het later nogmaals te proberen.",
-      "ACTIVE_TRANSACTION": "Het huidige evenement kan momenteel niet worden bewerkt aangezien het bij een actieve transactie betrokken is.",
+      "ACTIVE_TRANSACTION": "Het huidige event kan momenteel niet worden bewerkt aangezien het bij een actieve transactie betrokken is.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "Alle evenementen zijn met succes geüpdatet.",
-         "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Sommige evenementen konden niet geüpdatet worden."
+         "UNEXPECTED_ERROR": "Er is een onverwachte fout opgetreden tijdens het bijwerken. Sommige events zijn mogelijk bijgewerkt.",
+         "ALL_EVENTS_UPDATED": "Alle events zijn met succes geüpdatet.",
+         "NO_EVENTS_UPDATED": "Alle updates zijn mislukt.",
+         "SOME_EVENTS_NOT_UPDATED": "Sommige events konden niet geüpdatet worden."
       },
-      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
-      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
-      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
+      "ADOPTER_PROFILE_UPDATED": "Profielinformatie is succesvol bijgewerkt.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oeps! Kon de profielgegevens niet bijwerken. Probeer het opnieuw!",
+      "ADOPTER_PROFILE_DELETED": "Profielinformatie succesvol verwijderd.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oeps! Kon de profielgegevens niet verwijderen. Probeer het opnieuw!"
    },
    "BULK_ACTIONS": {
       "CAPTION": "Acties",
@@ -243,24 +251,24 @@
          "SERIES": {
             "CAPTION": "Verwijderen",
             "BUTTON": "Verwijderen",
-            "CANNOT_DELETE": "Deze series kunnen niet verwijdertd worden omdat deze nog eventementen bevaten."
+            "CANNOT_DELETE": "Deze series kunnen niet verwijderd worden omdat deze nog events bevatten."
          },
          "EVENTS": {
             "CAPTION": "Verwijderen",
-            "DELETE_EVENTS": "Evenementen verwijderen",
-            "UNAUTHORIZED": "Je hebt geen machtiging om het geselecteerde evenement te verwijderen. Gelieve selectie te verwijderen om verder te gaan."
+            "DELETE_EVENTS": "Events verwijderen",
+            "UNAUTHORIZED": "Je hebt geen machtiging om het geselecteerde event te verwijderen. Gelieve je selectie te verwijderen om verder te gaan."
          }
       },
-      "DELETE_EVENTS_WARNING_LINE1": "Eens verwijderd zijn alle metadata, audio- en videobestanden van het evenement verwijderd en niet meer te recupereren.",
+      "DELETE_EVENTS_WARNING_LINE1": "Eens verwijderd zijn alle metadata, audio- en videobestanden van het event verwijderd en niet meer te recupereren.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Eens verwijderd zijn de metadata van alle series niet meer te recupereren. Evenementen in de series worden niet verwijderd.",
+      "DELETE_SERIES_WARNING_LINE1": "Eens verwijderd zijn de metadata van alle series niet meer te recupereren. Events in de series worden niet verwijderd.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "Begin de taak",
          "GENERAL": {
             "CAPTION": "Algemeen",
-            "SUMMARY": "({{ count }} evenementen geselecteerd)",
-            "CANNOTSTART": "De gemarkeerde evenementen kunnen momenteel niet verwerkt worden. Verwijder ze uit de selectie of probeer het later opnieuw."
+            "SUMMARY": "({{ count }} events geselecteerd)",
+            "CANNOTSTART": "De gemarkeerde events kunnen momenteel niet verwerkt worden. Verwijder ze uit de selectie of probeer het later opnieuw."
          },
          "TASKS": {
             "CAPTION": "Taken",
@@ -268,70 +276,70 @@
          },
          "SUMMARY": {
             "CAPTION": "Samenvatting",
-            "EVENTS": "Evenementen",
-            "EVENTS_SUMMARY": "Je hebt {{numberOfEvents}} evenementen geselecteerd",
+            "EVENTS": "Events",
+            "EVENTS_SUMMARY": "Je hebt {{numberOfEvents}} events geselecteerd",
             "CONFIGURATION": "Configuratie",
             "WORKFLOW": "Taak"
          }
       },
       "EDIT_EVENTS": {
-         "CAPTION": "Geplande gebeurtenissen bewerken",
+         "CAPTION": "Geplande events bewerken",
          "CONFLICT_CHECK_RUNNING": "Conflict check wordt uitgevoerd…",
          "GENERAL": {
             "CAPTION": "Algemeen",
-            "CANNOTSTART": "Gemarkeerde Event (s) kunnen niet worden verwerkt, alleen geplande gebeurtenissen worden ondersteund.",
-            "NOCHANGES": "Geen veranderingen in de gebeurtenissen gedetecteerd!",
-            "CONFLICT_FIRST_EVENT": "Evenement veranderd",
-            "CONFLICT_SECOND_EVENT": "Evenement in conflict",
-            "CANNOTEDITSCHEDULE": "Onvoldoende permissies om de tijdschema informatie aan te passen voor het geselecteerde event. Je kan verdergaan, zonder de mogelijkheid om tijdschema informatie aan te passen voor alle events."
+            "CANNOTSTART": "De gemarkeerde events kunnen niet worden verwerkt, alleen geplande events worden ondersteund.",
+            "NOCHANGES": "Geen veranderingen in de events vastgesteld!",
+            "CONFLICT_FIRST_EVENT": "Event veranderd",
+            "CONFLICT_SECOND_EVENT": "Event in conflict",
+            "CANNOTEDITSCHEDULE": "Je hebt onvoldoende permissies om de tijdsinformatie aan te passen voor de geselecteerde events. Je kan verdergaan, zonder de mogelijkheid om de tijdsinformatie aan te passen voor alle events."
          },
          "METADATA": {
             "EDIT": "Metagegevens bewerken"
          },
          "SUMMARY": {
             "CAPTION": "Samenvatting",
-            "SINGLE_EVENT_CAPTION": "Evenement \"{{ title }}\"",
+            "SINGLE_EVENT_CAPTION": "Event \"{{ title }}\"",
             "TYPE": "Type",
             "PREVIOUS": "Oude waarde",
             "NEXT": "Nieuwe waarde"
          },
          "EDIT": {
             "CAPTION": "Bewerken",
-            "EVENT": "evenement",
-            "EVENTS": "evenementen",
-            "HEADER": "Deze pagina stelt u in staat geplande gebeurtenissen te bewerken, gegroepeerd op weekdagen. De invoervelden zijn vooraf ingevuld in het geval alle geplande gebeurtenissen dezelfde waarde hebben voor een specifiek veld. Anders worden de invoervelden leeg gelaten. Door de invoervelden leeg te laten, betekent dit dat de respectieve waarden niet gewijzigd moeten worden.",
+            "EVENT": "event",
+            "EVENTS": "events",
+            "HEADER": "Deze pagina stelt u in staat geplande events te bewerken, gegroepeerd op weekdagen. De invoervelden zijn vooraf ingevuld in het geval alle geplande events dezelfde waarde hebben voor een specifiek veld. Anders worden de invoervelden leeg gelaten. Door de invoervelden leeg te laten, betekent dit dat de respectieve waarden niet gewijzigd moeten worden.",
             "METADATA": "Metadata",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Bewerk de metadata van meerdere evenementen",
-         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "CAPTION": "Bewerk de metadata van meerdere events",
+         "FATAL_ERROR": "Er is een belangrijke fout opgetreden: {{ fatalError }}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Gemarkeerde evenementen kunnen niet bewerkt worden.",
-            "NOTHING_TO_EDIT": "Deze evenementen kunnen niet bewerkt worden.",
-            "NOT_FOUND": "Not found",
-            "RUNNING_WORKFLOW": "Running workflow",
+            "CANNOT_EDIT_SOME": "De gemarkeerde events kunnen niet bewerkt worden.",
+            "NOTHING_TO_EDIT": "Deze events kunnen niet bewerkt worden.",
+            "NOT_FOUND": "Niet gevonden",
+            "RUNNING_WORKFLOW": "Bezig met workflow",
             "TABLE": {
-               "CAPTION": "Geselecteerde evenementen",
-               "ERRORS": "Errors"
+               "CAPTION": "Geselecteerde events",
+               "ERRORS": "Fouten"
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Bewerk en/of selecteer de velden die je wilt updaten. Een veld kan niet worden geselecteerd als dit niet resulteert in een gewijzigde waarde voor minstens één event, of als het veld niet geldig is (bv. verplichte velden kunnen niet leeg blijven). Gemarkeerde velden hebben verschillende waarden voor de geselecteerde events.",
             "TABLE": {
-               "CAPTION": "Metadata of selected events",
+               "CAPTION": "Metadata van geselecteerde video's",
                "FIELDS": "Metadata",
-               "VALUES": "Values"
+               "VALUES": "Waarden"
             }
          },
          "UPDATE_FAILURES": {
             "TABLE": {
-               "CAPTION": "Update Failures"
+               "CAPTION": "Update fouten"
             },
-            "UPDATE_FAILED": "Update failed",
-            "NO_EVENTS_UPDATED": "All updates failed.",
-            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+            "UPDATE_FAILED": "Update mislukt",
+            "NO_EVENTS_UPDATED": "Alle updates zijn mislukt.",
+            "SOME_EVENTS_NOT_UPDATED": "De gemarkeerde video's kunnen niet bewerkt worden."
          }
       }
    },
@@ -394,58 +402,58 @@
    },
    "ADOPTER_REGISTRATION": {
       "MODAL": {
-         "CAPTION": "Registration",
-         "SKIP": "Not now",
-         "CONTINUE": "Continue",
-         "BACK": "Back",
+         "CAPTION": "Registratie",
+         "SKIP": "Nu niet",
+         "CONTINUE": "Ga door",
+         "BACK": "Terug",
          "LEGAL_INFO_STATE": {
-            "HEADER": "Terms of Service and Privacy Policy"
+            "HEADER": "Gebruiksvoorwaarden en privacybeleid"
          },
          "INFORMATION_STATE": {
-            "HEADER": "Thank you for using Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
-            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+            "HEADER": "Bedankt voor het gebruiken van Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Onze ontwikkelaars proberen je de best mogelijke gebruikerservaring te bieden. Hiervoor moeten we meer weten over wie Opencast gebruikt en hoe het gebruikt wordt. Je kunt ons helpen met een snelle registratie.",
+            "INFORMATION_PARAGRAPH_2": "We waarderen elke feedback. Data over het gebruik van Opencast helpt ons de software te verbeteren, de kans op extra financiering te verhogen en meer bedrijven aan te trekken om diensten te verlenen rond Opencast."
          },
          "FORM_STATE": {
-            "ORGANISATION": "Organisation",
-            "DEPARTMENT": "Department",
-            "COUNTRY": "Country",
-            "POSTAL_CODE": "Postal code",
-            "CITY": "City",
-            "CONTACT_INFO": "Contact information",
-            "GENDER": "Gender",
-            "GENDER_MALE": "male",
-            "GENDER_FEMALE": "female",
-            "FIRST_NAME": "First name",
-            "LAST_NAME": "Last name",
-            "STREET": "Street",
-            "NUMBER": "Number",
-            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
-            "MAIL": "Email",
-            "CONTACT_ME": "Contact me for updates and secruity issues",
-            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
-            "POLICY_HEADLINE": "Privacy policy and terms of use",
-            "USAGE_STATISTICS": "Usage statistcs",
-            "ERROR_REPORTS": "Error reports",
-            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
-            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "ORGANISATION": "Organisatie",
+            "DEPARTMENT": "Afdeling",
+            "COUNTRY": "Land",
+            "POSTAL_CODE": "Postcode",
+            "CITY": "Stad",
+            "CONTACT_INFO": "Contactinformatie",
+            "GENDER": "Geslacht",
+            "GENDER_MALE": "man",
+            "GENDER_FEMALE": "vrouw",
+            "FIRST_NAME": "Voornaam",
+            "LAST_NAME": "Familienaam",
+            "STREET": "Straat",
+            "NUMBER": "Nummer",
+            "ADDITIONAL_ADDRESS_INFO": "Bijkomende adresinformatie",
+            "MAIL": "E-mail",
+            "CONTACT_ME": "Contacteer me bij updates en veiligheidsproblemen",
+            "WHICH_DATA_TO_SHARE": "Welke data wil je delen?",
+            "POLICY_HEADLINE": "Privacybeleid en gebruiksvoorwaarden",
+            "USAGE_STATISTICS": "Gebruiksstatistieken",
+            "ERROR_REPORTS": "Foutmeldingen",
+            "READ_TERMS_OF_USE_BEFORE": "Ik heb het gelezen en ga akkoord met de",
+            "READ_TERMS_OF_USE_LINK": "privacybeleid en gebruiksvoorwaarden",
             "READ_TERMS_OF_USE_AFTER": ""
          },
          "SKIP_STATE": {
-            "HEADER": "Maybe next time!",
-            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+            "HEADER": "Misschien de volgende keer!",
+            "TEXT": "Klik op de help knop in de rechterbovenhoek om je later te registreren."
          },
          "THANK_YOU_STATE": {
-            "HEADER": "Thank you for your registration!",
-            "TEXT_LEADING_TO_PATH": "You can change your data at ",
-            "TEXT_LEADING_AFTER_PATH": "at any time."
+            "HEADER": "Bedankt voor jouw registratie!",
+            "TEXT_LEADING_TO_PATH": "U kunt uw gegevens wijzigen op ",
+            "TEXT_LEADING_AFTER_PATH": "op elk gewenst moment."
          },
          "ERROR": {
-            "HEADER": "Error",
-            "TEXT": "An error occurred while processing your request."
+            "HEADER": "Fout",
+            "TEXT": "Er is een fout opgetreden tijdens het verwerken van je verzoek."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Are you sure you want to delete your registration data?"
+            "TEXT": "Zeker dat je jouw registratiegegevens wilt verwijderen?"
          }
       }
    },
@@ -465,7 +473,7 @@
       },
       "EVENTS": {
          "NEW": {
-            "CAPTION": "Creëer evenement",
+            "CAPTION": "Creëer event",
             "METADATA": {
                "CAPTION": "Metadata"
             },
@@ -508,7 +516,7 @@
                   },
                   "MULTIPLE_PARTS": {
                      "SHORT": "Meerdere delen",
-                     "DETAIL": "Een set bestanden met verschillende delen van het evenement."
+                     "DETAIL": "Een set bestanden met verschillende delen van het event."
                   }
                },
                "DATE_TIME": {
@@ -521,7 +529,7 @@
                   "DURATION": "Duur"
                },
                "SCHEDULE_SINGLE": {
-                  "CAPTION": "Eén evenement inplannen"
+                  "CAPTION": "Eén event inplannen"
                },
                "SCHEDULE_MULTIPLE": {
                   "CAPTION": "Meerdere events inplannen",
@@ -583,15 +591,15 @@
             }
          },
          "NAVIGATION": {
-            "EVENTS": "Evenementen",
+            "EVENTS": "Events",
             "SERIES": "Series",
             "OVERVIEW": "Overzicht"
          },
          "UPLOAD": "Uploaden",
          "ADD_SERIES": "Series toevoegen",
-         "ADD_EVENT": "Evenement toevoegen",
+         "ADD_EVENT": "Event toevoegen",
          "TABLE": {
-            "CAPTION": "Evenementen",
+            "CAPTION": "Events",
             "TITLE": "Titel",
             "PRESENTERS": "Presentator(en)",
             "SERIES": "Series",
@@ -615,12 +623,12 @@
                "ASSETS": "Open asset details",
                "START": "Filter voor deze begindatum",
                "SERIES": "Filter voor deze serie",
-               "STATUS": "Filter voor deze gebeurtenis status",
+               "STATUS": "Filter op deze event status",
                "LOCATION": "Filter voor deze locatie",
-               "DETAILS": "Open evenement details",
+               "DETAILS": "Open event details",
                "DELETE": "Verwijder event",
-               "EMBEDDING_CODE": "Embedding code",
-               "EDITOR": "Open video Editor",
+               "EMBEDDING_CODE": "Code inbedden",
+               "EDITOR": "Open video editor",
                "EDITOR_NEEDS_CUTTING": "Open video-Editor (een opmerking geeft aan dat video trimmen is aangevraagd)",
                "COMMENTS": "Commentaar bekijken",
                "PAUSED_WORKFLOW": "Onderbroken workflow weergeven",
@@ -638,7 +646,7 @@
             "PROCESSED": "Voltooid",
             "RECORDING_FAILURE": "Opname mislukt",
             "PROCESSING_FAILURE": "Verwerking mislukt",
-            "PROCESSING_CANCELED": "Verwerking geannuleerd"
+            "PROCESSING_CANCELLED": "Verwerking geannuleerd"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Intrekken",
@@ -650,7 +658,7 @@
             "UPDATING_PREVIEWS": "Previews updaten"
          },
          "DETAILS": {
-            "HEADER": "Details van evenement {{resourceId}}",
+            "HEADER": "Details van event {{resourceId}}",
             "TABS": {
                "METADATA": "Metadata",
                "EXTENDED-METADATA": "Metadata II",
@@ -664,14 +672,14 @@
             },
             "PUBLICATIONS": {
                "CAPTION": "Publicaties",
-               "NO_PUBLICATIONS_AVAILABLE": "Deze gebeurtenis heeft geen publicaties",
-               "PUBLICATION_DESCRIPTION": "Dit evenement is gepubliceerd op de volgende publicatie kanalen:",
-               "LIVE_EVENT_NOT_IN_PROGRESS": "Deze gebeurtenis wordt niet uitgevoerd",
+               "NO_PUBLICATIONS_AVAILABLE": "Dit event is niet gepubliceerd.",
+               "PUBLICATION_DESCRIPTION": "Dit event is gepubliceerd op de volgende kanalen:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Dit event wordt niet uitgevoerd",
                "CUSTOM": "Aangepast",
                "ENGAGE": "Aan de slag",
                "ENGAGE_LIVE": "Engage live",
                "EXTERNAL_API": "Publicatie van de externe API",
-               "YOUTUBE": "Youtube",
+               "YOUTUBE": "YouTube",
                "OAIPMH": "OAI-PMH",
                "SELECT_WORKFLOW": "Selecteer workflow",
                "SELECT_WORKFLOW_EMPTY": "Geen workflows beschikbaar"
@@ -731,7 +739,7 @@
                   "DURATION": "Duur"
                },
                "SCHEDULE_SINGLE": {
-                  "CAPTION": "Eén evenement inplannen"
+                  "CAPTION": "Eén event inplannen"
                },
                "SCHEDULE_MULTIPLE": {
                   "CAPTION": "Meerdere events inplannen",
@@ -886,7 +894,7 @@
                   "REVIEW": "Beoordeling vereist",
                   "ASYNC": "A/V tracks asynchroon",
                   "AUDIO_ISSUE": "Ontbrekend of gebrekkig audiokanaal",
-                  "CANCELED": "Evenement annuleren",
+                  "CANCELLED": "Event annuleren",
                   "CONFLICTING_METADATA": "Conflicterende metadata",
                   "IMPROPER_POINT": "Ongepast in- of uitpunt",
                   "MISSING_AGREEMENT": "Ontbrekende overeenkomst",
@@ -906,7 +914,7 @@
                "CAPTION": "Statistieken"
             },
             "METADATA": {
-               "CAPTION": "Details evenement",
+               "CAPTION": "Details event",
                "TITLE": "Titel",
                "ID": "UID",
                "SERIES": "Series",
@@ -931,7 +939,7 @@
                "PUBLIC": "Openbaar doel",
                "OS": "Verwerking besturingssysteem",
                "LOCKED": {
-                  "RUNNING": "Aanpassen van metadata is niet mogelijk wanneer er verwerkingen gebeuren op een evenement"
+                  "RUNNING": "Aanpassen van metadata is niet mogelijk wanneer er verwerkingen gebeuren op een event"
                }
             },
             "SCHEDULING": {
@@ -1006,7 +1014,7 @@
                   "TIME_IN_QUEUE": "Tijd in wachtrij",
                   "STARTED": "Gestart",
                   "FINISHED": "Voltooid",
-                  "RETRY_STRATEGY": "Retry Strategy",
+                  "RETRY_STRATEGY": "Strategie opnieuw proberen",
                   "FAILED_ATTEMPTS": "Mislukte pogingen",
                   "MAX_ATTEMPTS": "Max",
                   "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
@@ -1108,15 +1116,15 @@
          "TABLE": {
             "CAPTION": "Series",
             "TITLE": "Series",
-            "HAS_EVENTS": "Bevat eventementen",
+            "HAS_EVENTS": "Bevat events",
             "ORGANIZERS": "Organisator(en)",
             "CONTRIBUTORS": "Bijdrager(s)",
             "CREATED": "Aangemaakt",
             "MANAGED_ACL": "Toegangspolicy",
-            "EVENTS": "Evenementen",
+            "EVENTS": "Events",
             "ACTION": "Acties",
             "TOOLTIP": {
-               "SERIES": "Gebeurtenissen filteren voor deze serie",
+               "SERIES": "Filter events op deze serie",
                "DETAILS": "Serie details openen",
                "DELETE": "Verwijder series"
             }
@@ -1126,7 +1134,7 @@
             "TABS": {
                "METADATA": "Metadata",
                "EXTENDED_METADATA": "Metadata II",
-               "EVENTS": "Evenementen",
+               "EVENTS": "Events",
                "PERMISSIONS": "Toegangspolicy",
                "THEME": "Thema",
                "STATISTICS": "Statistieken"
@@ -1149,10 +1157,10 @@
                   "ACTION": "Acties",
                   "NEW": "Nieuwe policy",
                   "DETAILS": "Details",
-                  "REPLACE_EVENT_ACLS": "Event permissies updaten",
-                  "REPLACE_EVENT_ACLS_HINT": "Zorg ervoor dat alle gebeurtenissen van deze serie deze machtigingen hebben",
-                  "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "REPLACE_EVENT_ACLS": "Permissies bijwerken",
+                  "REPLACE_EVENT_ACLS_HINT": "Zorg ervoor dat alle events van deze serie deze permissies hebben",
+                  "LOAD_MORE_LIMIT": "beleidsrichtlijnen getoond.",
+                  "LOAD_MORE_LINK": "Laad meer"
                },
                "ROLES": {
                   "LABEL": "Selecteer een rol",
@@ -1201,13 +1209,13 @@
             "NAME": "Naam",
             "LOCATION": "Locatie",
             "UPDATED": "Laatste update",
-            "NEXT_DATE": "Volgend evenement",
-            "NEXT_NAME": "Titel volgend evenement",
+            "NEXT_DATE": "Volgend event",
+            "NEXT_NAME": "Titel volgend event",
             "STATUS": "Status",
             "VERSION": "Versie",
             "ACTION": "Acties",
             "TOOLTIP": {
-               "NAME": "Gebeurtenissen filteren voor deze locatie",
+               "NAME": "Events filteren voor deze locatie",
                "DETAILS": "Open locatie details",
                "DELETE": "Locatie verwijderen (unregister capture agent)"
             }
@@ -1447,7 +1455,7 @@
                "NAME": "Naam",
                "DESCRIPTION": "Beschrijving",
                "DEFAULT": "Standaard",
-               "SET_DEFAULT_INFO": "Stel als standaard theme in voor alle series en evenementen",
+               "SET_DEFAULT_INFO": "Stel in als standaard thema voor alle series en events",
                "NAME_ERROR": "Naam is reeds in gebruik",
                "NAME_REQUIRED": "Verplicht"
             },
@@ -1503,13 +1511,13 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Thema aanmaken",
-            "EDITCAPTION": "Theme details - {{name}}",
+            "EDITCAPTION": "Details theme - {{name}}",
             "GENERAL": {
                "CAPTION": "Algemeen",
                "NAME": "Naam",
                "DESCRIPTION": "Beschrijving",
                "DEFAULT": "Standaard",
-               "SET_DEFAULT_INFO": "Stel in als standaard thema voor alle series en evenementen",
+               "SET_DEFAULT_INFO": "Stel in als standaard thema voor alle series en events",
                "NAME_REQUIRED": "Verplicht"
             },
             "BUMPER": {
@@ -1601,7 +1609,7 @@
             "INSTANTIATED": "Geïnstantieerd",
             "DISPATCHING": "Versturen",
             "RESTART": "Herstart",
-            "CANCELED": "Geannuleerd",
+            "CANCELLED": "Geannuleerd",
             "WAITING": "Wachtend"
          }
       },
@@ -1696,7 +1704,7 @@
          "END": "Einde"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "Een standaard thumbnail om het event te visualiseren wordt automatisch gegenereerd. Indien je zelf een andere thumbnail wil gebruiken kan je een thumbnail laten genereren op de huidige positie van de videoplayer, of zelf een afbeelding uploaden.",
+         "DESCRIPTION": "Een standaard thumbnail om het event te visualiseren wordt automatisch gegenereerd. Indien je zelf een andere thumbnail wil gebruiken, kan je een thumbnail laten genereren op de huidige positie van de videospeler, of zelf een afbeelding uploaden.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1732,7 +1740,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "Je kan tracks deselecteren om deze uit te sluiten van verdere verwerking. Gelieve rekening te houden met het feit dat je het evenement opnieuw moet publiceren om de wijzigingen effectief toe te passen.",
+         "DESCRIPTION": "Je kan tracks deselecteren om deze uit te sluiten van verdere verwerking. Gelieve rekening te houden met het feit dat je het event opnieuw moet publiceren om de wijzigingen effectief toe te passen.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "Selecteer ten minste een video track",
             "NO_AUDIO_TRACK_SELECTED": "Selecteer ten minste een audio track"
@@ -2075,9 +2083,9 @@
             "SELECT_NEXT_DASHBOARD_FILTER": "Selecteer de volgende dashboard filter",
             "SELECT_PREVIOUS_DASHBOARD_FILTER": "Selecteer de vorige dashboard filter",
             "REMOVE_FILTERS": "Alle filters verwijderen",
-            "EVENT_VIEW": "Evenementen",
+            "EVENT_VIEW": "Events",
             "SERIES_VIEW": "Series",
-            "NEW_EVENT": "Evenement toevoegen",
+            "NEW_EVENT": "Event toevoegen",
             "NEW_SERIES": "Series toevoegen",
             "CHEAT_SHEET": "Sneltoetsen"
          },
@@ -2091,7 +2099,7 @@
             "NEXT_SEGMENT": "Volgende segment / Direct naar einde",
             "VOLUME_UP": "Volume omhoog",
             "VOLUME_DOWN": "Volume omlaag",
-            "MUTE": "Mute/unmute"
+            "MUTE": "Dempen aan/uit"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Splitsen",

@@ -22,34 +22,34 @@
         </div>
         <div class="full-col">
           <div class="obj tbl-list">
-            <header translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.CAPTION" />
-              <div class="obj-container">
-                <table class="main-tbl">
-                  <thead>
-                    <tr>
-                      <th class="small"><input type="checkbox" ng-model="allSelected" ng-change="allSelectedChanged(allSelected)" class="select-all-cbox"></th>
-                      <th class="full-width" translate="EVENTS.EVENTS.TABLE.TITLE">
-                        <!-- Title -->
-                      </th>
-                      <th class="nowrap" translate="EVENTS.EVENTS.TABLE.SERIES">
-                        <!-- Series -->
-                      </th>
-                      <th class="nowrap" translate="EVENTS.EVENTS.TABLE.STATUS">
-                        <!-- Progress -->
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody >
-                    <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: nonSchedule(row), info: noAgentAccess(row)}">
-                      <td><input name="selection" ng-required="!hasAnySelected()" type="checkbox" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
-                      <td>{{ row.title }}</td>
-                      <td class="nowrap">{{ row.series_name}}</td>
-                      <td class="nowrap">{{ row.event_status }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+            <header translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.CAPTION"></header>
+            <div class="obj-container">
+              <table class="main-tbl">
+                <thead>
+                  <tr>
+                    <th class="small"><input type="checkbox" ng-model="allSelected" ng-change="allSelectedChanged(allSelected)" class="select-all-cbox"></th>
+                    <th class="full-width" translate="EVENTS.EVENTS.TABLE.TITLE">
+                      <!-- Title -->
+                    </th>
+                    <th class="nowrap" translate="EVENTS.EVENTS.TABLE.SERIES">
+                      <!-- Series -->
+                    </th>
+                    <th class="nowrap" translate="EVENTS.EVENTS.TABLE.STATUS">
+                      <!-- Progress -->
+                    </th>
+                  </tr>
+                </thead>
+                <tbody >
+                  <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: nonSchedule(row), info: noAgentAccess(row)}">
+                    <td><input name="selection" ng-required="!hasAnySelected()" type="checkbox" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
+                    <td>{{ row.title }}</td>
+                    <td class="nowrap">{{ row.series_name}}</td>
+                    <td class="nowrap">{{ row.event_status }}</td>
+                  </tr>
+                </tbody>
+              </table>
 
-              </div><!-- obj-container -->
+            </div><!-- obj-container -->
 
           </div><!-- obj -->
 
@@ -143,7 +143,7 @@
                             ng-change="onTemporalValueChange(wd, 'start')"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                             ng-options="h.index as h.value for h in hours"
-                    />
+                    ></select>
                     <select chosen
                             ng-disabled="checkingConflicts"
                             data-width="'100px'"
@@ -151,7 +151,7 @@
                             ng-change="onTemporalValueChange(wd, 'start');"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                             ng-options="m.index as m.value for m in minutes"
-                    />
+                    ></select>
                   </td>
                 </tr>
                 <tr>
@@ -164,7 +164,7 @@
                             ng-change="onTemporalValueChange(wd, 'end');"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                             ng-options="h.index as h.value for h in hours"
-                    />
+                    ></select>
                     <select chosen
                             ng-disabled="checkingConflicts"
                             data-width="'100px'"
@@ -172,10 +172,10 @@
                             ng-change="onTemporalValueChange(wd, 'end');"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                             ng-options="m.index as m.value for m in minutes"
-                    />
+                    ></select>
                     <span ng-bind="scheduling.end.date"
                           ng-show="scheduling.end.date !== scheduling.start.date"
-                    />
+                    ></span>
                   </td>
                 </tr>
                 <tr>
@@ -188,7 +188,7 @@
                             ng-model="scheduling[wd].location"
                             ng-options="ca.name for ca in captureAgents | filter:hasAgentAccess track by ca.id"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
-                            />
+                            ></select>
                   </td>
                   <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                     {{ source.device.name }}
@@ -257,9 +257,9 @@
               <table class="main-tbl">
                 <thead>
                   <tr>
-                    <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.TYPE" />
-                      <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.PREVIOUS" />
-                        <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.NEXT" />
+                    <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.TYPE"></th>
+                    <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.PREVIOUS"></th>
+                    <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.NEXT"></th>
                   </tr>
                 </thead>
                 <tbody >

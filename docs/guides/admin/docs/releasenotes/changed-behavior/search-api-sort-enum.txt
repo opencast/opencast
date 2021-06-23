@@ -1,0 +1,1 @@
+- Rename value for `sort` parameter in search API from `DATE_PUBLISHED` to `DATE_MODIFIED`.

@@ -16,7 +16,8 @@
                 <td admin-ng-editable
                     class="editable" name="row.id"
                                      target="dublincore/episode"
-                                     params="row" save="$parent.wizard.save">
+                                     params="row" save="$parent.wizard.save"
+                                     sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
             </table>
@@ -40,7 +41,8 @@
                 <td>{{ row.label | translate }} <i ng-show="row.required" class="required">*</i></td>
                 <td admin-ng-editable
                     class="editable" name="row.id" target="{{name}}"
-                                                   params="row" save="$parent.wizard.save">
+                                                   params="row" save="$parent.wizard.save"
+                                                   sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
             </table>
@@ -246,7 +248,7 @@
                 </select>
                 <span ng-bind="wizard.step.ud.SCHEDULE_SINGLE.end.date"
                       ng-show="wizard.step.ud.SCHEDULE_SINGLE.end.date !== wizard.step.ud.SCHEDULE_SINGLE.start.date"
-                      />
+                      ></span>
               </td>
             </tr>
             <tr>

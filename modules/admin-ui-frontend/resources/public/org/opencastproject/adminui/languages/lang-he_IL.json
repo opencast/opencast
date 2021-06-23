@@ -2,6 +2,12 @@
    "MATTERHORN": "Opencast",
    "NAV_HOME": "התחל",
    "NAV_ABOUT": "אודות",
+   "BUILD": {
+      "BUILT_ON": "built on",
+      "DATE_DESC": "Date this system's kernel module was built on.",
+      "COMMIT": "Git commit this version was built from.",
+      "VERSION": "Common bundle version"
+   },
    "NO": "לא",
    "SUBMIT": "שלח",
    "UPDATE": {
@@ -31,8 +37,10 @@
       "CURRENT_JOBS": "Today's jobs",
       "PRESENTER": "Presenter",
       "PRESENTER_DESCRIPTION": "Video file for the presenter track",
+      "VIDEOFILE": "Videofile",
+      "VIDEOFILE_DESCRIPTION": "Video file for upload",
       "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
       "UPLOAD": "Upload",
       "UPLOADING": "Uploading",
       "EDIT": "Save",
@@ -227,7 +235,7 @@
       "SERVICE_UNAVAILABLE": ". אופס! נראה שהשרת לא מגיב. נא נסה שוב מאוחר יותר.",
       "ACTIVE_TRANSACTION": "לא ניתן לערוך את האירוע הזה בזמן שהוא עובר עיבוד.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
          "ALL_EVENTS_UPDATED": "All events were successfully updated.",
          "NO_EVENTS_UPDATED": "All updates failed.",
          "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
@@ -306,7 +314,7 @@
       },
       "EDIT_EVENTS_METADATA": {
          "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "FATAL_ERROR": "A fatal error occurred: {{ fatalError }}",
          "REQUEST_ERRORS": {
             "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
             "NOTHING_TO_EDIT": "The events cannot be edited.",
@@ -420,12 +428,12 @@
             "LAST_NAME": "Last name",
             "STREET": "Street",
             "NUMBER": "Number",
-            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
             "MAIL": "Email",
-            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "CONTACT_ME": "Contact me for updates and security issues",
             "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
             "POLICY_HEADLINE": "Privacy policy and terms of use",
-            "USAGE_STATISTICS": "Usage statistcs",
+            "USAGE_STATISTICS": "Usage statistics",
             "ERROR_REPORTS": "Error reports",
             "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
             "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
@@ -638,7 +646,7 @@
             "PROCESSED": "הסתיים",
             "RECORDING_FAILURE": "הקלטה נכשלה",
             "PROCESSING_FAILURE": "עיבוד נכשל",
-            "PROCESSING_CANCELED": "עיבוד בוטל"
+            "PROCESSING_CANCELLED": "Processing cancelled"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
@@ -886,7 +894,7 @@
                   "REVIEW": "סקירת דרישות",
                   "ASYNC": "רצועות שמע/וידאו לא מתואמות",
                   "AUDIO_ISSUE": "רצועת שמע חסרה או פגומה",
-                  "CANCELED": "אירועים מבוטלים",
+                  "CANCELLED": "Cancelled event",
                   "CONFLICTING_METADATA": "מטה-נתונים סותרים",
                   "IMPROPER_POINT": "לא נכון או מחוץ נקודה",
                   "MISSING_AGREEMENT": "הסכמה חסרה",
@@ -1601,7 +1609,7 @@
             "INSTANTIATED": "מופעל",
             "DISPATCHING": "משגר",
             "RESTART": "הפעלה מחדש",
-            "CANCELED": "בוטל",
+            "CANCELLED": "Cancelled",
             "WAITING": "ממתין"
          }
       },

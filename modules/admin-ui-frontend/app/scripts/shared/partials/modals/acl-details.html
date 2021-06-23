@@ -39,7 +39,8 @@
                         ng-model="metadata.name"
                         ng-model-options="{ debounce: {'default': 500} }"
                         ng-required="true"
-                        placeholder="{{ 'USERS.ACLS.DETAILS.METADATA.NAME.PLACEHOLDER' | translate }}">
+                        placeholder="{{ 'USERS.ACLS.DETAILS.METADATA.NAME.PLACEHOLDER' | translate }}"
+                        sanitize-xml="metadata.name">
                     </td>
                   </tr>
                 </table>
@@ -85,7 +86,7 @@
                                     ng-options="id as name for (id, name) in acls"
                                     placeholder-text-single="'{{ 'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                     no-results-text="'{{ 'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                    />
+                                    ></select>
                           </div>
                         </td>
                       </tr>
@@ -133,7 +134,7 @@
                                       call-on-search="getMatchingRoles"
                                       placeholder-text-single="'{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                       no-results-text="'{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
-                                      />
+                                      ></select>
                             </td>
                             <td class="fit"><input type="checkbox" ng-model="policy.read"/></td>
                             <td class="fit"><input type="checkbox" ng-model="policy.write"/></td>

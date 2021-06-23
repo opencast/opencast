@@ -310,6 +310,11 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
             obj = stream.get("nb_frames");
             if (obj != null) {
               vMetadata.setFrames(Long.parseLong((String) obj));
+            } else if (vMetadata.getDuration() != null && vMetadata.getFrameRate() != null) {
+              long framesEstimation = Double.valueOf(vMetadata.getDuration() / 1000.0 * vMetadata.getFrameRate()).longValue();
+              if (framesEstimation >= 1) {
+                vMetadata.setFrames(framesEstimation);
+              }
             }
           }
 

@@ -6,7 +6,7 @@
   <tags>
     <tag>delete</tag>
   </tags>
-  <description>This workflow is used by the Admin UI to retract all publications of an event upon deletion</description>
+  <description>This workflow is used to retract all publications of an event upon deletion</description>
   <operations>
 
     <!-- Make sure the workflow contains at least a default configuration -->

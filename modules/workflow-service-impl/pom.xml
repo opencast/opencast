@@ -76,6 +76,21 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-elasticsearch-index</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-dublincore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
     </dependency>

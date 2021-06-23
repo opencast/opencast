@@ -13,7 +13,7 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <prometheus.version>0.9.0</prometheus.version>
+    <prometheus.version>0.11.0</prometheus.version>
   </properties>
   <dependencies>
     <!-- Opencast dependencies -->
@@ -52,6 +52,11 @@
     <dependency>
       <groupId>io.prometheus</groupId>
       <artifactId>simpleclient_common</artifactId>
+      <version>${prometheus.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_hotspot</artifactId>
       <version>${prometheus.version}</version>
     </dependency>
     <!-- Testing -->
@@ -95,12 +100,14 @@
             <Import-Package>
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
+              !io.opentelemetry.*,
+              !com.sun.management.*,
               *
             </Import-Package>
             <Embed-Dependency>
-              simpleclient,
-              simpleclient_common
+              *;groupId=io.prometheus,
             </Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
           </instructions>
         </configuration>
       </plugin>

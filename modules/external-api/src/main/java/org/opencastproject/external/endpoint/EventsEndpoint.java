@@ -40,7 +40,6 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.elasticsearch.index.IndexObject;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
@@ -107,6 +106,8 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.entwinemedia.fn.Fn;
@@ -170,7 +171,8 @@ import javax.ws.rs.core.Response.Status;
 
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
+            ApiMediaType.VERSION_1_6_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
 public class EventsEndpoint implements ManagedService {
@@ -186,6 +188,12 @@ public class EventsEndpoint implements ManagedService {
   /** Subtype of previews required by the video editor */
   private static final String DEFAULT_PREVIEW_SUBTYPE = "preview";
 
+  /** ID of the workflow used to retract published events */
+  private static final String RETRACT_WORKFLOW = "retract.workflow.id";
+
+  /** Default ID of the workflow used to retract published events */
+  private static final String DEFAULT_RETRACT_WORKFLOW = "delete";
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(EventsEndpoint.class);
 
@@ -197,6 +205,8 @@ public class EventsEndpoint implements ManagedService {
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
 
   private Map<String, MetadataField> configuredMetadataFields = new TreeMap<>();
+
+  private String retractWorkflowId = DEFAULT_RETRACT_WORKFLOW;
 
   /** The resolutions */
   private enum CommentResolution {
@@ -326,6 +336,9 @@ public class EventsEndpoint implements ManagedService {
     logger.debug("Preview subtype is '{}'", previewSubtype);
 
     configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
+
+    retractWorkflowId = StringUtils.defaultString((String) properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
+    logger.debug("Retract Workflow is '{}'", retractWorkflowId);
   }
 
   public static <T> boolean isNullOrEmpty(List<String> list) {
@@ -420,14 +433,45 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}")
   @RestQuery(name = "deleteevent", description = "Deletes an event.", returnDescription = "", pathParameters = {
           @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
-                  @RestResponse(description = "The event has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-                  @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+          @RestResponse(description = "The event has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+          @RestResponse(description = "The retraction of publications has started.", responseCode = HttpServletResponse.SC_ACCEPTED),
+          @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
-          throws NotFoundException, UnauthorizedException {
-    if (!indexService.removeEvent(id))
-      return Response.serverError().build();
-
-    return Response.noContent().build();
+          throws SearchIndexException, UnauthorizedException {
+    final Opt<Event> event = indexService.getEvent(id, externalIndex);
+    if (event.isNone()) {
+      return RestUtil.R.notFound(id);
+    }
+    final Runnable doOnNotFound = () -> {
+      try {
+        externalIndex.delete(Event.DOCUMENT_TYPE, id, getSecurityService().getOrganization().getId());
+      } catch (SearchIndexException e) {
+        logger.error("error removing event {}: {}", id, e);
+      }
+    };
+    final IndexService.EventRemovalResult result;
+    try {
+      result = indexService.removeEvent(event.get(), doOnNotFound, retractWorkflowId);
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Workflow database is not reachable. This may be a temporary problem.");
+      return RestUtil.R.serverError();
+    } catch (NotFoundException e) {
+      logger.error("Configured retract workflow not found. Check your configuration.");
+      return RestUtil.R.serverError();
+    }
+    switch (result) {
+      case SUCCESS:
+        return Response.noContent().build();
+      case RETRACTING:
+        return Response.accepted().build();
+      case GENERAL_FAILURE:
+        return Response.serverError().build();
+      case NOT_FOUND:
+        doOnNotFound.run();
+        return RestUtil.R.notFound(id);
+      default:
+        throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());
+    }
   }
 
   @POST
@@ -1773,7 +1817,7 @@ public class EventsEndpoint implements ManagedService {
   @GET
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
-              ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+              ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1802,7 +1846,7 @@ public class EventsEndpoint implements ManagedService {
   @PUT
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
-              ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+              ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),

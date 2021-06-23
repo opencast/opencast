@@ -290,7 +290,10 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
               withPublishedElements, checkAvailability, false);
     }
 
-    if (!downloadElementsDistributed && !streamingElementsDistributed) {
+    if (!downloadElementsDistributed && !streamingElementsDistributed
+        && (downloadSourceFlavors.length > 0 || downloadSourceTags.length > 0
+        || streamingSourceFlavors.length > 0 || streamingSourceTags.length > 0)) {
+      // skip publication if no elements was distributed but should be
       return createResult(mp, Action.SKIP);
     }
 

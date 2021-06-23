@@ -248,8 +248,9 @@ public class SolrIndexManager {
         inputDocument.setField(field, doc.get(field));
       }
 
-      // Set the oc_deleted field to the current date, then update
+      // Set the oc_deleted and oc_modified field to the given date, then update
       Schema.setOcDeleted(inputDocument, deletionDate);
+      Schema.setOcModified(inputDocument, deletionDate);
       solrServer.add(inputDocument);
       solrServer.commit();
       return true;

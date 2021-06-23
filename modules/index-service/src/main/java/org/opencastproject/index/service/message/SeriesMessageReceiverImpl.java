@@ -24,12 +24,17 @@ package org.opencastproject.index.service.message;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesIndexUtils;
 import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.series.SeriesItem;
+import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.data.Option;
@@ -41,6 +46,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesItem> {
 
@@ -59,44 +66,42 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
 
   @Override
   protected void execute(SeriesItem seriesItem) {
-    Series series = null;
+    Function<Optional<Series>, Optional<Series>> updateFunction = null;
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
+    String seriesId = seriesItem.getSeriesId();
+
     switch (seriesItem.getType()) {
       case UpdateCatalog:
         logger.debug("Received Update Series for index {}", getSearchIndex().getIndexName());
-
         DublinCoreCatalog dc = seriesItem.getMetadata();
-        String seriesId = dc.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);
 
-        // Load or create the corresponding series
-        try {
-          series = SeriesIndexUtils.getOrCreate(seriesId, organization, user, getSearchIndex());
+        updateFunction = (Optional<Series> seriesOpt) -> {
+          Series series = seriesOpt.orElse(new Series(seriesItem.getSeriesId(), organization));
           series.setCreator(getSecurityService().getUser().getName());
-          SeriesIndexUtils.updateSeries(series, dc);
-        } catch (SearchIndexException e) {
-          logger.error("Error retrieving series {} from the search index", seriesId, e);
-          return;
-        }
 
-        // Update the event series titles if they changed
-        try {
-          SeriesIndexUtils.updateEventSeriesTitles(series, organization, getSecurityService().getUser(),
-                  getSearchIndex());
-        } catch (SearchIndexException e) {
-          logger.error("Error updating the series name of series {} from the associated events",
-                  series.getIdentifier(), e);
-        }
-
-        // Persist the series
-        update(seriesItem.getSeriesId(), series);
+          // update from dublin core catalog
+          series.setTitle(dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
+          series.setDescription(dc.getFirst(DublinCore.PROPERTY_DESCRIPTION));
+          series.setSubject(dc.getFirst(DublinCore.PROPERTY_SUBJECT));
+          series.setLanguage(dc.getFirst(DublinCoreCatalog.PROPERTY_LANGUAGE));
+          series.setLicense(dc.getFirst(DublinCoreCatalog.PROPERTY_LICENSE));
+          series.setRightsHolder(dc.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER));
+          String createdDateStr = dc.getFirst(DublinCoreCatalog.PROPERTY_CREATED);
+          if (createdDateStr != null) {
+            series.setCreatedDateTime(EncodingSchemeUtils.decodeDate(createdDateStr));
+          }
+          series.setPublishers(dc.get(DublinCore.PROPERTY_PUBLISHER, DublinCore.LANGUAGE_ANY));
+          series.setContributors(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY));
+          series.setOrganizers(dc.get(DublinCoreCatalog.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY));
+          return Optional.of(series);
+        };
         break;
       case UpdateAcl:
         logger.debug("Received Update Series ACL for index {}", getSearchIndex().getIndexName());
 
-        // Load or create the corresponding series
-        try {
-          series = SeriesIndexUtils.getOrCreate(seriesItem.getSeriesId(), organization, user, getSearchIndex());
+        updateFunction = (Optional<Series> seriesOpt) -> {
+          Series series = seriesOpt.orElse(new Series(seriesItem.getSeriesId(), organization));
 
           List<ManagedAcl> acls = aclServiceFactory.serviceFor(getSecurityService().getOrganization()).getAcls();
           Option<ManagedAcl> managedAcl = AccessInformationUtil.matchAcls(acls, seriesItem.getAcl());
@@ -104,42 +109,32 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
             series.setManagedAcl(managedAcl.get().getName());
 
           series.setAccessPolicy(AccessControlParser.toJsonSilent(seriesItem.getAcl()));
-        } catch (SearchIndexException e) {
-          logger.error("Error retrieving series {} from the search index", seriesItem.getSeriesId(), e);
-          return;
-        }
-
-        // Persist the updated series
-        update(seriesItem.getSeriesId(), series);
+          return Optional.of(series);
+        };
         break;
       case UpdateProperty:
-        logger.debug("Received update property of series {} for index {}", seriesItem.getSeriesId(), getSearchIndex().getIndexName());
+        logger.debug("Received update property of series {} for index {}", seriesItem.getSeriesId(),
+                getSearchIndex().getIndexName());
 
         if (!THEME_PROPERTY_NAME.equals(seriesItem.getPropertyName()))
           break;
 
-        // Load or create the corresponding series
-        try {
-          series = SeriesIndexUtils.getOrCreate(seriesItem.getSeriesId(), organization, user, getSearchIndex());
+        updateFunction = (Optional<Series> seriesOpt) -> {
+          Series series = seriesOpt.orElse(new Series(seriesItem.getSeriesId(), organization));
           series.setTheme(Opt.nul(seriesItem.getPropertyValue()).bind(Strings.toLong).orNull());
-        } catch (SearchIndexException e) {
-          logger.error("Error retrieving series {} from the search index", seriesItem.getSeriesId(), e);
-          return;
-        }
-
-        // Persist the updated series
-        update(seriesItem.getSeriesId(), series);
+          return Optional.of(series);
+        };
         break;
       case Delete:
-        logger.debug("Received Delete Series Event {} for index {}", seriesItem.getSeriesId(), getSearchIndex().getIndexName());
+        logger.debug("Received Delete Series Event {} for index {}", seriesItem.getSeriesId(),
+                getSearchIndex().getIndexName());
 
         // Remove the series from the search index
         try {
-          getSearchIndex().delete(Series.DOCUMENT_TYPE, seriesItem.getSeriesId().concat(organization));
+          getSearchIndex().delete(Series.DOCUMENT_TYPE, seriesItem.getSeriesId(), organization);
           logger.debug("Series {} removed from search index", seriesItem.getSeriesId());
         } catch (SearchIndexException e) {
           logger.error("Error deleting the series {} from the search index", seriesItem.getSeriesId(), e);
-          return;
         }
         return;
       case UpdateElement:
@@ -148,14 +143,37 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
       default:
         throw new IllegalArgumentException("Unhandled type of SeriesItem");
     }
-  }
 
-  private void update(String seriesId, Series series) {
-    try {
-      getSearchIndex().addOrUpdate(series);
-      logger.debug("Series {} updated in the search index", seriesId);
-    } catch (SearchIndexException e) {
-      logger.error("Error storing the series {} to the search index", seriesId, e);
+    // do the actual update
+    if (updateFunction != null) {
+      try {
+        Optional<Series> updatedSeriesOpt = getSearchIndex().addOrUpdateSeries(seriesId, updateFunction, organization,
+                user);
+
+        // update series title in events
+        if (updatedSeriesOpt.isPresent() && updatedSeriesOpt.get().isSeriesTitleUpdated()) {
+          Series updatedSeries = updatedSeriesOpt.get();
+          SearchResult<Event> events = getSearchIndex().getByQuery(
+                  new EventSearchQuery(organization, user).withoutActions().withSeriesId(updatedSeries.getIdentifier()));
+          for (SearchResultItem<Event> searchResultItem : events.getItems()) {
+            String eventId = searchResultItem.getSource().getIdentifier();
+
+            Function<Optional<Event>, Optional<Event>> eventUpdateFunction = (Optional<Event> eventOpt) -> {
+              if (eventOpt.isPresent() && eventOpt.get().getSeriesId().equals(updatedSeries.getIdentifier())) {
+                Event event = eventOpt.get();
+                event.setSeriesName(updatedSeries.getTitle());
+                return Optional.of(event);
+              }
+              return Optional.empty();
+            };
+
+            getSearchIndex().addOrUpdateEvent(eventId, eventUpdateFunction, organization, user);
+          }
+        }
+        logger.debug("Series {} updated in the search index", seriesId);
+      } catch (SearchIndexException e) {
+        logger.error("Error storing the series {} in the search index", seriesId, e);
+      }
     }
   }
 
@@ -163,5 +181,4 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
-
 }

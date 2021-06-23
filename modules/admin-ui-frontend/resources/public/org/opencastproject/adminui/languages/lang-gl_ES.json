@@ -2,6 +2,12 @@
    "MATTERHORN": "Opencast",
    "NAV_HOME": "Inicio",
    "NAV_ABOUT": "Acerca de",
+   "BUILD": {
+      "BUILT_ON": "built on",
+      "DATE_DESC": "Date this system's kernel module was built on.",
+      "COMMIT": "Git commit this version was built from.",
+      "VERSION": "Common bundle version"
+   },
    "NO": "Non",
    "SUBMIT": "Enviar",
    "UPDATE": {
@@ -31,8 +37,10 @@
       "CURRENT_JOBS": "Traballos de hoxe",
       "PRESENTER": "Relator",
       "PRESENTER_DESCRIPTION": "Ficheiro de vídeo coa gravación do relator",
+      "VIDEOFILE": "Videofile",
+      "VIDEOFILE_DESCRIPTION": "Video file for upload",
       "CAPTION": "Subtítulos",
-      "CAPTION_DESCRIPTION": "Ficheiro de subtítulos en formato VTT",
+      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
       "UPLOAD": "Cargar",
       "UPLOADING": "Cargando",
       "EDIT": "Gardar",
@@ -227,7 +235,7 @@
       "SERVICE_UNAVAILABLE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "ACTIVE_TRANSACTION": "No se pode modificar este evento mentres exista un fluxo de traballo ou unha transacción activos.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "Produciuse un erro inesperado na actualización. Pode que algúns eventos non se actualizasen.",
+         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
          "ALL_EVENTS_UPDATED": "Todos os eventos se actualizaron correctamente.",
          "NO_EVENTS_UPDATED": "Fallaron tódalas actualizacións.",
          "SOME_EVENTS_NOT_UPDATED": "Non se puideron crear algúns eventos."
@@ -306,7 +314,7 @@
       },
       "EDIT_EVENTS_METADATA": {
          "CAPTION": "Modificar os metadatos de múltiples eventos",
-         "FATAL_ERROR": "Produciuse un erro grave: {{ fatalError }}",
+         "FATAL_ERROR": "A fatal error occurred: {{ fatalError }}",
          "REQUEST_ERRORS": {
             "CANNOT_EDIT_SOME": "Non se poden modificar os eventos resaltados.",
             "NOTHING_TO_EDIT": "No se poden modificar os eventos.",
@@ -420,12 +428,12 @@
             "LAST_NAME": "Last name",
             "STREET": "Street",
             "NUMBER": "Number",
-            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
             "MAIL": "Email",
-            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "CONTACT_ME": "Contact me for updates and security issues",
             "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
             "POLICY_HEADLINE": "Privacy policy and terms of use",
-            "USAGE_STATISTICS": "Usage statistcs",
+            "USAGE_STATISTICS": "Usage statistics",
             "ERROR_REPORTS": "Error reports",
             "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
             "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
@@ -638,7 +646,7 @@
             "PROCESSED": "Finalizado",
             "RECORDING_FAILURE": "Fallo na gravación",
             "PROCESSING_FAILURE": "Fallo no procesamento",
-            "PROCESSING_CANCELED": "Procesamento cancelado"
+            "PROCESSING_CANCELLED": "Processing cancelled"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retirando",
@@ -886,7 +894,7 @@
                   "REVIEW": "Pendente de revisar",
                   "ASYNC": "Pistas de A/V asíncronas",
                   "AUDIO_ISSUE": "Pista de audio non dispoñible ou defectuosa",
-                  "CANCELED": "Evento cancelado",
+                  "CANCELLED": "Cancelled event",
                   "CONFLICTING_METADATA": "Conflito de metadatos",
                   "IMPROPER_POINT": "Punto inicial ou final incorrecto",
                   "MISSING_AGREEMENT": "Acordo non dispoñible",
@@ -1601,7 +1609,7 @@
             "INSTANTIATED": "Instanciado",
             "DISPATCHING": "Asignando",
             "RESTART": "Reiniciar",
-            "CANCELED": "Cancelado",
+            "CANCELLED": "Cancelled",
             "WAITING": "Esperando"
          }
       },

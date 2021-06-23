@@ -31,25 +31,31 @@ import org.opencastproject.authorization.xacml.XACMLParsingException;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.impl.SearchResultImpl;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.util.data.Option;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXParseException;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.xml.bind.UnmarshalException;
 
 public class AclScannerTest {
 
@@ -76,17 +82,31 @@ public class AclScannerTest {
     orgService = EasyMock.createNiceMock(OrganizationDirectoryService.class);
     EasyMock.expect(orgService.getOrganizations()).andReturn(orgs).anyTimes();
 
+    User user = EasyMock.createNiceMock(User.class);
+    EasyMock.expect(user.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+
     final SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
 
-    final MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    SearchResultImpl<Event> eventSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
+    EasyMock.expect(eventSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
 
-    EasyMock.replay(orgService, messageSender, securityService);
+    SearchResultImpl<Series> seriesSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
+    EasyMock.expect(seriesSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
+
+    final AbstractSearchIndex index = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(eventSearchResult)
+            .anyTimes();
+    EasyMock.expect(index.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(seriesSearchResult)
+            .anyTimes();
+
+    EasyMock.replay(orgService, securityService, index, user, eventSearchResult, seriesSearchResult);
 
     AclServiceFactory aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
         return new AclServiceImpl(new DefaultOrganization(), aclDb, null, null, null,
-                messageSender);
+                index, index, securityService);
       }
     };
 
@@ -120,7 +140,7 @@ public class AclScannerTest {
       aclScanner.install(file);
       fail("Should not be parsed.");
     } catch (XACMLParsingException e) {
-      assertTrue("The file can not be parsed.", e.getCause() instanceof UnmarshalException);
+      assertTrue("The file can not be parsed.", e.getCause() instanceof SAXParseException);
     }
   }
 
@@ -171,7 +191,7 @@ public class AclScannerTest {
       aclScanner.update(file);
       fail("Should not be parsed.");
     } catch (XACMLParsingException e) {
-      assertTrue("The file can not be parsed.", e.getCause() instanceof UnmarshalException);
+      assertTrue("The file can not be parsed.", e.getCause() instanceof SAXParseException);
     }
   }
 

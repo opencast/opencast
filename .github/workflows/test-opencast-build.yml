@@ -8,6 +8,7 @@ on:
       - 'docs/checkstyle/**'
       - 'docs/log4j/**'
       - 'assemblies/**'
+      - '.github/**'
   push:
     paths:
       - 'pom.xml'
@@ -15,14 +16,15 @@ on:
       - 'docs/checkstyle/**'
       - 'docs/log4j/**'
       - 'assemblies/**'
+      - '.github/**'
 
 jobs:
   build:
     strategy:
       matrix:
         java:
-          - 8
           - 11
+          - 13
     name: build (java ${{ matrix.java }})
     runs-on: ubuntu-20.04
     steps:

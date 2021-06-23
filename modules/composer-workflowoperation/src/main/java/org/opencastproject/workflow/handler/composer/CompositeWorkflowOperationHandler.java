@@ -53,6 +53,7 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -95,8 +96,6 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final String SOURCE_FLAVOR_WATERMARK = "source-flavor-watermark";
   private static final String SOURCE_URL_WATERMARK = "source-url-watermark";
 
-  private static final String TARGET_TAGS = "target-tags";
-  private static final String TARGET_FLAVOR = "target-flavor";
   private static final String ENCODING_PROFILE = "encoding-profile";
 
   private static final String LAYOUT = "layout";
@@ -154,18 +153,19 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     logger.debug("Running composite workflow operation on workflow {}", workflowInstance.getId());
 
     try {
-      return composite(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());
+      return composite(workflowInstance);
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
   }
 
-  private WorkflowOperationResult composite(MediaPackage src, WorkflowOperationInstance operation)
+  private WorkflowOperationResult composite(WorkflowInstance wi)
           throws EncoderException, IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
+    MediaPackage src = wi.getMediaPackage();
     MediaPackage mediaPackage = (MediaPackage) src.clone();
     CompositeSettings compositeSettings;
     try {
-      compositeSettings = new CompositeSettings(operation);
+      compositeSettings = new CompositeSettings(wi);
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to parse composite settings because", e);
       return createResult(mediaPackage, Action.SKIP);
@@ -274,8 +274,6 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     private String sourceTagsWatermark;
     private String sourceFlavorWatermark;
     private String sourceUrlWatermark;
-    private String targetTagsOption;
-    private String targetFlavorOption;
     private String encodingProfile;
     private String layoutMultipleString;
     private String layoutSingleString;
@@ -305,8 +303,10 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
     private MediaPackageElementFlavor targetFlavor = null;
 
-    CompositeSettings(WorkflowOperationInstance operation) throws WorkflowOperationException {
-      // Check which tags have been configured
+    CompositeSettings(WorkflowInstance wi) throws WorkflowOperationException {
+      WorkflowOperationInstance operation = wi.getCurrentOperation();
+      ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
+          Configuration.none, Configuration.none, Configuration.many, Configuration.one);
       sourceAudioName = StringUtils.trimToNull(operation.getConfiguration(SOURCE_AUDIO_NAME));
       if (sourceAudioName == null) {
         sourceAudioName = ComposerService.BOTH; // default
@@ -322,8 +322,9 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       sourceFlavorWatermark = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_WATERMARK));
       sourceUrlWatermark = StringUtils.trimToNull(operation.getConfiguration(SOURCE_URL_WATERMARK));
 
-      targetTagsOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS));
-      targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
+      targetTags = tagsAndFlavors.getTargetTags();
+      targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
+
       encodingProfile = StringUtils.trimToNull(operation.getConfiguration(ENCODING_PROFILE));
 
       layoutMultipleString = StringUtils.trimToNull(operation.getConfiguration(LAYOUT_MULTIPLE));
@@ -366,13 +367,6 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       if (profile == null)
         throw new WorkflowOperationException("Encoding profile '" + encodingProfile + "' was not found");
 
-      // Target tags
-      targetTags = asList(targetTagsOption);
-
-      // Target flavor
-      if (targetFlavorOption == null)
-        throw new WorkflowOperationException("Target flavor must be set!");
-
       // Output resolution
       if (outputResolution == null)
         throw new WorkflowOperationException("Output resolution must be set!");
@@ -406,11 +400,10 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       }
 
       try {
-        targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
         if ("*".equals(targetFlavor.getType()) || "*".equals(targetFlavor.getSubtype()))
           throw new WorkflowOperationException("Target flavor must have a type and a subtype, '*' are not allowed!");
       } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Target flavor '" + targetFlavorOption + "' is malformed");
+        throw new WorkflowOperationException("Target flavor '" + targetFlavor + "' is malformed");
       }
 
       // Support legacy "source-flavor-upper" option

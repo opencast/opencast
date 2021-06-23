@@ -41,6 +41,10 @@ paths:
                     description: Title of the video 
                     type: string
                     example: "Video title"
+                  workflow_active:
+                    description: Is a workflow runing
+                    type: boolean
+                    example: false
                   date:
                     description: Creation date 
                     type: string

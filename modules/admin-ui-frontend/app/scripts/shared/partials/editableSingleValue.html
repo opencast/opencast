@@ -36,7 +36,7 @@
             name="hours"
             placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
             ng-options="h.index as h.value for h in hours"
-            />
+            ></select>
       <select chosen
               ng-if="params.type === 'time' && editMode"
               ng-change="submit()"
@@ -49,5 +49,5 @@
               name="minutes"
               placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
               ng-options="m.index as m.value for m in minutes"
-              />
+              ></select>
 </div>
