@@ -115,9 +115,13 @@ public class TobiraApi {
       description = "Harvesting API to get incremental updates about series and events.",
       restParameters = {
           @RestParameter(
-              name = "limit",
+              name = "preferredAmount",
               isRequired = true,
-              description = "The maximum number of items to return. Has to be positive.",
+              description = "A preferred number of items the request should return. This is "
+                  + "merely a rough guideline and the API might return more or fewer items than "
+                  + "this parameter. You cannot rely on an exact number of returned items! "
+                  + "In practice this API usually returns between 0 and twice this parameter "
+                  + "number of items.",
               type = Type.INTEGER
           ),
           @RestParameter(
@@ -134,77 +138,77 @@ public class TobiraApi {
       returnDescription = "Event and Series Data changed after the given timestamp"
   )
   public Response harvest(
-      @QueryParam("limit") Integer limit,
+      @QueryParam("preferredAmount") Integer preferredAmount,
       @QueryParam("since") Long since
   ) {
     // Parameter error handling
     if (since == null) {
       return badRequest("Required parameter 'since' not specified");
     }
-    if (limit == null) {
-      return badRequest("Required parameter 'limit' not specified");
+    if (preferredAmount == null) {
+      return badRequest("Required parameter 'preferredAmount' not specified");
     }
     if (since < 0) {
       return badRequest("Parameter 'since' < 0, but it has to be positive or 0");
     }
-    if (limit <= 0) {
-      return badRequest("Parameter 'limit' <= 0, but it has to be positive");
+    if (preferredAmount <= 0) {
+      return badRequest("Parameter 'preferredAmount' <= 0, but it has to be positive");
     }
 
-    logger.debug("Request to '/harvest' with limit={} and since={}", limit, since);
+    logger.debug("Request to '/harvest' with preferredAmount={} since={}", preferredAmount, since);
 
     try {
       // Retrieve episodes from index.
       //
-      // We actually fetch `limit + 1` to get some useful extra information: whether there are more
-      // events and if so, what timestamp that extra event was modified at.
+      // We actually fetch `preferredAmount + 1` to get some useful extra information: whether there
+      // are more events and if so, what timestamp that extra event was modified at.
       final SearchQuery q = new SearchQuery()
           .withUpdatedSince(new Date(since))
           .withSort(SearchQuery.Sort.DATE_MODIFIED)
           .includeDeleted(true)
-          .withLimit(limit + 1);
+          .withLimit(preferredAmount + 1);
       final SearchResultItem[] rawEvents = searchService.getForAdministrativeRead(q).getItems();
-      final boolean hasMoreEvents = rawEvents.length == limit + 1;
+      final boolean hasMoreEvents = rawEvents.length == preferredAmount + 1;
       logger.debug("Retrieved {} events from the index during harvest", rawEvents.length);
 
 
       // Retrieve series from DB.
       //
       // Here we optimize a bit to avoid transfering some items twice. If the events were limited by
-      // `limit` (i.e. there are more than we will return), we only fetch series that were modified
-      // before the modification date of the last event we will return. Consider that
+      // `preferredAmount` (i.e. there are more than we will return), we only fetch series that
+      // were modified before the modification date of the last event we will return. Consider that
       // `includesItemsUntil` can be at most that event's modification date. So if we were to now
       // return any series that are modified after that timestamp, they will be returned by the
       // next request of the client as well, since the next request's `since` parameter is the
       // `includesItemsUntil` value of the current response.
       //
-      // We also fetch `limit + 1` here to be able to know whether there are more series in the
-      // given time range, which allows us to figure out `hasMore` and `includesItemsUntil` more
-      // precisely.
+      // We also fetch `preferredAmount + 1` here to be able to know whether there are more series
+      // in the given time range, which allows us to figure out `hasMore` and `includesItemsUntil`
+      // more precisely.
       final Optional<Date> seriesRangeEnd = hasMoreEvents
           ? Optional.of(rawEvents[rawEvents.length - 1].getModified())
           : Optional.empty();
       final List<Series> rawSeries = seriesService.getAllForAdministrativeRead(
           new Date(since),
           seriesRangeEnd,
-          limit + 1
+          preferredAmount + 1
       );
-      final boolean hasMoreSeriesInRange = rawSeries.size() == limit + 1;
+      final boolean hasMoreSeriesInRange = rawSeries.size() == preferredAmount + 1;
       logger.debug("Retrieved {} series from the database during harvest", rawSeries.size());
 
 
-      // Convert events and series into JSON representation. We limit both to `limit` here again,
-      // because we fetched `limit + 1` above.
+      // Convert events and series into JSON representation. We limit both to `preferredAmount` here
+      // again, because we fetched `preferredAmount + 1` above.
       final Stream<Item> eventItems = Arrays.stream(rawEvents)
-          .limit(limit)
+          .limit(preferredAmount)
           .filter(event -> {
             // Here, we potentially filter out some events. Compare to above: when loading series
-            // from the DB, we used the modified date of the last event as upper bound of the series
-            // modified date. That is, IF we had more events than `limit`. The same reasoning
-            // applies the other way: if we have more series than `limit`, then all events with
-            // modified dates after the modified date of the last series we return will be included
-            // in the next request anyway. So we might as well filter them out here to save a bit
-            // on the size of this request.
+            // from the DB, we used the modified date of the last event as upper bound of the
+            // series modified date. That is, IF we had more events than `preferredAmount`. The
+            // same reasoning applies the other way: if we have more series than `preferredAmount`,
+            // then all events with modified dates after the modified date of the last series we
+            // return will be included in the next request anyway. So we might as well filter them
+            // out here to save a bit on the size of this request.
             //
             // The reason we first filter series, then events, is because it is likely that an
             // Opencast instance contains way more events than series. This means that
@@ -220,7 +224,7 @@ public class TobiraApi {
           .map(event -> new Item(event));
 
       final Stream<Item> seriesItems = rawSeries.stream()
-          .limit(limit)
+          .limit(preferredAmount)
           .map(series -> new Item(series));
 
 
