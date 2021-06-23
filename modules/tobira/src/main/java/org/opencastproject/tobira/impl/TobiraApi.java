@@ -182,7 +182,7 @@ public class TobiraApi {
       // given time range, which allows us to figure out `hasMore` and `includesItemsUntil` more
       // precisely.
       final Optional<Date> seriesRangeEnd = hasMoreEvents
-          ? Optional.of(rawEvents[rawEvents.length - 2].getModified())
+          ? Optional.of(rawEvents[rawEvents.length - 1].getModified())
           : Optional.empty();
       final List<Series> rawSeries = seriesService.getAllForAdministrativeRead(
           new Date(since),
@@ -213,7 +213,7 @@ public class TobiraApi {
               return true;
             }
 
-            final Date lastSeriesModifiedDate = rawSeries.get(rawSeries.size() - 2)
+            final Date lastSeriesModifiedDate = rawSeries.get(rawSeries.size() - 1)
                 .getModifiedDate();
             return !event.getModified().after(lastSeriesModifiedDate);
           })
@@ -235,17 +235,36 @@ public class TobiraApi {
 
 
       // Obtain information to allow Tobira to plan the next harvesting request.
-      //
-      // The timestamp that can be used as next `since` parameter depends on whether we have more
-      // items. If that's not the case, we basically just return the current timestamp (minus a
-      // buffer, see docs for `TIME_BUFFER_SIZE`). If we have more items, we can use the timestamp
-      // of the last item in `items`, thanks to our filtering and upper limit on modified date
-      // above. However, it must also be at least `TIME_BUFFER_SIZE` in the past.
       boolean hasMore = hasMoreEvents || hasMoreSeriesInRange;
-      final long timeBuffer = new Date().getTime() - TIME_BUFFER_SIZE;
-      final long includesItemsUntil = hasMore
-          ? Math.min(items.get(items.size() - 1).getModifiedDate().getTime(), timeBuffer)
-          : timeBuffer;
+      final Date includesItemsUntilRaw;
+      if (!hasMoreEvents && !hasMoreSeriesInRange) {
+        // All events and series up to now have been harvested.
+        includesItemsUntilRaw = new Date();
+      } else if (!hasMoreEvents && hasMoreSeriesInRange) {
+        // `rawEvents` contains all events that currently exist. Our response won't contain the ones
+        // that have a modified date after the one of the last raw series. But that means that we
+        // will return all series and events until the last raw series.
+        includesItemsUntilRaw = rawSeries.get(rawSeries.size() - 1).getModifiedDate();
+      } else if (hasMoreEvents && !hasMoreSeriesInRange) {
+        // There are more events, but no additional series in the range from `since` to the modified
+        // date of the last raw event. So we know there are no other events or series before the
+        // last raw events.
+        includesItemsUntilRaw = rawEvents[rawEvents.length - 1].getModified();
+      } else {
+        // There are more events and more series in the given range. In theory, this would be
+        // `Math.min()` of the last raw event and last raw series. However, since `hasMoreEvents`
+        // is set, we only loaded series with modified dates smaller than the last raw event's
+        // modified date. That means, that the modified date of the last raw series is always
+        // smaller than that of the last raw event.
+        includesItemsUntilRaw = rawSeries.get(rawSeries.size() - 1).getModifiedDate();
+      }
+
+      // The `includesItemsUntil` we return has to be at least `TIME_BUFFER_SIZE` in the past. See
+      // the constant's documentation for more information on that.
+      final long includesItemsUntil = Math.min(
+          includesItemsUntilRaw.getTime(),
+          new Date().getTime() - TIME_BUFFER_SIZE
+      );
 
 
       // Assembly full response.
