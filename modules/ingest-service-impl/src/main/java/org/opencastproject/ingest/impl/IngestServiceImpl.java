@@ -219,6 +219,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The default is not to automatically skip attachments and catalogs from capture agent */
   public static final boolean DEFAULT_SKIP = false;
 
+  /** The maximum length of filenames ingested by Opencast */
+  public static final int FILENAME_LENGTH_MAX = 75;
+
   /** Managed Property key to allow Opencast series modification during ingest
    * Deprecated, the param potentially causes an update chain reaction for all
    * events associated to that series, for each ingest */
@@ -715,13 +718,18 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding track {} from input stream on mediapackage {}", elementId, mediaPackage);
+      if (fileName.length() > FILENAME_LENGTH_MAX) {
+        final String extension = "." + FilenameUtils.getExtension(fileName);
+        final int length = Math.max(0, FILENAME_LENGTH_MAX - extension.length());
+        fileName = fileName.substring(0, length) + extension;
+      }
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
       if (tags != null && tags.length > 0) {
         MediaPackageElement trackElement = mp.getTrack(elementId);
         for (String tag : tags) {
-          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          logger.debug("Adding tag `{}` to element {}", tag, elementId);
           trackElement.addTag(tag);
         }
       }

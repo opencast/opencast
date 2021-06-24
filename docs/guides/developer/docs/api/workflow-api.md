@@ -5,8 +5,6 @@ The Workflow API is available since API version 1.1.0.
 
 # Workflow instances
 
-**Warning:** these examples reference the `fast` testing workflow. Recordings archived from the `fast` testing workflow can not be used with other Opencast workflows.
-
 ### GET /api/workflows
 
 Returns a list of workflow instances.
@@ -75,7 +73,6 @@ __Sample request__
 ```xml
 https://opencast.example.org/api/workflow-definitions?sort=event_created:DESC&limit=5&offset=1&filter=workflow_definition_identifier:fast
 ```
-Note: The "fast" workflow is for testing only. Recordings created from that workflow are incompatible with other Opencast workflows.
 
 __Response__
 
