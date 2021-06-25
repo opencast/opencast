@@ -162,6 +162,10 @@ public class SearchResultItemImpl implements SearchResultItem {
   @XmlElement
   private Date modified = null;
 
+  /** Date of when this event was deleted or null if the event was not deleted */
+  @XmlElement
+  private Date deleted = null;
+
   /** Result ranking score **/
   @XmlElement
   private double score = -1;
@@ -639,12 +643,20 @@ public class SearchResultItemImpl implements SearchResultItem {
     return modified;
   }
 
+  public Date getDeletionDate() {
+    return deleted;
+  }
+
   /**
    * @param modified
    *          the modified to set
    */
   public void setModified(Date modified) {
     this.modified = modified;
+  }
+
+  public void setDeletionDate(Date deleted) {
+    this.deleted = deleted;
   }
 
   /**
@@ -723,6 +735,7 @@ public class SearchResultItemImpl implements SearchResultItem {
     }
     item.setCover(from.getCover());
     item.setModified(from.getModified());
+    item.setDeletionDate(from.getDeletionDate());
     item.setScore(from.getScore());
     for (MediaSegment s : from.getSegments()) {
       item.addSegment(s);
