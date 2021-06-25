@@ -463,7 +463,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         SearchQuery seriesSearch = new SearchQuery();
         seriesSearch.includeSeries(true)
             .includeEpisodes(false)
-            .withQuery("*:(dc_title___:" + SolrUtils.clean(seriesName) + ")");
+            .withQuery("dc_title___:" + SolrUtils.clean(seriesName));
         result = searchService.getByQuery(seriesSearch);
       } catch (SearchException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -477,13 +477,15 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         invalidSeries = true;
       } else {
         if (result.getTotalSize() > 1) {
+          logger.debug("Retrieved {} series with sname parameter {}, we only expect a single series to be returned",
+                        result.getTotalSize(), seriesName);
           return Response.status(Response.Status.BAD_REQUEST)
               .entity("more than one series matches given series name")
               .build();
         }
         SearchResultItem seriesResult = result.getItems()[0];
         seriesId = seriesResult.getId();
-        logger.debug("Using sname parameter, series ID found: {}", seriesId);
+        logger.debug("Using sname parameter, series {} found with ID {}", seriesName, seriesId);
       }
     }
 
@@ -567,6 +569,13 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               description = "The lucene query."
           ),
           @RestParameter(
+              name = "series",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              defaultValue = "false",
+              description = "Include series in the search result."
+          ),
+          @RestParameter(
               name = "sort",
               isRequired = false,
               type = RestParameter.Type.STRING,
@@ -614,6 +623,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   )
   public Response getByLuceneQuery(
       @QueryParam("q") String q,
+      @QueryParam("series") boolean includeSeries,
       @QueryParam("sort") String sort,
       @QueryParam("limit") int limit,
       @QueryParam("offset") int offset,
@@ -626,6 +636,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     if (!StringUtils.isBlank(q)) {
       query.withQuery(q);
     }
+
+    // Include series data in the results?
+    query.includeSeries(includeSeries);
 
     query.withSort(SearchQuery.Sort.DATE_CREATED, false);
     if (StringUtils.isNotBlank(sort)) {
