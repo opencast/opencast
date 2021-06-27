@@ -545,7 +545,12 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           mp = ingestService.addAttachment(in, fileName, flavor, tags, mp);
           break;
         case Catalog:
-          mp = ingestService.addCatalog(in, fileName, flavor, tags, mp);
+          try {
+            mp = ingestService.addCatalog(in, fileName, flavor, tags, mp);
+          } catch (IllegalArgumentException e) {
+            logger.debug("Invalid catalog data", e);
+            return Response.serverError().status(Status.BAD_REQUEST).build();
+          }
           break;
         case Track:
           if (startTime == null) {

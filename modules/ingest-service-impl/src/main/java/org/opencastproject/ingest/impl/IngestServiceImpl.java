@@ -69,6 +69,7 @@ import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ProgressInputStream;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -117,8 +118,10 @@ import org.xml.sax.SAXException;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -135,9 +138,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.ObjectInstance;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Creates and augments Opencast MediaPackages. Stores media into the Working File Repository.
@@ -922,7 +922,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   @Override
   public MediaPackage addCatalog(InputStream in, String fileName, MediaPackageElementFlavor flavor, String[] tags,
-          MediaPackage mediaPackage) throws IOException, IngestException {
+          MediaPackage mediaPackage) throws IOException, IngestException, IllegalArgumentException {
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG, null, null, false, ingestFileJobLoad);
@@ -933,14 +933,25 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Start adding catalog {} from input stream on mediapackage {}", elementId, mediaPackageId);
       final URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
 
-      // Verify XML is not corrupted
-      try {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        builder.parse(workingFileRepository.get(mediaPackageId, elementId));
-      } catch (SAXException | ParserConfigurationException e) {
-        workingFileRepository.delete(mediaPackageId, elementId);
-        throw new IOException("Catalog XML is invalid", e);
+      final boolean isJSON;
+      try (InputStream inputStream = workingFileRepository.get(mediaPackageId, elementId)) {
+        try (BufferedReader reader  = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+          // Exception for current BBB integration which is ingesting a JSON array as catalog
+          isJSON = reader.read() == '[';
+        }
+      }
+
+      if (isJSON) {
+        logger.warn("Input catalog seems to be JSON. This is a mistake and will fail in future Opencast versions."
+            + "You will likely want to ingest this as a media package attachment instead.");
+      } else {
+        // Verify XML is not corrupted
+        try {
+          XmlSafeParser.parse(workingFileRepository.get(mediaPackageId, elementId));
+        } catch (SAXException e) {
+          workingFileRepository.delete(mediaPackageId, elementId);
+          throw new IllegalArgumentException("Catalog XML is invalid", e);
+        }
       }
 
       if (MediaPackageElements.SERIES.equals(flavor)) {
@@ -951,7 +962,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (tags != null && tags.length > 0) {
         MediaPackageElement trackElement = mp.getCatalog(elementId);
         for (String tag : tags) {
-          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          logger.info("Adding tag {} to element {}", tag, elementId);
           trackElement.addTag(tag);
         }
       }
