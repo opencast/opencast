@@ -215,8 +215,7 @@ public final class LtiUtils {
     text.append(endpoint);
     text.append("\" name=\"ltiLaunchForm\" id=\"ltiLaunchForm_" + submitUuid + "\" method=\"post\" ");
     text.append(" encType=\"application/x-www-form-urlencoded\" accept-charset=\"utf-8\">\n");
-    if (debug) {
-    }
+
     for (Entry<String, String> entry : newMap.entrySet()) {
       String key = entry.getKey();
       String value = entry.getValue();
@@ -240,7 +239,8 @@ public final class LtiUtils {
       text.append(htmlspecialchars(launchtext));
       text.append("\">\n");
 
-      text.append(" <input type=\"Submit\" value=\"Show Launch Data\" onclick=\"document.getElementById('ltiLaunchDebug_");
+      text.append(
+          " <input type=\"Submit\" value=\"Show Launch Data\" onclick=\"document.getElementById('ltiLaunchDebug_");
       text.append(submitUuid);
       text.append("').style.display = 'block';return false;\">\n");
     } else {
@@ -271,7 +271,7 @@ public final class LtiUtils {
     text.append("   ourUrl = window.location.href;\n");
     text.append("   if ( formAction.indexOf('http://') == 0 && ourUrl.indexOf('https://') == 0 ) {\n");
     text.append("      theform.target = '_blank';\n");
-    text.append("      window.console && console.log('Launching http from https in new window!');\n");
+    text.append("      window.console && console.debug('Launching http from https in new window!');\n");
     text.append("    }\n");
     text.append("  }\n");
     text.append("}\n");

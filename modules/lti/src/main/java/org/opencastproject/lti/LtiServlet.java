@@ -332,7 +332,8 @@ public class LtiServlet extends HttpServlet implements ManagedService {
     props.put(LTI_MESSAGE_TYPE, LTI_MESSAGE_TYPE_CONTENTITEMSELECTION);
     props.put(CONTENT_ITEMS, contentItems);
     props.put(DATA, req.getParameter(DATA));
-    Map<String, String> properties = LtiUtils.signProperties(props, returnUrl, "POST", consumerKey, consumerSecret, "", "", "", "", "", null);
+    Map<String, String> properties = LtiUtils.signProperties(
+                props, returnUrl, "POST", consumerKey, consumerSecret, "", "", "", "", "", null);
     resp.setContentType("text/html");
 
     // whether to show debug info before sending content items to tool consumer
@@ -396,7 +397,7 @@ public class LtiServlet extends HttpServlet implements ManagedService {
     }
   }
 
-  public void activate(ComponentContext cc) {
+  public void activate() {
     logger.info("LTI Servlet started.");
   }
 
