@@ -30,6 +30,7 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +41,7 @@ import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -1201,9 +1203,11 @@ public final class MediaPackageImpl implements MediaPackage {
   public static MediaPackageImpl valueOf(InputStream xml) throws MediaPackageException {
     try {
       Unmarshaller unmarshaller = context.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(xml), MediaPackageImpl.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(xml), MediaPackageImpl.class).getValue();
     } catch (JAXBException e) {
       throw new MediaPackageException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    } catch (IOException | SAXException e) {
+      throw new MediaPackageException(e);
     } finally {
       IoSupport.closeQuietly(xml);
     }
@@ -1228,10 +1232,14 @@ public final class MediaPackageImpl implements MediaPackage {
       LSOutput output = impl.createLSOutput();
       output.setEncoding("UTF-8");
       output.setByteStream(out);
+      // This is safe because the Node was already parsed
       serializer.write(xml, output);
 
       try (InputStream in = new ByteArrayInputStream(out.toByteArray())) {
+        // CHECKSTYLE:OFF
+        // in was already parsed, therefore this is save
         return unmarshaller.unmarshal(new StreamSource(in), MediaPackageImpl.class).getValue();
+        // CHECKSTYLE:ON
       }
     } catch (Exception e) {
       throw new MediaPackageException("Error deserializing media package node", e);

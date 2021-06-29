@@ -25,6 +25,7 @@
         <configuration key="publishToYouTube">false</configuration>
         <configuration key="thumbnailType">0</configuration>
         <configuration key="thumbnailPosition">1</configuration>
+        <configuration key="flagQuality720p">true</configuration>
       </configurations>
     </operation>
 

@@ -50,7 +50,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 /**
  * This class represents the mime type registry that is responsible for providing resolving mime types through all
@@ -122,8 +121,7 @@ public final class MimeTypes {
 
     // initialize from file
     try {
-      SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-      SAXParser parser = parserFactory.newSAXParser();
+      SAXParser parser = XmlSafeParser.newSAXParserFactory().newSAXParser();
       DefaultHandler handler = new MimeTypeParser(mimeTypes);
 
       try (InputStream inputStream = MimeTypes.class.getResourceAsStream(DEFINITION_FILE)) {

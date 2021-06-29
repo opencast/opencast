@@ -25,6 +25,7 @@ import org.opencastproject.elasticsearch.index.IndexObject;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,7 @@ import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,7 +62,6 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Object wrapper for a recording event.
@@ -113,7 +114,7 @@ public class Event implements IndexObject {
     workflowStatusMapping.put(WorkflowState.PAUSED.toString(), "EVENTS.EVENTS.STATUS.PAUSED");
     workflowStatusMapping.put(WorkflowState.SUCCEEDED.toString(), "EVENTS.EVENTS.STATUS.PROCESSED");
     workflowStatusMapping.put(WorkflowState.FAILED.toString(), "EVENTS.EVENTS.STATUS.PROCESSING_FAILURE");
-    workflowStatusMapping.put(WorkflowState.STOPPED.toString(), "EVENTS.EVENTS.STATUS.PROCESSING_CANCELED");
+    workflowStatusMapping.put(WorkflowState.STOPPED.toString(), "EVENTS.EVENTS.STATUS.PROCESSING_CANCELLED");
   }
 
   /** The identifier */
@@ -882,6 +883,14 @@ public class Event implements IndexObject {
 
     if (getWorkflowId() != null && StringUtils.isNotBlank(getWorkflowState())) {
       eventStatus = workflowStatusMapping.get(getWorkflowState());
+    } else if ("EVENTS.EVENTS.STATUS.PROCESSED".equals(eventStatus)
+            && (RecordingState.CAPTURE_FINISHED.equals(getRecordingStatus())
+            || RecordingState.UPLOAD_FINISHED.equals(getRecordingStatus()))) {
+      eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
+    } else if ("EVENTS.EVENTS.STATUS.PROCESSING_FAILURE".equals(eventStatus)
+            && RecordingState.CAPTURE_ERROR.equals(getRecordingStatus())
+            || RecordingState.UPLOAD_ERROR.equals(getRecordingStatus())) {
+      eventStatus = recordingStatusMapping.get(getRecordingStatus());
     } else if (StringUtils.isNotBlank(getRecordingStatus())) {
       eventStatus = recordingStatusMapping.get(getRecordingStatus());
     } else if (isScheduledEvent()) {
@@ -1063,9 +1072,11 @@ public class Event implements IndexObject {
       if (context == null) {
         createJAXBContext();
       }
-      return unmarshaller.unmarshal(new StreamSource(xml), Event.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(xml), Event.class).getValue();
     } catch (JAXBException e) {
       throw new IOException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    } catch (SAXException e) {
+      throw new IOException(e);
     } finally {
       IoSupport.closeQuietly(xml);
     }
@@ -1102,9 +1113,12 @@ public class Event implements IndexObject {
     xmlToJsonNamespaces.put(IndexObject.INDEX_XML_NAMESPACE, "");
     config.setXmlToJsonNamespaces(xmlToJsonNamespaces);
     MappedNamespaceConvention con = new MappedNamespaceConvention(config);
-    XMLStreamReader xmlStreamReader = new MappedXMLStreamReader(obj, con);
     Unmarshaller unmarshaller = context.createUnmarshaller();
+    // CHECKSTYLE:OFF
+    // the xml is parsed from json and should be safe
+    XMLStreamReader xmlStreamReader = new MappedXMLStreamReader(obj, con);
     Event event = (Event) unmarshaller.unmarshal(xmlStreamReader);
+    // CHECKSTYLE:ON
     return event;
   }
 

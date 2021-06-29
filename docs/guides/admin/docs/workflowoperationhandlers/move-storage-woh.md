@@ -8,7 +8,7 @@ The MoveStorageOperationHandler can be used to move files in the Asset Manager f
 |Configuration Key|Example           |Description                                       |
 |:----------------|:----------------:|:-------------------------------------------------|
 |target-storage*  |local-storage     |The ID of the storage to move the files to        |
-|target-version   |0                 |The (optional) snapshot version to move           |
+|target-version   |0                 |The (optional) snapshot version to move. Use the keyword `latest` to move the last snapshot version.           |
 
 \* mandatory configuration key
 

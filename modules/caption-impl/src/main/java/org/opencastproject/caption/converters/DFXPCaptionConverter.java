@@ -31,6 +31,7 @@ import org.opencastproject.caption.impl.TimeImpl;
 import org.opencastproject.caption.util.TimeUtil;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -52,7 +53,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -89,8 +89,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
 
     Document doc;
     try {
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder builder = factory.newDocumentBuilder();
+      DocumentBuilder builder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
       doc = builder.parse(in);
       doc.getDocumentElement().normalize();
     } catch (ParserConfigurationException e) {
@@ -206,11 +205,10 @@ public class DFXPCaptionConverter implements CaptionConverter {
   @Override
   public void exportCaption(OutputStream outputStream, List<Caption> captions, String language) throws IOException {
     // get document builder factory and parse template
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     Document doc = null;
     InputStream is = null;
     try {
-      DocumentBuilder builder = factory.newDocumentBuilder();
+      DocumentBuilder builder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
       // load dfxp template from file
       is = DFXPCaptionConverter.class.getResourceAsStream("/templates/template.dfxp.xml");
       doc = builder.parse(is);
@@ -254,7 +252,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
     OutputStreamWriter osw = new OutputStreamWriter(outputStream, "UTF-8");
     StreamResult result = new StreamResult(osw);
     DOMSource source = new DOMSource(doc);
-    TransformerFactory tfactory = TransformerFactory.newInstance();
+    TransformerFactory tfactory = XmlSafeParser.newTransformerFactory();
     Transformer transformer;
     try {
       transformer = tfactory.newTransformer();
@@ -283,7 +281,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
     final List<String> langList = new LinkedList<String>();
 
     // get SAX parser
-    SAXParserFactory factory = SAXParserFactory.newInstance();
+    SAXParserFactory factory = XmlSafeParser.newSAXParserFactory();
     try {
       SAXParser parser = factory.newSAXParser();
       // create handler

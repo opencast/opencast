@@ -32,6 +32,7 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.elementbuilder.TrackBuilderPlugin;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -47,8 +48,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Test case to Test the implementation of {@link TrackImpl}.
@@ -123,7 +122,7 @@ public class TrackTest {
     Unmarshaller unmarshaller = context.createUnmarshaller();
     InputStream inputStream = IOUtils.toInputStream(writer.toString(), "UTF-8");
     try {
-      TrackImpl t1 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
+      TrackImpl t1 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
     } finally {
       IoSupport.closeQuietly(inputStream);
@@ -133,7 +132,7 @@ public class TrackTest {
     String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\"><oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m4v</oc:url><oc:duration>-1</oc:duration></oc:track>";
     inputStream = IOUtils.toInputStream(xml);
     try {
-      TrackImpl t2 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
+      TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
       Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t2.getURI().toString());
     } finally {
@@ -145,7 +144,7 @@ public class TrackTest {
     Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
 
     // And finally, using the element builder
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
     Document doc = docBuilder.parse(IOUtils.toInputStream(xml));
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
@@ -167,7 +166,7 @@ public class TrackTest {
     Unmarshaller unmarshaller = context.createUnmarshaller();
     InputStream inputStream = IOUtils.toInputStream(writer.toString(), "UTF-8");
     try {
-      TrackImpl t1 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
+      TrackImpl t1 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
       Assert.assertEquals(true, t1.isLive());
     } finally {
@@ -178,7 +177,7 @@ public class TrackTest {
     String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\"><oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m4v</oc:url><oc:duration>-1</oc:duration><oc:live>true</oc:live></oc:track>";
     inputStream = IOUtils.toInputStream(xml);
     try {
-      TrackImpl t2 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
+      TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
       Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t2.getURI().toString());
       Assert.assertEquals(true, t2.isLive());
@@ -192,7 +191,7 @@ public class TrackTest {
     Assert.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<live>true</live>"));
 
     // And finally, using the element builder
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
     Document doc = docBuilder.parse(IOUtils.toInputStream(xml));
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()

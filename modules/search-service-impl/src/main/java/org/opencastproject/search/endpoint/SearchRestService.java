@@ -227,7 +227,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
                   + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
           ),
@@ -300,26 +300,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     query.withSort(SearchQuery.Sort.DATE_CREATED, false);
-    if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      SearchQuery.Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
-        try {
-          sortField = SearchQuery.Sort.valueOf(enumKey);
-          query.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = SearchQuery.Sort.valueOf(sort);
-          query.withSort(sortField);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
-      }
-    }
+    parseSortParameter(sort, query);
     query.withLimit(limit);
     query.withOffset(offset);
 
@@ -387,7 +368,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
                   + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
           ),
@@ -513,26 +494,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     search.withSort(SearchQuery.Sort.DATE_CREATED, false);
-    if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      SearchQuery.Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
-        try {
-          sortField = SearchQuery.Sort.valueOf(enumKey);
-          search.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = SearchQuery.Sort.valueOf(sort);
-          search.withSort(sortField);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
-      }
-    }
+    parseSortParameter(sort, search);
 
     // Build the response
     ResponseBuilder rb = Response.ok();
@@ -581,7 +543,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
                   + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
           ),
@@ -638,26 +600,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     query.withSort(SearchQuery.Sort.DATE_CREATED, false);
-    if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      SearchQuery.Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
-        try {
-          sortField = SearchQuery.Sort.valueOf(enumKey);
-          query.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = SearchQuery.Sort.valueOf(sort);
-          query.withSort(sortField);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
-      }
-    }
+    parseSortParameter(sort, query);
     query.withLimit(limit);
     query.withOffset(offset);
 
@@ -725,4 +668,41 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     return serviceRegistry;
   }
 
+  /**
+   * Parses the given sort parameter and calls {@code query.sortWith} with the
+   * parsed value. If the {@code sort} parameter is the empty string, nothing
+   * happens.
+   */
+  private void parseSortParameter(String sort, SearchQuery query) {
+    if (StringUtils.isBlank(sort)) {
+      return;
+    }
+
+    boolean ascending;
+    String enumKey;
+    if (sort.endsWith(DESCENDING_SUFFIX)) {
+      enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
+      ascending = false;
+    } else {
+      enumKey = sort;
+      ascending = true;
+    }
+
+    // Backwards compatibility check. The enum variant was changed from
+    // `DATE_PUBLISHED` to `DATE_MODIFIED`. To not break existing applications,
+    // we fix an old `sort` value. This will be removed in a future version
+    // of Opencast.
+    if ("DATE_PUBLISHED".equals(enumKey)) {
+      enumKey = "DATE_MODIFIED";
+      logger.warn("Search API was used with deprecated sort parameter 'DATE_PUBLISHED'. "
+          + "Update all applications using this API to switch to 'DATE_MODIFIED'");
+    }
+
+    try {
+      SearchQuery.Sort sortField = SearchQuery.Sort.valueOf(enumKey);
+      query.withSort(sortField, ascending);
+    } catch (IllegalArgumentException e) {
+      logger.warn("No sort enum matches '{}'", enumKey);
+    }
+  }
 }
