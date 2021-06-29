@@ -16,9 +16,9 @@ with the basic concepts and vocabulary described in the Spring Security document
 
 ## Configure Access
 
-To configure access roles and URL patterns for a tenant, modify `/etc/security/{{tenant_identifier.xml}}`.  If you are
-not hosting multiple tenants on your Opencast server or cluster, all configuration should be done in
-`mh_default_org.xml`.
+To configure access roles and URL patterns for a tenant, modify `etc/security/<tenant_identifier.xml>`.
+If you are not hosting multiple tenants on your Opencast server or cluster,
+all configuration should be done in `mh_default_org.xml`.
 
 Some examples:
 

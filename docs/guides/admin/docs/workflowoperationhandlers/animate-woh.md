@@ -37,13 +37,13 @@ files usually have the file extension `.sif` and *not* `.sifz`.
 You can use all metadata fields present in the episode and series DublinCore catalogs of an event. In SynfigStudio, just
 use placeholders of the following form:
 
-    '{{' ['series' | 'episode'] '.' DC-FIELD '}}'
+    {{ '{{' }} ['series' | 'episode'] '.' DC-FIELD {{ '}}' }}
 
 Here are some common examples:
 
-- `{{episode.title}}`
-- `{{episode.creator}}`
-- `{{series.title}}`
+- {{ '`{{episode.title}}`' }}
+- {{ '`{{episode.creator}}`' }}
+- {{ '`{{series.title}}`' }}
 
 
 Operation Examples
