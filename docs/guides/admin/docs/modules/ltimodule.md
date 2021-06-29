@@ -108,8 +108,8 @@ custom parameters to be defined globally.
     - `series=SERIESID` if you have the series ID
     - `series_name=SERIESNAME` if you just have the series name (has to be unique)
     - `lng=LANG` to force a language (the browser language is used otherwise)
-- To show a selection dialog to insert opencast content into the LMS via the LTI deeplink protocol
-  ( http://www.imsglobal.org/specs/lticiv1p0 ), use the following parameters
+- To show a selection dialog to insert opencast content into the LMS via the
+  [LTI deeplink protocol](https://www.imsglobal.org/specs/lticiv1p0), use the following parameters
   ( Please consult your LMS's documentation on how to configure a LTI deeplink ( CIM ) tool ) :
     - `subtool=deeplink`
     - `series=SERIESID` if you have the series ID

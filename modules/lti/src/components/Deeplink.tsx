@@ -10,7 +10,6 @@ import { Container, Tabs, Tab, Form, Button, Col } from 'react-bootstrap';
 import InnerHTML from 'dangerously-set-html-content'
 import "../App.css";
 import './Deeplink.css';
-import 'engage-ui/src/main/resources/ui/css/engage-ui.css';
 import 'bootstrap/dist/css/bootstrap.css';
 
 const pagingLimit: number = 15;
@@ -280,7 +279,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                                             })}
                                         </div>
                                         <div className="infos">
-                                            {episode.mediapackage.creators !== undefined && <div className="creator">
+                                            {episode.mediapackage.creators.length > 0 && <div className="creator">
                                                 {this.props.t("LTI.CREATOR", { creator: episode.mediapackage.creators })}
                                             </div>}
                                             {episode.mediapackage.seriestitle !== undefined && <div className="seriestitle">{episode.mediapackage.seriestitle}</div>}
