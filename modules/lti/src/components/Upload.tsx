@@ -191,7 +191,7 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             captionFormat = 'vtt';
         } else {
             if(newFile instanceof File){
-                captionFormat = newFile.name !== undefined ? newFile.name.substring(newFile.name.lastIndexOf('.') + 1) : undefined;
+                captionFormat = newFile.name !== '' ? newFile.name.substring(newFile.name.lastIndexOf('.') + 1) : undefined;
                 if(captionFormat === 'dfxp') {
                     const fileReader = new FileReader();
                     fileReader.onloadend = (e) =>
