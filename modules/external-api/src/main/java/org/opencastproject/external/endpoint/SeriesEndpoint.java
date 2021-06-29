@@ -39,7 +39,6 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.elasticsearch.index.series.SeriesIndexSchema;
@@ -82,6 +81,7 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
@@ -125,7 +125,8 @@ import javax.ws.rs.core.Response.Status;
 
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
+            ApiMediaType.VERSION_1_6_0 })
 @RestService(name = "externalapiseries", title = "External API Series Service", notes = {},
              abstractText = "Provides resources and operations related to the series")
 public class SeriesEndpoint {

@@ -28,8 +28,6 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.api.SearchQuery;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.index.service.resources.list.provider.ServersListProvider;
 import org.opencastproject.index.service.resources.list.query.ServersListQuery;
 import org.opencastproject.index.service.util.RestUtils;
@@ -41,6 +39,8 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import com.entwinemedia.fn.data.json.JValue;
 
@@ -310,8 +310,8 @@ public class ServerEndpoint {
       try {
         SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
         sortKey = Sort.valueOf(sortCriterion.getFieldName().toUpperCase());
-        ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
-                || SearchQuery.Order.None == sortCriterion.getOrder();
+        ascending = Order.Ascending == sortCriterion.getOrder()
+                || Order.None == sortCriterion.getOrder();
       } catch (WebApplicationException ex) {
         logger.warn("Failed to parse sort criterion \"{}\", invalid format.", sort);
       } catch (IllegalArgumentException ex) {

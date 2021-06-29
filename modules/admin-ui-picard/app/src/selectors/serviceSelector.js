@@ -3,3 +3,4 @@
  */
 
 export const getServices = state => state.services.results;
+export const getTotalServices = state => state.services.total;

@@ -17,7 +17,7 @@ services:
       - ../activemq/activemq.xml:/activemq-opencast.tpl.xml:ro
   mariadb:
     container_name: opencast-mariadb
-    image: docker.io/library/mariadb:10.5.5
+    image: docker.io/library/mariadb:10.5.9
     ports:
       - 127.0.0.1:3306:3306
     environment:

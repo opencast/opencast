@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.workflow.handler.workflow.ConditionalConfigWorkflowOperationHandler"
+               immediate="true" activate="activate" >
+  <implementation class="org.opencastproject.workflow.handler.workflow.ConditionalConfigWorkflowOperationHandler" />
+  <property name="service.description" value="Set a Workflow Configuration based on Conditions Operation Handler" />
+  <property name="workflow.operation" value="conditional-config" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+</scr:component>

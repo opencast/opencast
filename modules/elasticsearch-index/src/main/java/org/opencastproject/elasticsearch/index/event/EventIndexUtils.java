@@ -24,7 +24,6 @@ package org.opencastproject.elasticsearch.index.event;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchMetadata;
 import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.impl.SearchMetadataCollection;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.elasticsearch.index.series.Series;
@@ -44,7 +43,6 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -206,7 +204,7 @@ public final class EventIndexUtils {
     }
 
     if (StringUtils.isNotBlank(event.getAccessPolicy())) {
-      metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), false);
+      metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), true);
       addAuthorization(metadata, event.getAccessPolicy());
     }
 
@@ -338,68 +336,6 @@ public final class EventIndexUtils {
     for (Map.Entry<String, List<String>> entry : permissions.entrySet()) {
       String fieldName = EventIndexSchema.ACL_PERMISSION_PREFIX.concat(entry.getKey());
       doc.addField(fieldName, entry.getValue(), false);
-    }
-  }
-
-  /**
-   * Loads the recording event from the search index or creates a new one that can then be persisted.
-   *
-   * @param mediapackageId
-   *          the mediapackage identifier
-   * @param organization
-   *          the organization
-   * @param user
-   *          the user
-   * @param searchIndex
-   *          the {@link AbstractSearchIndex} to search in
-   * @return the recording event
-   * @throws SearchIndexException
-   *           if querying the search index fails
-   * @throws IllegalStateException
-   *           if multiple recording events with the same identifier are found
-   */
-  public static Event getOrCreateEvent(String mediapackageId, String organization, User user,
-          AbstractSearchIndex searchIndex) throws SearchIndexException {
-    EventSearchQuery query = new EventSearchQuery(organization, user).withoutActions().withIdentifier(mediapackageId);
-    SearchResult<Event> searchResult = searchIndex.getByQuery(query);
-    if (searchResult.getDocumentCount() == 0) {
-      return new Event(mediapackageId, organization);
-    } else if (searchResult.getDocumentCount() == 1) {
-      return searchResult.getItems()[0].getSource();
-    } else {
-      throw new IllegalStateException(
-              "Multiple recording events with identifier " + mediapackageId + " found in search index");
-    }
-  }
-
-  /**
-   * Loads the recording event from the search index
-   *
-   * @param mediapackageId
-   *          the mediapackage identifier
-   * @param organization
-   *          the organization
-   * @param user
-   *          the user
-   * @param searchIndex
-   *          the {@link AbstractSearchIndex} to search in
-   * @return the recording event or <code>null</code> if not found
-   * @throws SearchIndexException
-   *           if querying the search index fails
-   * @throws IllegalStateException
-   *           if multiple recording events with the same identifier are found
-   */
-  public static Event getEvent(String mediapackageId, String organization, User user, AbstractSearchIndex searchIndex)
-          throws SearchIndexException {
-    EventSearchQuery query = new EventSearchQuery(organization, user).withoutActions().withIdentifier(mediapackageId);
-    SearchResult<Event> searchResult = searchIndex.getByQuery(query);
-    if (searchResult.getDocumentCount() == 0) {
-      return null;
-    } else if (searchResult.getDocumentCount() == 1) {
-      return searchResult.getItems()[0].getSource();
-    } else {
-      throw new IllegalStateException(
-              "Multiple recording events with identifier " + mediapackageId + " found in search index");
     }
   }
 
@@ -544,127 +480,7 @@ public final class EventIndexUtils {
     }
   }
 
-  /**
-   * Update an event with the given has comments and has open comments status.
-   *
-   * @param eventId
-   *          the event id
-   * @param hasComments
-   *          whether it has comments
-   * @param hasOpenComments
-   *          whether it has open comments
-   * @param organization
-   *          the organization
-   * @param user
-   *          the user
-   * @param searchIndex
-   *          the serach index
-   * @throws SearchIndexException
-   *           if error occurs
-   * @throws NotFoundException
-   *           if event has not been found
-   */
-  public static void updateComments(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting,
-      String organization, User user, AbstractSearchIndex searchIndex)
-          throws SearchIndexException, NotFoundException {
-    if (!hasComments && hasOpenComments) {
-      throw new IllegalStateException(
-              "Invalid comment update request: You can't have open comments without having any comments!");
-    }
-    if (!hasOpenComments && needsCutting) {
-      throw new IllegalStateException(
-          "Invalid comment update request: You can't have an needs cutting comment without having any open comments!");
-    }
-    Event event = getEvent(eventId, organization, user, searchIndex);
-    if (event == null) {
-      throw new NotFoundException("No event with id " + eventId + " found.");
-    }
-
-    event.setHasComments(hasComments);
-    event.setHasOpenComments(hasOpenComments);
-    event.setNeedsCutting(needsCutting);
-    try {
-      searchIndex.addOrUpdate(event);
-    } catch (SearchIndexException e) {
-      logger.warn("Unable to update event '{}'", event, e);
-    }
-  }
-
-  /**
-   * Update a managed acl name to a new one.
-   *
-   * @param currentManagedAcl
-   *          The current unique managed acl name to look for in the events.
-   * @param newManagedAcl
-   *          The new managed acl name to update all of the events to.
-   * @param organization
-   *          The organization for the managed acl.
-   * @param user
-   *          The user.
-   * @param searchIndex
-   *          The index to update with the new managed acl name.
-   */
-  public static void updateManagedAclName(String currentManagedAcl, String newManagedAcl, String organization,
-          User user, AbstractSearchIndex searchIndex) {
-    SearchResult<Event> result = null;
-    try {
-      result = searchIndex
-              .getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(currentManagedAcl));
-    } catch (SearchIndexException e) {
-      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event",
-              organization, currentManagedAcl, e);
-    }
-    if (result != null && result.getHitCount() > 0) {
-      for (SearchResultItem<Event> eventItem : result.getItems()) {
-        Event event = eventItem.getSource();
-        event.setManagedAcl(newManagedAcl);
-        try {
-          searchIndex.addOrUpdate(event);
-        } catch (SearchIndexException e) {
-          logger.warn(
-                  "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}'",
-                  event, currentManagedAcl, newManagedAcl, e);
-        }
-      }
-    }
-  }
-
-  /**
-   * Remove a managed acl from all events that have it.
-   *
-   * @param managedAcl
-   *          The managed acl unique name to remove.
-   * @param organization
-   *          The organization for the managed acl
-   * @param user
-   *          The user
-   * @param searchIndex
-   *          The search index to remove the managed acl from.
-   */
-  public static void deleteManagedAcl(String managedAcl, String organization, User user,
-          AbstractSearchIndex searchIndex) {
-    SearchResult<Event> result = null;
-    try {
-      result = searchIndex
-              .getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(managedAcl));
-    } catch (SearchIndexException e) {
-      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event",
-              organization, managedAcl, e);
-    }
-    if (result != null && result.getHitCount() > 0) {
-      for (SearchResultItem<Event> eventItem : result.getItems()) {
-        Event event = eventItem.getSource();
-        event.setManagedAcl(null);
-        try {
-          searchIndex.addOrUpdate(event);
-        } catch (SearchIndexException e) {
-          logger.warn("Unable to update event '{}' to remove managed acl '{}'", event, managedAcl, e);
-        }
-      }
-    }
-  }
-
-  /**
+ /**
    * Gets all of the MediaPackageElement's flavors.
    *
    * @param publications

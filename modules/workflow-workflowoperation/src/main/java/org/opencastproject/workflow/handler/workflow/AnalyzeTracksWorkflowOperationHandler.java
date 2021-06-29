@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
@@ -67,16 +68,16 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
 
     logger.info("Running analyze-tracks workflow operation on workflow {}", workflowInstance.getId());
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    final String sourceFlavor = getConfig(workflowInstance, OPT_SOURCE_FLAVOR);
     Map<String, String> properties = new HashMap<>();
 
-    final MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor);
-    final Track[] tracks = mediaPackage.getTracks(flavor);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.one, Configuration.none, Configuration.none);
+    final MediaPackageElementFlavor singleSourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
+    final Track[] tracks = mediaPackage.getTracks(singleSourceFlavor);
     if (tracks.length <= 0) {
       if (BooleanUtils.toBoolean(getConfig(workflowInstance, OPT_FAIL_NO_TRACK, "false"))) {
-        throw new WorkflowOperationException("No matching tracks for flavor " + sourceFlavor);
+        throw new WorkflowOperationException("No matching tracks for flavor " + singleSourceFlavor.toString());
       }
-      logger.info("No tracks with specified flavors ({}) to analyse.", sourceFlavor);
+      logger.info("No tracks with specified flavors ({}) to analyse.", singleSourceFlavor.toString());
       return createResult(mediaPackage, properties, Action.CONTINUE, 0);
     }
 

@@ -171,9 +171,11 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                 <th className="fit">
                                                                     {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE')}
                                                                 </th>
-                                                                <th className="fit">
-                                                                    {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS')}
-                                                                </th>
+                                                                {aclActions.length > 0 && (
+                                                                    <th className="fit">
+                                                                        {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS')}
+                                                                    </th>
+                                                                )}
                                                                 <th className="fit">
                                                                     {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ACTION')}
                                                                 </th>

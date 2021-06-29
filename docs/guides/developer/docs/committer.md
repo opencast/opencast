@@ -31,27 +31,24 @@ such, we welcome and value committers both in the traditional sense (e.g. progra
 The committer body is the group of individuals who drive, manage, and govern the product. They make releases, set
 policy, and determine the both the quality and feature-set of Opencast.
 
-Responsibilities of a committer
+
+Responsibilities of a Committer
 -------------------------------
 
 Committers responsibilities are centered around two key principles, that there is a commitment to excellence and
 success, and that there is a commitment to being active and involved. These commitments are demonstrated through
 activities such as:
 
-* Being involved in quality assurance of the source code, documentation, designs, and other project pieces.
-* Being active and engaging in the broader community, including supporting adopters and providing prompt feedback.
-* Knowing when a change is beyond your ability and asking for help.
-* Keeping informed of project governance and direction.
+* Contributing to the source code and doocumentation of Opencast
+* Being involved in quality assurance of the source code,
+  documentation, designs, and other project pieces.
+* Being active and engaging in the broader community, including
+  supporting adopters and providing feedback.
 * Fostering a collegial environment between the group of committers.
-* Ensuring that incoming code adheres to our [license](license.md) requirements. Minor patches can be accepted
-  without concern, but the main reviewer *must* ensure that a CLA (and CCLA) is in place prior to merging in the
-  contribution.
-* 20% of the time a committer invests to the project is to be allocated for general purposes, i.e. work not directly
-  associated with the committer's individual or institutional concerns.
 
-All committers must signed a ICLA. The privileges and rights of being a committer do not come into effect until an ICLA
-has been received and processed. The ICLA, as well as the list of ICLA signatories, can be found
-[here](http://licensing.apereo.org/). Your employer will also need to sign a CCLA as well.
+All committers must have a signed [ICLA on file with Apereo](http://licensing.apereo.org/).
+If you make contributions on behalf of your employer, he should also sign a CCLA.
+
 
 How do I become a committer?
 ----------------------------

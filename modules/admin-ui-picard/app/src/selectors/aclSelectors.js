@@ -3,3 +3,4 @@
  */
 
 export const getAcls = state => state.acls.results;
+export const getTotalAcls = state => state.acls.total;

@@ -84,9 +84,9 @@ const SelectContainer = ({ resource, formikField }) => {
     };
 
     const handleClickAdd = () => {
-        let editableItems = items;
-        let editableSelectedItems = selectedItems;
-        let editableDefaultItems = defaultItems;
+        let editableItems = [...items];
+        let editableSelectedItems = [...selectedItems];
+        let editableDefaultItems = [...defaultItems];
 
         // move marked items to selected items
         for (let i = 0; i < markedForAddition.length; i++) {
@@ -103,15 +103,15 @@ const SelectContainer = ({ resource, formikField }) => {
         // update items considered for search bar
         setDefaultItems(editableDefaultItems);
         //update formik field
-        helpers.setValue(selectedItems);
+        helpers.setValue(editableSelectedItems);
 
 
     };
 
     const handleClickRemove = () => {
-        let editableItems = items;
-        let editableSelectedItems = selectedItems;
-        let editableDefaultItems = defaultItems;
+        let editableItems = [...items];
+        let editableSelectedItems = [...selectedItems];
+        let editableDefaultItems = [...defaultItems];
 
         // move marked items from selected items back to items
         for (let i = 0; i < markedForRemoval.length; i++) {
@@ -130,7 +130,7 @@ const SelectContainer = ({ resource, formikField }) => {
         // update items considered for search bar
         setDefaultItems(editableDefaultItems);
         // update formik field
-        helpers.setValue(selectedItems);
+        helpers.setValue(editableSelectedItems);
 
     };
 

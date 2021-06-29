@@ -132,22 +132,27 @@ export const fetchRolesWithTarget = async target => {
 
 
 // post new acl to backend
-export const postNewAcl = values => {
+export const postNewAcl = values => async dispatch => {
 
     let acls = prepareAccessPolicyRulesForPost(values.acls);
 
-    let data = new FormData();
+    let data = new URLSearchParams();
     data.append('name', values.name);
     data.append('acl', JSON.stringify(acls));
 
-    // todo: notification if error occurs
     axios.post('/admin-ng/acl', data,
         {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         }
-    ).then(response => console.log(response)).catch(response => console.log(response));
+    ).then(response => {
+        console.log(response);
+        dispatch(addNotification('success', 'ACL_ADDED'));
+    }).catch(response => {
+        console.log(response);
+        dispatch(addNotification('error', 'ACL_NOT_SAVED'));
+    });
 
 };
 // delete acl with provided id

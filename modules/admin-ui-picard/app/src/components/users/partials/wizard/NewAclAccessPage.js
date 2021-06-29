@@ -168,9 +168,11 @@ const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, rem
                                                                     <th className="fit">
                                                                         {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE')}
                                                                     </th>
-                                                                    <th className="fit">
-                                                                        {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS')}
-                                                                    </th>
+                                                                    {aclActions.length > 0 && (
+                                                                        <th className="fit">
+                                                                            {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS')}
+                                                                        </th>
+                                                                    )}
                                                                     <th className="fit">
                                                                         {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ACTION')}
                                                                     </th>

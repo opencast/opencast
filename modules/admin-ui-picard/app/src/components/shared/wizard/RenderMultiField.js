@@ -13,6 +13,8 @@ const RenderMultiField = ({ fieldInfo, onlyCollectionValues=false, field, form, 
     // Temporary storage for value user currently types in
     const [inputValue, setInputValue] = useState('');
 
+    let fieldValue = [...field.value];
+
     useEffect(() => {
         // Handle click outside the field and leave edit mode
         const handleClickOutside = e => {
@@ -48,16 +50,16 @@ const RenderMultiField = ({ fieldInfo, onlyCollectionValues=false, field, form, 
             // Flag if only values of collection are allowed or any value
             if (onlyCollectionValues) {
                 // add input to formik field value if not already added and input in collection of possible values
-                if (!field.value.find(e => e === inputValue)
+                if (!fieldValue.find(e => e === inputValue)
                     && fieldInfo.collection.find(e=> e.value === inputValue)) {
-                    field.value[field.value.length] = inputValue;
-                    form.setFieldValue(field.name, field.value);
+                    fieldValue[fieldValue.length] = inputValue;
+                    form.setFieldValue(field.name, fieldValue);
                 }
             } else {
                 // add input to formik field value if not already added
-                if (!field.value.find(e => e === inputValue)) {
-                    field.value[field.value.length] = inputValue;
-                    form.setFieldValue(field.name, field.value);
+                if (!fieldValue.find(e => e === inputValue)) {
+                    fieldValue[fieldValue.length] = inputValue;
+                    form.setFieldValue(field.name, fieldValue);
                 }
             }
 
@@ -68,8 +70,8 @@ const RenderMultiField = ({ fieldInfo, onlyCollectionValues=false, field, form, 
 
     // Remove item/value from inserted field values
     const removeItem = key => {
-        field.value.splice(key, 1);
-        form.setFieldValue(field.name, field.value);
+        fieldValue.splice(key, 1);
+        form.setFieldValue(field.name, fieldValue);
     };
 
     return (
@@ -80,6 +82,7 @@ const RenderMultiField = ({ fieldInfo, onlyCollectionValues=false, field, form, 
                 {fieldInfo.type === "mixed_text" && !!fieldInfo.collection ? (
                     <EditMultiSelect collection={fieldInfo.collection}
                                      field={field}
+                                     fieldValue={fieldValue}
                                      setEditMode={setEditMode}
                                      inputValue={inputValue}
                                      removeItem={removeItem}
@@ -87,6 +90,7 @@ const RenderMultiField = ({ fieldInfo, onlyCollectionValues=false, field, form, 
                                      handleKeyDown={handleKeyDown}/>
                 ) : (fieldInfo.type === "mixed_text" && (
                     <EditMultiValue setEditMode={setEditMode}
+                                    fieldValue={fieldValue}
                                     field={field}
                                     inputValue={inputValue}
                                     removeItem={removeItem}
@@ -104,7 +108,7 @@ const RenderMultiField = ({ fieldInfo, onlyCollectionValues=false, field, form, 
 };
 
 // Renders multi select
-const EditMultiSelect = ({ collection, setEditMode, handleKeyDown, handleChange, inputValue, removeItem, field }) => {
+const EditMultiSelect = ({ collection, setEditMode, handleKeyDown, handleChange, inputValue, removeItem, field, fieldValue }) => {
     const { t } = useTranslation();
 
     return (
@@ -126,7 +130,7 @@ const EditMultiSelect = ({ collection, setEditMode, handleKeyDown, handleChange,
                     </datalist>
                 </div>
                 {/* Render blue label for all values already in field array */}
-                {(field.value instanceof Array && field.value.length !== 0) && (field.value.map((item, key) => (
+                {(fieldValue instanceof Array && fieldValue.length !== 0) && (fieldValue.map((item, key) => (
                     <span className="ng-multi-value"
                           key={key}>
                         {item}
@@ -141,7 +145,7 @@ const EditMultiSelect = ({ collection, setEditMode, handleKeyDown, handleChange,
 };
 
 // Renders editable field input for multiple values
-const EditMultiValue = ({ setEditMode, inputValue, removeItem, handleChange, handleKeyDown, field }) => {
+const EditMultiValue = ({ setEditMode, inputValue, removeItem, handleChange, handleKeyDown, field, fieldValue }) => {
     const { t } = useTranslation();
 
     return (
@@ -155,7 +159,7 @@ const EditMultiValue = ({ setEditMode, inputValue, removeItem, handleChange, han
                        value={inputValue}
                        placeholder={t('EDITABLE.MULTI.PLACEHOLDER')}/>
             </div>
-            {(field.value instanceof Array && field.value.length !== 0) && (field.value.map((item, key) => (
+            {(fieldValue instanceof Array && fieldValue.length !== 0) && (fieldValue.map((item, key) => (
                 <span className="ng-multi-value"
                       key={key}>
                     {item}
@@ -169,7 +173,7 @@ const EditMultiValue = ({ setEditMode, inputValue, removeItem, handleChange, han
 };
 
 // Shows the values of the array in non-edit mode
-const ShowValue = ({ setEditMode, form: { initialValues }, field, showCheck }) => {
+const ShowValue = ({ setEditMode, form: { initialValues }, field, showCheck, fieldValue }) => {
     return (
         <div onClick={() => setEditMode(true)}>
             {(field.value instanceof Array && field.value.length !== 0) ? (

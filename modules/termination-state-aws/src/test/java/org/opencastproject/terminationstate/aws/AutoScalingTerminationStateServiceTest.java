@@ -38,6 +38,7 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -128,6 +129,7 @@ public class AutoScalingTerminationStateServiceTest {
   }
 
   @Test
+  @Ignore // regularly fails. See https://github.com/opencast/opencast/issues/1111
   public void testLifeCyclePolling() throws Exception {
     service.startPollingLifeCycleHook();
     String[] trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);

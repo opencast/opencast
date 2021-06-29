@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {Formik} from "formik";
 import {useTranslation} from "react-i18next";
+import {connect} from "react-redux";
 import {initialFormValuesStartTask} from "../../../configs/wizardConfig";
 import WizardStepper from "../../shared/wizard/WizardStepper";
 import StartTaskGeneralPage from "./wizards/StartTaskGeneralPage";
@@ -11,7 +12,7 @@ import {postTasks} from "../../../thunks/taskThunks";
 /**
  * This component manages the pages of the task start bulk action
  */
-const StartTaskModal = ({ close }) => {
+const StartTaskModal = ({ close, postTasks }) => {
     const { t } = useTranslation();
 
     const initialValues = initialFormValuesStartTask;
@@ -89,4 +90,8 @@ const StartTaskModal = ({ close }) => {
     );
 };
 
-export default StartTaskModal;
+const mapDispatchToState = dispatch => ({
+    postTasks: values => dispatch(postTasks(values))
+});
+
+export default connect(null, mapDispatchToState)(StartTaskModal);

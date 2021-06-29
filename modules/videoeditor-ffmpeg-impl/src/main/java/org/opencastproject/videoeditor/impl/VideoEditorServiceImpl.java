@@ -205,7 +205,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     // create working directory
     File tempDirectory = new File(new File(workspace.rootDirectory()), "editor");
     tempDirectory = new File(tempDirectory, Long.toString(job.getId()));
-    String filename = String.format("%s-%s%s", sourceTrackFlavor, FilenameUtils.removeExtension(sourceFile.getName()), outputFileExtension);
+    String filename = String.format("%s-%s%s", sourceTrackFlavor,
+        FilenameUtils.removeExtension(sourceFile.getName()), outputFileExtension);
     File outputPath = new File(tempDirectory, filename);
 
     if (!outputPath.getParentFile().exists()) {
@@ -297,9 +298,9 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
 
       // inspect new Track
       try {
-          inspectionJob = inspect(job,newTrackURI);
+        inspectionJob = inspect(job,newTrackURI);
       } catch (MediaInspectionException e) {
-          throw new ProcessFailedException("Media inspection of " + newTrackURI + " failed", e);
+        throw new ProcessFailedException("Media inspection of " + newTrackURI + " failed", e);
       }
       Track editedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
       logger.info("Finished editing track {}", editedTrack);
@@ -325,7 +326,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   protected Job inspect(Job job, URI workspaceURI) throws MediaInspectionException, ProcessFailedException {
     Job inspectionJob;
     try {
-        inspectionJob = inspectionService.inspect(workspaceURI);
+      inspectionJob = inspectionService.inspect(workspaceURI);
     } catch (MediaInspectionException e) {
       incident().recordJobCreationIncident(job, e);
       throw new MediaInspectionException("Media inspection of " + workspaceURI + " failed", e);
@@ -356,8 +357,9 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     while (!ll.isEmpty()) { // Check that 2 consecutive segments from same src are at least 2 secs apart
       if (ll.peek() != null) {
         nextclip = ll.pop();  // check next consecutive segment
-        if ((nextclip.getSrc() == clip.getSrc()) && (nextclip.getStart() - clip.getEnd()) < 2) { // collapse two segments into one
-          clip.setEnd(nextclip.getEnd());                             // by using inpt of seg 1 and outpoint of seg 2
+        // collapse two segments into one
+        if ((nextclip.getSrc() == clip.getSrc()) && (nextclip.getStart() - clip.getEnd()) < 2) {
+          clip.setEnd(nextclip.getEnd());   // by using inpt of seg 1 and outpoint of seg 2
         } else {
           clips.add(clip);   // keep last segment
           clip = nextclip;   // check next segment

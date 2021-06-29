@@ -159,7 +159,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandlerTest {
 
     operation.setConfiguration(GoogleSpeechAttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
     operation.setConfiguration(GoogleSpeechAttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
-    operation.setConfiguration(GoogleSpeechAttachTranscriptionOperationHandler.TARGET_TAG, "tag1,tag2");
+    operation.setConfiguration(GoogleSpeechAttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(GoogleSpeechAttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "dfxp");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
@@ -184,7 +184,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandlerTest {
 
     operation.setConfiguration(GoogleSpeechAttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
     operation.setConfiguration(GoogleSpeechAttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
-    operation.setConfiguration(GoogleSpeechAttachTranscriptionOperationHandler.TARGET_TAG, "tag1,tag2");
+    operation.setConfiguration(GoogleSpeechAttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(GoogleSpeechAttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "webvtt");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);

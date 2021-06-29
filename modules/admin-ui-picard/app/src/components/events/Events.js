@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
-
 import TableFilters from "../shared/TableFilters";
 import MainNav from "../shared/MainNav";
 import Stats from "../shared/Stats";
 import Table from "../shared/Table";
 import {fetchEventMetadata, fetchEvents} from "../../thunks/eventThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
-import {getEvents, isLoading, isShowActions} from "../../selectors/eventSelectors";
+import {getTotalEvents, isLoading, isShowActions} from "../../selectors/eventSelectors";
 import {connect} from "react-redux";
 import {eventsTemplateMap} from "../../configs/tableConfigs/eventsTableConfig";
 import Link from "react-router-dom/Link";
@@ -17,6 +16,8 @@ import {fetchSeries} from "../../thunks/seriesThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
+import {editTextFilter} from "../../actions/tableFilterActions";
+import {setOffset} from "../../actions/tableActions";
 import DeleteEventsModal from "./partials/DeleteEventsModal";
 import StartTaskModal from "./partials/StartTaskModal";
 import EditScheduledEventsModal from "./partials/EditScheduledEventsModal";
@@ -29,7 +30,8 @@ const containerAction = React.createRef();
  * This component renders the table view of events
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
-                        loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata }) => {
+                        loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter,
+                    resetOffset }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -52,6 +54,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     };
 
     const loadSeries = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         //fetching series from server
         loadingSeries();
 
@@ -60,13 +65,13 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     }
 
     useEffect(() => {
+        resetTextFilter();
 
         // Load events on mount
         loadEvents().then(r => console.log(r));
 
         // Load event filters
         loadingFilters("events");
-
 
         // Function for handling clicks outside of an open dropdown menu
         const handleClickOutside = e => {
@@ -235,7 +240,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                                       resource={'events'}/>
                     </div>
                     <h1>{t('EVENTS.EVENTS.TABLE.CAPTION')}</h1>
-                    <h4>{t('TABLE_SUMMARY', { numberOfRows: events.length })}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: events })}</h4>
                 </div>
                 {/*Include table component*/}
                 <Table templateMap={eventsTemplateMap} resourceType="events"/>
@@ -246,7 +251,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    events: getEvents(state),
+    events: getTotalEvents(state),
     showActions: isShowActions(state),
     isLoadingEvents: isLoading(state)
 });
@@ -259,7 +264,9 @@ const mapDispatchToProps = dispatch => ({
     loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingStats: () => dispatch(fetchStats()),
-    loadingEventMetadata: () => dispatch(fetchEventMetadata())
+    loadingEventMetadata: () => dispatch(fetchEventMetadata()),
+    resetTextFilter: () => dispatch(editTextFilter('')),
+    resetOffset: () => dispatch(setOffset(0))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Events));

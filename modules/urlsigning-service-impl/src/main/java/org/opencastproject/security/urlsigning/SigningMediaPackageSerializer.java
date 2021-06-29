@@ -80,27 +80,19 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
             this.getClass().getSimpleName());
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageSerializer#encodeURI(URI)
-   */
   @Override
   public URI encodeURI(URI uri) throws URISyntaxException {
-    if (uri == null)
+    if (uri == null) {
       throw new IllegalArgumentException("Argument uri is null");
+    }
     return uri;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageSerializer#decodeURI(URI)
-   */
   @Override
   public URI decodeURI(URI uri) throws URISyntaxException {
-    if (uri == null)
+    if (uri == null) {
       throw new IllegalArgumentException("Argument uri is null");
+    }
     return sign(uri);
   }
 

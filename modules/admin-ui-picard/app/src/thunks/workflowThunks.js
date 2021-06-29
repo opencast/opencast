@@ -23,7 +23,7 @@ export const fetchWorkflowDef = (type) => async (dispatch, getState) => {
             }
             default: {
                 urlParams = {
-                    tags: ['upload','schedule']
+                    tags: 'upload,schedule'
                 };
             }
         }

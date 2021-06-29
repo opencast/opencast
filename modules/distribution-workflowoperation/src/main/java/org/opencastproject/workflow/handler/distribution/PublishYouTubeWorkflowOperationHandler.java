@@ -35,16 +35,17 @@ import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.publication.api.PublicationException;
 import org.opencastproject.publication.api.YouTubePublicationService;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * The workflow definition for handling "publish" operations
@@ -74,9 +75,10 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
     // Check which tags have been configured
-    String sourceTags = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration("source-tags"));
-    String sourceFlavors = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
-            "source-flavors"));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+    List<String> sourceTags = tagsAndFlavors.getSrcTags();
+    List<MediaPackageElementFlavor> sourceFlavors = tagsAndFlavors.getSrcFlavors();
 
     AbstractMediaPackageElementSelector<MediaPackageElement> elementSelector;
 
@@ -86,13 +88,13 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
     }
     elementSelector = new SimpleElementSelector();
 
-    if (sourceFlavors != null) {
-      for (String flavor : asList(sourceFlavors)) {
-        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
+    if (!sourceFlavors.isEmpty()) {
+      for (MediaPackageElementFlavor flavor : sourceFlavors) {
+        elementSelector.addFlavor(flavor);
       }
     }
-    if (sourceTags != null) {
-      for (String tag : asList(sourceTags)) {
+    if (!sourceTags.isEmpty()) {
+      for (String tag : sourceTags) {
         elementSelector.addTag(tag);
       }
     }

@@ -140,7 +140,8 @@ public class StaticFileRestServiceTest {
     requestBody.append(MOCK_FILE_CONTENT);
     requestBody.append("\r\n");
     requestBody.append("-----1234");
-    return new MockHttpServletRequest(requestBody.toString().getBytes("UTF-8"), "multipart/form-data; boundary=---1234");
+    return new MockHttpServletRequest(requestBody.toString().getBytes("UTF-8"),
+        "multipart/form-data; boundary=---1234");
   }
 
   private MockHttpServletRequest newUnsizedMockRequest() throws Exception {

@@ -39,6 +39,7 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ZipUtil;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -175,17 +176,18 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     MediaPackageElementFlavor targetFlavor = DEFAULT_ARCHIVE_FLAVOR;
 
     // Read the target flavor
-    String targetFlavorOption = currentOperation.getConfiguration(TARGET_FLAVOR_PROPERTY);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.none, Configuration.many, Configuration.many);
+    List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
     try {
-      targetFlavor = targetFlavorOption == null ? DEFAULT_ARCHIVE_FLAVOR : MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
+      targetFlavor = targetFlavorOption.isEmpty() ? DEFAULT_ARCHIVE_FLAVOR : targetFlavorOption.get(0);
       logger.trace("Using '{}' as the target flavor for the zip archive of recording {}", targetFlavor, mediaPackage);
     } catch (IllegalArgumentException e) {
       throw new WorkflowOperationException("Flavor '" + targetFlavorOption + "' is not valid", e);
     }
 
     // Read the target tags
-    String targetTagsOption = StringUtils.trimToEmpty(currentOperation.getConfiguration(TARGET_TAGS_PROPERTY));
-    String[] targetTags = StringUtils.split(targetTagsOption, ",");
+    List<String> targetTags = tagsAndFlavors.getTargetTags();
 
     // If the configuration does not specify flavors, just zip them all
     if (flavors == null) {

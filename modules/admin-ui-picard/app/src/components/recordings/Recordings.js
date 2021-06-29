@@ -8,16 +8,17 @@ import Table from "../shared/Table";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {recordingsTemplateMap} from "../../configs/tableConfigs/recordingsTableConfig";
-import {getRecordings} from "../../selectors/recordingSelectors";
+import {getTotalRecordings} from "../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../thunks/recordingThunks";
 import {loadRecordingsIntoTable} from "../../thunks/tableThunks";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
 import Notifications from "../shared/Notifications";
+import {editTextFilter} from "../../actions/tableFilterActions";
 
 /**
  * This component renders the table view of recordings
  */
-const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings, loadingFilters }) => {
+const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings, loadingFilters, resetTextFilter }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -30,11 +31,14 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
     }
 
     useEffect(() => {
+        resetTextFilter();
+
         // Load recordings on mount
         loadRecordings().then(r => console.log(r));
 
         // Load filters
         loadingFilters('recordings');
+
     }, []);
 
     const toggleNavigation = () => {
@@ -77,7 +81,7 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
                                   resource={'recordings'}/>
 
                     <h1>{t('RECORDINGS.RECORDINGS.TABLE.CAPTION')}</h1>
-                    <h4>{t('TABLE_SUMMARY', { numberOfRows: recordings.length})}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: recordings })}</h4>
                 </div>
                 {/* Include table component */}
                 <Table templateMap={recordingsTemplateMap} />
@@ -88,14 +92,15 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    recordings: getRecordings(state)
+    recordings: getTotalRecordings(state)
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingRecordings: () => dispatch(fetchRecordings()),
     loadingRecordingsIntoTable: () => dispatch(loadRecordingsIntoTable()),
-    loadingFilters: resource => dispatch(fetchFilters(resource))
+    loadingFilters: resource => dispatch(fetchFilters(resource)),
+    resetTextFilter: () => dispatch(editTextFilter(''))
 });
 
 export default withRouter(connect(mapStateToProps,mapDispatchToProps)(Recordings));

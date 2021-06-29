@@ -33,6 +33,7 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -48,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -59,7 +61,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
   /** Workflow configuration option keys */
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
   static final String TARGET_FLAVOR = "target-flavor";
-  static final String TARGET_TAG = "target-tag";
+  static final String TARGET_TAGS = "target-tags";
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
 
   private TranscriptionService service = null;
@@ -74,7 +76,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(TRANSCRIPTION_JOB_ID, "The job id that identifies the file to be attached");
     CONFIG_OPTIONS.put(TARGET_FLAVOR, "The target \"flavor\" of the transcription file");
-    CONFIG_OPTIONS.put(TARGET_TAG, "The target \"tag\" of the transcription file");
+    CONFIG_OPTIONS.put(TARGET_TAGS, "The target \"tags\" of the transcription file");
     CONFIG_OPTIONS.put(TARGET_CAPTION_FORMAT, "The target caption format of the transcription file (dfxp, etc)");
   }
 
@@ -101,19 +103,20 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     if (jobId == null)
       throw new WorkflowOperationException(TRANSCRIPTION_JOB_ID + " missing.");
 
-    String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
-    String targetTagOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAG));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.many);
+    List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
+    List<String> targetTagOption = tagsAndFlavors.getTargetTags();
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
 
     // Target flavor is mandatory if target-caption-format was NOT informed and no conversion is done
-    if (targetFlavorOption == null && captionFormatOption == null)
+    if (targetFlavorOption.isEmpty() && captionFormatOption == null)
       throw new WorkflowOperationException(TARGET_FLAVOR + " missing.");
 
     // Target flavor is optional if target-caption-format was informed because the default flavor
     // will be "captions/<format>". If informed, will override the default.
     MediaPackageElementFlavor flavor = null;
-    if (targetFlavorOption != null)
-      flavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
+    if (!targetFlavorOption.isEmpty())
+      flavor = targetFlavorOption.get(0);
 
     try {
       MediaPackageElement transcription = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
@@ -139,11 +142,8 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
         if (flavor != null)
           vttElement.setFlavor(flavor);
 
-        if (targetTagOption != null) {
-          for (String tag : asList(targetTagOption)) {
-            if (StringUtils.trimToNull(tag) != null)
-              vttElement.addTag(tag);
-          }
+        for (String tag : targetTagOption) {
+            vttElement.addTag(tag);
         }
 
       // Add the vtt file to the  media package
