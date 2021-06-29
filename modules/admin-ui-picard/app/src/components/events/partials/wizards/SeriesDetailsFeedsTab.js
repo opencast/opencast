@@ -12,17 +12,19 @@ const SeriesDetailsFeedsTab = ({ }) => {
                     <div className="obj">
                         <div className="obj-container">
                             <table className="main-tbl">
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Version</th>
-                                    <th>Link</th>
-                                </tr>
-                                {/*todo: repeat for each feed link*/}
-                                <tr>
-                                    <td>row.type</td>
-                                    <td>row.version</td>
-                                    <td><a href="row.link">row.link</a></td>
-                                </tr>
+                                <tbody>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Version</th>
+                                        <th>Link</th>
+                                    </tr>
+                                    {/*todo: repeat for each feed link*/}
+                                    <tr>
+                                        <td>row.type</td>
+                                        <td>row.version</td>
+                                        <td><a href="row.link">row.link</a></td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>

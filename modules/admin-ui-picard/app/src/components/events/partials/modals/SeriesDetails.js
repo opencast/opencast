@@ -7,8 +7,10 @@ import SeriesDetailsAccessTab from "../wizards/SeriesDetailsAccessTab";
 import SeriesDetailsThemeTab from "../wizards/SeriesDetailsThemeTab";
 import SeriesDetailsStatisticTab from "../wizards/SeriesDetailsStatisticTab";
 import SeriesDetailsFeedsTab from "../wizards/SeriesDetailsFeedsTab";
+import {getSeriesMetadata} from "../../../../selectors/seriesDetailsSelectors";
+import {connect} from "react-redux";
 
-const SeriesDetails = ({ seriesId }) => {
+const SeriesDetails = ({ seriesId, metadataFields }) => {
     const { t } = useTranslation();
 
     const [page, setPage] = useState(0);
@@ -87,7 +89,7 @@ const SeriesDetails = ({ seriesId }) => {
             </nav>
             <div>
                 {page === 0 && (
-                    <SeriesDetailsMetadataTab />
+                    <SeriesDetailsMetadataTab metadataFields={metadataFields}/>
                 )}
                 {page === 1 && (
                     <SeriesDetailsExtendedMetadataTab />
@@ -109,4 +111,8 @@ const SeriesDetails = ({ seriesId }) => {
     );
 };
 
-export default SeriesDetails;
+const mapStateToProps = state => ({
+    metadataFields: getSeriesMetadata(state)
+});
+
+export default connect(mapStateToProps)(SeriesDetails);

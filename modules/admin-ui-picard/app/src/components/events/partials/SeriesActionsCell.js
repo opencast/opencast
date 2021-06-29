@@ -4,11 +4,12 @@ import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteSeries} from "../../../thunks/seriesThunks";
 import {connect} from "react-redux";
 import SeriesDetailsModal from "./modals/SeriesDetailsModal";
+import {fetchSeriesDetails} from "../../../thunks/seriesDetailsThunks";
 
 /**
  * This component renders the action cells of series in the table view
  */
-const SeriesActionsCell = ({ row, deleteSeries }) => {
+const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetails }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
@@ -26,12 +27,18 @@ const SeriesActionsCell = ({ row, deleteSeries }) => {
         setSeriesDetailsModal(false);
     }
 
+    const showSeriesDetailsModal = async () => {
+        await fetchSeriesDetails(row.id);
+
+        setSeriesDetailsModal(true);
+    }
+
     return (
         <>
 
             {/*TODO: When series details are implemented, remove placeholder
             {/*TODO: with-Role ROLE_UI_SERIES_DETAILS_VIEW*/}
-            <a onClick={() => setSeriesDetailsModal(true)}
+            <a onClick={() => showSeriesDetailsModal()}
                className="more-series"
                title={t('EVENTS.SERIES.TABLE.TOOLTIP.DETAILS')}/>
 
@@ -65,7 +72,8 @@ const onClickPlaceholder = row => {
 };
 
 const mapDispatchToProps = dispatch => ({
-    deleteSeries: (id) => dispatch(deleteSeries(id))
+    deleteSeries: id => dispatch(deleteSeries(id)),
+    fetchSeriesDetails: id => dispatch(fetchSeriesDetails(id))
 })
 
 export default connect(null, mapDispatchToProps)(SeriesActionsCell);
