@@ -113,10 +113,10 @@ public class LtiServiceRestEndpoint {
   @Path("/")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @RestQuery(
-    name = "createevent",
-    description = "Creates an event by sending metadata in a multipart request.",
-    returnDescription = "",
-    restParameters = {
+      name = "createevent",
+      description = "Creates an event by sending metadata in a multipart request.",
+      returnDescription = "",
+      restParameters = {
         @RestParameter(
             name = "metadata",
             description = "Event metadata",
@@ -159,8 +159,8 @@ public class LtiServiceRestEndpoint {
             isRequired = false,
             type = STRING
         )
-    },
-    responses = {
+      },
+      responses = {
         @RestResponse(
             description = "A new event is created or the event is updated",
             responseCode = HttpServletResponse.SC_OK
@@ -173,7 +173,7 @@ public class LtiServiceRestEndpoint {
             description = "The event to be updated wasn't found",
             responseCode = HttpServletResponse.SC_NOT_FOUND
         )
-    }
+      }
   )
   public Response createNewEvent(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request) {
     String seriesId = "";

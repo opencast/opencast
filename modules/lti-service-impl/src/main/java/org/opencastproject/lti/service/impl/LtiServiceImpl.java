@@ -253,7 +253,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         throw new RuntimeException("Unable to create media package for event");
       }
       if (captions != null) {
-        final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor(captionsFormat + "+" + captionsLanguage, "captions");
+        final MediaPackageElementFlavor captionsFlavor =
+            new MediaPackageElementFlavor(captionsFormat + "+" + captionsLanguage, "captions");
         final MediaPackageElementBuilder elementBuilder
             = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         final MediaPackageElement captionsMpe = elementBuilder
