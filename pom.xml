@@ -1693,6 +1693,21 @@
         <github.nick>mliradelc</github.nick>
       </properties>
     </developer>
+    <developer>
+      <id>awilken</id>
+      <name>Arne Wilken</name>
+      <email>wilken@elan-ev.de</email>
+      <organization>ELAN e.V.</organization>
+      <organizationUrl>https://elan-ev.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+      <properties>
+        <github.nick>Arnei</github.nick>
+        <matrix.user>@arnewilken:chat.virtuos.uni-osnabrueck.de</matrix.user>
+      </properties>
+    </developer>
   </developers>
   <!-- People having significantly contributed to Opencast in the past -->
   <contributors>
