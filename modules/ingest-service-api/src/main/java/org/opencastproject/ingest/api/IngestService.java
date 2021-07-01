@@ -297,13 +297,14 @@ public interface IngestService extends JobProducer {
    * @param mediaPackage
    *          The specific Opencast MediaPackage to which Media is being added
    * @return MediaPackage The updated Opencast MediaPackage element
-   * @throws MediaPackageException
+   * @throws IllegalArgumentException
+     *         if the data passed to this method are not valid
    * @throws IOException
    * @throws IngestException
    *           if an unexpected error occurs
    */
   MediaPackage addCatalog(InputStream catalog, String fileName, MediaPackageElementFlavor flavor, String[] tags,
-          MediaPackage mediaPackage) throws MediaPackageException, IOException, IngestException;
+          MediaPackage mediaPackage) throws IllegalArgumentException, IOException, IngestException;
 
   /**
    * Add an attachment to an existing MediaPackage in the repository
