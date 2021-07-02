@@ -26,6 +26,7 @@
       <outputDirectory></outputDirectory>
       <excludes>
         <exclude>*.append</exclude>
+        <exclude>build.xml</exclude>
       </excludes>
     </fileSet>
 
