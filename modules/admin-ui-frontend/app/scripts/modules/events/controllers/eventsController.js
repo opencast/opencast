@@ -165,7 +165,7 @@ angular.module('adminNg.controllers')
     // Text for events without notes
     $scope.noCommentTextArea = '';
     // Type of comments in the notes column
-    $scope.table.commentReason = 'EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ADMINUI_NOTES';
+    $scope.table.notesCommentReason = 'EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ADMINUI_NOTES';
 
     $scope.table.createComment = function(commentText, eventId) {
       if (!commentText || !eventId) {
@@ -173,7 +173,7 @@ angular.module('adminNg.controllers')
       }
       CommentResource.save(
         { resource: 'event', resourceId: eventId, type: 'comment' },
-        { text: commentText, reason: $scope.commentReason }
+        { text: commentText, reason: $scope.table.notesCommentReason }
       );
     };
 
