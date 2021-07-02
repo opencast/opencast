@@ -1,12 +1,14 @@
 import React, {useState, useEffect} from "react";
 import {connect} from "react-redux";
 import {
+    saveAccessPolicies
 } from "../../../../thunks/eventDetailsThunks";
 import {
 } from "../../../../selectors/eventDetailsSelectors";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import {
     fetchAclActions,
+    fetchAclTemplateById,
     fetchAclTemplates,
     fetchRolesWithTarget
 } from "../../../../thunks/aclThunks";
@@ -15,14 +17,16 @@ import {
     fetchHasActiveTransactions
 } from "../../../../thunks/eventDetailsThunks";
 import Notifications from "../../../shared/Notifications";
-import {Formik} from "formik";
+import {Formik, Field, FieldArray} from "formik";
+import {addNotification} from "../../../../thunks/notificationThunks";
+import {NOTIFICATION_CONTEXT} from "../../../../configs/wizardConfig";
 
 /**
  * This component manages the access policy tab of the event details modal
  */
 const EventDetailsAccessPolicyTab = ({ eventId, header, t,
 
-                                      fetchAclTemplates, fetchHasActiveTransactions, fetchAccessPolicies, fetchRoles}) => {
+                                      addNotification, fetchAclTemplates, fetchHasActiveTransactions, fetchAccessPolicies, fetchRoles, saveNewAccessPolicies}) => {
 
     const baseAclId = "";
 
@@ -31,7 +35,9 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
     const [loading, setLoading] = useState(false);
     const [hasActions, setHasActions] = useState(false);
     const [roles, setRoles] = useState(false);
+    const [policyChanged, setPolicyChanged] = useState(false);
     const [policies, setPolicies] = useState([]);
+    const [initialPolicies, setInitialPolicies] = useState([]);
     const [transactions, setTransactions] = useState({read_only: true});
 
     const createPolicy = (role) => {
@@ -39,10 +45,7 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
             role: role,
             read: false,
             write: false,
-            actions: {
-                name: 'event-acl-actions',
-                value: []
-            }
+            actions: []
         };
     };
 
@@ -69,10 +72,11 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
                         if (policy.action === 'read' || policy.action === 'write') {
                             newPolicies[policy.role][policy.action] = policy.allow;
                         } else if (policy.allow === true || policy.allow === 'true'){
-                            newPolicies[policy.role].actions.value.push(policy.action);
+                            newPolicies[policy.role].actions.push(policy.action);
                         }
                     }
                     setPolicies(policyRoles.map(role => newPolicies[role]));
+                    setInitialPolicies(policyRoles.map(role => newPolicies[role]));
                 }
             });
             fetchRoles().then(roles => setRoles(roles));
@@ -86,43 +90,151 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
         fetchData().then(r => {});
     }, []);
 
-    const exampleFunction = (exampleValue, exampleValue2) => {
-        /*saveNewComment(eventId, exampleValue, exampleValue2).then((successful) => {
-            if(successful){
-                loadComments(eventId);
-                setNewCommentText("");
-                setCommentReason("");
-            }
-        });*/
+    const resetPolicies = (resetFormik) => {
+        setPolicyChanged(false);
+        resetFormik();
     }
 
+    const saveAccess = (values, resetFormik) => {
+        // TODO: remove old notifications
 
-    const deletePolicy = async (e) => {
+        let ace = [];
+        let roleWithFullRightsExists = false;
+        let allRulesValid = true;
 
+        values.policies.map(policy => {
+            if (policy.read && policy.write) {
+                roleWithFullRightsExists = true;
+            }
+
+            if ((policy.read || policy.write || policy.actions.length > 0) && !!policy.role) {
+                if (policy.read) {
+                    ace.push({
+                        'action' : 'read',
+                        'allow'  : policy.read,
+                        'role'   : policy.role
+                    });
+                }
+
+                if (policy.write) {
+                    ace.push({
+                        'action' : 'write',
+                        'allow'  : policy.write,
+                        'role'   : policy.role
+                    });
+                }
+
+                policy.actions.map( customAction => {
+                    ace.push({
+                        'action' : customAction,
+                        'allow'  : true,
+                        'role'   : policy.role
+                    });
+                });
+            } else {
+                allRulesValid = false;
+            }
+        })
+
+        if(!allRulesValid){
+            addNotification('warning','INVALID_ACL_RULES', -1, null, NOTIFICATION_CONTEXT);
+        }
+
+        if(!roleWithFullRightsExists){
+            addNotification('warning','MISSING_ACL_RULES', -1, null, NOTIFICATION_CONTEXT);
+        }
+
+        if(allRulesValid && roleWithFullRightsExists){
+            //TODO: save, if successful, reload
+            saveNewAccessPolicies(eventId, ace);
+        }
+    }
+
+    const isPolicyChanged = (newPolicies) => {
+        const sortSchema = (pol1, pol2) => {return (pol1.role > pol2.role)? 1 : -1};
+        const sortedNewPolicies = [...newPolicies].sort(sortSchema);
+        const sortedInitialPolicies = [...initialPolicies].sort(sortSchema);
+        if (newPolicies.length !== initialPolicies.length) {
+            return true;
+        }
+        for (let i = 0; i < sortedNewPolicies.length; i++){
+            console.log(sortedNewPolicies[i].role);
+            console.log(sortedNewPolicies[i].actions);
+            console.log(sortedInitialPolicies[i].actions);
+            console.log();
+            if (sortedNewPolicies[i].role !== sortedInitialPolicies[i].role ||
+                sortedNewPolicies[i].read !== sortedInitialPolicies[i].read ||
+                sortedNewPolicies[i].write !== sortedInitialPolicies[i].write ||
+                sortedNewPolicies[i].actions.name !== sortedInitialPolicies[i].actions.name ||
+                sortedNewPolicies[i].actions.length !== sortedInitialPolicies[i].actions.length){
+                return true;
+            }
+            if(sortedNewPolicies[i].actions.length > 0 && sortedNewPolicies[i].actions.length === sortedInitialPolicies[i].actions.length){
+                for(let j = 0; j < sortedNewPolicies[i].actions.length; j++){
+                    if(sortedNewPolicies[i].actions[j] !== sortedInitialPolicies[i].actions[j]){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    const deletePolicy = async (policy, remove, index, policies) => {
+        const newPolicies = policies.filter(pol => pol !== policy);
+        remove(index);
+        setPolicyChanged(isPolicyChanged(newPolicies));
     };
 
-    const addPolicy = async (e) => {
-        let oldPolicies = policies;
+    const addPolicy = async (push, policies) => {
         const newPolicy = createPolicy("");
-        oldPolicies.push(newPolicy);
-        setPolicies(oldPolicies);
-        console.log(policies);
+        const newPolicies = policies.concat(newPolicy);
+        push(newPolicy);
+        setPolicyChanged(isPolicyChanged(newPolicies));
     };
 
-    const saveAccess = async (e) => {
-
+    const changeReadAccess = async (policy, read, replace, index, policies) => {
+        const newPolicies = policies.map(pol => (pol === policy)?
+            {
+                ...pol,
+                read: read
+            } : pol);
+        replace(index, {...policy, read: read})
+        setPolicyChanged(isPolicyChanged(newPolicies));
     };
 
-    const changeAccess = async (e) => {
-
+    const changeWriteAccess = async (policy, write, replace, index, policies) => {
+        const newPolicies = policies.map(pol => (pol === policy)?
+            {
+                ...pol,
+                write: write
+            } : pol);
+        replace(index, {...policy, write: write})
+        setPolicyChanged(isPolicyChanged(newPolicies));
     };
 
-    const handleTemplateChange = async (e) => {
+    const changeAccessAction = async (e) => {
+        setPolicyChanged(isPolicyChanged());
+    };
+    const changeAccessRole = async (policy, role, replace, index, policies) => {
+        const newPolicies = policies.map(pol => (pol === policy)?
+            {
+                ...pol,
+                role: role
+            } : pol);
+        replace(index, {...policy, role:role});
+        setPolicyChanged(isPolicyChanged(newPolicies));
+    };
+
+    const handleTemplateChange = async (templateId, setFormikFieldValue) => {
         // fetch information about chosen template from backend
-        /*const template =  await fetchAclTemplateById(e.target.value);
+        const template =  await fetchAclTemplateById(templateId);
 
-        formik.setFieldValue('policies', template);
-        checkPolicies();*/
+        console.log(templateId);
+        console.log(template);
+
+        setFormikFieldValue('policies', template);
+        setPolicyChanged(isPolicyChanged(template));
     };
 
     // todo: add user and role management
@@ -141,6 +253,15 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
                     {!loading && (
                         <ul>
                             <li>
+                                <Formik
+                                    initialValues={{policies: [...policies]}}
+                                    onSubmit={(values, actions) => {
+                                        /*alert(JSON.stringify(values, null, 2));
+                                        actions.setSubmitting(false);*/
+                                        saveAccess(values).then(r => {})
+                                    }}
+                                >
+                                    {formik => (
                                 <div className="obj list-obj">
                                     <header>{t(header)/* Access Policy */}</header>
                                     <div className="obj-container">
@@ -160,30 +281,15 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
                                                                 <p>
                                                                     {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.DESCRIPTION") /* Description */}
                                                                 </p>
-                                                                {/*
-                                                                <div ng-show="!transactions.read_only">
-                                                                    <select chosen
-                                                                            pre-select-from="acls"
-                                                                            data-width="'200px'"
-                                                                            ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"
-                                                                            ng-change="changeBaseAcl()"
-                                                                            ng-model="baseAclId"
-                                                                            ng-options="id as name for (id, name) in acls"
-                                                                            placeholder-text-single="'{{ '' | translate }}'"
-                                                                            no-results-text="'{{ '' | translate }}'"
-                                                                    />
-                                                                </div>
-                                                                <p ng-show="transactions.read_only">{{baseAclId}}</p>
-                                                                */}
                                                                 {!transactions.read_only ? (
                                                                     <select className="chosen-single chosen-default"
                                                                             chosen
                                                                             style={{width: '200px'}}
-                                                                            onChange={e => handleTemplateChange(e)}>
+                                                                            onChange={event => handleTemplateChange(event.target.value, formik.setFieldValue)}>
                                                                         {(aclTemplates && aclTemplates.length > 0) ?
                                                                             (
                                                                                 <>
-                                                                                    <option value="" disabled selected hidden>
+                                                                                    <option value="" selected hidden disabled>
                                                                                         {t('EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL')}
                                                                                     </option>
                                                                                     {
@@ -237,174 +343,139 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    {
-                                                        /*
-                                                    <tr ng-repeat="policy in policies track by $index">
-                                                        <td ng-show="!transactions.read_only">
-                                                            <select chosen
-                                                                    pre-select-from="roles"
-                                                                    ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"
-                                                                    data-width="'360px'"
-                                                                    ng-model="policy.role"
-                                                                    ng-change="accessChanged(policy.role)"
-                                                                    ng-options="role as role for role in roles"
-                                                                    call-on-search="getMatchingRoles"
-                                                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
-                                                                    no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
-                                                            />
-                                                        </td>
-                                                        <td ng-show="transactions.read_only">
-                                                            <p>{{policy.role}}</p>
-                                                        </td>
-                                                        <td className="fit text-center"><input type="checkbox"
-                                                                                               ng-model="policy.read"
-                                                                                               ng-change="accessSave(policy)"
-                                                                                               ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/>
-                                                        </td>
-                                                        <td className="fit text-center"><input type="checkbox"
-                                                                                               ng-model="policy.write"
-                                                                                               ng-change="accessSave(policy)"
-                                                                                               ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/>
-                                                        </td>
-                                                        <td className="fit editable" ng-if="hasActions">
-                                                            <div
-                                                                ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') && !transactions.read_only"
-                                                                save="accessSave" admin-ng-editable-multi-select
-                                                                mixed="false" params="policy.actions"
-                                                                collection="actions"></div>
-                                                            <div
-                                                                ng-if="((!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')) || transactions.read_only)"
-                                                                ng-repeat="customAction in policy.actions.value">{{customAction}}</div>
-                                                        </td>
-                                                        <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"
-                                                            className="fit"><a ng-show="!transactions.read_only"
-                                                                               ng-click="deletePolicy(policy)"
-                                                                               className="remove"></a>
-                                                        </td>
-                                                    </tr>
-                                                    */
-                                                        policies.map( (policy, key) => (
-                                                            <tr>
-                                                                <td>
+                                                    <FieldArray name="policies">
+                                                                {({ replace, remove, push }) => (
+                                                                    <>
+                                                                        { (formik.values.policies.length > 0) &&
+                                                                                    formik.values.policies.map((policy, index) => (
+                                                                                        <tr key={index}>
+
+                                                                                            <td>
                                                                     {!transactions.read_only ? (
-                                                                        <div className="obj-container padded chosen-container chosen-container-single">
-                                                                            <select key={key}
-                                                                                    className="chosen-single"
-                                                                                    chosen
-                                                                                    style={{width: '360px'}}
-                                                                                    onChange={role => changeAccess(role)}>
-                                                                                {/*pre-select-from="roles"
-                                                                                    ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"
-                                                                                    call-on-search="getMatchingRoles"*/}
-                                                                                {(roles && roles.length > 0) ?
-                                                                                    (
-                                                                                        <>
-                                                                                            <option value="" disabled selected
-                                                                                                    hidden>
-                                                                                                {policy.role || t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL')}
-                                                                                            </option>
-                                                                                            {
-                                                                                                roles.map((role, roleKey) => (
-                                                                                                    <option value={role.name}
-                                                                                                            key={roleKey}>
-                                                                                                        {role.name}
-                                                                                                    </option>
-                                                                                                ))
-                                                                                            }
-                                                                                        </>
-                                                                                    ) : (
-                                                                                        <option value="" disabled selected hidden>
+                                                                                                <Field className="chosen-single chosen-default"
+                                                                                                       style={{width: '360px'}}
+                                                                                                       name={`policies.${index}.role`}
+                                                                                                       as="select"
+                                                                                                       onChange={role => changeAccessRole(policy, role.target.value, replace, index, formik.values.policies)}>
+                                                                                                    {(roles && roles.length > 0) && (
+                                                                                                        <>
+                                                                                                            {!policy.role &&
+                                                                                                                <option value="" defaultValue hidden>
+                                                                                                                    {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL')}
+                                                                                                                </option>
+                                                                                                            }
+                                                                                                            {!!policy.role &&
+                                                                                                                <option value={policy.role} defaultValue>
+                                                                                                                    {policy.role}
+                                                                                                                </option>
+                                                                                                            }
+                                                                                                            {roles.filter(role => !formik.values.policies.find(policy => policy.role === role.name)).map((role, key) => (
+                                                                                                                <option value={role.name}
+                                                                                                                        key={key}>{role.name}</option>
+                                                                                                            ))}
+                                                                                                        </>
+                                                                                                    )}
+                                                                                                    {(roles && roles.length > 0) || (
+                                                                                        <option value="" defaultValue hidden>
                                                                                             {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY')}
                                                                                         </option>
-                                                                                    )
-                                                                                }
-                                                                            </select>
-                                                                        </div>
-                                                                    ) : (
+                                                                                                    )}
+                                                                                                </Field>
+                                                            ) : (
                                                                         <p>{policy.role}</p>
-                                                                    )
-                                                                    }
-                                                                </td>
+                                                                    )}
+                                                                                            </td>
+                                                                                            {/* Checkboxes for  policy.read and policy.write*/}
+                                                                                            <td className="fit text-center">
+                                                                                                <Field type="checkbox"
+                                                                                                       name={`policies.${index}.read`}
+                                                                                                       disabled={ transactions.read_only }
+                                                                                                       className={`${transactions.read_only ? 
+                                                                                                           "disabled" : "false"}`}
+                                                                                                       onChange={ (read) => changeReadAccess(policy, read.target.checked, replace, index, formik.values.policies)}
+                                                                                                /> {/*Todo:  ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"*/}
+                                                                                            </td>
+                                                                                            <td className="fit text-center">
+                                                                                                <Field type="checkbox"
+                                                                                                       name={`policies.${index}.write`}
+                                                                                                       disabled={ transactions.read_only }
+                                                                                                       className={`${transactions.read_only ?
+                                                                                                           "disabled" : "false"}`}
+                                                                                                       onChange={ (write) => changeWriteAccess(policy, write.target.checked, replace, index, formik.values.policies)}
 
-                                                                 <td className="fit text-center">
-                                                                        <input type="checkbox"
-                                                                               disabled={ transactions.read_only }
-                                                                               className={`${transactions.read_only ? 
-                                                                                   "disabled" : "false"}`}
-                                                                               defaultChecked={policy.read}
-                                                                               onChange={ (policy) => saveAccess(policy)}
-
-                                                                        /> {/*ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"*/}
-                                                                </td>
-                                                                <td className="fit text-center">
-                                                                        <input type="checkbox"
-                                                                               disabled={ transactions.read_only }
-                                                                               className={`${transactions.read_only ? 
-                                                                                   "disabled" : "false"}`}
-                                                                               defaultChecked={policy.write}
-                                                                               onChange={ (policy) => saveAccess(policy)}
-
-                                                                        /> {/*ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"*/}
-                                                                </td>
-                                                                { hasActions && (
-                                                                    <td className="fit editable">
-                                                                        <Formik
-                                                                            initialValues={{policy: {actions: ''}}}
-                                                                            onSubmit={(values, actions) => {
-                                                                                /*alert(JSON.stringify(values, null, 2));
-                                                                                actions.setSubmitting(false);*/
-                                                                                saveAccess(values).then(r => {})
-                                                                            }}
-                                                                        >
-                                                                            { !transactions.read_only /* && ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')*/ && (
-                                                                                <div>
-                                                                                    <RenderMultiField fieldInformation={
-                                                                                        {
-                                                                                            id: `policy.actions`,
-                                                                                            type: 'mixed_text',
-                                                                                            collection: aclActions
-                                                                                        }
-                                                                                    } onlyCollectionValues/>
-                                                                                </div>
-                                                                            )}
-                                                                        </Formik>
-                                                                        {transactions.read_only /* || ng-if="((!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"*/ && (
-                                                                            policy.actions.value.map((customAction, actionKey) => (
-                                                                                <div key={actionKey}>
-                                                                                    {customAction}
-                                                                                </div>
-                                                                            ))
-                                                                        )}
-                                                                    </td>
-                                                                )}
-                                                                { true /*ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"*/ && (
-                                                                    <td className="fit">
-                                                                        {transactions.read_only || (
-                                                                            <a onClick={(policy) => deletePolicy()}
-                                                                               className="remove"/>
-                                                                            )}
-                                                                    </td>
-                                                                )}
-                                                            </tr>
-                                                            )
-                                                        )
-                                                    }
-                                                    { !transactions.read_only /* && ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" */ && (
+                                                                                                /> {/*Todo:  ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"*/}
+                                                                                            </td>
+                                                                                            {hasActions && (
+                                                                                                <td className="fit editable">
+                                                                                                    { !transactions.read_only /*Todo:  && ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')*/ && (
+                                                                                                        <div>
+                                                                                                            <RenderMultiField
+                                                                                                                fieldInformation={
+                                                                                                                    {
+                                                                                                                        id: `policies.${index}.actions`,
+                                                                                                                        type: 'mixed_text',
+                                                                                                                        collection: aclActions
+                                                                                                                    }
+                                                                                                                }
+                                                                                                                onlyCollectionValues
+                                                                                                            />
+                                                                                                        </div>
+                                                                                                    )}
+                                                                                                    {transactions.read_only /*Todo:  || ng-if="((!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"*/ && (
+                                                                                                        policy.actions.value.map((customAction, actionKey) => (
+                                                                                                            <div key={actionKey}>
+                                                                                                                {customAction}
+                                                                                                            </div>
+                                                                                                        ))
+                                                                                                    )}
+                                                                                                </td>
+                                                                                            )}
+                                                                                            { true /*Todo: ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"*/ && (
+                                                                                                /*Remove policy*/
+                                                                                                <td>
+                                                                                                    <a onClick={() => deletePolicy(policy, remove, index, formik.values.policies)}
+                                                                                                       className="remove" />
+                                                                                                </td>
+                                                                                            )}
+                                                                                        </tr>
+                                                                                    ))}
+                                                    { !transactions.read_only /*Todo:   && ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" */ && (
                                                         <tr>
                                                             <td colSpan="5">
 
-                                                                <a onClick={() => addPolicy()}>
+                                                                <a onClick={() => addPolicy(push, formik.values.policies)}>
                                                                     + {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.NEW")}
                                                                 </a>
                                                             </td>
                                                         </tr>
                                                     )}
+
+                                                                    </>
+                                                                )}
+                                                            </FieldArray>
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
+
+                                                        { (!transactions.read_only && policyChanged) && (
+                                                            <footer style={{padding: '15px'}}>
+                                                        <div className="pull-left">
+                                                        <button type="reset" onClick={() => {
+                                                            resetPolicies(formik.resetForm);
+                                                            //resetPolicies(formik.values.policies, formik.);
+                                                        }} className="cancel">{t('CANCEL')/* Cancel */}</button>
+                                                        </div>
+                                                        <div className="pull-right">
+                                                        <button onClick={() => {
+                                                            saveAccess(formik.values);
+                                                        }} className="save green">{t('SAVE')/* Save */}</button>
+                                                        </div>
+                                                            </footer>) }
                                 </div>
+                                )}
+                            </Formik>
                             </li>
                         </ul>
                     )}
@@ -422,10 +493,12 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
+    addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
     fetchAccessPolicies: (eventId) => dispatch(fetchAccessPolicies(eventId)),
     fetchHasActiveTransactions: (eventId) => dispatch(fetchHasActiveTransactions(eventId)),
     fetchRoles: () => fetchRolesWithTarget("ACL"),
     fetchAclTemplates: () => fetchAclTemplates(),
+    saveNewAccessPolicies: (eventId, policies) => dispatch(saveAccessPolicies(eventId, policies)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsAccessPolicyTab);

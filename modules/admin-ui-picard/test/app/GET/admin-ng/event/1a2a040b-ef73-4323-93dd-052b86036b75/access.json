@@ -6,7 +6,7 @@
         "write": true
       }
     },
-    "acl": "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_USER_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_USER_ADMIN\",\"action\":\"write\"}]}}",
+    "acl": "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_USER_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_USER_ADMIN\",\"action\":\"write\"},{\"allow\":true,\"role\":\"ROLE_USER\",\"action\":\"read\"}]}}",
     "current_acl": 0
   },
   "system_acls": [

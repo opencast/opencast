@@ -12,13 +12,13 @@
             },
             {
                 "action": "read",
-                "allow": true,
-                "role": "ROLE_ANONYMOUS"
+                "allow": false,
+                "role": "ROLE_USER"
             },
             {
                 "action": "write",
-                "allow": false,
-                "role": "ROLE_ANONYMOUS"
+                "allow": true,
+                "role": "ROLE_USER"
             }
         ]
     },

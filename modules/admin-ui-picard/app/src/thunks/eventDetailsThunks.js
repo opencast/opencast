@@ -9,6 +9,26 @@ import {
 } from '../actions/eventDetailsActions';
 import axios from "axios";
 
+export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
+    const ace = JSON.stringify({acl: {
+            ace: policies
+        }});
+    const data = {
+        ace,
+        override: "true"
+    };
+
+    //const policiesSaved = await axios.post(`admin-ng/event/${eventId}/access`, data);
+    axios.post(`admin-ng/event/${eventId}/access`, data)
+        .then(response => {
+            console.log(response);
+            return true;
+        })
+        .catch(response => {
+            console.log(response);
+        });
+}
+
 export const fetchAccessPolicies = (eventId) => async (dispatch) => {
     try {
         const getData = async () => {
