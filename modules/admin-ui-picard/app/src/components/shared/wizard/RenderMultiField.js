@@ -1,25 +1,23 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-import {useField} from "formik";
+import cn from "classnames";
 
 const childRef = React.createRef();
 
 /**
  * This component renders an editable field for multiple values depending on the type of the corresponding metadata
  */
-const RenderMultiField = ({ fieldInformation, onlyCollectionValues=false }) => {
+const RenderMultiField = ({ fieldInfo, onlyCollectionValues=false, field, form, showCheck=false }) => {
     // Indicator if currently edit mode is activated
     const [editMode, setEditMode] = useState(false);
     // Temporary storage for value user currently types in
     const [inputValue, setInputValue] = useState('');
 
-    // Formik hook for getting data of specific form field
-    // DON'T delete meta, hook works with indices not variable names
-    const [field, meta, helpers] = useField(fieldInformation.id);
+    let fieldValue = [...field.value];
 
     useEffect(() => {
+        // Handle click outside the field and leave edit mode
         const handleClickOutside = e => {
-            // Handle click outside the field and leave edit mode
             if(childRef.current && !childRef.current.contains(e.target)) {
                 setEditMode(false);
             }
@@ -36,13 +34,13 @@ const RenderMultiField = ({ fieldInformation, onlyCollectionValues=false }) => {
         return () => {
             window.removeEventListener('mousedown', handleClickOutside);
         }
-    }, [editMode]);
+    }, []);
 
     // Handle change of value user currently types in
     const handleChange = e => {
         const itemValue = e.target.value;
         setInputValue(itemValue);
-    }
+    };
 
     const handleKeyDown = (event) => {
         // Check if pressed key is Enter
@@ -52,165 +50,151 @@ const RenderMultiField = ({ fieldInformation, onlyCollectionValues=false }) => {
             // Flag if only values of collection are allowed or any value
             if (onlyCollectionValues) {
                 // add input to formik field value if not already added and input in collection of possible values
-                if (!field.value.find(e => e === inputValue)
-                    && fieldInformation.collection.find(e=> e.value === inputValue)) {
-                    field.value[field.value.length] = inputValue;
-                    helpers.setValue(field.value);
+                if (!fieldValue.find(e => e === inputValue)
+                    && fieldInfo.collection.find(e=> e.value === inputValue)) {
+                    fieldValue[fieldValue.length] = inputValue;
+                    form.setFieldValue(field.name, fieldValue);
                 }
             } else {
                 // add input to formik field value if not already added
-                if (!field.value.find(e => e === inputValue)) {
-                    field.value[field.value.length] = inputValue;
-                    helpers.setValue(field.value);
+                if (!fieldValue.find(e => e === inputValue)) {
+                    fieldValue[fieldValue.length] = inputValue;
+                    form.setFieldValue(field.name, fieldValue);
                 }
             }
 
             // reset inputValue
             setInputValue("");
         }
-    }
+    };
 
     // Remove item/value from inserted field values
     const removeItem = key => {
-        field.value.splice(key, 1);
-        helpers.setValue(field.value);
-    }
+        fieldValue.splice(key, 1);
+        form.setFieldValue(field.name, fieldValue);
+    };
 
     return (
         // Render editable field for multiple values depending on type of metadata field
         // (types: see metadata.json retrieved from backend)
-      <>
-          {(fieldInformation.type === "mixed_text" && !!fieldInformation.collection) ? (
-              <EditableMultiSelect collection={fieldInformation.collection}
-                                   fieldValue={field.value}
-                                   editMode={editMode}
-                                   setEditMode={setEditMode}
-                                   inputValue={inputValue}
-                                   removeItem={removeItem}
-                                   handleChange={handleChange}
-                                   handleKeyDown={handleKeyDown}/>
-          ) : (fieldInformation.type === "mixed_text" && (
-              <EditableMultiValue fieldValue={field.value}
-                                  editMode={editMode}
-                                  setEditMode={setEditMode}
-                                  inputValue={inputValue}
-                                  removeItem={removeItem}
-                                  handleChange={handleChange}
-                                  handleKeyDown={handleKeyDown}/>
-          ))}
-      </>
-    );
-}
-
-// Renders multi select
-const EditableMultiSelect = ({ fieldValue, collection, editMode, setEditMode, inputValue, removeItem, handleChange,
-                                 handleKeyDown }) => {
-    const { t } = useTranslation();
-
-    return (
         editMode ? (
             <>
-                <div ref={childRef}>
-                    <div onBlur={() => setEditMode(false)}>
-                        <input name="inputValue"
-                               value={inputValue}
-                               type="text"
-                               onKeyDown={e => handleKeyDown(e)}
-                               onChange={e => handleChange(e)}
-                               placeholder={t('EDITABLE.MULTI.PLACEHOLDER')}
-                               list="data-list"
-                        />
-                        {/* Display possible options for values as some kind of dropdown */}
-                        <datalist id="data-list">
-                            {collection.map((item, key) => (
-                                <option key={key}>{item.value}</option>
-                            ))}
-                        </datalist>
-                    </div>
-                    {/* Render blue label for all values already in fieldValue array */}
-                    {(fieldValue instanceof Array && fieldValue.length !== 0) ? (fieldValue.map((item, key) => (
-                        <span className="ng-multi-value"
-                              key={key}>
-                        {item}
-                            <a onClick={() => removeItem(key)}>
-                            <i className="fa fa-times" />
-                        </a>
-                    </span>
-                    ))) : null}
-                </div>
+                {fieldInfo.type === "mixed_text" && !!fieldInfo.collection ? (
+                    <EditMultiSelect collection={fieldInfo.collection}
+                                     field={field}
+                                     fieldValue={fieldValue}
+                                     setEditMode={setEditMode}
+                                     inputValue={inputValue}
+                                     removeItem={removeItem}
+                                     handleChange={handleChange}
+                                     handleKeyDown={handleKeyDown}/>
+                ) : (fieldInfo.type === "mixed_text" && (
+                    <EditMultiValue setEditMode={setEditMode}
+                                    fieldValue={fieldValue}
+                                    field={field}
+                                    inputValue={inputValue}
+                                    removeItem={removeItem}
+                                    handleChange={handleChange}
+                                    handleKeyDown={handleKeyDown}/>
+                ))}
             </>
-
         ) : (
-            <div onClick={() => setEditMode(true)}>
-                {/* Show values when not in editing mode */}
-                {(fieldValue instanceof Array && fieldValue.length !== 0) ? (
-                    <ul>
-                        {fieldValue.map((item, key) => (
-                            <li key={key}>
-                                <span>{item}</span>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <span className="editable preserve-newlines">
-                            {""}
-                    </span>
-                )}
-                <i className="edit fa fa-pencil-square"/>
-            </div>
+            <ShowValue setEditMode={setEditMode}
+                       field={field}
+                       form={form}
+                       showCheck={showCheck}/>
         )
     );
 };
 
-// Renders editable field input for multiple values
-const EditableMultiValue = ({ fieldValue, editMode, setEditMode, inputValue, removeItem, handleChange,
-                                handleKeyDown}) => {
+// Renders multi select
+const EditMultiSelect = ({ collection, setEditMode, handleKeyDown, handleChange, inputValue, removeItem, field, fieldValue }) => {
     const { t } = useTranslation();
 
     return (
-        editMode ? (
-            <>
-                <div onBlur={() => setEditMode(false)}
-                     ref={childRef}>
-                    <input name="inputValue"
+        <>
+            <div ref={childRef}>
+                <div onBlur={() => setEditMode(false)}>
+                    <input type="text"
+                           name={field.name}
                            value={inputValue}
-                           type="text"
                            onKeyDown={e => handleKeyDown(e)}
                            onChange={e => handleChange(e)}
                            placeholder={t('EDITABLE.MULTI.PLACEHOLDER')}
-                    />
+                           list="data-list"/>
+                    {/* Display possible options for values as some kind of dropdown */}
+                    <datalist id="data-list">
+                        {collection.map((item, key) => (
+                            <option key={key}>{item.value}</option>
+                        ))}
+                    </datalist>
                 </div>
-                {/* Render blue label for all values already in fieldValue array */}
-                {(fieldValue instanceof Array && fieldValue.length !== 0) ? (fieldValue.map((item, key) => (
+                {/* Render blue label for all values already in field array */}
+                {(fieldValue instanceof Array && fieldValue.length !== 0) && (fieldValue.map((item, key) => (
                     <span className="ng-multi-value"
                           key={key}>
                         {item}
                         <a onClick={() => removeItem(key)}>
-                            <i className="fa fa-times" />
+                            <i className="fa fa-times"/>
                         </a>
                     </span>
-                ))) : null}
-            </>
-        ) : (
-            <div onClick={() => setEditMode(true)}>
-                {/* Show values when not in editing mode */}
-                {(fieldValue instanceof Array && fieldValue.length !== 0) ? (
-                    <ul>
-                        {fieldValue.map((item, key) => (
+                )))}
+            </div>
+        </>
+    );
+};
+
+// Renders editable field input for multiple values
+const EditMultiValue = ({ setEditMode, inputValue, removeItem, handleChange, handleKeyDown, field, fieldValue }) => {
+    const { t } = useTranslation();
+
+    return (
+        <>
+            <div onBlur={() => setEditMode(false)}
+                 ref={childRef}>
+                <input type="text"
+                       name={field.name}
+                       onKeyDown={e => handleKeyDown(e)}
+                       onChange={e => handleChange(e)}
+                       value={inputValue}
+                       placeholder={t('EDITABLE.MULTI.PLACEHOLDER')}/>
+            </div>
+            {(fieldValue instanceof Array && fieldValue.length !== 0) && (fieldValue.map((item, key) => (
+                <span className="ng-multi-value"
+                      key={key}>
+                    {item}
+                    <a onClick={() => removeItem(key)}>
+                        <i className="fa fa-times" />
+                    </a>
+                </span>
+            )))}
+        </>
+    );
+};
+
+// Shows the values of the array in non-edit mode
+const ShowValue = ({ setEditMode, form: { initialValues }, field, showCheck, fieldValue }) => {
+    return (
+        <div onClick={() => setEditMode(true)}>
+            {(field.value instanceof Array && field.value.length !== 0) ? (
+                <ul>
+                    {field.value.map((item, key) => (
                         <li key={key}>
                             <span>{item}</span>
                         </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <span className="editable preserve-newlines">
-                        {""}
-                    </span>
-                )}
-                <i className="edit fa fa-pencil-square"/>
-            </div>
-        )
-    );
-};
+                    ))}
+                </ul>
+            ) : (
+                <span className="editable preserve-newlines">
+                    {""}
+                </span>
+            )}
+            <i className="edit fa fa-pencil-square" />
+            {showCheck && (
+                <i className={cn("saved fa fa-check", { active: (initialValues[field.name] !== field.value)})}/>
+            )}
+        </div>
+    )
+}
 
 export default RenderMultiField;

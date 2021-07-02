@@ -32,9 +32,9 @@ import javax.ws.rs.Path;
 @Path("/")
 public class EngagePluginCustomNotifications extends AbstractEngagePlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(EngagePluginCustomNotifications.class);
+  private static final Logger log = LoggerFactory.getLogger(EngagePluginCustomNotifications.class);
 
-    protected void activate(ComponentContext cc) {
-        log.info("Activated engage plugin: Notifications.");
-    }
+  protected void activate(ComponentContext cc) {
+    log.info("Activated engage plugin: Notifications.");
+  }
 }

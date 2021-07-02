@@ -25,13 +25,12 @@ const feedbackUrl = 'https://opencast.org/';
 
 function App() {
   return (
-      //todo: add remaining routes and put login on other place
           <HashRouter>
               <Header />
               <Switch>
                   <Route exact path={"/"}>
-                      {/*<Login />*/}
-                      <Events />
+                      <Login />
+                      {/*<Events />*/}
                   </Route>
                   <Route exact path={"/events/events"}>
                       <Events />

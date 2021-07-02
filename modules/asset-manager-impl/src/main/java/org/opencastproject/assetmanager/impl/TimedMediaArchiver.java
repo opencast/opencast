@@ -93,8 +93,9 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
       }
 
       cronExpression = (String) properties.get(PARAM_KEY_CRON_EXPR);
-      if (StringUtils.isBlank(cronExpression) || !CronExpression.isValidExpression(cronExpression))
+      if (StringUtils.isBlank(cronExpression) || !CronExpression.isValidExpression(cronExpression)) {
         throw new ConfigurationException(PARAM_KEY_CRON_EXPR, "Cron expression must be valid");
+      }
       setCronExpression(cronExpression);
       logger.debug("Timed media offload cron expression: '" + cronExpression + "'");
 
@@ -148,8 +149,8 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
     try {
       // Hardcoded date of zero.  Assumption: there is nothing with a date older than 0 which needs to be auto moved.
       assetManager.moveSnapshotsByDate(new Date(0), maxAge, storeId);
-    } catch (NotFoundException e) {
-      throw new RuntimeException("Unable to offload asset manager data", e);
+    } catch (NotFoundException ignore) {
+      logger.debug("No snapshots found that need to be moved");
     }
   }
 

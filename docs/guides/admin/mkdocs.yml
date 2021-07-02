@@ -41,6 +41,7 @@ nav:
 - Changelog: 'changelog.md'
 - Installation:
    - Overview: 'installation/index.md'
+   - Hardware Requirements: installation/server-requirements.md
    - Multiple Servers: 'installation/multiple-servers.md'
    - Installation from Source:
       - Linux: 'installation/source-linux.md'
@@ -168,6 +169,7 @@ nav:
    - Comment: 'workflowoperationhandlers/comment-woh.md'
    - Composite: 'workflowoperationhandlers/composite-woh.md'
    - Concat: 'workflowoperationhandlers/concat-woh.md'
+   - Conditional Config: 'workflowoperationhandlers/conditional-config-woh.md'
    - Configure-By-DCTerm: 'workflowoperationhandlers/configure-by-dcterm-woh.md'
    - Copy: 'workflowoperationhandlers/copy-woh.md'
    - Clone: 'workflowoperationhandlers/clone-woh.md'

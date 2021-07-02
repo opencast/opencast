@@ -44,8 +44,10 @@ import {fetchThemes} from "./themeThunks";
 
 // Method to load events into the table
 export const loadEventsIntoTable = () => async (dispatch, getState) => {
-    const { events } = getState();
-    const pagination = getTablePagination(getState());
+    const { events, table } = getState();
+    const total = events.total;
+
+    const pagination = table.pagination;
     const resource = events.results.map((result) => {
         return {
             ...result,
@@ -53,299 +55,411 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
         }
     });
 
-    const c = eventsTableConfig.columns;
-    const columns = c.map(column => {
-        const col = events.columns.find(co => co.name === column.name);
-        return {
-            ...column,
-            deactivated: col.deactivated
-        }
-    })
-    const multiSelect = eventsTableConfig.multiSelect;
+    const pages = calculatePages(total / pagination.limit, pagination.offset);
 
-    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
-
-    const tableData = {
+    let tableData = {
         resource: "events",
         rows: resource,
-        columns: columns,
-        multiSelect: multiSelect,
+        columns: table.columns,
+        multiSelect: table.multiSelect,
         pages: pages,
-        sortBy: "title"
+        sortBy: table.sortBy,
+        totalItems: total
     };
-    dispatch(loadResourceIntoTable(tableData));
 
+    if (table.resource !== 'events') {
+        const c = eventsTableConfig.columns;
+        const columns = c.map(column => {
+            const col = events.columns.find(co => co.name === column.name);
+            return {
+                ...column,
+                deactivated: col.deactivated
+            }
+        })
+        const multiSelect = eventsTableConfig.multiSelect;
+
+        tableData = {
+            ...tableData,
+            columns: columns,
+            sortBy: "title",
+            multiSelect: multiSelect
+        }
+    }
+    dispatch(loadResourceIntoTable(tableData));
 }
 
 // Method to load series into the table
 export const loadSeriesIntoTable = () => (dispatch, getState) => {
-    const { series } = getState();
-    const pagination = getTablePagination(getState());
+    const { series, table } = getState();
+    const total = series.total;
+    const pagination = table.pagination;
+
     const resource = series.results.map((result) => {
         return {
             ...result,
             selected: false
         }
     });
-    const c = seriesTableConfig.columns;
-    const columns = c.map(column => {
-        const col = series.columns.find(co => co.name === column.name);
-        return {
-            ...column,
-            deactivated: col.deactivated
-        }
-    });
-    const multiSelect = seriesTableConfig.multiSelect;
 
-    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
 
-    const tableData = {
+    const pages = calculatePages(total / pagination.limit, pagination.offset);
+
+    let tableData = {
         resource: "series",
         rows: resource,
-        columns: columns,
-        multiSelect: multiSelect,
+        columns: table.columns,
+        multiSelect: table.multiSelect,
         pages: pages,
-        sortBy: "title"
+        sortBy: table.sortBy,
+        totalItems: total
     };
+
+    if (table.resource !== 'series') {
+        const c = seriesTableConfig.columns;
+        const columns = c.map(column => {
+            const col = series.columns.find(co => co.name === column.name);
+            return {
+                ...column,
+                deactivated: col.deactivated
+            }
+        });
+        const multiSelect = seriesTableConfig.multiSelect;
+
+        tableData = {
+            ...tableData,
+            columns: columns,
+            sortBy: "title",
+            multiSelect: multiSelect
+        }
+    }
     dispatch(loadResourceIntoTable(tableData));
 };
 
 export const loadRecordingsIntoTable = () => (dispatch, getState) => {
-    const { recordings } = getState();
-    const pagination = getTablePagination(getState());
+    const { recordings, table } = getState();
+    const pagination = table.pagination;
     const resource = recordings.results;
+    const total = recordings.total;
 
-    const c = recordingsTableConfig.columns;
-    const columns = c.map(column => {
-        const col = recordings.columns.find(co => co.name === column.name);
-        return {
-            ...column,
-            deactivated : col.deactivated
-        }
-    });
+    const pages = calculatePages(total / pagination.limit, pagination.offset);
 
-    const multiSelect = recordingsTableConfig.multiSelect;
-
-    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
-
-    const tableData = {
+    let tableData = {
         resource: "recordings",
-        rows: resource,
-        columns: columns,
-        multiSelect: multiSelect,
+        columns: table.columns,
+        multiSelect: table.multiSelect,
         pages: pages,
-        sortBy: "status"
-    };
+        sortBy: table.sortBy,
+        rows: resource,
+        totalItems: total
+    }
+
+    if (table.resource !== "recordings") {
+        const c = recordingsTableConfig.columns;
+        const columns = c.map(column => {
+            const col = recordings.columns.find(co => co.name === column.name);
+            return {
+                ...column,
+                deactivated : col.deactivated
+            }
+        });
+
+        const multiSelect = recordingsTableConfig.multiSelect;
+
+        tableData = {
+            ...tableData,
+            columns: columns,
+            sortBy: "status",
+            multiSelect: multiSelect
+        }
+    }
+
     dispatch(loadResourceIntoTable(tableData));
 }
 
 export const loadJobsIntoTable = () => (dispatch, getState) => {
-    const { jobs } = getState();
-    const pagination = getTablePagination(getState());
+    const { jobs, table } = getState();
+    const pagination = table.pagination;
     const resource = jobs.results;
+    const total = jobs.total;
 
-    const c = jobsTableConfig.columns;
-    const columns = c.map(column => {
-        const col = jobs.columns.find(co => co.name === column.name);
-        return {
-            ...column,
-            deactivated: col.deactivated
-        }
-    });
+    const pages = calculatePages(total / pagination.limit, pagination.offset);
 
-    const multiSelect = jobsTableConfig.multiSelect;
-
-    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
-
-    const tableData = {
+    let tableData = {
         resource: "jobs",
         rows: resource,
-        columns: columns,
-        multiSelect: multiSelect,
+        columns: table.columns,
+        multiSelect: table.multiSelect,
         pages: pages,
-        sortBy: "id"
+        sortBy: table.sortBy,
+        totalItems: total
     };
+
+    if (table.resource !== 'jobs') {
+        const c = jobsTableConfig.columns;
+        const columns = c.map(column => {
+            const col = jobs.columns.find(co => co.name === column.name);
+            return {
+                ...column,
+                deactivated: col.deactivated
+            }
+        });
+
+        const multiSelect = jobsTableConfig.multiSelect;
+
+        tableData = {
+            ...tableData,
+            columns: columns,
+            sortBy: "id",
+            multiSelect: multiSelect
+        };
+    }
     dispatch(loadResourceIntoTable(tableData));
 }
 
 export const loadServersIntoTable = () => (dispatch, getState) => {
-    const { servers } = getState();
-    const pagination = getTablePagination(getState());
+    const { servers, table } = getState();
+    const pagination = table.pagination;
     const resource = servers.results;
+    const total = servers.total;
 
-    const c = serversTableConfig.columns;
-    const columns = c.map(column => {
-        const col = servers.columns.find(co => co.name === column.name);
-        return {
-            ...column,
-            deactivated: col.deactivated
-        }
-    });
+    const pages = calculatePages(total / pagination.limit, pagination.offset);
 
-    const multiSelect = serversTableConfig.multiSelect;
-
-    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
-
-    const tableData = {
+    let tableData = {
         resource: "servers",
         rows: resource,
-        columns: columns,
-        multiSelect: multiSelect,
+        columns: table.columns,
+        multiSelect: table.multiSelect,
         pages: pages,
-        sortBy: "online"
+        sortBy: table.sortBy,
+        totalItems: total
     };
+
+    if (table.resource !== 'servers') {
+        const c = serversTableConfig.columns;
+        const columns = c.map(column => {
+            const col = servers.columns.find(co => co.name === column.name);
+            return {
+                ...column,
+                deactivated: col.deactivated
+            }
+        });
+
+        const multiSelect = serversTableConfig.multiSelect;
+
+        tableData = {
+            ...tableData,
+            columns: columns,
+            sortBy: "online",
+            multiSelect: multiSelect
+        };
+    }
     dispatch(loadResourceIntoTable(tableData));
 
 }
 
 export const loadServicesIntoTable = () => (dispatch, getState) => {
-    const { services } = getState();
-    const pagination = getTablePagination(getState());
+    const { services, table } = getState();
+    const pagination = table.pagination;
     const resource = services.results;
+    const total = services.total;
 
-    const c = servicesTableConfig.columns;
-    const columns = c.map(column => {
-        const col = services.columns.find(co => co.name === column.name);
-        return {
-            ...column,
-            deactivated: col.deactivated
-        }
-    });
+    const pages = calculatePages(total / pagination.limit, pagination.offset);
 
-    const multiSelect = servicesTableConfig.multiSelect;
-
-    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
-
-    const tableData = {
-        resource: "services",
+    let tableData = {
         rows: resource,
-        columns: columns,
-        multiSelect: multiSelect,
         pages: pages,
-        sortBy: "status"
-    };
+        totalItems: total,
+        resource: "services",
+        columns: table.columns,
+        multiSelect: table.multiSelect,
+        sortBy: table.sortBy
+    }
+
+    if (table.resource !== 'services') {
+        const c = servicesTableConfig.columns;
+        const columns = c.map(column => {
+            const col = services.columns.find(co => co.name === column.name);
+            return {
+                ...column,
+                deactivated: col.deactivated
+            }
+        });
+
+        const multiSelect = servicesTableConfig.multiSelect;
+
+        tableData = {
+            ...tableData,
+            columns: columns,
+            sortBy: "status",
+            multiSelect: multiSelect
+        };
+    }
+
     dispatch(loadResourceIntoTable(tableData));
 }
 
 export const loadUsersIntoTable = () => (dispatch, getState) => {
-    const {users} = getState();
-    const pagination = getTablePagination(getState());
+    const { users, table} = getState();
+    const pagination = table.pagination;
     const resource = users.results;
+    const total = users.total;
 
-    const c = usersTableConfig.columns;
-    const columns = c.map(column => {
-        const col = users.columns.find(co => co.name === column.name);
-        return {
-            ...column,
-            deactivated: col.deactivated
-        }
-    });
+    const pages = calculatePages(total / pagination.limit, pagination.offset);
 
-    const multiSelect = usersTableConfig.multiSelect;
-
-    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
-
-    const tableData = {
+    let tableData = {
         resource: "users",
         rows: resource,
-        columns: columns,
-        multiSelect: multiSelect,
+        columns: table.columns,
+        multiSelect: table.multiSelect,
         pages: pages,
-        sortBy: "name"
+        sortBy: table.sortBy,
+        totalItems: total
     };
+
+    if (table.resource !== 'users') {
+        const c = usersTableConfig.columns;
+        const columns = c.map(column => {
+            const col = users.columns.find(co => co.name === column.name);
+            return {
+                ...column,
+                deactivated: col.deactivated
+            }
+        });
+
+        const multiSelect = usersTableConfig.multiSelect;
+
+        tableData = {
+            ...tableData,
+            columns: columns,
+            sortBy: "name",
+            multiSelect: multiSelect
+        };
+    }
     dispatch(loadResourceIntoTable(tableData));
 };
 
 export const loadGroupsIntoTable = () => (dispatch, getState) => {
-    const { groups } = getState();
-    const pagination = getTablePagination(getState());
+    const { groups, table } = getState();
+    const pagination = table.pagination;
     const resource = groups.results;
+    const total = groups.total;
 
-    const c = groupsTableConfig.columns;
-    const columns = c.map(column => {
-        const col = groups.columns.find(co => co.name === column.name);
-        return {
-            ...column,
-            deactivated: col.deactivated
-        }
-    });
+    const pages = calculatePages(total / pagination.limit, pagination.offset);
 
-    const multiSelect = groupsTableConfig.multiSelect;
-
-    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
-
-    const tableData = {
+    let tableData = {
         resource: "groups",
         rows: resource,
-        columns: columns,
-        multiSelect: multiSelect,
+        columns: table.columns,
+        multiSelect: table.multiSelect,
         pages: pages,
-        sortBy: "name"
+        sortBy: table.sortBy,
+        totalItems: total
     };
+
+    if (table.resource !== 'groups') {
+        const c = groupsTableConfig.columns;
+        const columns = c.map(column => {
+            const col = groups.columns.find(co => co.name === column.name);
+            return {
+                ...column,
+                deactivated: col.deactivated
+            }
+        });
+
+        const multiSelect = groupsTableConfig.multiSelect;
+
+        tableData = {
+            ...tableData,
+            columns: columns,
+            sortBy: "name",
+            multiSelect: multiSelect
+        };
+    }
     dispatch(loadResourceIntoTable(tableData));
 }
 
 export const loadAclsIntoTable = () => (dispatch, getState) => {
-    const { acls } = getState();
-    const pagination = getTablePagination(getState());
+    const { acls, table } = getState();
+    const pagination = table.pagination;
     const resource = acls.results;
+    const total = acls.total;
 
-    const c = aclsTableConfig.columns;
-    const columns = c.map(column => {
-        const col = acls.columns.find(co => co.name === column.name);
-        return {
-            ...column,
-            deactivated: col.deactivated
-        }
-    });
+    const pages = calculatePages(total / pagination.limit, pagination.offset);
 
-    const multiSelect = aclsTableConfig.multiSelect;
-
-    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
-
-    const tableData = {
+    let tableData = {
         resource: "acls",
         rows: resource,
-        columns: columns,
-        multiSelect: multiSelect,
+        columns: table.columns,
+        multiSelect: table.multiSelect,
         pages: pages,
-        sortBy: "name"
+        sortBy: table.sortBy,
+        totalItems: total
     };
+
+    if (table.resource !== 'acls') {
+        const c = aclsTableConfig.columns;
+        const columns = c.map(column => {
+            const col = acls.columns.find(co => co.name === column.name);
+            return {
+                ...column,
+                deactivated: col.deactivated
+            }
+        });
+
+        const multiSelect = aclsTableConfig.multiSelect;
+        tableData = {
+            ...tableData,
+            columns: columns,
+            sortBy: "name",
+            multiSelect: multiSelect
+        };
+    }
     dispatch(loadResourceIntoTable(tableData));
 }
 
 export const loadThemesIntoTable = () => (dispatch, getState) => {
-    const { themes } = getState();
-    const pagination = getTablePagination(getState());
+    const { themes, table } = getState();
+    const pagination = table.pagination;
     const resource = themes.results;
+    const total = themes.total;
 
-    const c = themesTableConfig.columns;
-    const columns = c.map(column => {
-        const col = themes.columns.find(co => co.name === column.name);
-        return {
-            ...column,
-            deactivated: col.deactivated
-        }
-    });
+    const pages = calculatePages(total / pagination.limit, pagination.offset);
 
-    const multiSelect = themesTableConfig.multiSelect;
-
-    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
-
-    const tableData = {
+    let tableData = {
         resource: "themes",
         rows: resource,
-        columns: columns,
-        multiSelect: multiSelect,
+        columns: table.columns,
+        multiSelect: table.multiSelect,
         pages: pages,
-        sortBy: "name"
+        sortBy: table.sortBy,
+        totalItems: total
     };
+
+    if (table.resource !== 'themes') {
+        const c = themesTableConfig.columns;
+        const columns = c.map(column => {
+            const col = themes.columns.find(co => co.name === column.name);
+            return {
+                ...column,
+                deactivated: col.deactivated
+            }
+        });
+
+        const multiSelect = themesTableConfig.multiSelect;
+
+        tableData = {
+            ...tableData,
+            columns: columns,
+            sortBy: "name",
+            multiSelect: multiSelect
+        };
+    }
     dispatch(loadResourceIntoTable(tableData));
 }
 
 
 // Navigate between pages
-export const goToPage = pageNumber => (dispatch, getState) => {
+export const goToPage = pageNumber => async (dispatch, getState) => {
 
     dispatch(deselectAll());
     dispatch(setOffset(pageNumber));
@@ -358,56 +472,55 @@ export const goToPage = pageNumber => (dispatch, getState) => {
     dispatch(setPageActive(pages[offset].number));
 
     // Get resources of page and load them into table
-    // todo: Check for all other type of resource
     // eslint-disable-next-line default-case
     switch (getResourceType(state)) {
         case 'events': {
-            dispatch(fetchEvents());
+            await dispatch(fetchEvents());
             dispatch(loadEventsIntoTable());
             break;
         }
         case 'series': {
-            dispatch(fetchSeries());
+            await dispatch(fetchSeries());
             dispatch(loadSeriesIntoTable());
             break;
         }
         case 'recordings': {
-            dispatch(fetchRecordings());
+            await dispatch(fetchRecordings());
             dispatch(loadRecordingsIntoTable());
             break;
         }
         case 'jobs': {
-            dispatch(fetchJobs());
+            await dispatch(fetchJobs());
             dispatch(loadJobsIntoTable());
             break;
         }
         case 'servers': {
-            dispatch(fetchServers());
+            await dispatch(fetchServers());
             dispatch(loadServersIntoTable());
             break;
         }
         case 'services': {
-            dispatch(fetchServices());
+            await dispatch(fetchServices());
             dispatch(loadServicesIntoTable());
             break;
         }
         case 'users': {
-            dispatch(fetchUsers());
+            await dispatch(fetchUsers());
             dispatch(loadUsersIntoTable());
             break;
         }
         case 'groups': {
-            dispatch(fetchGroups());
+            await dispatch(fetchGroups());
             dispatch(loadGroupsIntoTable());
             break;
         }
         case 'acls': {
-            dispatch(fetchAcls());
+            await dispatch(fetchAcls());
             dispatch(loadAclsIntoTable());
             break;
         }
         case 'themes': {
-            dispatch(fetchThemes());
+            await dispatch(fetchThemes());
             dispatch(loadThemesIntoTable());
             break;
         }
@@ -415,7 +528,7 @@ export const goToPage = pageNumber => (dispatch, getState) => {
 }
 
 // Update pages for example if page size was changed
-export const updatePages = () => (dispatch,getState) => {
+export const updatePages = () => async (dispatch,getState) => {
     const state = getState();
 
     const pagination = getTablePagination(state);
@@ -425,56 +538,55 @@ export const updatePages = () => (dispatch,getState) => {
     dispatch(setPages(pages));
 
     // Get resources of page and load them into table
-    // todo: Check for all other type of resource
     // eslint-disable-next-line default-case
     switch (getResourceType(state)) {
         case 'events': {
-            dispatch(fetchEvents());
+            await dispatch(fetchEvents());
             dispatch(loadEventsIntoTable());
             break;
         }
         case 'series': {
-            dispatch(fetchSeries());
+            await dispatch(fetchSeries());
             dispatch(loadSeriesIntoTable());
             break;
         }
         case 'recordings': {
-            dispatch(fetchRecordings());
+            await dispatch(fetchRecordings());
             dispatch(loadRecordingsIntoTable());
             break;
         }
         case 'jobs': {
-            dispatch(fetchJobs());
+            await dispatch(fetchJobs());
             dispatch(loadJobsIntoTable());
             break;
         }
         case 'servers': {
-            dispatch(fetchServers());
+            await dispatch(fetchServers());
             dispatch(loadServersIntoTable());
             break;
         }
         case 'services': {
-            dispatch(fetchServices());
+            await dispatch(fetchServices());
             dispatch(loadServicesIntoTable());
             break;
         }
         case 'users': {
-            dispatch(fetchUsers());
+            await dispatch(fetchUsers());
             dispatch(loadUsersIntoTable());
             break;
         }
         case 'groups': {
-            dispatch(fetchGroups());
+            await dispatch(fetchGroups());
             dispatch(loadGroupsIntoTable());
             break;
         }
         case 'acls': {
-            dispatch(fetchAcls());
+            await dispatch(fetchAcls());
             dispatch(loadAclsIntoTable());
             break;
         }
         case 'themes': {
-            dispatch(fetchThemes());
+            await dispatch(fetchThemes());
             dispatch(loadThemesIntoTable());
             break;
         }

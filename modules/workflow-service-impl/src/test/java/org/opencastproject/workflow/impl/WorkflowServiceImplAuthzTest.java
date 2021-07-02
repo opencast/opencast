@@ -27,9 +27,11 @@ import static org.junit.Assert.fail;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -225,9 +227,6 @@ public class WorkflowServiceImplAuthzTest {
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(messageSender);
-
     // Service Registry
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
@@ -244,7 +243,16 @@ public class WorkflowServiceImplAuthzTest {
     dao.solrRoot = sRoot + File.separator + "solr." + System.currentTimeMillis();
     dao.activate("System Admin");
     service.setDao(dao);
-    service.setMessageSender(messageSender);
+
+    SearchResult result = EasyMock.createNiceMock(SearchResult.class);
+
+    final AbstractSearchIndex index = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
+    EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
+    EasyMock.replay(result, index);
+
+    service.setAdminUiIndex(index);
+    service.setExternalApiIndex(index);
 
     // Activate
     service.activate(null);

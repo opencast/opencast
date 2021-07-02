@@ -14,6 +14,7 @@ import {
     isSavingComment,
     isSavingCommentReply,
 } from "../../../../selectors/eventDetailsSelectors";
+import Notifications from "../../../shared/Notifications";
 
 /**
  * This component manages the comment tab of the event details modal
@@ -88,7 +89,7 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
     return (
         <div className="modal-content">
             <div className="modal-body">
-                { /* <div data-admin-ng-notifications="" context="events-access"/> */}
+                <Notifications context="not-corner"/>
                 <div className="full-col">
                     <div className="obj comments">
                         <header>{t(header)}</header>

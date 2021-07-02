@@ -26,18 +26,19 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,23 +71,26 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
     final WorkflowOperationInstance currentOperation = wi.getCurrentOperation();
 
     // Check which tags have been configured
-    final String tags = StringUtils.trimToNull(currentOperation.getConfiguration("source-tags"));
-    final String sourceFlavorsString = StringUtils.trimToEmpty(currentOperation.getConfiguration("source-flavors"));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
+        Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+    List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
+    List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
 
-    final String[] sourceFlavors = StringUtils.split(sourceFlavorsString, ",");
-    if (sourceFlavors.length < 1 && tags == null)
+
+    if (sourceTagsOption.isEmpty() && sourceFlavorsOption.isEmpty()) {
       logger.debug("No source tags have been specified, so everything will be added to the AssetManager");
+    }
 
     final List<String> tagSet;
     // If a set of tags has been specified, use it
-    if (tags != null) {
-      tagSet = asList(tags);
+    if (!sourceTagsOption.isEmpty()) {
+      tagSet = sourceTagsOption;
     } else {
       tagSet = new ArrayList<>();
     }
 
     try {
-      final MediaPackage mpAssetManager = getMediaPackageForArchival(mpWorkflow, tagSet, sourceFlavors);
+      final MediaPackage mpAssetManager = getMediaPackageForArchival(mpWorkflow, tagSet, sourceFlavorsOption);
       if (mpAssetManager != null) {
         logger.info("Take snapshot of media package {}", mpAssetManager);
         // adding media package to the episode service
@@ -101,17 +105,18 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
     }
   }
 
-  protected MediaPackage getMediaPackageForArchival(MediaPackage current, List<String> tags, String[] sourceFlavors)
+  protected MediaPackage getMediaPackageForArchival(MediaPackage current, List<String> tags,
+                                                    List<MediaPackageElementFlavor> sourceFlavors)
           throws MediaPackageException {
     MediaPackage mp = (MediaPackage) current.clone();
 
     Collection<MediaPackageElement> keep;
 
-    if (tags.isEmpty() && sourceFlavors.length < 1) {
+    if (tags.isEmpty() && sourceFlavors.isEmpty()) {
       keep = new ArrayList<>(Arrays.asList(current.getElementsByTags(tags)));
     } else {
       SimpleElementSelector simpleElementSelector = new SimpleElementSelector();
-      for (String flavor : sourceFlavors) {
+      for (MediaPackageElementFlavor flavor : sourceFlavors) {
         simpleElementSelector.addFlavor(flavor);
       }
       for (String tag : tags) {
@@ -136,8 +141,9 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
     // Fix references and flavors
     for (MediaPackageElement element : mp.getElements()) {
 
-      if (removals.contains(element))
+      if (removals.contains(element)) {
         continue;
+      }
 
       // Is the element referencing anything?
       MediaPackageReference reference = element.getReference();
@@ -161,11 +167,11 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
           }
 
           // Done. Let's cut the path but keep references to the mediapackage itself
-          if (reference != null && reference.getType().equals(MediaPackageReference.TYPE_MEDIAPACKAGE))
+          if (reference != null && reference.getType().equals(MediaPackageReference.TYPE_MEDIAPACKAGE)) {
             element.setReference(reference);
-          else if (reference != null && (referenceProperties == null || referenceProperties.size() == 0))
+          } else if (reference != null && (referenceProperties == null || referenceProperties.size() == 0)) {
             element.clearReference();
-          else {
+          } else {
             // Ok, there is more to that reference than just pointing at an element. Let's keep the original,
             // you never know.
             removals.remove(referencedElement);

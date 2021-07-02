@@ -115,8 +115,15 @@ public final class HttpUtil {
     long now = 0L;
     while (true) {
       final HttpHead head = new HttpHead(resourceUri);
+      HttpResponse response = null;
+      final int status;
       try {
-        final int status = http.execute(head).getStatusLine().getStatusCode();
+        try {
+          response = http.execute(head);
+          status = response.getStatusLine().getStatusCode();
+        } finally {
+          http.close(response);
+        }
         if (status == expectedStatus || now >= timeout) {
           return right(status);
         } else {

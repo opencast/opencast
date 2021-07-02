@@ -137,8 +137,9 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
 
     String flavorNames = operation.getConfiguration(SOURCE_MEDIA_FLAVORS);
     final List<MediaPackageElementFlavor> flavors = new ArrayList<MediaPackageElementFlavor>();
-    for (String flavorName : asList(flavorNames))
+    for (String flavorName : asList(flavorNames)) {
       flavors.add(MediaPackageElementFlavor.parseFlavor(flavorName));
+    }
 
     // Target tags
     String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS));

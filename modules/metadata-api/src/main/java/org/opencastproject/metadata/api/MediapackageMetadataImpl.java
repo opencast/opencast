@@ -93,8 +93,9 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
    * {@inheritDoc}
    */
   public String[] getCreators() {
-    if (creators == null)
+    if (creators == null) {
       return new String[] {};
+    }
     return creators;
   }
 
@@ -109,8 +110,9 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
   }
 
   public String[] getContributors() {
-    if (contributors == null)
+    if (contributors == null) {
       return new String[] {};
+    }
     return contributors;
   }
 
@@ -128,8 +130,9 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
    * {@inheritDoc}
    */
   public String[] getSubjects() {
-    if (subjects == null)
+    if (subjects == null) {
       return new String[] {};
+    }
     return subjects;
   }
 

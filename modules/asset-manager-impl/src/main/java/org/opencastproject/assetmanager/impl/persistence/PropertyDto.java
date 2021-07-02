@@ -134,31 +134,31 @@ public class PropertyDto {
 
   private static void setValue(final PropertyDto dto, final Value value) {
     value.decompose(
-            new Fx<String>() {
-              @Override public void apply(String a) {
-                dto.stringValue = a;
-              }
-            }.toFn(),
-            new Fx<Date>() {
-              @Override public void apply(Date a) {
-                dto.dateValue = a;
-              }
-            }.toFn(),
-            new Fx<Long>() {
-              @Override public void apply(Long a) {
-                dto.longValue = a;
-              }
-            }.toFn(),
-            new Fx<Boolean>() {
-              @Override public void apply(Boolean a) {
-                dto.boolValue = a;
-              }
-            }.toFn(),
-            new Fx<Version>() {
-              @Override public void apply(Version a) {
-                dto.longValue = RuntimeTypes.convert(a).value();
-              }
-            }.toFn());
+        new Fx<String>() {
+          @Override public void apply(String a) {
+            dto.stringValue = a;
+          }
+        }.toFn(),
+        new Fx<Date>() {
+          @Override public void apply(Date a) {
+            dto.dateValue = a;
+          }
+        }.toFn(),
+        new Fx<Long>() {
+          @Override public void apply(Long a) {
+            dto.longValue = a;
+          }
+        }.toFn(),
+        new Fx<Boolean>() {
+          @Override public void apply(Boolean a) {
+            dto.boolValue = a;
+          }
+        }.toFn(),
+        new Fx<Version>() {
+          @Override public void apply(Version a) {
+            dto.longValue = RuntimeTypes.convert(a).value();
+          }
+        }.toFn());
   }
 
   public static int delete(EntityManager em, final String mediaPackageId) {

@@ -36,6 +36,7 @@ The following table contains the workflow operations that are available in an ou
 |comment             |Add, resolve or delete a comment                               |[Documentation](comment-woh.md)|
 |composite           |Compose two videos on one canvas.                              |[Documentation](composite-woh.md)|
 |concat              |Concatenate multiple video tracks into one video track         |[Documentation](concat-woh.md)|
+|conditional-config  |Configure workflow configuration variable based on coditions   |[Documentation](conditional-config-woh.md)|
 |configure-by-dcterm |Set workflow parameter if dublincore term matches value        |[Documentation](configure-by-dcterm-woh.md)|
 |copy                |Copy media package elements to target directory                |[Documentation](copy-woh.md)|
 |cover-image         |Generate a cover-image containing metadata                     |[Documentation](coverimage-woh.md)|

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -87,6 +87,7 @@
               !org.apache.lucene.*,
               !org.jboss.resource.adapter.jdbc.*,
               !org.hibernate.*,
+              !waffle.*,
               !com.sun.jna.platform.win32,
               org.w3c.dom;version=0,
               *

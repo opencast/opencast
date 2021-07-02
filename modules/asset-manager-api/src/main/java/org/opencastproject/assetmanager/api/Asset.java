@@ -28,7 +28,8 @@ import com.entwinemedia.fn.data.Opt;
 import java.io.InputStream;
 
 /**
- * An asset is a {@link org.opencastproject.mediapackage.MediaPackageElement} under the control of the {@link AssetManager}.
+ * An asset is a {@link org.opencastproject.mediapackage.MediaPackageElement}
+ * under the control of the {@link AssetManager}.
  */
 public interface Asset {
   /** Return the identifier of the asset. */

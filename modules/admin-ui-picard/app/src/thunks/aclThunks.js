@@ -2,6 +2,7 @@ import {loadAclsFailure, loadAclsInProgress, loadAclsSuccess} from "../actions/a
 import {getURLParams, prepareAccessPolicyRulesForPost} from "../utils/resourceUtils";
 import axios from "axios";
 import {transformToIdValueArray} from "../utils/utils";
+import {addNotification} from "./notificationThunks";
 
 // fetch acls from server
 export const fetchAcls = () => async (dispatch, getState) => {
@@ -131,21 +132,38 @@ export const fetchRolesWithTarget = async target => {
 
 
 // post new acl to backend
-export const postNewAcl = values => {
+export const postNewAcl = values => async dispatch => {
 
     let acls = prepareAccessPolicyRulesForPost(values.acls);
 
-    let data = new FormData();
+    let data = new URLSearchParams();
     data.append('name', values.name);
     data.append('acl', JSON.stringify(acls));
 
-    // todo: notification if error occurs
     axios.post('/admin-ng/acl', data,
         {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         }
-    ).then(response => console.log(response)).catch(response => console.log(response));
+    ).then(response => {
+        console.log(response);
+        dispatch(addNotification('success', 'ACL_ADDED'));
+    }).catch(response => {
+        console.log(response);
+        dispatch(addNotification('error', 'ACL_NOT_SAVED'));
+    });
 
 };
+// delete acl with provided id
+export const deleteAcl = id => async dispatch => {
+    axios.delete(`/admin-ng/acl/${id}`).then(res => {
+        console.log(res);
+        //add success notification
+        dispatch(addNotification('success', 'ACL_DELETED'));
+    }).catch(res => {
+        console.log(res);
+        // add error notification
+        dispatch(addNotification('error', 'ACL_NOT_DELETED'));
+    })
+}

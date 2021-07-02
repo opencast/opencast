@@ -1,0 +1,2 @@
+- Paellas internal user tracking is now disabled by default since it is seldom used and can put a lot of stress on the
+  database.

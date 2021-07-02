@@ -25,7 +25,7 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manages the pages of the new event wizard and the submission of values
  */
-const NewEventWizard = ({ metadataFields, close }) => {
+const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
 
     const initialValues = getInitialValues(metadataFields);
 
@@ -157,9 +157,12 @@ const NewEventWizard = ({ metadataFields, close }) => {
 const getInitialValues = metadataFields => {
     // Transform metadata fields provided by backend (saved in redux)
     let initialValues = {};
-    metadataFields.fields.forEach(field => {
-        initialValues[field.id] = field.value;
-    });
+
+    if (!!metadataFields.fields && metadataFields.fields.length > 0) {
+        metadataFields.fields.forEach(field => {
+            initialValues[field.id] = field.value;
+        });
+    }
 
     // Transform additional metadata for source (provided by constant in newEventConfig)
     if (!!sourceMetadata.UPLOAD) {
@@ -209,6 +212,9 @@ const mapStateToProps = state => ({
     metadataFields: getEventMetadata(state)
 });
 
+const mapDispatchToProps = dispatch => ({
+    postNewEvent: (values, metadataFields) => dispatch(postNewEvent(values, metadataFields))
+});
 
 
-export default connect(mapStateToProps)(NewEventWizard);
+export default connect(mapStateToProps, mapDispatchToProps)(NewEventWizard);

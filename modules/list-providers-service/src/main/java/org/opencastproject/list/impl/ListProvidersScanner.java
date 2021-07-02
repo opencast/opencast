@@ -111,8 +111,11 @@ public class ListProvidersScanner implements ArtifactInstaller {
     public Map<String, String> getList(String listName, ResourceListQuery query)
             throws ListProviderNotFoundException {
       logger.debug("Getting list {} with query {} for org {}", listName, query, orgId);
-      if (this.listName.equals(listName)) return Collections.unmodifiableMap(list);
-      else throw new ListProviderNotFoundException("Unable to read list data from file");
+      if (this.listName.equals(listName)) {
+        return Collections.unmodifiableMap(list);
+      } else {
+        throw new ListProviderNotFoundException("Unable to read list data from file");
+      }
     }
 
     @Override

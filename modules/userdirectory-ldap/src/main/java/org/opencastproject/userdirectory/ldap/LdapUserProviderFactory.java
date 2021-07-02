@@ -28,6 +28,7 @@ import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -43,6 +44,8 @@ import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
@@ -99,6 +102,30 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
    * The "role prefix" defined with the ROLE_PREFIX_KEY will not be prepended to the roles starting with any of these
    */
   private static final String EXCLUDE_PREFIXES_KEY = "org.opencastproject.userdirectory.ldap.exclude.prefixes";
+
+  /**
+   * The key to indicate a prefix,
+   * which is used to check whether a roleattribute value shall be added as a group to the user
+   */
+  private static final String GROUP_CHECK_PREFIX_KEY = "org.opencastproject.userdirectory.ldap.groupcheckprefix";
+
+  /** Specifies, whether the roleattributes should be added as a role */
+  private static final String APPLY_ROLEATTRIBUTES_AS_ROLES_KEY = "org.opencastproject.userdirectory.ldap.roleattributes.applyasroles";
+
+  /** Specifies, whether the roleattributes should be added as a group */
+  private static final String APPLY_ROLEATTRIBUTES_AS_GROUPS_KEY = "org.opencastproject.userdirectory.ldap.roleattributes.applyasgroups";
+
+  /** The prefix of the keys, which map a ldap attribute to opencast roles */
+  private static final String ATTRIBUTE_MAPPING_KEY_PREFIX = "org.opencastproject.userdirectory.ldap.map.";
+
+  /** The postfix of the attribute maps, which specifiy the value to map */
+  private static final String ATTRIBUTE_MAPPING_KEY_POSTFIX_VALUE = "value";
+
+  /** The postfix of the attribute maps, which map a ldap attribute to opencast roles */
+  private static final String ATTRIBUTE_MAPPING_KEY_POSTFIX_ROLES = "roles";
+
+  /** The postfix of the attribute maps, which map a ldap attribute to opencast groups */
+  private static final String ATTRIBUTE_MAPPING_KEY_POSTFIX_GROUPS = "groups";
 
   /** The key to indicate whether or not the roles should be converted to uppercase */
   private static final String UPPERCASE_KEY = "org.opencastproject.userdirectory.ldap.uppercase";
@@ -210,15 +237,100 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     // optional with default values
     String rolePrefix = Objects.toString(properties.get(ROLE_PREFIX_KEY), "ROLE_");
     String[] excludePrefixes = StringUtils.split((String) properties.get(EXCLUDE_PREFIXES_KEY), ",");
+    String groupCheckPrefix = Objects.toString(properties.get(GROUP_CHECK_PREFIX_KEY), "ROLE_GROUP_");
     boolean convertToUppercase = BooleanUtils.toBoolean(Objects.toString(properties.get(UPPERCASE_KEY), "true"));
     int cacheSize = NumberUtils.toInt((String) properties.get(CACHE_SIZE), 1000);
     int cacheExpiration = NumberUtils.toInt((String) properties.get(CACHE_EXPIRATION), 5);
+    boolean applyRoleattributesAsRoles = BooleanUtils.toBoolean(Objects.toString(
+            properties.get(APPLY_ROLEATTRIBUTES_AS_ROLES_KEY), "true"));
+    boolean applyRoleattributesAsGroups = BooleanUtils.toBoolean(Objects.toString(
+            properties.get(APPLY_ROLEATTRIBUTES_AS_GROUPS_KEY), "true"));
+    if (applyRoleattributesAsGroups && !applyRoleattributesAsRoles) {
+      throw new ConfigurationException(APPLY_ROLEATTRIBUTES_AS_GROUPS_KEY,
+              "'" + APPLY_ROLEATTRIBUTES_AS_ROLES_KEY + "' needs to be 'true' to enable this option");
+    }
 
     // extra roles
     String[] extraRoles =  StringUtils.split(Objects.toString(properties.get(EXTRA_ROLES_KEY), ""), ",");
     Set<String> extraRoleSet = new HashSet<>(Arrays.asList(extraRoles));
     extraRoleSet.addAll(Arrays.asList("ROLE_ANONYMOUS", "ROLE_USER"));
     extraRoles = extraRoleSet.toArray(new String[extraRoles.length]);
+
+    // maps
+    HashMap<String, HashMap<String, String>> ldapAssignmentMappingsPreparation = new HashMap();
+    for (Enumeration<String> e = properties.keys(); e.hasMoreElements();) {
+      String key = e.nextElement();
+
+      if (key.startsWith(ATTRIBUTE_MAPPING_KEY_PREFIX)) {
+        final String[] postfix = key.substring(ATTRIBUTE_MAPPING_KEY_PREFIX.length()).split("\\.");
+
+        if (postfix.length != 2) {
+          throw new ConfigurationException(key,
+                  "Invalid Configkey format, the following format is needed: "
+                  + ATTRIBUTE_MAPPING_KEY_PREFIX + "<identifier>.<key>");
+        }
+
+        final String mappingIdentifier = postfix[0];
+        final String mappingKey = postfix[1];
+
+        HashMap keyValueMap = ldapAssignmentMappingsPreparation.getOrDefault(mappingIdentifier, new HashMap());
+
+        keyValueMap.put(mappingKey, (String) properties.get(key));
+
+        ldapAssignmentMappingsPreparation.put(mappingIdentifier, keyValueMap);
+      }
+    }
+    HashMap<String, String[]> ldapAssignmentRoleMap = new HashMap();
+    HashMap<String, String[]> ldapAssignmentGroupMap = new HashMap();
+    for (HashMap.Entry<String, HashMap<String, String>> entry : ldapAssignmentMappingsPreparation.entrySet()) {
+      HashMap<String, String> mappingConf = entry.getValue();
+      String value = StringUtils.trimToNull(mappingConf.get(ATTRIBUTE_MAPPING_KEY_POSTFIX_VALUE));
+      String roles = StringUtils.trimToNull(mappingConf.get(ATTRIBUTE_MAPPING_KEY_POSTFIX_ROLES));
+      String groups = StringUtils.trimToNull(mappingConf.get(ATTRIBUTE_MAPPING_KEY_POSTFIX_GROUPS));
+
+      if (value == null) {
+        throw new ConfigurationException(ATTRIBUTE_MAPPING_KEY_PREFIX + entry.getKey() + ".*",
+                "LDAP mapping incomplete, the key 'value' is needed");
+      }
+      if (roles == null && groups == null) {
+        throw new ConfigurationException(ATTRIBUTE_MAPPING_KEY_PREFIX + entry.getKey() + ".*",
+                "LDAP mapping incomplete, one of the keys 'roles' or 'groups' is needed");
+      }
+
+      if (convertToUppercase) {
+        value = value.toUpperCase();
+      }
+
+      if (roles != null) {
+        if (convertToUppercase) {
+          roles = roles.toUpperCase();
+        }
+        ldapAssignmentRoleMap.put(value,
+                ArrayUtils.addAll(
+                        ldapAssignmentRoleMap.getOrDefault(value, new String[0]),
+                        Arrays.stream(roles.split(","))
+                                .map(r -> StringUtils.trimToNull(r))
+                                .filter(r -> r != null)
+                                .toArray(String[]::new)
+                )
+        );
+      }
+
+      if (groups != null) {
+        if (convertToUppercase) {
+          groups = groups.toUpperCase();
+        }
+        ldapAssignmentGroupMap.put(value,
+                ArrayUtils.addAll(
+                        ldapAssignmentGroupMap.getOrDefault(value, new String[0]),
+                        Arrays.stream(groups.split(","))
+                                .map(r -> StringUtils.trimToNull(r))
+                                .filter(r -> r != null)
+                                .toArray(String[]::new)
+                )
+        );
+      }
+    }
 
     // Now that we have everything we need, go ahead and activate a new provider, removing an old one if necessary
     ServiceRegistration existingRegistration = providerRegistrations.remove(pid);
@@ -247,13 +359,14 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
     // Instantiate this LDAP instance and register it as such
     LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
-            password, roleAttributes, rolePrefix, extraRoles, excludePrefixes, convertToUppercase, cacheSize,
-            cacheExpiration, securityService);
+            password, roleAttributes, convertToUppercase, cacheSize, cacheExpiration, securityService);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 
     OpencastLdapAuthoritiesPopulator authoritiesPopulator = new OpencastLdapAuthoritiesPopulator(roleAttributes,
-            rolePrefix, excludePrefixes, convertToUppercase, org, securityService, groupRoleProvider, extraRoles);
+            rolePrefix, excludePrefixes, groupCheckPrefix, applyRoleattributesAsRoles, applyRoleattributesAsGroups,
+            ldapAssignmentRoleMap, ldapAssignmentGroupMap, convertToUppercase, org, securityService,
+            groupRoleProvider, extraRoles);
 
     // Also, register this instance as LdapAuthoritiesPopulator so that it can be used within the security.xml file
     authoritiesPopulatorRegistrations.put(pid,

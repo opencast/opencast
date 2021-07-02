@@ -66,8 +66,6 @@ export const health = (state=initialState, action) => {
         }
         case SET_ERROR: {
             const { isError } = payload;
-            console.log('In set Error:');
-            console.log(isError);
             return {
                 ...state,
                 error: isError
@@ -75,8 +73,6 @@ export const health = (state=initialState, action) => {
         }
         case ADD_NUM_ERROR: {
             const { numError } = payload;
-            console.log('In set Number of Error:');
-            console.log(numError);
             return {
                 ...state,
                 numErr: state.numErr + numError

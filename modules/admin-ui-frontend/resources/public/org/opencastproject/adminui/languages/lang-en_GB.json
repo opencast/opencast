@@ -2,6 +2,12 @@
    "MATTERHORN": "Opencast",
    "NAV_HOME": "Start",
    "NAV_ABOUT": "About",
+   "BUILD": {
+      "BUILT_ON": "built on",
+      "DATE_DESC": "Date this system's kernel module was built on.",
+      "COMMIT": "Git commit this version was built from.",
+      "VERSION": "Common bundle version"
+   },
    "NO": "No",
    "SUBMIT": "Submit",
    "UPDATE": {
@@ -60,7 +66,7 @@
       "COPY_TO_SERIES": "Copy event to series",
       "SELECT_COPY_TARGET": "Select destination series",
       "COPY": "Copy",
-      "COPY_IN_PROGRESS": "Starting copy…",
+      "COPY_IN_PROGRESS": "Starting copy...",
       "CREATOR": "by {{creator}}"
    },
    "LANGUAGES": {

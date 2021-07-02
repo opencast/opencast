@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -41,6 +42,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -56,7 +58,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
    */
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
   static final String TARGET_FLAVOR = "target-flavor";
-  static final String TARGET_TAG = "target-tag";
+  static final String TARGET_TAGS = "target-tags";
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
   static final String TRANSCRIPTION_LINE_SIZE = "line-size";
   static final String DEFAULT_LINE_SIZE = "100";
@@ -77,7 +79,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(TRANSCRIPTION_JOB_ID, "The job id that identifies the file to be attached");
     CONFIG_OPTIONS.put(TARGET_FLAVOR, "The target \"flavor\" of the transcription file");
-    CONFIG_OPTIONS.put(TARGET_TAG, "The target \"tag\" of the transcription file");
+    CONFIG_OPTIONS.put(TARGET_TAGS, "The target \"tag\" of the transcription file");
     CONFIG_OPTIONS.put(TARGET_CAPTION_FORMAT, "The target caption format of the transcription file (vtt, dfxp, etc)");
     CONFIG_OPTIONS.put(TRANSCRIPTION_LINE_SIZE, "Line size of transcription text to display on video");
   }
@@ -109,13 +111,11 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
     }
 
     // Check which tags/flavors have been configured
-    String targetTagOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAG));
-    String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+    List<String> targetTagOption = tagsAndFlavors.getTargetTags();
     // Target flavor is mandatory
-    if (StringUtils.isBlank(targetFlavorOption)) {
-      throw new WorkflowOperationException(TARGET_FLAVOR + " missing");
-    }
-    MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
+    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
+
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
 
     // Get line size if set
@@ -139,15 +139,11 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
       }
 
       // Set the target flavor
-      transcription.setFlavor(flavor);
+      transcription.setFlavor(targetFlavor);
 
       // Add tags
-      if (StringUtils.isNotBlank(targetTagOption)) {
-        for (String tag : asList(targetTagOption)) {
-          if (StringUtils.isNotBlank(StringUtils.trimToNull(tag))) {
-            transcription.addTag(tag);
-          }
-        }
+      for (String tag : targetTagOption) {
+        transcription.addTag(tag);
       }
 
       // Add to media package

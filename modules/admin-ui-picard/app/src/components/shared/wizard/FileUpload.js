@@ -32,16 +32,17 @@ const FileUpload = ({ descriptionKey, labelKey, buttonKey, acceptableTypes, form
     // upload file to backend
     const upload = file => {
         const data = new FormData();
-        data.append('BODY', file);
-        console.log(file);
+        data.append('BODY', file, file.name);
+        console.log(data);
         axios.post('/staticfiles', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
             onUploadProgress: ProgressEvent => {
                 // update loaded with current progress
                 setLoaded((ProgressEvent.loaded / ProgressEvent.total * 100))
             }
         }).then(res => {
-            console.log(res.statusText);
-            console.log(res.data);
             if (res.status === 201) {
                 // set information about file later needed for POST request and summary
                 helpers.setValue({

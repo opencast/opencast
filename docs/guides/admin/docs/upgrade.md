@@ -1,10 +1,11 @@
-Upgrading Opencast from 8.x to 9.x
-==================================
+Upgrading Opencast from 9.x to 10.x
+===================================
 
 This guide describes how to upgrade Opencast 8.x to 9.x. In case you need information about how to upgrade older
 versions of Opencast, please refer to [older release notes](https://docs.opencast.org).
 
 1. Stop your current Opencast instance
+2. Upgrade Java
 2. Replace Opencast with the new version
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
@@ -15,6 +16,40 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 10. [Check passwords](#check-passwords)
 11. Static file delivery
+
+
+Upgrade Java
+------------
+
+While Opencast 9 worked with both Java 8 and Java 11, Opencast 10 requires Java 11.
+Trying to start Opencast 10 with Java 8 will fail.
+
+Either install both java versions and set Java 11 as default using something like:
+
+```
+update-alternatives --config java
+```
+
+Or replace the old Java version like this:
+
+```
+% dnf shell
+> remove java-1.8.0-openjdk.x86_64
+> install java-11-openjdk.x86_64
+> run
+```
+
+Note that these commands can differ based on your distribution and your set-up.
+Make sure to adjust them accordingly.
+
+Finally, check you have the correct version using:
+
+```
+% java --version
+openjdk 11.0.11 2021-04-20
+OpenJDK Runtime Environment 18.9 (build 11.0.11+9)
+OpenJDK 64-Bit Server VM 18.9 (build 11.0.11+9, mixed mode, sharing)
+```
 
 
 
@@ -51,6 +86,10 @@ Please make sure to compare your configuration against the current configuration
 - The configuration keys `source-tags` and `source-flavors` of the _publish-configure_ workflow operation were renamed
   to `download-source-tags` and `download-source-flavors` respectively. If you use custom workflows, you may need to
   adjust them accordingly.
+- A new configuration option `org.opencastproject.userdirectory.ldap.groupcheckprefix` with default option
+  was added to the LDAP configuration. The option affects the
+  `org.opencastproject.userdirectory.ldap.roleattributes` and `org.opencastproject.userdirectory.ldap.extra.roles`
+  configuration options and should be adjusted accordingly
 
 
 ### Wowza streaming configuration changes

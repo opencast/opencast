@@ -8,12 +8,12 @@ import {
     fetchAclTemplates,
     fetchRolesWithTarget
 } from "../../../../thunks/aclThunks";
-import {FieldArray, Field} from "formik";
+import {Field, FieldArray} from "formik";
 import {connect} from "react-redux";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
-import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/wizardConfig";
+import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 
 /**
  * This component renders the access page for new events and series in the wizards.
@@ -171,9 +171,11 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                 <th className="fit">
                                                                     {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE')}
                                                                 </th>
-                                                                <th className="fit">
-                                                                    {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS')}
-                                                                </th>
+                                                                {aclActions.length > 0 && (
+                                                                    <th className="fit">
+                                                                        {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS')}
+                                                                    </th>
+                                                                )}
                                                                 <th className="fit">
                                                                     {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ACTION')}
                                                                 </th>
@@ -213,13 +215,17 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                             {aclActions.length > 0 && (
                                                                                                 <td className="fit editable">
                                                                                                     <div>
-                                                                                                        <RenderMultiField fieldInformation={
-                                                                                                            {
-                                                                                                                id: `policies.${index}.actions`,
-                                                                                                                type: 'mixed_text',
-                                                                                                                collection: aclActions
+                                                                                                        <Field
+                                                                                                            fieldInfo={
+                                                                                                                {
+                                                                                                                    id: `policies.${index}.actions`,
+                                                                                                                    type: 'mixed_text',
+                                                                                                                    collection: aclActions
+                                                                                                                }
                                                                                                             }
-                                                                                                        } onlyCollectionValues/>
+                                                                                                            onlyCollectionValues
+                                                                                                            name={`policies.${index}.actions`}
+                                                                                                            component={RenderMultiField}/>
                                                                                                     </div>
                                                                                                 </td>
                                                                                             )}

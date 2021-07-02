@@ -120,7 +120,7 @@ public class IndexEndpoint {
     description = "Repopulates the Admin UI Index from an specific service",
     returnDescription = "OK if repopulation has started", pathParameters = {
       @RestParameter(name = "service", isRequired = true, description = "The service to recreate index from. "
-        + "The available services are: Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
+        + "The available services are: Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
         + "The service order (see above) is very important! Make sure, you do not run index rebuild for more than one "
         + "service at a time!",
         type = RestParameter.Type.STRING) }, responses = {

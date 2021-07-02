@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -270,7 +270,6 @@
             <Service-Component>
               OSGI-INF/catalog-ui-adapter-factory.xml,
               OSGI-INF/index_service.xml,
-              OSGI-INF/message-receiver-lock-service.xml,
               OSGI-INF/list-providers/acl.xml,
               OSGI-INF/list-providers/agents.xml,
               OSGI-INF/list-providers/boolean.xml,

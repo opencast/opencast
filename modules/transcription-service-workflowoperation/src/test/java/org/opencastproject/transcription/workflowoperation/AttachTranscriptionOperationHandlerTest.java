@@ -154,7 +154,7 @@ public class AttachTranscriptionOperationHandlerTest {
 
     operation.setConfiguration(AttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
     // operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
-    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAG, "tag1,tag2");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "dfxp");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
@@ -180,7 +180,7 @@ public class AttachTranscriptionOperationHandlerTest {
 
     operation.setConfiguration(AttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
     // operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
-    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAG, "tag1,tag2");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "vtt");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);

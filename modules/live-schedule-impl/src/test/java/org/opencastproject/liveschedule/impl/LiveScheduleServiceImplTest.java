@@ -63,6 +63,8 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
@@ -126,6 +128,7 @@ public class LiveScheduleServiceImplTest {
   private AssetManager assetManager;
   private AuthorizationService authService;
   private OrganizationDirectoryService organizationService;
+  private SecurityService securityService;
 
   @Before
   public void setUp() throws Exception {
@@ -155,8 +158,13 @@ public class LiveScheduleServiceImplTest {
             defOrg.getAnonymousRole(), orgProps);
     EasyMock.expect(organizationService.getOrganization(ORG_ID)).andReturn(org).anyTimes();
 
+    securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.expect(securityService.getUser()).andReturn(null);
+
     // Live service configuration
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+    EasyMock.expect(bc.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER)).andReturn("system-user");
     Dictionary<String, Object> props = new Hashtable<String, Object>();
     props.put(LiveScheduleServiceImpl.LIVE_STREAMING_URL, STREAMING_SERVER_URL);
     props.put(LiveScheduleServiceImpl.LIVE_STREAM_MIME_TYPE, "video/x-flv");
@@ -180,13 +188,13 @@ public class LiveScheduleServiceImplTest {
     service.setAssetManager(assetManager);
     service.setAuthorizationService(authService);
     service.setOrganizationService(organizationService);
-
+    service.setSecurityService(securityService);
     service.activate(cc);
   }
 
   private void replayServices() {
     EasyMock.replay(searchService, seriesService, serviceRegistry, captureAgentService, downloadDistributionService,
-            workspace, dublinCoreService, assetManager, organizationService);
+            workspace, dublinCoreService, assetManager, organizationService, securityService);
   }
 
   private void assertExpectedLiveTracks(Track[] liveTracks, long duration, String caName, String suffix,
@@ -453,7 +461,7 @@ public class LiveScheduleServiceImplTest {
   public void testGetMediaPackageFromSearch() throws Exception {
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getByQuery((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
@@ -465,7 +473,7 @@ public class LiveScheduleServiceImplTest {
   public void testGetMediaPackageFromSearchNotFound() throws Exception {
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result-empty.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getByQuery((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
@@ -749,7 +757,7 @@ public class LiveScheduleServiceImplTest {
   public void testCreateOuUpdateLiveEventAlreadyPast() throws Exception {
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result-empty.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getByQuery((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
@@ -764,7 +772,7 @@ public class LiveScheduleServiceImplTest {
 
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/no-live-search-result.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getByQuery((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));

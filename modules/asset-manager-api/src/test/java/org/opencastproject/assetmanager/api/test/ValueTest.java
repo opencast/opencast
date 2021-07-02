@@ -58,7 +58,8 @@ public class ValueTest {
 
   @Test
   public void testDecompose() {
-    final Object value = Value.mk(1511L).<Object>decompose(Fns.<String>id(), Fns.<Date>id(), Fns.<Long>id(), Fns.<Boolean>id(), Fns.<Version>id());
+    final Object value = Value.mk(1511L)
+        .<Object>decompose(Fns.<String>id(), Fns.<Date>id(), Fns.<Long>id(), Fns.<Boolean>id(), Fns.<Version>id());
     assertEquals(1511L, value);
     final String valueAsString = Value.mk(1511L).decompose(
             Value.<String>doNotMatch(),

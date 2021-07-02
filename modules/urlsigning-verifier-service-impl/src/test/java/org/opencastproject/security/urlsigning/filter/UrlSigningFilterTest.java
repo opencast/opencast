@@ -83,7 +83,8 @@ public class UrlSigningFilterTest {
     HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
     EasyMock.expect(request.getMethod()).andStubReturn(method);
     EasyMock.expect(request.getRequestURL()).andStubReturn(new StringBuffer(fullUrl));
-    EasyMock.expect(request.getQueryString()).andStubReturn(ResourceRequestUtil.policyToResourceRequestQueryString(policy, keyId, key));
+    EasyMock.expect(request.getQueryString())
+        .andStubReturn(ResourceRequestUtil.policyToResourceRequestQueryString(policy, keyId, key));
     EasyMock.expect(request.getRemoteAddr()).andStubReturn(clientIp);
     return request;
   }
@@ -199,14 +200,16 @@ public class UrlSigningFilterTest {
     String acceptedIp = "10.0.0.1";
     DateTime future = new DateTime(4749125399000L);
     Policy policy = Policy.mkSimplePolicy(acceptedUrl, future);
-    String acceptedQueryString = ResourceRequestUtil.policyToResourceRequestQueryString(policy, encryptionKeyId, acceptedKey);
+    String acceptedQueryString = ResourceRequestUtil.policyToResourceRequestQueryString(
+        policy, encryptionKeyId, acceptedKey);
 
     ResourceRequest acceptedRequest = new ResourceRequest();
     acceptedRequest.setStatus(Status.Ok);
 
     // Setup the Mock Url Signing Service
     UrlSigningVerifier urlSigningVerifier = EasyMock.createMock(UrlSigningVerifier.class);
-    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true)).andReturn(acceptedRequest);
+    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true))
+        .andReturn(acceptedRequest);
     EasyMock.replay(urlSigningVerifier);
 
     UrlSigningFilter filter = new UrlSigningFilter();
@@ -241,7 +244,8 @@ public class UrlSigningFilterTest {
     String acceptedIp = "10.0.0.1";
     DateTime future = new DateTime(4749125399000L);
     Policy policy = Policy.mkSimplePolicy(acceptedUrl, future);
-    String acceptedQueryString = ResourceRequestUtil.policyToResourceRequestQueryString(policy, encryptionKeyId, acceptedKey);
+    String acceptedQueryString = ResourceRequestUtil.policyToResourceRequestQueryString(
+        policy, encryptionKeyId, acceptedKey);
 
     ResourceRequest acceptedRequest = new ResourceRequest();
     acceptedRequest.setStatus(Status.Ok);
@@ -283,14 +287,16 @@ public class UrlSigningFilterTest {
     String acceptedIp = "10.0.0.1";
     DateTime future = new DateTime(4749125399000L);
     Policy policy = Policy.mkSimplePolicy(acceptedUrl, future);
-    String acceptedQueryString = ResourceRequestUtil.policyToResourceRequestQueryString(policy, encryptionKeyId, acceptedKey);
+    String acceptedQueryString = ResourceRequestUtil.policyToResourceRequestQueryString(
+        policy, encryptionKeyId, acceptedKey);
 
     ResourceRequest acceptedRequest = new ResourceRequest();
     acceptedRequest.setStatus(Status.BadRequest);
 
     // Setup the Mock Url Signing Service
     UrlSigningVerifier urlSigningVerifier = EasyMock.createMock(UrlSigningVerifier.class);
-    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true)).andReturn(acceptedRequest);
+    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true))
+        .andReturn(acceptedRequest);
     EasyMock.replay(urlSigningVerifier);
 
     UrlSigningFilter filter = new UrlSigningFilter();
@@ -324,14 +330,16 @@ public class UrlSigningFilterTest {
     String acceptedIp = "10.0.0.1";
     DateTime future = new DateTime(4749125399000L);
     Policy policy = Policy.mkSimplePolicy(acceptedUrl, future);
-    String acceptedQueryString = ResourceRequestUtil.policyToResourceRequestQueryString(policy, encryptionKeyId, acceptedKey);
+    String acceptedQueryString = ResourceRequestUtil.policyToResourceRequestQueryString(
+        policy, encryptionKeyId, acceptedKey);
 
     ResourceRequest acceptedRequest = new ResourceRequest();
     acceptedRequest.setStatus(Status.Forbidden);
 
     // Setup the Mock Url Signing Service
     UrlSigningVerifier urlSigningVerifier = EasyMock.createMock(UrlSigningVerifier.class);
-    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true)).andReturn(acceptedRequest);
+    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true))
+        .andReturn(acceptedRequest);
     EasyMock.replay(urlSigningVerifier);
 
     UrlSigningFilter filter = new UrlSigningFilter();
@@ -365,14 +373,16 @@ public class UrlSigningFilterTest {
     String acceptedIp = "10.0.0.1";
     DateTime future = new DateTime(4749125399000L);
     Policy policy = Policy.mkSimplePolicy(acceptedUrl, future);
-    String acceptedQueryString = ResourceRequestUtil.policyToResourceRequestQueryString(policy, encryptionKeyId, acceptedKey);
+    String acceptedQueryString = ResourceRequestUtil.policyToResourceRequestQueryString(
+        policy, encryptionKeyId, acceptedKey);
 
     ResourceRequest acceptedRequest = new ResourceRequest();
     acceptedRequest.setStatus(Status.Gone);
 
     // Setup the Mock Url Signing Service
     UrlSigningVerifier urlSigningVerifier = EasyMock.createMock(UrlSigningVerifier.class);
-    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true)).andReturn(acceptedRequest);
+    EasyMock.expect(urlSigningVerifier.verify(acceptedQueryString, acceptedIp, acceptedUrl, true))
+        .andReturn(acceptedRequest);
     EasyMock.replay(urlSigningVerifier);
 
     UrlSigningFilter filter = new UrlSigningFilter();

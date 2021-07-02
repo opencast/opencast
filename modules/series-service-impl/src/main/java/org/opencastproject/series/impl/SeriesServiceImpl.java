@@ -27,6 +27,7 @@ import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Option.some;
 
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
@@ -83,11 +84,11 @@ import javax.xml.parsers.ParserConfigurationException;
  * {@link SeriesServiceIndex} for searching.
  */
 @Component(
-  property = {
-    "service.description=Series Service"
-  },
-  immediate = true,
-  service = { SeriesService.class, IndexProducer.class }
+    property = {
+        "service.description=Series Service"
+    },
+    immediate = true,
+    service = { SeriesService.class, IndexProducer.class }
 )
 public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesService {
 
@@ -152,9 +153,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Activates Series Service. Checks whether we are using synchronous or asynchronous indexing. If asynchronous is
-   * used, Executor service is set. If index is empty, persistent storage is queried if it contains any series. If that
-   * is the case, series are retrieved and indexed.
+   * Activates Series Service. Checks whether we are using synchronous or asynchronous indexing. If
+   * asynchronous is used, Executor service is set. If index is empty, persistent storage is queried
+   * if it contains any series. If that is the case, series are retrieved and indexed.
    */
   @Activate
   public void activate(ComponentContext cc) throws Exception {
@@ -470,8 +471,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     final Map<EName, List<DublinCoreValue>> bv = b.getValues();
     if (av.size() == bv.size()) {
       for (Map.Entry<EName, List<DublinCoreValue>> ave : av.entrySet()) {
-        if (!eqListSorted(ave.getValue(), bv.get(ave.getKey())))
+        if (!eqListSorted(ave.getValue(), bv.get(ave.getKey()))) {
           return false;
+        }
       }
       return true;
     } else {
@@ -547,12 +549,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public void repopulate(final String indexName) throws IndexRebuildException {
-    final String destinationId = SeriesItem.SERIES_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
-            + indexName.substring(1);
+  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
+    final String destinationId = SeriesItem.SERIES_QUEUE_PREFIX + index.getIndexName().substring(0, 1).toUpperCase()
+            + index.getIndexName().substring(1);
     try {
       final int total = persistence.countSeries();
-      logIndexRebuildBegin(logger, indexName, total, "series");
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "series");
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       int current = 1;
       for (SeriesEntity series: databaseSeries) {
@@ -574,9 +576,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                   String aclStr = series.getAccessControl();
                   if (StringUtils.isNotBlank(aclStr)) {
                     try {
-                        AccessControlList acl = AccessControlParser.parseAcl(aclStr);
-                        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                                SeriesItem.updateAcl(id, acl, false));
+                      AccessControlList acl = AccessControlParser.parseAcl(aclStr);
+                      messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                              SeriesItem.updateAcl(id, acl, false));
                     } catch (Exception ex) {
                       logger.error("Unable to parse series {} access control list", id, ex);
                     }
@@ -590,12 +592,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     logger.error("Error requesting series properties", e);
                   }
                 });
-        logIndexRebuildProgress(logger, indexName, total, current);
+        logIndexRebuildProgress(logger, index.getIndexName(), total, current);
         current++;
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, indexName, e);
-      throw new IndexRebuildException(indexName, getService(), e);
+      logIndexRebuildError(logger, index.getIndexName(), e);
+      throw new IndexRebuildException(index.getIndexName(), getService(), e);
     }
   }
 

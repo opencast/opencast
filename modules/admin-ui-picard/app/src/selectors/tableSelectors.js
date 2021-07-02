@@ -14,6 +14,7 @@ export const getNumberDirectAccessiblePages = state => state.table.pagination.di
 export const getResourceType = state => state.table.resource;
 export const getTableSorting = state => state.table.sortBy;
 export const getTableDirection = state => state.table.reverse;
+export const getTable = state => state.table;
 
 export const getSelectedRows = createSelector(
     getTableRows,

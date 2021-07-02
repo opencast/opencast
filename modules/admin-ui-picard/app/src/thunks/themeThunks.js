@@ -1,6 +1,7 @@
 import {loadThemesFailure, loadThemesInProgress, loadThemesSuccess} from "../actions/themeActions";
 import {getURLParams} from "../utils/resourceUtils";
 import axios from "axios";
+import {addNotification} from "./notificationThunks";
 
 // fetch themes from server
 export const fetchThemes = () => async (dispatch, getState) => {
@@ -22,10 +23,10 @@ export const fetchThemes = () => async (dispatch, getState) => {
 }
 
 // post new theme to backend
-export const postNewTheme = async values => {
+export const postNewTheme = values => async dispatch => {
 
     // fill form data depending on user inputs
-    let data = new FormData();
+    let data = new URLSearchParams();
     data.append('name', values.name);
     data.append('description', values.description);
     data.append('bumperActive', values.bumperActive);
@@ -52,5 +53,23 @@ export const postNewTheme = async values => {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-    }).then(response => console.log(response)).catch(response => console.log(response));
+    }).then(response => {
+        console.log(response);
+        dispatch(addNotification('success', 'THEME_CREATED'));
+    }).catch(response => {
+        console.log(response);
+        dispatch(addNotification('error', 'THEME_NOT_CREATED'));
+    });
+};
+
+export const deleteTheme = id => async dispatch => {
+    axios.delete(`/admin-ng/themes/${id}`).then(res => {
+        console.log(res);
+        // add success notification
+        dispatch(addNotification('success', 'THEME_DELETED'));
+    }).catch(res => {
+        console.log(res);
+        // add error notification
+        dispatch(addNotification('error', 'THEME_NOT_DELETED'));
+    })
 }

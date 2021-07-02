@@ -5,17 +5,19 @@ import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
-
 import {fetchSeries, fetchSeriesMetadata, fetchSeriesThemes} from "../../thunks/seriesThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
 import {seriesTemplateMap} from "../../configs/tableConfigs/seriesTableConfig";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
 import {fetchEvents} from "../../thunks/eventThunks";
-import {getSeries, isShowActions} from "../../selectors/seriesSeletctor";
+import {getTotalSeries, isShowActions} from "../../selectors/seriesSeletctor";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
+import {editTextFilter} from "../../actions/tableFilterActions";
+import {setOffset} from "../../actions/tableActions";
+import DeleteSeriesModal from "./partials/DeleteSeriesModal";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -25,13 +27,18 @@ const containerAction = React.createRef();
  * This component renders the table view of series
  */
 const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEvents, loadingEventsIntoTable,
-                    series, loadingFilters, loadingStats, loadingSeriesMetadata, loadingSeriesThemes }) => {
+                    series, loadingFilters, loadingStats, loadingSeriesMetadata, loadingSeriesThemes, resetTextFilter,
+                    resetOffset }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewSeriesModal, setNewSeriesModal] = useState(false);
+    const [displayDeleteSeriesModal, setDeleteSeriesModal] = useState(false);
 
     const loadEvents = () => {
+        // Reset the current page to first page
+        resetOffset();
+
         // Fetching stats from server
         loadingStats()
 
@@ -51,6 +58,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     }
 
     useEffect( () => {
+        resetTextFilter();
 
         // Load series on mount
         loadSeries().then(r => console.log(r));
@@ -85,18 +93,22 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     const handleActionMenu = e => {
         e.preventDefault();
         setActionMenu(!displayActionMenu);
-    }
+    };
 
     const showNewSeriesModal = async () => {
         await loadingSeriesMetadata();
         await loadingSeriesThemes();
 
         setNewSeriesModal(true);
-    }
+    };
 
     const hideNewSeriesModal = () => {
         setNewSeriesModal(false);
-    }
+    };
+
+    const hideDeleteModal = () => {
+        setDeleteSeriesModal(false);
+    };
 
     const styleNavOpen = {
         marginLeft: '130px',
@@ -119,6 +131,10 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                 <NewResourceModal showModal={displayNewSeriesModal}
                                   handleClose={hideNewSeriesModal}
                                   resource={"series"}/>
+
+                {displayDeleteSeriesModal && (
+                    <DeleteSeriesModal close={hideDeleteModal}/>
+                )}
 
                 {/* Include Burger-button menu */}
                 <MainNav  isOpen={displayNavigation}
@@ -155,7 +171,9 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                                     {/*todo: show only if user has right to delete resource (with-role ROLE_UI_{{ table.resource }}_DELETE*/}
                                     <li>
                                         {/*todo: open overlay for deletion */}
-                                        <a>{t('BULK_ACTIONS.DELETE.SERIES.CAPTION')}</a>
+                                        <a onClick={() => setDeleteSeriesModal(true)}>
+                                            {t('BULK_ACTIONS.DELETE.SERIES.CAPTION')}
+                                        </a>
                                     </li>
                                 </ul>
                             )}
@@ -169,17 +187,17 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                     </div>
                     <h1>{t('EVENTS.SERIES.TABLE.CAPTION')}</h1>
                     {/* Include table view */}
-                    <h4>{t('TABLE_SUMMARY', { numberOfRows: series.length})}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: series })}</h4>
                 </div>
                 <Table templateMap={seriesTemplateMap} />
             </div>
         </>
     )
-};
+}
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    series: getSeries(state),
+    series: getTotalSeries(state),
     showActions: isShowActions(state),
 });
 
@@ -192,7 +210,9 @@ const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingStats: () => dispatch(fetchStats()),
     loadingSeriesMetadata: () => dispatch(fetchSeriesMetadata()),
-    loadingSeriesThemes: () => dispatch(fetchSeriesThemes())
+    loadingSeriesThemes: () => dispatch(fetchSeriesThemes()),
+    resetTextFilter: () => dispatch(editTextFilter('')),
+    resetOffset: () => dispatch(setOffset(0))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Series));

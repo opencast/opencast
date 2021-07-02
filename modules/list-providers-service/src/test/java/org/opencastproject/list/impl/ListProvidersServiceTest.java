@@ -68,13 +68,15 @@ public class ListProvidersServiceTest {
         for (Entry<String, String> e : list.entrySet()) {
           if ((query.getOffset().isNone() || query.getOffset().get() <= i)
                   && (!query.hasFilter(TEST_FILTER_NAME) || e.getValue().contains(
-                          (String) query.getFilter(TEST_FILTER_NAME).getValue().get())))
+                          (String) query.getFilter(TEST_FILTER_NAME).getValue().get()))) {
             filteredList.put(e.getKey(), e.getValue());
+          }
 
           i++;
 
-          if ((query.getLimit().isSome() && filteredList.size() >= query.getLimit().get()))
+          if ((query.getLimit().isSome() && filteredList.size() >= query.getLimit().get())) {
             break;
+          }
         }
 
         if (query.getSortBy().isSome() && query.getSortBy().get().equals(TEST_SORTBY)) {

@@ -9,6 +9,8 @@ Important Changes
 Features
 --------
 
+- New *conditional-config* workflow operation handler, used to evaluate a list of conditions and set
+  a workflow configuration variable accordingly.
 - …
 
 Improvements
@@ -20,6 +22,7 @@ API changes
 -----------
 
 - …
+
 
 Release Schedule
 ----------------

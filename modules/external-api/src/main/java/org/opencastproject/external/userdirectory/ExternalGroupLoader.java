@@ -123,7 +123,7 @@ public class ExternalGroupLoader {
 
           // External Applications
           String externalApplicationsGroupId = org.getId().toUpperCase().concat(EXTERNAL_GROUP_SUFFIX);
-          JpaGroup externalApplicationGroup = (JpaGroup) groupRoleProvider.loadGroup(externalApplicationsGroupId,
+          JpaGroup externalApplicationGroup = groupRoleProvider.loadGroup(externalApplicationsGroupId,
                   org.getId());
           if (externalApplicationGroup == null) {
             String externalApplicationsGroupname = org.getName().concat(" External Applications");

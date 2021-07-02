@@ -4,7 +4,7 @@ import EventDetails from "./EventDetails";
 
 
 /**
- * This component renders the modal for adding new resources
+ * This component renders the modal for displaying event details
  */
 const EventDetailsModal = ({ handleClose, showModal, tabIndex, eventTitle, eventId }) => {
     const { t } = useTranslation();

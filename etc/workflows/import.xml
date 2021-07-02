@@ -56,7 +56,7 @@
         <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="channel-id">internal</configuration>
         <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
@@ -72,7 +72,7 @@
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 

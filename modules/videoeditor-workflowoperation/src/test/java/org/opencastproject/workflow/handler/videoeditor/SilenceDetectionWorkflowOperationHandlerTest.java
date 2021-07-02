@@ -116,7 +116,8 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowInstance.WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op", WorkflowOperationInstance.OperationState.RUNNING);
+    WorkflowOperationInstanceImpl operation
+        = new WorkflowOperationInstanceImpl("op", WorkflowOperationInstance.OperationState.RUNNING);
     operation.setTemplate("silence");
     operation.setState(WorkflowOperationInstance.OperationState.RUNNING);
     for (String key : configurations.keySet()) {
@@ -131,7 +132,8 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
 
   @Test
   public void testStartOperation() throws WorkflowOperationException, SilenceDetectionFailedException,
-          NotFoundException, ServiceRegistryException, MediaPackageException, SmilException, MalformedURLException, JAXBException, SAXException, IOException {
+          NotFoundException, ServiceRegistryException, MediaPackageException, SmilException,
+          MalformedURLException, JAXBException, SAXException, IOException {
 
     Smil smil = smilService.fromXml(new File(smilURI)).getSmil();
     Job job = EasyMock.createNiceMock(Job.class);

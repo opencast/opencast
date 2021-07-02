@@ -86,7 +86,8 @@
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(seriesCatalog.flavor)">
+                    params="row" save="getSaveFunction(seriesCatalog.flavor)"
+                    sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
             </table>
@@ -112,7 +113,8 @@
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(catalog.flavor)">
+                    params="row" save="getSaveFunction(catalog.flavor)"
+                    sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
             </table>

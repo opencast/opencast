@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -100,7 +100,7 @@
               <failOnWarning>true</failOnWarning>
               <ignoredUsedUndeclaredDependencies>
                 <ignoredUsedUndeclaredDependency>junit:junit</ignoredUsedUndeclaredDependency>
-                <ignoredUsedUndeclaredDependency>javax.annotation:javax.annotation-api</ignoredUsedUndeclaredDependency>
+                <ignoredUsedUndeclaredDependency>jakarta.annotation:jakarta.annotation-api</ignoredUsedUndeclaredDependency>
                 <ignoredUsedUndeclaredDependency>org.springframework:spring-expression</ignoredUsedUndeclaredDependency>
                 <ignoredUsedUndeclaredDependency>org.springframework:spring-core</ignoredUsedUndeclaredDependency>
                 <ignoredUsedUndeclaredDependency>org.springframework.security:spring-security-core</ignoredUsedUndeclaredDependency>

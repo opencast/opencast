@@ -85,10 +85,14 @@ public class ExecuteOnceWorkflowOperationHandlerTest {
             .anyTimes();
     EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.LOAD_PROPERTY)).andReturn("123")
             .anyTimes();
+    EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.TARGET_FLAVORS_PROPERTY))
+        .andReturn(null).anyTimes();
     EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.TARGET_FLAVOR_PROPERTY))
             .andReturn(null).anyTimes();
     EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.TARGET_TAGS_PROPERTY))
             .andReturn(null).anyTimes();
+    EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.TARGET_TAG_PROPERTY))
+        .andReturn(null).anyTimes();
     EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.OUTPUT_FILENAME_PROPERTY))
             .andReturn(null).anyTimes();
     EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.SET_WF_PROPS_PROPERTY))

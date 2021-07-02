@@ -13,9 +13,12 @@ import {
     transformMetadataCollection
 } from "../utils/resourceUtils";
 import axios from "axios";
-import {getTimezoneOffset} from "../utils/utils";
+import {getTimezoneOffset, makeTwoDigits} from "../utils/utils";
 import {sourceMetadata, uploadAssetOptions} from "../configs/sourceConfig";
-import {WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizardConfig";
+import {NOTIFICATION_CONTEXT, weekdays, WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizardConfig";
+import {addNotification} from "./notificationThunks";
+import moment from "moment-timezone";
+
 
 // fetch events from server
 export const fetchEvents = () => async (dispatch, getState) => {
@@ -75,6 +78,93 @@ export const fetchEventMetadata = () => async dispatch => {
         dispatch(loadEventMetadataFailure());
         console.log(e);
     }
+};
+
+// get merged metadata for provided event ids
+export const postEditMetadata = async ids => {
+    let formData = new URLSearchParams();
+    formData.append('eventIds', JSON.stringify(ids));
+
+    try {
+        let data = await axios.post('/admin-ng/event/events/metadata.json', formData,
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }
+        );
+        let response = await data.data;
+
+        // transform response
+        const metadata = transformMetadataCollection(response.metadata, true);
+        return {
+            mergedMetadata: metadata,
+            notFound: response.notFound,
+            merged: response.merged,
+            runningWorkflow: response.runningWorkflow,
+        };
+    } catch (e) {
+        // return error
+        return {
+            fatalError: e.message
+        };
+    }
+};
+
+export const updateBulkMetadata = (metadataFields, values) => async dispatch => {
+    let formData = new URLSearchParams();
+    formData.append('eventIds', JSON.stringify(metadataFields.merged));
+    let metadata = [{
+        flavor: 'dublincore/episode',
+        title: 'EVENTS.EVENTS.DETAILS.CATALOG.EPISODE',
+        fields: []
+    }];
+
+    metadataFields.mergedMetadata.forEach(field => {
+        if (field.selected) {
+            let value = values[field.id];
+            metadata[0].fields.push({
+                ...field,
+                value: value
+            });
+        }
+    });
+
+    formData.append('metadata', JSON.stringify(metadata));
+
+    axios.put('/admin-ng/event/events/metadata', formData,
+        {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
+        .then(res => {
+            console.log(res);
+            dispatch(addNotification('success', 'BULK_METADATA_UPDATE.ALL_EVENTS_UPDATED'));
+        })
+        .catch(err => {
+            console.log(err);
+            // if an internal server error occurred, then backend sends further information
+            if (err.status === 500) {
+                // backend should send data containing further information about occurred internal error
+                // if this error data is undefined then an unexpected error occurred
+                if (!err.data) {
+                    dispatch(addNotification('error', 'BULK_METADATA_UPDATE.UNEXPECTED_ERROR'));
+                } else {
+                    if (err.data.updated && err.data.updated.length === 0) {
+                        dispatch(addNotification('error', 'BULK_METADATA_UPDATE.NO_EVENTS_UPDATED'));
+                    }
+                    if (err.data.updateFailures && err.data.updateFailures.length > 0) {
+                        dispatch(addNotification('warning', 'BULK_METADATA_UPDATE.SOME_EVENTS_NOT_UPDATED'));
+                    }
+                    if (err.data.notFound && err.data.notFound.length > 0) {
+                        dispatch(addNotification('warning', 'BULK_ACTIONS.EDIT_EVENTS_METADATA.REQUEST_ERRORS.NOT_FOUND'));
+                    }
+                }
+            } else {
+                dispatch(addNotification('error', 'BULK_METADATA_UPDATE.UNEXPECTED_ERROR'));
+            }
+        });
 }
 
 // Check for conflicts with already scheduled events
@@ -104,7 +194,7 @@ export const checkForConflicts =  async (startDate, endDate, duration, device) =
 }
 
 // post new event to backend
-export const postNewEvent = async (values, metadataInfo) => {
+export const postNewEvent = (values, metadataInfo) => async dispatch => {
 
     let formData = new FormData();
     let metadataFields, metadata, source, access, assets;
@@ -119,7 +209,6 @@ export const postNewEvent = async (values, metadataInfo) => {
             type: values.sourceMode
         }
         for (let i = 0; sourceMetadata.UPLOAD.metadata.length > i; i++) {
-            console.log(sourceMetadata.UPLOAD.metadata[i].id);
             metadataFields = metadataFields.concat({
                 id: sourceMetadata.UPLOAD.metadata[i].id,
                 value: values[sourceMetadata.UPLOAD.metadata[i].id],
@@ -130,11 +219,11 @@ export const postNewEvent = async (values, metadataInfo) => {
     }
 
     // metadata for post request
-    metadata = {
+    metadata = [{
         flavor: metadataInfo.flavor,
         title: metadataInfo.title,
         fields: metadataFields
-    };
+    }];
 
     // transform date data for post request if source mode is SCHEDULE_*
     if (values.sourceMode === 'SCHEDULE_SINGLE' || values.sourceMode === 'SCHEDULE_MULTIPLE') {
@@ -196,14 +285,16 @@ export const postNewEvent = async (values, metadataInfo) => {
         if (uploadAssetOptions[i].type === 'track' && values.sourceMode === 'UPLOAD') {
             let asset = values.uploadAssetsTrack.find(asset => asset.id === uploadAssetOptions[i].id);
             if (!!asset.file) {
-                formData.append(asset.id, asset.file);
+                formData.append(asset.id + '.0', asset.file);
             }
+            assets.options = assets.options.concat(uploadAssetOptions[i]);
         } else {
             if (!!values[uploadAssetOptions[i].id] && values.sourceMode === 'UPLOAD') {
-                formData.append(uploadAssetOptions[i].id, values[uploadAssetOptions[i].id])
+                formData.append(uploadAssetOptions[i].id + '.0', values[uploadAssetOptions[i].id]);
+                assets.options = assets.options.concat(uploadAssetOptions[i]);
             }
         }
-        assets.options = assets.options.concat(uploadAssetOptions[i]);
+
     }
 
     // prepare access rules provided by user
@@ -215,9 +306,10 @@ export const postNewEvent = async (values, metadataInfo) => {
         processing: {
             workflow: values.processingWorkflow,
             configuration: {
-                'placeholderKey': 'placeholderValue'
+                published: false
             }
         },
+        options: {},
         access: access,
         source: source,
         assets: assets
@@ -230,7 +322,211 @@ export const postNewEvent = async (values, metadataInfo) => {
                 'Content-Type': 'multipart/form-data'
             }
         }
-    ).then(response => console.log(response)).catch(response => console.log(response));
+    ).then(response => {
+        console.log(response);
+        dispatch(addNotification('success', 'EVENTS_CREATED'));
 
-}
+    }).catch(response => {
+        console.log(response);
+        dispatch(addNotification('error', 'EVENTS_NOT_CREATED'));
+    });
 
+};
+
+// delete event with provided id
+export const deleteEvent = id => async dispatch => {
+    // API call for deleting an event
+    axios.delete(`/admin-ng/event/${id}`).then(res => {
+        // add success notification depending on status code
+        if (res.status === 200) {
+            dispatch(addNotification('success', 'EVENT_DELETED'));
+        } else {
+            dispatch(addNotification('success', 'EVENT_WILL_BE_DELETED'));
+        }
+    }).catch(res => {
+        // add error notification depending on status code
+        if (res.status === 401) {
+            dispatch(addNotification('error', 'EVENTS_NOT_DELETED_NOT_AUTHORIZED'));
+        } else {
+            dispatch(addNotification('error', 'EVENTS_NOT_DELETED'));
+        }
+    });
+};
+
+// delete multiple events
+export const deleteMultipleEvent = events => async dispatch => {
+
+    let data = [];
+
+    for (let i = 0; i < events.length; i++) {
+        if (events[i].selected) {
+            data.push(events[i].id);
+        }
+    }
+
+    axios.post('/admin-ng/event/deleteEvents', data)
+        .then(res => {
+            console.log(res);
+            //add success notification
+            dispatch(addNotification('success', 'EVENTS_DELETED'));
+        }).catch(res => {
+        console.log(res);
+        //add error notification
+        dispatch(addNotification('error', 'EVENTS_NOT_DELETED'));
+    });
+
+};
+
+// fetch scheduling info for events
+export const fetchScheduling = async events => {
+    let formData = new FormData();
+
+    for (let i = 0; i < events.length; i++) {
+        if (events[i].selected) {
+            formData.append('eventIds', events[i].id);
+        }
+    }
+
+    formData.append('ignoreNonScheduled', true);
+
+    const response = await axios.post('/admin-ng/event/scheduling.json', formData);
+
+    let data = await response.data;
+
+    // transform data for further use
+    let editedEvents = [];
+    for (let i = 0; i < data.length; i++) {
+        let startDate = new Date(data[i].start);
+        let endDate = new Date(data[i].end);
+        let event = {
+            eventId: data[i].eventId,
+            title: data[i].agentConfiguration['event.title'],
+            changedTitle: data[i].agentConfiguration['event.title'],
+            series: data[i].agentConfiguration['event.series'],
+            changedSeries: data[i].agentConfiguration['event.series'],
+            location: data[i].agentConfiguration['event.location'],
+            changedLocation: data[i].agentConfiguration['event.location'],
+            deviceInputs: data[i].agentConfiguration['capture.device.names'],
+            changedDeviceInputs: [],
+            startTimeHour: makeTwoDigits(startDate.getHours()),
+            changedStartTimeHour: makeTwoDigits(startDate.getHours()),
+            startTimeMinutes: makeTwoDigits(startDate.getMinutes()),
+            changedStartTimeMinutes: makeTwoDigits(startDate.getMinutes()),
+            endTimeHour: makeTwoDigits(endDate.getHours()),
+            changedEndTimeHour: makeTwoDigits(endDate.getHours()),
+            endTimeMinutes: makeTwoDigits(endDate.getMinutes()),
+            changedEndTimeMinutes: makeTwoDigits(endDate.getMinutes()),
+            weekday: weekdays[startDate.getDay()].name,
+            changedWeekday: weekdays[startDate.getDay()].name
+        }
+        editedEvents.push(event);
+    }
+
+    return editedEvents;
+};
+
+// check if there are any scheduling conflicts with other events
+export const checkForSchedulingConflicts = events =>  async dispatch => {
+    const formData = new FormData();
+    let update = [];
+    let timezone = moment.tz.guess();
+    for (let i = 0; i < events.length; i++) {
+        update.push({
+            events: [events[i].eventId],
+            scheduling: {
+                timezone: timezone,
+                start: {
+                    hour: parseInt(events[i].changedStartTimeHour),
+                    minute: parseInt(events[i].changedStartTimeMinutes)
+                },
+                end: {
+                    hour: parseInt(events[i].changedEndTimeHour),
+                    minutes: parseInt(events[i].changedEndTimeMinutes)
+                },
+                weekday: events[i].changedWeekday,
+                agentId: events[i].changedLocation
+            }
+        });
+    }
+
+    formData.append('update', JSON.stringify(update));
+
+    let response = [];
+
+    axios.post('/admin-ng/event/bulk/conflicts', formData)
+        .then(res => console.log(res))
+        .catch(res => {
+            if (res.status === 409) {
+                dispatch(addNotification('error', 'CONFLICT_BULK_DETECTED', -1, null, NOTIFICATION_CONTEXT));
+                response = res.data;
+            }
+            console.log(res);
+        });
+
+    return response;
+};
+
+// update multiple scheduled events at once
+export const updateScheduledEventsBulk = values => async dispatch => {
+    let formData = new FormData();
+    let update = [];
+    let timezone = moment.tz.guess();
+
+    for (let i = 0; i < values.changedEvents.length; i++) {
+        let eventChanges = values.editedEvents.find(event => event.eventId === values.changedEvents[i]);
+        let originalEvent = values.events.find(event => event.id === values.changedEvents[i]);
+
+        if (!eventChanges || !originalEvent) {
+            dispatch(addNotification('error', 'EVENTS_NOT_UPDATED'));
+            return;
+        }
+
+        update.push({
+            events: [eventChanges.eventId],
+            metadata: {
+                flavor: originalEvent.flavor,
+                title: originalEvent.title,
+                fields: [
+                    {
+                        id: 'isPartOf',
+                        // todo: maybe change this; dunno if considered in backend
+                        collection: {},
+                        label: 'EVENTS.EVENTS.DETAILS.METADATA.SERIES',
+                        readOnly: false,
+                        required: false,
+                        translatable: false,
+                        type: 'text',
+                        value: eventChanges.changedSeries,
+                        // todo: what is hashkey?
+                        $$hashKey: 'object:1589'
+                    }
+                ]
+            },
+            scheduling: {
+                timezone: timezone,
+                start: {
+                    hour: parseInt(eventChanges.changedStartTimeHour),
+                    minute: parseInt(eventChanges.changedStartTimeMinutes)
+                },
+                end: {
+                    hour: parseInt(eventChanges.changedEndTimeHour),
+                    minute: parseInt(eventChanges.changedEndTimeMinutes)
+                },
+                weekday: eventChanges.changedWeekday,
+                agentId: eventChanges.changedLocation
+            }
+        });
+    }
+
+    formData.append('update', JSON.stringify(update))
+
+    axios.put('/admin-ng/event/bulk/update', formData)
+        .then(res => {
+            console.log(res);
+            dispatch(addNotification('success', 'EVENTS_UPDATED_ALL'));
+        })
+        .catch(res => {
+            console.log(res);
+            dispatch(addNotification('error', 'EVENTS_NOT_UPDATED'));
+        });
+};

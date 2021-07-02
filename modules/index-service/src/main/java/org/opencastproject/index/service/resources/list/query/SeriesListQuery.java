@@ -52,6 +52,12 @@ public class SeriesListQuery extends ResourceListQueryImpl {
   public static final String FILTER_ACL_NAME = "managedAcl";
   private static final String FILTER_ACL_LABEL = "FILTERS.SERIES.ACCESS_POLICY.LABEL";
 
+  public static final String FILTER_ACL_PERMISSION_READ_NAME = "acl_permission_read";
+  private static final String FILTER_ACL_PERMISSION_READ_LABEL = "FILTERS.SERIES.ACL_PREMISSION_READ.LABEL";
+
+  public static final String FILTER_ACL_PERMISSION_WRITE_NAME = "acl_permission_write";
+  private static final String FILTER_ACL_PERMISSION_WRITE_LABEL = "FILTERS.SERIES.ACL_PREMISSION_WRITE.LABEL";
+
   public static final String FILTER_CONTRIBUTORS_NAME = "contributors";
   private static final String FILTER_CONTRIBUTORS_LABEL = "FILTERS.SERIES.CONTRIBUTORS.LABEL";
 
@@ -102,6 +108,33 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    */
   public Option<String> getAccessPolicy() {
     return this.getFilterValue(FILTER_ACL_NAME);
+  }
+
+  public void withoutPermissions() {
+    ResourceListFilter filter = this.getFilter(FILTER_ACL_PERMISSION_READ_NAME);
+    if (filter != null) {
+      this.removeFilter(filter);
+    }
+    filter = this.getFilter(FILTER_ACL_PERMISSION_WRITE_NAME);
+    if (filter != null) {
+      this.removeFilter(filter);
+    }
+  }
+
+  public void withReadPermission(boolean value) {
+    this.addFilter(createReadPermissionFilter(Option.option(value)));
+  }
+
+  public void withWritePermission(boolean value) {
+    this.addFilter(createWritePermissionFilter(Option.option(value)));
+  }
+
+  public Option<Boolean> getReadPermission() {
+    return this.getFilterValue(FILTER_ACL_PERMISSION_READ_NAME);
+  }
+
+  public Option<Boolean> getWritePermission() {
+    return this.getFilterValue(FILTER_ACL_PERMISSION_WRITE_NAME);
   }
 
   /**
@@ -266,6 +299,16 @@ public class SeriesListQuery extends ResourceListQueryImpl {
   public static ResourceListFilter<String> createAccessPolicyFilter(Option<String> acl) {
     return FiltersUtils.generateFilter(acl, FILTER_ACL_NAME, FILTER_ACL_LABEL, SourceType.SELECT,
             Option.some(AclListProvider.NAME));
+  }
+
+  public static ResourceListFilter<Boolean> createReadPermissionFilter(Option<Boolean> value) {
+    return FiltersUtils.generateFilter(value, FILTER_ACL_PERMISSION_READ_NAME, FILTER_ACL_PERMISSION_READ_LABEL,
+        SourceType.SELECT, Option.none());
+  }
+
+  public static ResourceListFilter<Boolean> createWritePermissionFilter(Option<Boolean> value) {
+    return FiltersUtils.generateFilter(value, FILTER_ACL_PERMISSION_WRITE_NAME, FILTER_ACL_PERMISSION_WRITE_LABEL,
+        SourceType.SELECT, Option.none());
   }
 
   /**

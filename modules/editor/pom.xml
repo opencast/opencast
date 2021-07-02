@@ -7,14 +7,14 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <editor.url>https://github.com/elan-ev/opencast-editor/releases/download/2021-03-05/oc-editor-2021-03-05-v2.tar.gz</editor.url>
-    <editor.sha256>e1686aefdc611c6b19c56a8c50f27a4713a57f7451bcd69e3b1111f58bd09905</editor.sha256>
+    <editor.url>https://github.com/elan-ev/opencast-editor/releases/download/2021-05-20/oc-editor-2021-05-20.tar.gz</editor.url>
+    <editor.sha256>7a6d901355647bda76986f1ca6f5f0f16d4d94b7d1526eb69a6ad6d2b47d25ab</editor.sha256>
   </properties>
   <build>
     <plugins>

@@ -2,13 +2,14 @@ import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {DateTimePicker} from "@material-ui/pickers";
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
+import cn from "classnames";
 
 
 const childRef = React.createRef();
 /**
  * This component renders an editable field for single values depending on the type of the corresponding metadata
  */
-const RenderField = ({ field, metadataField, form }) => {
+const RenderField = ({ field, metadataField, form, showCheck=false }) => {
     // Indicator if currently edit mode is activated
     const [editMode, setEditMode] = useState(false);
 
@@ -42,7 +43,7 @@ const RenderField = ({ field, metadataField, form }) => {
         if (type !== "textarea" && keys.indexOf(key) > -1) {
             setEditMode(false);
         }
-    }
+    };
 
     return (
         // Render editable field depending on type of metadata field
@@ -54,28 +55,34 @@ const RenderField = ({ field, metadataField, form }) => {
                                          editMode={editMode}
                                          setEditMode={setEditMode}
                                          form={form}
-                                         handleKeyDown={handleKeyDown}/>
+                                         showCheck={showCheck}/>
             )}
             {((metadataField.type === "text" && !!metadataField.collection && metadataField.collection.length !== 0) ||
                 metadataField.type === "ordered_text") ? (
                 <EditableSingleSelect metadataField={metadataField}
                                       field={field}
+                                      form={form}
                                       text={field.value}
                                       editMode={editMode}
                                       setEditMode={setEditMode}
+                                      showCheck={showCheck}
                                       handleKeyDown={handleKeyDown}/>
             ) : (metadataField.type === "text" && (
                 <EditableSingleValue field={field}
+                                     form={form}
                                      text={field.value}
                                      editMode={editMode}
                                      setEditMode={setEditMode}
+                                     showCheck={showCheck}
                                      handleKeyDown={handleKeyDown}/>
             ))}
             {metadataField.type === "text_long" && (
                 <EditableSingleValueTextArea field={field}
                                              text={field.value}
+                                             form={form}
                                              editMode={editMode}
                                              setEditMode={setEditMode}
+                                             showCheck={showCheck}
                                              handleKeyDown={handleKeyDown}/>
             )}
             {metadataField.type === "date" && (
@@ -84,13 +91,15 @@ const RenderField = ({ field, metadataField, form }) => {
                                    form={form}
                                    editMode={editMode}
                                    setEditMode={setEditMode}
-                                   handleKeyDown={handleKeyDown}/>
+                                   showCheck={showCheck}/>
             )}
             {metadataField.type === "boolean" && (
                 <EditableBooleanValue field={field}
                                       text={field.value}
+                                      form={form}
                                       editMode={editMode}
                                       setEditMode={setEditMode}
+                                      showCheck={showCheck}
                                       handleKeyDown={handleKeyDown}/>
             )}
         </>
@@ -98,7 +107,7 @@ const RenderField = ({ field, metadataField, form }) => {
 };
 
 // Renders editable field for a boolean value
-const EditableBooleanValue = ({ field, text, editMode, setEditMode, handleKeyDown }) => {
+const EditableBooleanValue = ({ field, text, editMode, setEditMode, handleKeyDown, form: { initialValues }, showCheck }) => {
     return (
         editMode ? (
             <div onBlur={() => setEditMode(false)}
@@ -110,6 +119,9 @@ const EditableBooleanValue = ({ field, text, editMode, setEditMode, handleKeyDow
             <div onClick={() => setEditMode(true)}>
                 <span className="editable preserve-newlines" >{text || ''}</span>
                 <i className="edit fa fa-pencil-square"/>
+                {showCheck && (
+                    <i className={cn("saved fa fa-check", { active: (initialValues[field.name] !== field.value) })}/>
+                )}
             </div>
         )
 
@@ -117,7 +129,7 @@ const EditableBooleanValue = ({ field, text, editMode, setEditMode, handleKeyDow
 };
 
 // Renders editable field for a data value
-const EditableDateValue = ({ field, text, form: { setFieldValue }, editMode, setEditMode, handleKeyDown }) => {
+const EditableDateValue = ({ field, text, form: { setFieldValue, initialValues }, editMode, setEditMode, showCheck }) => {
     const { t } = useTranslation();
 
     const theme = createMuiTheme({
@@ -148,6 +160,9 @@ const EditableDateValue = ({ field, text, form: { setFieldValue }, editMode, set
                     {t('dateFormats.dateTime.short', {dateTime: new Date(text)}) || ''}
                 </span>
                 <i className="edit fa fa-pencil-square"/>
+                {showCheck && (
+                    <i className={cn("saved fa fa-check", { active: (initialValues[field.name] !== field.value) })}/>
+                )}
             </div>
         )
 
@@ -155,7 +170,8 @@ const EditableDateValue = ({ field, text, form: { setFieldValue }, editMode, set
 };
 
 // renders editable field for selecting value via dropdown
-const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMode, handleKeyDown }) => {
+const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMode, handleKeyDown,
+                                  form: { initialValues }, showCheck }) => {
     const { t } = useTranslation();
     return (
         editMode ? (
@@ -173,9 +189,16 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
                                 <option key={key} value={item.value}>{t(item.name)}</option>
                         ))
                     ) : (
-                        metadataField.collection.map((item, key) => (
+                        // if selection of series then use item name as option label else use item value
+                        metadataField.id === "isPartOf" ? (
+                            metadataField.collection.map((item, key) => (
+                                <option key={key} value={item.value}>{item.name}</option>
+                            ))
+                            ) : (
+                            metadataField.collection.map((item, key) => (
                                 <option key={key}>{item.value}</option>
-                        ))
+                            ))
+                        )
                     )}
                 </select>
             </div>
@@ -185,13 +208,16 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
                      {text || t('SELECT_NO_OPTION_SELECTED')}
                  </span>
                  <i className="edit fa fa-pencil-square"/>
+                 {showCheck && (
+                     <i className={cn("saved fa fa-check", { active: (initialValues[field.name] !== field.value) })}/>
+                 )}
              </div>
         )
     );
 };
 
 // Renders editable text area
-const EditableSingleValueTextArea = ({ field, text, editMode, setEditMode, handleKeyDown}) => {
+const EditableSingleValueTextArea = ({ field, text, editMode, setEditMode, handleKeyDown, form: { initialValues }, showCheck }) => {
     return (
         editMode ? (
             <div onBlur={() => setEditMode(false)}
@@ -203,13 +229,16 @@ const EditableSingleValueTextArea = ({ field, text, editMode, setEditMode, handl
             <div onClick={() => setEditMode(true)}>
                 <span className="editable preserve-newlines">{text || ''}</span>
                 <i className="edit fa fa-pencil-square"/>
+                {showCheck && (
+                    <i className={cn("saved fa fa-check", { active: (initialValues[field.name] !== field.value) })}/>
+                )}
             </div>
         )
     );
 };
 
 // Renders editable input for single value
-const EditableSingleValue = ({ field, text, editMode, setEditMode, handleKeyDown }) => {
+const EditableSingleValue = ({ field, form: { initialValues }, text, editMode, setEditMode, handleKeyDown, showCheck }) => {
     return (
         editMode ? (
             <div onBlur={() => setEditMode(false)}
@@ -221,13 +250,16 @@ const EditableSingleValue = ({ field, text, editMode, setEditMode, handleKeyDown
             <div onClick={() => setEditMode(true)}>
                 <span className="editable preserve-newlines" >{text || ''}</span>
                 <i className="edit fa fa-pencil-square"/>
+                {showCheck && (
+                    <i className={cn("saved fa fa-check", { active: (initialValues[field.name] !== field.value) })}/>
+                )}
             </div>
         )
     );
 };
 
 // Renders editable field for time value
-const EditableSingleValueTime = ({ field, text, form: { setFieldValue }, editMode, setEditMode, handleKeyDown }) => {
+const EditableSingleValueTime = ({ field, text, form: { setFieldValue, initialValues }, editMode, setEditMode, showCheck }) => {
     const { t } = useTranslation();
 
     const theme = createMuiTheme({
@@ -257,6 +289,9 @@ const EditableSingleValueTime = ({ field, text, form: { setFieldValue }, editMod
                     {t('dateFormats.dateTime.short', {dateTime: new Date(text)}) || ''}
                 </span>
                 <i className="edit fa fa-pencil-square"/>
+                {showCheck && (
+                    <i className={cn("saved fa fa-check", { active: (initialValues[field.name] !== field.value) })}/>
+                )}
             </div>
         )
     );

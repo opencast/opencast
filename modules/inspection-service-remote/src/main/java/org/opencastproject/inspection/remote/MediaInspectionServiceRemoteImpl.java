@@ -53,11 +53,11 @@ import java.util.Map;
  * Proxies a remote media inspection service for use as a JVM-local service.
  */
 @Component(
-  property = {
-    "service.description=Media Inspection Remote Service Proxy"
-  },
-  immediate = true,
-  service = { MediaInspectionService.class }
+    property = {
+        "service.description=Media Inspection Remote Service Proxy"
+    },
+    immediate = true,
+    service = { MediaInspectionService.class }
 )
 public class MediaInspectionServiceRemoteImpl extends RemoteBase implements MediaInspectionService {
 

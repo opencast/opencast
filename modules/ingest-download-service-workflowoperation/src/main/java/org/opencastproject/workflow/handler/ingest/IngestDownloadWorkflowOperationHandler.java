@@ -25,10 +25,12 @@ import org.opencastproject.ingestdownloadservice.api.IngestDownloadService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -36,6 +38,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.BooleanUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Downloads all external URI's to the working file repository and optionally deletes external working file repository
@@ -45,12 +50,6 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /** Deleting external working file repository URI's after download config key */
   public static final String DELETE_EXTERNAL = "delete-external";
-
-  /** config key used to specify a list of flavors (seperated by comma), elements matching a flavor will be downloaded */
-  public static final String SOURCE_FLAVORS = "source-flavors";
-
-  /** config key used to specify a list of tags (seperated by comma), elements matching a tag will be downloaded */
-  public static final String SOURCE_TAGS = "source-tags";
 
   /** config key used to specify, whether both, a tag and a flavor, must match or if one is sufficient */
   public static final String TAGS_AND_FLAVORS = "tags-and-flavors";
@@ -79,8 +78,18 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
     boolean deleteExternal = BooleanUtils.toBoolean(currentOperation.getConfiguration(DELETE_EXTERNAL));
     boolean tagsAndFlavor = BooleanUtils.toBoolean(currentOperation.getConfiguration(TAGS_AND_FLAVORS));
-    String sourceFlavors = getConfig(workflowInstance, SOURCE_FLAVORS, "*/*");
-    String sourceTags = getConfig(workflowInstance, SOURCE_TAGS, "");
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+    List<MediaPackageElementFlavor> sourceFlavorList = tagsAndFlavors.getSrcFlavors();
+    List<String> sourceTagList = tagsAndFlavors.getSrcTags();
+    String sourceFlavors = "*/*";
+    String sourceTags = "";
+    if (!sourceTagList.isEmpty()) {
+      sourceTags = String.join(",",sourceTagList);
+    }
+    if (!sourceFlavorList.isEmpty()) {
+      sourceFlavors = sourceFlavorList.stream().map(MediaPackageElementFlavor::toString).collect(Collectors.joining(","));
+    }
 
     try {
       Job job = ingestDownloadService.ingestDownload(workflowInstance.getMediaPackage(), sourceFlavors, sourceTags,

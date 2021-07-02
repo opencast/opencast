@@ -46,4 +46,4 @@ const mapDispatchToProps = dispatch => ({
     loadEventsIntoTable: () => dispatch(loadEventsIntoTable())
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(EventsSeriesCell);;
+export default connect(mapStateToProps, mapDispatchToProps)(EventsSeriesCell);

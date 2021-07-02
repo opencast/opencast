@@ -22,20 +22,20 @@ package org.opencastproject.event.comment.persistence;
 
 import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.comments.CommentItem;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.persistencefn.PersistenceEnv;
 import org.opencastproject.util.persistencefn.PersistenceEnvs;
@@ -43,7 +43,6 @@ import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +53,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -85,14 +86,12 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   /** The user directory service */
   private UserDirectoryService userDirectoryService;
 
-  /** The message broker sender service */
-  private MessageSender messageSender;
-
-  /** The message broker receiver service */
-  private MessageReceiver messageReceiver;
-
   /** The component context this bundle is running in. */
   private ComponentContext cc;
+
+  /** The elasticsearch indices */
+  private AbstractSearchIndex adminUiIndex;
+  private AbstractSearchIndex externalApiIndex;
 
   /** OSGi component activation callback */
   public void activate(ComponentContext cc) {
@@ -137,23 +136,23 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   /**
-   * OSGi callback to set the message sender.
+   * OSgi callback for the Admin UI index.
    *
-   * @param messageSender
-   *          the message sender
+   * @param index
+   *          the admin UI index.
    */
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
   }
 
   /**
-   * OSGi callback to set the message receiver.
+   * OSGi callback for the External API index
    *
-   * @param messageReceiver
-   *          the message receiver
+   * @param index
+   *          the external API index.
    */
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
+  public void setExternalApiIndex(AbstractSearchIndex index) {
+    this.externalApiIndex = index;
   }
 
   @Override
@@ -205,7 +204,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
       em.remove(event);
       tx.commit();
-      sendMessageUpdate(event.getEventId());
+      updateIndices(event.getEventId());
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -256,7 +255,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
     // send updates only if we actually modified anything
     if (count > 0) {
-      sendMessageUpdate(eventId);
+      updateIndices(eventId);
     }
   }
 
@@ -264,7 +263,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   public EventComment updateComment(EventComment comment) throws EventCommentDatabaseException {
     final EventCommentDto commentDto = EventCommentDto.from(comment);
     final EventComment updatedComment = env.tx(persistOrUpdate(commentDto)).toComment(userDirectoryService);
-    sendMessageUpdate(updatedComment.getEventId());
+    updateIndices(updatedComment.getEventId());
     return updatedComment;
   }
 
@@ -298,7 +297,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       q.setParameter("org", securityService.getOrganization().getId());
 
       List<EventComment> comments = Monadics.mlist(q.getResultList())
-              .map(new Function<EventCommentDto, EventComment>() {
+              .map(new org.opencastproject.util.data.Function<EventCommentDto, EventComment>() {
                 @Override
                 public EventComment apply(EventCommentDto a) {
                   return a.toComment(userDirectoryService);
@@ -375,12 +374,49 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     return orgEventsMap;
   }
 
-  private void sendMessageUpdate(String eventId) throws EventCommentDatabaseException {
+  private void updateIndices(String eventId)
+          throws EventCommentDatabaseException {
     List<EventComment> comments = getComments(eventId);
-    boolean openComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
+    boolean hasOpenComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
     boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
-    CommentItem update = CommentItem.update(eventId, !comments.isEmpty(), openComments, needsCutting);
-    messageSender.sendObjectMessage(CommentItem.COMMENT_QUEUE, MessageSender.DestinationType.Queue, update);
+
+    String organization = securityService.getOrganization().getId();
+    User user = securityService.getUser();
+
+    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user, adminUiIndex);
+    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user, externalApiIndex);
+  }
+
+  private void updateIndex(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting,
+          String organization, User user, AbstractSearchIndex index) {
+    logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
+    if (!hasComments && hasOpenComments) {
+      throw new IllegalStateException(
+              "Invalid comment update request: You can't have open comments without having any comments!");
+    }
+    if (!hasOpenComments && needsCutting) {
+      throw new IllegalStateException(
+              "Invalid comment update request: You can't have an needs cutting comment without having any open "
+                      + "comments!");
+    }
+
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      if (!eventOpt.isPresent()) {
+        logger.debug("Event {} not found for comment status updating", eventId);
+        return Optional.empty();
+      }
+      Event event = eventOpt.get();
+      event.setHasComments(hasComments);
+      event.setHasOpenComments(hasOpenComments);
+      event.setNeedsCutting(needsCutting);
+      return Optional.of(event);
+    };
+
+    try {
+      index.addOrUpdateEvent(eventId, updateFunction, organization, user);
+    } catch (SearchIndexException e) {
+      logger.error("Error updating comment status of event {} in the {} index:", eventId, index.getIndexName(), e);
+    }
   }
 
   private static final Fn<EventComment, Boolean> filterOpenComments = new Fn<EventComment, Boolean>() {
@@ -398,28 +434,28 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   };
 
   @Override
-  public void repopulate(final String indexName) throws IndexRebuildException {
-    final String destinationId = CommentItem.COMMENT_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
     try {
       final int total = countComments();
       final int[] current = new int[1];
       current[0] = 0;
-      logIndexRebuildBegin(logger, indexName, total, "events with comment");
+      logIndexRebuildBegin(logger, index.getIndexName(), total, "events with comment");
       final Map<String, List<String>> eventsWithComments = getEventsWithComments();
       for (String orgId : eventsWithComments.keySet()) {
         Organization organization = organizationDirectoryService.getOrganization(orgId);
-        SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization),
+        User systemUser = SecurityUtil.createSystemUser(cc, organization);
+        SecurityUtil.runAs(securityService, organization, systemUser,
                 () -> {
                   for (String eventId : eventsWithComments.get(orgId)) {
                     try {
                       List<EventComment> comments = getComments(eventId);
                       boolean hasOpenComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
                       boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
-                      messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                              CommentItem.update(eventId, !comments.isEmpty(), hasOpenComments, needsCutting));
 
+                      updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, orgId, systemUser,
+                              index);
                       current[0] += comments.size();
-                      logIndexRebuildProgress(logger, indexName, total, current[0]);
+                      logIndexRebuildProgress(logger, index.getIndexName(), total, current[0]);
                     } catch (Throwable t) {
                       logSkippingElement(logger, "comment of event", eventId, organization, t);
                     }
@@ -427,8 +463,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                 });
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, indexName, e);
-      throw new IndexRebuildException(indexName, getService(), e);
+      logIndexRebuildError(logger, index.getIndexName(), e);
+      throw new IndexRebuildException(index.getIndexName(), getService(), e);
     }
   }
 

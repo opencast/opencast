@@ -23,7 +23,7 @@ const NewMetadataPage = ({ metadataFields, nextPage, formik, header }) => {
                                 <table className="main-tbl">
                                     <tbody>
                                     {/* Render table row for each metadata field depending on type*/}
-                                    {metadataFields.fields.map((field, key) =>
+                                    {!!metadataFields.fields && metadataFields.fields.map((field, key) =>
                                         (
                                             <tr key={key}>
                                                 <td>
@@ -35,7 +35,9 @@ const NewMetadataPage = ({ metadataFields, nextPage, formik, header }) => {
                                                 <td className="editable ng-isolated-scope">
                                                     {/* Render single value or multi value input */}
                                                     {(field.type === "mixed_text" && field.collection.length !== 0) ? (
-                                                        <RenderMultiField fieldInformation={field}/>
+                                                        <Field name={field.id}
+                                                               fieldInfo={field}
+                                                               component={RenderMultiField}/>
                                                     ) : (
                                                         <Field name={field.id}
                                                                metadataField={field}

@@ -144,10 +144,11 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
       @Override
       public NonEmptyList<MetadataValue<String>> getTitles() {
-        if (mp.getTitle() != null)
+        if (mp.getTitle() != null) {
           return new NonEmptyList<MetadataValue<String>>(new MetadataValue(mp.getTitle(), "title"));
-        else
+        } else {
           throw new IllegalArgumentException("MediaPackage " + mp + " does not contain a title");
+        }
       }
 
       @Override
@@ -192,10 +193,11 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
       @Override
       public List<MetadataValue<String>> getLicenses() {
-        if (mp.getLicense() != null)
+        if (mp.getLicense() != null) {
           return Arrays.asList(new MetadataValue<String>(mp.getLicense(), "license"));
-        else
+        } else {
           return Collections.emptyList();
+        }
       }
     };
   }

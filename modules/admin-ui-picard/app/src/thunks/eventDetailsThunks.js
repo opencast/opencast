@@ -9,6 +9,15 @@ import {
 } from '../actions/eventDetailsActions';
 import axios from "axios";
 
+// prepare http headers for posting to resources
+const getHttpHeaders = () => {
+    return {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+    };
+}
+
 export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
     const ace = JSON.stringify({acl: {
             ace: policies
@@ -50,7 +59,6 @@ export const fetchHasActiveTransactions = (eventId) => async (dispatch) => {
     } catch (e) {
         console.log(e);
     }
-}
 
 export const fetchComments = (eventId) => async (dispatch) => {
     try {
@@ -73,8 +81,14 @@ export const saveComment = (eventId, commentText, commentReason) => async (dispa
     try {
         dispatch(saveCommentInProgress());
 
+        let headers = getHttpHeaders();
+
+        let data = new URLSearchParams();
+        data.append("text", commentText);
+        data.append("reason", commentReason);
+
         const commentSaved = await axios.post(`admin-ng/event/${eventId}/comment`,
-            `text=${commentText}&reason=${commentReason}`);
+            data.toString(), headers );
         await commentSaved.data;
 
         dispatch(saveCommentDone());
@@ -86,7 +100,7 @@ export const saveComment = (eventId, commentText, commentReason) => async (dispa
     }
 }
 
-export const deleteComment = (eventId, commentId) => async (dispatch) => {
+export const deleteComment = (eventId, commentId) => async () => {
     try {
         const commentDeleted = await axios.delete(`admin-ng/event/${eventId}/comment/${commentId}`);
         await commentDeleted.data;
@@ -101,8 +115,14 @@ export const saveCommentReply = (eventId, commentId, replyText, commentResolved)
     try {
         dispatch(saveCommentReplyInProgress());
 
+        let headers = getHttpHeaders();
+
+        let data = new URLSearchParams();
+        data.append("text", replyText);
+        data.append("resolved", commentResolved);
+
         const commentReply = await axios.post(`admin-ng/event/${eventId}/comment/${commentId}/reply`,
-            `text=${replyText}&resolved=${commentResolved}`);
+            data.toString(), headers );
 
         await commentReply.data;
 
@@ -115,7 +135,7 @@ export const saveCommentReply = (eventId, commentId, replyText, commentResolved)
     }
 }
 
-export const deleteCommentReply = (eventId, commentId, replyId) => async (dispatch) => {
+export const deleteCommentReply = (eventId, commentId, replyId) => async () => {
     try {
         const commentReplyDeleted = await axios.delete(`admin-ng/event/${eventId}/comment/${commentId}/${replyId}`);
         await commentReplyDeleted.data;

@@ -133,7 +133,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /** List of available operations on jobs */
   private enum Operation {
-    Add, Delete
+    Add, Delete, DeleteSeries
   };
 
   /** Solr server */
@@ -204,8 +204,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   /**
-   * Service activator, called via declarative services configuration. If the solr server url is configured, we try to
-   * connect to it. If not, the solr data directory with an embedded Solr server is used.
+   * Service activator, called via declarative services configuration. If the
+   * solr server url is configured, we try to connect to it. If not, the solr
+   * data directory with an embedded Solr server is used.
    *
    * @param cc
    *          the component context
@@ -379,8 +380,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    *           if the user does not have the rights to add the mediapackage
    */
   public void addSynchronously(MediaPackage mediaPackage)
-      throws SearchException, IllegalArgumentException, UnauthorizedException, NotFoundException,
-      SearchServiceDatabaseException {
+          throws SearchException, IllegalArgumentException, UnauthorizedException, NotFoundException,
+          SearchServiceDatabaseException {
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Unable to add a null mediapackage");
     }
@@ -419,7 +420,22 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    */
   public Job delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException {
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Delete.toString(), Arrays.asList(mediaPackageId), deleteJobLoad);
+      return serviceRegistry.createJob(
+        JOB_TYPE, Operation.Delete.toString(), Arrays.asList(mediaPackageId), deleteJobLoad);
+    } catch (ServiceRegistryException e) {
+      throw new SearchException(e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.search.api.SearchService#delete(java.lang.String)
+   */
+  public Job deleteSeries(String seriesId) throws SearchException, UnauthorizedException, NotFoundException {
+    try {
+      return serviceRegistry.createJob(
+          JOB_TYPE, Operation.DeleteSeries.toString(), Arrays.asList(seriesId), deleteJobLoad);
     } catch (ServiceRegistryException e) {
       throw new SearchException(e);
     }
@@ -483,6 +499,40 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   /**
+   * Immediately removes the given series from the search service.
+   *
+   * @param seriesId
+   *          the series
+   * @return <code>true</code> if the series was deleted
+   * @throws SearchException
+   */
+  public boolean deleteSeriesSynchronously(String seriesId) throws SearchException {
+    SearchResult result;
+    try {
+      SearchQuery searchQuery = new SearchQuery();
+      searchQuery.withId(seriesId);
+      searchQuery.includeSeries(true);
+
+      result = solrRequester.getForWrite(searchQuery);
+      if (result.getItems().length == 0) {
+        logger.warn(
+                "Can not delete series {}, which is not available for the current user to delete from the search index."
+                    + "",
+                seriesId);
+        return false;
+      }
+      logger.info("Removing series {} from search index", seriesId);
+
+      Date now = new Date();
+      //only delete from searchindex, there is no series Element in the Database
+      return indexManager.delete(seriesId, now);
+    } catch (SolrServerException e) {
+      logger.info("Could not delete series with id {} from search index", seriesId);
+      throw new SearchException(e);
+    }
+  }
+
+  /**
    * Clears the complete solr index.
    *
    * @throws SearchException
@@ -497,11 +547,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.search.api.SearchService#getByQuery(org.opencastproject.search.api.SearchQuery)
-   */
   public SearchResult getByQuery(SearchQuery q) throws SearchException {
     try {
       logger.debug("Searching index using query object '" + q + "'");
@@ -511,16 +556,12 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.search.api.SearchService#getForAdministrativeRead(org.opencastproject.search.api.SearchQuery)
-   */
   @Override
   public SearchResult getForAdministrativeRead(SearchQuery q) throws SearchException, UnauthorizedException {
     User user = securityService.getUser();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole()))
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
       throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
+    }
 
     try {
       return solrRequester.getForAdministrativeRead(q);
@@ -573,7 +614,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           Date deletionDate = persistence.getDeletionDate(mediaPackageId);
 
 
-          AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId).stream()
+          AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId)
+              .stream()
               .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
           logger.debug("Updating series with merged access control list: {}", seriesAcl);
 
@@ -595,8 +637,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           logger.info("Indexing search {}/{} ({} percent done)", current, total, current * 100 / total);
         }
       }
-      if (errors > 0)
+      if (errors > 0) {
         logger.error("Skipped {} erroneous search entries while populating the search index", errors);
+      }
       logger.info("Finished populating search index");
     }
   }
@@ -621,7 +664,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
     retriesToPopulateIndex++;
 
-      new Thread() {
+    new Thread() {
         public void run() {
           try {
             Thread.sleep(30000);
@@ -652,6 +695,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           String mediapackageId = arguments.get(0);
           boolean deleted = deleteSynchronously(mediapackageId);
           return Boolean.toString(deleted);
+        case DeleteSeries:
+          String seriesId = arguments.get(0);
+          deleted = deleteSeriesSynchronously(seriesId);
+          return Boolean.toString(deleted);
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
@@ -674,14 +721,16 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** Dynamic reference. */
   public void setStaticMetadataService(StaticMetadataService mdService) {
     this.mdServices.add(mdService);
-    if (indexManager != null)
+    if (indexManager != null) {
       indexManager.setStaticMetadataServices(mdServices);
+    }
   }
 
   public void unsetStaticMetadataService(StaticMetadataService mdService) {
     this.mdServices.remove(mdService);
-    if (indexManager != null)
+    if (indexManager != null) {
       indexManager.setStaticMetadataServices(mdServices);
+    }
   }
 
   public void setMpeg7CatalogService(Mpeg7CatalogService mpeg7CatalogService) {
@@ -778,14 +827,16 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    */
   protected void setMediaPackageSerializer(MediaPackageSerializer serializer) {
     this.serializer = serializer;
-    if (solrRequester != null)
+    if (solrRequester != null) {
       solrRequester.setMediaPackageSerializer(serializer);
+    }
   }
 
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     addJobLoad = LoadUtil.getConfiguredLoadValue(properties, ADD_JOB_LOAD_KEY, DEFAULT_ADD_JOB_LOAD, serviceRegistry);
-    deleteJobLoad = LoadUtil.getConfiguredLoadValue(properties, DELETE_JOB_LOAD_KEY, DEFAULT_DELETE_JOB_LOAD, serviceRegistry);
+    deleteJobLoad = LoadUtil.getConfiguredLoadValue(
+        properties, DELETE_JOB_LOAD_KEY, DEFAULT_DELETE_JOB_LOAD, serviceRegistry);
   }
 
   @Override

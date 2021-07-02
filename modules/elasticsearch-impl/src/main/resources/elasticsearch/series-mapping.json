@@ -23,7 +23,7 @@
 
           "license": { "type" : "keyword" },
 
-          "access_policy": { "type" : "text", "index" : false, "store" : false },
+          "access_policy": { "type" : "text" },
 
           "managed_acl": { "type" : "keyword" },
 

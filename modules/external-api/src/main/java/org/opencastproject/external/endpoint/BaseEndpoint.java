@@ -79,7 +79,8 @@ import javax.ws.rs.core.Response;
  */
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
+            ApiMediaType.VERSION_1_6_0 })
 @RestService(name = "externalapiservice", title = "External API Service", notes = {},
              abstractText = "Provides a location for external apis to query the current server of the API.")
 public class BaseEndpoint {
@@ -234,6 +235,7 @@ public class BaseEndpoint {
     versions.add(v(ApiVersion.VERSION_1_3_0.toString()));
     versions.add(v(ApiVersion.VERSION_1_4_0.toString()));
     versions.add(v(ApiVersion.VERSION_1_5_0.toString()));
+    versions.add(v(ApiVersion.VERSION_1_6_0.toString()));
     JValue json = obj(f("versions", arr(versions)), f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
   }
@@ -274,7 +276,7 @@ public class BaseEndpoint {
           description = "Repopulates the external Index from an specific service",
           returnDescription = "OK if repopulation has started", pathParameters = {
           @RestParameter(name = "service", isRequired = true, description = "The service to recreate index from. "
-                  + "The available services are: Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
+                  + "The available services are: Series, Scheduler, Workflow, AssetManager and Comments. "
                   + "The service order (see above) is very important! Make sure, you do not run index rebuild for more than one "
                   + "service at a time!",
                   type = RestParameter.Type.STRING) }, responses = {

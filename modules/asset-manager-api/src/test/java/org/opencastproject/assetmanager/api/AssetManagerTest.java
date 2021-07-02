@@ -57,16 +57,21 @@ public class AssetManagerTest {
     // Also fetch _all_ properties of the media package.
     q.select(q.snapshot(), q.properties()).where(q.mediaPackageId("some-mp-id").and(q.version().isLatest())).run();
 
-    // Select the latest version of "mp-id" only if it has properties of namespace "org.opencastproject.service" attached.
-    // Fetch only the media package and associated metadata like version, creation date etc.
-    q.select(q.snapshot()).where(q.mediaPackageId("mp-id").and(q.version().isLatest()).and(q.hasPropertiesOf("org.opencastproject.service"))).run();
+    // Select the latest version of "mp-id" only if it has properties of
+    // namespace "org.opencastproject.service" attached. Fetch only the media
+    // package and associated metadata like version, creation date etc.
+    q.select(q.snapshot()).where(q.mediaPackageId("mp-id")
+        .and(q.version().isLatest())
+        .and(q.hasPropertiesOf("org.opencastproject.service")))
+        .run();
 
     // Select all versions of media package "mp-id" that are archived before now. Do not fetch associated properties.
     final Date date = null; // <- assume some real date here
     q.select(q.snapshot()).where(q.mediaPackageId("mp-id").and(q.archived().lt(date))).run();
 
     // does not compile because of a type error
-    //AssetResult r = q.select(q.mediaPackage("some-mp-id").and(q.archived().lt(q.val(Value.mk("bla"))))).fetchProperties(false).run();
+    //AssetResult r = q.select(q.mediaPackage("some-mp-id").and(q.archived().lt(q.val(Value.mk("bla")))))
+    //    .fetchProperties(false).run();
 
     // Select all versions of all media packages of series "series".
     // Also fetch all of their properties.
@@ -76,8 +81,9 @@ public class AssetManagerTest {
     // Also fetch all of their properties.
     q.select(q.snapshot()).where(q.seriesId().eq("series").and(q.version().isLatest())).run();
 
-    // Select all media packages and all of their versions that have boolean property "org.opencastproject.myservice:approved" set to true.
-    // Fetch media packages and associated metadata like version, creation date etc.
+    // Select all media packages and all of their versions that have boolean
+    // property "org.opencastproject.myservice:approved" set to true. Fetch
+    // media packages and associated metadata like version, creation date etc.
     // Fetch all properties of namespace "org.opencastproject.myservice"
     q.select(q.snapshot(), q.propertiesOf("org.opencastproject.myservice"))
             .where(q.property(Value.BOOLEAN, "org.opencastproject.myservice", "approved").eq(true)).run();
@@ -85,10 +91,13 @@ public class AssetManagerTest {
     // The above works but it's better to define and use a property schema!
     final Props p = new Props(q);
 
-    // Select all versions of media packages that have boolean property "org.opencastproject.myservice:approved" set to true.
+    // Select all versions of media packages that have boolean property
+    // "org.opencastproject.myservice:approved" set to true.
     q.select(q.snapshot()).where(p.approved().eq(true)).run();
 
-    // Select all versions of media packages and properties of namespace "org.opencastproject.myservice" having a "count" property of less than 10.
+    // Select all versions of media packages and properties of namespace
+    // "org.opencastproject.myservice" having a "count" property of less than
+    // 10.
     q.select(q.snapshot(), q.propertiesOf(p.namespace())).where(p.count().lt(10L)).run();
 
     final Version v = null; // <- assume some version here
@@ -119,12 +128,22 @@ public class AssetManagerTest {
     q.delete("owner", q.propertiesOf("org.opencastproject.myservice")).where(q.mediaPackageId("mp-id")).run();
 
     // Delete property "org.opencastproject.myservice:prop" from media package "mp-id".
-    q.delete("owner", q.properties(PropertyName.mk("org.opencastproject.myservice", "prop"))).where(q.mediaPackageId("mp-id")).run();
+    q.delete("owner", q.properties(PropertyName.mk("org.opencastproject.myservice", "prop")))
+        .where(q.mediaPackageId("mp-id")).run();
 
-    // Delete properties "org.opencastproject.myservice:prop" and "org.opencastproject.myservice:prop2" from media package "mp-id".
-    q.delete("owner", q.properties(PropertyName.mk("org.opencastproject.myservice", "prop"), PropertyName.mk("org.opencastproject.myservice", "prop2"))).where(q.mediaPackageId("mp-id")).run();
+    // Delete properties "org.opencastproject.myservice:prop" and
+    // "org.opencastproject.myservice:prop2" from media package "mp-id".
+    q.delete(
+        "owner",
+        q.properties(
+            PropertyName.mk("org.opencastproject.myservice", "prop"),
+            PropertyName.mk("org.opencastproject.myservice", "prop2")
+        ))
+        .where(q.mediaPackageId("mp-id"))
+        .run();
 
-    // Delete all "org.opencastproject.myservice:approved" properties from all media package having a "org.opencastproject.myservice:count" greater 10.
+    // Delete all "org.opencastproject.myservice:approved" properties from all
+    // media package having a "org.opencastproject.myservice:count" greater 10.
     q.delete("owner", p.approved().target()).where(p.count().gt(10L));
 
     //
@@ -159,4 +178,3 @@ public class AssetManagerTest {
     }
   }
 }
-

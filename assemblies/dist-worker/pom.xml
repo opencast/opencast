@@ -4,11 +4,12 @@
   <parent>
     <groupId>org.opencastproject.assemblies</groupId>
     <artifactId>opencast-assemblies</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
+    <disableJobDispatching>true</disableJobDispatching>
   </properties>
   <artifactId>opencast-dist-worker</artifactId>
   <packaging>karaf-assembly</packaging>

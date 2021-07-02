@@ -50,7 +50,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * Creates a new metadata item with the given name.
-   * 
+   *
    * @param name
    *          the name
    */
@@ -78,7 +78,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * Adds <code>value</code> to the list of language neutral values.
-   * 
+   *
    * @param language
    *          the language
    * @param v
@@ -181,7 +181,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -191,7 +191,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -204,7 +204,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

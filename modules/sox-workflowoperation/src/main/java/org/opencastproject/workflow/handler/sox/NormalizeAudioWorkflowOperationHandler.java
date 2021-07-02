@@ -39,6 +39,7 @@ import org.opencastproject.sox.api.SoxException;
 import org.opencastproject.sox.api.SoxService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -113,36 +114,35 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
     this.workspace = workspace;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     logger.debug("Running sox workflow operation on workflow {}", workflowInstance.getId());
 
     try {
-      return normalize(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());
+      return normalize(workflowInstance.getMediaPackage(), workflowInstance);
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
   }
 
-  private WorkflowOperationResult normalize(MediaPackage src, WorkflowOperationInstance operation) throws SoxException,
+  private WorkflowOperationResult normalize(MediaPackage src, WorkflowInstance workflowInstance) throws SoxException,
           IOException, NotFoundException, MediaPackageException, WorkflowOperationException, EncoderException {
     MediaPackage mediaPackage = (MediaPackage) src.clone();
 
+    WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
+
     // Check which tags have been configured
-    String sourceTagsOption = StringUtils.trimToNull(operation.getConfiguration("source-tags"));
-    String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration("target-tags"));
-    String sourceFlavorOption = StringUtils.trimToNull(operation.getConfiguration("source-flavor"));
-    String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("source-flavors"));
-    String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration("target-flavor"));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many,
+        Configuration.many, Configuration.many, Configuration.many);
+    List<String> targetTagsOption = tagsAndFlavors.getTargetTags();
+    List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
+    List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
+    List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
+
     String targetDecibelString = StringUtils.trimToNull(operation.getConfiguration("target-decibel"));
-    if (targetDecibelString == null)
+    if (targetDecibelString == null) {
       throw new IllegalArgumentException("target-decibel must be specified");
+    }
     boolean forceTranscode = BooleanUtils.toBoolean(operation.getConfiguration("force-transcode"));
     Float targetDecibel;
     try {
@@ -154,47 +154,25 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Make sure either one of tags or flavors are provided
-    if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorOption)
-            && StringUtils.isBlank(sourceFlavorsOption)) {
+    if (sourceTagsOption.isEmpty() && sourceFlavorsOption.isEmpty()) {
       logger.info("No source tags or flavors have been specified, not matching anything");
       return createResult(mediaPackage, Action.CONTINUE);
     }
 
     // Select the source flavors
-    for (String flavor : asList(sourceFlavorsOption)) {
-      try {
-        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed");
-      }
-    }
-
-    // Support legacy "source-flavor" option
-    if (StringUtils.isNotBlank(sourceFlavorOption)) {
-      String flavor = StringUtils.trim(sourceFlavorOption);
-      try {
-        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed");
-      }
+    for (MediaPackageElementFlavor flavor : sourceFlavorsOption) {
+      elementSelector.addFlavor(flavor);
     }
 
     // Select the source tags
-    for (String tag : asList(sourceTagsOption)) {
+    for (String tag : sourceTagsOption) {
       elementSelector.addTag(tag);
     }
 
-    // Target tags
-    List<String> targetTags = asList(targetTagsOption);
-
-    // Target flavor
+    //select target flavor
     MediaPackageElementFlavor targetFlavor = null;
-    if (StringUtils.isNotBlank(targetFlavorOption)) {
-      try {
-        targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Target flavor '" + targetFlavorOption + "' is malformed");
-      }
+    if (!targetFlavorOption.isEmpty()) {
+      targetFlavor = targetFlavorOption.get(0);
     }
 
     // Look for elements matching the tag
@@ -222,8 +200,9 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
         if (audioTrack.getAudio().size() < 1 || audioTrack.getAudio().get(0).getRmsLevDb() == null) {
           logger.info("Audio track {} has no RMS Lev dB metadata, analyze it first", audioTrack);
           Job analyzeJob = soxService.analyze(audioTrack);
-          if (!waitForStatus(analyzeJob).isSuccess())
+          if (!waitForStatus(analyzeJob).isSuccess()) {
             throw new WorkflowOperationException("Unable to analyze the audio track " + audioTrack);
+          }
           audioTrack = (TrackImpl) MediaPackageElementParser.getFromXml(analyzeJob.getPayload());
           cleanupURIs.add(audioTrack.getURI());
         }
@@ -237,8 +216,9 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
       }
 
       // Wait for the jobs to return
-      if (!waitForStatus(normalizeJobs.keySet().toArray(new Job[normalizeJobs.size()])).isSuccess())
+      if (!waitForStatus(normalizeJobs.keySet().toArray(new Job[normalizeJobs.size()])).isSuccess()) {
         throw new WorkflowOperationException("One of the normalize jobs did not complete successfully");
+      }
 
       // Process the result
       for (Map.Entry<Job, Track> entry : normalizeJobs.entrySet()) {
@@ -257,9 +237,10 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
 
             logger.info("Mux normalized audio track {} to video track {}", normalizedAudioTrack, origTrack);
             Job muxAudioVideo = composerService.mux(origTrack, normalizedAudioTrack, SOX_AREPLACE_PROFILE);
-            if (!waitForStatus(muxAudioVideo).isSuccess())
+            if (!waitForStatus(muxAudioVideo).isSuccess()) {
               throw new WorkflowOperationException("Muxing normalized audio track " + normalizedAudioTrack
                       + " to video container " + origTrack + " failed");
+            }
 
             resultTrack = (TrackImpl) MediaPackageElementParser.getFromXml(muxAudioVideo.getPayload());
 
@@ -267,7 +248,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
             extendAudioStream(resultTrack, normalizedAudioTrack);
           }
 
-          adjustFlavorAndTags(targetTags, targetFlavor, origTrack, resultTrack);
+          adjustFlavorAndTags(targetTagsOption, targetFlavor, origTrack, resultTrack);
 
           mediaPackage.addDerived(resultTrack, origTrack);
           String fileName = getFileNameFromElements(origTrack, resultTrack);
@@ -309,10 +290,12 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
     if (targetFlavor != null) {
       String flavorType = targetFlavor.getType();
       String flavorSubtype = targetFlavor.getSubtype();
-      if ("*".equals(flavorType))
+      if ("*".equals(flavorType)) {
         flavorType = origTrack.getFlavor().getType();
-      if ("*".equals(flavorSubtype))
+      }
+      if ("*".equals(flavorSubtype)) {
         flavorSubtype = origTrack.getFlavor().getSubtype();
+      }
       normalized.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
       logger.debug("Normalized track has flavor '{}'", normalized.getFlavor());
     }
@@ -333,8 +316,9 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
           MediaPackageException {
     logger.info("Extract audio stream from track {}", videoTrack);
     Job job = composerService.encode(videoTrack, SOX_AONLY_PROFILE);
-    if (!waitForStatus(job).isSuccess())
+    if (!waitForStatus(job).isSuccess()) {
       throw new WorkflowOperationException("Extracting audio track from video track " + videoTrack + " failed");
+    }
 
     return (Track) MediaPackageElementParser.getFromXml(job.getPayload());
   }

@@ -62,21 +62,25 @@ import io.prometheus.client.exporter.common.TextFormat;
  * Opencast metrics endpoint
  */
 @Component(
-  property = {
-    "service.description=Metrics Endpoint",
-    "opencast.service.type=org.opencastproject.metrics",
-    "opencast.service.path=/metrics",
-    "opencast.service.jobproducer=false"
-  },
-  immediate = true,
-  service = MetricsExporter.class
+    property = {
+        "service.description=Metrics Endpoint",
+        "opencast.service.type=org.opencastproject.metrics",
+        "opencast.service.path=/metrics",
+        "opencast.service.jobproducer=false"
+    },
+    immediate = true,
+    service = MetricsExporter.class
 )
 @Path("")
-@RestService(name = "MetricsEndpoint",
+@RestService(
+    name = "MetricsEndpoint",
     title = "Metrics Endpoint",
     abstractText = "Opencast metrics endpoint.",
-    notes = { "The endpoints supports the <a href=https://openmetrics.io>OpenMetrics format</a>",
-              "This can be used by <a href=https://prometheus.io>Prometheus</a>"})
+    notes = {
+        "The endpoints supports the <a href=https://openmetrics.io>OpenMetrics format</a>",
+        "This can be used by <a href=https://prometheus.io>Prometheus</a>"
+    }
+)
 public class MetricsExporter {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(MetricsExporter.class);

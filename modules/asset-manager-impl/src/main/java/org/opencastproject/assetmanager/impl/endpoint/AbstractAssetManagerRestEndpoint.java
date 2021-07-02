@@ -115,7 +115,10 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
    */
   @POST
   @Path("add")
-  @RestQuery(name = "add", description = "Adds a media package to the asset manager. This method is deprecated in favor of method POST 'snapshot'.",
+  @RestQuery(
+      name = "add",
+      description = "Adds a media package to the asset manager. This method is deprecated in "
+          + "favor of method POST 'snapshot'.",
       restParameters = {
           @RestParameter(
               name = "mediapackage",
@@ -334,27 +337,27 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{mediaPackageID}/properties.json")
   @RestQuery(name = "getProperties",
-          description = "Get stored properties for an episode.",
-          returnDescription = "Properties as JSON",
-          pathParameters = {
-                  @RestParameter(
-                          name = "mediaPackageID",
-                          description = "the media package ID",
-                          isRequired = true,
-                          type = STRING)
-          }, restParameters = {
-                  @RestParameter(
-                          name = "namespace",
-                          description = "property namespace",
-                          isRequired = false,
-                          type = STRING)
-          },
-          responses = {
-                  @RestResponse(responseCode = SC_OK, description = "Media package returned"),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found"),
-                  @RestResponse(responseCode = SC_FORBIDDEN, description = "Not allowed to read media package."),
-                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "There has been an internal error.")
-          })
+      description = "Get stored properties for an episode.",
+      returnDescription = "Properties as JSON",
+      pathParameters = {
+          @RestParameter(
+              name = "mediaPackageID",
+              description = "the media package ID",
+              isRequired = true,
+              type = STRING)
+      }, restParameters = {
+          @RestParameter(
+              name = "namespace",
+              description = "property namespace",
+              isRequired = false,
+              type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Media package returned"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found"),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not allowed to read media package."),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "There has been an internal error.")
+      })
   public Response getProperties(@PathParam("mediaPackageID") final String mediaPackageId,
           @FormParam("namespace") final String namespace) {
     try {
@@ -396,22 +399,22 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{mediaPackageID}/workflowProperties.json")
   @RestQuery(name = "getWorkflowProperties",
-          description = "Get stored workflow properties for an episode.",
-          returnDescription = "Properties as JSON",
-          pathParameters = {
-                  @RestParameter(
-                          name = "mediaPackageID",
-                          description = "the media package ID",
-                          isRequired = true,
-                          type = STRING)
-          },
-          responses = {
-                  @RestResponse(responseCode = SC_OK, description = "Media package returned"),
-                  @RestResponse(responseCode = SC_OK, description = "Invalid parameters"),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found"),
-                  @RestResponse(responseCode = SC_FORBIDDEN, description = "Not allowed to read media package."),
-                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "There has been an internal error.")
-          })
+      description = "Get stored workflow properties for an episode.",
+      returnDescription = "Properties as JSON",
+      pathParameters = {
+          @RestParameter(
+              name = "mediaPackageID",
+              description = "the media package ID",
+              isRequired = true,
+              type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Media package returned"),
+          @RestResponse(responseCode = SC_OK, description = "Invalid parameters"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found"),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not allowed to read media package."),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "There has been an internal error.")
+      })
   public Response getWorkflowProperties(@PathParam("mediaPackageID") final String mediaPackageId) {
     try {
       final AQueryBuilder queryBuilder = getAssetManager().createQuery();
@@ -442,26 +445,26 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
   @POST
   @Path("{mediaPackageID}/workflowProperties")
   @RestQuery(name = "setWorkflowProperties",
-          description = "Set additional workflow properties",
-          pathParameters = {
-                  @RestParameter(
-                          name = "mediaPackageID",
-                          description = "the media package ID",
-                          isRequired = true,
-                          type = STRING)
-          },
-          restParameters = {
-                  @RestParameter(
-                          name = "properties",
-                          isRequired = true,
-                          type = STRING,
-                          description = "JSON object containing new properties")
-          },
-          responses = {
-                  @RestResponse(description = "Properties successfully set", responseCode = SC_CREATED),
-                  @RestResponse(description = "Invalid data", responseCode = SC_BAD_REQUEST),
-                  @RestResponse(description = "Internal error", responseCode = SC_INTERNAL_SERVER_ERROR) },
-          returnDescription = "Returned status code indicates success")
+      description = "Set additional workflow properties",
+      pathParameters = {
+          @RestParameter(
+              name = "mediaPackageID",
+              description = "the media package ID",
+              isRequired = true,
+              type = STRING)
+      },
+      restParameters = {
+          @RestParameter(
+              name = "properties",
+              isRequired = true,
+              type = STRING,
+              description = "JSON object containing new properties")
+      },
+      responses = {
+          @RestResponse(description = "Properties successfully set", responseCode = SC_CREATED),
+          @RestResponse(description = "Invalid data", responseCode = SC_BAD_REQUEST),
+          @RestResponse(description = "Internal error", responseCode = SC_INTERNAL_SERVER_ERROR) },
+      returnDescription = "Returned status code indicates success")
   public Response setWorkflowProperties(@PathParam("mediaPackageID") final String mediaPackageId,
           @FormParam("properties") final String propertiesJSON) {
     Map<String, String> properties;
