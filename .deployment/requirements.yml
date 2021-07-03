@@ -1,0 +1,16 @@
+---
+
+roles:
+  - lkiesow.dnf_autoupdate
+  - lkiesow.opencast_activemq
+  - lkiesow.opencast_certbot
+  - lkiesow.opencast_elasticsearch
+  - lkiesow.opencast_firewalld
+  - lkiesow.opencast_nginx
+  - lkiesow.opencast_postgresql
+  - lkiesow.opencast_repository
+  - lkiesow.opencast_selinux
+  - lkiesow.opencast_user
+
+collections:
+  - community.postgresql

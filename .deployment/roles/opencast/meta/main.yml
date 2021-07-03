@@ -1,0 +1,13 @@
+---
+
+dependencies:
+  - lkiesow.opencast_activemq
+  # configure firewalld before certbot
+  - lkiesow.opencast_firewalld
+  - lkiesow.opencast_certbot
+  - lkiesow.opencast_elasticsearch
+  - lkiesow.opencast_nginx
+  - lkiesow.opencast_postgresql
+  - lkiesow.opencast_repository
+  - lkiesow.opencast_selinux
+  - lkiesow.opencast_user

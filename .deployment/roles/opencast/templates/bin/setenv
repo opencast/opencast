@@ -1,0 +1,46 @@
+# Licensed to The Apereo Foundation under one or more contributor license
+# agreements. See the NOTICE file distributed with this work for additional
+# information regarding copyright ownership.
+#
+#
+# The Apereo Foundation licenses this file to you under the Educational
+# Community License, Version 2.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy of the License
+# at:
+#
+#   http://opensource.org/licenses/ecl2.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+# License for the specific language governing permissions and limitations under
+# the License.
+
+
+
+# Possible configuration options for the start script:
+#
+# export JAVA_HOME         # Location of Java installation
+# export JAVA_MIN_MEM      # Minimum memory for the JVM
+# export JAVA_MAX_MEM      # Maximum memory for the JVM
+# export JAVA_PERM_MEM     # Minimum perm memory for the JVM
+# export JAVA_MAX_PERM_MEM # Maximum perm memory for the JVM
+# export EXTRA_JAVA_OPTS   # Additional JVM options
+# export KARAF_HOME        # Karaf home folder
+# export KARAF_DATA        # Karaf data folder
+# export KARAF_BASE        # Karaf base folder
+# export KARAF_ETC         # Karaf etc  folder
+# export KARAF_OPTS        # Additional Karaf options
+# export KARAF_DEBUG       # Enable debug mode
+# export KARAF_REDIRECT    # Enable/set the std/err redirection when using bin/start
+
+export KARAF_DATA={{ opencast_data_path }}
+export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8"
+export JAVA_MAX_MEM="${JAVA_MAX_MEM:-3G}"
+export JAVA_PERM_MEM="${JAVA_PERM_MEM:-256M}"
+export KARAF_NOROOT=true
+
+# Mitigation for new Tesseract 4.x locking up the system
+export OMP_THREAD_LIMIT=1
+
+. "$DIRNAME/check_ports"

@@ -1,0 +1,76 @@
+---
+
+- name: stop opencast
+  service:
+    name: opencast
+    state: stopped
+  ignore_errors: true
+
+- name: remove previous deployment
+  file:
+    path: /opt/opencast-dist-allinone
+    state: absent
+
+- name: extract distribution
+  unarchive:
+    src: '{{ lookup("fileglob", "../../../build/opencast-dist-allinone-*.tar.gz") }}'
+    dest: /opt
+    owner: root
+    group: root
+
+- name: link installation from /opt/opencast
+  file:
+    src: /opt/opencast-dist-allinone
+    dest: /opt/opencast
+    owner: root
+    group: root
+    state: link
+
+# by making the directory writable, we allow Karaf to generate a jetty.xml dynamically
+- name: fix for missing configuration
+  file:
+    path: /opt/opencast/etc
+    owner: opencast
+    group: opencast
+
+- name: link to systemd unit
+  file:
+    src: /opt/opencast/docs/scripts/service/opencast.service
+    dest: /etc/systemd/system/opencast.service
+    owner: root
+    group: root
+    state: link
+
+- name: set ownership of storage
+  file:
+    path: '{{ opencast_data_path }}'
+    owner: opencast
+    group: opencast
+
+- name: install dependencies
+  package:
+    name:
+      - ffmpeg
+      - tesseract
+      - tesseract-langpack-deu
+      - hunspell
+      - nmap-ncat
+    state: present
+
+- name: configure opencast
+  template:
+    src: '{{ item }}'
+    dest: /opt/opencast/{{ item }}
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - etc/custom.properties
+    - bin/setenv
+
+- name: start and enable opencast service
+  systemd:
+    name: opencast.service
+    state: restarted
+    enabled: true
+    daemon_reload: true

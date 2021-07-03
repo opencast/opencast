@@ -1,0 +1,29 @@
+---
+
+# opencast system credentials
+opencast_admin_password: '{{ lookup("env", "OPENCAST_ADMIN_PASSWORD") }}'
+opencast_digest_password: '{{ lookup("env", "OPENCAST_DIGEST_PASSWORD") }}'
+
+# password used for the PostgreSQL database
+# we can use the defaults for everything else (local access only)
+# https://github.com/lkiesow/opencast_postgresql/#role-variables
+opencast_postgresql_password: '{{ lookup("env", "OPENCAST_POSTGRESQL_PASSWORD") }}'
+
+# email used fore registering with Let's Encrypt
+# https://github.com/lkiesow/opencast_certbot/#role-variables
+opencast_letsencrypt_email: '{{ lookup("env", "OPENCAST_LETSENCRYPT_EMAIL") }}'
+
+# repository configuration
+# https://github.com/lkiesow/opencast_repository#role-variables
+# enable repository (testing and release) for version 10
+opencast_version_major: 10
+opencast_repository_enabled_release: true
+opencast_repository_enabled_testing: true
+
+# storage/data path configuration
+# based on ETH server configuration
+opencast_data_path: /mnt/share
+
+# allow direct downloads via nginx
+# https://github.com/lkiesow/opencast_nginx#role-variables
+opencast_storage_downloads_path: '{{ opencast_data_path }}/opencast/downloads'
