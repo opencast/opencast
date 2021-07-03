@@ -12,11 +12,11 @@
   <div class="total"><span translate="STATISTICS.TOTAL"><!-- Total --></span> <span>{{ $ctrl.totalValue }}</span></div>
   <span class="preset" ng-if="$ctrl.timeChooseMode == 'year' || $ctrl.timeChooseMode == 'month'">
     <a class="navigation prev" ng-click="$ctrl.selectPrevious()" ></a>
-    <div>{{$ctrl.selectedName()}}</div>
+    <span>{{$ctrl.selectedName()}}</span>
     <a class="navigation next" ng-click="$ctrl.selectNext()"></a>
   </span>
   <span class="custom" ng-if="$ctrl.timeChooseMode == 'custom'">
-    <div class="range">
+    <span class="range">
       <span translate="STATISTICS.FROM"><!-- From --></span>
       <input datepicker
              type="text"
@@ -31,8 +31,8 @@
              placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}"
              ng-model="$ctrl.to"
              ng-change="$ctrl.change()" />
-    </div>
-    <div>
+    </span>
+    <span>
       <span translate="STATISTICS.GRANULARITY"></span>
       <select chosen
               data-width="'100px'"
@@ -42,7 +42,7 @@
           {{option.label}}
         </option>
       </select>
-    </div>
+    </span>
   </span>
   <canvas
     class="chart chart-bar"
