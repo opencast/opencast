@@ -174,7 +174,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not delete series: {}", e.getMessage());
+      logger.error("Could not delete series", e);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -219,7 +219,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not delete series: {}", e.getMessage());
+      logger.error("Could not delete property for series '{}'", seriesId, e);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -242,7 +242,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     try {
       return query.getResultList();
     } catch (Exception e) {
-      logger.error("Could not retrieve all series: {}", e.getMessage());
+      logger.error("Could not retrieve all series", e);
       throw new SeriesServiceDatabaseException(e);
     } finally {
       em.close();
@@ -271,7 +271,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not retrieve ACL for series '{}': {}", seriesId, e.getMessage());
+      logger.error("Could not retrieve ACL for series '{}'", seriesId, e);
       throw new SeriesServiceDatabaseException(e);
     } finally {
       em.close();
@@ -329,7 +329,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       tx.commit();
       return newSeries;
     } catch (Exception e) {
-      logger.error("Could not update series: {}", e.getMessage());
+      logger.error("Could not update series", e);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -373,7 +373,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not update series: {}", e.getMessage());
+      logger.error("Could not retrieve series", e);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -407,7 +407,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not update series: {}", e.getMessage());
+      logger.error("Could not retrieve properties of series '{}'", seriesId, e);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -445,7 +445,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not update series: {}", e.getMessage());
+      logger.error("Could not retrieve property '{}' of series '{}'", propertyName, seriesId, e);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -508,7 +508,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     try {
       serializedAC = AccessControlParser.toXml(accessControl);
     } catch (Exception e) {
-      logger.error("Could not serialize access control parameter: {}", e.getMessage());
+      logger.error("Could not serialize access control parameter", e);
       throw new SeriesServiceDatabaseException(e);
     }
     EntityManager em = emf.createEntityManager();
@@ -540,7 +540,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not update series: {}", e.getMessage());
+      logger.error("Could not store ACL for series '{}'", seriesId, e);
       if (tx.isActive()) {
         tx.rollback();
       }
