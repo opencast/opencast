@@ -6,6 +6,10 @@ on:
       - 'r/*'
       - 'develop'
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy-documentation:
     if: github.repository_owner == 'opencast'
