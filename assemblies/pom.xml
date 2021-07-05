@@ -33,6 +33,13 @@
       </modules>
     </profile>
     <profile>
+      <id>allinone</id>
+      <modules>
+        <module>karaf-features</module>
+        <module>dist-allinone</module>
+      </modules>
+    </profile>
+    <profile>
       <id>dev</id>
       <modules>
         <module>karaf-features</module>

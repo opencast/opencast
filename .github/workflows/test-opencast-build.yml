@@ -75,8 +75,12 @@ jobs:
           && github.repository == 'opencast/opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         run: |
-          mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-            clean install
+          mvn clean install -Pallinone  \
+            --batch-mode \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            -Dhttp.keepAlive=false \
+            -Dmaven.wagon.http.pool=false \
+            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
       - name: save version
         working-directory: build
