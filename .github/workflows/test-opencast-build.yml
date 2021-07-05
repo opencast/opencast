@@ -108,8 +108,7 @@ jobs:
 
       - name: show logs on failure
         if: ${{ failure() }}
-        working-directory: build/opencast-dist-allinone/data/log
-        run: cat opencast.log || true
+        run: cat build/opencast-dist-allinone/data/log/opencast.log || true
 
       - name: save version
         working-directory: build
