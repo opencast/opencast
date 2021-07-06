@@ -38,6 +38,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -152,6 +153,28 @@ public class ContributorsListProviderTest {
   }
 
   @Test
+  public void testUsernamesListWithExcludeUserProvider() {
+    Map<String, Object> configuration = new HashMap<>();
+    configuration.put("exclude.user.provider", "provider1");
+    contributorsListProvider.modified(configuration);
+
+    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, null);
+
+    Assert.assertFalse(list.containsKey(user1.getUsername()));
+    Assert.assertFalse(list.containsKey(user2.getUsername()));
+    Assert.assertFalse(list.containsKey(user3.getUsername()));
+
+    Assert.assertTrue(list.containsValue(user1.getName()));
+    Assert.assertFalse(list.containsValue(user2.getName()));
+    Assert.assertFalse(list.containsValue(user3.getUsername()));
+
+    Assert.assertTrue(list.containsKey("User 5"));
+    Assert.assertTrue(list.containsValue("User 5"));
+
+    Assert.assertEquals(2, list.size());
+  }
+
+  @Test
   public void testListSimple() throws ListProviderException {
     Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.DEFAULT, null);
 
@@ -165,6 +188,25 @@ public class ContributorsListProviderTest {
     Assert.assertTrue(list.containsValue("User 5"));
 
     Assert.assertEquals(3, list.size());
+  }
+
+  @Test
+  public void testListSimpleWithExcludeUserProvider() {
+    Map<String, Object> configuration = new HashMap<>();
+    configuration.put("exclude.user.provider", "provider1");
+    contributorsListProvider.modified(configuration);
+
+    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.DEFAULT, null);
+
+    Assert.assertTrue(list.containsKey(user1.getName()));
+    Assert.assertTrue(list.containsValue("User 1"));
+    Assert.assertFalse(list.containsKey(user2.getName()));
+    Assert.assertFalse(list.containsKey(user3.getName()));
+
+    Assert.assertTrue(list.containsKey("User 5"));
+    Assert.assertTrue(list.containsValue("User 5"));
+
+    Assert.assertEquals(2, list.size());
   }
 
   @Test
