@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: global
+  cancel-in-progress: false
+
 jobs:
   build:
     name: deploy tobira opencast
