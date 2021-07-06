@@ -74,6 +74,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -374,6 +375,7 @@ public class OaiPmhRepositoryTest {
     EasyMock.expect(item.getId()).andReturn(id).anyTimes();
     EasyMock.expect(item.isDeleted()).andReturn(deleted).anyTimes();
     EasyMock.expect(item.getMediaPackageXml()).andReturn(mpXml).anyTimes();
+    EasyMock.expect(item.getSetSpecs()).andReturn(new ArrayList<>()).anyTimes();
 
     SearchResultElementItem episodeDcElement = EasyMock.createNiceMock(SearchResultElementItem.class);
     EasyMock.expect(episodeDcElement.getType()).andReturn("catalog").anyTimes();

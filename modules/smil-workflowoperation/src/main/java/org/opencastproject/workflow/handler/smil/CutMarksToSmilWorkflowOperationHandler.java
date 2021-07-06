@@ -136,7 +136,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
             getConfig(operation, TARGET_SMIL_FLAVOR));
 
     String flavorNames = operation.getConfiguration(SOURCE_MEDIA_FLAVORS);
-    final List<MediaPackageElementFlavor> flavors = new ArrayList<MediaPackageElementFlavor>();
+    final List<MediaPackageElementFlavor> flavors = new ArrayList<>();
     for (String flavorName : asList(flavorNames)) {
       flavors.add(MediaPackageElementFlavor.parseFlavor(flavorName));
     }
@@ -146,17 +146,23 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     List<String> targetTags = asList(targetTagsOption);
 
     // Is there a catalog?
-    Catalog[] catalogs = mediaPackage.getCatalogs(jsonFlavor);
-    if (catalogs.length < 1) {
-      logger.warn("No catalogs in the source flavor. Skipping...");
+    MediaPackageElement[] cutMarksElements = mediaPackage.getAttachments(jsonFlavor);
+    if (cutMarksElements.length < 1) {
+      logger.debug("No cut marks found as attachment. Falling back to catalogs…");
+      cutMarksElements = mediaPackage.getCatalogs(jsonFlavor);
+    }
+    if (cutMarksElements.length < 1) {
+      logger.warn("No cut marks with source flavor {} found. Skipping…", jsonFlavor);
       return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
-    } else if (catalogs.length > 1) {
-      throw new WorkflowOperationException("More than one catalog with source flavor! Make sure there is only one.");
+    } else if (cutMarksElements.length > 1) {
+      // Remember Highlander? There can be only one!
+      throw new WorkflowOperationException(String.format(
+          "More than one cut marks element with source flavor %s found! Make sure there is only one.", jsonFlavor));
     }
 
     // Parse JSON
     List<Times> cutMarks;
-    Catalog jsonWithTimes = catalogs[0];
+    MediaPackageElement jsonWithTimes = cutMarksElements[0];
     try (BufferedReader reader = new BufferedReader(new FileReader(getMediaPackageElementPath(jsonWithTimes)))) {
       cutMarks = gson.fromJson(reader, timesListType);
     } catch (Exception e) {
@@ -181,7 +187,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     logger.info("Get tracks from media package");
     ArrayList<Track> tracksFromFlavors = new ArrayList<>();
     for (MediaPackageElementFlavor flavor : flavors) {
-      logger.debug("Trying to get Tracks from Flavor {}", flavor);
+      logger.debug("Trying to get tracks with flavor {}", flavor);
       TrackSelector trackSelector = new TrackSelector();
       trackSelector.addFlavor(flavor);
       Collection<Track> tracks = trackSelector.select(mediaPackage, false);
@@ -191,7 +197,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
 
     // Are there actually any tracks?
     if (tracksFromFlavors.isEmpty()) {
-      logger.warn("None of the given flavors contained a track. Skipping...");
+      logger.warn("No track with given flavors. Skipping…");
       return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 
