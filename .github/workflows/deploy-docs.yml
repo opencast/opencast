@@ -94,7 +94,7 @@ jobs:
         mv -v docs/guides/developer/site docs.opencast.org/"${GITHUB_REF#refs/heads/}/developer"
         mv -v docs/guides/.infrastructure/*.html docs.opencast.org/ || :
         mv -v docs/guides/.infrastructure/*.js docs.opencast.org/ || :
-        mv -rv docs/guides/.infrastructure/js/ docs.opencast.org/ || :
+        mv -v docs/guides/.infrastructure/js/ docs.opencast.org/ || :
         git log -n1 > docs.opencast.org/"${GITHUB_REF#refs/heads/}/commit"
 
     - name: commit new version
