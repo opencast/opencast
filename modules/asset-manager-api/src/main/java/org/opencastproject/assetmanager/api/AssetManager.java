@@ -77,12 +77,26 @@ public interface AssetManager {
   Opt<Asset> getAsset(Version version, String mpId, String mpeId);
 
   /**
-   * Get the asset store by id (local or remote).
+   * Get an asset store by id (local or remote).
    *
    * @param storeId the store id
-   * @return the asset store
+   * @return the asset store if it exists
    */
   Opt<AssetStore> getAssetStore(String storeId);
+
+  /**
+   * Get the remote asset stores as a list.
+   *
+   * @return a list of asset stores
+   */
+  List<AssetStore> getRemoteAssetStores();
+
+  /**
+   * Get the local asset store.
+   *
+   * @return the asset store
+   */
+  AssetStore getLocalAssetStore();
 
 
   /* Snapshots */

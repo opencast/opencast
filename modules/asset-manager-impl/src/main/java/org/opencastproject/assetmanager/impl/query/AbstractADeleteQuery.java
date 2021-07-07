@@ -109,11 +109,8 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
       final VersionImpl version = Conversions.toVersion(t.get(Q_SNAPSHOT.version));
       final DeletionSelector deletionSelector = DeletionSelector.delete(orgId, mpId, version);
       am.getLocalAssetStore().delete(deletionSelector);
-      if (am instanceof TieredStorageAssetManager) {
-        TieredStorageAssetManager tsam = (TieredStorageAssetManager) am;
-        for (String remoteStoreId : tsam.getRemoteAssetStoreIds()) {
-          tsam.getRemoteAssetStore(remoteStoreId).get().delete(deletionSelector);
-        }
+      for (AssetStore remoteStore : am.getRemoteAssetStores()) {
+        remoteStore.delete(deletionSelector);
       }
       deleteSnapshotHandler.handleDeletedSnapshot(mpId, version);
     }
