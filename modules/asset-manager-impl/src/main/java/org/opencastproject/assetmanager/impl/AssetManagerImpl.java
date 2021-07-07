@@ -131,6 +131,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -337,23 +338,25 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Override
   public Opt<AssetStore> getAssetStore(String storeId) {
-    if (getLocalAssetStore().getStoreType().equals(storeId)) {
-      return Opt.some(getLocalAssetStore());
+    if (assetStore.getStoreType().equals(storeId)) {
+      return Opt.some(assetStore);
     } else {
-      return getRemoteAssetStore(storeId);
+      if (remoteStores.containsKey(storeId)) {
+        return Opt.some(remoteStores.get(storeId));
+      } else {
+        return Opt.none();
+      }
     }
   }
 
+  @Override
   public AssetStore getLocalAssetStore() {
     return assetStore;
   }
 
-  public Opt<AssetStore> getRemoteAssetStore(String id) {
-    if (remoteStores.containsKey(id)) {
-      return Opt.some(remoteStores.get(id));
-    } else {
-      return Opt.none();
-    }
+  @Override
+  public List<AssetStore> getRemoteAssetStores() {
+    return new ArrayList<>(remoteStores.values());
   }
 
   /** Snapshots */
