@@ -73,8 +73,12 @@ jobs:
         if: matrix.java == 11
         working-directory: assemblies
         run: |
-          mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-            clean install
+          mvn clean install -Pallinone  \
+            --batch-mode \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            -Dhttp.keepAlive=false \
+            -Dmaven.wagon.http.pool=false \
+            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
       - name: prepare allinone distribution
         if: matrix.java == 11
@@ -108,8 +112,7 @@ jobs:
 
       - name: show logs on failure
         if: ${{ failure() }}
-        working-directory: build/opencast-dist-allinone/data/log
-        run: cat opencast.log || true
+        run: cat build/opencast-dist-allinone/data/log/opencast.log || true
 
       - name: save version
         working-directory: build

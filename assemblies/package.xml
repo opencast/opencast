@@ -26,6 +26,7 @@
       <outputDirectory></outputDirectory>
       <excludes>
         <exclude>*.append</exclude>
+        <exclude>build.xml</exclude>
       </excludes>
     </fileSet>
 
@@ -73,7 +74,7 @@
       <source>target/assembly/bin/karaf</source>
       <outputDirectory>bin</outputDirectory>
       <destName>start-opencast</destName>
-      <fileMode>0744</fileMode>
+      <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/assembly/bin/inc</source>
