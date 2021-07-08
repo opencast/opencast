@@ -111,6 +111,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String CHECK_AVAILABILITY = "check-availability";
   private static final String STRATEGY = "strategy";
   private static final String MERGE_FORCE_FLAVORS = "merge-force-flavors";
+  private static final String LIST_ELEMENTS = "list-elements";
 
   private static final String MERGE_FORCE_FLAVORS_DEFAULT = "dublincore/*,security/*";
 
@@ -211,6 +212,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             StringUtils.defaultString(op.getConfiguration(MERGE_FORCE_FLAVORS), MERGE_FORCE_FLAVORS_DEFAULT));
 
     boolean checkAvailability = option(op.getConfiguration(CHECK_AVAILABILITY)).bind(trimToNone).map(toBool)
+            .getOrElse(true);
+
+    boolean publishElements = option(op.getConfiguration(LIST_ELEMENTS)).bind(trimToNone).map(toBool)
             .getOrElse(true);
 
     String[] sourceDownloadTags = StringUtils.split(downloadSourceTags, ",");
@@ -327,6 +331,23 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         throw new WorkflowOperationException("One of the distribution jobs did not complete successfully");
       }
 
+      // Prepare published elements to be added
+      Set<MediaPackageElement> mediaPackageElements = new HashSet<>();
+      if (publishElements) {
+        for (Job job : jobs) {
+          try {
+            mediaPackageElements.addAll(MediaPackageElementParser.getArrayFromXml(job.getPayload()));
+          } catch (MediaPackageException e) {
+            throw new WorkflowOperationException(String.format(
+                    "Job '%s' returned payload (%s) that could not be parsed to media package elements", job,
+                    job.getPayload()), e);
+          }
+        }
+      }
+
+
+
+
       logger.debug("Distribute of mediapackage {} completed", mediaPackage);
 
       String engageUrlString = null;
@@ -379,6 +400,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         // Create new distribution element
         Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_ID,
                 engageUri, MimeTypes.parseMimeType("text/html"));
+
+        // Add published elements
+        for (MediaPackageElement element : mediaPackageElements) {
+          element.setIdentifier(null);
+          PublicationImpl.addElementToPublication(publicationElement, element);
+        }
+
         mediaPackage.add(publicationElement);
 
         // create publication URI for streaming
