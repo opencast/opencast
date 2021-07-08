@@ -91,6 +91,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -640,10 +641,11 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
           @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
           @RestParameter(description = "Access control list in XACML or JSON form", isRequired = false, name = "acl", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Tag of the next media file", isRequired = false, name = "tag", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) },
       bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
       responses = {
-          @RestResponse(description = "Ingest successfull. Returns workflow instance as xml", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Ingest successful. Returns workflow instance as xml", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Ingest failed due to invalid requests.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the log files",
               responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
@@ -719,6 +721,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
           @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
           @RestParameter(description = "Access control list in XACML or JSON form", isRequired = false, name = "acl", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Tag of the next media file", isRequired = false, name = "tag", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) },
       bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
       responses = {
@@ -730,6 +733,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   public Response addMediaPackage(@Context HttpServletRequest request, @PathParam("wdID") String wdID) {
     logger.trace("add mediapackage as multipart-form-data with workflow definition id: {}", wdID);
     MediaPackageElementFlavor flavor = null;
+    List<String> tags = new ArrayList<>();
     try {
       MediaPackage mp = ingestService.createMediaPackage();
       DublinCoreCatalog dcc = null;
@@ -756,6 +760,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               } catch (IllegalArgumentException e) {
                 return badRequest(String.format("Could not parse flavor '%s'", value), e);
               }
+              /* “Remember” the tags for the next media. */
+            } else if ("tag".equals(fieldName)) {
+              tags.add(value);
               /* Fields for DC catalog */
             } else if (dcterms.contains(fieldName)) {
               if ("identifier".equals(fieldName)) {
@@ -838,7 +845,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               } catch (java.net.URISyntaxException e) {
                 return badRequest(String.format("Invalid URI %s for media", value), e);
               }
-              ingestService.addTrack(mediaUrl, flavor, mp);
+              ingestService.addTrack(mediaUrl, flavor, tags.toArray(new String[0]), mp);
+              tags.clear();
               hasMedia = true;
 
             } else {
@@ -852,7 +860,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               /* A flavor has to be specified in the request prior the video file */
               return badRequest("A flavor has to be specified in the request prior to the content BODY", null);
             }
-            ingestService.addTrack(item.openStream(), item.getName(), flavor, mp);
+            ingestService.addTrack(item.openStream(), item.getName(), flavor, tags.toArray(new String[0]), mp);
+            tags.clear();
             hasMedia = true;
           }
         }
