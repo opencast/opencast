@@ -325,6 +325,14 @@ public class TobiraApi {
             Jsons.p("updated", event.getModified().getTime())
         );
       } else {
+        // Find a suitable thumbnail. This certainly has to be improved in the future.
+        final String thumbnail = Arrays.stream(event.getMediaPackage().getAttachments())
+            .filter(a -> a.getFlavor().getSubtype().equals("player+preview"))
+            .map(a -> a.getURI().toString())
+            .findFirst()
+            .orElse(null);
+
+        // Obtain JSON array of tracks.
         final List<Jsons.Val> tracks = Arrays.stream(event.getMediaPackage().getTracks())
             .map(track -> {
               VideoStream[] videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
@@ -359,6 +367,7 @@ public class TobiraApi {
             Jsons.p("created", event.getDcCreated().getTime()),
             Jsons.p("creator", event.getDcCreator()),
             Jsons.p("duration", event.getDcExtent() < 0 ? null : event.getDcExtent()),
+            Jsons.p("thumbnail", thumbnail),
             Jsons.p("tracks", Jsons.arr(tracks)),
             Jsons.p("updated", event.getModified().getTime())
         );
