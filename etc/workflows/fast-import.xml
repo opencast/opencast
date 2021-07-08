@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>fast-import</id>
+  <title>Import Mediapackage and Publish without reencode</title>
+  <tags>
+  </tags>
+  <description>
+  A minimal Workflow that only publishes a Mediapackage
+  </description>
+
+  <operations>
+
+    <!-- Ingest elements from external working file repositories and file servers -->
+
+    <operation
+      id="ingest-download"
+      description="Ingesting external elements">
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Apply ACL from series to the mediapackage -->
+
+    <operation
+      id="series"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Applying access control entries from series">
+      <configurations>
+        <configuration key="apply-acl">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish to engage player -->
+
+    <operation
+      id="publish-engage"
+      max-attempts="2"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Publishing to Engage">
+      <configurations>
+        <configuration key="download-source-flavors">*/*</configuration>
+        <configuration key="check-availability">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+      id="snapshot"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Archiving">
+      <configurations>
+        <configuration key="source-flavors">*/*</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Clean up the working file repository -->
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="delete-external">false</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.IMPORTING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.IMPORTING</state-mapping>
+  </state-mappings>
+
+</definition>
