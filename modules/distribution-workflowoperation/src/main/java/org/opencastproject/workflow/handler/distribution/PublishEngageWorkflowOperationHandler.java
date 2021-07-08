@@ -345,9 +345,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         }
       }
 
-
-
-
       logger.debug("Distribute of mediapackage {} completed", mediaPackage);
 
       String engageUrlString = null;
