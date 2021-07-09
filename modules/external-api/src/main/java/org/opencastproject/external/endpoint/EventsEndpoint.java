@@ -404,7 +404,7 @@ public class EventsEndpoint implements ManagedService {
         if (track.getIdentifier() != null)
           fields.add(f("identifier", v(track.getIdentifier())));
         if (track.getMimeType() != null)
-          fields.add(f("identifier", v(track.getMimeType().toString())));
+          fields.add(f("mimetype", v(track.getMimeType().toString())));
         fields.add(f("size", v(track.getSize())));
         if (track.getStreams() != null) {
           List<Field> streams = new ArrayList<>();
