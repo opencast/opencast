@@ -1,7 +1,7 @@
 Partial Import Operation
 ========================
 
-ID: `animate`
+ID: `partial-import`
 
 
 Description
@@ -60,7 +60,9 @@ records three sources:
 
 While the capture agent internally triggers the recording for all sources at the same time, the actual recording of the
 individual sources might not necessarily start at the exact same time, e.g. due to latency of the recording
-devices.</br> Also, while recording, a watch dog in our example capture agent recognizes that for whatever reason, the
+devices.
+
+Also, while recording, a watch dog in our example capture agent recognizes that for whatever reason, the
 recording of the sources had stopped and restarted again several times - resulting in multiple audio and/or video files
 per source.
 

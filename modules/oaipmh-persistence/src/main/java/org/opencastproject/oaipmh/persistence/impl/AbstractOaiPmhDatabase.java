@@ -27,8 +27,12 @@ import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseException;
 import org.opencastproject.oaipmh.persistence.OaiPmhElementEntity;
 import org.opencastproject.oaipmh.persistence.OaiPmhEntity;
+import org.opencastproject.oaipmh.persistence.OaiPmhSetDefinition;
+import org.opencastproject.oaipmh.persistence.OaiPmhSetDefinitionFilter;
 import org.opencastproject.oaipmh.persistence.Query;
+import org.opencastproject.oaipmh.persistence.QueryBuilder;
 import org.opencastproject.oaipmh.persistence.SearchResult;
+import org.opencastproject.oaipmh.persistence.SearchResultElementItem;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.MimeTypes;
@@ -45,8 +49,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -237,15 +243,22 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
   @Override
   public SearchResult search(Query query) {
     try {
+      final int chunkSize = query.getLimit().getOrElse(-1);
       dbAccessLock.readLock().lock();
-      return searchInternal(query);
+      return searchInternal(query, chunkSize);
     } finally {
       dbAccessLock.readLock().unlock();
     }
   }
 
-  private SearchResult searchInternal(Query query) {
+  private SearchResult searchInternal(Query query, int chunkSize) {
     EntityManager em = null;
+    final String requestSetSpec = query.getSetSpec().getOrElseNull();
+    final List<SearchResultItem> filteredItems = new ArrayList<>();
+    Date lastDate = new Date();
+    long resultSize;
+    long resultOffset;
+    long resultLimit;
     try {
       em = getEmf().createEntityManager();
       CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -265,29 +278,154 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
         predicates.add(cb.equal(c.get("series"), p));
       for (Boolean p : query.isDeleted())
         predicates.add(cb.equal(c.get("deleted"), p));
-      if (!query.isSubsequentRequest()) {
-        for (Date p : query.getModifiedAfter())
-          predicates.add(cb.greaterThanOrEqualTo(c.get("modificationDate").as(Date.class), p));
-      } else {
+      if (query.isSubsequentRequest()) {
         for (Date p : query.getModifiedAfter())
           predicates.add(cb.greaterThan(c.get("modificationDate").as(Date.class), p));
+      } else {
+        for (Date p : query.getModifiedAfter())
+          predicates.add(cb.greaterThanOrEqualTo(c.get("modificationDate").as(Date.class), p));
       }
       for (Date p : query.getModifiedBefore())
         predicates.add(cb.lessThanOrEqualTo(c.get("modificationDate").as(Date.class), p));
 
-      q.where(cb.and(predicates.toArray(new Predicate[predicates.size()])));
+      q.where(cb.and(predicates.toArray(new Predicate[0])));
       q.orderBy(cb.asc(c.get("modificationDate")));
 
       TypedQuery<OaiPmhEntity> typedQuery = em.createQuery(q);
-      for (int maxResult : query.getLimit())
-        typedQuery.setMaxResults(maxResult);
-      for (int startPosition : query.getOffset())
+      if (chunkSize > 0) {
+        typedQuery.setMaxResults(chunkSize);
+      }
+      for (int startPosition : query.getOffset()) {
+        logger.warn("I'm pretty sure things break if this is used");
         typedQuery.setFirstResult(startPosition);
-      return createSearchResult(typedQuery);
+      }
+
+      SearchResult result = createSearchResult(typedQuery);
+
+      if (requestSetSpec != null) {
+        Optional<OaiPmhSetDefinition> requestedSetDef = query.getSetDefinitions().stream().filter(def -> StringUtils.equals(def.getSetSpec(), requestSetSpec)).findFirst();
+        // return empty result if there is no definition for a requested setSpec
+        if (!requestedSetDef.isPresent()) {
+          return new SearchResultImpl(result.getOffset(), result.getLimit(), new ArrayList<>());
+        }
+      }
+
+      for (SearchResultItem item : result.getItems()) {
+        for (OaiPmhSetDefinition setDef : query.getSetDefinitions()) {
+          if (matchSetDef(setDef, item.getElements())) {
+            item.addSetSpec(setDef.getSetSpec());
+          }
+        }
+        if (requestSetSpec == null || item.getSetSpecs().contains(requestSetSpec)) {
+          filteredItems.add(item);
+        }
+      }
+      resultSize = result.size();
+      resultOffset = result.getOffset();
+      resultLimit = result.getLimit();
+      if (requestSetSpec != null && resultSize == chunkSize) {
+        lastDate = result.getItems().get(result.getItems().size() - 1).getModificationDate();
+      }
     } finally {
       if (em != null)
         em.close();
     }
+
+    if (requestSetSpec != null) {
+      // only continue if we got the amount of results we requested in the first place
+      // otherwise, we have no more results and it does not make any sense to continue
+      logger.debug("result.size={}, chunk.size={}", resultSize, chunkSize);
+      if (resultSize == chunkSize) {
+        final int limit = query.getLimit().getOrElse(-1);
+        logger.debug("filteredItems.size={}, query.limit={}", filteredItems.size(), limit);
+        if (filteredItems.size() == 0 || filteredItems.size() < limit) {
+          // No results left after filtering. Automatically request the next range to avoid returning empty results.
+          QueryBuilder subQuery = QueryBuilder.query(query).modifiedAfter(lastDate)
+                  .limit(limit - filteredItems.size())
+                  .subsequentRequest(true);
+          filteredItems.addAll(searchInternal(subQuery.build(), chunkSize).getItems());
+        }
+      }
+    }
+
+    if (query.getLimit().isSome() && filteredItems.size() > query.getLimit().get()) {
+      logger.debug("limit items");
+      return new SearchResultImpl(resultOffset, query.getLimit().get(),
+              filteredItems.subList(0, query.getLimit().get()));
+    }
+    return new SearchResultImpl(resultOffset, resultLimit, filteredItems);
+  }
+
+  /**
+   * Returns true if all set definition filters matches.
+   *
+   * @param setDef set definition to test
+   * @param elements media package elements to test
+   * @return returns true if all set definition filters matches, otherwise false
+   */
+  protected boolean matchSetDef(OaiPmhSetDefinition setDef, List<SearchResultElementItem> elements) {
+    // all filters should match
+    for (OaiPmhSetDefinitionFilter filter : setDef.getFilters()) {
+      if (!matchSetDefFilter(filter, elements)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Returns true if any filter criterion matches
+   *
+   * @param filter filter to test
+   * @param elements media package elements to test filter criteria on
+   * @return true if any filter criteria matches, otherwise false
+   */
+  private boolean matchSetDefFilter(OaiPmhSetDefinitionFilter filter, List<SearchResultElementItem> elements) {
+    // At least one filter criterion should match
+    for (String criterion : filter.getCriteria().keySet()) {
+      if (StringUtils.equals(OaiPmhSetDefinitionFilter.CRITERION_CONTAINS, criterion)) {
+        for (SearchResultElementItem element : elements) {
+          if (!StringUtils.equals(filter.getFlavor(), element.getFlavor())) {
+            continue;
+          }
+          for (String criterionValue : filter.getCriteria().get(criterion)) {
+            if (StringUtils.contains(element.getXml(), criterionValue)) {
+              return true;
+            }
+          }
+        }
+      } else if (StringUtils.equals(OaiPmhSetDefinitionFilter.CRITERION_CONTAINSNOT, criterion)) {
+        for (SearchResultElementItem element : elements) {
+          if (!StringUtils.equals(filter.getFlavor(), element.getFlavor())) {
+            continue;
+          }
+          for (String criterionValue : filter.getCriteria().get(criterion)) {
+            if (!StringUtils.contains(element.getXml(), criterionValue)) {
+              return true;
+            }
+          }
+        }
+      } else if (StringUtils.equals(OaiPmhSetDefinitionFilter.CRITERION_MATCH, criterion)) {
+        for (String criterionValue : filter.getCriteria().get(criterion)) {
+          Pattern matchPattern = null; // wait with initialization until we found an element to test
+          for (SearchResultElementItem element : elements) {
+            if (!StringUtils.equals(filter.getFlavor(), element.getFlavor())) {
+              continue;
+            }
+            // initialize regex pattern once and only if we need it (for performance reasons)
+            if (matchPattern == null) {
+              matchPattern = Pattern.compile(criterionValue);
+            }
+            if (matchPattern.matcher(element.getXml()).find()) {
+              return true;
+            }
+          }
+        }
+      } else {
+        logger.warn("Unknown OAI-PMH set filter criterion '{}'. Ignore it.", criterion);
+      }
+    }
+    return false;
   }
 
   /**
