@@ -36,6 +36,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 
+
+
 /**
  * LTI functions from tsugi-util to send content items
  */
@@ -119,6 +121,7 @@ public final class LtiUtils {
     OAuthConsumer cons = new OAuthConsumer("about:blank", oauthConsumerKey,
         oauthConsumerSecret, null);
     OAuthAccessor acc = new OAuthAccessor(cons);
+    Map<String, String> nextProp = new HashMap<String, String>();
     try {
       oam.addRequiredParameters(acc);
       String baseString = OAuthSignatureMethod.getBaseString(oam);
@@ -129,22 +132,21 @@ public final class LtiUtils {
 
       List<Map.Entry<String, String>> params = oam.getParameters();
 
-      Map<String, String> nextProp = new HashMap<String, String>();
       // Convert to Map<String, String>
       for (final Map.Entry<String, String> entry : params) {
         nextProp.put(entry.getKey(), entry.getValue());
       }
-      return nextProp;
     } catch (net.oauth.OAuthException e) {
       logger.warn("BasicLTIUtil.signProperties OAuth Exception {}", e.getMessage());
-      throw new Error(e);
+      e.printStackTrace();
     } catch (java.io.IOException e) {
       logger.warn("BasicLTIUtil.signProperties IO Exception {}", e.getMessage());
-      throw new Error(e);
+      e.printStackTrace();
     } catch (java.net.URISyntaxException e) {
       logger.warn("BasicLTIUtil.signProperties URI Syntax Exception {}", e.getMessage());
-      throw new Error(e);
+      e.printStackTrace();
     }
+    return nextProp;
   }
 
 
