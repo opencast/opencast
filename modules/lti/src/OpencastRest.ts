@@ -216,11 +216,15 @@ export async function searchEpisode(
             languageShortCode: result.dcLanguage,
             licenseKey: result.dcLicense,
             mediapackage: result.mediapackage !== undefined ? {
-                creators: result.mediapackage.creators !== undefined ? result.mediapackage.creators.creator : [],
+                creators: result.mediapackage.creators !== undefined
+                    ? Array.isArray(result.mediapackage.creators.creator)
+                        ? result.mediapackage.creators.creator
+                        : [result.mediapackage.creators.creator]
+                    : [],
                 attachments: Array.from(
-                    Array.isArray(result.mediapackage.attachments.attachment) ?
-                        result.mediapackage.attachments.attachment :
-                        Array.of(result.mediapackage.attachments.attachment),
+                    Array.isArray(result.mediapackage.attachments.attachment)
+                        ? result.mediapackage.attachments.attachment
+                        : Array.of(result.mediapackage.attachments.attachment),
                     (attachment: any) => ({
                         type: attachment.type,
                         url: attachment.url
@@ -284,7 +288,7 @@ export async function uploadFile(
 }
 
 export async function postDeeplinkData(
-    contentItems?: string,
+    contentItems: string,
     contentItemReturnUrl?: string,
     consumerKey?: string,
     data?: string,
@@ -302,9 +306,7 @@ export async function postDeeplinkData(
     if(test !== undefined){
         formdata.append("test", test);
     }
-    if(contentItems !== undefined){
-        formdata.append("content_items", contentItems);
-    }
+    formdata.append("content_items", contentItems);
     return axios.post(
         hostAndPort() + "/lti/ci",
         formdata,
