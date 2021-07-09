@@ -643,6 +643,10 @@ __Response__
     },
     "checksum": "ac0e3138be69927c0fb6ff4ea7465df0 (md5)",
     "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": false,
+    "is_live": false,
     "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/ea9a6cd8-85d2-4fb5-8571-29dc8b9c5940\/5\/presenter.mp4",
     "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/ea9a6cd8-85d2-4fb5-8571-29dc8b9c5940\/5\/presenter.mp4",
     "tags": [
@@ -675,6 +679,10 @@ __Response__
     },
     "checksum": "e6a5fad8100fd5b09920e6a6dddc44dc (md5)",
     "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": false,
+    "is_live": false,
     "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/28fba154-cdbd-4bd8-b6b7-829ad1ea6746\/5\/84066_segment_0_480p.mp4",
     "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/28fba154-cdbd-4bd8-b6b7-829ad1ea6746\/5\/84066_segment_0_480p.mp4",
     "tags": [
@@ -708,6 +716,10 @@ __Response__
     },
     "checksum": "6f547c80f9cc4166ccea52192ce82045 (md5)",
     "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": false,
+    "is_live": false,
     "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/3f359b10-da82-4834-8e65-741bc62dcdaf\/5\/84066_segment_1_720p.mp4",
     "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/3f359b10-da82-4834-8e65-741bc62dcdaf\/5\/84066_segment_1_720p.mp4",
     "tags": [
@@ -757,6 +769,10 @@ __Response__
     },
     "checksum": "053aaad6a0ada363e17c787e78a2b349 (md5)",
     "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": true,
+    "is_live": false,
     "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/db9e1496-5044-4451-9070-18399e20791a\/5\/presenter.m3u8",
     "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/db9e1496-5044-4451-9070-18399e20791a\/5\/presenter.m3u8",
     "tags": [
@@ -789,6 +805,10 @@ __Response__
     },
     "checksum": "d7109c109cf955b2d6e9ebdf0ad07f6c (md5)",
     "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": false,
+    "is_live": false,
     "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/dfd0a8a6-be37-46fa-993e-997b0aad064f\/5\/84066_variant_0.m3u8",
     "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/dfd0a8a6-be37-46fa-993e-997b0aad064f\/5\/84066_variant_0.m3u8",
     "tags": [
@@ -821,6 +841,10 @@ __Response__
     },
     "checksum": "720c93ec46bba9fa14cf1b5761b0458e (md5)",
     "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": false,
+    "is_live": false,
     "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/d94e2fbc-8f65-4b21-b7b9-cf2dcee43eeb\/5\/84066_variant_1.m3u8",
     "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/d94e2fbc-8f65-4b21-b7b9-cf2dcee43eeb\/5\/84066_variant_1.m3u8",
     "tags": [
@@ -1058,6 +1082,8 @@ __Response__
       ],
       "has_audio":true,
       "has_video":true,
+      "is_master_playlist": false,
+      "is_live": false,
       "duration":3648,
       "description":"Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p, 640x360, 447 kb/s, 25 fps, 25"
     },
@@ -1073,6 +1099,8 @@ __Response__
       ],
       "has_audio":true,
       "has_video":false,
+      "is_master_playlist": false,
+      "is_live": false,
       "duration":3648,
       "description":"aac (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 96 kb/s (default)"
     }
