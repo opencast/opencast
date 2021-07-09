@@ -376,6 +376,10 @@ public class EventsEndpoint implements ManagedService {
 
   @GET
   @Path("{eventId}/media")
+  @RestQuery(name = "geteventmedia", description = "Returns media tracks of specific single event.", returnDescription = "", pathParameters = {
+      @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
+      @RestResponse(description = "The event's media is returned.", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventMedia(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
     ArrayList<TrackImpl> tracks = new ArrayList<>();
