@@ -336,10 +336,7 @@ public class LtiServlet extends HttpServlet implements ManagedService {
     resp.setContentType("text/html");
 
     // whether to show debug info before sending content items to tool consumer
-    boolean test = false;
-    if ("true".equals(req.getParameter(TEST))) {
-      test = true;
-    }
+    final boolean test = "true".equals(req.getParameter(TEST));
 
     resp.getWriter().write(LtiUtils.postLaunchHTML(properties, returnUrl, "Send content to LMS", test, null));
   }
