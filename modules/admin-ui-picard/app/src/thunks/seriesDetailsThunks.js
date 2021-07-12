@@ -138,40 +138,44 @@ export const fetchNamesOfPossibleThemes = () => async dispatch => {
 
 // update series with new metadata
 export const updateSeriesMetadata = (id, values) => async (dispatch, getState) => {
-    let metadataInfos = getSeriesDetailsMetadata(getState());
+    try {
+        let metadataInfos = getSeriesDetailsMetadata(getState());
 
-    let fields = [];
+        let fields = [];
+        let updatedFields = [];
 
-    metadataInfos.fields.forEach(field => {
-        if (field.value !== values[field.id]) {
-            let updatedField = {
-                ...field,
-                value: values[field.id]
+        metadataInfos.fields.forEach(field => {
+            if (field.value !== values[field.id]) {
+                let updatedField = {
+                    ...field,
+                    value: values[field.id]
+                }
+                updatedFields.push(updatedField);
+                fields.push(updatedField);
+            } else {
+                fields.push({...field});
             }
-            fields.concat(updatedField);
-        }
-    });
-
-    let data = [{
-        flavor: metadataInfos.flavor,
-        title: metadataInfos.title,
-        fields: fields
-    }];
-
-    axios.put(`/admin-ng/series/${id}/metadata`, JSON.stringify(data))
-        .then(response => {
-            // load data of response in series details redux store
-            const metadataResponse = response.data;
-
-
-            const seriesMetadata = transformMetadataCollection(metadataResponse[0]);
-
-            dispatch(loadSeriesDetailsMetadataSuccess(seriesMetadata));
-
-        })
-        .catch(response => {
-            console.log(response);
         });
+
+        let data = new URLSearchParams();
+        data.append("metadata",JSON.stringify([{
+            flavor: metadataInfos.flavor,
+            title: metadataInfos.title,
+            fields: updatedFields
+        }]));
+
+        await axios.put(`/admin-ng/series/${id}/metadata`, data);
+
+        // updated metadata in series details redux store
+        let seriesMetadata = {
+            flavor: metadataInfos.flavor,
+            title: metadataInfos.title,
+            fields: fields
+        };
+        dispatch(loadSeriesDetailsMetadataSuccess(seriesMetadata));
+    } catch (e) {
+        console.log(e);
+    }
 }
 
 export const updateSeriesTheme = (id, values) => async (dispatch, getState) => {
