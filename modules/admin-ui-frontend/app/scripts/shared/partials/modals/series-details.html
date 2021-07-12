@@ -218,17 +218,15 @@
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
-                                   ng-disabled="::aclLocked"
                                    ng-model="policy.read"
                                    ng-change="accessSave()"
-                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked"/>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
-                                   ng-disabled="::aclLocked"
                                    ng-model="policy.write"
                                    ng-change="accessSave()"
-                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked"/>
                           </td>
                           <td class="fit editable" ng-if="hasActions">
                             <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"

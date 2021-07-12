@@ -418,7 +418,8 @@
               <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
               <td>
                 <label ng-repeat="inputMethod in wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs">
-                  <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputMethods[inputMethod.id]" tabindex="20">{{ inputMethod.id | translate }}</input>
+                  <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputMethods[inputMethod.id]" tabindex="20" />
+                  {{ inputMethod.id | translate }}
                 </label>
               </td>
             </tr>
@@ -474,7 +475,6 @@
           </select>
 		  <div class="collapsible-box" input="wizard.step.workflowDescription" maxheight=45></div>
           <div id="new-event-workflow-configuration"
-               class="checkbox-container"
                ng-click="wizard.step.save()"
                ng-bind-html="wizard.step.workflowConfiguration"
                class="obj-container">
