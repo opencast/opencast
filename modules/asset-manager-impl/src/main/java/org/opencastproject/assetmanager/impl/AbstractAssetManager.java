@@ -383,7 +383,6 @@ public abstract class AbstractAssetManager implements AssetManager {
     try {
       return p.get1();
     } catch (Exception e) {
-      logger.error("An error occurred", e);
       throw unwrapExceptionUntil(AssetManagerException.class, e).getOr(new AssetManagerException(e));
     }
   }
