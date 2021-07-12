@@ -50,6 +50,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -124,7 +125,9 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
   @Override
   public List<DublinCoreValue> get(EName property) {
     RequireUtil.notNull(property, "property");
-    return mlist(getValuesAsList(property)).map(toDublinCoreValue).value();
+    return getValuesAsList(property).stream()
+            .map(this::toDublinCoreValue)
+            .collect(Collectors.toList());
   }
 
   private DublinCoreValue toDublinCoreValue(CatalogEntry e) {
