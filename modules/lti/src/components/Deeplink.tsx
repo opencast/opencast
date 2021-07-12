@@ -6,7 +6,7 @@ import { parsedQueryString } from "../utils";
 import { withTranslation, WithTranslation } from "react-i18next";
 import Pagination from "react-js-pagination";
 import * as i18next from "i18next";
-import { Container, Tabs, Tab, Form, Button, Col } from 'react-bootstrap';
+import { Container, Tabs, Tab, Form, Button, Col, Row } from 'react-bootstrap';
 import InnerHTML from 'dangerously-set-html-content'
 import "../App.css";
 import './Deeplink.css';
@@ -155,7 +155,9 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
 
     hasSeriesParameters() {
         const qs = parsedQueryString();
-        return qs.series !== '' || qs.series_name !== '';
+        /* eslint-disable */
+        return qs.series !== undefined || qs.series_name !== undefined;
+        /* eslint-enable */
     }
 
     populateData(title: string, image: string, created: string, tool: string) {
@@ -248,7 +250,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
             {this.state.populatedData !== undefined && <InnerHTML html={this.state.populatedData} />}
             <Tabs defaultActiveKey="episodes">
                 <Tab eventKey="episodes" title="Episodes">
-                    <Form.Row id="episodes-searchfield" className="searchfield">
+                    <Row id="episodes-searchfield" className="searchfield">
                         <Col>
                             <Form.Control type="text" placeholder="Filter" value={this.state.episodesFilter} onChange={(e) => {
                                 this.setState({
@@ -262,8 +264,9 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                                 Refresh list
                             </Button>
                         </Col>
-                    </ Form.Row>
+                    </Row>
                     <Container fluid id="episodes-results" className="p-0">
+                    <Row className="row-cols-auto">
                     { this.state.searchEpisodeResults !== undefined ? this.state.searchEpisodeResults.total !== 0 ? this.state.searchEpisodeResults.results.map((episode) => {
                         return (
                             <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 float-left">
@@ -291,6 +294,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                                 </div>
                             </div>
                     )}) : <p className="ml-2 pl-1">No episodes found.</p> : <Loading t={this.props.t} />}
+                    </Row>
                     </Container>
                     <div className="clearfix" />
                     <DeeplinkPaging
@@ -300,7 +304,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                     />
                 </Tab>
                 { !this.hasSeriesParameters() && <Tab eventKey="series" title="Series">
-                    <Form.Row id="series-searchfield" className="searchfield">
+                    <Row id="series-searchfield" className="searchfield">
                         <Col>
                             <Form.Control type="text" placeholder="Filter" value={this.state.seriesFilter} onChange={(e) => {
                                 this.setState({
@@ -314,8 +318,9 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                                 Refresh list
                             </Button>
                         </Col>
-                    </Form.Row>
+                    </Row>
                     <Container fluid id="series-results" className="p-0">
+                    <Row className="row-cols-auto">
                     { this.state.searchSeriesResults !== undefined ? this.state.searchSeriesResults.total !== 0 ? this.state.searchSeriesResults.results.map((serie) => {
                         return (
                         <>
@@ -330,6 +335,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                             </div>
                         </>
                     )}) : <p className="ml-2 pl-1">No series found.</p> : <Loading t={this.props.t} />}
+                    </Row>
                     </Container>
                     <div className="clearfix" />
                     <DeeplinkPaging

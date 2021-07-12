@@ -23,3 +23,32 @@
     border: 1px solid gray;
     height: 12rem;
 }
+
+.tilecontent {
+    padding: 0.3rem 1rem 1rem;
+    box-sizing: border-box;
+}
+
+.tile .infos, .tile .title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tile img {
+    float: left;
+    width: 50%;
+    margin-right: 2%;
+}
+
+.creator, .siriestitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.searchfield .col {
+    float: left;
+    width: 65%;
+    margin-right: 2%;
+}
