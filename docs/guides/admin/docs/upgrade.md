@@ -29,6 +29,7 @@ Or replace the old Java version like this:
 ```
 % dnf shell
 > remove java-1.8.0-openjdk.x86_64
+> remove java-1.8.0-openjdk-headless.x86_64
 > install java-11-openjdk.x86_64
 > run
 ```
