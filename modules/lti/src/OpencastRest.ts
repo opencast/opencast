@@ -21,12 +21,14 @@ export interface MediaPackage {
     readonly creators: string[];
     readonly tracks: Track[] | undefined;
     readonly seriestitle?: string;
+    readonly series ?: string;
     readonly duration?: number;
 }
 
 export interface SearchEpisodeResult {
     readonly dcCreator?: string;
     readonly id: string;
+    readonly dcIsPartOf?: string;
     readonly dcTitle: string;
     readonly dcCreated: string;
     readonly mediapackage: MediaPackage;
@@ -210,6 +212,7 @@ export async function searchEpisode(
     return {
         results: results.map((result: any) => ({
             dcCreator: result.dcCreator,
+            dcIsPartOf: result.dcIsPartOf,
             id: result.id,
             dcTitle: result.dcTitle,
             dcCreated: result.dcCreated,
@@ -231,6 +234,7 @@ export async function searchEpisode(
                     })),
                 tracks: series ? undefined : parseTracksFromResult(result),
                 seriestitle: result.mediapackage.seriestitle,
+                series: result.mediapackage.series,
                 duration: result.mediapackage.duration
             } : {
                 creators: [],

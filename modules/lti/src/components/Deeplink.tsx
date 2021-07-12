@@ -271,7 +271,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                         return (
                             <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 float-left">
                                 <div className="tile">
-                                    <div className="seriesindicator" style={{backgroundColor: this.generateSeriesColor(episode.id)}} />
+                                    <div className="seriesindicator" style={{backgroundColor: this.generateSeriesColor(episode.dcIsPartOf)}} />
                                     <div className="tilecontent">
                                         <h4 className="title">{episode.dcTitle}</h4>
                                         <div>
