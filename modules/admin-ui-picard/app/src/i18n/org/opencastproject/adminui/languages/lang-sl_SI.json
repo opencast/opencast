@@ -1172,7 +1172,9 @@
                "SUBJECT": "Zadeva",
                "LANGUAGE": "Jezik",
                "LICENSE": "Licenca",
-               "DESCRIPTION": "Opis"
+               "DESCRIPTION": "Opis",
+               "REPLACE_SERIES_METADATA": "Update series metadata",
+               "REPLACE_SERIES_THEME": "Update series theme"
             },
             "EVENTS": {
                "TITLE": "Naslov",

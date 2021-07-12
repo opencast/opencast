@@ -1172,7 +1172,9 @@
                "SUBJECT": "Betreff",
                "LANGUAGE": "Sprache",
                "LICENSE": "Lizenz",
-               "DESCRIPTION": "Beschreibung"
+               "DESCRIPTION": "Beschreibung",
+               "REPLACE_SERIES_METADATA": "Metadaten der Serie aktualisieren",
+               "REPLACE_SERIES_THEME": "Theme der Serie aktualisieren"
             },
             "EVENTS": {
                "TITLE": "Titel",

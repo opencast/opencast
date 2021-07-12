@@ -2,23 +2,69 @@
  * This file contains all redux actions that can be executed on a series
  */
 
-// Constants of action types for fetching details of a certain series from server
+// Constants of action types for fetching metadata of a certain series from server
 export const LOAD_SERIES_DETAILS_IN_PROGRESS = 'LOAD_SERIES_DETAILS_IN_PROGRESS';
-export const LOAD_SERIES_DETAILS_SUCCESS = 'LOAD_SERIES_DETAILS_SUCCESS';
+export const LOAD_SERIES_DETAILS_METADATA_SUCCESS = 'LOAD_SERIES_DETAILS_METADATA_SUCCESS';
 export const LOAD_SERIES_DETAILS_FAILURE = 'LOAD_SERIES_DETAILS_FAILURE';
 
+// Constants of action types for fetching acls of a certain series from server
+export const LOAD_SERIES_DETAILS_ACLS_SUCCESS = 'LOAD_SERIES_DETAILS_ACLS_SUCCESS';
 
-// Actions affecting fetching details of a certain series from server
+// Constants of action types for fetching feeds of a certain series from server
+export const LOAD_SERIES_DETAILS_FEEDS_SUCCESS = 'LOAD_SERIES_DETAILS_FEEDS_SUCCESS';
+
+// Constants of action types for fetching theme of a certain series from server
+export const LOAD_SERIES_DETAILS_THEME_SUCCESS = 'LOAD_SERIES_DETAILS_THEME_SUCCESS';
+export const LOAD_SERIES_DETAILS_THEME_NAMES_IN_PROGRESS = 'LOAD_SERIES_DETAILS_THEME_NAMES_IN_PROGRESS';
+export const LOAD_SERIES_DETAILS_THEME_NAMES_SUCCESS = 'LOAD_SERIES_DETAILS_THEME_NAMES_SUCCESS';
+export const LOAD_SERIES_DETAILS_THEME_NAMES_FAILURE = 'LOAD_SERIES_DETAILS_THEME_NAMES_FAILURE';
+
+
+// Actions affecting fetching metadata of a certain series from server
 
 export const loadSeriesDetailsInProgress = () => ({
     type: LOAD_SERIES_DETAILS_IN_PROGRESS
 });
 
-export const loadSeriesDetailsSuccess = seriesDetails => ({
-    type: LOAD_SERIES_DETAILS_SUCCESS,
-    payload: { seriesDetails }
+export const loadSeriesDetailsMetadataSuccess = seriesMetadata => ({
+    type: LOAD_SERIES_DETAILS_METADATA_SUCCESS,
+    payload: { seriesMetadata }
 });
 
 export const loadSeriesDetailsFailure = () => ({
     type: LOAD_SERIES_DETAILS_FAILURE
+});
+
+// Actions affecting fetching acls of a certain series from server
+
+export const loadSeriesDetailsAclsSuccess = seriesAcls => ({
+    type: LOAD_SERIES_DETAILS_ACLS_SUCCESS,
+    payload: { seriesAcls }
+});
+
+// Actions affecting fetching feeds of a certain series from server
+
+export const loadSeriesDetailsFeedsSuccess = seriesFeeds => ({
+    type: LOAD_SERIES_DETAILS_FEEDS_SUCCESS,
+    payload: { seriesFeeds }
+});
+
+// Actions affecting fetching theme of a certain series from server
+
+export const loadSeriesDetailsThemeSuccess = seriesTheme => ({
+    type: LOAD_SERIES_DETAILS_THEME_SUCCESS,
+    payload: { seriesTheme }
+});
+
+export const loadSeriesDetailsThemeNamesInProgress = () => ({
+    type: LOAD_SERIES_DETAILS_THEME_NAMES_IN_PROGRESS
+});
+
+export const loadSeriesDetailsThemeNamesSuccess = themeNames => ({
+    type: LOAD_SERIES_DETAILS_THEME_NAMES_SUCCESS,
+    payload: { themeNames }
+});
+
+export const loadSeriesDetailsThemeNamesFailure = () => ({
+    type: LOAD_SERIES_DETAILS_THEME_NAMES_FAILURE
 });

@@ -1,11 +1,8 @@
 import React from "react";
-import {useTranslation} from "react-i18next";
 
-const SeriesDetailsFeedsTab = ({ }) => {
-    const { t } = useTranslation();
+const SeriesDetailsFeedsTab = ({ feeds }) => {
 
     return (
-        // todo: show if feed links
         <div className="modal-content">
             <div className="modal-body">
                 <div className="full-col">
@@ -19,11 +16,13 @@ const SeriesDetailsFeedsTab = ({ }) => {
                                         <th>Link</th>
                                     </tr>
                                     {/*todo: repeat for each feed link*/}
-                                    <tr>
-                                        <td>row.type</td>
-                                        <td>row.version</td>
-                                        <td><a href="row.link">row.link</a></td>
-                                    </tr>
+                                    {feeds.length > 0 && feeds.map((feed, key) => (
+                                        <tr key={key}>
+                                            <td>{feed.type}</td>
+                                            <td>{feed.version}</td>
+                                            <td><a href={feed.link}>{feed.link}</a></td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>

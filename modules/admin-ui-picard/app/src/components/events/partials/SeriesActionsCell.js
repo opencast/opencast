@@ -4,12 +4,17 @@ import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteSeries} from "../../../thunks/seriesThunks";
 import {connect} from "react-redux";
 import SeriesDetailsModal from "./modals/SeriesDetailsModal";
-import {fetchSeriesDetails} from "../../../thunks/seriesDetailsThunks";
+import {
+    fetchNamesOfPossibleThemes,
+    fetchSeriesDetailsAcls, fetchSeriesDetailsFeeds,
+    fetchSeriesDetailsMetadata, fetchSeriesDetailsTheme
+} from "../../../thunks/seriesDetailsThunks";
 
 /**
  * This component renders the action cells of series in the table view
  */
-const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetails }) => {
+const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetchSeriesDetailsAcls,
+                               fetchSeriesDetailsFeeds, fetchSeriesDetailsTheme, fetchSeriesDetailsThemeNames }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
@@ -28,7 +33,11 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetails }) => {
     }
 
     const showSeriesDetailsModal = async () => {
-        await fetchSeriesDetails(row.id);
+        await fetchSeriesDetailsMetadata(row.id);
+        await fetchSeriesDetailsAcls(row.id);
+        await fetchSeriesDetailsFeeds(row.id);
+        await fetchSeriesDetailsTheme(row.id);
+        await fetchSeriesDetailsThemeNames();
 
         setSeriesDetailsModal(true);
     }
@@ -36,7 +45,6 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetails }) => {
     return (
         <>
 
-            {/*TODO: When series details are implemented, remove placeholder
             {/*TODO: with-Role ROLE_UI_SERIES_DETAILS_VIEW*/}
             <a onClick={() => showSeriesDetailsModal()}
                className="more-series"
@@ -65,15 +73,13 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetails }) => {
     )
 }
 
-
-//todo: remove if not needed anymore
-const onClickPlaceholder = row => {
-    console.log("In the Future here opens an other component, which is not implemented yet");
-};
-
 const mapDispatchToProps = dispatch => ({
     deleteSeries: id => dispatch(deleteSeries(id)),
-    fetchSeriesDetails: id => dispatch(fetchSeriesDetails(id))
+    fetchSeriesDetailsMetadata: id => dispatch(fetchSeriesDetailsMetadata(id)),
+    fetchSeriesDetailsAcls: id => dispatch(fetchSeriesDetailsAcls(id)),
+    fetchSeriesDetailsFeeds: id => dispatch(fetchSeriesDetailsFeeds(id)),
+    fetchSeriesDetailsTheme: id => dispatch(fetchSeriesDetailsTheme(id)),
+    fetchSeriesDetailsThemeNames: () => dispatch(fetchNamesOfPossibleThemes())
 })
 
 export default connect(null, mapDispatchToProps)(SeriesActionsCell);

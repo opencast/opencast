@@ -1,73 +1,134 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import {Formik, Field} from "formik";
+import {Field, Formik} from "formik";
+import cn from "classnames";
+import _ from 'lodash';
+import {connect} from "react-redux";
 import Notifications from "../../../shared/Notifications";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import RenderField from "./RenderField";
+import {updateSeriesMetadata} from "../../../../thunks/seriesDetailsThunks";
 
-const SeriesDetailsMetadataTab = ({ metadataFields }) => {
+const SeriesDetailsMetadataTab = ({ metadataFields, updateSeries, seriesId }) => {
     const { t } = useTranslation();
 
     const handleSubmit = values => {
-        console.log(values);
+        updateSeries(seriesId, values);
     }
 
+    // set current values of metadata fields as initial values
     const getInitialValues = () => {
         let initialValues = {};
-        metadataFields.fields.forEach(field => {
-            initialValues[field.id] = field.value;
-        });
+
+        // Transform metadata fields and their values provided by backend (saved in redux)
+        if (!!metadataFields.fields && metadataFields.fields.length > 0) {
+            metadataFields.fields.forEach(field => {
+                initialValues[field.id] = field.value;
+            });
+        }
 
         return initialValues;
     }
 
+    const checkValidity = formik => {
+        if (formik.dirty && formik.isValid) {
+            // check if user provided values differ from initial ones
+            return !_.isEqual(formik.values, formik.initialValues);
+        } else {
+            return false;
+        }
+    }
+
     return (
-        <div className="modal-content">
-            <div className="modal-body">
-                <Notifications context="not-corner"/>
-                <div className="full-col">
-                    <div className="obj tbl-list">
-                        <header className="no-expand">
-                            {t('EVENTS.SERIES.DETAILS.TABS.METADATA')}
-                        </header>
-                        <div className="obj-container">
-                            <Formik initialValues={getInitialValues()} onSubmit={values => handleSubmit(values)}>
-                                <table className="main-tbl">
-                                    <tbody>
-                                    {/* todo: repeat for each metadata entry*/}
-                                    {metadataFields.fields.map((field, key) => (
-                                        <tr key={key}>
-                                            <td>
-                                                <span>{t(field.label)}</span>
-                                                {field.required && (
-                                                    <i className="required">*</i>
-                                                )}
-                                            </td>
-                                            <td className="editable ng-isolated-scope">
-                                                {/* todo: role: ROLE_UI_SERIES_DETAILS_METADATA_EDIT */}
-                                                {(field.type === "mixed_text" && field.collection.length !== 0) ? (
-                                                    <Field name={field.id}
-                                                           fieldInfo={field}
-                                                           component={RenderMultiField}/>
-                                                ) : (
-                                                    <Field name={field.id}
-                                                           metadataField={field}
-                                                           component={RenderField}/>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
-                            </Formik>
+        // initialize form
+        <Formik enableReinitialize
+                initialValues={getInitialValues()}
+                onSubmit={values => handleSubmit(values)}>
+            {formik => (
+                <>
+                    <div className="modal-content">
+                        <div className="modal-body">
+                            <Notifications context="not-corner"/>
+                            <div className="full-col">
+                                <div className="obj tbl-list">
+                                    <header className="no-expand">
+                                        {t('EVENTS.SERIES.DETAILS.TABS.METADATA')}
+                                    </header>
+                                    <div className="obj-container">
+                                        <table className="main-tbl">
+                                            <tbody>
+                                            {/* Render table row for each metadata field depending on type */}
+                                            {!!metadataFields.fields && metadataFields.fields.map((field, key) => (
+                                                <tr key={key}>
+                                                    <td>
+                                                        <span>{t(field.label)}</span>
+                                                        {field.required && (
+                                                            <i className="required">*</i>
+                                                        )}
+                                                    </td>
+                                                    {field.readOnly ? (
+                                                        // non-editable field if readOnly is set
+                                                        <td>{field.value}</td>
+                                                    ) : (
+                                                        <td className="editable ng-isolated-scope">
+                                                            {/* todo: role: ROLE_UI_SERIES_DETAILS_METADATA_EDIT */}
+                                                            {/* Render single value or multi value editable input */}
+                                                            {(field.type === "mixed_text" && field.collection.length !== 0) ? (
+                                                                <Field name={field.id}
+                                                                       fieldInfo={field}
+                                                                       showCheck
+                                                                       component={RenderMultiField}/>
+                                                            ) : (
+                                                                <Field name={field.id}
+                                                                       metadataField={field}
+                                                                       showCheck
+                                                                       component={RenderField}/>
+                                                            )}
+                                                        </td>
+                                                    )}
+                                                </tr>
+                                            ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+
+                    {formik.dirty && (
+                        <>
+                            {/* Render buttons for updating metadata */}
+                            <footer>
+                                <button type="submit"
+                                        onClick={() => formik.handleSubmit()}
+                                        disabled={!checkValidity(formik)}
+                                        className={cn("submit",
+                                            {
+                                                active: checkValidity(formik),
+                                                inactive: !checkValidity(formik)
+                                            }
+                                        )}>
+                                    {t('EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA')}
+                                </button>
+                                <button onClick={() => formik.resetForm({values: ''})}
+                                        className="cancel">
+                                    {t('CANCEL')}
+                                </button>
+                            </footer>
+
+                            <div className="btm-spacer"/>
+                        </>
+                    )}
+                </>
+            )}
+        </Formik>
     );
 };
 
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    updateSeries: (id, values) => dispatch(updateSeriesMetadata(id, values))
+});
 
-
-export default SeriesDetailsMetadataTab;
+export default connect(null, mapDispatchToProps)(SeriesDetailsMetadataTab);

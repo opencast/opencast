@@ -1172,7 +1172,9 @@
                "SUBJECT": "Emne",
                "LANGUAGE": "Sprog",
                "LICENSE": "Licens",
-               "DESCRIPTION": "Beskriveslse"
+               "DESCRIPTION": "Beskriveslse",
+               "REPLACE_SERIES_METADATA": "Update series metadata",
+               "REPLACE_SERIES_THEME": "Update series theme"
             },
             "EVENTS": {
                "TITLE": "Titel",

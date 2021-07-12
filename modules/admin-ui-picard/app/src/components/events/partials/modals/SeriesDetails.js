@@ -7,14 +7,19 @@ import SeriesDetailsAccessTab from "../wizards/SeriesDetailsAccessTab";
 import SeriesDetailsThemeTab from "../wizards/SeriesDetailsThemeTab";
 import SeriesDetailsStatisticTab from "../wizards/SeriesDetailsStatisticTab";
 import SeriesDetailsFeedsTab from "../wizards/SeriesDetailsFeedsTab";
-import {getSeriesMetadata} from "../../../../selectors/seriesDetailsSelectors";
+import {
+    getSeriesDetailsFeeds,
+    getSeriesDetailsMetadata,
+    getSeriesDetailsTheme, getSeriesDetailsThemeNames
+} from "../../../../selectors/seriesDetailsSelectors";
 import {connect} from "react-redux";
 
-const SeriesDetails = ({ seriesId, metadataFields }) => {
+const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames }) => {
     const { t } = useTranslation();
 
     const [page, setPage] = useState(0);
 
+    // information about each tab
     const tabs = [
         {
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.METADATA',
@@ -51,6 +56,7 @@ const SeriesDetails = ({ seriesId, metadataFields }) => {
     return (
         <>
             {/* todo: role management */}
+            {/* navigation for navigating between tabs */}
             <nav className="modal-nav" id="modal-nav">
                 <a className={cn({active: page === 0})}
                    onClick={() => openTab(0)}>
@@ -82,14 +88,18 @@ const SeriesDetails = ({ seriesId, metadataFields }) => {
                         </a>
 
                 }
-                <a className={cn({active: page === 5})}
-                   onClick={() => openTab(5)}>
-                    {t(tabs[5].tabNameTranslation)}
-                </a>
+                {feeds.length > 0 && (
+                    <a className={cn({active: page === 5})}
+                       onClick={() => openTab(5)}>
+                        {t(tabs[5].tabNameTranslation)}
+                    </a>
+                )}
             </nav>
+
+            {/* render modal content depending on current page */}
             <div>
                 {page === 0 && (
-                    <SeriesDetailsMetadataTab metadataFields={metadataFields}/>
+                    <SeriesDetailsMetadataTab metadataFields={metadataFields} seriesId={seriesId}/>
                 )}
                 {page === 1 && (
                     <SeriesDetailsExtendedMetadataTab />
@@ -98,13 +108,13 @@ const SeriesDetails = ({ seriesId, metadataFields }) => {
                     <SeriesDetailsAccessTab />
                 )}
                 {page === 3 && (
-                    <SeriesDetailsThemeTab />
+                    <SeriesDetailsThemeTab theme={theme} themeNames={themeNames} seriesId={seriesId} />
                 )}
                 {page === 4 && (
                     <SeriesDetailsStatisticTab />
                 )}
                 {page === 5 && (
-                    <SeriesDetailsFeedsTab />
+                    <SeriesDetailsFeedsTab feeds={feeds}/>
                 )}
             </div>
         </>
@@ -112,7 +122,10 @@ const SeriesDetails = ({ seriesId, metadataFields }) => {
 };
 
 const mapStateToProps = state => ({
-    metadataFields: getSeriesMetadata(state)
+    metadataFields: getSeriesDetailsMetadata(state),
+    feeds: getSeriesDetailsFeeds(state),
+    theme: getSeriesDetailsTheme(state),
+    themeNames: getSeriesDetailsThemeNames(state)
 });
 
 export default connect(mapStateToProps)(SeriesDetails);

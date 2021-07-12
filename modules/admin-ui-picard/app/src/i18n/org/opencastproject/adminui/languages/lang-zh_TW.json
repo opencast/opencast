@@ -1172,7 +1172,9 @@
                "SUBJECT": "主題",
                "LANGUAGE": "語言",
                "LICENSE": "許可證",
-               "DESCRIPTION": "說明"
+               "DESCRIPTION": "說明",
+               "REPLACE_SERIES_METADATA": "Update series metadata",
+               "REPLACE_SERIES_THEME": "Update series theme"
             },
             "EVENTS": {
                "TITLE": "標題",

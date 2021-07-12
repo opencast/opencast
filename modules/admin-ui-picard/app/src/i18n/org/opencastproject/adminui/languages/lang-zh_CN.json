@@ -1172,7 +1172,9 @@
                "SUBJECT": "主题",
                "LANGUAGE": "语言",
                "LICENSE": "许可证",
-               "DESCRIPTION": "说明"
+               "DESCRIPTION": "说明",
+               "REPLACE_SERIES_METADATA": "Update series metadata",
+               "REPLACE_SERIES_THEME": "Update series theme"
             },
             "EVENTS": {
                "TITLE": "标题",
