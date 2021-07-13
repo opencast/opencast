@@ -328,8 +328,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       r.setSource(source);
       indexService.createEvent(r);
     } catch (SchedulerException e) {
-      if (e.getCause() != null && e.getCause() instanceof NotFoundException
-              || e.getCause() instanceof IllegalArgumentException) {
+      if (e.getCause() instanceof NotFoundException || e.getCause() instanceof IllegalArgumentException) {
         throw new RuntimeException("unable to create event", e.getCause());
       } else {
         throw new RuntimeException("unable to create event", e);
