@@ -354,10 +354,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     final EventCatalogUIAdapter adapter = catalogUIAdapters.stream()
         .filter(e -> e.getFlavor().equals(flavor))
         .findAny()
-        .orElse(null);
-    if (adapter == null) {
-      throw new RuntimeException("no adapter found");
-    }
+        .orElseThrow(() -> new RuntimeException("no adapter found"));
     return adapter;
   }
 
