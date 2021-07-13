@@ -116,9 +116,9 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
         }
 
         if(allRulesValid && roleWithFullRightsExists){
-            saveNewAccessPolicies(eventId, ace).then(result => {
+            saveNewAccessPolicies(eventId, ace).then(success => {
                 // fetch new policies from server, if save successful
-                if(!result){
+                if(success){
                     fetchAccessPolicies(eventId);
                 }
             })
@@ -190,11 +190,11 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
                                                 <div className="obj tbl-list">
                                                     <table className="main-tbl">{/*todo: show only if: $root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') */}
                                                         <thead>
-                                                        <tr>
-                                                            <th>
-                                                                {t("EVENTS.EVENTS.DETAILS.ACCESS.TEMPLATES.TITLE") /* Templates */}
-                                                            </th>
-                                                        </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    {t("EVENTS.EVENTS.DETAILS.ACCESS.TEMPLATES.TITLE") /* Templates */}
+                                                                </th>
+                                                            </tr>
                                                         </thead>
 
                                                         <tbody>
@@ -202,7 +202,7 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
                                                             <td>
                                                                 <div className="obj-container padded chosen-container chosen-container-single">
                                                                     <p>
-                                                                        {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.DESCRIPTION") /* Description */}
+                                                                        {t("EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION") /* Description */}
                                                                     </p>
                                                                     {!transactions.read_only ? (
 
@@ -425,7 +425,7 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
                                                         <button onClick={() => saveAccess(formik.values)}
                                                                 className="save green"
                                                         >
-                                                            {t('SAVE')/* Save */}
+                                                            {t('EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS')/* Save */}
                                                         </button>
                                                     </div>
                                                 </footer>
