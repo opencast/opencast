@@ -1196,6 +1196,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       startCache.asMap().remove(mp.getIdentifier().toString());
       return Response.ok(WorkflowParser.toXml(workflow)).build();
     } catch (Exception e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof NotFoundException) {
+        return badRequest("Could not retrieve all media package elements", e);
+      }
       logger.warn("Unable to ingest mediapackage", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
