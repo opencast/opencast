@@ -34,7 +34,6 @@ import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
-import org.opencastproject.index.service.impl.util.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.lti.service.api.LtiFileUpload;
@@ -249,7 +248,6 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       throw new RuntimeException("No workflow configured, cannot upload");
     }
     try {
-      final EventHttpServletRequest eventHttpRequest = new EventHttpServletRequest();
       MediaPackage mediaPackage = ingestService.createMediaPackage();
       if (mediaPackage == null) {
         throw new RuntimeException("Unable to create media package for event");
