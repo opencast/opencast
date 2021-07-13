@@ -304,12 +304,18 @@ public class LtiServiceImpl implements LtiService, ManagedService {
 
       AccessControlList accessControlList = null;
 
-      accessControlList = new AccessControlList(
+      // If series is set and it's ACL is not empty, use series' ACL as default
+      if (StringUtils.isNotBlank(seriesId)) {
+        accessControlList = seriesService.getSeriesAccessControl(seriesId);
+      }
+
+      if (accessControlList == null || accessControlList.getEntries().isEmpty()) {
+        accessControlList = new AccessControlList(
           new AccessControlEntry("ROLE_ADMIN", "write", true),
           new AccessControlEntry("ROLE_ADMIN", "read", true),
           new AccessControlEntry("ROLE_OAUTH_USER", "write", true),
           new AccessControlEntry("ROLE_OAUTH_USER", "read", true));
-
+      }
       r.setAcl(accessControlList);
       r.setProcessing(
               (JSONObject) new JSONParser().parse(
