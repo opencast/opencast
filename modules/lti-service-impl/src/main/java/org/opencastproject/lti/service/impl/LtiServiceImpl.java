@@ -250,9 +250,9 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       throw new RuntimeException("No workflow configured, cannot upload");
     }
     try {
-      final EventHttpServletRequest r = new EventHttpServletRequest();
-      final MediaPackage mp = ingestService.createMediaPackage();
-      if (mp == null) {
+      final EventHttpServletRequest eventHttpRequest = new EventHttpServletRequest();
+      final MediaPackage mediaPackage = ingestService.createMediaPackage();
+      if (mediaPackage == null) {
         throw new RuntimeException("Unable to create media package for event");
       }
 
@@ -262,36 +262,33 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         );
         final MediaPackageElementBuilder elementBuilder =
             MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-        final MediaPackageElement captionsMpe = elementBuilder
+        final MediaPackageElement captionsMediaPackage = elementBuilder
                 .newElement(MediaPackageElement.Type.Attachment, captionsFlavor);
         if ("dfxp".equals(captionFormat)) {
-          captionsMpe.setMimeType(mimeType("application", "xml"));
+          captionsMediaPackage.setMimeType(mimeType("application", "xml"));
         } else {
-          captionsMpe.setMimeType(mimeType("text", captionFormat));
+          captionsMediaPackage.setMimeType(mimeType("text", captionFormat));
         }
-        captionsMpe.addTag("lang:" + captionLanguage);
-        mp.add(captionsMpe);
+        captionsMediaPackage.addTag("lang:" + captionLanguage);
+        mediaPackage.add(captionsMediaPackage);
         final URI captionsUri = workspace
                 .put(
-                        mp.getIdentifier().toString(),
-                        captionsMpe.getIdentifier(),
+                        mediaPackage.getIdentifier().toString(),
+                        captionsMediaPackage.getIdentifier(),
                         "captions." + captionFormat,
                         new ByteArrayInputStream(captions.getBytes(StandardCharsets.UTF_8)));
-        captionsMpe.setURI(captionsUri);
+        captionsMediaPackage.setURI(captionsUri);
       }
 
-      r.setMediaPackage(mp);
+      eventHttpRequest.setMediaPackage(mediaPackage);
       final MetadataList metadataList = new MetadataList();
       final MediaPackageElementFlavor flavor = new MediaPackageElementFlavor("dublincore", "episode");
-      final EventCatalogUIAdapter adapter = catalogUIAdapters.stream()
-          .filter(e -> e.getFlavor().equals(flavor)).findAny().orElse(null);
-      if (adapter == null) {
-        throw new RuntimeException("no adapter found");
-      }
+      final EventCatalogUIAdapter adapter = getEventCatalogUIAdapter();
+
       final DublinCoreMetadataCollection collection = adapter.getRawFields();
 
-      r.setMediaPackage(ingestService.addTrack(file.getStream(), file.getSourceName(),
-          MediaPackageElements.PRESENTER_SOURCE, mp));
+      eventHttpRequest.setMediaPackage(ingestService.addTrack(file.getStream(), file.getSourceName(),
+          MediaPackageElements.PRESENTER_SOURCE, mediaPackage));
 
       JSONArray metadataJsonArray = (JSONArray) new JSONParser().parse(metadataJson);
 
@@ -299,8 +296,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       MetadataJson.fillCollectionFromJson(collection, collectionJsonArray);
 
       replaceField(collection, "isPartOf", seriesId);
-      replaceField(collection, "duration", "6000");
-      adapter.storeFields(mp, collection);
+      adapter.storeFields(mediaPackage, collection);
 
       AccessControlList accessControlList = null;
 
@@ -313,19 +309,23 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         accessControlList = new AccessControlList(
           new AccessControlEntry("ROLE_ADMIN", "write", true),
           new AccessControlEntry("ROLE_ADMIN", "read", true),
-          new AccessControlEntry("ROLE_OAUTH_USER", "write", true),
-          new AccessControlEntry("ROLE_OAUTH_USER", "read", true));
+          new AccessControlEntry("ROLE_USER", "read", true));
       }
-      r.setAcl(accessControlList);
-      r.setProcessing(
-              (JSONObject) new JSONParser().parse(
-                      String.format("{\"workflow\":\"%s\",\"configuration\":%s}", workflow, workflowConfiguration)));
-      r.setMetadataList(metadataList);
+      eventHttpRequest.setAcl(accessControlList);
+
+      //Set workflow json object
+      JsonObject workflowConfig = new JSONObject();
+
+      workflowConfig.put('workflow', workflow);
+      workflowConfig.put('configuration', workflowConfiguration);
+
+      eventHttpRequest.setProcessing(workflowConfig);
+      eventHttpRequest.setMetadataList(metadataList);
       metadataList.add(adapter, collection);
 
       JSONObject source = new JSONObject();
       source.put("type", "UPLOAD");
-      r.setSource(source);
+      eventHttpRequest.setSource(source);
       indexService.createEvent(r);
     } catch (SchedulerException e) {
       if (e.getCause() instanceof NotFoundException || e.getCause() instanceof IllegalArgumentException) {
