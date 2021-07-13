@@ -21,6 +21,7 @@ import health from "./reducers/healthReducers";
 import {notifications} from "./reducers/notificationReducers";
 import workflows from "./reducers/workflowReducers";
 import eventDetails from "./reducers/eventDeatilsReducers";
+import recordingDetails from "./reducers/recordingDetailsReducer";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -44,7 +45,8 @@ const reducers = {
     health,
     notifications,
     workflows,
-    eventDetails
+    eventDetails,
+    recordingDetails
 };
 
 // Configuration for persisting store
