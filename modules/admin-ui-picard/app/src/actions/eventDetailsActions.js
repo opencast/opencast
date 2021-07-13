@@ -1,3 +1,4 @@
+export const LOAD_EVENT_POLICIES_SUCCESS = 'LOAD_EVENT_POLICIES_SUCCESS';
 export const LOAD_EVENT_COMMENTS_SUCCESS = 'LOAD_EVENT_COMMENTS_SUCCESS';
 export const LOAD_EVENT_COMMENTS_FAILURE = 'LOAD_EVENT_COMMENTS_FAILURE';
 export const LOAD_EVENT_COMMENTS_IN_PROGRESS = 'LOAD_EVENT_COMMENTS_IN_PROGRESS';
@@ -7,6 +8,13 @@ export const SAVE_COMMENT_REPLY_DONE = 'SAVE_COMMENT_REPLY_DONE';
 export const SAVE_COMMENT_REPLY_IN_PROGRESS = 'SAVE_COMMENT_REPLY_IN_PROGRESS';
 
 // Actions affecting fetching of event details from server
+
+export const loadEventPoliciesSuccess = ( accessPolicies ) => ({
+    type: LOAD_EVENT_POLICIES_SUCCESS,
+    payload: {
+        accessPolicies
+    }
+});
 
 export const loadEventCommentsInProgress = () => ({
     type: LOAD_EVENT_COMMENTS_IN_PROGRESS
