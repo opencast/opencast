@@ -314,11 +314,11 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       eventHttpRequest.setAcl(accessControlList);
 
       //Set workflow json object
-      JsonObject workflowConfig = new JSONObject();
+      JSONObject workflowConfig = new JSONObject();
 
-      workflowConfig.put('workflow', workflow);
-      workflowConfig.put('configuration', workflowConfiguration);
-
+      workflowConfig.put("workflow", workflow);
+      workflowConfig.put("configuration", (JSONObject) new JSONParser()
+          .parse(workflowConfiguration));
       eventHttpRequest.setProcessing(workflowConfig);
       eventHttpRequest.setMetadataList(metadataList);
       metadataList.add(adapter, collection);
@@ -326,7 +326,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       JSONObject source = new JSONObject();
       source.put("type", "UPLOAD");
       eventHttpRequest.setSource(source);
-      indexService.createEvent(r);
+      indexService.createEvent(eventHttpRequest);
     } catch (SchedulerException e) {
       if (e.getCause() instanceof NotFoundException || e.getCause() instanceof IllegalArgumentException) {
         throw new RuntimeException("unable to create event", e.getCause());
