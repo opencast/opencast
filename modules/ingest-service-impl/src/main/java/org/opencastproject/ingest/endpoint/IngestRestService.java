@@ -1166,7 +1166,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     final String workflowDefinition = wfConfig.get(WORKFLOW_DEFINITION_ID_PARAM);
 
     // Adding ingest start time to workflow configuration
-    wfConfig.put(IngestService.START_DATE_KEY, DATE_FORMAT.format(startCache.asMap().get(mp.getIdentifier().toString())));
+    final Date ingestDate = startCache.getIfPresent(mp.getIdentifier().toString());
+    wfConfig.put(IngestService.START_DATE_KEY, DATE_FORMAT.format(ingestDate != null ? ingestDate : new Date()));
 
     final X<WorkflowInstance> ingest = new X<WorkflowInstance>() {
       @Override
