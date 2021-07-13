@@ -27,9 +27,11 @@ import org.opencastproject.elasticsearch.index.IndexObject;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.DateTimeSupport.UtcTimestampAdapter;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +49,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Object wrapper for a theme.
@@ -333,9 +334,11 @@ public class IndexTheme implements IndexObject {
         createJAXBContext();
       }
       Unmarshaller unmarshaller = context.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(xml), IndexTheme.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(xml), IndexTheme.class).getValue();
     } catch (JAXBException e) {
       throw new IOException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    } catch (SAXException e) {
+      throw new IOException(e);
     } finally {
       IoSupport.closeQuietly(xml);
     }

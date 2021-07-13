@@ -18,28 +18,35 @@
  * the License.
  *
  */
+package org.opencastproject.oaipmh.persistence;
 
+import java.util.Collection;
 
-package org.opencastproject.oaipmh.harvester;
-
-import org.w3c.dom.Node;
-
-/**
- * Pluggable component to handle OAI-PMH records harvested by the {@link OaiPmhHarvester}.
- */
-public interface RecordHandler {
+public interface OaiPmhSetDefinition {
 
   /**
-   * Return the OAI-PMH metadata prefix this handler deals with.
-   * See <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces">this section</a>
-   * of the OAI-PMH specification for more details.
+   * Returns the setSpec.
+   *
+   * @return setSpec
    */
-  String getMetadataPrefix();
+  String getSetSpec();
 
   /**
-   * Handle an OAI-PMH record.
-   * See section <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Record">2.5 Record</a> of the
-   * OAI-PMH specification.
+   * Returns the setSpec name.
+   *
+   * @return setSpec name
    */
-  void handle(Node record);
+  String getName();
+
+  /**
+   * Returns the set description. The value may be null.
+   * @return set description or null
+   */
+  String getDescription();
+
+  /**
+   * Returns the filters.
+   * @return setSpec filters
+   */
+  Collection<OaiPmhSetDefinitionFilter> getFilters();
 }

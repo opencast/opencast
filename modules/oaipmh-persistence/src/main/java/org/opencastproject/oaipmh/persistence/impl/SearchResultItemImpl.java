@@ -44,6 +44,7 @@ public class SearchResultItemImpl implements SearchResultItem {
   private final Date modificationDate;
   private final boolean isDeleted;
   private final List<SearchResultElementItem> mediaPackageElements;
+  private List<String> setSpecs;
 
   public SearchResultItemImpl(final OaiPmhEntity entity) throws MediaPackageException {
     this.mediaPackageId = entity.getMediaPackageId();
@@ -54,6 +55,7 @@ public class SearchResultItemImpl implements SearchResultItem {
     this.isDeleted = entity.isDeleted();
     this.mediaPackage = MediaPackageParser.getFromXml(mediaPackageXml);
     this.mediaPackageElements = new ArrayList<>();
+    this.setSpecs = new ArrayList<>();
     for (OaiPmhElementEntity elementEntity : entity.getMediaPackageElements()) {
       SearchResultElementItemImpl searchResultElementItem = new SearchResultElementItemImpl(elementEntity);
       mediaPackageElements.add(searchResultElementItem);
@@ -118,5 +120,15 @@ public class SearchResultItemImpl implements SearchResultItem {
       }
     }
     throw new OaiPmhDatabaseException("Series dublincore catalog not found");
+  }
+
+  @Override
+  public List<String> getSetSpecs() {
+    return setSpecs;
+  }
+
+  @Override
+  public void addSetSpec(String setSpec) {
+    setSpecs.add(setSpec);
   }
 }

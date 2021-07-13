@@ -350,8 +350,12 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           // nothing to do here
         }
 
-        if (!isPublishable(mediaPackageForSearch)) {
-          throw new WorkflowOperationException("Media package does not meet criteria for publication");
+        // Check that the media package meets the criteria for publication
+        if (isBlank(mediaPackageForSearch.getTitle())) {
+          throw new WorkflowOperationException("Media package does not meet publication criteria: Missing title");
+        }
+        if (!mediaPackageForSearch.hasTracks()) {
+          throw new WorkflowOperationException("Media package does not meet publication criteria: No tracks selected");
         }
 
         logger.info("Publishing media package {} to search index", mediaPackageForSearch);
@@ -611,21 +615,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     for (String tag : tags) {
       element.addTag(tag);
     }
-  }
-
-  /** Media package must meet these criteria in order to be published. */
-  private boolean isPublishable(MediaPackage mp) {
-    boolean hasTitle = !isBlank(mp.getTitle());
-    if (!hasTitle) {
-      logger.warn("Media package does not meet criteria for publication: There is no title");
-    }
-
-    boolean hasTracks = mp.hasTracks();
-    if (!hasTracks) {
-      logger.warn("Media package does not meet criteria for publication: There are no tracks");
-    }
-
-    return hasTitle && hasTracks;
   }
 
   protected MediaPackage getDistributedMediapackage(String mediaPackageID) throws WorkflowOperationException {

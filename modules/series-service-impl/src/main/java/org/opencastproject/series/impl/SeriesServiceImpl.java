@@ -388,9 +388,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return index.getAccessControl(notNull(seriesID, "seriesID"));
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Exception occurred while retrieving access control rules for series {}: {}", seriesID,
-              e.getMessage());
-      throw new SeriesException(e);
+      throw new SeriesException(
+          String.format("Exception occurred while retrieving access control rules for series %s", seriesID), e);
     }
   }
 

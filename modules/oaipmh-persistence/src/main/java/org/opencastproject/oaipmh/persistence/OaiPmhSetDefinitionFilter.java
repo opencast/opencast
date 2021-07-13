@@ -18,16 +18,28 @@
  * the License.
  *
  */
+package org.opencastproject.oaipmh.persistence;
 
+import java.util.List;
+import java.util.Map;
 
-package org.opencastproject.oaipmh.harvester;
+public interface OaiPmhSetDefinitionFilter {
 
-public class HarvesterException extends RuntimeException {
-  public HarvesterException(String s) {
-    super(s);
-  }
+  String CRITERION_CONTAINS = "contains";
+  String CRITERION_CONTAINSNOT = "containsnot";
+  String CRITERION_MATCH = "match";
 
-  public HarvesterException(String s, Throwable throwable) {
-    super(s, throwable);
-  }
+  /**
+   * Returns element flavor to test filter criteria on.
+   *
+   * @return element flavor
+   */
+  String getFlavor();
+
+  /**
+   * Returns filter criteria.
+   *
+   * @return filter criteria
+   */
+  Map<String, List<String>> getCriteria();
 }

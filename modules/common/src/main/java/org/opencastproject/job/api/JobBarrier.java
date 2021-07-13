@@ -295,7 +295,7 @@ public final class JobBarrier {
               final Job processedJob = serviceRegistry.getJob(job.getId());
               final Job.Status jobStatus = processedJob.getStatus();
               switch (jobStatus) {
-                case CANCELED:
+                case CANCELLED:
                   throw new JobCanceledException(processedJob);
                 case DELETED:
                 case FAILED:

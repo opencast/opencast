@@ -31,8 +31,12 @@
 # export KARAF_BASE        # Karaf base folder
 # export KARAF_ETC         # Karaf etc  folder
 # export KARAF_OPTS        # Additional Karaf options
-# export KARAF_DEBUG       # Enable debug mode
 # export KARAF_REDIRECT    # Enable/set the std/err redirection when using bin/start
+#
+# Debug options
+# export KARAF_DEBUG       # Enable debug mode
+# export JAVA_DEBUG_PORT   # Set debug port (defaults to 5005)
+
 
 export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8"
 export JAVA_MAX_MEM="${JAVA_MAX_MEM:-1G}"

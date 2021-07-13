@@ -550,7 +550,12 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           mp = ingestService.addAttachment(in, fileName, flavor, tags, mp);
           break;
         case Catalog:
-          mp = ingestService.addCatalog(in, fileName, flavor, tags, mp);
+          try {
+            mp = ingestService.addCatalog(in, fileName, flavor, tags, mp);
+          } catch (IllegalArgumentException e) {
+            logger.debug("Invalid catalog data", e);
+            return Response.serverError().status(Status.BAD_REQUEST).build();
+          }
           break;
         case Track:
           if (startTime == null) {
@@ -749,9 +754,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               try {
                 flavor = MediaPackageElementFlavor.parseFlavor(value);
               } catch (IllegalArgumentException e) {
-                String error = String.format("Could not parse flavor '%s'", value);
-                logger.debug(error, e);
-                return Response.status(Status.BAD_REQUEST).entity(error).build();
+                return badRequest(String.format("Could not parse flavor '%s'", value), e);
               }
               /* Fields for DC catalog */
             } else if (dcterms.contains(fieldName)) {
@@ -759,51 +762,56 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
                 /* Use the identifier for the mediapackage */
                 mp.setIdentifier(new IdImpl(value));
               }
-              EName en = new EName(DublinCore.TERMS_NS_URI, fieldName);
               if (dcc == null) {
                 dcc = dublinCoreService.newInstance();
               }
-              dcc.add(en, value);
+              dcc.add(new EName(DublinCore.TERMS_NS_URI, fieldName), value);
 
               /* Episode metadata by URL */
             } else if ("episodeDCCatalogUri".equals(fieldName)) {
               try {
-                URI dcurl = new URI(value);
-                updateMediaPackageID(mp, dcurl);
-                ingestService.addCatalog(dcurl, MediaPackageElements.EPISODE, mp);
+                URI dcUrl = new URI(value);
+                ingestService.addCatalog(dcUrl, MediaPackageElements.EPISODE, mp);
+                updateMediaPackageID(mp, dcUrl);
                 episodeDCCatalogNumber += 1;
               } catch (java.net.URISyntaxException e) {
-                /* Parameter was not a valid URL: Return 400 Bad Request */
-                logger.warn("Invalid URI {} for episodeDCCatalogUri: {}", value, e.getMessage());
-                return Response.serverError().status(Status.BAD_REQUEST).build();
+                return badRequest(String.format("Invalid URI %s for episodeDCCatalogUri", value), e);
+              } catch (Exception e) {
+                return badRequest("Could not parse XML Dublin Core catalog", e);
               }
 
               /* Episode metadata DC catalog (XML) as string */
             } else if ("episodeDCCatalog".equals(fieldName)) {
-              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
-              updateMediaPackageID(mp, is);
-              is.reset();
-              String fileName = "episode" + episodeDCCatalogNumber + ".xml";
-              episodeDCCatalogNumber += 1;
-              ingestService.addCatalog(is, fileName, MediaPackageElements.EPISODE, mp);
+              try (InputStream is = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8))) {
+                final String fileName = "episode-" + episodeDCCatalogNumber + ".xml";
+                ingestService.addCatalog(is, fileName, MediaPackageElements.EPISODE, mp);
+                episodeDCCatalogNumber += 1;
+                is.reset();
+                updateMediaPackageID(mp, is);
+              } catch (Exception e) {
+                return badRequest("Could not parse XML Dublin Core catalog", e);
+              }
 
               /* Series by URL */
             } else if ("seriesDCCatalogUri".equals(fieldName)) {
               try {
-                URI dcurl = new URI(value);
-                ingestService.addCatalog(dcurl, MediaPackageElements.SERIES, mp);
+                URI dcUrl = new URI(value);
+                ingestService.addCatalog(dcUrl, MediaPackageElements.SERIES, mp);
               } catch (java.net.URISyntaxException e) {
-                /* Parameter was not a valid URL: Return 400 Bad Request */
-                logger.warn("Invalid URI {} for seriesDCCatalogUri: {}", value, e.getMessage());
-                return Response.serverError().status(Status.BAD_REQUEST).build();
+                return badRequest(String.format("Invalid URI %s for episodeDCCatalogUri", value), e);
+              } catch (Exception e) {
+                return badRequest("Could not parse XML Dublin Core catalog", e);
               }
 
               /* Series DC catalog (XML) as string */
             } else if ("seriesDCCatalog".equals(fieldName)) {
-              String fileName = "series" + seriesDCCatalogNumber + ".xml";
+              final String fileName = "series-" + seriesDCCatalogNumber + ".xml";
               seriesDCCatalogNumber += 1;
-              InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
-              ingestService.addCatalog(is, fileName, MediaPackageElements.SERIES, mp);
+              try (InputStream is = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8))) {
+                ingestService.addCatalog(is, fileName, MediaPackageElements.SERIES, mp);
+              } catch (Exception e) {
+                return badRequest("Could not parse XML Dublin Core catalog", e);
+              }
 
               // Add ACL in JSON, XML or XACML format
             } else if ("acl".equals(fieldName)) {
@@ -822,16 +830,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               /* Add media files by URL */
             } else if ("mediaUri".equals(fieldName)) {
               if (flavor == null) {
-                /* A flavor has to be specified in the request prior the media file */
-                return Response.serverError().status(Status.BAD_REQUEST).build();
+                return badRequest("A flavor has to be specified in the request prior to the media file", null);
               }
               URI mediaUrl;
               try {
                 mediaUrl = new URI(value);
               } catch (java.net.URISyntaxException e) {
-                /* Parameter was not a valid URL: Return 400 Bad Request */
-                logger.warn("Invalid URI {} for media: {}", value, e.getMessage());
-                return Response.serverError().status(Status.BAD_REQUEST).build();
+                return badRequest(String.format("Invalid URI %s for media", value), e);
               }
               ingestService.addTrack(mediaUrl, flavor, mp);
               hasMedia = true;
@@ -845,8 +850,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           } else {
             if (flavor == null) {
               /* A flavor has to be specified in the request prior the video file */
-              logger.debug("A flavor has to be specified in the request prior to the content BODY");
-              return Response.serverError().status(Status.BAD_REQUEST).build();
+              return badRequest("A flavor has to be specified in the request prior to the content BODY", null);
             }
             ingestService.addTrack(item.openStream(), item.getName(), flavor, mp);
             hasMedia = true;
@@ -855,21 +859,24 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
         /* Check if we got any media. Fail if not. */
         if (!hasMedia) {
-          logger.warn("Rejected ingest without actual media.");
-          return Response.serverError().status(Status.BAD_REQUEST).build();
+          return badRequest("Rejected ingest without actual media.", null);
         }
 
         /* Add episode mediapackage if metadata were send separately */
         if (dcc != null) {
           ByteArrayOutputStream out = new ByteArrayOutputStream();
-          dcc.toXml(out, true);
-          InputStream in = new ByteArrayInputStream(out.toByteArray());
-          ingestService.addCatalog(in, "dublincore.xml", MediaPackageElements.EPISODE, mp);
+          try {
+            dcc.toXml(out, true);
+            try (InputStream in = new ByteArrayInputStream(out.toByteArray())) {
+              ingestService.addCatalog(in, "dublincore.xml", MediaPackageElements.EPISODE, mp);
+            }
+          } catch (Exception e) {
+            return badRequest("Could not create XML from ingested metadata", e);
+          }
 
           /* Check if we have metadata for the episode */
         } else if (episodeDCCatalogNumber == 0) {
-          logger.warn("Rejected ingest without episode metadata. At least provide a title.");
-          return Response.serverError().status(Status.BAD_REQUEST).build();
+          return badRequest("Rejected ingest without episode metadata. At least provide a title.", null);
         }
 
         WorkflowInstance workflow = (wdID == null)
@@ -879,7 +886,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       }
       return Response.serverError().status(Status.BAD_REQUEST).build();
     } catch (IllegalArgumentException e) {
-      return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+      return badRequest(e.getMessage(), e);
     } catch (Exception e) {
       logger.warn("Unable to add mediapackage", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
@@ -1326,6 +1333,22 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       return Response.serverError().build();
     }
     return Response.ok(mediaPackage).build();
+  }
+
+  /**
+   * Return a bad request response but log additional details in debug mode.
+   *
+   * @param message
+   *          Message to send
+   * @param e
+   *          Exception to log. If <pre>null</pre>, a new exception is created to log a stack trace.
+   * @return 400 BAD REQUEST HTTP response
+   */
+  private Response badRequest(final String message, final Exception e) {
+    logger.debug(message, e == null && logger.isDebugEnabled() ? new IngestException(message) : e);
+    return Response.status(Status.BAD_REQUEST)
+        .entity(message)
+        .build();
   }
 
   @Override

@@ -41,6 +41,7 @@ import org.opencastproject.mediapackage.elementbuilder.TrackBuilderPlugin;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeType;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.data.Function2;
 
 import org.apache.commons.io.FileUtils;
@@ -53,6 +54,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -78,8 +80,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Test case to Test the implementation of {@link AdaptivePlaylistImpl}.
@@ -152,14 +152,14 @@ public class AdaptivePlaylistTest {
     FileUtils.copyURLToFile(this.getClass().getResource("/" + hls_mp_raw), mpxml);
   }
 
-  public Track makeTrack(URI uri, String logicalName) throws JAXBException {
+  public Track makeTrack(URI uri, String logicalName) throws JAXBException, IOException, SAXException {
     String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\"><oc:tags/><oc:url>"
             + uri + "</oc:url><oc:duration>1</oc:duration><oc:logicalname>" + logicalName
             + "</oc:logicalname></oc:track>";
     InputStream inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     TrackImpl track;
     try {
-      track = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
+      track = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
@@ -337,7 +337,7 @@ public class AdaptivePlaylistTest {
     Unmarshaller unmarshaller = context.createUnmarshaller();
     InputStream inputStream = new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8));
     try {
-      TrackImpl t1 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class)
+      TrackImpl t1 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class)
               .getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
       // Assert.assertTrue(t1.isMaster());
@@ -350,7 +350,7 @@ public class AdaptivePlaylistTest {
             + hlsUrl.toString() + "</oc:url><oc:master>true</oc:master><oc:duration>-1</oc:duration></oc:track>";
     inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     try {
-      TrackImpl t2 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
+      TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
       Assert.assertEquals(hlsUrl, t2.getURI());
     } finally {
@@ -362,7 +362,7 @@ public class AdaptivePlaylistTest {
     Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
 
     // And finally, using the element builder
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
     Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
@@ -386,7 +386,7 @@ public class AdaptivePlaylistTest {
     Unmarshaller unmarshaller = context.createUnmarshaller();
     InputStream inputStream = IOUtils.toInputStream(writer.toString(), "UTF-8");
     try {
-      TrackImpl t1 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
+      TrackImpl t1 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
       Assert.assertEquals(logicalName, t1.getLogicalName());
     } finally {
@@ -399,7 +399,7 @@ public class AdaptivePlaylistTest {
             + "</oc:logicalname></oc:track>";
     inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     try {
-      TrackImpl t2 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class).getValue();
+      TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
       Assert.assertEquals(fmp4Url, t2.getURI());
       Assert.assertEquals(logicalName, t2.getLogicalName());
@@ -413,7 +413,7 @@ public class AdaptivePlaylistTest {
     Assert.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<logicalname>" + logicalName + "</logicalname>"));
 
     // And finally, using the element builder
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
     Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
@@ -438,7 +438,7 @@ public class AdaptivePlaylistTest {
     Unmarshaller unmarshaller = context.createUnmarshaller();
     InputStream inputStream = IOUtils.toInputStream(writer.toString(), "UTF-8");
     try {
-      TrackImpl t1 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class)
+      TrackImpl t1 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class)
               .getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
       Assert.assertEquals(logicalName, t1.getLogicalName());
@@ -452,7 +452,7 @@ public class AdaptivePlaylistTest {
             + "</oc:logicalname><oc:master>true</oc:master><oc:duration>-1</oc:duration><oc:live>true</oc:live></oc:track>";
     inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     try {
-      TrackImpl t2 = unmarshaller.unmarshal(new StreamSource(inputStream), TrackImpl.class)
+      TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class)
               .getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
       Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m3u8", t2.getURI().toString());
@@ -469,7 +469,7 @@ public class AdaptivePlaylistTest {
     Assert.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<master>true</master>"));
 
     // And finally, using the element builder
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
     Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()

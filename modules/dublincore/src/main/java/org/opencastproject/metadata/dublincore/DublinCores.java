@@ -40,6 +40,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -170,7 +171,7 @@ public final class DublinCores {
   public static DublinCoreCatalog read(InputStream in) {
     final String ser;
     try {
-      ser = IOUtils.toString(in, "UTF-8");
+      ser = IOUtils.toString(in, StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException("Unable to read DublinCore from stream", e);
     }

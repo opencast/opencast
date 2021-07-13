@@ -21,6 +21,8 @@
 
 package org.opencastproject.job.api;
 
+import org.opencastproject.util.XmlSafeParser;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -32,7 +34,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Marshals and unmarshals {@link Job}s.
@@ -76,7 +77,7 @@ public final class JobParser {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), JaxbJob.class).getValue().toJob();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), JaxbJob.class).getValue().toJob();
     } catch (Exception e) {
       throw new IOException(e);
     } finally {
@@ -126,7 +127,7 @@ public final class JobParser {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), JaxbJobList.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), JaxbJobList.class).getValue();
     } catch (Exception e) {
       throw new IOException(e);
     } finally {
