@@ -19,7 +19,7 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
                                        policies,
                                        fetchAccessPolicies, fetchHasActiveTransactions, saveNewAccessPolicies}) => {
     return (
-        <ResourceDetailsAccessPolicyTab eventId={eventId}
+        <ResourceDetailsAccessPolicyTab resourceId={eventId}
                                         header={header}
                                         t={t}
                                         policies={policies}

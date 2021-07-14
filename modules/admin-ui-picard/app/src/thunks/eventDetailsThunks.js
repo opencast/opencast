@@ -1,5 +1,7 @@
 import {
+    loadEventPoliciesInProgress,
     loadEventPoliciesSuccess,
+    loadEventPoliciesFailure,
     loadEventCommentsInProgress,
     loadEventCommentsSuccess,
     loadEventCommentsFailure,
@@ -20,6 +22,16 @@ const getHttpHeaders = () => {
             }
     };
 }
+
+// creates an empty policy with the role from the argument
+const createPolicy = (role) => {
+    return {
+        role: role,
+        read: false,
+        write: false,
+        actions: []
+    };
+};
 
 export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
 
@@ -50,16 +62,39 @@ export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
 
 export const fetchAccessPolicies = (eventId) => async (dispatch) => {
     try {
+        dispatch(loadEventPoliciesInProgress());
+
         const policyData = await axios.get(`admin-ng/event/${eventId}/access.json`);
-        let policies = await policyData.data;
+        let accessPolicies = await policyData.data;
+
+        let policies = [];
+        if(!!accessPolicies.episode_access){
+            const json = JSON.parse(accessPolicies.episode_access.acl).acl.ace;
+            let newPolicies = {};
+            let policyRoles = [];
+            for(let i = 0; i < json.length; i++){
+                const policy = json[i];
+                if(!newPolicies[policy.role]){
+                    newPolicies[policy.role] = createPolicy(policy.role);
+                    policyRoles.push(policy.role);
+                }
+                if (policy.action === 'read' || policy.action === 'write') {
+                    newPolicies[policy.role][policy.action] = policy.allow;
+                } else if (policy.allow === true || policy.allow === 'true'){
+                    newPolicies[policy.role].actions.push(policy.action);
+                }
+            }
+            policies = policyRoles.map(role => newPolicies[role]);
+        }
 
         dispatch(loadEventPoliciesSuccess(policies));
     } catch (e) {
         console.log(e);
+        dispatch(loadEventPoliciesFailure());
     }
 }
 
-export const fetchHasActiveTransactions = (eventId) => async (dispatch) => {
+export const fetchHasActiveTransactions = (eventId) => async () => {
     try {
         const transactionsData = await axios.get(`admin-ng/event/${eventId}/hasActiveTransaction`);
         const hasActiveTransactions = await transactionsData.data;

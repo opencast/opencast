@@ -15,19 +15,33 @@ import {NOTIFICATION_CONTEXT} from "../../../configs/wizardConfig";
 /**
  * This component manages the access policy tab of resource details modals
  */
-const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHasActiveTransactions, fetchAccessPolicies, saveNewAccessPolicies,
+const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetchHasActiveTransactions, fetchAccessPolicies, saveNewAccessPolicies,
                                           addNotification, fetchAclTemplates, fetchRoles}) => {
 
     const baseAclId = "";
 
+    // list of policy templates
     const [aclTemplates, setAclTemplates] = useState([]);
+
+    // list of possible additional actions
     const [aclActions, setAclActions] = useState([]);
+
+    // shows, whether a resource has additional actions on top of normal read and write rights
     const [hasActions, setHasActions] = useState(false);
+
+    // list of possible roles
     const [roles, setRoles] = useState(false);
+
+    // tracks, whether the policies are different to the initial value
     const [policyChanged, setPolicyChanged] = useState(false);
+
+    // this state is used, because the policies should be read-only, if a transaction is currently being performed on a resource
     const [transactions, setTransactions] = useState({read_only: false});
+
+    // this state tracks, whether data is currently being fetched
     const [loading, setLoading] = useState(false);
 
+    /* creates a new policy with the role from the argument and no rights or actions*/
     const createPolicy = (role) => {
         return {
             role: role,
@@ -37,8 +51,8 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
         };
     };
 
+    /* fetch initial values from backend */
     useEffect( () => {
-
         async function fetchData() {
             setLoading(true);
             const responseTemplates = await fetchAclTemplates();
@@ -46,10 +60,10 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
             const responseActions = await fetchAclActions();
             setAclActions(responseActions);
             setHasActions(responseActions.length > 0);
-            await fetchAccessPolicies(eventId);
+            await fetchAccessPolicies(resourceId);
             fetchRoles().then(roles => setRoles(roles));
             if(fetchHasActiveTransactions) {
-                const fetchTransactionResult = await fetchHasActiveTransactions(eventId);
+                const fetchTransactionResult = await fetchHasActiveTransactions(resourceId);
                 fetchTransactionResult.active !== undefined ?
                     setTransactions({read_only: fetchTransactionResult.active})
                     : setTransactions({read_only: true});
@@ -63,12 +77,55 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
         fetchData().then(r => {});
     }, []);
 
+    /* resets the formik form and hides the save and cancel buttons */
     const resetPolicies = (resetFormik) => {
         setPolicyChanged(false);
         resetFormik();
     }
 
+    /* transforms rules into proper format for saving and checks validity
+    * if the policies are valid, the new policies are saved in the backend */
     const saveAccess = (values) => {
+        const {ace, roleWithFullRightsExists, allRulesValid} = validatePolicies(values);
+
+        if(!allRulesValid){
+            addNotification('warning','INVALID_ACL_RULES', 3, null, NOTIFICATION_CONTEXT);
+        }
+
+        if(!roleWithFullRightsExists){
+            addNotification('warning','MISSING_ACL_RULES', 3, null, NOTIFICATION_CONTEXT);
+        }
+
+        if(allRulesValid && roleWithFullRightsExists){
+            saveNewAccessPolicies(resourceId, ace).then(success => {
+                // fetch new policies from the backend, if save successful
+                if(success){
+                    setPolicyChanged(false);
+                    fetchAccessPolicies(resourceId);
+                }
+            })
+        }
+    }
+
+    /* validates the policies in the formik form */
+    const validateFormik = (values) => {
+        const errors = {};
+        setPolicyChanged(isPolicyChanged(values.policies));
+
+        // each policy needs a role
+        if(values.policies.find(policy => ((!policy.role) || (policy.role === '')))){
+            errors.emptyRole = "Empty role!";
+        }
+
+        return errors;
+    }
+
+    /* transforms rules into proper format for saving and checks validity
+    * of the policies
+    * each policy needs a role and at least one of: read-rights, write-rights, additional action
+    * there needs to be at least one role, which has both read and write rights*/
+    const validatePolicies = (values) => {
+
         let ace = [];
         let roleWithFullRightsExists = false;
         let allRulesValid = true;
@@ -107,28 +164,11 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
             }
         })
 
-        if(!allRulesValid){
-            addNotification('warning','INVALID_ACL_RULES', 5, null, NOTIFICATION_CONTEXT);
-        }
-
-        if(!roleWithFullRightsExists){
-            addNotification('warning','MISSING_ACL_RULES', 5, null, NOTIFICATION_CONTEXT);
-        }
-
-        if(allRulesValid && roleWithFullRightsExists){
-            saveNewAccessPolicies(eventId, ace).then(success => {
-                // fetch new policies from server, if save successful
-                if(success){
-                    fetchAccessPolicies(eventId);
-                }
-            })
-        }
+        return {ace, roleWithFullRightsExists, allRulesValid};
     }
 
-    const validateFormik = (values) => {
-        setPolicyChanged(isPolicyChanged(values.policies));
-    }
-
+    /* checks whether the current state of the policies from the formik is different form the
+    * initial policies or equal to them */
     const isPolicyChanged = (newPolicies) => {
         if (newPolicies.length !== policies.length) {
             return true;
@@ -154,6 +194,7 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
         return false;
     }
 
+    /* fetches the policies for the chosen template and sets the policies in the formik form to those policies */
     const handleTemplateChange = async (templateId, setFormikFieldValue) => {
         // fetch information about chosen template from backend
         const template =  await fetchAclTemplateById(templateId);
@@ -411,7 +452,7 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
                                             </div>
 
                                             {/* Save and cancel buttons */}
-                                            { (!transactions.read_only && policyChanged) && (
+                                            { (!transactions.read_only && policyChanged && formik.dirty) && (
                                                 <footer style={{padding: '15px'}}>
                                                     <div className="pull-left">
                                                         <button type="reset"
@@ -423,7 +464,8 @@ const ResourceDetailsAccessPolicyTab = ({ eventId, header, t, policies, fetchHas
                                                     </div>
                                                     <div className="pull-right">
                                                         <button onClick={() => saveAccess(formik.values)}
-                                                                className="save green"
+                                                                disabled={ !formik.isValid}
+                                                                className={`save green  ${(!formik.isValid) ? "disabled" : ""}`}
                                                         >
                                                             {t('EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS')/* Save */}
                                                         </button>

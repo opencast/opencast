@@ -1,5 +1,7 @@
 import {
+    LOAD_EVENT_POLICIES_IN_PROGRESS,
     LOAD_EVENT_POLICIES_SUCCESS,
+    LOAD_EVENT_POLICIES_FAILURE,
     LOAD_EVENT_COMMENTS_IN_PROGRESS,
     LOAD_EVENT_COMMENTS_SUCCESS,
     LOAD_EVENT_COMMENTS_FAILURE,
@@ -12,6 +14,7 @@ import {
 // Initial state of event details in redux store
 const initialState = {
     policies: [],
+    fetchingPoliciesInProgress: false,
     savingCommentReplyInProgress: false,
     savingCommentInProgress: false,
     fetchingCommentsInProgress: false,
@@ -20,44 +23,28 @@ const initialState = {
     eventId: ""
 }
 
-const createPolicy = (role) => {
-    return {
-        role: role,
-        read: false,
-        write: false,
-        actions: []
-    };
-};
-
 // Reducer for event details
 const eventDetails = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {
+        case LOAD_EVENT_POLICIES_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingPoliciesInProgress: true,
+            };
+        }
         case LOAD_EVENT_POLICIES_SUCCESS: {
-            const { accessPolicies } = payload;
-            let policies = [];
-            if(!!accessPolicies.episode_access){
-                const json = JSON.parse(accessPolicies.episode_access.acl).acl.ace;
-                let newPolicies = {};
-                let policyRoles = [];
-                for(let i = 0; i < json.length; i++){
-                    const policy = json[i];
-                    if(!newPolicies[policy.role]){
-                        newPolicies[policy.role] = createPolicy(policy.role);
-                        policyRoles.push(policy.role);
-                    }
-                    if (policy.action === 'read' || policy.action === 'write') {
-                        newPolicies[policy.role][policy.action] = policy.allow;
-                    } else if (policy.allow === true || policy.allow === 'true'){
-                        newPolicies[policy.role].actions.push(policy.action);
-                    }
-                }
-                policies = policyRoles.map(role => newPolicies[role]);
-            }
+            const { policies } = payload;
             return {
                 ...state,
                 fetchingPoliciesInProgress: false,
                 policies: policies
+            };
+        }
+        case LOAD_EVENT_POLICIES_FAILURE: {
+            return {
+                ...state,
+                fetchingPoliciesInProgress: false,
             };
         }
         case LOAD_EVENT_COMMENTS_IN_PROGRESS: {
