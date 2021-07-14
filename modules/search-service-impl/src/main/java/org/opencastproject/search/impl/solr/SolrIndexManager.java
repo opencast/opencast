@@ -27,7 +27,6 @@ import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Collections.flatMap;
 import static org.opencastproject.util.data.Collections.head;
-import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Option.option;
 
 import org.opencastproject.mediapackage.Attachment;
@@ -104,6 +103,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Utility class used to manage the search index.
@@ -681,21 +681,15 @@ public class SolrIndexManager {
   }
 
   static List<DField<String>> fromMValue(List<MetadataValue<String>> as) {
-    return map(as, new ArrayList<DField<String>>(), new Function<MetadataValue<String>, DField<String>>() {
-      @Override
-      public DField<String> apply(MetadataValue<String> v) {
-        return new DField<String>(v.getValue(), v.getLanguage());
-      }
-    });
+    return as.stream()
+        .map(v -> new DField<>(v.getValue(), ""))
+        .collect(Collectors.toList());
   }
 
   static List<DField<String>> fromDCValue(List<DublinCoreValue> as) {
-    return map(as, new ArrayList<DField<String>>(), new Function<DublinCoreValue, DField<String>>() {
-      @Override
-      public DField<String> apply(DublinCoreValue v) {
-        return new DField<String>(v.getValue(), v.getLanguage());
-      }
-    });
+    return as.stream()
+        .map(v -> new DField<>(v.getValue(), ""))
+        .collect(Collectors.toList());
   }
 
   /**

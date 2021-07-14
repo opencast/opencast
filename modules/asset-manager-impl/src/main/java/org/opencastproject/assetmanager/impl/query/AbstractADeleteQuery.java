@@ -25,7 +25,8 @@ import static java.lang.String.format;
 
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.impl.AbstractAssetManager;
+import org.opencastproject.assetmanager.api.storage.DeletionSelector;
+import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import org.opencastproject.assetmanager.impl.TieredStorageAssetManager;
 import org.opencastproject.assetmanager.impl.VersionImpl;
@@ -33,7 +34,6 @@ import org.opencastproject.assetmanager.impl.persistence.Conversions;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.assetmanager.impl.persistence.QPropertyDto;
 import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
-import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.SetB;
@@ -55,10 +55,10 @@ import java.util.Set;
 public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryContributor, EntityPaths {
   private static final Logger logger = LoggerFactory.getLogger(AbstractADeleteQuery.class);
 
-  private AbstractAssetManager am;
+  private AssetManagerImpl am;
   private String owner;
 
-  public AbstractADeleteQuery(AbstractAssetManager am, String owner) {
+  public AbstractADeleteQuery(AssetManagerImpl am, String owner) {
     this.am = am;
     this.owner = owner;
   }
@@ -95,7 +95,7 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
     // resolve AST
     final DeleteQueryContribution c = contributeDelete(owner);
     // run all queries in a single transaction
-    final DeletionResult deletion = am.getDb().run(new Fn<JPAQueryFactory, DeletionResult>() {
+    final DeletionResult deletion = am.getDatabase().run(new Fn<JPAQueryFactory, DeletionResult>() {
       @Override public DeletionResult apply(final JPAQueryFactory jpa) {
         return runQueries(jpa, c);
       }
@@ -115,10 +115,10 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
           tsam.getRemoteAssetStore(remoteStoreId).get().delete(deletionSelector);
         }
       }
-      deleteSnapshotHandler.notifyDeleteSnapshot(mpId, version);
+      deleteSnapshotHandler.handleDeletedSnapshot(mpId, version);
     }
     for (String mpId : deletion.deletedEpisodes) {
-      deleteSnapshotHandler.notifyDeleteEpisode(mpId);
+      deleteSnapshotHandler.handleDeletedEpisode(mpId);
     }
     final long searchTime = (System.nanoTime() - startTime) / 1000000;
     logger.debug("Complete query ms " + searchTime);
@@ -185,7 +185,7 @@ HAVING v = (SELECT count(*)
 // </BLOCK>
       // main delete query
       final JPADeleteClause qMain = jpa.delete(Q_SNAPSHOT).where(where);
-      am.getDb().logDelete(formatQueryName(c.name, "main"), qMain);
+      am.getDatabase().logDelete(formatQueryName(c.name, "main"), qMain);
       final long deletedItems = qMain.execute();
       // <BLOCK>
       // TODO Bad solution. Yields all media package IDs which can easily be thousands
@@ -248,7 +248,7 @@ HAVING v = (SELECT count(*)
         }
       }
       final JPADeleteClause qProperties = jpa.delete(from).where(Expressions.allOf(c.targetPredicate.orNull(), where));
-      am.getDb().logDelete(formatQueryName(c.name, "main"), qProperties);
+      am.getDatabase().logDelete(formatQueryName(c.name, "main"), qProperties);
       final long deletedItems = qProperties.execute();
       return new DeletionResult(deletedItems, Collections.<Tuple>emptyList(), Collections.<String>emptySet());
     } else {
@@ -269,16 +269,16 @@ HAVING v = (SELECT count(*)
    * Call {@link #run(DeleteSnapshotHandler)} with a deletion handler to get notified about deletions.
    */
   public interface DeleteSnapshotHandler {
-    void notifyDeleteSnapshot(String mpId, VersionImpl version);
+    void handleDeletedSnapshot(String mpId, VersionImpl version);
 
-    void notifyDeleteEpisode(String mpId);
+    void handleDeletedEpisode(String mpId);
   }
 
   public static final DeleteSnapshotHandler NOP_DELETE_SNAPSHOT_HANDLER = new DeleteSnapshotHandler() {
-    @Override public void notifyDeleteSnapshot(String mpId, VersionImpl version) {
+    @Override public void handleDeletedSnapshot(String mpId, VersionImpl version) {
     }
 
-    @Override public void notifyDeleteEpisode(String mpId) {
+    @Override public void handleDeletedEpisode(String mpId) {
     }
   };
 

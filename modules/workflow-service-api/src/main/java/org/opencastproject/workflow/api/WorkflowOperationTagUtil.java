@@ -23,7 +23,6 @@ package org.opencastproject.workflow.api;
 
 import org.opencastproject.mediapackage.Track;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,16 +51,15 @@ public final class WorkflowOperationTagUtil {
 
   private static final String PLUS = "+";
   private static final String MINUS = "-";
-  private static final String SEPARATOR = ",";
 
-  public static TagDiff createTagDiff(final String tagList) {
+  public static TagDiff createTagDiff(final List<String> tagList) {
 
     final List<String> removeTags = new ArrayList<>();
     final List<String> addTags = new ArrayList<>();
     final List<String> overrideTags = new ArrayList<>();
 
     if (tagList != null) {
-      for (final String tag : StringUtils.split(tagList, SEPARATOR)) {
+      for (final String tag : tagList) {
         if (tag.startsWith(MINUS)) {
           removeTags.add(tag);
         } else if (tag.startsWith(PLUS)) {

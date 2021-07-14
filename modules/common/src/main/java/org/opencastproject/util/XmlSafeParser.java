@@ -116,7 +116,7 @@ public final class XmlSafeParser {
    */
   public static TransformerFactory configureTransformerFactory(TransformerFactory f) {
     try {
-      if (f.getClass() == com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl.class) {
+      if (f.getClass().getName().equals("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl")) {
         f.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         f.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
         f.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");

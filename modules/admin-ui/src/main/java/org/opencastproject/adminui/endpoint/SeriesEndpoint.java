@@ -42,6 +42,7 @@ import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.R.badRequest;
 import static org.opencastproject.util.RestUtil.R.conflict;
+import static org.opencastproject.util.RestUtil.R.forbidden;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
@@ -53,9 +54,9 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
-import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
@@ -69,7 +70,6 @@ import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
-import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
@@ -941,7 +941,8 @@ public class SeriesEndpoint implements ManagedService {
           @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the given ACL"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error") })
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error"),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response applyAclToSeries(@PathParam("seriesId") String seriesId, @FormParam("acl") String acl,
           @DefaultValue("false") @FormParam("override") boolean override) throws SearchIndexException {
 
@@ -964,13 +965,14 @@ public class SeriesEndpoint implements ManagedService {
     }
 
     try {
-      if (getAclService().applyAclToSeries(seriesId, accessControlList, override))
-        return ok();
-      else {
-        logger.warn("Unable to find series '{}' to apply the ACL.", seriesId);
-        return notFound();
-      }
-    } catch (AclServiceException e) {
+      seriesService.updateAccessControl(seriesId, accessControlList, override);
+      return ok();
+    } catch (NotFoundException e) {
+      logger.warn("Unable to find series '{}' to apply the ACL.", seriesId);
+      return notFound();
+    } catch (UnauthorizedException e) {
+      return forbidden();
+    } catch (SeriesException e) {
       logger.error("Error applying acl to series {}", seriesId);
       return serverError();
     }

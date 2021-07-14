@@ -22,11 +22,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-series-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-asset-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -38,11 +33,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-authorization-xacml</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -109,6 +99,10 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
     </dependency>
     <!-- Logging -->
     <dependency>
@@ -217,11 +211,10 @@
               org.opencastproject.authorization.xacml.manager.api;version=${project.version},
               org.opencastproject.authorization.xacml.manager.impl;version=${project.version},
               org.opencastproject.authorization.xacml.manager.impl.persistence;version=${project.version},
-              org.opencastproject.authorization.xacml.manager.endpoint;version=${project.version}
+              org.opencastproject.authorization.xacml.manager.endpoint;version=${project.version},
+              org.opencastproject.authorization.xacml.manager.util;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/acl-jpa-db.xml,
-              OSGI-INF/acl-service-factory.xml,
               OSGI-INF/acl-scanner.xml,
               OSGI-INF/acl-service-rest.xml
             </Service-Component>
