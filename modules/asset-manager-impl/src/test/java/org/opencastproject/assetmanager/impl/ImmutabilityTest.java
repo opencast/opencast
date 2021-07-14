@@ -31,14 +31,10 @@ import org.junit.Test;
 public class ImmutabilityTest {
   @Test
   public void testImmutability() {
-//    assertImmutable(AssetId.class);
-//    assertImmutable(Property.class);
     assertImmutable(PropertyId.class);
     assertImmutable(PropertyName.class);
     assertImmutable(Value.BooleanValue.class);
     assertImmutable(Value.LongValue.class);
     assertImmutable(Value.StringValue.class);
-//    assertImmutable(DeletionSelector.class);
-//    assertImmutable(StoragePath.class);
   }
 }

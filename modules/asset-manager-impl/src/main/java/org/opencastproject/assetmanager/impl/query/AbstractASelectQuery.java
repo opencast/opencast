@@ -29,7 +29,7 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Order;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.impl.AbstractAssetManager;
+import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.assetmanager.impl.persistence.PropertyDto;
@@ -63,9 +63,9 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
   protected static final Logger logger = LoggerFactory.getLogger(AbstractASelectQuery.class);
 
   private final AbstractASelectQuery self = this;
-  private final AbstractAssetManager am;
+  private final AssetManagerImpl am;
 
-  public AbstractASelectQuery(AbstractAssetManager am) {
+  public AbstractASelectQuery(AssetManagerImpl am) {
     this.am = am;
   }
 
@@ -103,7 +103,7 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
   }
 
   @Override public AResult run() {
-    return am.getDb().run(new Fn<JPAQueryFactory, AResult>() {
+    return am.getDatabase().run(new Fn<JPAQueryFactory, AResult>() {
       @Override public AResult apply(JPAQueryFactory f) {
         return run(f);
       }
@@ -198,7 +198,7 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
     final Stream<ARecordImpl> records;
     {
       // run query
-      am.getDb().logQuery(q);
+      am.getDatabase().logQuery(q);
       final List<Tuple> result = q.list(JpaFns.toExpressionArray(fetch));
       logger.debug("Pure query ms " + (System.nanoTime() - startTime) / 1000000);
       // map result based on the fact whether properties have been fetched or not
