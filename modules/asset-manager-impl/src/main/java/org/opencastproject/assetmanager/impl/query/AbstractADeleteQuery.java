@@ -25,10 +25,10 @@ import static java.lang.String.format;
 
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
-import org.opencastproject.assetmanager.impl.TieredStorageAssetManager;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.Conversions;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
@@ -109,11 +109,8 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
       final VersionImpl version = Conversions.toVersion(t.get(Q_SNAPSHOT.version));
       final DeletionSelector deletionSelector = DeletionSelector.delete(orgId, mpId, version);
       am.getLocalAssetStore().delete(deletionSelector);
-      if (am instanceof TieredStorageAssetManager) {
-        TieredStorageAssetManager tsam = (TieredStorageAssetManager) am;
-        for (String remoteStoreId : tsam.getRemoteAssetStoreIds()) {
-          tsam.getRemoteAssetStore(remoteStoreId).get().delete(deletionSelector);
-        }
+      for (AssetStore as : am.getRemoteAssetStores()) {
+        as.delete(deletionSelector);
       }
       deleteSnapshotHandler.handleDeletedSnapshot(mpId, version);
     }
