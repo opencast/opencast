@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,10 +88,11 @@ public class EmailTemplateScanner implements ArtifactInstaller {
    */
   @Override
   public void install(File artifact) throws Exception {
-    InputStream is = new FileInputStream(artifact);
-    String template = IOUtils.toString(is);
-    templates.put(artifact.getName(), template);
-    logger.info("Template {} installed", artifact.getName());
+    try (FileInputStream is = new FileInputStream(artifact)) {
+      String template = IOUtils.toString(is, StandardCharsets.UTF_8);
+      templates.put(artifact.getName(), template);
+      logger.info("Template {} installed", artifact.getName());
+    }
   }
 
   /**

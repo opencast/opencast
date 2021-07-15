@@ -28,7 +28,6 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.ReadinessIndicator;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -39,6 +38,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -117,12 +118,8 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
   public void install(File artifact) throws Exception {
     logger.info("Installing a feed from '{}'", artifact.getName());
     Properties props = new Properties();
-    FileInputStream in = null;
-    try {
-      in = new FileInputStream(artifact);
-      props.load(in);
-    } finally {
-      IOUtils.closeQuietly(in);
+    try (InputStreamReader reader = new InputStreamReader(new FileInputStream(artifact), StandardCharsets.UTF_8)) {
+      props.load(reader);
     }
     // Always include the server URL obtained from the bundle context
     props.put("org.opencastproject.server.url", bundleContext.getProperty("org.opencastproject.server.url"));

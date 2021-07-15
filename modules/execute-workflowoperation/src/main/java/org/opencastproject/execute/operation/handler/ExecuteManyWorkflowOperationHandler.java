@@ -51,8 +51,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -256,8 +257,8 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
             // The job payload is a file with set of properties for the workflow
             final Properties properties = new Properties();
             File propertiesFile = workspace.get(resultElements[i].getURI());
-            try (InputStream is = new FileInputStream(propertiesFile)) {
-              properties.load(is);
+            try (InputStreamReader reader = new InputStreamReader(new FileInputStream(propertiesFile), StandardCharsets.UTF_8)) {
+              properties.load(reader);
             }
             logger.debug("Loaded {} properties from {}", properties.size(), propertiesFile);
             workspace.deleteFromCollection(ExecuteService.COLLECTION, propertiesFile.getName());

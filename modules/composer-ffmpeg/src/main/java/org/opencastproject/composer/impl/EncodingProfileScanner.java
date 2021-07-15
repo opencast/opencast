@@ -41,6 +41,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -129,8 +131,8 @@ public class EncodingProfileScanner implements ArtifactInstaller {
   Map<String, EncodingProfile> loadFromProperties(File artifact) throws IOException {
     // Format name
     Properties properties = new Properties();
-    try (FileInputStream in = new FileInputStream(artifact)) {
-      properties.load(in);
+    try (InputStreamReader reader = new InputStreamReader(new FileInputStream(artifact), StandardCharsets.UTF_8)) {
+      properties.load(reader);
     }
 
     // Find list of formats in properties
