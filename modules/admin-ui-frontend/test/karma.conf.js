@@ -78,6 +78,9 @@ module.exports = function (config) {
                     console.error("Suggest installing Firefox or other FOSS browser");
                     throw "No browsers detected";
 	        }
+        if (availableBrowsers.includes('Safari')){
+                result = availableBrowsers.filter(item => item !== 'Safari')
+        }
                 return result;
             }
         },
