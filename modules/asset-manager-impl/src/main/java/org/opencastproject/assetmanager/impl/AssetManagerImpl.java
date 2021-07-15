@@ -407,20 +407,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 mkPropertyName(ace.getRole(), ace.getAction())), Value.mk(ace.isAllow())));
       }
 
-      // We pass the original media package here, instead of using
-      // snapshot.getMediaPackage(), for security reasons. The original media
-      // package has elements with URLs of type http://.../files/... in it. These
-      // URLs will be pulled from the Workspace cache without a HTTP call.
-      //
-      // Were we to use snapshot.getMediaPackage(), we'd have a HTTP call on our
-      // hands that's secured via the asset manager security model. But the
-      // snapshot taken here doesn't have the necessary security properties
-      // installed (yet). This happens in AssetManagerWithSecurity, some layers
-      // higher up. So there's a weird loop in here.
       logger.info("Send update message for snapshot {}, {} to ActiveMQ",
               snapshot.getMediaPackage().getIdentifier().toString(), snapshot.getVersion());
       messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-              mkTakeSnapshotMessage(snapshot, mp));
+              mkTakeSnapshotMessage(snapshot));
 
       // update ES indices
       updateEventInIndex(snapshot, adminUiIndex);
@@ -464,13 +454,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * <p>
    * Do not call outside of a security context.
    */
-  private AssetManagerItem.TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot, MediaPackage mp) {
-    final MediaPackage chosenMp;
-    if (mp != null) {
-      chosenMp = mp;
-    } else {
-      chosenMp = snapshot.getMediaPackage();
-    }
+  private AssetManagerItem.TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot) {
+    final MediaPackage mp = snapshot.getMediaPackage();
 
     long version;
     try {
@@ -483,7 +468,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       throw new RuntimeException("The current implementation of the index requires versions being of type 'long'.");
     }
 
-    return AssetManagerItem.add(workspace, chosenMp, authorizationService.getActiveAcl(chosenMp).getA(),
+    return AssetManagerItem.add(workspace, mp, authorizationService.getActiveAcl(mp).getA(),
             version, snapshot.getArchivalDate());
   }
 
