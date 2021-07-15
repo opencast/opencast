@@ -49,10 +49,24 @@ function parseMetadataCollectionKey(s: string): MetadataCollectionKey {
 }
 
 function collectionToOptions(collection: EventMetadataCollection, translatable: boolean, t: i18next.TFunction): OptionType[] {
-    return collectionToPairs(collection)
+    const pairs = collectionToPairs(collection);
+    //Check if we get a JSON object back, and that this contains the order field
+    //Use the order field in this case to determine to order of the items in the dropdown
+    if(pairs[0][0].startsWith("{") === true) {
+        if(Object.prototype.hasOwnProperty.call(JSON.parse(pairs[0][0]), "order") === true) {
+            return pairs
+                .sort((a,b)  => JSON.parse(a[0]).order - JSON.parse(b[0]).order)
+                .map(([k, v]) => [parseMetadataCollectionKey(k).label, v])
+                .map(([k, v]) => [translatable ? t(k) : k, v])
+                .map(([k, v]) => ({ value: v, label: k}));
+        }
+    }
+    //Otherwise just return an alphabetically sorted list
+    return pairs
         .map(([k, v]) => [parseMetadataCollectionKey(k).label, v])
         .map(([k, v]) => [translatable ? t(k) : k, v])
-        .map(([k, v]) => ({ value: v, label: k }));
+        .map(([k, v]) => ({ value: v, label: k}))
+        .sort((a,b) => a.label.localeCompare(b.label, i18next.language));
 }
 
 function MetadataFieldReadOnly(props: MetadataFieldProps) {
