@@ -16,6 +16,20 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>net.oauth.core</groupId>
+      <artifactId>oauth</artifactId>
+      <version>20100527</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <scope>provided</scope>
@@ -23,7 +37,6 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -221,6 +234,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <ignoredDependencies>
+            <ignoredDependency>javax.servlet:servlet-api</ignoredDependency>
+            <ignoredDependency>javax.servlet:javax.servlet-api</ignoredDependency>
+          </ignoredDependencies>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -236,7 +255,9 @@
               *
             </Import-Package>
             <Export-Package>
-              org.opencastproject.lti;version=${project.version}
+              org.opencastproject.lti;version=${project.version},
+              net.oauth,
+              net.oauth.*
             </Export-Package>
             <Service-Component>
               OSGI-INF/opencast-lti.xml,

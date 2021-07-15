@@ -9,6 +9,7 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "axios": "^0.21.1",
     "bootstrap": "^5.0.1",
+    "dangerously-set-html-content": "^1.0.8",
     "i18next": "^20.2.4",
     "i18next-browser-languagedetector": "^6.1.1",
     "iframe-resizer": "^4.3.2",
@@ -63,13 +64,13 @@
     ]
   },
   "devDependencies": {
-    "http-mock-server": "^0.5.2",
     "@types/jest": "26.0.23",
     "@types/node": "15.3.0",
     "@types/react": "17.0.5",
     "@types/react-dom": "17.0.5",
     "@types/react-helmet": "^6.1.1",
     "@types/react-js-pagination": "^3.0.3",
-    "@types/react-select": "^4.0.15"
+    "@types/react-select": "^4.0.15",
+    "http-mock-server": "^0.5.2"
   }
 }

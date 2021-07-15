@@ -322,12 +322,14 @@
 
     <!-- Enable 2-legged OAuth access ("signed fetch") to the LTI launch servlet -->
     <sec:intercept-url pattern="/lti/**" access="ROLE_OAUTH_USER" />
+    <sec:intercept-url pattern="/lti/ci" access="ROLE_OAUTH_USER" />
 
     <!-- Enable access to the LTI tools -->
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
 
     <!-- Enable access to the LTI service -->
     <sec:intercept-url pattern="/lti-service-gui/**" access="ROLE_OAUTH_USER" />
+    <sec:intercept-url pattern="/lti-service/**" access="ROLE_OAUTH_USER" />
 
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />

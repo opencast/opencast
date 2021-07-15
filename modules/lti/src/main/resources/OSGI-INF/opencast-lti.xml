@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-               name="org.opencastproject.lti.LtiServlet" immediate="true">
+               name="org.opencastproject.lti.LtiServlet" activate="activate" immediate="true">
   <implementation class="org.opencastproject.lti.LtiServlet"/>
   <property name="service.description" value="LTI Servlet"/>
   <property name="alias" value="/lti"/>
@@ -8,5 +8,7 @@
   <property name="httpContext.shared" value="true"/>
   <service>
     <provide interface="javax.servlet.Servlet"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
   </service>
+  <reference name="consumer-details-service" interface="org.springframework.security.oauth.provider.ConsumerDetailsService" cardinality="1..1" policy="static" bind="setConsumerDetailsService"/>
 </scr:component>
