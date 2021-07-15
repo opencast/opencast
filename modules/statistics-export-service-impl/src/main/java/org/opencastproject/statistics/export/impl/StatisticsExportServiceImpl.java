@@ -82,8 +82,10 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   private static final Logger logger = LoggerFactory.getLogger(StatisticsExportServiceImpl.class);
   private static final String[] header = {"ID", "Name", "Date", "Value"};
   private static final String CFG_KEY_SERIES_TO_EVENT_PROVIDER_MAPPINGS = "series.to.event.provider.mappings";
-  private static final String CFG_KEY_ORGANIZATION_TO_EVENT_PROVIDER_MAPPINGS = "organization.to.event.provider.mappings";
-  private static final String CFG_KEY_ORGANIZATION_TO_SERIES_PROVIDER_MAPPINGS = "organization.to.series.provider.mappings";
+  private static final String CFG_KEY_ORGANIZATION_TO_EVENT_PROVIDER_MAPPINGS
+      = "organization.to.event.provider.mappings";
+  private static final String CFG_KEY_ORGANIZATION_TO_SERIES_PROVIDER_MAPPINGS
+      = "organization.to.series.provider.mappings";
 
 
   private Map<String, String> seriesToEventProviderMapping = new HashMap<>();
@@ -101,11 +103,13 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     if (seriesToEventProviderMappings != null) {
       this.seriesToEventProviderMapping = getMapping(seriesToEventProviderMappings);
     }
-    final String organizationToEventProviderMappings = (String) dictionary.get(CFG_KEY_ORGANIZATION_TO_EVENT_PROVIDER_MAPPINGS);
+    final String organizationToEventProviderMappings
+        = (String) dictionary.get(CFG_KEY_ORGANIZATION_TO_EVENT_PROVIDER_MAPPINGS);
     if (organizationToEventProviderMappings != null) {
       this.organizationToEventProviderMapping = getMapping(organizationToEventProviderMappings);
     }
-    final String organizationToSeriesProviderMappings = (String) dictionary.get(CFG_KEY_ORGANIZATION_TO_SERIES_PROVIDER_MAPPINGS);
+    final String organizationToSeriesProviderMappings
+        = (String) dictionary.get(CFG_KEY_ORGANIZATION_TO_SERIES_PROVIDER_MAPPINGS);
     if (organizationToSeriesProviderMappings != null) {
       this.organizationToSeriesProviderMapping = getMapping(organizationToSeriesProviderMappings);
     }
@@ -173,9 +177,15 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
 
 
   @Override
-  public String getCSV(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution
-      dataResolution, AbstractSearchIndex index, ZoneId zoneId) throws SearchIndexException, UnauthorizedException,
-      NotFoundException {
+  public String getCSV(
+      StatisticsProvider provider,
+      String resourceId,
+      Instant from,
+      Instant to,
+      DataResolution dataResolution,
+      AbstractSearchIndex index,
+      ZoneId zoneId
+  ) throws SearchIndexException, UnauthorizedException, NotFoundException {
     if (!(provider instanceof TimeSeriesProvider)) {
       throw new IllegalStateException("CSV export not supported for provider of type " + provider.getClass().getName());
     }
@@ -229,7 +239,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     try (CSVPrinter printer = CSVFormat.RFC4180.print(stringWriter)) {
       switch (provider.getResourceType()) {
         case EPISODE:
-          printEvent(provider, resourceId, from, to, dataResolution, index, zoneId, printer, fullMetadata, limit, offset);
+          printEvent(provider, resourceId, from, to,
+              dataResolution, index, zoneId, printer, fullMetadata, limit, offset);
           break;
         case SERIES:
           if (detailLevel == DetailLevel.EPISODE) {
@@ -238,17 +249,22 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
                     limit, offset, filters);
           } else {
             // Default: just export series data
-            printSeries(provider, resourceId, from, to, dataResolution, index, zoneId, printer, fullMetadata, limit, offset);
+            printSeries(provider, resourceId, from, to, dataResolution,
+                index, zoneId, printer, fullMetadata, limit, offset);
           }
           break;
         case ORGANIZATION:
           if (detailLevel == DetailLevel.EPISODE) {
-            // Advanced: instead of exporting the organization data we export the data of all organization events
-            printOrganizationEvents(provider, resourceId, from, to, dataResolution, index, zoneId, printer, fullMetadata,
+            // Advanced: instead of exporting the organization data we export
+            // the data of all organization events
+            printOrganizationEvents(provider, resourceId, from, to,
+                dataResolution, index, zoneId, printer, fullMetadata,
                     limit, offset, filters);
           } else if (detailLevel == DetailLevel.SERIES) {
-            // Advanced: instead of exporting the organization data we export the data of all organization series
-            printOrganizationSeries(provider, resourceId, from, to, dataResolution, index, zoneId, printer, fullMetadata,
+            // Advanced: instead of exporting the organization data we export
+            // the data of all organization series
+            printOrganizationSeries(provider, resourceId, from, to,
+                dataResolution, index, zoneId, printer, fullMetadata,
                     limit, offset, filters);
           } else {
             printOrganization(provider, resourceId, from, to, dataResolution, zoneId, printer, limit, offset);
@@ -264,10 +280,19 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   }
 
 
-  private void printEvent(StatisticsProvider provider, String resourceId, Instant from, Instant to,
-                          DataResolution dataResolution, AbstractSearchIndex index, ZoneId zoneId, CSVPrinter printer,
-                          boolean fullMetaData, int limit, int offset)
-      throws IOException, SearchIndexException, NotFoundException {
+  private void printEvent(
+      StatisticsProvider provider,
+      String resourceId,
+      Instant from,
+      Instant to,
+      DataResolution dataResolution,
+      AbstractSearchIndex index,
+      ZoneId zoneId,
+      CSVPrinter printer,
+      boolean fullMetaData,
+      int limit,
+      int offset
+  ) throws IOException, SearchIndexException, NotFoundException {
     if (offset != 0) {
       return;
     }
@@ -275,7 +300,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     if (!event.isSome()) {
       throw new NotFoundException("Event not found in index: " + resourceId);
     }
-    final TimeSeries dataEvent = statisticsService.getTimeSeriesData(provider, resourceId, from, to, dataResolution, zoneId);
+    final TimeSeries dataEvent = statisticsService.getTimeSeriesData(
+        provider, resourceId, from, to, dataResolution, zoneId);
     if (fullMetaData) {
       this.printFullEventData(printer, dataEvent, dataResolution, resourceId, zoneId, true);
     } else {
@@ -294,7 +320,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     if (!series.isSome()) {
       throw new NotFoundException("Series not found in index: " + resourceId);
     }
-    final TimeSeries dataSeries = statisticsService.getTimeSeriesData(provider, resourceId, from, to, dataResolution, zoneId);
+    final TimeSeries dataSeries = statisticsService.getTimeSeriesData(
+        provider, resourceId, from, to, dataResolution, zoneId);
     if (fullMetadata) {
       this.printFullSeriesData(printer, dataSeries, dataResolution, resourceId, zoneId, true);
     } else {
@@ -302,13 +329,24 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     }
   }
 
-  private void printSeriesEvents(StatisticsProvider provider, String resourceId, Instant from, Instant to,
-                                 DataResolution dataResolution, AbstractSearchIndex index, ZoneId zoneId, CSVPrinter printer,
-                                 boolean fullMetadata, int limit, int offset, Map<String, String> filters)
-      throws SearchIndexException, IOException {
+  private void printSeriesEvents(
+      StatisticsProvider provider,
+      String resourceId,
+      Instant from,
+      Instant to,
+      DataResolution dataResolution,
+      AbstractSearchIndex index,
+      ZoneId zoneId,
+      CSVPrinter printer,
+      boolean fullMetadata,
+      int limit,
+      int offset,
+      Map<String, String> filters
+  ) throws SearchIndexException, IOException {
     final String eventProviderId = seriesToEventProviderMapping.get(provider.getId());
     final StatisticsProvider eventProvider = statisticsService.getProvider(eventProviderId)
-        .orElseThrow(() -> new IllegalStateException("The configured provider " + eventProviderId + " is not available."));
+        .orElseThrow(() -> new IllegalStateException(
+            "The configured provider " + eventProviderId + " is not available."));
     EventSearchQuery query = (EventSearchQuery) new EventSearchQuery(securityService.getOrganization().getId(),
             securityService.getUser()).withSeriesId(resourceId).withLimit(limit).withOffset(offset);
     for (Map.Entry<String, String> filter: filters.entrySet()) {
@@ -321,7 +359,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       final TimeSeries dataEvent = statisticsService.getTimeSeriesData(eventProvider,
           currentEvent.getSource().getIdentifier(), from, to, dataResolution, zoneId);
       if (fullMetadata) {
-        this.printFullEventData(printer, dataEvent, dataResolution, currentEvent.getSource().getIdentifier(), zoneId, first);
+        this.printFullEventData(printer, dataEvent, dataResolution,
+            currentEvent.getSource().getIdentifier(), zoneId, first);
       } else {
         printData(printer, dataEvent, dataResolution, currentEvent.getSource().getIdentifier(),
                 currentEvent.getSource().getTitle(), zoneId, first);
@@ -330,9 +369,17 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     }
   }
 
-  private void printOrganization(StatisticsProvider provider, String resourceId, Instant from, Instant to,
-                                 DataResolution dataResolution, ZoneId zoneId, CSVPrinter printer, int limit, int offset)
-      throws UnauthorizedException, IOException {
+  private void printOrganization(
+      StatisticsProvider provider,
+      String resourceId,
+      Instant from,
+      Instant to,
+      DataResolution dataResolution,
+      ZoneId zoneId,
+      CSVPrinter printer,
+      int limit,
+      int offset
+  ) throws UnauthorizedException, IOException {
     if (offset != 0) {
       return;
     }
@@ -340,14 +387,25 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     if (!resourceId.equals(organization.getId())) {
       throw new UnauthorizedException("Can only export CSV statistics for own organization.");
     }
-    final TimeSeries dataOrg = statisticsService.getTimeSeriesData(provider, resourceId, from, to, dataResolution, zoneId);
+    final TimeSeries dataOrg = statisticsService.getTimeSeriesData(
+        provider, resourceId, from, to, dataResolution, zoneId);
     printData(printer, dataOrg, dataResolution, resourceId, organization.getName(), zoneId, true);
   }
 
-  private void printOrganizationEvents(StatisticsProvider provider, String resourceId, Instant from, Instant to,
-                                 DataResolution dataResolution, AbstractSearchIndex index, ZoneId zoneId,
-                                 CSVPrinter printer, boolean fullMetadata, int limit, int offset, Map<String, String> filters)
-          throws UnauthorizedException, SearchIndexException, IOException {
+  private void printOrganizationEvents(
+      StatisticsProvider provider,
+      String resourceId,
+      Instant from,
+      Instant to,
+      DataResolution dataResolution,
+      AbstractSearchIndex index,
+      ZoneId zoneId,
+      CSVPrinter printer,
+      boolean fullMetadata,
+      int limit,
+      int offset,
+      Map<String, String> filters
+  ) throws UnauthorizedException, SearchIndexException, IOException {
 
     final Organization organization = securityService.getOrganization();
     if (!resourceId.equals(organization.getId())) {
@@ -356,7 +414,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
 
     final String eventProviderId = organizationToEventProviderMapping.get(provider.getId());
     final StatisticsProvider eventProvider = statisticsService.getProvider(eventProviderId)
-            .orElseThrow(() -> new IllegalStateException("The configured provider " + eventProviderId + " is not available."));
+        .orElseThrow(() -> new IllegalStateException(
+            "The configured provider " + eventProviderId + " is not available."));
     EventSearchQuery query = (EventSearchQuery) new EventSearchQuery(securityService.getOrganization().getId(),
             securityService.getUser()).withLimit(limit).withOffset(offset);
     for (Map.Entry<String, String> filter: filters.entrySet()) {
@@ -368,7 +427,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       final TimeSeries dataEvent = statisticsService.getTimeSeriesData(eventProvider,
               currentEvent.getSource().getIdentifier(), from, to, dataResolution, zoneId);
       if (fullMetadata) {
-        this.printFullEventData(printer, dataEvent, dataResolution, currentEvent.getSource().getIdentifier(), zoneId, first);
+        this.printFullEventData(printer, dataEvent, dataResolution,
+            currentEvent.getSource().getIdentifier(), zoneId, first);
       } else {
         printData(printer, dataEvent, dataResolution, currentEvent.getSource().getIdentifier(),
                 currentEvent.getSource().getTitle(), zoneId, first);
@@ -378,10 +438,20 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   }
 
 
-  private void printOrganizationSeries(StatisticsProvider provider, String resourceId, Instant from, Instant to,
-                                       DataResolution dataResolution, AbstractSearchIndex index, ZoneId zoneId,
-                                       CSVPrinter printer, boolean fullMetadata, int limit, int offset, Map<String, String> filters)
-          throws UnauthorizedException, SearchIndexException, IOException {
+  private void printOrganizationSeries(
+      StatisticsProvider provider,
+      String resourceId,
+      Instant from,
+      Instant to,
+      DataResolution dataResolution,
+      AbstractSearchIndex index,
+      ZoneId zoneId,
+      CSVPrinter printer,
+      boolean fullMetadata,
+      int limit,
+      int offset,
+      Map<String, String> filters
+  ) throws UnauthorizedException, SearchIndexException, IOException {
 
     final Organization organization = securityService.getOrganization();
     if (!resourceId.equals(organization.getId())) {
@@ -390,7 +460,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
 
     final String seriesProviderId = organizationToSeriesProviderMapping.get(provider.getId());
     final StatisticsProvider seriesProvider = statisticsService.getProvider(seriesProviderId)
-            .orElseThrow(() -> new IllegalStateException("The configured provider " + seriesProviderId + " is not available."));
+        .orElseThrow(() -> new IllegalStateException(
+            "The configured provider " + seriesProviderId + " is not available."));
 
     SeriesSearchQuery query = (SeriesSearchQuery) new SeriesSearchQuery(securityService.getOrganization().getId(),
             securityService.getUser()).withLimit(limit).withOffset(offset);
@@ -403,7 +474,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       final TimeSeries dataEvent = statisticsService.getTimeSeriesData(seriesProvider,
               currentSeries.getSource().getIdentifier(), from, to, dataResolution, zoneId);
       if (fullMetadata) {
-        this.printFullSeriesData(printer, dataEvent, dataResolution, currentSeries.getSource().getIdentifier(), zoneId, first);
+        this.printFullSeriesData(printer, dataEvent, dataResolution,
+            currentSeries.getSource().getIdentifier(), zoneId, first);
       } else {
         printData(printer, dataEvent, dataResolution, currentSeries.getSource().getIdentifier(),
                 currentSeries.getSource().getTitle(), zoneId, first);

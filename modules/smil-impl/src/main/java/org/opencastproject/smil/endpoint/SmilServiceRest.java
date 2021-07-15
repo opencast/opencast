@@ -53,17 +53,22 @@ import javax.ws.rs.core.Response;
  * Implement {@link SmilService} as REST Endpoint.
  */
 @Path("/")
-@RestService(name = "smil", title = "SmilService Rest Endpoint",
-        abstractText = "SmilRestService provide other services to create and modify Smil objects.",
-        notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/smil)"})
+@RestService(
+    name = "smil",
+    title = "SmilService Rest Endpoint",
+    abstractText = "SmilRestService provide other services to create and modify Smil objects.",
+    notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/smil)"
+    }
+)
 @Component(
-  property = {
-    "service.description=Smil Service REST Endpoint",
-    "opencast.service.type=org.opencastproject.smil",
-    "opencast.service.path=/smil"
-  },
-  immediate = true,
-  service = { SmilServiceRest.class }
+    property = {
+        "service.description=Smil Service REST Endpoint",
+        "opencast.service.type=org.opencastproject.smil",
+        "opencast.service.path=/smil"
+    },
+    immediate = true,
+    service = { SmilServiceRest.class }
 )
 public class SmilServiceRest {
 
@@ -80,15 +85,29 @@ public class SmilServiceRest {
   @POST
   @Path("create")
   @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML})
-  @RestQuery(name = "create", description = "Create new SMIL. Add some MediaPackage metadata.",
-          restParameters = {
-            @RestParameter(name = "mediaPackage", description = "MediaPackage for metadata.",
-                    isRequired = false, type = RestParameter.Type.TEXT)},
-          returnDescription = "Returns new SmilResponse with SMIL document inside.",
-          responses = {
-            @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Create new SMIL successfull"),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Given mediaPackage is not valid")
-          })
+  @RestQuery(
+      name = "create",
+      description = "Create new SMIL. Add some MediaPackage metadata.",
+      restParameters = {
+          @RestParameter(
+              name = "mediaPackage",
+              description = "MediaPackage for metadata.",
+              isRequired = false,
+              type = RestParameter.Type.TEXT
+          ),
+      },
+      returnDescription = "Returns new SmilResponse with SMIL document inside.",
+      responses = {
+          @RestResponse(
+            responseCode = HttpServletResponse.SC_OK,
+            description = "Create new SMIL successfull"
+          ),
+          @RestResponse(
+            responseCode = HttpServletResponse.SC_BAD_REQUEST,
+            description = "Given mediaPackage is not valid"
+          ),
+      }
+  )
   public Response createNewSmil(@FormParam("mediaPackage") String mediaPackage) {
     SmilResponse smilResponse = null;
     try {
@@ -109,19 +128,40 @@ public class SmilServiceRest {
   @POST
   @Path("addPar")
   @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML})
-  @RestQuery(name = "addPar", description = "Add an parallel element to SMIL (into SMIL body or an element with given parentId).",
-          restParameters = {
-            @RestParameter(name = "smil", description = "SMIL document where to add a par-element.",
-                    isRequired = true, type = RestParameter.Type.TEXT),
-            @RestParameter(name = "parentId", description = "An element Id, were to add new parallel.",
-                    isRequired = false, type = RestParameter.Type.STRING)},
-          returnDescription = "Returns SmilResponse with a parallel element inside "
+  @RestQuery(
+      name = "addPar",
+      description = "Add an parallel element to SMIL (into SMIL body or an element with given parentId).",
+      restParameters = {
+          @RestParameter(
+              name = "smil",
+              description = "SMIL document where to add a par-element.",
+              isRequired = true,
+              type = RestParameter.Type.TEXT
+          ),
+          @RestParameter(
+              name = "parentId",
+              description = "An element Id, were to add new parallel.",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          )
+      },
+      returnDescription = "Returns SmilResponse with a parallel element inside "
           + "(the new par will be returned as response entity).",
-          responses = {
-            @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Add par to SMIL successfull."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document doesn't contain an element with given parentId.")
-          })
+      responses = {
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_OK,
+              description = "Add par to SMIL successfull."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "SMIL document not valid."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "SMIL document doesn't contain an element with given parentId."
+          ),
+      }
+  )
   public Response addParallel(@FormParam("smil") String smil, @FormParam("parentId") String parentId) {
     SmilResponse smilResponse = null;
     try {
@@ -139,26 +179,49 @@ public class SmilServiceRest {
       return Response.ok(smilResponse).build();
     } catch (SmilException ex) {
       logger.info(ex.getMessage(), ex);
-      return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("SMIL document doesn't contain an element with given parentId.").build();
+      return Response.status(HttpServletResponse.SC_BAD_REQUEST)
+          .entity("SMIL document doesn't contain an element with given parentId.")
+          .build();
     }
   }
 
   @POST
   @Path("addSeq")
   @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML})
-  @RestQuery(name = "addSeq", description = "Add an sequence element to SMIL (into SMIL body or an element with given parentId).",
-          restParameters = {
-            @RestParameter(name = "smil", description = "SMIL document where to add a seq-element.",
-                    isRequired = true, type = RestParameter.Type.TEXT),
-            @RestParameter(name = "parentId", description = "An element Id, were to add new sequence.",
-                    isRequired = false, type = RestParameter.Type.STRING)},
-          returnDescription = "Returns SmilResponse with a sequence element inside "
+  @RestQuery(
+      name = "addSeq",
+      description = "Add an sequence element to SMIL (into SMIL body or an element with given parentId).",
+      restParameters = {
+          @RestParameter(
+              name = "smil",
+              description = "SMIL document where to add a seq-element.",
+              isRequired = true,
+              type = RestParameter.Type.TEXT
+          ),
+          @RestParameter(
+              name = "parentId",
+              description = "An element Id, were to add new sequence.",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          )
+      },
+      returnDescription = "Returns SmilResponse with a sequence element inside "
           + "(the new seq will be returned as response entity).",
-          responses = {
-            @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Add seq to SMIL successfull"),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid"),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document doesn't contain an element with given parentId")
-          })
+      responses = {
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_OK,
+              description = "Add seq to SMIL successfull"
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "SMIL document not valid"
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "SMIL document doesn't contain an element with given parentId"
+          ),
+      }
+  )
   public Response addSequence(@FormParam("smil") String smil, @FormParam("parentId") String parentId) {
     SmilResponse smilResponse = null;
     try {
@@ -177,39 +240,85 @@ public class SmilServiceRest {
       return Response.ok(smilResponse).build();
     } catch (SmilException ex) {
       logger.info(ex.getMessage(), ex);
-      return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("SMIL document doesn't contain an element with given parentId.").build();
+      return Response.status(HttpServletResponse.SC_BAD_REQUEST)
+          .entity("SMIL document doesn't contain an element with given parentId.")
+          .build();
     }
   }
 
   @POST
   @Path("addClip")
   @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML})
-  @RestQuery(name = "addClip", description = "Add new media element based on given Track information and start / duration parameters. "
+  @RestQuery(
+      name = "addClip",
+      description = "Add new media element based on given Track information and start / duration parameters. "
           + "ParentId specifies where to put the new media element.",
-          restParameters = {
-            @RestParameter(name = "smil", description = "SMIL document where to add new media element.",
-                    isRequired = true, type = RestParameter.Type.TEXT),
-            @RestParameter(name = "parentId", description = "An element Id, were to add new media.",
-                    isRequired = false, type = RestParameter.Type.STRING),
-            @RestParameter(name = "track", description = "Track (MediaPackageElement) to add as media element. "
-                    + "Some information like Track source and flavor will be stored in ParamGroup (in SMIL Head) "
-                    + "and referenced by paramGroup media element attribute.",
-                    isRequired = true, type = RestParameter.Type.TEXT),
-            @RestParameter(name = "start", description = "Track start position in milliseconds.",
-                    isRequired = true, type = RestParameter.Type.INTEGER),
-            @RestParameter(name = "duration", description = "Clip duration in milliseconds (should be positive).",
-                    isRequired = true, type = RestParameter.Type.INTEGER)},
-          returnDescription = "Returns new Smil with an media element inside "
+      restParameters = {
+          @RestParameter(
+              name = "smil",
+              description = "SMIL document where to add new media element.",
+              isRequired = true,
+              type = RestParameter.Type.TEXT
+          ),
+          @RestParameter(
+              name = "parentId",
+              description = "An element Id, were to add new media.",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              name = "track",
+              description = "Track (MediaPackageElement) to add as media element. "
+                  + "Some information like Track source and flavor will be stored in ParamGroup (in SMIL Head) "
+                  + "and referenced by paramGroup media element attribute.",
+              isRequired = true,
+              type = RestParameter.Type.TEXT
+          ),
+          @RestParameter(
+              name = "start",
+              description = "Track start position in milliseconds.",
+              isRequired = true,
+              type = RestParameter.Type.INTEGER
+          ),
+          @RestParameter(
+              name = "duration",
+              description = "Clip duration in milliseconds (should be positive).",
+              isRequired = true,
+              type = RestParameter.Type.INTEGER
+          ),
+      },
+      returnDescription = "Returns new Smil with an media element inside "
           + "(the new media and metadata elements will be returned as response entities).",
-          responses = {
-            @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Add media element to SMIL successfull."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Track not valid."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document doesn't contain an element with given parentId."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Start plus duration is bigger than Track length.")
-          })
-  public Response addClip(@FormParam("smil") String smil, @FormParam("parentId") String parentId, @FormParam("track") String track,
-          @FormParam("start") long start, @FormParam("duration") long duration) {
+      responses = {
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_OK,
+              description = "Add media element to SMIL successfull."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "SMIL document not valid."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "Track not valid."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "SMIL document doesn't contain an element with given parentId."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "Start plus duration is bigger than Track length."
+          ),
+      }
+  )
+  public Response addClip(
+      @FormParam("smil") String smil,
+      @FormParam("parentId") String parentId,
+      @FormParam("track") String track,
+      @FormParam("start") long start,
+      @FormParam("duration") long duration
+  ) {
     SmilResponse smilResponse = null;
     Track trackObj = null;
     try {
@@ -225,41 +334,87 @@ public class SmilServiceRest {
       return Response.ok(smilResponse).build();
     } catch (SmilException ex) {
       logger.info(ex.getMessage(), ex);
-      return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("SMIL document doesn't contain an element with given parentId.").build();
+      return Response.status(HttpServletResponse.SC_BAD_REQUEST)
+          .entity("SMIL document doesn't contain an element with given parentId.")
+          .build();
     }
   }
 
   @POST
   @Path("addClips")
   @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML})
-  @RestQuery(name = "addClips", description = "Add new media elements based on given Tracks information and start / duration parameters. "
+  @RestQuery(
+      name = "addClips",
+      description = "Add new media elements based on given Tracks information and start / duration parameters. "
           + "ParentId specifies where to put the new media.",
-          restParameters = {
-            @RestParameter(name = "smil", description = "SMIL document where to add new media elements.",
-                    isRequired = true, type = RestParameter.Type.TEXT),
-            @RestParameter(name = "parentId", description = "An element Id, were to add new media. ",
-                    isRequired = false, type = RestParameter.Type.STRING),
-            @RestParameter(name = "tracks", description = "Tracks (MediaPackageElements) to add as media elements."
-                    + "Some information like Track source and flavor will be stored in ParamGroup (in SMIL Head) "
-                    + "and referenced by paramGroup media element attribute.",
-                    isRequired = true, type = RestParameter.Type.TEXT),
-            @RestParameter(name = "start", description = "Track start position in milliseconds. "
-                    + "The start position will be applied to each media element.",
-                    isRequired = true, type = RestParameter.Type.INTEGER),
-            @RestParameter(name = "duration", description = "Clip duration in milliseconds (should be positive). "
-                    + "The duration will be applied to each media element.",
-                    isRequired = true, type = RestParameter.Type.INTEGER)},
-          returnDescription = "Returns new Smil with new media elements inside "
+      restParameters = {
+          @RestParameter(
+              name = "smil",
+              description = "SMIL document where to add new media elements.",
+              isRequired = true,
+              type = RestParameter.Type.TEXT
+          ),
+          @RestParameter(
+              name = "parentId",
+              description = "An element Id, were to add new media. ",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              name = "tracks",
+              description = "Tracks (MediaPackageElements) to add as media elements."
+                  + "Some information like Track source and flavor will be stored in ParamGroup (in SMIL Head) "
+                  + "and referenced by paramGroup media element attribute.",
+              isRequired = true,
+              type = RestParameter.Type.TEXT
+          ),
+          @RestParameter(
+              name = "start",
+              description = "Track start position in milliseconds. "
+                  + "The start position will be applied to each media element.",
+              isRequired = true,
+              type = RestParameter.Type.INTEGER
+          ),
+          @RestParameter(
+              name = "duration",
+              description = "Clip duration in milliseconds (should be positive). "
+                  + "The duration will be applied to each media element.",
+              isRequired = true,
+              type = RestParameter.Type.INTEGER
+          ),
+      },
+      returnDescription = "Returns new Smil with new media elements inside "
           + "(the new media and metadata elements will be returned as response entities).",
-          responses = {
-            @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Add media elements to SMIL successfull."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Tracks are not valid."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document doesn't contain an element with given parentId."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Start plus duration is bigger than Track length.")
-          })
-  public Response addClips(@FormParam("smil") String smil, @FormParam("parentId") String parentId, @FormParam("tracks") String tracks,
-          @FormParam("start") long start, @FormParam("duration") long duration) {
+      responses = {
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_OK,
+              description = "Add media elements to SMIL successfull."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "SMIL document not valid."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "Tracks are not valid."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "SMIL document doesn't contain an element with given parentId."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "Start plus duration is bigger than Track length."
+          ),
+      }
+  )
+  public Response addClips(
+      @FormParam("smil") String smil,
+      @FormParam("parentId") String parentId,
+      @FormParam("tracks") String tracks,
+      @FormParam("start") long start,
+      @FormParam("duration") long duration
+  ) {
     SmilResponse smilResponse = null;
     List<Track> tracksList = null;
     try {
@@ -279,28 +434,56 @@ public class SmilServiceRest {
       return Response.ok(smilResponse).build();
     } catch (SmilException ex) {
       logger.info(ex.getMessage(), ex);
-      return Response.status(HttpServletResponse.SC_BAD_REQUEST).entity("SMIL document doesn't contain an element with given parentId.").build();
+      return Response.status(HttpServletResponse.SC_BAD_REQUEST)
+          .entity("SMIL document doesn't contain an element with given parentId.")
+          .build();
     }
   }
 
   @POST
   @Path("addMeta")
   @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML})
-  @RestQuery(name = "addMeta", description = "Add a meta element to SMIL head.",
-          restParameters = {
-            @RestParameter(name = "smil", description = "SMIL document where to add an meta element.",
-                    isRequired = true, type = RestParameter.Type.TEXT),
-            @RestParameter(name = "name", description = "Value of meta name attribute.",
-                    isRequired = true, type = RestParameter.Type.STRING),
-            @RestParameter(name = "content", description = "Value of meta content attribute.",
-                    isRequired = true, type = RestParameter.Type.STRING)},
-          returnDescription = "Returns SmilResponse with a new meta element inside "
+  @RestQuery(
+      name = "addMeta",
+      description = "Add a meta element to SMIL head.",
+      restParameters = {
+          @RestParameter(
+              name = "smil",
+              description = "SMIL document where to add an meta element.",
+              isRequired = true,
+              type = RestParameter.Type.TEXT
+          ),
+          @RestParameter(
+              name = "name",
+              description = "Value of meta name attribute.",
+              isRequired = true,
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              name = "content",
+              description = "Value of meta content attribute.",
+              isRequired = true,
+              type = RestParameter.Type.STRING
+          ),
+      },
+      returnDescription = "Returns SmilResponse with a new meta element inside "
           + "(the new meta will be returned as response entity).",
-          responses = {
-            @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Add par to SMIL successfull."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid.")
-          })
-  public Response addMeta(@FormParam("smil") String smil, @FormParam("name") String metaName, @FormParam("content") String metaContent) {
+      responses = {
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_OK,
+              description = "Add par to SMIL successfull."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "SMIL document not valid."
+          ),
+      }
+  )
+  public Response addMeta(
+      @FormParam("smil") String smil,
+      @FormParam("name") String metaName,
+      @FormParam("content") String metaContent
+  ) {
     SmilResponse smilResponse = null;
     try {
       smilResponse = smilService.fromXml(smil);
@@ -314,18 +497,36 @@ public class SmilServiceRest {
   @POST
   @Path("remove")
   @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML})
-  @RestQuery(name = "remove", description = "Remove an element with given Id from SMIL.",
-          restParameters = {
-            @RestParameter(name = "smil", description = "SMIL document.",
-                    isRequired = true, type = RestParameter.Type.TEXT),
-            @RestParameter(name = "elementId", description = "Id of element to remove.",
-                    isRequired = true, type = RestParameter.Type.STRING)},
-          returnDescription = "Returns SMIL document without an element with given Id "
+  @RestQuery(
+      name = "remove",
+      description = "Remove an element with given Id from SMIL.",
+      restParameters = {
+          @RestParameter(
+              name = "smil",
+              description = "SMIL document.",
+              isRequired = true,
+              type = RestParameter.Type.TEXT
+          ),
+          @RestParameter(
+              name = "elementId",
+              description = "Id of element to remove.",
+              isRequired = true,
+              type = RestParameter.Type.STRING
+          )
+      },
+      returnDescription = "Returns SMIL document without an element with given Id "
           + "(if SMIL document contains an element with given Id, this will be returned as entity).",
-          responses = {
-            @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Removing element from SMIL successfull."),
-            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid.")
-          })
+      responses = {
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_OK,
+              description = "Removing element from SMIL successfull."
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_BAD_REQUEST,
+              description = "SMIL document not valid."
+          ),
+      }
+  )
   public Response removeSmilElement(@FormParam("smil") String smil, @FormParam("elementId") String elementId) {
     SmilResponse smilResponse = null;
     try {

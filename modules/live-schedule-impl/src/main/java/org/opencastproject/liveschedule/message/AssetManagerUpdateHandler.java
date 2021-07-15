@@ -54,22 +54,25 @@ public class AssetManagerUpdateHandler extends UpdateHandler {
           if (item instanceof TakeSnapshot) { // Check class just in case
             TakeSnapshot snapshotItem = (TakeSnapshot) item;
             // If no episopde dc, there's nothing to do.
-            if (snapshotItem.getEpisodeDublincore().isNone())
+            if (snapshotItem.getEpisodeDublincore().isNone()) {
               break;
+            }
             // Does media package have a live publication channel? This is to ignore non-live
             // and past events.
             // Note: we never create live events when getting asset manager
             // notifications, only when getting scheduler notifications
             for (Publication pub : snapshotItem.getMediapackage().getPublications()) {
-              if (LiveScheduleService.CHANNEL_ID.equals(pub.getChannel()))
+              if (LiveScheduleService.CHANNEL_ID.equals(pub.getChannel())) {
                 liveScheduleService.createOrUpdateLiveEvent(mpId, snapshotItem.getEpisodeDublincore().get());
+              }
             }
           }
           break;
         case Delete:
-          if (item instanceof DeleteEpisode)
+          if (item instanceof DeleteEpisode) {
             // Episode is being deleted
             liveScheduleService.deleteLiveEvent(mpId);
+          }
 
           // No action needed when a snapshot is deleted
           break;

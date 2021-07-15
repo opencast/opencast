@@ -67,13 +67,21 @@ public class TerminationStateRestServiceImpl implements TerminationStateRestServ
   @GET
   @Path("/state")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "stateasjson",
-          description = "Returns the Termination State as JSON.  Possible termination states are none, wait and ready.",
-          returnDescription = "A JSON representation of the termination state.",
-          responses = {
-            @RestResponse(responseCode = SC_OK, description = "A JSON representation of the termination state."),
-            @RestResponse(responseCode = SC_SERVICE_UNAVAILABLE, description = "The Termination State Service is disabled or unavailable")
-          })
+  @RestQuery(
+      name = "stateasjson",
+      description = "Returns the Termination State as JSON. Possible termination states are none, wait and ready.",
+      returnDescription = "A JSON representation of the termination state.",
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "A JSON representation of the termination state."
+          ),
+          @RestResponse(
+              responseCode = SC_SERVICE_UNAVAILABLE,
+              description = "The Termination State Service is disabled or unavailable"
+          ),
+      }
+  )
   public Response getState() {
     if (service != null) {
       JSONObject json = new JSONObject();
@@ -89,16 +97,34 @@ public class TerminationStateRestServiceImpl implements TerminationStateRestServ
   @Override
   @PUT
   @Path("/state")
-  @RestQuery(name = "setstate",
-          description = "Set the termination state. The only permissable values are 'none', 'wait' or 'ready'",
-          returnDescription = "Whether the termination state was set successfully",
-          restParameters = {
-            @RestParameter(name = "state", type = Type.STRING, defaultValue = "wait", description = "The termination state, the only valid value is 'wait'", isRequired = true)
-          },
-          responses = {
-            @RestResponse(responseCode = SC_NO_CONTENT, description = "The node is preparing to terminate"),
-            @RestResponse(responseCode = SC_BAD_REQUEST, description = "The state was not valid"),
-            @RestResponse(responseCode = SC_SERVICE_UNAVAILABLE, description = "The Termination State Service is disabled or unavailable"),})
+  @RestQuery(
+      name = "setstate",
+      description = "Set the termination state. The only permissable values are 'none', 'wait' or 'ready'",
+      returnDescription = "Whether the termination state was set successfully",
+      restParameters = {
+          @RestParameter(
+              name = "state",
+              type = Type.STRING,
+              defaultValue = "wait",
+              description = "The termination state, the only valid value is 'wait'",
+              isRequired = true
+          ),
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_NO_CONTENT,
+              description = "The node is preparing to terminate"
+          ),
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "The state was not valid"
+          ),
+          @RestResponse(
+              responseCode = SC_SERVICE_UNAVAILABLE,
+              description = "The Termination State Service is disabled or unavailable"
+          ),
+      }
+  )
   public Response setState(@FormParam("state") String state) {
     if (service != null) {
       TerminationStateService.TerminationState tState;

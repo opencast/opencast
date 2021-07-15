@@ -62,13 +62,20 @@ import javax.ws.rs.Path;
  * A proxy to a remote series service.
  */
 @Path("/")
-@RestService(name = "statisticsservice", title = "Statistics Service Remote", abstractText = "This service provides statistics.", notes = {
-    "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-    "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
-    "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"})
+@RestService(
+    name = "statisticsservice",
+    title = "Statistics Service Remote",
+    abstractText = "This service provides statistics.",
+    notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "If the service is down or not working it will return a status 503, this means the the "
+            + "underlying service is not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was "
+            + "not anticipated. In other words, there is a bug! You should file an error report "
+            + "with your server logs from the time when the error occurred: "
+            + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
 public class StatisticsServiceRemoteImpl extends RemoteBase implements StatisticsService {
 
   private static final JSONParser jsonParser = new JSONParser();
@@ -104,14 +111,22 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
   }
 
   @Override
-  public TimeSeries getTimeSeriesData(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution resolution, ZoneId zoneId) {
+  public TimeSeries getTimeSeriesData(
+      StatisticsProvider provider,
+      String resourceId,
+      Instant from,
+      Instant to,
+      DataResolution resolution,
+      ZoneId zoneId
+  ) {
     final List<NameValuePair> queryStringParams = new ArrayList<>();
     queryStringParams.add(new BasicNameValuePair("resourceId", resourceId));
     queryStringParams.add(new BasicNameValuePair("from", from.toString()));
     queryStringParams.add(new BasicNameValuePair("to", to.toString()));
     queryStringParams.add(new BasicNameValuePair("resolution", resolution.name()));
     queryStringParams.add(new BasicNameValuePair("zoneId", zoneId.getId()));
-    final HttpGet get = new HttpGet("timeseries/" + provider.getId() + ".json?" + URLEncodedUtils.format(queryStringParams, UTF_8));
+    final HttpGet get = new HttpGet("timeseries/" + provider.getId() + ".json?"
+        + URLEncodedUtils.format(queryStringParams, UTF_8));
     final HttpResponse response = getResponse(get, SC_OK);
     try {
       if (response != null) {
@@ -190,7 +205,13 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
           }
 
           @Override
-          public TimeSeries getValues(String resourceId, Instant from, Instant to, DataResolution resolution, ZoneId zoneId) {
+          public TimeSeries getValues(
+              String resourceId,
+              Instant from,
+              Instant to,
+              DataResolution resolution,
+              ZoneId zoneId
+          ) {
             throw new IllegalStateException("This method should never get called");
           }
 

@@ -62,24 +62,27 @@ public class SchedulerUpdateHandler extends UpdateHandler {
 
       switch (schedulerItem.getType()) {
         case UpdateCatalog:
-          if (isLive(mpId))
+          if (isLive(mpId)) {
             liveScheduleService.createOrUpdateLiveEvent(mpId, schedulerItem.getEvent());
+          }
           break;
         case UpdateAcl:
-          if (isLive(mpId))
+          if (isLive(mpId)) {
             liveScheduleService.updateLiveEventAcl(mpId, schedulerItem.getAcl());
+          }
           break;
         case UpdateProperties:
           // Workflow properties may have been updated (publishLive configuration)
           String publishLive = schedulerItem.getProperties().get(PUBLISH_LIVE_PROPERTY);
-          if (publishLive == null)
+          if (publishLive == null) {
             // Not specified so we do nothing. We don't want to delete if we got incomplete props.
             return;
-          else if (BooleanUtils.toBoolean(publishLive)) {
+          } else if (BooleanUtils.toBoolean(publishLive)) {
             DublinCoreCatalog episodeDC = schedulerService.getDublinCore(mpId);
             liveScheduleService.createOrUpdateLiveEvent(mpId, episodeDC);
-          } else
+          } else {
             liveScheduleService.deleteLiveEvent(mpId);
+          }
           break;
         case Delete:
         case DeleteRecordingStatus:
@@ -99,9 +102,11 @@ public class SchedulerUpdateHandler extends UpdateHandler {
           String state = schedulerItem.getRecordingState();
           if (RecordingState.CAPTURE_FINISHED.equals(state) || RecordingState.UPLOADING.equals(state)
                   || RecordingState.UPLOADING.equals(state) || RecordingState.CAPTURE_ERROR.equals(state)
-                  || RecordingState.UPLOAD_ERROR.equals(state))
-            if (isLive(mpId))
+                  || RecordingState.UPLOAD_ERROR.equals(state)) {
+            if (isLive(mpId)) {
               liveScheduleService.deleteLiveEvent(mpId);
+            }
+          }
           break;
         case UpdatePresenters:
           break;

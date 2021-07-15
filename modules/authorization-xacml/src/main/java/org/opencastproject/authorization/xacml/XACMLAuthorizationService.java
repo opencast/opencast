@@ -70,10 +70,10 @@ import javax.xml.bind.JAXBException;
  * A XACML implementation of the {@link AuthorizationService}.
  */
 @Component(
-  property = {
-    "service.description=Provides translation between access control entries and xacml documents"
-  },
-  service = { AuthorizationService.class, ManagedService.class }
+    property = {
+        "service.description=Provides translation between access control entries and xacml documents"
+    },
+    service = { AuthorizationService.class, ManagedService.class }
 )
 public class XACMLAuthorizationService implements AuthorizationService, ManagedService {
 
@@ -152,7 +152,9 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
       for (Attachment xacml : mp.getAttachments(XACML_POLICY_EPISODE)) {
         URI uri = xacml.getURI();
         try {
-          if (serializer != null) uri = serializer.decodeURI(uri);
+          if (serializer != null) {
+            uri = serializer.decodeURI(uri);
+          }
         } catch (URISyntaxException e) {
           logger.warn("URI {} syntax error, skip decoding", uri);
         }
@@ -163,7 +165,9 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
       for (Attachment xacml : mp.getAttachments(XACML_POLICY_SERIES)) {
         URI uri = xacml.getURI();
         try {
-          if (serializer != null) uri = serializer.decodeURI(uri);
+          if (serializer != null) {
+            uri = serializer.decodeURI(uri);
+          }
         } catch (URISyntaxException e) {
           logger.warn("URI {} syntax error, skip decoding", uri);
         }
@@ -199,8 +203,11 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   }
 
   @Override
-  public Tuple<MediaPackage, Attachment> setAcl(final MediaPackage mp, final AclScope scope, final AccessControlList acl)
-          throws MediaPackageException {
+  public Tuple<MediaPackage, Attachment> setAcl(
+      final MediaPackage mp,
+      final AclScope scope,
+      final AccessControlList acl
+  ) throws MediaPackageException {
     // Get XACML representation of these role + action tuples
     String xacmlContent;
     try {

@@ -7,7 +7,6 @@
 <suppressions>
     <suppress checks="LineLength" files="modules/admin-ui/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/annotation-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/authorization-xacml/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/capture-admin-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/common/.+\.(java|properties)"/>
@@ -29,24 +28,14 @@
     <suppress checks="LineLength" files="modules/ingest-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/inspection-service-ffmpeg/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/kernel/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/live-schedule-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/message-broker-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/mpeg7/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh-persistence/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/runtime-info/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/smil-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-export-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-provider-influx/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-service-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-service-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/termination-state-aws/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/termination-state-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-amberscript/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-google-speech-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-ibm-watson-impl/.+\.(java|properties)"/>
@@ -68,7 +57,6 @@
 
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
     <suppress checks="Indentation" files="modules/annotation-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/authorization-xacml/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/common/.+\.java"/>
     <suppress checks="Indentation" files="modules/common-jpa-impl/.+\.java"/>
@@ -87,12 +75,8 @@
     <suppress checks="Indentation" files="modules/metadata/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
-    <suppress checks="Indentation" files="modules/runtime-info/.+\.java"/>
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="Indentation" files="modules/smil-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/statistics-export-service-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/statistics-service-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-amberscript/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-google-speech-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-persistence/.+\.java"/>
@@ -108,7 +92,6 @@
 
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/admin-ui/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/annotation-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/authorization-xacml/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/caption-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/common-jpa-impl/.+\.java"/>
@@ -128,7 +111,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/ingest-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/inspection-service-ffmpeg/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/kernel/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/live-schedule-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/message-broker-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/message-broker-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/mpeg7/.+\.java"/>
