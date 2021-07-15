@@ -26,6 +26,11 @@ import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
+import org.opencastproject.api.index.event.EventSearchQuery;
+import org.opencastproject.api.index.series.Series;
+import org.opencastproject.api.index.series.SeriesSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
@@ -39,11 +44,6 @@ import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentParser;
@@ -1184,7 +1184,7 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public MetadataList updateAllEventMetadata(
-          final String id, final String metadataJSON, final AbstractSearchIndex index)
+          final String id, final String metadataJSON, final ApiIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, SearchIndexException,
           UnauthorizedException {
     final MetadataList metadataList;
@@ -1270,7 +1270,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public MetadataList updateEventMetadata(String id, MetadataList metadataList, AbstractSearchIndex index)
+  public MetadataList updateEventMetadata(String id, MetadataList metadataList, ApiIndex index)
           throws IndexServiceException, SearchIndexException, NotFoundException, UnauthorizedException {
     Opt<Event> optEvent = getEvent(id, index);
     if (optEvent.isNone())
@@ -1348,7 +1348,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public AccessControlList updateEventAcl(String id, AccessControlList acl, AbstractSearchIndex index)
+  public AccessControlList updateEventAcl(String id, AccessControlList acl, ApiIndex index)
           throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
           UnauthorizedException {
     Opt<Event> optEvent = getEvent(id, index);
@@ -1396,7 +1396,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Opt<Event> getEvent(String id, AbstractSearchIndex index) throws SearchIndexException {
+  public Opt<Event> getEvent(String id, ApiIndex index) throws SearchIndexException {
     SearchResult<Event> result = index
             .getByQuery(new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
                     .withIdentifier(id));
@@ -1864,7 +1864,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Opt<Series> getSeries(String seriesId, AbstractSearchIndex searchIndex) throws SearchIndexException {
+  public Opt<Series> getSeries(String seriesId, ApiIndex searchIndex) throws SearchIndexException {
     SearchResult<Series> result = searchIndex
             .getByQuery(new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
                     .withIdentifier(seriesId));
@@ -1882,14 +1882,14 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public MetadataList updateAllSeriesMetadata(String id, String metadataJSON, AbstractSearchIndex index)
+  public MetadataList updateAllSeriesMetadata(String id, String metadataJSON, ApiIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
     MetadataList metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
     return updateSeriesMetadata(id, metadataJSON, index, metadataList);
   }
 
   @Override
-  public MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, AbstractSearchIndex index)
+  public MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, ApiIndex index)
           throws IndexServiceException, NotFoundException, UnauthorizedException {
     checkSeriesExists(id, index);
     updateSeriesMetadata(id, metadataList);
@@ -1988,7 +1988,7 @@ public class IndexServiceImpl implements IndexService {
    * @throws IndexServiceException
    *           Thrown if unable to access the index to get the series.
    */
-  private void checkSeriesExists(String seriesID, AbstractSearchIndex index)
+  private void checkSeriesExists(String seriesID, ApiIndex index)
           throws NotFoundException, IndexServiceException {
     try {
       Opt<Series> optSeries = getSeries(seriesID, index);
@@ -2003,7 +2003,7 @@ public class IndexServiceImpl implements IndexService {
   private MetadataList updateSeriesMetadata(
           final String seriesID,
           final String metadataJSON,
-          final AbstractSearchIndex index,
+          final ApiIndex index,
           final MetadataList metadataList)
           throws IllegalArgumentException, IndexServiceException, NotFoundException {
     checkSeriesExists(seriesID, index);

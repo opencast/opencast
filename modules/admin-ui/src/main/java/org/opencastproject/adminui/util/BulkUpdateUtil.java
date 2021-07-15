@@ -25,9 +25,9 @@ import static org.opencastproject.adminui.endpoint.AbstractEventEndpoint.SCHEDUL
 import static org.opencastproject.adminui.endpoint.AbstractEventEndpoint.SCHEDULING_END_KEY;
 import static org.opencastproject.adminui.endpoint.AbstractEventEndpoint.SCHEDULING_START_KEY;
 
-import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.mediapackage.MediaPackageElements;
@@ -72,7 +72,7 @@ public final class BulkUpdateUtil {
    */
   public static Optional<Event> getEvent(
     final IndexService indexSvc,
-    final AdminUISearchIndex index,
+    final ApiIndex index,
     final String id) {
     try {
       final Event event = indexSvc.getEvent(id, index).orNull();

@@ -25,7 +25,7 @@
              interface="org.opencastproject.security.api.SecurityService"
              bind="setSecurityService"/>
   <reference name="search-index"
-             interface="org.opencastproject.external.index.ExternalIndex"
+             interface="org.opencastproject.api.index.ApiIndex"
              bind="setSearchIndex"/>
   <reference name="asset-manager"
              interface="org.opencastproject.assetmanager.api.AssetManager"

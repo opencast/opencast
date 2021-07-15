@@ -23,7 +23,7 @@ package org.opencastproject.index.rebuild;
 
 import static java.lang.String.format;
 
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.api.index.ApiIndex;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -120,7 +120,7 @@ public class IndexRebuildService implements BundleActivator {
    * @throws IndexRebuildException
    *           Thrown if the index rebuild failed.
    */
-  public synchronized void rebuildIndex(AbstractSearchIndex index)
+  public synchronized void rebuildIndex(ApiIndex index)
           throws IOException, IndexRebuildException {
     index.clear();
     logger.info("Index '{}' cleared, starting complete rebuild.", index.getIndexName());
@@ -142,7 +142,7 @@ public class IndexRebuildService implements BundleActivator {
    * @throws IndexRebuildException
    *           Thrown if the index rebuild failed.
    */
-  public synchronized void rebuildIndex(AbstractSearchIndex index, String serviceName)
+  public synchronized void rebuildIndex(ApiIndex index, String serviceName)
           throws IllegalArgumentException, IndexRebuildException {
     IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
     logger.info("Starting partial rebuild of index '{}' from service '{}'.", index.getIndexName(), service);
@@ -160,7 +160,7 @@ public class IndexRebuildService implements BundleActivator {
    * @throws IndexRebuildException
    *           Thrown if the index rebuild failed.
    */
-  private void rebuildIndex(AbstractSearchIndex index, IndexRebuildService.Service service)
+  private void rebuildIndex(ApiIndex index, IndexRebuildService.Service service)
           throws IndexRebuildException {
 
     if (!indexProducers.containsKey(service)) {

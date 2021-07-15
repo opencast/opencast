@@ -26,7 +26,8 @@ import static java.util.Collections.emptyList;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
@@ -40,7 +41,6 @@ import org.opencastproject.editor.api.TrackData;
 import org.opencastproject.editor.api.TrackSubData;
 import org.opencastproject.editor.api.WorkflowData;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -157,7 +157,7 @@ public class EditorServiceImpl implements EditorService {
   private String previewTag;
   private String previewSubtype;
   private MediaPackageElementFlavor smilSilenceFlavor;
-  private AdminUISearchIndex searchIndex;
+  private ApiIndex searchIndex;
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
   private static final String DEFAULT_PREVIEW_TAG = "editor";
@@ -207,8 +207,8 @@ public class EditorServiceImpl implements EditorService {
   }
 
   @Reference
-  public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
-    this.searchIndex = adminUISearchIndex;
+  public void setApiIndex(ApiIndex apiIndex) {
+    this.searchIndex = apiIndex;
   }
 
   @Reference

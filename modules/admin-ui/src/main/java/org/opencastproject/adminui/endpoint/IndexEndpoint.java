@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.api.index.ApiIndex;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
@@ -76,7 +76,7 @@ public class IndexEndpoint {
   private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
   /** The admin UI index */
-  private AdminUISearchIndex adminUISearchIndex;
+  private ApiIndex apiIndex;
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -87,8 +87,8 @@ public class IndexEndpoint {
    * OSGI DI
    */
   @Reference
-  public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
-    this.adminUISearchIndex = adminUISearchIndex;
+  public void setApiIndex(ApiIndex apiIndex) {
+    this.apiIndex = apiIndex;
   }
 
   @Reference
@@ -121,7 +121,7 @@ public class IndexEndpoint {
     return securityContext.runInContext(() -> {
       try {
         logger.info("Clear the Admin UI index");
-        adminUISearchIndex.clear();
+        apiIndex.clear();
         return R.ok();
       } catch (Throwable t) {
         logger.error("Clearing the Admin UI index failed", t);
@@ -147,7 +147,7 @@ public class IndexEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
-        indexRebuildService.rebuildIndex(adminUISearchIndex, service);
+        indexRebuildService.rebuildIndex(apiIndex, service);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -166,7 +166,7 @@ public class IndexEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index");
-        indexRebuildService.rebuildIndex(adminUISearchIndex);
+        indexRebuildService.rebuildIndex(apiIndex);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }

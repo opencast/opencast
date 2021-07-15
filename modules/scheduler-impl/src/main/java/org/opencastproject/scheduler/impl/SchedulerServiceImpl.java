@@ -37,6 +37,9 @@ import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.RequireUtil.requireTrue;
 import static org.opencastproject.util.data.Monadics.mlist;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
+import org.opencastproject.api.index.event.EventIndexUtils;
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
@@ -47,9 +50,6 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
 import org.opencastproject.index.rebuild.IndexRebuildService;
@@ -224,8 +224,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private OrganizationDirectoryService orgDirectoryService;
 
   /** The Elasticsearch indices */
-  private AbstractSearchIndex adminUiIndex;
-  private AbstractSearchIndex externalApiIndex;
+  private ApiIndex index;
 
   /** The list of registered event catalog UI adapters */
   private List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
@@ -319,23 +318,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * OSgi callback to set the Admin UI index.
+   * OSgi callback to set the API index.
    *
    * @param index
-   *          the admin UI index.
+   *          the API index.
    */
-  public void setAdminUiIndex(AbstractSearchIndex index) {
-    this.adminUiIndex = index;
-  }
-
-  /**
-   * OSGi callback to set the External API index
-   *
-   * @param index
-   *          the external API index.
-   */
-  public void setExternalApiIndex(AbstractSearchIndex index) {
-    this.externalApiIndex = index;
+  public void setIndex(ApiIndex index) {
+    this.index = index;
   }
 
   /** OSGi callback to add {@link EventCatalogUIAdapter} instance. */
@@ -449,11 +438,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       updateLiveEvent(mediaPackageId, Opt.some(acl), dublinCore, Opt.some(startDateTime),
               Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(finalCaProperties));
 
-      // Update Elasticsearch indices
-      updateEventInIndex(mediaPackageId, adminUiIndex, Opt.some(acl), dublinCore, Opt.some(startDateTime),
-              Opt.some(endDateTime), Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties),
-              Opt.none());
-      updateEventInIndex(mediaPackageId, externalApiIndex, Opt.some(acl), dublinCore, Opt.some(startDateTime),
+      // Update API index
+      updateEventInIndex(mediaPackageId, index, Opt.some(acl), dublinCore, Opt.some(startDateTime),
               Opt.some(endDateTime), Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties),
               Opt.none());
 
@@ -598,10 +584,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         // Update live event
         updateLiveEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                 Opt.some(captureAgentId), Opt.some(finalCaProperties));
-        // Update Elasticsearch indices
-        updateEventInIndex(mediaPackageId, adminUiIndex, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
-                Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.none());
-        updateEventInIndex(mediaPackageId, externalApiIndex, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
+
+        // Update API index
+        updateEventInIndex(mediaPackageId, index, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                 Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.none());
 
         scheduledEvents.put(mediaPackageId, event);
@@ -795,10 +780,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       updateLiveEvent(mpId, acl, dublinCore, startDateTime, endDateTime, Opt.some(agentId),
               finalCaProperties);
 
-      // Update Elasticsearch indices
-      updateEventInIndex(mpId, adminUiIndex, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
-              finalCaProperties, Opt.none());
-      updateEventInIndex(mpId, externalApiIndex, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
+      // Update API index
+      updateEventInIndex(mpId, index, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
               finalCaProperties, Opt.none());
 
       // Update last modified
@@ -886,9 +869,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       sendSchedulerMessage(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
 
-      // Update Elasticsearch indices
-      removeSchedulingFromIndex(mediaPackageId, adminUiIndex);
-      removeSchedulingFromIndex(mediaPackageId, externalApiIndex);
+      // Update API index
+      removeSchedulingFromIndex(mediaPackageId, index);
 
     } catch (NotFoundException | SchedulerException e) {
       throw e;
@@ -1279,10 +1261,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         sendSchedulerMessage(new SchedulerItemList(r.getID(), Collections.singletonList(SchedulerItem
                 .updateRecordingStatus(r.getState(), r.getLastCheckinTime()))));
 
-        // Update Elasticsearch indices
-        updateEventInIndex(r.getID(), adminUiIndex, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
-                Opt.none(), Opt.none(), Opt.some(r.getState()));
-        updateEventInIndex(r.getID(), externalApiIndex, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
+        // Update API index
+        updateEventInIndex(r.getID(), index, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
                 Opt.none(), Opt.none(), Opt.some(r.getState()));
       } else {
         logger.debug("Recording state not changed");
@@ -1341,9 +1321,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       sendSchedulerMessage(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
 
-      // Update Elasticsearch indices
-      removeRecordingStatusFromIndex(id, adminUiIndex);
-      removeRecordingStatusFromIndex(id, externalApiIndex);
+      // Update API index
+      removeRecordingStatusFromIndex(id, index);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1393,7 +1372,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Update the event in the Elasticsearch index. Fields will only be updated of the corresponding Opt is not none.
+   * Update the event in the API index. Fields will only be updated of the corresponding Opt is not none.
    *
    * @param mediaPackageId
    * @param index
@@ -1406,7 +1385,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param properties
    * @param recordingStatus
    */
-  private void updateEventInIndex(String mediaPackageId, AbstractSearchIndex index, Opt<AccessControlList> acl,
+  private void updateEventInIndex(String mediaPackageId, ApiIndex index, Opt<AccessControlList> acl,
           Opt<DublinCoreCatalog> dublinCore, Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters,
           Opt<String> agentId, Opt<Map<String, String>> properties, Opt<String> recordingStatus) {
 
@@ -1465,12 +1444,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Set recording status to null for this event in the Elasticsearch index.
+   * Set recording status to null for this event in the API index.
    *
    * @param mediaPackageId
    * @param index
    */
-  private void removeRecordingStatusFromIndex(String mediaPackageId, AbstractSearchIndex index) {
+  private void removeRecordingStatusFromIndex(String mediaPackageId, ApiIndex index) {
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
 
@@ -1490,12 +1469,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Remove scheduling information for this event from the Elasticsearch index.
+   * Remove scheduling information for this event from the API index.
    *
    * @param mediaPackageId
    * @param index
    */
-  private void removeSchedulingFromIndex(String mediaPackageId, AbstractSearchIndex index) {
+  private void removeSchedulingFromIndex(String mediaPackageId, ApiIndex index) {
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
     try {
@@ -1686,7 +1665,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
+  public void repopulate(final ApiIndex index) throws IndexRebuildException {
     final int[] current = {0};
     final int total;
     try {

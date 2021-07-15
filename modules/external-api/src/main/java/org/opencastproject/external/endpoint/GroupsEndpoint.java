@@ -37,10 +37,10 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_6_0;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.api.index.ApiIndex;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.SecurityService;
@@ -98,13 +98,13 @@ public class GroupsEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(GroupsEndpoint.class);
 
   /* OSGi service references */
-  private ExternalIndex externalIndex;
+  private ApiIndex apiIndex;
   private JpaGroupRoleProvider jpaGroupRoleProvider;
   private SecurityService securityService;
 
   /** OSGi DI */
-  void setExternalIndex(ExternalIndex externalIndex) {
-    this.externalIndex = externalIndex;
+  void setApiIndex(ApiIndex apiIndex) {
+    this.apiIndex = apiIndex;
   }
 
   /** OSGi DI. */

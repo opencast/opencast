@@ -24,12 +24,12 @@ package org.opencastproject.external.endpoint;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.functions.Functions.chuck;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
+import org.opencastproject.api.index.series.Series;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.external.util.statistics.QueryUtils;
 import org.opencastproject.external.util.statistics.ResourceTypeUtils;
 import org.opencastproject.external.util.statistics.StatisticsProviderUtils;
@@ -91,7 +91,7 @@ public class StatisticsEndpoint {
 
   private SecurityService securityService;
   private IndexService indexService;
-  private ExternalIndex externalIndex;
+  private ApiIndex apiIndex;
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
@@ -103,8 +103,8 @@ public class StatisticsEndpoint {
     this.indexService = indexService;
   }
 
-  public void setExternalIndex(ExternalIndex externalIndex) {
-    this.externalIndex = externalIndex;
+  public void setApiIndex(ApiIndex apiIndex) {
+    this.apiIndex = apiIndex;
   }
 
   public void setStatisticsService(StatisticsService statisticsService) {
@@ -325,7 +325,7 @@ public class StatisticsEndpoint {
             parameters.getFrom(),
             parameters.getTo(),
             parameters.getDataResolution(),
-            this.externalIndex,
+            this.apiIndex,
             ZoneId.systemDefault(),
             true,
             parameters.getDetailLevel(),
@@ -358,7 +358,7 @@ public class StatisticsEndpoint {
   }
 
   private void checkMediapackageAccess(final String mpId) throws UnauthorizedException, SearchIndexException {
-    final Opt<Event> event = indexService.getEvent(mpId, externalIndex);
+    final Opt<Event> event = indexService.getEvent(mpId, apiIndex);
     if (event.isNone()) {
       // IndexService checks permissions and returns None if user is unauthorized
       throw new UnauthorizedException(securityService.getUser(), "read");
@@ -366,7 +366,7 @@ public class StatisticsEndpoint {
   }
 
   private void checkSeriesAccess(final String seriesId) throws UnauthorizedException, SearchIndexException {
-    final Opt<Series> series = indexService.getSeries(seriesId, externalIndex);
+    final Opt<Series> series = indexService.getSeries(seriesId, apiIndex);
     if (series.isNone()) {
       // IndexService checks permissions and returns None if user is unauthorized
       throw new UnauthorizedException(securityService.getUser(), "read");

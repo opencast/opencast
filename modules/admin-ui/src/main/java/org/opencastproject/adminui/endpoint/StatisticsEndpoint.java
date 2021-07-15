@@ -27,10 +27,10 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.impl.ProviderQuery;
 import org.opencastproject.adminui.impl.RawProviderQuery;
-import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
+import org.opencastproject.api.index.series.Series;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -102,7 +102,7 @@ public class StatisticsEndpoint {
 
   private SecurityService securityService;
   private IndexService indexService;
-  private AdminUISearchIndex searchIndex;
+  private ApiIndex searchIndex;
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
@@ -117,7 +117,7 @@ public class StatisticsEndpoint {
   }
 
   @Reference
-  public void setSearchIndex(AdminUISearchIndex searchIndex) {
+  public void setSearchIndex(ApiIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 

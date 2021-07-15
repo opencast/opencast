@@ -11,8 +11,8 @@
     <provide interface="org.opencastproject.list.api.ResourceListProvider"/>
   </service>
 
-  <reference name="AdminUISearchIndex"
-             interface="org.opencastproject.adminui.index.AdminUISearchIndex"
+  <reference name="ApiIndex"
+             interface="org.opencastproject.api.index.ApiIndex"
              bind="setSearchIndex"/>
   <reference name="SecurityService"
              interface="org.opencastproject.security.api.SecurityService"

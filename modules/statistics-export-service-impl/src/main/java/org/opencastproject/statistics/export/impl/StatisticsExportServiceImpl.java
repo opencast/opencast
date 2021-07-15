@@ -23,16 +23,16 @@ package org.opencastproject.statistics.export.impl;
 
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
+import org.opencastproject.api.index.event.EventSearchQuery;
+import org.opencastproject.api.index.series.Series;
+import org.opencastproject.api.index.series.SeriesSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
@@ -183,7 +183,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      AbstractSearchIndex index,
+      ApiIndex index,
       ZoneId zoneId
   ) throws SearchIndexException, UnauthorizedException, NotFoundException {
     if (!(provider instanceof TimeSeriesProvider)) {
@@ -229,7 +229,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
 
   @Override
   public String getCSV(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution
-          dataResolution, AbstractSearchIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel,
+          dataResolution, ApiIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel,
           int limit, int offset, Map<String, String> filters)
           throws SearchIndexException, UnauthorizedException, NotFoundException {
     if (!(provider instanceof TimeSeriesProvider)) {
@@ -286,7 +286,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      AbstractSearchIndex index,
+      ApiIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetaData,
@@ -310,7 +310,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   }
 
   private void printSeries(StatisticsProvider provider, String resourceId, Instant from, Instant to,
-                           DataResolution dataResolution, AbstractSearchIndex index, ZoneId zoneId, CSVPrinter printer,
+                           DataResolution dataResolution, ApiIndex index, ZoneId zoneId, CSVPrinter printer,
                            boolean fullMetadata, int limit, int offset)
           throws SearchIndexException, NotFoundException, IOException {
     if (offset != 0) {
@@ -335,7 +335,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      AbstractSearchIndex index,
+      ApiIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetadata,
@@ -398,7 +398,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      AbstractSearchIndex index,
+      ApiIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetadata,
@@ -444,7 +444,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      AbstractSearchIndex index,
+      ApiIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetadata,

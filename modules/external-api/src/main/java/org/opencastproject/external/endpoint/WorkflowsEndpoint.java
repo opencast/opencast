@@ -34,11 +34,11 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -115,7 +115,7 @@ public class WorkflowsEndpoint {
 
   /* OSGi service references */
   private WorkflowService workflowService;
-  private ExternalIndex externalIndex;
+  private ApiIndex apiIndex;
   private IndexService indexService;
 
   /** OSGi DI */
@@ -124,8 +124,8 @@ public class WorkflowsEndpoint {
   }
 
   /** OSGi DI */
-  public void setExternalIndex(ExternalIndex externalIndex) {
-    this.externalIndex = externalIndex;
+  public void setApiIndex(ApiIndex apiIndex) {
+    this.apiIndex = apiIndex;
   }
 
   /** OSGi DI */
@@ -343,7 +343,7 @@ public class WorkflowsEndpoint {
 
     try {
       // Media Package
-      Opt<Event> event = indexService.getEvent(eventId, externalIndex);
+      Opt<Event> event = indexService.getEvent(eventId, apiIndex);
       if (event.isNone()) {
         return ApiResponses.notFound("Cannot find an event with id '%s'.", eventId);
       }

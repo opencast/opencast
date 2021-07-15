@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.api.index.ApiIndex;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -122,7 +122,7 @@ public class SeriesServiceImplTest {
     MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
     EasyMock.replay(messageSender);
 
-    AbstractSearchIndex esIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    ApiIndex esIndex = EasyMock.createNiceMock(ApiIndex.class);
     EasyMock.expect(esIndex.addOrUpdateSeries(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);
@@ -132,8 +132,8 @@ public class SeriesServiceImplTest {
     seriesService.setIndex(index);
     seriesService.setSecurityService(securityService);
     seriesService.setMessageSender(messageSender);
-    seriesService.setAdminUiIndex(esIndex);
-    seriesService.setExternalApiIndex(esIndex);
+    seriesService.setApiIndex(esIndex);
+    seriesService.setIndex(index);
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty((String) EasyMock.anyObject())).andReturn("System Admin");

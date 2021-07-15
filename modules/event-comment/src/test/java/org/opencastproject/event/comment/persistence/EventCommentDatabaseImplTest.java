@@ -28,11 +28,11 @@ import static org.opencastproject.event.comment.persistence.EventCommentDatabase
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
+import org.opencastproject.api.index.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -88,14 +88,14 @@ public class EventCommentDatabaseImplTest {
     EasyMock.expect(result.getItems()).andReturn(new SearchResultItem[]{ resultItem }).anyTimes();
     EasyMock.replay(result);
 
-    AbstractSearchIndex adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    ApiIndex adminUiIndex = EasyMock.createNiceMock(ApiIndex.class);
     EasyMock.expect(adminUiIndex.getIndexName()).andReturn("adminui").anyTimes();
     EasyMock.expect(adminUiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
     EasyMock.expect(adminUiIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.of(event)).atLeastOnce();
     EasyMock.replay(adminUiIndex);
 
-    AbstractSearchIndex externalApiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    ApiIndex externalApiIndex = EasyMock.createNiceMock(ApiIndex.class);
     EasyMock.expect(externalApiIndex.getIndexName()).andReturn("externalapi").anyTimes();
     EasyMock.expect(externalApiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).
             anyTimes();
@@ -107,8 +107,8 @@ public class EventCommentDatabaseImplTest {
     persistence.setEntityManagerFactory(newTestEntityManagerFactory(PERSISTENCE_UNIT));
     persistence.setUserDirectoryService(userDirectoryService);
     persistence.setSecurityService(securityService);
-    persistence.setAdminUiIndex(adminUiIndex);
-    persistence.setExternalApiIndex(externalApiIndex);
+    persistence.setIndex(adminUiIndex);
+    persistence.setIndex(externalApiIndex);
     persistence.activate(null);
   }
 

@@ -28,6 +28,8 @@ import static org.junit.Assert.assertEquals;
 import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.CONTINUE;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.EventSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
@@ -39,8 +41,6 @@ import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -318,13 +318,12 @@ public class WorkflowServiceImplTest {
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
 
-    final AbstractSearchIndex index = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    final ApiIndex index = EasyMock.createNiceMock(ApiIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
     EasyMock.replay(result, index);
 
-    service.setAdminUiIndex(index);
-    service.setExternalApiIndex(index);
+    service.setIndex(index);
   }
 
   @After

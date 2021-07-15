@@ -22,9 +22,9 @@ package org.opencastproject.event.comment.persistence;
 
 import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildException;
@@ -90,8 +90,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   private ComponentContext cc;
 
   /** The elasticsearch indices */
-  private AbstractSearchIndex adminUiIndex;
-  private AbstractSearchIndex externalApiIndex;
+  private ApiIndex index;
 
   /** OSGi component activation callback */
   public void activate(ComponentContext cc) {
@@ -136,23 +135,13 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   /**
-   * OSgi callback for the Admin UI index.
+   * OSgi callback for the API index.
    *
    * @param index
-   *          the admin UI index.
+   *          the API index.
    */
-  public void setAdminUiIndex(AbstractSearchIndex index) {
-    this.adminUiIndex = index;
-  }
-
-  /**
-   * OSGi callback for the External API index
-   *
-   * @param index
-   *          the external API index.
-   */
-  public void setExternalApiIndex(AbstractSearchIndex index) {
-    this.externalApiIndex = index;
+  public void setIndex(ApiIndex index) {
+    this.index = index;
   }
 
   @Override
@@ -393,12 +382,11 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     String organization = securityService.getOrganization().getId();
     User user = securityService.getUser();
 
-    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user, adminUiIndex);
-    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user, externalApiIndex);
+    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user, index);
   }
 
   private void updateIndex(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting,
-          String organization, User user, AbstractSearchIndex index) {
+          String organization, User user, ApiIndex index) {
     logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
     if (!hasComments && hasOpenComments) {
       throw new IllegalStateException(
@@ -444,7 +432,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   };
 
   @Override
-  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
+  public void repopulate(final ApiIndex index) throws IndexRebuildException {
     try {
       final int total = countComments();
       final int[] current = new int[1];

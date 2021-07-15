@@ -59,6 +59,8 @@ import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.EventSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
@@ -77,8 +79,6 @@ import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -214,7 +214,7 @@ public class SchedulerServiceImplTest {
   private Organization currentOrg = new DefaultOrganization();
 
   private static SchedulerServiceImpl schedSvc;
-  private static AbstractSearchIndex index;
+  private static ApiIndex index;
 
   // persistent properties
   private static SchedulerServiceDatabaseImpl schedulerDatabase;
@@ -269,7 +269,7 @@ public class SchedulerServiceImplTest {
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
 
-    index = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    index = EasyMock.createNiceMock(ApiIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
 
@@ -284,8 +284,7 @@ public class SchedulerServiceImplTest {
     schedSvc.addCatalogUIAdapter(episodeAdapter);
     schedSvc.addCatalogUIAdapter(extendedAdapter);
     schedSvc.setOrgDirectoryService(orgDirectoryService);
-    schedSvc.setAdminUiIndex(index);
-    schedSvc.setExternalApiIndex(index);
+    schedSvc.setIndex(index);
 
     schedSvc.activate(componentContext);
   }
@@ -1742,7 +1741,7 @@ public class SchedulerServiceImplTest {
     MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
     EasyMock.replay(ms);
 
-    AbstractSearchIndex esIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    ApiIndex esIndex = EasyMock.createNiceMock(ApiIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);
@@ -1755,8 +1754,7 @@ public class SchedulerServiceImplTest {
     am.setAuthorizationService(authorizationService);
     am.setSecurityService(securityService);
     am.setMessageSender(ms);
-    am.setAdminUiIndex(esIndex);
-    am.setExternalApiIndex(esIndex);
+    am.setIndex(esIndex);
     return am;
   }
 

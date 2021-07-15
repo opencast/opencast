@@ -36,17 +36,17 @@ import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.EventIndexSchema;
+import org.opencastproject.api.index.series.Series;
+import org.opencastproject.api.index.series.SeriesIndexSchema;
+import org.opencastproject.api.index.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesIndexSchema;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
@@ -140,14 +140,14 @@ public class SeriesEndpoint {
   protected String endpointBaseUrl;
 
   /* OSGi service references */
-  private ExternalIndex externalIndex;
+  private ApiIndex apiIndex;
   private IndexService indexService;
   private SecurityService securityService;
   private SeriesService seriesService;
 
   /** OSGi DI */
-  void setExternalIndex(ExternalIndex externalIndex) {
-    this.externalIndex = externalIndex;
+  void setApiIndex(ApiIndex apiIndex) {
+    this.apiIndex = apiIndex;
   }
 
   /** OSGi DI */
@@ -307,7 +307,7 @@ public class SeriesEndpoint {
 
       logger.trace("Using Query: " + query.toString());
 
-      SearchResult<Series> result = externalIndex.getByQuery(query);
+      SearchResult<Series> result = apiIndex.getByQuery(query);
       final boolean includeAcl = (withAcl != null && withAcl);
       return ApiResponses.Json.ok(requestedVersion, arr($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
         @Override
@@ -403,7 +403,7 @@ public class SeriesEndpoint {
       withAcl = false;
     }
 
-    for (final Series s : indexService.getSeries(id, externalIndex)) {
+    for (final Series s : indexService.getSeries(id, apiIndex)) {
       JValue subjects;
       if (s.getSubject() == null) {
         subjects = arr();
@@ -483,7 +483,7 @@ public class SeriesEndpoint {
   }
 
   private Response getAllMetadata(String id, ApiVersion requestedVersion) throws SearchIndexException {
-    Opt<Series> optSeries = indexService.getSeries(id, externalIndex);
+    Opt<Series> optSeries = indexService.getSeries(id, apiIndex);
     if (optSeries.isNone())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
@@ -503,7 +503,7 @@ public class SeriesEndpoint {
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
-    Opt<Series> optSeries = indexService.getSeries(id, externalIndex);
+    Opt<Series> optSeries = indexService.getSeries(id, apiIndex);
     if (optSeries.isNone())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
@@ -689,7 +689,7 @@ public class SeriesEndpoint {
     Opt<DublinCoreMetadataCollection> optCollection = Opt.none();
     SeriesCatalogUIAdapter adapter = null;
 
-    Opt<Series> optSeries = indexService.getSeries(id, externalIndex);
+    Opt<Series> optSeries = indexService.getSeries(id, apiIndex);
     if (optSeries.isNone())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
@@ -742,7 +742,7 @@ public class SeriesEndpoint {
     }
 
     metadataList.add(adapter, collection);
-    indexService.updateAllSeriesMetadata(id, metadataList, externalIndex);
+    indexService.updateAllSeriesMetadata(id, metadataList, apiIndex);
     return ApiResponses.Json.ok(acceptHeader, "");
   }
 
@@ -775,7 +775,7 @@ public class SeriesEndpoint {
               .build();
     }
 
-    Opt<Series> optSeries = indexService.getSeries(id, externalIndex);
+    Opt<Series> optSeries = indexService.getSeries(id, apiIndex);
     if (optSeries.isNone())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
@@ -796,7 +796,7 @@ public class SeriesEndpoint {
   public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     JSONParser parser = new JSONParser();
-    for (final Series series : indexService.getSeries(id, externalIndex)) {
+    for (final Series series : indexService.getSeries(id, apiIndex)) {
       // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.
       JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
 
@@ -817,7 +817,7 @@ public class SeriesEndpoint {
                   @RestResponse(description = "The series' properties are returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
-    if (indexService.getSeries(id, externalIndex).isSome()) {
+    if (indexService.getSeries(id, apiIndex).isSome()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
       return ApiResponses.Json.ok(acceptHeader, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
@@ -862,7 +862,7 @@ public class SeriesEndpoint {
           @FormParam("metadata") String metadataJSON)
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
-      MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, externalIndex);
+      MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, apiIndex);
       return ApiResponses.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update series '{}' with metadata '{}'", seriesID, metadataJSON, e);

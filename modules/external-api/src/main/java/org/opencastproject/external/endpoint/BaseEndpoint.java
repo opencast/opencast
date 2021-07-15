@@ -27,9 +27,9 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserIdRole;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 
+import org.opencastproject.api.index.ApiIndex;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
@@ -99,13 +99,13 @@ public class BaseEndpoint {
 
   /* OSGi service references */
   private SecurityService securityService;
-  private ExternalIndex externalIndex;
+  private ApiIndex apiIndex;
 
   private IndexRebuildService indexRebuildService = null;
 
   /** OSGi DI */
-  void setExternalIndex(ExternalIndex externalIndex) {
-    this.externalIndex = externalIndex;
+  void setApiIndex(ApiIndex apiIndex) {
+    this.apiIndex = apiIndex;
   }
 
   /** OSGi DI */
@@ -262,7 +262,7 @@ public class BaseEndpoint {
     return securityContext.runInContext(() -> {
       try {
         logger.info("Clear the external index");
-        externalIndex.clear();
+        apiIndex.clear();
         return R.ok();
       } catch (Throwable t) {
         logger.error("Clearing the external index failed", t);
@@ -288,7 +288,7 @@ public class BaseEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
-        indexRebuildService.rebuildIndex(externalIndex, service);
+        indexRebuildService.rebuildIndex(apiIndex, service);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -306,7 +306,7 @@ public class BaseEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the external index");
-        indexRebuildService.rebuildIndex(externalIndex);
+        indexRebuildService.rebuildIndex(apiIndex);
         logger.info("Finished repopulating the external index");
       } catch (Throwable t) {
         logger.error("Repopulating the external index failed", t);

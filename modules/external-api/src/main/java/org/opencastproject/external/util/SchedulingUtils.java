@@ -28,12 +28,12 @@ import static java.time.ZoneOffset.UTC;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -346,8 +346,8 @@ public final class SchedulingUtils {
    *          The conflicting {@link MediaPackage}s.
    * @param indexService
    *          The {@link IndexService} for getting the corresponding events for the conflicting {@link MediaPackage}s.
-   * @param externalIndex
-   *          The ExternalIndex to use for getting the corresponding events for the conflicting MediaPackages.
+   * @param apiIndex
+   *          The ApiIndex to use for getting the corresponding events for the conflicting MediaPackages.
    *
    * @return A List of conflicting events, represented as JSON objects.
    *
@@ -358,11 +358,11 @@ public final class SchedulingUtils {
       Optional<String> checkedEventId,
       List<MediaPackage> mediaPackages,
       IndexService indexService,
-      AbstractSearchIndex externalIndex
+      ApiIndex apiIndex
   ) throws SearchIndexException {
     final List<JValue> result = new ArrayList<>();
     for (MediaPackage mediaPackage : mediaPackages) {
-      final Opt<Event> eventOpt = indexService.getEvent(mediaPackage.getIdentifier().toString(), externalIndex);
+      final Opt<Event> eventOpt = indexService.getEvent(mediaPackage.getIdentifier().toString(), apiIndex);
       if (eventOpt.isSome()) {
         final Event event = eventOpt.get();
         if (checkedEventId.isPresent() && checkedEventId.equals(event.getIdentifier())) {

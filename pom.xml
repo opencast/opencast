@@ -54,13 +54,13 @@
   <modules>
     <module>modules/admin-ui</module>
     <module>modules/admin-ui-frontend</module>
-    <module>modules/admin-ui-index</module>
     <module>modules/animate-api</module>
     <module>modules/animate-impl</module>
     <module>modules/animate-remote</module>
     <module>modules/animate-workflowoperation</module>
     <module>modules/annotation-api</module>
     <module>modules/annotation-impl</module>
+    <module>modules/api-index</module>
     <module>modules/asset-manager-api</module>
     <module>modules/asset-manager-impl</module>
     <module>modules/asset-manager-workflowoperation</module>
@@ -132,7 +132,6 @@
     <module>modules/execute-remote</module>
     <module>modules/execute-workflowoperation</module>
     <module>modules/external-api</module>
-    <module>modules/external-api-index</module>
     <module>modules/fileupload</module>
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
@@ -194,7 +193,6 @@
     <module>modules/schema</module>
     <module>modules/elasticsearch-impl</module>
     <module>modules/elasticsearch-api</module>
-    <module>modules/elasticsearch-index</module>
     <module>modules/search-service-api</module>
     <module>modules/search-service-feeds</module>
     <module>modules/search-service-impl</module>

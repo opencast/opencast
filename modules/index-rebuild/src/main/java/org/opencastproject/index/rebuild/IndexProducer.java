@@ -21,7 +21,7 @@
 
 package org.opencastproject.index.rebuild;
 
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.api.index.ApiIndex;
 
 /**
  * This service handles data that's added to an ElasticSearch index.
@@ -34,7 +34,7 @@ public interface IndexProducer {
    * @param index
    *           The index to repopulate.
    */
-  void repopulate(AbstractSearchIndex index) throws IndexRebuildException;
+  void repopulate(ApiIndex index) throws IndexRebuildException;
 
   /**
    * Get the service that implements IndexProducer.

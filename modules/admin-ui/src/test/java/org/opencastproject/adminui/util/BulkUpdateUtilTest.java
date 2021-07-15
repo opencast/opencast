@@ -24,7 +24,7 @@ package org.opencastproject.adminui.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.api.index.event.Event;
 
 import org.easymock.EasyMock;
 import org.json.simple.JSONArray;

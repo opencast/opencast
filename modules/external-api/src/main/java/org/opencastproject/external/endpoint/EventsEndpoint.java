@@ -36,19 +36,19 @@ import static org.opencastproject.external.util.SchedulingUtils.getConflictingEv
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.IndexObject;
+import org.opencastproject.api.index.event.Event;
+import org.opencastproject.api.index.event.EventIndexSchema;
+import org.opencastproject.api.index.event.EventSearchQuery;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.IndexObject;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
@@ -213,7 +213,7 @@ public class EventsEndpoint implements ManagedService {
   };
 
   /* OSGi service references */
-  private ExternalIndex externalIndex;
+  private ApiIndex apiIndex;
   private IndexService indexService;
   private IngestService ingestService;
   private SecurityService securityService;
@@ -224,8 +224,8 @@ public class EventsEndpoint implements ManagedService {
   private CaptureAgentStateService agentStateService;
 
   /** OSGi DI */
-  void setExternalIndex(ExternalIndex externalIndex) {
-    this.externalIndex = externalIndex;
+  void setApiIndex(ApiIndex apiIndex) {
+    this.apiIndex = apiIndex;
   }
 
   /** OSGi DI */
@@ -365,7 +365,7 @@ public class EventsEndpoint implements ManagedService {
       // withScheduling was added in version 1.1.0 and should be ignored for smaller versions
       withScheduling = false;
     }
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
+    for (final Event event : indexService.getEvent(id, apiIndex)) {
       event.updatePreview(previewSubtype);
       return ApiResponses.Json.ok(
           requestedVersion, eventToJSON(event, withAcl, withMetadata, withScheduling, withPublications, sign, requestedVersion));
@@ -384,7 +384,7 @@ public class EventsEndpoint implements ManagedService {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     ArrayList<TrackImpl> tracks = new ArrayList<>();
 
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
+    for (final Event event : indexService.getEvent(id, apiIndex)) {
       final MediaPackage mp = indexService.getEventMediapackage(event);
       for (Track track : mp.getTracks()) {
         if (track instanceof TrackImpl) {
@@ -448,13 +448,13 @@ public class EventsEndpoint implements ManagedService {
           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws SearchIndexException, UnauthorizedException {
-    final Opt<Event> event = indexService.getEvent(id, externalIndex);
+    final Opt<Event> event = indexService.getEvent(id, apiIndex);
     if (event.isNone()) {
       return RestUtil.R.notFound(id);
     }
     final Runnable doOnNotFound = () -> {
       try {
-        externalIndex.delete(Event.DOCUMENT_TYPE, id, getSecurityService().getOrganization().getId());
+        apiIndex.delete(Event.DOCUMENT_TYPE, id, getSecurityService().getOrganization().getId());
       } catch (SearchIndexException e) {
         logger.error("error removing event {}: {}", id, e);
       }
@@ -504,17 +504,17 @@ public class EventsEndpoint implements ManagedService {
     try {
       String startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : null;
       String startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : null;
-      for (final Event event : indexService.getEvent(eventId, externalIndex)) {
+      for (final Event event : indexService.getEvent(eventId, apiIndex)) {
         EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.updateFromHttpServletRequest(event,
                 request, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
 
         // FIXME: All of these update operations should be a part of a transaction to avoid a partially updated event.
         if (eventHttpServletRequest.getMetadataList().isSome()) {
-          indexService.updateEventMetadata(eventId, eventHttpServletRequest.getMetadataList().get(), externalIndex);
+          indexService.updateEventMetadata(eventId, eventHttpServletRequest.getMetadataList().get(), apiIndex);
         }
 
         if (eventHttpServletRequest.getAcl().isSome()) {
-          indexService.updateEventAcl(eventId, eventHttpServletRequest.getAcl().get(), externalIndex);
+          indexService.updateEventAcl(eventId, eventHttpServletRequest.getAcl().get(), apiIndex);
         }
 
         if (eventHttpServletRequest.getProcessing().isSome()) {
@@ -663,7 +663,7 @@ public class EventsEndpoint implements ManagedService {
           getConflictingEvents(schedulingInfo, agentStateService, schedulerService);
       logger.debug("Client tried to schedule conflicting event(s).");
       return ApiResponses.Json.conflict(requestedVersion,
-          arr(convertConflictingEvents(Optional.empty(), conflictingEvents, indexService, externalIndex)));
+          arr(convertConflictingEvents(Optional.empty(), conflictingEvents, indexService, apiIndex)));
     }
   }
 
@@ -859,7 +859,7 @@ public class EventsEndpoint implements ManagedService {
 
         SearchResult<Event> results = null;
         try {
-          results = externalIndex.getByQuery(query);
+          results = apiIndex.getByQuery(query);
         } catch (SearchIndexException e) {
           logger.error("The External Search Index was not able to get the events list", e);
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -943,7 +943,7 @@ public class EventsEndpoint implements ManagedService {
 
       SearchResult<Event> results = null;
       try {
-        results = externalIndex.getByQuery(query);
+        results = apiIndex.getByQuery(query);
       } catch (SearchIndexException e) {
         logger.error("The External Search Index was not able to get the events list", e);
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1113,7 +1113,7 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
+    for (final Event event : indexService.getEvent(id, apiIndex)) {
       AccessControlList acl = getAclFromEvent(event);
       return ApiResponses.Json.ok(acceptHeader, arr(AclUtils.serializeAclToJson(acl)));
     }
@@ -1129,7 +1129,7 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @FormParam("acl") String acl) throws Exception {
-    if (indexService.getEvent(id, externalIndex).isSome()) {
+    if (indexService.getEvent(id, apiIndex).isSome()) {
       AccessControlList accessControlList;
       try {
         accessControlList = AclUtils.deserializeJsonToAcl(acl, false);
@@ -1141,7 +1141,7 @@ public class EventsEndpoint implements ManagedService {
         return R.badRequest(e.getMessage());
       }
       try {
-        accessControlList = indexService.updateEventAcl(id, accessControlList, externalIndex);
+        accessControlList = indexService.updateEventAcl(id, accessControlList, apiIndex);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to update event '{}' acl with '{}'", id, acl, e);
         return Response.status(Status.FORBIDDEN).build();
@@ -1163,7 +1163,7 @@ public class EventsEndpoint implements ManagedService {
   public Response addEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @FormParam("role") String role) throws Exception {
     List<AccessControlEntry> entries = new ArrayList<>();
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
+    for (final Event event : indexService.getEvent(id, apiIndex)) {
       AccessControlList accessControlList = getAclFromEvent(event);
       AccessControlEntry newAce = new AccessControlEntry(role, action, true);
       boolean alreadyInAcl = false;
@@ -1188,7 +1188,7 @@ public class EventsEndpoint implements ManagedService {
 
       AccessControlList withNewAce = new AccessControlList(entries);
       try {
-        withNewAce = indexService.updateEventAcl(id, withNewAce, externalIndex);
+        withNewAce = indexService.updateEventAcl(id, withNewAce, apiIndex);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to update event '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
         return Response.status(Status.FORBIDDEN).build();
@@ -1209,7 +1209,7 @@ public class EventsEndpoint implements ManagedService {
   public Response deleteEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @PathParam("role") String role) throws Exception {
     List<AccessControlEntry> entries = new ArrayList<>();
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
+    for (final Event event : indexService.getEvent(id, apiIndex)) {
       AccessControlList accessControlList = getAclFromEvent(event);
       boolean foundDelete = false;
       for (AccessControlEntry ace : accessControlList.getEntries()) {
@@ -1227,7 +1227,7 @@ public class EventsEndpoint implements ManagedService {
 
       AccessControlList withoutDeleted = new AccessControlList(entries);
       try {
-        withoutDeleted = indexService.updateEventAcl(id, withoutDeleted, externalIndex);
+        withoutDeleted = indexService.updateEventAcl(id, withoutDeleted, apiIndex);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to delete event's '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
         return Response.status(Status.FORBIDDEN).build();
@@ -1299,7 +1299,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   protected Opt<MetadataList> getEventMetadataById(String id) throws IndexServiceException, Exception {
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
+    for (final Event event : indexService.getEvent(id, apiIndex)) {
       return getEventMetadata(event);
     }
     return Opt.<MetadataList> none();
@@ -1338,7 +1338,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private Response getEventMetadataByType(String id, String type, ApiVersion requestedVersion) throws Exception {
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
+    for (final Event event : indexService.getEvent(id, apiIndex)) {
       Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
       if (flavor.isNone()) {
         return R.badRequest(
@@ -1408,7 +1408,7 @@ public class EventsEndpoint implements ManagedService {
 
     DublinCoreMetadataCollection collection = null;
     EventCatalogUIAdapter adapter = null;
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
+    for (final Event event : indexService.getEvent(id, apiIndex)) {
       MetadataList metadataList = new MetadataList();
       // Try the main catalog first as we load it from the index.
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
@@ -1505,7 +1505,7 @@ public class EventsEndpoint implements ManagedService {
       }
 
       metadataList.add(adapter, collection);
-      indexService.updateEventMetadata(id, metadataList, externalIndex);
+      indexService.updateEventMetadata(id, metadataList, apiIndex);
       return Response.noContent().build();
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
@@ -1534,7 +1534,7 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type) throws SearchIndexException {
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
+    for (final Event event : indexService.getEvent(id, apiIndex)) {
       Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
       if (flavor.isNone()) {
         return R.badRequest(
@@ -1582,7 +1582,7 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("sign") boolean sign) throws Exception {
     try {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-      final Opt<Event> event = indexService.getEvent(id, externalIndex);
+      final Opt<Event> event = indexService.getEvent(id, apiIndex);
       if (event.isSome()) {
         return ApiResponses.Json.ok(acceptHeader, arr(getPublications(event.get(), sign, requestedVersion)));
       } else {
@@ -1721,7 +1721,7 @@ public class EventsEndpoint implements ManagedService {
 
   private JObject getPublication(String eventId, String publicationId, Boolean withSignedUrls, ApiVersion requestedVersion)
           throws SearchIndexException, NotFoundException {
-    for (final Event event : indexService.getEvent(eventId, externalIndex)) {
+    for (final Event event : indexService.getEvent(eventId, apiIndex)) {
       List<Publication> publications = $(event.getPublications()).filter(EventUtils.internalChannelFilter).toList();
       for (Publication publication : publications) {
         if (publicationId.equals(publication.getIdentifier())) {
@@ -1837,7 +1837,7 @@ public class EventsEndpoint implements ManagedService {
   public Response getEventScheduling(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
       throws Exception {
     try {
-      final Opt<Event> event = indexService.getEvent(id, externalIndex);
+      final Opt<Event> event = indexService.getEvent(id, apiIndex);
 
       if (event.isNone()) {
         return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
@@ -1871,7 +1871,7 @@ public class EventsEndpoint implements ManagedService {
                                  @FormParam("scheduling") String scheduling,
                                  @FormParam("allowConflict") @DefaultValue("false") boolean allowConflict) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    final Opt<Event> event = indexService.getEvent(id, externalIndex);
+    final Opt<Event> event = indexService.getEvent(id, apiIndex);
 
     if (requestedVersion.isSmallerThan(ApiVersion.VERSION_1_2_0)) {
         allowConflict = false;
@@ -1930,7 +1930,7 @@ public class EventsEndpoint implements ManagedService {
           schedulingInfo.merge(technicalMetadata), agentStateService, schedulerService);
       logger.debug("Client tried to change scheduling information causing a conflict for event {}.", id);
       return Optional.of(ApiResponses.Json.conflict(requestedVersion,
-          arr(convertConflictingEvents(Optional.of(id), conflictingEvents, indexService, externalIndex))));
+          arr(convertConflictingEvents(Optional.of(id), conflictingEvents, indexService, apiIndex))));
     }
     return Optional.empty();
   }

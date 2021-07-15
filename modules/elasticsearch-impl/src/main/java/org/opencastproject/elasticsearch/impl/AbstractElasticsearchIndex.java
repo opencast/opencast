@@ -22,9 +22,14 @@
 
 package org.opencastproject.elasticsearch.impl;
 
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.elasticsearch.api.SearchIndex;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchMetadata;
 import org.opencastproject.elasticsearch.api.SearchQuery;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.io.IOUtils;
@@ -44,6 +49,7 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
@@ -53,11 +59,16 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.script.Script;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.ScriptSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -76,6 +87,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -297,7 +309,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   }
 
   /**
-   * Prepares Elasticsearch index to store data for the types (or mappings) as returned by {@link #getDocumentTypes()}.
+   * Prepares API index to store data for the types (or mappings) as returned by {@link #getDocumentTypes()}.
    *
    * @param idx
    *          the index name
@@ -496,4 +508,107 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     return client;
   }
 
+  /**
+   * Execute a query on the index.
+   *
+   * @param query
+   *          The query to use to find the results
+   * @param request
+   *          The builder to use to create the query.
+   * @param toSearchResult
+   *          The function to convert the results to a {@link SearchResult}
+   * @return A {@link SearchResult} containing the relevant objects.
+   * @throws SearchIndexException
+   */
+  protected <T> SearchResult<T> executeQuery(SearchQuery query, SearchRequest request,
+          Function<SearchMetadataCollection, T> toSearchResult) throws SearchIndexException {
+    // Execute the query and try to get hold of a query response
+    SearchResponse response = null;
+    try {
+      response = getClient().search(request, RequestOptions.DEFAULT);
+    } catch (Throwable t) {
+      throw new SearchIndexException(t);
+    }
+
+    // Create and configure the query result
+    long hits = getTotalHits(response.getHits());
+    long size = response.getHits().getHits().length;
+    SearchResultImpl<T> result = new SearchResultImpl<>(query, hits, size);
+    result.setSearchTime(response.getTook().millis());
+
+    // Walk through response and create new items with title, creator, etc:
+    for (SearchHit doc : response.getHits()) {
+
+      // Wrap the search resulting metadata
+      SearchMetadataCollection metadata = new SearchMetadataCollection(doc.getType());
+      metadata.setIdentifier(doc.getId());
+
+      for (DocumentField field : doc.getFields().values()) {
+        String name = field.getName();
+        SearchMetadata<Object> m = new SearchMetadataImpl<>(name);
+        // TODO: Add values with more care (localized, correct type etc.)
+
+        // Add the field values
+        if (field.getValues().size() > 1) {
+          for (Object v : field.getValues()) {
+            m.addValue(v);
+          }
+        } else {
+          m.addValue(field.getValue());
+        }
+
+        // Add the metadata
+        metadata.add(m);
+      }
+
+      // Get the score for this item
+      float score = doc.getScore();
+
+      // Have the serializer in charge create a type-specific search result
+      // item
+      try {
+        T document = toSearchResult.apply(metadata);
+        SearchResultItem<T> item = new SearchResultItemImpl<>(score, document);
+        result.addResultItem(item);
+      } catch (Throwable t) {
+        logger.warn("Error during search result serialization: '{}'. Skipping this search result.", t.getMessage());
+        size--;
+      }
+    }
+
+    // Set the number of resulting documents
+    result.setDocumentCount(size);
+
+    return result;
+  }
+
+  /**
+   * Returns all the known terms for a field (aka facets).
+   *
+   * @param field
+   *          the field name
+   * @param type
+   *          the document type
+   * @return the list of terms
+   */
+  public List<String> getTermsForField(String field, String type) {
+    final String facetName = "terms";
+    final AggregationBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field);
+    final SearchSourceBuilder searchSource = new SearchSourceBuilder().aggregation(aggBuilder);
+    final SearchRequest searchRequest = new SearchRequest(this.getIndexName(type)).source(searchSource);
+    try {
+      final SearchResponse response = getClient().search(searchRequest, RequestOptions.DEFAULT);
+
+      final List<String> terms = new ArrayList<>();
+      final Terms aggs = response.getAggregations().get(facetName);
+
+      for (Terms.Bucket bucket : aggs.getBuckets()) {
+        terms.add(bucket.getKey().toString());
+      }
+
+      return terms;
+    } catch (IOException e) {
+      return chuck(e);
+    }
+  }
 }

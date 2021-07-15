@@ -21,9 +21,9 @@
 
 package org.opencastproject.themes.persistence;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.theme.IndexTheme;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.theme.IndexTheme;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.Organization;
@@ -76,7 +76,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   protected OrganizationDirectoryService organizationDirectoryService;
 
   /** The elasticsearch indices */
-  protected AbstractSearchIndex adminUiIndex;
+  protected ApiIndex index;
 
   /** The component context for this themes service database */
   private ComponentContext cc;
@@ -122,8 +122,8 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   /** OSGi DI */
-  public void setAdminUiIndex(AbstractSearchIndex index) {
-    this.adminUiIndex = index;
+  public void setIndex(ApiIndex index) {
+    this.index = index;
   }
 
   @Override
@@ -202,7 +202,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       // update the elasticsearch indices
       String orgId = securityService.getOrganization().getId();
       User user = securityService.getUser();
-      updateThemeInIndex(theme, adminUiIndex, orgId, user);
+      updateThemeInIndex(theme, index, orgId, user);
 
       return theme;
     } catch (Exception e) {
@@ -257,7 +257,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
       // update the elasticsearch indices
       String organization = securityService.getOrganization().getId();
-      removeThemeFromIndex(id, adminUiIndex, organization);
+      removeThemeFromIndex(id, index, organization);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -312,8 +312,8 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   @Override
-  public void repopulate(final AbstractSearchIndex index) {
-    if (index.getIndexName() != adminUiIndex.getIndexName()) {
+  public void repopulate(final ApiIndex index) {
+    if (index.getIndexName() != this.index.getIndexName()) {
       logger.info("Themes are currently not part of the {} index, no re-indexing necessary.");
       return;
     }
@@ -354,7 +354,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    * @param orgId
    *           the organization the theme belongs to
    */
-  private void removeThemeFromIndex(long themeId, AbstractSearchIndex index, String orgId) {
+  private void removeThemeFromIndex(long themeId, ApiIndex index, String orgId) {
     logger.debug("Removing theme {} from the {} index.", themeId, index.getIndexName());
 
     try {
@@ -375,7 +375,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    *           the organization the theme belongs to
    * @param user
    */
-  private void updateThemeInIndex(Theme theme, AbstractSearchIndex index, String orgId,
+  private void updateThemeInIndex(Theme theme, ApiIndex index, String orgId,
           User user) {
     logger.debug("Updating the theme with id '{}', name '{}', description '{}', organization '{}' in the {} index.",
             theme.getId(), theme.getName(), theme.getDescription(),

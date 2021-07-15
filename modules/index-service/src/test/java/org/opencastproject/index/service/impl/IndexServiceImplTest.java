@@ -24,6 +24,9 @@ package org.opencastproject.index.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.event.Event;
+import org.opencastproject.api.index.event.EventSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -32,9 +35,6 @@ import org.opencastproject.elasticsearch.api.SearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.impl.SearchResultImpl;
 import org.opencastproject.elasticsearch.impl.SearchResultItemImpl;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.ingest.api.IngestException;
@@ -772,7 +772,7 @@ public class IndexServiceImplTest {
 
     SearchResult<Event> result = new SearchResultImpl<>(query, 0, 0);
 
-    AbstractSearchIndex abstractIndex = EasyMock.createMock(AbstractSearchIndex.class);
+    ApiIndex abstractIndex = EasyMock.createMock(ApiIndex.class);
     EasyMock.expect(abstractIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result);
     EasyMock.replay(abstractIndex);
 
@@ -852,7 +852,7 @@ public class IndexServiceImplTest {
     SearchResultImpl<Event> searchResult = new SearchResultImpl<>(query, 0, 0);
     searchResult.addResultItem(searchResultItem);
     SecurityService securityService = setupSecurityService(username, org);
-    AbstractSearchIndex index = EasyMock.createMock(AbstractSearchIndex.class);
+    ApiIndex index = EasyMock.createMock(ApiIndex.class);
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
             .loadFromXml(getClass().getResourceAsStream("/events/update-event-mp.xml"));
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(searchResult);

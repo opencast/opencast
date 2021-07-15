@@ -38,7 +38,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
-import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.api.index.ApiIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
@@ -116,7 +116,7 @@ public class GroupsEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(GroupsEndpoint.class);
 
   /** The admin UI search index */
-  private AdminUISearchIndex searchIndex;
+  private ApiIndex searchIndex;
 
   /** The security service */
   private SecurityService securityService;
@@ -150,7 +150,7 @@ public class GroupsEndpoint {
 
   /** OSGi callback for the search index. */
   @Reference
-  public void setSearchIndex(AdminUISearchIndex searchIndex) {
+  public void setSearchIndex(ApiIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
