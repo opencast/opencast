@@ -572,6 +572,43 @@ Opencast 10
 Opencast 9
 ----------
 
+### Opencast 9.7
+
+*Released on July 15th, 2021*
+
+- [[#2793](https://github.com/opencast/opencast/pull/2793)] -
+  More HTML validation for AdminUI
+- [[#2790](https://github.com/opencast/opencast/pull/2790)] -
+  Fix file permissions of start-opencast
+- [[#2788](https://github.com/opencast/opencast/pull/2788)] -
+  Introduce Allinone Profile
+- [[#2778](https://github.com/opencast/opencast/pull/2778)] -
+  Cut Marks Attachments
+- [[#2771](https://github.com/opencast/opencast/pull/2771)] -
+  Documentation Deployment Conflicts
+- [[#2770](https://github.com/opencast/opencast/pull/2770)] -
+  Link Video in Installation Guide
+- [[#2736](https://github.com/opencast/opencast/pull/2736)] -
+  Fix processing of `fast` events
+- [[#2723](https://github.com/opencast/opencast/pull/2723)] -
+  Limit Ingest Filename Length
+- [[#2722](https://github.com/opencast/opencast/pull/2722)] -
+  Default for Access Control Entry Allow
+- [[#2719](https://github.com/opencast/opencast/pull/2719)] -
+  Closing tags for non-void elements in Admin UI
+- [[#2717](https://github.com/opencast/opencast/pull/2717)] -
+  Make Series Endpoint Accept Metadata Fields
+- [[#2714](https://github.com/opencast/opencast/pull/2714)] -
+  Fix pagination in engage-ui
+- [[#2710](https://github.com/opencast/opencast/pull/2710)] -
+  Recognize more input types in WF configuration
+- [[#2678](https://github.com/opencast/opencast/pull/2678)] -
+  OAI-PMH Sets
+- [[#2543](https://github.com/opencast/opencast/pull/2543)] -
+  Exclude user provider configuration for contributors list provider
+- [[#2535](https://github.com/opencast/opencast/pull/2535)] -
+  Prevent Ingests with Illegal Data
+
 ### Opencast 9.6
 
 *Released on June 15th, 2021*
