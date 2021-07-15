@@ -73,7 +73,13 @@ public class FileUploadJob {
     this.payload = new Payload("unknown", -1, null, null);
   }
 
-  public FileUploadJob(String filename, long filesize, int chunksize, MediaPackage mp, MediaPackageElementFlavor flavor) {
+  public FileUploadJob(
+      String filename,
+      long filesize,
+      int chunksize,
+      MediaPackage mp,
+      MediaPackageElementFlavor flavor
+  ) {
     this.id = UUID.randomUUID().toString();
     this.modified = System.currentTimeMillis();
     this.chunksize = chunksize;

@@ -167,8 +167,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logger.error("Could not get reasons", e);
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -177,8 +178,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     EntityManager em = emf.createEntityManager();
     try {
       EventCommentDto event = getEventComment(commentId, em);
-      if (event == null)
+      if (event == null) {
         throw new NotFoundException("Event comment with ID " + commentId + " does not exist");
+      }
 
       return event.toComment(userDirectoryService);
     } catch (NotFoundException e) {
@@ -187,8 +189,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logger.error("Could not get event comment {}", commentId, e);
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -199,8 +202,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     try {
       tx.begin();
       EventCommentDto event = getEventComment(commentId, em);
-      if (event == null)
+      if (event == null) {
         throw new NotFoundException("Event comment with ID " + commentId + " does not exist");
+      }
 
       em.remove(event);
       tx.commit();
@@ -209,13 +213,15 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       throw e;
     } catch (Exception e) {
       logger.error("Could not delete event comment", e);
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
 
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -235,8 +241,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       for (EventComment comment : comments) {
         long commentId = comment.getId().get().intValue();
         EventCommentDto event = getEventComment(commentId, em);
-        if (event == null)
+        if (event == null) {
           throw new NotFoundException("Event comment with ID " + commentId + " does not exist");
+        }
 
         em.remove(event);
       }
@@ -245,8 +252,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       throw e;
     } catch (Exception e) {
       logger.error("Could not delete event comments", e);
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
 
       throw new EventCommentDatabaseException(e);
     } finally {
@@ -315,8 +323,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logger.error("Could not retreive comments for event {}", eventId, e);
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -330,8 +339,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logger.error("Could not retreive event comments", e);
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 

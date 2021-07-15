@@ -74,8 +74,9 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       q.setParameter("userId", securityService.getUser().getUsername());
       return ((Long) q.getSingleResult()).intValue();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -95,8 +96,9 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       if (tx.isActive()) {
         tx.rollback();
       }
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -158,8 +160,9 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
         return a;
       }
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -184,12 +187,18 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       }
       return result;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
-  public AnnotationList getAnnotationsByTypeAndMediapackageId(String type, String mediapackageId, int offset, int limit) {
+  public AnnotationList getAnnotationsByTypeAndMediapackageId(
+      String type,
+      String mediapackageId,
+      int offset,
+      int limit
+  ) {
     AnnotationListImpl result = new AnnotationListImpl();
 
     EntityManager em = null;
@@ -214,8 +223,9 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
 
       return result;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -279,8 +289,9 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       }
       return result;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
 
   }
@@ -317,8 +328,9 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       }
       return result;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -344,8 +356,9 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
       }
       return result;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 

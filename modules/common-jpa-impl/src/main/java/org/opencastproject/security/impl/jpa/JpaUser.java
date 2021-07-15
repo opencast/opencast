@@ -53,18 +53,46 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "oc_user", uniqueConstraints = {
-    @UniqueConstraint(name = "UNQ_oc_user", columnNames = { "username", "organization" }) })
+@Table(
+    name = "oc_user",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "UNQ_oc_user", columnNames = { "username", "organization" }),
+    }
+)
 @NamedQueries({
-  @NamedQuery(name = "User.findByQuery", query = "select u from JpaUser u where UPPER(u.username) like :query and u.organization.id = :org"),
-  @NamedQuery(name = "User.findByIdAndOrg", query = "select u from JpaUser u where u.id=:id and u.organization.id = :org"),
-  @NamedQuery(name = "User.findByUsername", query = "select u from JpaUser u where u.username=:u and u.organization.id = :org"),
-  @NamedQuery(name = "User.findAll", query = "select u from JpaUser u where u.organization.id = :org"),
-  @NamedQuery(name = "User.findInsecureHash",
-              query = "select u from JpaUser u where length(u.password) = 32 and u.organization.id = :org"),
-  @NamedQuery(name = "User.findAllByUserNames", query = "select u from JpaUser u where u.organization.id = :org AND u.username IN :names"),
-  @NamedQuery(name = "User.countAllByOrg", query = "select COUNT(u) from JpaUser u where u.organization.id = :org"),
-  @NamedQuery(name = "User.countAll", query = "select COUNT(u) from JpaUser u") })
+    @NamedQuery(
+        name = "User.findByQuery",
+        query = "select u from JpaUser u where UPPER(u.username) like :query and u.organization.id = :org"
+    ),
+    @NamedQuery(
+        name = "User.findByIdAndOrg",
+        query = "select u from JpaUser u where u.id=:id and u.organization.id = :org"
+    ),
+    @NamedQuery(
+        name = "User.findByUsername",
+        query = "select u from JpaUser u where u.username=:u and u.organization.id = :org"
+    ),
+    @NamedQuery(
+        name = "User.findAll",
+        query = "select u from JpaUser u where u.organization.id = :org"
+    ),
+    @NamedQuery(
+        name = "User.findInsecureHash",
+        query = "select u from JpaUser u where length(u.password) = 32 and u.organization.id = :org"
+    ),
+    @NamedQuery(
+        name = "User.findAllByUserNames",
+        query = "select u from JpaUser u where u.organization.id = :org AND u.username IN :names"
+    ),
+    @NamedQuery(
+        name = "User.countAllByOrg",
+        query = "select COUNT(u) from JpaUser u where u.organization.id = :org"
+    ),
+    @NamedQuery(
+        name = "User.countAll",
+        query = "select COUNT(u) from JpaUser u"
+    ),
+})
 public class JpaUser implements User {
 
   @Id
@@ -96,12 +124,14 @@ public class JpaUser implements User {
   private JpaOrganization organization;
 
   @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.LAZY)
-  @JoinTable(name = "oc_user_role", joinColumns = {
-      @JoinColumn(name = "user_id")
-    }, inverseJoinColumns = {
-      @JoinColumn(name = "role_id")
-    }, uniqueConstraints = {
-      @UniqueConstraint(name = "UNQ_oc_user_role", columnNames = { "user_id", "role_id" }) })
+  @JoinTable(
+      name = "oc_user_role",
+      joinColumns = { @JoinColumn(name = "user_id") },
+      inverseJoinColumns = { @JoinColumn(name = "role_id") },
+      uniqueConstraints = {
+          @UniqueConstraint(name = "UNQ_oc_user_role", columnNames = { "user_id", "role_id" })
+      }
+  )
   private Set<JpaRole> roles;
 
   /**
@@ -232,8 +262,9 @@ public class JpaUser implements User {
   @Override
   public boolean hasRole(String roleName) {
     for (Role role : roles) {
-      if (role.getName().equals(roleName))
+      if (role.getName().equals(roleName)) {
         return true;
+      }
     }
     return false;
   }
@@ -261,8 +292,9 @@ public class JpaUser implements User {
    */
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof User))
+    if (!(obj instanceof User)) {
       return false;
+    }
     User other = (User) obj;
     return username.equals(other.getUsername()) && organization.equals(other.getOrganization())
             && EqualsUtil.eq(provider, other.getProvider());

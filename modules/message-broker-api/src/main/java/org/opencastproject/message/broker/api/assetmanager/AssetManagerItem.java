@@ -136,8 +136,9 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
     }
 
     public Opt<DublinCoreCatalog> getEpisodeDublincore() {
-      if (episodeDublincore == null)
+      if (episodeDublincore == null) {
         return Opt.none();
+      }
 
       try (InputStream is = IOUtils.toInputStream(episodeDublincore, "UTF-8")) {
         return Opt.some(DublinCores.read(is));
@@ -159,12 +160,13 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
       }
     };
 
-    public static final Fn<TakeSnapshot, Opt<DublinCoreCatalog>> getEpisodeDublincore = new Fn<TakeSnapshot, Opt<DublinCoreCatalog>>() {
-      @Override
-      public Opt<DublinCoreCatalog> apply(TakeSnapshot a) {
-        return a.getEpisodeDublincore();
-      }
-    };
+    public static final Fn<TakeSnapshot, Opt<DublinCoreCatalog>> getEpisodeDublincore
+        = new Fn<TakeSnapshot, Opt<DublinCoreCatalog>>() {
+          @Override
+          public Opt<DublinCoreCatalog> apply(TakeSnapshot a) {
+            return a.getEpisodeDublincore();
+          }
+        };
 
     public static final Fn<TakeSnapshot, AccessControlList> getAcl = new Fn<TakeSnapshot, AccessControlList>() {
       @Override

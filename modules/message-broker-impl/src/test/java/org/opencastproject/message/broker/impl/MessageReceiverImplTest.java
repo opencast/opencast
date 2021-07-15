@@ -82,7 +82,7 @@ public class MessageReceiverImplTest {
   public void testActivate() throws Exception {
     BundleContext bctx = EasyMock.createMock(BundleContext.class);
     EasyMock.expect(bctx.getProperty(MessageBaseFacility.ACTIVEMQ_BROKER_URL_KEY))
-      .andReturn("failover://(tcp://127.0.0.1:9)?initialReconnectDelay=2000&maxReconnectAttempts=2");
+        .andReturn("failover://(tcp://127.0.0.1:9)?initialReconnectDelay=2000&maxReconnectAttempts=2");
     EasyMock.expect(bctx.getProperty(MessageBaseFacility.ACTIVEMQ_BROKER_USERNAME_KEY)).andReturn(null);
     EasyMock.expect(bctx.getProperty(MessageBaseFacility.ACTIVEMQ_BROKER_PASSWORD_KEY)).andReturn(null);
     EasyMock.replay(bctx);

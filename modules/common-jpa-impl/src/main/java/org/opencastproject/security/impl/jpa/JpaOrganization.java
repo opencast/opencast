@@ -49,10 +49,23 @@ import javax.persistence.UniqueConstraint;
 @Access(AccessType.FIELD)
 @Table(name = "oc_organization")
 @NamedQueries({
-  @NamedQuery(name = "Organization.findAll", query = "Select o FROM JpaOrganization o"),
-  @NamedQuery(name = "Organization.findById", query = "Select o FROM JpaOrganization o where o.id = :id"),
-  @NamedQuery(name = "Organization.findByHost", query = "Select o FROM JpaOrganization o JOIN o.servers s where key(s) = :serverName AND s = :port"),
-  @NamedQuery(name = "Organization.getCount", query = "Select COUNT(o) FROM JpaOrganization o") })
+    @NamedQuery(
+        name = "Organization.findAll",
+        query = "Select o FROM JpaOrganization o"
+    ),
+    @NamedQuery(
+        name = "Organization.findById",
+        query = "Select o FROM JpaOrganization o where o.id = :id"
+    ),
+    @NamedQuery(
+        name = "Organization.findByHost",
+        query = "Select o FROM JpaOrganization o JOIN o.servers s where key(s) = :serverName AND s = :port"
+    ),
+    @NamedQuery(
+        name = "Organization.getCount",
+        query = "Select COUNT(o) FROM JpaOrganization o"
+    ),
+})
 public class JpaOrganization implements Organization {
 
   @Id
@@ -65,13 +78,16 @@ public class JpaOrganization implements Organization {
   @ElementCollection
   @MapKeyColumn(name = "name", nullable = false)
   @Column(name = "port", nullable = false)
-  @CollectionTable(name = "oc_organization_node", joinColumns = @JoinColumn(name = "organization", nullable = false),
-    indexes = {
-      @Index(name = "IX_oc_organization_node_pk", columnList = ("organization")),
-      @Index(name = "IX_oc_organization_node_name", columnList = ("name")),
-      @Index(name = "IX_oc_organization_node_port", columnList = ("port"))
-    }, uniqueConstraints =
-      @UniqueConstraint(columnNames = {"organization", "name", "port"}))
+  @CollectionTable(
+      name = "oc_organization_node",
+      joinColumns = @JoinColumn(name = "organization", nullable = false),
+      indexes = {
+          @Index(name = "IX_oc_organization_node_pk", columnList = ("organization")),
+          @Index(name = "IX_oc_organization_node_name", columnList = ("name")),
+          @Index(name = "IX_oc_organization_node_port", columnList = ("port"))
+      },
+      uniqueConstraints = @UniqueConstraint(columnNames = {"organization", "name", "port"})
+  )
   private Map<String, Integer> servers;
 
   @Column(name = "admin_role")
@@ -84,7 +100,10 @@ public class JpaOrganization implements Organization {
   @ElementCollection
   @MapKeyColumn(name = "name", nullable = false)
   @Column(name = "value", length = 65535)
-  @CollectionTable(name = "oc_organization_property", joinColumns = @JoinColumn(name = "organization", nullable = false))
+  @CollectionTable(
+      name = "oc_organization_property",
+      joinColumns = @JoinColumn(name = "organization", nullable = false)
+  )
   private Map<String, String> properties;
 
   /**
@@ -111,8 +130,15 @@ public class JpaOrganization implements Organization {
    * @param properties
    *          arbitrary properties defined for this organization, which might include branding, etc.
    */
-  public JpaOrganization(String orgId, String name, String serverName, Integer serverPort, String adminRole,
-          String anonymousRole, Map<String, String> properties) {
+  public JpaOrganization(
+      String orgId,
+      String name,
+      String serverName,
+      Integer serverPort,
+      String adminRole,
+      String anonymousRole,
+      Map<String, String> properties
+  ) {
     super();
     this.id = orgId;
     this.name = name;
@@ -139,8 +165,14 @@ public class JpaOrganization implements Organization {
    * @param properties
    *          arbitrary properties defined for this organization, which might include branding, etc.
    */
-  public JpaOrganization(String orgId, String name, Map<String, Integer> servers, String adminRole,
-          String anonymousRole, Map<String, String> properties) {
+  public JpaOrganization(
+      String orgId,
+      String name,
+      Map<String, Integer> servers,
+      String adminRole,
+      String anonymousRole,
+      Map<String, String> properties
+  ) {
     super();
     this.id = orgId;
     this.name = name;
@@ -233,8 +265,9 @@ public class JpaOrganization implements Organization {
    *          the port
    */
   public void addServer(String serverName, Integer port) {
-    if (servers == null)
+    if (servers == null) {
       servers = new HashMap<String, Integer>();
+    }
     servers.put(serverName, port);
   }
 
@@ -254,8 +287,9 @@ public class JpaOrganization implements Organization {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Organization))
+    if (!(obj instanceof Organization)) {
       return false;
+    }
     return ((Organization) obj).getId().equals(id);
   }
 

@@ -89,7 +89,13 @@ public final class EventCommentReply {
    * @throws IllegalArgumentException
    *           if some of the parameters aren't set
    */
-  public static EventCommentReply create(Option<Long> id, String text, User author, Date creationDate, Date modificationDate) {
+  public static EventCommentReply create(
+      Option<Long> id,
+      String text,
+      User author,
+      Date creationDate,
+      Date modificationDate
+  ) {
     return new EventCommentReply(id, text, author, creationDate, modificationDate);
   }
 
@@ -148,10 +154,12 @@ public final class EventCommentReply {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || getClass() != o.getClass()) {
       return false;
+    }
     EventCommentReply reply = (EventCommentReply) o;
     return text.equals(reply.getText()) && creationDate.equals(reply.getCreationDate())
             && modificationDate.equals(reply.getModificationDate()) && author.equals(reply.getAuthor());
@@ -172,8 +180,9 @@ public final class EventCommentReply {
             Jsons.p("email", author.getEmail()));
 
     Val idValue = Jsons.ZERO_VAL;
-    if (id.isSome())
+    if (id.isSome()) {
       idValue = Jsons.v(id.get());
+    }
 
     return Jsons.obj(Jsons.p("id", idValue), Jsons.p("text", text), Jsons.p("author", authorObj),
             Jsons.p("creationDate", DateTimeSupport.toUTC(creationDate.getTime())),
