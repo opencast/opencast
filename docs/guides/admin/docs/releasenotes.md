@@ -113,6 +113,20 @@ API changes
   different types of events in one request
 - The Series API can now return ACLs within its response, if you tell it to
 
+Additional Notes about 9.7
+--------------------------
+
+Bugfixes, quality of life improvements for developers, and even some features!
+Some highlights:
+
+- OAI-PMH sets
+- workflow configuration panels can now use more `input`-types
+- the pagination in the admin UI series page works properly agian
+- you can now pass metadata fields directly to the series endpoint
+- ACEs no longer need to specify that they are "allow entries"
+- events ingested with the `fast` workflow can be processed with other workflows again
+- the filename length of ingested tracks is now limited
+
 Additional Notes about 9.6
 --------------------------
 
