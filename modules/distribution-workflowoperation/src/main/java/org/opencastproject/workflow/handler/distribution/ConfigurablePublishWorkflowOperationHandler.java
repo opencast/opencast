@@ -315,6 +315,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     if (!withPublishedElements) {
       Set<MediaPackageElement> elements = distribute(selector.select(mp, false), mp, channelId, mode,
               checkAvailability, streaming);
+
       if (elements.size() > 0) {
         for (MediaPackageElement element : elements) {
           // Make sure the mediapackage is prompted to create a new identifier for this element
@@ -346,7 +347,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     return true;
   }
 
-  private Set<MediaPackageElement> distribute(
+  protected Set<MediaPackageElement> distribute(
       Collection<MediaPackageElement> elements,
       MediaPackage mediapackage,
       String channelId,
