@@ -71,6 +71,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -318,10 +319,13 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
           asset.getMimeType().map(MimeTypeUtil.Fns.toString);
           // Write the file contents back
           Option<Long> length = asset.getSize() > 0 ? Option.some(asset.getSize()) : Option.none();
-          return ok(asset.getInputStream(),
-                  Option.fromOpt(asset.getMimeType().map(MimeTypeUtil.Fns.toString)),
-                  length,
-                  Option.some(fileName));
+          try (InputStream is = asset.getInputStream()) {
+            return ok(is,
+                    Option.fromOpt(asset.getMimeType().map(MimeTypeUtil.Fns.toString)),
+                    length,
+                    Option.some(fileName));
+          }
+
         }
         // none
         return notFound();
