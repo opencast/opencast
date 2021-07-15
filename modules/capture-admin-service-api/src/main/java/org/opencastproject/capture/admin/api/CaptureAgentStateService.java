@@ -21,6 +21,8 @@
 
 package org.opencastproject.capture.admin.api;
 
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.Map;
@@ -92,6 +94,13 @@ public interface CaptureAgentStateService {
    * @return A {@link java.util.Map} of name-agent pairs.
    */
   Map<String, Agent> getKnownAgents();
+
+  /**
+   * Returns the list of known agents that a given user and organization is authorized to schedule
+   *
+   * @return A {@link java.util.Map} of name-agent pairs.
+   */
+  Map<String, Agent> getKnownAgents(User u, Organization o);
 
   /**
    * Returns the list of known agent capabilities.

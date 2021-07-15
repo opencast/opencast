@@ -78,6 +78,18 @@ public class GeneralData {
   /** The E-Mail address of the adopter. */
   private final String email;
 
+  /** Whether we can contact the adopter */
+  @SerializedName("contact_me")
+  private final boolean allowContact;
+
+  /** Whether we can send error reports */
+  @SerializedName("send_errors")
+  private final boolean allowErrorReports;
+
+  /** Whether we can contact statistics */
+  @SerializedName("send_usage")
+  private final boolean allowStatistics;
+
 
   //================================================================================
   // Constructor and Methods
@@ -95,6 +107,9 @@ public class GeneralData {
     this.street = adopterRegistrationForm.getStreet();
     this.streetNo = adopterRegistrationForm.getStreetNo();
     this.email = adopterRegistrationForm.getEmail();
+    this.allowContact = adopterRegistrationForm.allowsContacting();
+    this.allowErrorReports = adopterRegistrationForm.allowsErrorReports();
+    this.allowStatistics = adopterRegistrationForm.allowsStatistics();
   }
 
   /**
@@ -152,5 +167,17 @@ public class GeneralData {
 
   public String getEmail() {
     return email;
+  }
+
+  public String getContactMe() {
+    return Boolean.toString(allowContact);
+  }
+
+  public String getErrorReports() {
+    return Boolean.toString(allowErrorReports);
+  }
+
+  public String getStatisticss() {
+    return Boolean.toString(allowStatistics);
   }
 }

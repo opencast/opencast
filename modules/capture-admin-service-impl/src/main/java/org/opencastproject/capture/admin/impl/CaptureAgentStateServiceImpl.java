@@ -373,10 +373,21 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   @Override
   public Map<String, Agent> getKnownAgents() {
+    return getKnownAgents(null, null);
+  }
+
+  public Map<String, Agent> getKnownAgents(User u, Organization o) {
     agentCache.cleanUp();
     EntityManager em = null;
-    User user = securityService.getUser();
-    Organization org = securityService.getOrganization();
+    User user = u;
+    Organization org = o;
+    if (null == u) {
+      user = securityService.getUser();
+    }
+    if (null == o) {
+      org = securityService.getOrganization();
+    }
+
     String orgAdmin = org.getAdminRole();
     Set<Role> roles = user.getRoles();
     try {
