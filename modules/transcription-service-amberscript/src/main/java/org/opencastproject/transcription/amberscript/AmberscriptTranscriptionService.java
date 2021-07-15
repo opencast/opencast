@@ -243,7 +243,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
     scheduledExecutor.scheduleWithFixedDelay(new ResultsFileCleanup(), 1, 1, TimeUnit.DAYS);
 
-   logger.info("Activated.");
+    logger.info("Activated.");
   }
 
   public void deactivate(ComponentContext cc) {
@@ -262,7 +262,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return startTranscription(mpId, track, language, getAmberscriptJobType());
   }
 
-  public Job startTranscription(String mpId, Track track, String language, String jobtype) throws TranscriptionServiceException {
+  public Job startTranscription(String mpId, Track track, String language, String jobtype)
+          throws TranscriptionServiceException {
     if (StringUtils.isBlank(language)) {
       language = getLanguage();
     }
@@ -292,12 +293,12 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
   private void transcriptionDone(String mpId, String jobId) {
     try {
-        logger.info("Transcription done for mpId '{}'.", mpId);
-        if (getAndSaveJobResult(jobId)) {
-          database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
-        } else {
-          logger.debug("Unable to get and save the transcription result for mpId '{}'.", mpId);
-        }
+      logger.info("Transcription done for mpId '{}'.", mpId);
+      if (getAndSaveJobResult(jobId)) {
+        database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
+      } else {
+        logger.debug("Unable to get and save the transcription result for mpId '{}'.", mpId);
+      }
     } catch (IOException e) {
       logger.warn("Could not save transcription results file for mpId '{}': {}", mpId, e.toString());
     } catch (TranscriptionServiceException e) {
@@ -357,8 +358,10 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return result;
   }
 
-  void createRecognitionsJob(String mpId, Track track, String languageCode, String jobtype) throws TranscriptionServiceException, IOException {
-    // Timeout 3 hours (needs to include the time for the remote service to fetch the media URL before sending final response)
+  void createRecognitionsJob(String mpId, Track track, String languageCode, String jobtype)
+          throws TranscriptionServiceException, IOException {
+    // Timeout 3 hours (needs to include the time for the remote service to
+    // fetch the media URL before sending final response)
     CloseableHttpClient httpClient = makeHttpClient(CONNECTION_TIMEOUT, 3 * 3600 * 1000, CONNECTION_TIMEOUT);
     CloseableHttpResponse response = null;
 
@@ -567,9 +570,9 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
         workspace.get(uri);
         logger.info("Found captions at URI: {}", uri);
       } catch (Exception e) {
-          logger.info("Results not saved: getting from service for jobId {}", jobId);
-          // Not saved yet so call the transcription service to get the results
-          checkJobResults(jobId);
+        logger.info("Results not saved: getting from service for jobId {}", jobId);
+        // Not saved yet so call the transcription service to get the results
+        checkJobResults(jobId);
       }
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       logger.debug("Returning MPE with results file URI: {}", uri);
@@ -757,7 +760,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
                 } catch (TranscriptionDatabaseException ex) {
                   logger.warn("Could not cancel job '{}'.", jobId);
                 }
-            }
+              }
             } else {
               continue; // Not time to check yet
             }

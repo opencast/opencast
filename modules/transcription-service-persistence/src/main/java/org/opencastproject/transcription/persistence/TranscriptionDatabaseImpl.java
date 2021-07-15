@@ -83,7 +83,8 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
 
   @Override
   public TranscriptionProviderControl storeProviderControl(String provider) throws TranscriptionDatabaseException {
-    TranscriptionProviderControlDto dto = TranscriptionProviderControlDto.storeProvider(emf.createEntityManager(), provider);
+    TranscriptionProviderControlDto dto
+        = TranscriptionProviderControlDto.storeProvider(emf.createEntityManager(), provider);
     if (dto != null) {
       logger.info("Transcription provider '{}' stored", provider);
       return dto.toTranscriptionProviderControl();
@@ -146,7 +147,8 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
 
   @Override
   public TranscriptionProviderControl findIdByProvider(String provider) throws TranscriptionDatabaseException {
-    TranscriptionProviderControlDto dtoProvider = TranscriptionProviderControlDto.findIdByProvider(emf.createEntityManager(), provider);
+    TranscriptionProviderControlDto dtoProvider
+        = TranscriptionProviderControlDto.findIdByProvider(emf.createEntityManager(), provider);
     if (dtoProvider != null) {
       return dtoProvider.toTranscriptionProviderControl();
     } else {
@@ -162,7 +164,8 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
 
   @Override
   public TranscriptionProviderControl findProviderById(Long id) throws TranscriptionDatabaseException {
-    TranscriptionProviderControlDto dtoProvider = TranscriptionProviderControlDto.findProviderById(emf.createEntityManager(), id);
+    TranscriptionProviderControlDto dtoProvider
+        = TranscriptionProviderControlDto.findProviderById(emf.createEntityManager(), id);
     if (dtoProvider != null) {
       return dtoProvider.toTranscriptionProviderControl();
     }

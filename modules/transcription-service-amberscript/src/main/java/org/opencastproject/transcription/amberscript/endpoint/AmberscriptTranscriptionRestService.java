@@ -35,8 +35,14 @@ import javax.ws.rs.Path;
 
 
 @Path("/")
-@RestService(name = "AmberscriptTranscriptionRestService", title = "Transcription Service REST Endpoint (uses Amberscript services)", abstractText = "Uses external service to generate transcriptions of recordings.", notes = {
-  "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)"})
+@RestService(
+    name = "AmberscriptTranscriptionRestService",
+    title = "Transcription Service REST Endpoint (uses Amberscript services)",
+    abstractText = "Uses external service to generate transcriptions of recordings.",
+    notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)",
+    }
+)
 
 public class AmberscriptTranscriptionRestService extends AbstractJobProducerEndpoint {
 

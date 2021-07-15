@@ -64,12 +64,6 @@ public class StartTranscriptionOperationHandler extends AbstractWorkflowOperatio
     super.activate(cc);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -90,22 +84,25 @@ public class StartTranscriptionOperationHandler extends AbstractWorkflowOperatio
     logger.debug("Start transcription for mediapackage {} started", mediaPackage);
 
     // Check which tags have been configured
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
+        workflowInstance, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
     List<String> sourceTagOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorOption = tagsAndFlavors.getSrcFlavors();
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Make sure either one of tags or flavors are provided
-    if (sourceTagOption.isEmpty() && sourceFlavorOption.isEmpty())
+    if (sourceTagOption.isEmpty() && sourceFlavorOption.isEmpty()) {
       throw new WorkflowOperationException("No source tag or flavor have been specified!");
+    }
 
     if (!sourceFlavorOption.isEmpty()) {
       MediaPackageElementFlavor flavor = sourceFlavorOption.get(0);
       elementSelector.addFlavor(flavor);
     }
-    if (!sourceTagOption.isEmpty())
+    if (!sourceTagOption.isEmpty()) {
       elementSelector.addTag(sourceTagOption.get(0));
+    }
 
     Collection<Track> elements = elementSelector.select(mediaPackage, false);
     Job job = null;

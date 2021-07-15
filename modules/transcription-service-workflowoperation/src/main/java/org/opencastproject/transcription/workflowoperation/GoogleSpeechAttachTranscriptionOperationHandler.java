@@ -111,7 +111,8 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
     }
 
     // Check which tags/flavors have been configured
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
+        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
     List<String> targetTagOption = tagsAndFlavors.getTargetTags();
     // Target flavor is mandatory
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();

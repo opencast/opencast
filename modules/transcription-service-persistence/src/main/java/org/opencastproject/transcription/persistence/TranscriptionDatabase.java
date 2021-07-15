@@ -68,7 +68,7 @@ public interface TranscriptionDatabase {
    * Get transcription service job list by mediapackage Id, track Id and transcription status
    */
   List<TranscriptionJobControl> findByMediaPackageTrackAndStatus(String mpId, String trackId, String... status)
-    throws TranscriptionDatabaseException;
+          throws TranscriptionDatabaseException;
 
   /*
    * Find transcription provider ID by provider name
