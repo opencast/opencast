@@ -66,7 +66,7 @@
     "http-mock-server": "^0.5.2",
     "@types/jest": "26.0.23",
     "@types/node": "16.0.0",
-    "@types/react": "17.0.13",
+    "@types/react": "17.0.14",
     "@types/react-dom": "17.0.8",
     "@types/react-helmet": "^6.1.1",
     "@types/react-js-pagination": "^3.0.3",
