@@ -180,19 +180,23 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
+              !com.carrotsearch.randomizedtesting,
               !com.conversantmedia.util.*,
               !com.fasterxml.jackson.dataformat.smile,
               !com.fasterxml.jackson.dataformat.xml.*,
               !com.fasterxml.jackson.dataformat.yaml.*,
               !com.lmax.disruptor.*,
               !com.sun.jna.*,
+              !com.sun.management*,
               !com.tdunning.*,
               !joptsimple.*,
               !org.HdrHistogram.*,
               !org.apache.kafka.clients.producer.*,
+              !org.apache.logging.log4j.util.internal,
               !org.apache.lucene.*,
               !javax.activation.*,
               !javax.annotation,
+              !jdk.net,
               !org.elasticsearch.geometry.*,
               !org.elasticsearch.secure_sm.*,
               !org.jctools.queues.*,

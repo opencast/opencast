@@ -275,12 +275,12 @@ public class UsersEndpoint {
       usersJSON.add(generateJsonUser(user));
     }
 
-    Map<String, Object> response = new HashMap<>();
-    response.put("results", usersJSON);
-    response.put("count", usersJSON.size());
-    response.put("offset", offset);
-    response.put("limit", limit);
-    response.put("total", total);
+    Map<String, Object> response = Map.of(
+        "results", usersJSON,
+        "count", usersJSON.size(),
+        "offset", offset,
+        "limit", limit,
+        "total", total);
     return Response.ok(gson.toJson(response)).build();
   }
 
