@@ -126,6 +126,10 @@
       <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
       <scope>test</scope>
@@ -159,6 +163,7 @@
             <Bundle-Activator>org.opencastproject.api.index.rebuild.IndexRebuildService</Bundle-Activator>
             <Export-Package>
               org.opencastproject.api.index,
+              org.opencastproject.api.index.endpoint,
               org.opencastproject.api.index.rebuild,
               org.opencastproject.api.index.objects,
               org.opencastproject.api.index.objects.event,
@@ -166,6 +171,7 @@
               org.opencastproject.api.index.objects.theme
             </Export-Package>
             <Service-Component>
+              OSGI-INF/api_index_endpoint.xml
             </Service-Component>
           </instructions>
         </configuration>
