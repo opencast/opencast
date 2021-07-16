@@ -32,15 +32,15 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.ST
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SUCCEEDED;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.Event;
-import org.opencastproject.api.index.event.EventIndexUtils;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.objects.event.EventIndexUtils;
+import org.opencastproject.api.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.api.index.rebuild.IndexProducer;
+import org.opencastproject.api.index.rebuild.IndexRebuildException;
+import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexProducer;
-import org.opencastproject.index.rebuild.IndexRebuildException;
-import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;

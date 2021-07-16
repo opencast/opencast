@@ -24,7 +24,7 @@ package org.opencastproject.themes;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.theme.ThemeSearchQuery;
+import org.opencastproject.api.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;

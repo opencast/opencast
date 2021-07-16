@@ -31,8 +31,8 @@ import static org.easymock.EasyMock.replay;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.series.Series;
-import org.opencastproject.api.index.series.SeriesSearchQuery;
+import org.opencastproject.api.index.objects.series.Series;
+import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.index.service.api.IndexService;

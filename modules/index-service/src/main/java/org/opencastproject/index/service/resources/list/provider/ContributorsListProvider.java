@@ -22,10 +22,10 @@
 package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.Event;
-import org.opencastproject.api.index.event.EventIndexSchema;
-import org.opencastproject.api.index.series.Series;
-import org.opencastproject.api.index.series.SeriesIndexSchema;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.objects.event.EventIndexSchema;
+import org.opencastproject.api.index.objects.series.Series;
+import org.opencastproject.api.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.util.ListProviderUtil;

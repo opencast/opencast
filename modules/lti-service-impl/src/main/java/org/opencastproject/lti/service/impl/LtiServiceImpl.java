@@ -25,8 +25,8 @@ import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SUCCEEDED;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.Event;
-import org.opencastproject.api.index.event.EventSearchQuery;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.objects.event.EventSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.elasticsearch.api.SearchIndexException;

@@ -29,8 +29,8 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.Event;
-import org.opencastproject.api.index.event.EventSearchQuery;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.event.comment.EventComment;

@@ -32,8 +32,12 @@ import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_RO
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.Event;
-import org.opencastproject.api.index.event.EventIndexUtils;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.objects.event.EventIndexUtils;
+import org.opencastproject.api.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.api.index.rebuild.IndexProducer;
+import org.opencastproject.api.index.rebuild.IndexRebuildException;
+import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetId;
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -68,10 +72,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexProducer;
-import org.opencastproject.index.rebuild.IndexRebuildException;
-import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;

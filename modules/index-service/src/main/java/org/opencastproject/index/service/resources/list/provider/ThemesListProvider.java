@@ -22,8 +22,8 @@
 package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.theme.IndexTheme;
-import org.opencastproject.api.index.theme.ThemeSearchQuery;
+import org.opencastproject.api.index.objects.theme.IndexTheme;
+import org.opencastproject.api.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;

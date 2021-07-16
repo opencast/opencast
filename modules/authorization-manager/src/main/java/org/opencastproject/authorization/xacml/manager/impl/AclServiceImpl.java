@@ -22,10 +22,10 @@
 package org.opencastproject.authorization.xacml.manager.impl;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.Event;
-import org.opencastproject.api.index.event.EventSearchQuery;
-import org.opencastproject.api.index.series.Series;
-import org.opencastproject.api.index.series.SeriesSearchQuery;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.objects.event.EventSearchQuery;
+import org.opencastproject.api.index.objects.series.Series;
+import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;

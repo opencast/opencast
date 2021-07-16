@@ -23,12 +23,12 @@ package org.opencastproject.event.comment.persistence;
 import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.Event;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.api.index.rebuild.IndexRebuildException;
+import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.event.comment.EventComment;
-import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexRebuildException;
-import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;

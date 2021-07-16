@@ -24,10 +24,10 @@ package org.opencastproject.adminui.endpoint;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.series.Series;
-import org.opencastproject.api.index.series.SeriesSearchQuery;
-import org.opencastproject.api.index.theme.IndexTheme;
-import org.opencastproject.api.index.theme.ThemeSearchQuery;
+import org.opencastproject.api.index.objects.series.Series;
+import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.api.index.objects.theme.IndexTheme;
+import org.opencastproject.api.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.impl.SearchResultImpl;

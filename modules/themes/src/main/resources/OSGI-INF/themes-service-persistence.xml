@@ -7,7 +7,7 @@
   <property name="service.description" value="Themes Database Service"/>
   <service>
     <provide interface="org.opencastproject.themes.ThemesServiceDatabase"/>
-    <provide interface="org.opencastproject.index.rebuild.IndexProducer"/>
+    <provide interface="org.opencastproject.api.index.rebuild.IndexProducer"/>
   </service>
   <reference name="organization-directory-service"
              interface="org.opencastproject.security.api.OrganizationDirectoryService"

@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.EventSearchQuery;
+import org.opencastproject.api.index.objects.event.EventSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;

@@ -28,9 +28,9 @@ import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserIdRole
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 
 import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;

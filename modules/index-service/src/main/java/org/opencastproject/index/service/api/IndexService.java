@@ -22,8 +22,8 @@
 package org.opencastproject.index.service.api;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.Event;
-import org.opencastproject.api.index.series.Series;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.objects.series.Series;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.service.exception.IndexServiceException;

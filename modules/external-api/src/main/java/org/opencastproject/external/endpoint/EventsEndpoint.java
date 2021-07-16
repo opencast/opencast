@@ -37,10 +37,10 @@ import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.IndexObject;
-import org.opencastproject.api.index.event.Event;
-import org.opencastproject.api.index.event.EventIndexSchema;
-import org.opencastproject.api.index.event.EventSearchQuery;
+import org.opencastproject.api.index.objects.IndexObject;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.objects.event.EventIndexSchema;
+import org.opencastproject.api.index.objects.event.EventSearchQuery;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;

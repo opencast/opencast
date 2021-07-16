@@ -60,7 +60,7 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.EventSearchQuery;
+import org.opencastproject.api.index.objects.event.EventSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;

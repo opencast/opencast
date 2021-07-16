@@ -25,8 +25,8 @@ import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_RO
 import static org.opencastproject.util.data.functions.Functions.chuck;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.Event;
-import org.opencastproject.api.index.series.Series;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.objects.series.Series;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;

@@ -22,10 +22,10 @@
 package org.opencastproject.themes.persistence;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.theme.IndexTheme;
+import org.opencastproject.api.index.objects.theme.IndexTheme;
+import org.opencastproject.api.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;

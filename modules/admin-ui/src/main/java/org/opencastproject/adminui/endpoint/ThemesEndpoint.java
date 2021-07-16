@@ -40,11 +40,11 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.series.Series;
-import org.opencastproject.api.index.series.SeriesSearchQuery;
-import org.opencastproject.api.index.theme.IndexTheme;
-import org.opencastproject.api.index.theme.ThemeIndexSchema;
-import org.opencastproject.api.index.theme.ThemeSearchQuery;
+import org.opencastproject.api.index.objects.series.Series;
+import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.api.index.objects.theme.IndexTheme;
+import org.opencastproject.api.index.objects.theme.ThemeIndexSchema;
+import org.opencastproject.api.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;

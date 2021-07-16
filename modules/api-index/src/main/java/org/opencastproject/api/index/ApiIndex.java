@@ -23,17 +23,17 @@ package org.opencastproject.api.index;
 
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.api.index.event.Event;
-import org.opencastproject.api.index.event.EventIndexUtils;
-import org.opencastproject.api.index.event.EventQueryBuilder;
-import org.opencastproject.api.index.event.EventSearchQuery;
-import org.opencastproject.api.index.series.Series;
-import org.opencastproject.api.index.series.SeriesIndexUtils;
-import org.opencastproject.api.index.series.SeriesQueryBuilder;
-import org.opencastproject.api.index.series.SeriesSearchQuery;
-import org.opencastproject.api.index.theme.IndexTheme;
-import org.opencastproject.api.index.theme.ThemeQueryBuilder;
-import org.opencastproject.api.index.theme.ThemeSearchQuery;
+import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.api.index.objects.event.EventIndexUtils;
+import org.opencastproject.api.index.objects.event.EventQueryBuilder;
+import org.opencastproject.api.index.objects.event.EventSearchQuery;
+import org.opencastproject.api.index.objects.series.Series;
+import org.opencastproject.api.index.objects.series.SeriesIndexUtils;
+import org.opencastproject.api.index.objects.series.SeriesQueryBuilder;
+import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.api.index.objects.theme.IndexTheme;
+import org.opencastproject.api.index.objects.theme.ThemeQueryBuilder;
+import org.opencastproject.api.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchMetadata;
 import org.opencastproject.elasticsearch.api.SearchResult;

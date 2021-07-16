@@ -37,7 +37,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.ThumbnailImpl;
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.event.Event;
+import org.opencastproject.api.index.objects.event.Event;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;

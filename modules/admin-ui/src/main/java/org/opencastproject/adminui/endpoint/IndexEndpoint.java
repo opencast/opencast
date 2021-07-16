@@ -22,7 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.index.rebuild.IndexRebuildService;
+import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.util.RestUtil.R;
