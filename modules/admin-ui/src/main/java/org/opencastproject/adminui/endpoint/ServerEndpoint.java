@@ -27,6 +27,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -45,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -98,6 +100,10 @@ public class ServerEndpoint {
   private static final String KEY_HOSTNAME = "hostname";
   private static final String KEY_NODE_NAME = "nodeName";
   private static final String KEY_STATUS = "status";
+  private static final String KEY_TEXT_FILTER = "textFilter";
+
+  /** Cache time */
+  private static final long CACHE_SECONDS = 60;
 
   /**
    * Comparator for the servers list
@@ -161,6 +167,9 @@ public class ServerEndpoint {
 
   private ServiceRegistry serviceRegistry;
 
+  private long lastUpdated = 0;
+  private final List<Server> serverData = new ArrayList<>();
+
   /** OSGi callback for the service registry. */
   @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
@@ -199,38 +208,7 @@ public class ServerEndpoint {
     }
 
     List<Server> servers = new ArrayList<>();
-    // Get service statistics for all hosts and services
-    List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
-    for (HostRegistration host : serviceRegistry.getHostRegistrations()) {
-      // Calculate statistics per server
-      Server server = new Server();
-      server.online = host.isOnline();
-      server.maintenance = host.isMaintenanceMode();
-      server.hostname = host.getBaseUrl();
-      server.nodeName = host.getNodeName();
-      server.cores = host.getCores();
-      server.running = 0;
-      server.queued = 0;
-      server.completed = 0;
-      long sumMeanRuntime = 0;
-      long sumMeanQueueTime = 0;
-      int totalServiceOnHost = 0;
-      for (ServiceStatistics serviceStat : servicesStatistics) {
-        if (host.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
-          totalServiceOnHost++;
-          server.completed += serviceStat.getFinishedJobs();
-          server.running += serviceStat.getRunningJobs();
-          server.queued += serviceStat.getQueuedJobs();
-          // mean time values are given in milliseconds,
-          // we should convert them to seconds,
-          // because the adminNG UI expect it in this format
-          sumMeanRuntime += TimeUnit.MILLISECONDS.toSeconds(serviceStat.getMeanRunTime());
-          sumMeanQueueTime += TimeUnit.MILLISECONDS.toSeconds(serviceStat.getMeanQueueTime());
-        }
-      }
-      long meanRuntime = totalServiceOnHost > 0 ? Math.round((double)sumMeanRuntime / totalServiceOnHost) : 0L;
-      long meanQueueTime = totalServiceOnHost > 0 ? Math.round((double)sumMeanQueueTime / totalServiceOnHost) : 0L;
-
+    for (Server server: getServerData()) {
       if (!filters.getOrDefault(KEY_HOSTNAME, server.hostname).equalsIgnoreCase(server.hostname)) {
         continue;
       }
@@ -252,13 +230,11 @@ public class ServerEndpoint {
         }
       }
 
-      final String text = filters.getOrDefault("textFilter", "");
+      final String text = filters.getOrDefault(KEY_TEXT_FILTER, "");
       if (Stream.of(server.hostname, server.nodeName).noneMatch(v -> StringUtils.containsIgnoreCase(v, text))) {
         continue;
       }
 
-      server.meanRunTime = meanRuntime;
-      server.meanQueueTime = meanQueueTime;
       servers.add(server);
     }
 
@@ -291,6 +267,58 @@ public class ServerEndpoint {
     result.put("limit", limit);
     result.put("results", serverResults);
     return Response.ok(gson.toJson(result)).build();
+  }
+
+  /**
+   * Get service statistics for all hosts and services
+   * @return List of all servers
+   * @throws ServiceRegistryException
+   *          If the host data could not be retrieved
+   */
+  private synchronized List<Server> getServerData() throws ServiceRegistryException {
+    // Check if cache is still valid
+    if (lastUpdated + CACHE_SECONDS > Instant.now().getEpochSecond()) {
+      logger.debug("Using server data cache.");
+      return serverData;
+    }
+
+    // Update cache
+    serverData.clear();
+    logger.debug("Updating server data");
+    List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
+    for (HostRegistration host : serviceRegistry.getHostRegistrations()) {
+      // Calculate statistics per server
+      Server server = new Server();
+      server.online = host.isOnline();
+      server.maintenance = host.isMaintenanceMode();
+      server.hostname = host.getBaseUrl();
+      server.nodeName = host.getNodeName();
+      server.cores = host.getCores();
+      server.running = 0;
+      server.queued = 0;
+      server.completed = 0;
+      long sumMeanRuntime = 0;
+      long sumMeanQueueTime = 0;
+      int totalServiceOnHost = 0;
+      for (ServiceStatistics serviceStat : servicesStatistics) {
+        if (host.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
+          totalServiceOnHost++;
+          server.completed += serviceStat.getFinishedJobs();
+          server.running += serviceStat.getRunningJobs();
+          server.queued += serviceStat.getQueuedJobs();
+          // mean time values are given in milliseconds,
+          // we should convert them to seconds,
+          // because the adminNG UI expect it in this format
+          sumMeanRuntime += TimeUnit.MILLISECONDS.toSeconds(serviceStat.getMeanRunTime());
+          sumMeanQueueTime += TimeUnit.MILLISECONDS.toSeconds(serviceStat.getMeanQueueTime());
+        }
+      }
+      server.meanRunTime = totalServiceOnHost > 0 ? Math.round((double) sumMeanRuntime / totalServiceOnHost) : 0L;
+      server.meanQueueTime = totalServiceOnHost > 0 ? Math.round((double) sumMeanQueueTime / totalServiceOnHost) : 0L;
+      serverData.add(server);
+    }
+    lastUpdated = Instant.now().getEpochSecond();
+    return serverData;
   }
 
   /**
