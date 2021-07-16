@@ -31,6 +31,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -79,9 +80,6 @@ public class ApiIndexEndpoint {
   /** The index rebuild service **/
   private IndexRebuildService indexRebuildService = null;
 
-  /**
-   * OSGI DI
-   */
   @Reference
   public void setApiIndex(ApiIndex apiIndex) {
     this.apiIndex = apiIndex;
@@ -92,9 +90,6 @@ public class ApiIndexEndpoint {
     this.indexRebuildService = indexRebuildService;
   }
 
-  /**
-   * OSGI DI
-   */
   @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;

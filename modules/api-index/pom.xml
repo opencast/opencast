@@ -161,6 +161,8 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Bundle-Activator>org.opencastproject.api.index.rebuild.IndexRebuildService</Bundle-Activator>
+            <!-- Only with this can the endpoint class use OSGI annotations while the IndexRebuildService doesn't -->
+            <_dsannotations-options>norequirements</_dsannotations-options>
             <Export-Package>
               org.opencastproject.api.index,
               org.opencastproject.api.index.endpoint,
@@ -171,7 +173,6 @@
               org.opencastproject.api.index.objects.theme
             </Export-Package>
             <Service-Component>
-              OSGI-INF/api_index_endpoint.xml
             </Service-Component>
           </instructions>
         </configuration>
