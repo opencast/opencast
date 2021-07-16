@@ -65,7 +65,7 @@ public class OrganizationDirectoryServiceTest {
           Map<String, Integer> servers = organization.getServers();
           assertEquals(1, servers.size());
           assertTrue(servers.containsKey("localhost"));
-          assertTrue(servers.containsValue(8080));
+          assertEquals(443, servers.get("localhost").intValue());
           assertEquals("true", organization.getProperties().get("org.test"));
         } else if (i == 1) {
           assertNotNull(organization);
@@ -76,10 +76,11 @@ public class OrganizationDirectoryServiceTest {
           Map<String, Integer> servers = organization.getServers();
           assertEquals(3, servers.size());
           assertTrue(servers.containsKey("localhost"));
-          assertTrue(servers.containsValue(8080));
+          assertEquals(443, servers.get("localhost").intValue());
           assertTrue(servers.containsKey("localhost2"));
-          assertTrue(servers.containsValue(8081));
+          assertEquals(80, servers.get("localhost2").intValue());
           assertTrue(servers.containsKey("another"));
+          assertEquals(8888, servers.get("another").intValue());
           assertEquals("false", organization.getProperties().get("org.test"));
         } else {
           fail("Too many storeOrganization calls: " + i);
@@ -140,8 +141,7 @@ public class OrganizationDirectoryServiceTest {
     // Add properties
     properties.put(OrganizationDirectoryServiceImpl.ORG_ID_KEY, "mh_default");
     properties.put(OrganizationDirectoryServiceImpl.ORG_NAME_KEY, "Opencast Test");
-    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_PREFIX + "localhost", "localhost");
-    properties.put(OrganizationDirectoryServiceImpl.ORG_PORT_KEY, "8080");
+    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_PREFIX + "localhost", "https://localhost");
     properties.put(OrganizationDirectoryServiceImpl.ORG_ADMIN_ROLE_KEY, "ROLE_TEST_ADMIN");
     properties.put(OrganizationDirectoryServiceImpl.ORG_ANONYMOUS_ROLE_KEY, "ROLE_TEST_ANONYMOUS");
     properties.put("prop.org.test", "true");
@@ -156,9 +156,8 @@ public class OrganizationDirectoryServiceTest {
     properties = new Hashtable<String, String>();
     properties.put(OrganizationDirectoryServiceImpl.ORG_ID_KEY, "mh_default");
     properties.put(OrganizationDirectoryServiceImpl.ORG_NAME_KEY, "Opencast Test 2");
-    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_PREFIX + "localhost2", "localhost2");
-    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_PREFIX + "another", "another");
-    properties.put(OrganizationDirectoryServiceImpl.ORG_PORT_KEY, "8081");
+    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_PREFIX + "localhost2", "http://localhost2");
+    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_PREFIX + "another", "http://another:8888");
     properties.put(OrganizationDirectoryServiceImpl.ORG_ADMIN_ROLE_KEY, "ROLE_TEST2_ADMIN");
     properties.put(OrganizationDirectoryServiceImpl.ORG_ANONYMOUS_ROLE_KEY, "ROLE_TEST2_ANONYMOUS");
     properties.put("prop.org.test", "false");

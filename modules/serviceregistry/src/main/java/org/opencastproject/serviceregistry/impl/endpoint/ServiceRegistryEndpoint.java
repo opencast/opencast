@@ -66,6 +66,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -304,22 +306,15 @@ public class ServiceRegistryEndpoint {
     try {
       for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByLoad(serviceType)) {
         JaxbServiceRegistration jaxbReg = new JaxbServiceRegistration(reg);
-
-        String internalHost = jaxbReg.getHost();
-        String schemePrefix = null;
-        // extract scheme
-        if (internalHost.contains("://")) {
-          schemePrefix = StringUtils.substringBefore(internalHost, "://") + "://";
-          internalHost = StringUtils.substringAfter(internalHost, "://");
-        }
-        String tenantSpecificHost = StringUtils.trimToNull(properties.get("org.opencastproject.host." + internalHost));
+        URL internalHostUrl = new URL(jaxbReg.getHost());
+        String tenantSpecificHost = StringUtils.trimToNull(properties.get("org.opencastproject.host." + internalHostUrl.getHost()));
         if (StringUtils.isNotBlank(tenantSpecificHost)) {
-          jaxbReg.setHost(schemePrefix + tenantSpecificHost);
+          jaxbReg.setHost(tenantSpecificHost);
         }
         registrations.add(jaxbReg);
       }
       return Response.ok(registrations).build();
-    } catch (ServiceRegistryException e) {
+    } catch (ServiceRegistryException | MalformedURLException e) {
       throw new WebApplicationException(e);
     }
   }
