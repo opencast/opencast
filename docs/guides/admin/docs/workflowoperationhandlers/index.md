@@ -87,6 +87,7 @@ The following table contains the workflow operations that are available in an ou
 |segment-video       |Extracting segments from presentation                          |[Documentation](segmentvideo-woh.md)|
 |segmentpreviews     |Extract segment images from a video using FFmpeg               |[Documentation](segmentpreviews-woh.md)|
 |select-streams       |Select streams for further processing                           |[Documentation](select-streams-woh.md)|
+|select-version       |Select a version of the media package to run the current workflow with|[Documentation](select-version-woh.md)|
 |send-email          |Sends email notifications at any part of a workflow            |[Documentation](send-email-woh.md)|
 |series              |Apply series to the mediapackage                               |[Documentation](series-woh.md)|
 |silence             |Silence detection on audio of the mediapackage                 |[Documentation](silence-woh.md)|

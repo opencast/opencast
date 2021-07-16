@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.workflow.handler.assetmanager.SelectVersionWorkflowOperationHandler"
+               immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.assetmanager.SelectVersionWorkflowOperationHandler" />
+  <property name="service.description" value="Selects a mp version from the archive" />
+  <property name="workflow.operation" value="select-version" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+  <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    policy="static" bind="setServiceRegistry" />
+  <reference name="assetManager" interface="org.opencastproject.assetmanager.api.AssetManager" cardinality="1..1"
+    policy="static" bind="setAssetManager" />
+</scr:component>
