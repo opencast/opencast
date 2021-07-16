@@ -80,7 +80,7 @@ import javax.ws.rs.core.Response;
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0 })
+            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
 @RestService(name = "externalapiservice", title = "External API Service", notes = {},
              abstractText = "Provides a location for external apis to query the current server of the API.")
 public class BaseEndpoint {
