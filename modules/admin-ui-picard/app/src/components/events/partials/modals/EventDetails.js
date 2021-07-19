@@ -4,6 +4,7 @@ import cn from 'classnames';
 import {connect} from "react-redux";
 import {getCurrentLanguageInformation} from "../../../../utils/utils";
 import EventDetailsCommentsTab from "./EventDetailsCommentsTab";
+import EventDetailsAccessPolicyTab from "./EventDetailsAccessPolicyTab";
 
 
 // Get info about the current language and its date locale
@@ -153,8 +154,10 @@ const EventDetails = ({ tabIndex, eventId }) => {
                                                  t={t}/>
                             )}
                             {page === 6 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
+                                <EventDetailsAccessPolicyTab
+                                    eventId={eventId}
+                                    header={tabs[page].bodyHeaderTranslation}
+                                    t={t}/>
                             )}
                             {page === 7 && (
                                 <EventDetailsCommentsTab
@@ -179,7 +182,8 @@ const MockDataPage = ({ header, t }) => {
             <div className="modal-body">
                 <div className="full-col">
                     <div className="obj tbl-details">
-                        <header className="no-expand">{t(header)}</header>
+                        <header>{t(header)}</header>
+                        {/* Table view containing input fields for metadata */}
                         <div className="obj-container">
                             <table class="main-tbl">
                                 <tr>

@@ -22,7 +22,7 @@ const EventDetailsModal = ({ handleClose, showModal, tabIndex, eventTitle, event
                     <header>
                         <a className="fa fa-times close-modal" onClick={() => close()}/>
                         <h2>
-                            {t('EVENTS.EVENTS.DETAILS.HEADER', { resourceId: eventTitle} ) /*Event details - {{resourceId}}*/}
+                            {t('EVENTS.EVENTS.DETAILS.HEADER', { resourceId: eventTitle } ) /*Event details - {resourceTitle}*/}
                         </h2>
                     </header>
 
