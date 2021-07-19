@@ -211,7 +211,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       }
       preparedIndices
               .removeAll(Arrays.stream(getDocumentTypes()).map(this::getIndexName).collect(Collectors.toList()));
-      createIndex(getIndexName());
+      createIndex();
     } catch (ElasticsearchException exception) {
       if (exception.status() == RestStatus.NOT_FOUND) {
         logger.error("Cannot clear non-existing index '{}'", exception.getIndex().getName());
@@ -293,7 +293,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     }
 
     // Create the index
-    createIndex(index);
+    createIndex();
   }
 
   /**
@@ -311,15 +311,13 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /**
    * Prepares API index to store data for the types (or mappings) as returned by {@link #getDocumentTypes()}.
    *
-   * @param idx
-   *          the index name
    *
    * @throws SearchIndexException
    *           if index and type creation fails
    * @throws IOException
    *           if loading of the type definitions fails
    */
-  private void createIndex(String idx) throws SearchIndexException, IOException {
+  private void createIndex() throws SearchIndexException, IOException {
     for (String type : getDocumentTypes()) {
       createSubIndex(type, getIndexName(type));
     }
