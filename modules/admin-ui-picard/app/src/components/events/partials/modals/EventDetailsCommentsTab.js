@@ -92,7 +92,7 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                 <Notifications context="not-corner"/>
                 <div className="full-col">
                     <div className="obj comments">
-                        <header className="no-expand">{t(header)}</header>
+                        <header>{t(header)}</header>
                         <div className="obj-container">
                             <div className="comment-container">
                                 {
