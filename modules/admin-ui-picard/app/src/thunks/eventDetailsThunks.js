@@ -13,6 +13,7 @@ import {
 import {addNotification} from "./notificationThunks";
 import axios from "axios";
 import {NOTIFICATION_CONTEXT} from "../configs/wizardConfig";
+import {createPolicy} from "../utils/resourceUtils";
 
 // prepare http headers for posting to resources
 const getHttpHeaders = () => {
@@ -22,16 +23,6 @@ const getHttpHeaders = () => {
             }
     };
 }
-
-// creates an empty policy with the role from the argument
-const createPolicy = (role) => {
-    return {
-        role: role,
-        read: false,
-        write: false,
-        actions: []
-    };
-};
 
 export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
 

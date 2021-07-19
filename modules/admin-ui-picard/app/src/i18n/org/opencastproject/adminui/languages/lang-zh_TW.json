@@ -1149,7 +1149,7 @@
                   "ACTION": "操作",
                   "NEW": "新政策",
                   "DETAILS": "詳細信息",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS": "Update series permissions",
                   "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
                   "LOAD_MORE_LIMIT": "policies shown.",
                   "LOAD_MORE_LINK": "Load more"

@@ -1149,7 +1149,7 @@
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
                   "DETAILS": "Dettagli",
-                  "REPLACE_EVENT_ACLS": "Aggiorna permessi evento",
+                  "REPLACE_EVENT_ACLS": "Aggiorna permessi serie",
                   "REPLACE_EVENT_ACLS_HINT": "Assicurarsi che tutti gli eventi di questa serie abbiano questi permessi in vigore",
                   "LOAD_MORE_LIMIT": "policies shown.",
                   "LOAD_MORE_LINK": "Load more"

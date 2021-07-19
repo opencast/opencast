@@ -1149,7 +1149,7 @@
                   "ACTION": "Acciones",
                   "NEW": "Nueva política",
                   "DETAILS": "Detalles",
-                  "REPLACE_EVENT_ACLS": "Actualizar permisos de evento",
+                  "REPLACE_EVENT_ACLS": "Actualizar permisos de serie",
                   "REPLACE_EVENT_ACLS_HINT": "Asegúrese de que todos los eventos de esta serie tengan estos permisos en vigor",
                   "LOAD_MORE_LIMIT": "policies shown.",
                   "LOAD_MORE_LINK": "Load more"

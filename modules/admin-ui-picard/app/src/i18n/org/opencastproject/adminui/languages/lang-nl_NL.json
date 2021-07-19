@@ -1149,7 +1149,7 @@
                   "ACTION": "Acties",
                   "NEW": "Nieuwe policy",
                   "DETAILS": "Details",
-                  "REPLACE_EVENT_ACLS": "Event permissies updaten",
+                  "REPLACE_EVENT_ACLS": "Serie permissies updaten",
                   "REPLACE_EVENT_ACLS_HINT": "Zorg ervoor dat alle gebeurtenissen van deze serie deze machtigingen hebben",
                   "LOAD_MORE_LIMIT": "policies shown.",
                   "LOAD_MORE_LINK": "Load more"

@@ -91,35 +91,36 @@ const SeriesDetailsMetadataTab = ({ metadataFields, updateSeries, seriesId }) =>
                                             </tbody>
                                         </table>
                                     </div>
+
+                                    {formik.dirty && (
+                                        <>
+                                            {/* Render buttons for updating metadata */}
+                                            <footer style={{padding: '15px'}}>
+                                                <button type="submit"
+                                                        onClick={() => formik.handleSubmit()}
+                                                        disabled={!checkValidity(formik)}
+                                                        className={cn("submit",
+                                                            {
+                                                                active: checkValidity(formik),
+                                                                inactive: !checkValidity(formik)
+                                                            }
+                                                        )}>
+                                                    {t('EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA')}
+                                                </button>
+                                                <button onClick={() => formik.resetForm({values: ''})}
+                                                        className="cancel">
+                                                    {t('CANCEL')}
+                                                </button>
+                                            </footer>
+
+                                            <div className="btm-spacer"/>
+                                        </>
+                                    )}
+
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    {formik.dirty && (
-                        <>
-                            {/* Render buttons for updating metadata */}
-                            <footer>
-                                <button type="submit"
-                                        onClick={() => formik.handleSubmit()}
-                                        disabled={!checkValidity(formik)}
-                                        className={cn("submit",
-                                            {
-                                                active: checkValidity(formik),
-                                                inactive: !checkValidity(formik)
-                                            }
-                                        )}>
-                                    {t('EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA')}
-                                </button>
-                                <button onClick={() => formik.resetForm({values: ''})}
-                                        className="cancel">
-                                    {t('CANCEL')}
-                                </button>
-                            </footer>
-
-                            <div className="btm-spacer"/>
-                        </>
-                    )}
                 </>
             )}
         </Formik>

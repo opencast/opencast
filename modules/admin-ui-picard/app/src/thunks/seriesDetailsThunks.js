@@ -3,15 +3,18 @@ import {
     loadSeriesDetailsFailure,
     loadSeriesDetailsFeedsSuccess,
     loadSeriesDetailsInProgress,
-    loadSeriesDetailsMetadataSuccess, loadSeriesDetailsThemeNamesFailure,
-    loadSeriesDetailsThemeNamesInProgress, loadSeriesDetailsThemeNamesSuccess,
+    loadSeriesDetailsMetadataSuccess,
+    loadSeriesDetailsThemeNamesFailure,
+    loadSeriesDetailsThemeNamesInProgress,
+    loadSeriesDetailsThemeNamesSuccess,
     loadSeriesDetailsThemeSuccess
 } from "../actions/seriesDetailsActions";
 import axios from "axios";
 import _ from 'lodash';
-import {transformMetadataCollection} from "../utils/resourceUtils";
+import {createPolicy, transformMetadataCollection} from "../utils/resourceUtils";
 import {getSeriesDetailsMetadata, getSeriesDetailsThemeNames} from "../selectors/seriesDetailsSelectors";
 import {transformToIdValueArray} from "../utils/utils";
+import {addNotification} from "./notificationThunks";
 
 // fetch metadata of certain series from server
 export const fetchSeriesDetailsMetadata = id => async dispatch => {
@@ -40,7 +43,26 @@ export const fetchSeriesDetailsAcls = id => async dispatch => {
         // fetch acl
         let data = await axios.get(`admin-ng/series/${id}/access.json`);
 
-        const seriesAcls = await data.data;
+        const response = await data.data;
+
+        let seriesAcls = [];
+        if (!!response.series_access) {
+            const json = JSON.parse(response.series_access.acl).acl.ace;
+            let policies = {};
+            let policyRoles = [];
+            json.forEach(policy => {
+                if (!policies[policy.role]) {
+                    policies[policy.role] = createPolicy(policy.role);
+                    policyRoles.push(policy.role);
+                }
+                if (policy.action === 'read' || policy.action === 'write') {
+                    policies[policy.role][policy.action] = policy.allow;
+                } else if (policy.allow === true || policy.allow === 'true') {
+                    policies[policy.role].actions.push(policy.action);
+                }
+            });
+            seriesAcls = policyRoles.map(role => policies[role]);
+        }
 
         dispatch(loadSeriesDetailsAclsSuccess(seriesAcls));
 
@@ -176,6 +198,34 @@ export const updateSeriesMetadata = (id, values) => async (dispatch, getState) =
     } catch (e) {
         console.log(e);
     }
+}
+
+export const updateSeriesAccess = (id, policies) => async (dispatch) => {
+    let data = new URLSearchParams();
+
+    let acls = {
+        acl: {
+            ace: policies
+        }
+    }
+    data.append("acl", JSON.stringify(acls));
+    data.append("override", true);
+
+    return axios.post(`admin-ng/series/${id}/access`, data, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
+        .then(res => {
+            console.log(res);
+            dispatch(addNotification('info', 'SAVED_ACL_RULES'));
+            return true;
+        })
+        .catch(res => {
+            console.log(res);
+            dispatch(addNotification('error', 'ACL_NOT_SAVED'));
+            return false;
+        });
 }
 
 export const updateSeriesTheme = (id, values) => async (dispatch, getState) => {

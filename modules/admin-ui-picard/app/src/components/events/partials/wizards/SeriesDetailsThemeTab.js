@@ -55,35 +55,34 @@ const SeriesDetailsThemeTab = ({ theme, seriesId, themeNames, updateTheme }) => 
                                             </li>
                                         </ul>
                                     </div>
+                                    {formik.dirty && (
+                                        <>
+                                            {/* Render buttons for updating theme */}
+                                            <footer style={{padding: '15px'}}>
+                                                <button type="submit"
+                                                        onClick={() => formik.handleSubmit()}
+                                                        disabled={!checkValidity(formik)}
+                                                        className={cn("submit",
+                                                            {
+                                                                active: checkValidity(formik),
+                                                                inactive: !checkValidity(formik)
+                                                            }
+                                                        )}>
+                                                    {t('EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_THEME')}
+                                                </button>
+                                                <button onClick={() => formik.resetForm({values: ''})}
+                                                        className="cancel">
+                                                    {t('CANCEL')}
+                                                </button>
+                                            </footer>
+
+                                            <div className="btm-spacer"/>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    {formik.dirty && (
-                        <>
-                            {/* Render buttons for updating theme */}
-                            <footer>
-                                <button type="submit"
-                                        onClick={() => formik.handleSubmit()}
-                                        disabled={!checkValidity(formik)}
-                                        className={cn("submit",
-                                            {
-                                                active: checkValidity(formik),
-                                                inactive: !checkValidity(formik)
-                                            }
-                                        )}>
-                                    {t('EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_THEME')}
-                                </button>
-                                <button onClick={() => formik.resetForm({values: ''})}
-                                        className="cancel">
-                                    {t('CANCEL')}
-                                </button>
-                            </footer>
-
-                            <div className="btm-spacer"/>
-                        </>
-                    )}
                 </>
             )}
         </Formik>

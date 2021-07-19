@@ -99,16 +99,20 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames }) =
             {/* render modal content depending on current page */}
             <div>
                 {page === 0 && (
-                    <SeriesDetailsMetadataTab metadataFields={metadataFields} seriesId={seriesId}/>
+                    <SeriesDetailsMetadataTab metadataFields={metadataFields}
+                                              seriesId={seriesId}/>
                 )}
                 {page === 1 && (
                     <SeriesDetailsExtendedMetadataTab />
                 )}
                 {page === 2 && (
-                    <SeriesDetailsAccessTab />
+                    <SeriesDetailsAccessTab seriesId={seriesId}
+                                            header={tabs[page].tabNameTranslation}/>
                 )}
                 {page === 3 && (
-                    <SeriesDetailsThemeTab theme={theme} themeNames={themeNames} seriesId={seriesId} />
+                    <SeriesDetailsThemeTab theme={theme}
+                                           themeNames={themeNames}
+                                           seriesId={seriesId} />
                 )}
                 {page === 4 && (
                     <SeriesDetailsStatisticTab />

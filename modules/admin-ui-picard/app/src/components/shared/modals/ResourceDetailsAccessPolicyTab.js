@@ -16,7 +16,7 @@ import {NOTIFICATION_CONTEXT} from "../../../configs/wizardConfig";
  * This component manages the access policy tab of resource details modals
  */
 const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetchHasActiveTransactions, fetchAccessPolicies, saveNewAccessPolicies,
-                                          addNotification, fetchAclTemplates, fetchRoles}) => {
+                                          addNotification, fetchAclTemplates, fetchRoles, buttonText}) => {
 
     const baseAclId = "";
 
@@ -257,7 +257,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                             {(aclTemplates && aclTemplates.length > 0) ? (
                                                                                 <>
                                                                                     <option value="" defaultValue hidden>
-                                                                                        {t('EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL')}
+                                                                                        {t(buttonText)}
                                                                                     </option>
                                                                                     {
                                                                                         aclTemplates.map((template, key) => (
