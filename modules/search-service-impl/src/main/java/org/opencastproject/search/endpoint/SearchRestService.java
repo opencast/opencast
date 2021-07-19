@@ -26,20 +26,16 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageImpl;
-import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
-import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultImpl;
+import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -94,9 +90,6 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   /** The search service */
   protected SearchServiceImpl searchService;
-
-  /** The optional series service; has to be volatile by the OSGi spec */
-  private volatile SeriesService seriesService;
 
   /** The service registry */
   private ServiceRegistry serviceRegistry;
@@ -446,35 +439,34 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
     boolean invalidSeries = false;
     if (seriesName != null) {
-      if (seriesService == null) {
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
-      }
-      DublinCoreCatalogList result;
+      SearchResult result = new SearchResultImpl();
       try {
-        result = seriesService.getSeries(new SeriesQuery().setSeriesTitle(seriesName));
-      } catch (SeriesException e) {
+        SearchQuery seriesSearch = new SearchQuery();
+        seriesSearch.includeSeries(true)
+            .includeEpisodes(false)
+            .withQuery("dc_title___:" + SolrUtils.clean(seriesName));
+        result = searchService.getByQuery(seriesSearch);
+      } catch (SearchException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
             .entity("Error while searching for series")
             .build();
       }
       // Specifying a nonexistent series ID is not an error, so a nonexistent
       // series name shouldn't be, either.
-      if (result.getTotalCount() == 0) {
+      if (result.getTotalSize() == 0) {
+        logger.debug("Retrieved 0 series results");
         invalidSeries = true;
       } else {
-        if (result.getTotalCount() > 1) {
+        if (result.getTotalSize() > 1) {
+          logger.debug("Retrieved {} series with sname parameter {}, we only expect a single series to be returned",
+                        result.getTotalSize(), seriesName);
           return Response.status(Response.Status.BAD_REQUEST)
               .entity("more than one series matches given series name")
               .build();
         }
-        DublinCoreCatalog seriesResult = result.getCatalogList().get(0);
-        final List<DublinCoreValue> identifiers = seriesResult.get(DublinCore.PROPERTY_IDENTIFIER);
-        if (identifiers.size() != 1) {
-          return Response.status(Response.Status.BAD_REQUEST)
-              .entity("more than one identifier in dublin core catalog for series")
-              .build();
-        }
-        seriesId = identifiers.get(0).getValue();
+        SearchResultItem seriesResult = result.getItems()[0];
+        seriesId = seriesResult.getId();
+        logger.debug("Using sname parameter, series {} found with ID {}", seriesName, seriesId);
       }
     }
 
@@ -539,6 +531,13 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               description = "The lucene query."
           ),
           @RestParameter(
+              name = "series",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              defaultValue = "false",
+              description = "Include series in the search result."
+          ),
+          @RestParameter(
               name = "sort",
               isRequired = false,
               type = RestParameter.Type.STRING,
@@ -586,6 +585,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   )
   public Response getByLuceneQuery(
       @QueryParam("q") String q,
+      @QueryParam("series") boolean includeSeries,
       @QueryParam("sort") String sort,
       @QueryParam("limit") int limit,
       @QueryParam("offset") int offset,
@@ -598,6 +598,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     if (!StringUtils.isBlank(q)) {
       query.withQuery(q);
     }
+
+    // Include series data in the results?
+    query.includeSeries(includeSeries);
 
     query.withSort(SearchQuery.Sort.DATE_CREATED, false);
     parseSortParameter(sort, query);
@@ -648,16 +651,6 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
    */
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
-  }
-
-  /**
-   * Callback from OSGi to set the series service implementation.
-   *
-   * @param seriesService
-   *          the series servie
-   */
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
   }
 
   /**
