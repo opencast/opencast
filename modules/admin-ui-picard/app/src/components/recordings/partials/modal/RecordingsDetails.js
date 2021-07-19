@@ -4,8 +4,8 @@ import {connect} from "react-redux";
 import cn from 'classnames';
 import GeneralDetailsTab from "../wizards/GeneralDetailsTab";
 import ConfigurationDetailsTab from "../wizards/ConfigurationDetailsTab";
-import {getRecordingDetails} from "../../../../selectors/recordingDetailsSelectors";
 import CapabilitiesDetailsTab from "../wizards/CapabilitiesDetailsTab";
+import {getRecordingDetails} from "../../../../selectors/recordingDetailsSelectors";
 
 /**
  * This component manages the pages of the recording details
