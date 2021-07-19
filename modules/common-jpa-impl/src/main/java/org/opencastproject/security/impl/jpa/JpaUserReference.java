@@ -57,14 +57,34 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "oc_user_ref", uniqueConstraints = {
-    @UniqueConstraint(name = "UNQ_oc_user_ref", columnNames = { "username", "organization" }) })
+@Table(
+    name = "oc_user_ref",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "UNQ_oc_user_ref", columnNames = { "username", "organization" }),
+    }
+)
 @NamedQueries({
-  @NamedQuery(name = "UserReference.findByQuery", query = "select u from JpaUserReference u where UPPER(u.username) like :query and u.organization.id = :org"),
-  @NamedQuery(name = "UserReference.findByUsername", query = "select u from JpaUserReference u where u.username=:u and u.organization.id = :org"),
-  @NamedQuery(name = "UserReference.findAll", query = "select u from JpaUserReference u where u.organization.id = :org"),
-  @NamedQuery(name = "UserReference.findAllByUserNames", query = "select u from JpaUserReference u where u.organization.id = :org and u.username in :names"),
-  @NamedQuery(name = "UserReference.countAll", query = "select COUNT(u) from JpaUserReference u where u.organization.id = :org") })
+    @NamedQuery(
+        name = "UserReference.findByQuery",
+        query = "select u from JpaUserReference u where UPPER(u.username) like :query and u.organization.id = :org"
+    ),
+    @NamedQuery(
+        name = "UserReference.findByUsername",
+        query = "select u from JpaUserReference u where u.username=:u and u.organization.id = :org"
+    ),
+    @NamedQuery(
+        name = "UserReference.findAll",
+        query = "select u from JpaUserReference u where u.organization.id = :org"
+    ),
+    @NamedQuery(
+        name = "UserReference.findAllByUserNames",
+        query = "select u from JpaUserReference u where u.organization.id = :org and u.username in :names"
+    ),
+    @NamedQuery(
+        name = "UserReference.countAll",
+        query = "select COUNT(u) from JpaUserReference u where u.organization.id = :org"
+    ),
+})
 public class JpaUserReference {
   @Id
   @GeneratedValue
@@ -229,8 +249,9 @@ public class JpaUserReference {
    */
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof JpaUserReference))
+    if (!(obj instanceof JpaUserReference)) {
       return false;
+    }
     JpaUserReference other = (JpaUserReference) obj;
     return username.equals(other.getUsername()) && organization.equals(other.getOrganization());
   }
