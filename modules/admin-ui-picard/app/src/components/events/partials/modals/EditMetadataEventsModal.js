@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from "react";
 import {Formik, Field} from "formik";
 import {useTranslation} from "react-i18next";
-import {getSelectedRows} from "../../../selectors/tableSelectors";
+import {getSelectedRows} from "../../../../selectors/tableSelectors";
 import {connect} from "react-redux";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import {getCurrentLanguageInformation} from "../../../utils/utils";
+import {getCurrentLanguageInformation} from "../../../../utils/utils";
 import cn from "classnames";
-import RenderField from "./wizards/RenderField";
-import {postEditMetadata, updateBulkMetadata} from "../../../thunks/eventThunks";
-import RenderMultiField from "../../shared/wizard/RenderMultiField";
+import RenderField from "../../../shared/wizard/RenderField";
+import {postEditMetadata, updateBulkMetadata} from "../../../../thunks/eventThunks";
+import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 
 
 // Get info about the current language and its date locale

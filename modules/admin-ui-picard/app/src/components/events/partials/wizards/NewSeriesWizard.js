@@ -1,16 +1,16 @@
 import React, {useState} from "react";
 import {Formik} from "formik";
-import NewThemePage from "./NewThemePage";
+import NewThemePage from "../ModalTabsAndPages/NewThemePage";
 import NewSeriesSummary from "./NewSeriesSummary";
 import {getSeriesMetadata} from "../../../../selectors/seriesSeletctor";
 import {connect} from "react-redux";
-import NewMetadataPage from "./NewMetadataPage";
-import NewMetadataExtendedPage from "./NewMetadataExtendedPage";
-import NewAccessPage from "./NewAccessPage";
+import NewMetadataPage from "../ModalTabsAndPages/NewMetadataPage";
+import NewMetadataExtendedPage from "../ModalTabsAndPages/NewMetadataExtendedPage";
+import NewAccessPage from "../ModalTabsAndPages/NewAccessPage";
 import {postNewSeries} from "../../../../thunks/seriesThunks";
 import {NewSeriesSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
-import {initialFormValuesNewSeries} from "../../../../configs/wizardConfig";
+import {initialFormValuesNewSeries} from "../../../../configs/modalConfig";
 
 
 /**

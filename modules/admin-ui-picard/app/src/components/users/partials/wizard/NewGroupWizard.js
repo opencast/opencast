@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Formik} from "formik";
 import {connect} from "react-redux";
-import {initialFormValuesNewGroup} from "../../../../configs/wizardConfig";
+import {initialFormValuesNewGroup} from "../../../../configs/modalConfig";
 import {NewGroupSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
 import NewGroupMetadataPage from "./NewGroupMetadataPage";

@@ -7,7 +7,7 @@ import NewAclMetadataPage from "./NewAclMetadataPage";
 import NewAclAccessPage from "./NewAclAccessPage";
 import NewAclSummaryPage from "./NewAclSummaryPage";
 import {postNewAcl} from "../../../../thunks/aclThunks";
-import {initialFormValuesNewAcl} from "../../../../configs/wizardConfig";
+import {initialFormValuesNewAcl} from "../../../../configs/modalConfig";
 
 const NewAclWizard = ({ close, postNewAcl }) => {
     const initialValues = initialFormValuesNewAcl;

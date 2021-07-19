@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import {Field, FieldArray} from "formik";
 import Notifications from "../../../shared/Notifications";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
-import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/wizardConfig";
+import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/modalConfig";
 import {
     fetchAclActions,
     fetchAclTemplateById,

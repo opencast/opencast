@@ -6,7 +6,7 @@ import cn from 'classnames';
 import NewUserGeneralTab from "./NewUserGeneralTab";
 import NewUserRolesTab from "./NewUserRolesTab";
 import {NewUserSchema} from "../../../shared/wizard/validate";
-import {initialFormValuesNewUser} from "../../../../configs/wizardConfig";
+import {initialFormValuesNewUser} from "../../../../configs/modalConfig";
 import {getUsernames} from "../../../../selectors/userSelectors";
 import {postNewUser} from "../../../../thunks/userThunks";
 

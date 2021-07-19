@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import {setHidden} from "../../actions/notificationActions";
-import {NOTIFICATION_CONTEXT, NOTIFICATION_CONTEXT_ACCESS} from "../../configs/wizardConfig";
+import {NOTIFICATION_CONTEXT, NOTIFICATION_CONTEXT_ACCESS} from "../../configs/modalConfig";
 
 /**
  * This component renders notifications about occurred errors, warnings and info

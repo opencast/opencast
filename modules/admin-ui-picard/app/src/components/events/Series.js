@@ -9,7 +9,7 @@ import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
-import DeleteSeriesModal from "./partials/DeleteSeriesModal";
+import DeleteSeriesModal from "./partials/modals/DeleteSeriesModal";
 import {seriesTemplateMap} from "../../configs/tableConfigs/seriesTableConfig";
 import {fetchSeries, fetchSeriesMetadata, fetchSeriesThemes} from "../../thunks/seriesThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";

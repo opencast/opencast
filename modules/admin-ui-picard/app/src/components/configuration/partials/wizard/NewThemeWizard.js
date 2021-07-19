@@ -9,7 +9,7 @@ import WatermarkPage from "./WatermarkPage";
 import ThemeSummaryPage from "./ThemeSummaryPage";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
 import {postNewTheme} from "../../../../thunks/themeThunks";
-import {initialFormValuesNewThemes} from "../../../../configs/wizardConfig";
+import {initialFormValuesNewThemes} from "../../../../configs/modalConfig";
 
 /**
  * This component manages the pages of the new theme wizard and the submission of values

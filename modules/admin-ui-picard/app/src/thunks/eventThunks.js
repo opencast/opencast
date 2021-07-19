@@ -16,7 +16,7 @@ import {
 } from "../utils/resourceUtils";
 import {getTimezoneOffset, makeTwoDigits} from "../utils/utils";
 import {sourceMetadata, uploadAssetOptions} from "../configs/sourceConfig";
-import {NOTIFICATION_CONTEXT, weekdays, WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizardConfig";
+import {NOTIFICATION_CONTEXT, weekdays, WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/modalConfig";
 import {addNotification} from "./notificationThunks";
 
 

@@ -12,7 +12,7 @@ import {
     saveCommentReplyDone,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
-import {NOTIFICATION_CONTEXT} from "../configs/wizardConfig";
+import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
 
 // prepare http headers for posting to resources
 const getHttpHeaders = () => {

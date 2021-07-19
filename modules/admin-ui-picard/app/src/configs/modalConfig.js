@@ -2,10 +2,10 @@
 // InitialValues of Formik form (others computed dynamically depending on responses from backend)
 import {initArray} from "../utils/utils";
 
-// Context for notifications shown in wizards
-export const NOTIFICATION_CONTEXT = 'wizard-form';
+// Context for notifications shown in modals
+export const NOTIFICATION_CONTEXT = 'modal-form';
 
-// Context for notifications shown in access page
+// Context for notifications shown in wizard access page
 export const NOTIFICATION_CONTEXT_ACCESS = 'wizard-access';
 
 export const initialFormValuesNewEvents = {

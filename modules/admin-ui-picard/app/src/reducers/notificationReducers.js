@@ -4,6 +4,7 @@ import {
     REMOVE_NOTIFICATION_WIZARD_FORM,
     SET_HIDDEN
 } from "../actions/notificationActions";
+import {NOTIFICATION_CONTEXT, NOTIFICATION_CONTEXT_ACCESS} from "../configs/modalConfig";
 
 /*
 State is looking something like this
@@ -67,13 +68,13 @@ export const notifications = (state=initialState, action) => {
         case REMOVE_NOTIFICATION_WIZARD_FORM: {
             return {
                 ...state,
-                notifications: state.notifications.filter(notification => notification.context !== 'wizard-form')
+                notifications: state.notifications.filter(notification => notification.context !== NOTIFICATION_CONTEXT)
             }
         }
         case REMOVE_NOTIFICATION_WIZARD_ACCESS: {
             return {
                 ...state,
-                notifications: state.notifications.filter(notification => notification.context !== 'wizard-access')
+                notifications: state.notifications.filter(notification => notification.context !== NOTIFICATION_CONTEXT_ACCESS)
             }
         }
         case SET_HIDDEN: {

@@ -2,12 +2,12 @@ import React, {useState} from "react";
 import {Formik} from "formik";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
-import {initialFormValuesStartTask} from "../../../configs/wizardConfig";
-import WizardStepper from "../../shared/wizard/WizardStepper";
-import StartTaskGeneralPage from "./wizards/StartTaskGeneralPage";
-import StartTaskWorkflowPage from "./wizards/StartTaskWorkflowPage";
-import StartTaskSummaryPage from "./wizards/StartTaskSummaryPage";
-import {postTasks} from "../../../thunks/taskThunks";
+import {initialFormValuesStartTask} from "../../../../configs/modalConfig";
+import WizardStepper from "../../../shared/wizard/WizardStepper";
+import StartTaskGeneralPage from "../ModalTabsAndPages/StartTaskGeneralPage";
+import StartTaskWorkflowPage from "../ModalTabsAndPages/StartTaskWorkflowPage";
+import StartTaskSummaryPage from "../ModalTabsAndPages/StartTaskSummaryPage";
+import {postTasks} from "../../../../thunks/taskThunks";
 
 /**
  * This component manages the pages of the task start bulk action

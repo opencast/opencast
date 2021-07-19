@@ -10,7 +10,7 @@ import {
 import Notifications from "../Notifications";
 import {Formik, Field, FieldArray} from "formik";
 import {addNotification} from "../../../thunks/notificationThunks";
-import {NOTIFICATION_CONTEXT} from "../../../configs/wizardConfig";
+import {NOTIFICATION_CONTEXT} from "../../../configs/modalConfig";
 import {removeNotificationWizardForm} from "../../../actions/notificationActions";
 
 /**

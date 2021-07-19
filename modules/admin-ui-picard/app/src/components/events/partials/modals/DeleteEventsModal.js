@@ -1,8 +1,8 @@
 import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
-import {deleteMultipleEvent} from "../../../thunks/eventThunks";
-import {getSelectedRows} from "../../../selectors/tableSelectors";
+import {deleteMultipleEvent} from "../../../../thunks/eventThunks";
+import {getSelectedRows} from "../../../../selectors/tableSelectors";
 import {connect} from "react-redux";
 
 /**

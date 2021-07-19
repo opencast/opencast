@@ -4,7 +4,7 @@ import axios from "axios";
 import {connect} from "react-redux";
 import {useField} from "formik";
 import {addNotification} from "../../../thunks/notificationThunks";
-import {NOTIFICATION_CONTEXT} from "../../../configs/wizardConfig";
+import {NOTIFICATION_CONTEXT} from "../../../configs/modalConfig";
 
 /**
  * This component renders a custom file upload button in wizards.

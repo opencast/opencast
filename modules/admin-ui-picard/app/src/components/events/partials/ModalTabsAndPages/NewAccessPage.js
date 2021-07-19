@@ -12,7 +12,7 @@ import {Field, FieldArray} from "formik";
 import {connect} from "react-redux";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
-import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/wizardConfig";
+import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/modalConfig";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 
 /**

@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-import {getSelectedRows} from "../../../selectors/tableSelectors";
+import {getSelectedRows} from "../../../../selectors/tableSelectors";
 import {connect} from "react-redux";
 import cn from "classnames";
-import {deleteMultipleSeries, getSeriesConfig, hasEvents} from "../../../thunks/seriesThunks";
+import {deleteMultipleSeries, getSeriesConfig, hasEvents} from "../../../../thunks/seriesThunks";
 
 
 /**
