@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
     loadSeriesFailure,
     loadSeriesInProgress,
@@ -14,7 +15,6 @@ import {
     transformMetadataCollection
 } from "../utils/resourceUtils";
 import {transformToIdValueArray, transformToObjectArray} from "../utils/utils";
-import axios from "axios";
 import {addNotification} from "./notificationThunks";
 
 

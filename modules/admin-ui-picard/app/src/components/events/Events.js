@@ -1,27 +1,28 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
+import {connect} from "react-redux";
+import Link from "react-router-dom/Link";
+import {withRouter} from "react-router-dom";
 import TableFilters from "../shared/TableFilters";
 import MainNav from "../shared/MainNav";
 import Stats from "../shared/Stats";
 import Table from "../shared/Table";
-import {fetchEventMetadata, fetchEvents} from "../../thunks/eventThunks";
-import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
-import {getTotalEvents, isLoading, isShowActions} from "../../selectors/eventSelectors";
-import {connect} from "react-redux";
-import {eventsTemplateMap} from "../../configs/tableConfigs/eventsTableConfig";
-import Link from "react-router-dom/Link";
-import {withRouter} from "react-router-dom";
-import {fetchSeries} from "../../thunks/seriesThunks";
-import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
-import {editTextFilter} from "../../actions/tableFilterActions";
-import {setOffset} from "../../actions/tableActions";
 import DeleteEventsModal from "./partials/DeleteEventsModal";
 import StartTaskModal from "./partials/StartTaskModal";
 import EditScheduledEventsModal from "./partials/EditScheduledEventsModal";
 import EditMetadataEventsModal from "./partials/EditMetadataEventsModal";
+import {eventsTemplateMap} from "../../configs/tableConfigs/eventsTableConfig";
+import {fetchEventMetadata, fetchEvents} from "../../thunks/eventThunks";
+import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
+import {fetchSeries} from "../../thunks/seriesThunks";
+import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
+import {getTotalEvents, isLoading, isShowActions} from "../../selectors/eventSelectors";
+import {editTextFilter} from "../../actions/tableFilterActions";
+import {setOffset} from "../../actions/tableActions";
+
 
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();

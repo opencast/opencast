@@ -44,6 +44,17 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
     // Size options for pagination
     const sizeOptions = [10, 20, 50, 100];
 
+    const lengthDivStyle = {
+        position: "absolute",
+        visibility: "hidden",
+        height: "auto",
+        width: "auto",
+        whiteSpace: "nowrap"
+    };
+    const loadingTdStyle = {
+        textAlign: "center"
+    };
+
     const directAccessible = getDirectAccessiblePages(pages, pagination);
 
     const { t } = useTranslation();
@@ -70,17 +81,6 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
             window.removeEventListener('mousedown', handleClickOutside);
         }
     }, []);
-
-    const lengthDivStyle = {
-        position: "absolute",
-        visibility: "hidden",
-        height: "auto",
-        width: "auto",
-        whiteSpace: "nowrap"
-    };
-    const loadingTdStyle = {
-        textAlign: "center"
-    };
 
     // Select or deselect all rows on a page
     const onChangeAllSelected = e => {

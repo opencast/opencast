@@ -1,9 +1,9 @@
+import axios from "axios";
 import {
     loadRecordingDetailsFailure,
     loadRecordingDetailsInProgress,
     loadRecordingDetailsSuccess
 } from "../actions/recordingDetailsActions";
-import axios from "axios";
 
 // fetch details of certain recording from server
 export const fetchRecordingDetails = name => async dispatch => {

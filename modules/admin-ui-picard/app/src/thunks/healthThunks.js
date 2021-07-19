@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
     addNumError,
     loadHealthStatus,
@@ -6,7 +7,7 @@ import {
     setError
 } from "../actions/healthActions";
 import {getErrorStatus} from "../selectors/healthSelectors";
-import axios from "axios";
+
 
 /**
  * This file contains methods/thunks used to query the REST-API of Opencast to get information about the health status of OC.

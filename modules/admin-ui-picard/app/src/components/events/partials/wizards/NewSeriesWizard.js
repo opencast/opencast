@@ -66,6 +66,7 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
 
     const handleSubmit = (values) => {
         const response = postNewSeries(values, metadataFields);
+        console.log(response);
         close();
     }
 

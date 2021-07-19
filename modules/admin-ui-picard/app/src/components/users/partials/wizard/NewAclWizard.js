@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {connect} from "react-redux";
 import {Formik} from "formik";
 import {NewAclSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
@@ -7,7 +8,6 @@ import NewAclAccessPage from "./NewAclAccessPage";
 import NewAclSummaryPage from "./NewAclSummaryPage";
 import {postNewAcl} from "../../../../thunks/aclThunks";
 import {initialFormValuesNewAcl} from "../../../../configs/wizardConfig";
-import {connect} from "react-redux";
 
 const NewAclWizard = ({ close, postNewAcl }) => {
     const initialValues = initialFormValuesNewAcl;
@@ -44,6 +44,7 @@ const NewAclWizard = ({ close, postNewAcl }) => {
 
     const handleSubmit = values => {
         const response = postNewAcl(values);
+        console.log(response);
         close();
     }
 

@@ -38,7 +38,7 @@ const RecordingsDetails = ({ agent }) => {
     return (
         <>
             <nav className="modal-nav" id="modal-nav">
-                {/**/}
+                {/* Navigation */}
                 <a className={cn({active: page === 0})}
                    onClick={() => openTab(0)}>
                     {t(tabs[0].tabNameTranslation)}

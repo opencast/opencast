@@ -53,6 +53,7 @@ const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata}) => 
 
     const handleSubmit = values => {
         const response = updateBulkMetadata(metadataFields, values);
+        console.log(response);
         close();
     };
 

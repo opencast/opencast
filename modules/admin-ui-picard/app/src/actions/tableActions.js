@@ -11,7 +11,6 @@ export const DESELECT_ALL = 'DESELECT_ALL';
 export const RESET_SORT_TABLE = 'RESET_SORT_TABLE';
 export const REVERSE_TABLE = 'REVERSE_TABLE';
 export const SET_SORT_BY = 'SET_SORT_BY';
-export const SET_MULTISELECT = 'SET_MULTISELECT';
 export const LOAD_COLUMNS = 'LOAD_COLUMNS';
 
 // Constants of of actions types concerning pagination
@@ -47,11 +46,6 @@ export const selectAll = ()=> ({
 export const deselectAll = () => ({
     type: DESELECT_ALL
 });
-
-export const resetSortTable = () => ({
-    type: RESET_SORT_TABLE
-});
-
 
 export const reverseTable = order => ({
     type: REVERSE_TABLE,

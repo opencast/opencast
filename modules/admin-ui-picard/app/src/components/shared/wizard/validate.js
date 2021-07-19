@@ -1,5 +1,4 @@
 import * as Yup from 'yup';
-import {getUsernames} from "../../../selectors/userSelectors";
 
 /**
  * This File contains all schemas used for validation with yup in the context of events and series

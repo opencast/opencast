@@ -11,12 +11,13 @@ import Notifications from "../Notifications";
 import {Formik, Field, FieldArray} from "formik";
 import {addNotification} from "../../../thunks/notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../../../configs/wizardConfig";
+import {removeNotificationWizardForm} from "../../../actions/notificationActions";
 
 /**
  * This component manages the access policy tab of resource details modals
  */
 const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetchHasActiveTransactions, fetchAccessPolicies, saveNewAccessPolicies,
-                                          addNotification, fetchAclTemplates, fetchRoles}) => {
+                                          addNotification, fetchAclTemplates, fetchRoles, removeNotificationWizardForm }) => {
 
     const baseAclId = "";
 
@@ -86,14 +87,15 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
     /* transforms rules into proper format for saving and checks validity
     * if the policies are valid, the new policies are saved in the backend */
     const saveAccess = (values) => {
+        removeNotificationWizardForm();
         const {ace, roleWithFullRightsExists, allRulesValid} = validatePolicies(values);
 
         if(!allRulesValid){
-            addNotification('warning','INVALID_ACL_RULES', 3, null, NOTIFICATION_CONTEXT);
+            addNotification('warning','INVALID_ACL_RULES', -1, null, NOTIFICATION_CONTEXT);
         }
 
         if(!roleWithFullRightsExists){
-            addNotification('warning','MISSING_ACL_RULES', 3, null, NOTIFICATION_CONTEXT);
+            addNotification('warning','MISSING_ACL_RULES', -1, null, NOTIFICATION_CONTEXT);
         }
 
         if(allRulesValid && roleWithFullRightsExists){
@@ -494,6 +496,7 @@ const mapDispatchToProps = dispatch => ({
     addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
     fetchRoles: () => fetchRolesWithTarget("ACL"),
     fetchAclTemplates: () => fetchAclTemplates(),
+    removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
 });
 
 export default connect(null, mapDispatchToProps)(ResourceDetailsAccessPolicyTab);

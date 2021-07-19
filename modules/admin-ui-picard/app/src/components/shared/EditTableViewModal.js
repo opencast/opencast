@@ -2,8 +2,8 @@ import React, {useState, useEffect} from "react";
 import { Container, Draggable } from "react-smooth-dnd";
 import arrayMove from "array-move";
 import {useTranslation} from "react-i18next";
-import {changeColumnSelection} from "../../thunks/tableThunks";
 import {connect} from "react-redux";
+import {changeColumnSelection} from "../../thunks/tableThunks";
 
 
 /**

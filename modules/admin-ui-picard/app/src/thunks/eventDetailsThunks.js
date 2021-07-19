@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
     loadEventPoliciesInProgress,
     loadEventPoliciesSuccess,
@@ -11,7 +12,6 @@ import {
     saveCommentReplyDone,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
-import axios from "axios";
 import {NOTIFICATION_CONTEXT} from "../configs/wizardConfig";
 
 // prepare http headers for posting to resources
@@ -50,12 +50,12 @@ export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
     return axios.post(`admin-ng/event/${eventId}/access`, data.toString(), headers)
         .then(response => {
             console.log(response);
-            dispatch(addNotification('info', 'SAVED_ACL_RULES', 5, null, NOTIFICATION_CONTEXT));
+            dispatch(addNotification('info', 'SAVED_ACL_RULES', -1, null, NOTIFICATION_CONTEXT));
             return true;
         })
         .catch(response => {
             console.log(response);
-            dispatch(addNotification('error', 'ACL_NOT_SAVED', 5, null, NOTIFICATION_CONTEXT));
+            dispatch(addNotification('error', 'ACL_NOT_SAVED', -1, null, NOTIFICATION_CONTEXT));
             return false;
         });
 }

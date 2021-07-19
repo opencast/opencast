@@ -7,6 +7,7 @@ import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
+import Notifications from "../shared/Notifications";
 import {serversTemplateMap} from "../../configs/tableConfigs/serversTableConfig";
 import {getTotalServers} from "../../selectors/serverSelectors";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
@@ -14,7 +15,6 @@ import {fetchServers} from "../../thunks/serverThunks";
 import {loadJobsIntoTable, loadServersIntoTable, loadServicesIntoTable} from "../../thunks/tableThunks";
 import {fetchJobs} from "../../thunks/jobThunks";
 import {fetchServices} from "../../thunks/serviceThunks";
-import Notifications from "../shared/Notifications";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 

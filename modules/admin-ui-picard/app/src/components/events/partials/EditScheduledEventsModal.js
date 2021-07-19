@@ -49,6 +49,7 @@ const EditScheduledEventsModal = ({ close, updateScheduledEventsBulk }) => {
         // Only update events if there are changes
         if (values.changedEvents.length > 0) {
             const response = updateScheduledEventsBulk(values);
+            console.log(response);
         }
         close();
     };

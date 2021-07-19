@@ -1,8 +1,8 @@
-import {loadWorkflowDefFailure, loadWorkflowDefInProgress, loadWorkflowDefSuccess} from "../actions/workflowActions";
 import axios from "axios";
+import {loadWorkflowDefFailure, loadWorkflowDefInProgress, loadWorkflowDefSuccess} from "../actions/workflowActions";
 
 // fetch workflow definitions from server
-export const fetchWorkflowDef = (type) => async (dispatch, getState) => {
+export const fetchWorkflowDef = (type) => async (dispatch) => {
     try {
         dispatch(loadWorkflowDefInProgress());
 

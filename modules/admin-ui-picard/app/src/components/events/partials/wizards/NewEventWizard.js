@@ -91,6 +91,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
 
     const handleSubmit = (values) => {
         const response = postNewEvent(values, metadataFields);
+        console.log(response);
         close();
     }
 

@@ -1,20 +1,20 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-import MainNav from "../shared/MainNav";
 import Link from "react-router-dom/Link";
+import {withRouter} from "react-router-dom";
+import {connect} from "react-redux";
 import cn from "classnames";
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
-import {withRouter} from "react-router-dom";
-import {connect} from "react-redux";
+import MainNav from "../shared/MainNav";
+import Notifications from "../shared/Notifications";
+import {servicesTemplateMap} from "../../configs/tableConfigs/servicesTableConfig";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {fetchJobs} from "../../thunks/jobThunks";
 import {loadJobsIntoTable, loadServersIntoTable, loadServicesIntoTable} from "../../thunks/tableThunks";
-import {fetchServers} from "../../thunks/serverThunks";
-import {servicesTemplateMap} from "../../configs/tableConfigs/servicesTableConfig";
-import {getTotalServices} from "../../selectors/serviceSelector";
 import {fetchServices} from "../../thunks/serviceThunks";
-import Notifications from "../shared/Notifications";
+import {fetchServers} from "../../thunks/serverThunks";
+import {getTotalServices} from "../../selectors/serviceSelector";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 

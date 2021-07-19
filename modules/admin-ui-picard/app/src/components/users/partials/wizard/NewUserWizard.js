@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {connect} from "react-redux";
 import {Formik} from "formik";
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
@@ -7,7 +8,6 @@ import NewUserRolesTab from "./NewUserRolesTab";
 import {NewUserSchema} from "../../../shared/wizard/validate";
 import {initialFormValuesNewUser} from "../../../../configs/wizardConfig";
 import {getUsernames} from "../../../../selectors/userSelectors";
-import {connect} from "react-redux";
 import {postNewUser} from "../../../../thunks/userThunks";
 
 /**
@@ -15,6 +15,12 @@ import {postNewUser} from "../../../../thunks/userThunks";
  */
 const NewUserWizard = ({ close, usernames, postNewUser }) => {
     const { t } = useTranslation();
+
+    const navStyle = {
+        left: '0px',
+        top: 'auto',
+        position: 'initial'
+    };
 
     const [tab, setTab] = useState(0);
 
@@ -24,14 +30,9 @@ const NewUserWizard = ({ close, usernames, postNewUser }) => {
 
     const handleSubmit = values => {
         const response = postNewUser(values);
+        console.log(response);
         close();
     }
-
-    const navStyle = {
-        left: '0px',
-        top: 'auto',
-        position: 'initial'
-    };
 
     return (
         <>

@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import {setHidden} from "../../actions/notificationActions";
+import {NOTIFICATION_CONTEXT, NOTIFICATION_CONTEXT_ACCESS} from "../../configs/wizardConfig";
 
 /**
  * This component renders notifications about occurred errors, warnings and info
@@ -19,8 +20,8 @@ const Notifications = ({ setNotificationHidden, notifications, globalPosition, c
         // if context is not_corner then render notification without consider global notification position
         context === 'not_corner' ? (
             <ul>{notifications.map((notification, key) => (
-                (!notification.hidden && (notification.context === 'wizard-form' ||
-                    notification.context === 'wizard-access')) ? (
+                (!notification.hidden && (notification.context === NOTIFICATION_CONTEXT ||
+                    notification.context === NOTIFICATION_CONTEXT_ACCESS)) ? (
                     <li key={key}>
                         <div className={cn(notification.type, 'alert sticky')}>
                             <a onClick={() => closeNotification(notification.id)}

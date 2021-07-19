@@ -52,6 +52,7 @@ const NewGroupWizard = ({ close, postNewGroup }) => {
 
     const handleSubmit = values => {
         const response = postNewGroup(values);
+        console.log(response);
         close();
     }
 

@@ -1,6 +1,6 @@
+import axios from "axios";
 import {loadAclsFailure, loadAclsInProgress, loadAclsSuccess} from "../actions/aclActions";
 import {getURLParams, prepareAccessPolicyRulesForPost} from "../utils/resourceUtils";
-import axios from "axios";
 import {transformToIdValueArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
 

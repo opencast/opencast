@@ -1,3 +1,5 @@
+import moment from "moment-timezone";
+import axios from "axios";
 import {
     loadEventMetadataFailure,
     loadEventMetadataInProgress,
@@ -12,12 +14,11 @@ import {
     prepareMetadataFieldsForPost,
     transformMetadataCollection
 } from "../utils/resourceUtils";
-import axios from "axios";
 import {getTimezoneOffset, makeTwoDigits} from "../utils/utils";
 import {sourceMetadata, uploadAssetOptions} from "../configs/sourceConfig";
 import {NOTIFICATION_CONTEXT, weekdays, WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/wizardConfig";
 import {addNotification} from "./notificationThunks";
-import moment from "moment-timezone";
+
 
 
 // fetch events from server

@@ -64,6 +64,7 @@ const NewThemeWizard = ({ close, postNewTheme }) => {
 
     const handleSubmit = values => {
         const response = postNewTheme(values);
+        console.log(response);
         close();
     }
 

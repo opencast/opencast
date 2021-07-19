@@ -1,6 +1,6 @@
+import axios from "axios";
 import {loadRecordingsFailure, loadRecordingsInProgress, loadRecordingsSuccess} from "../actions/recordingActions";
 import {getURLParams} from "../utils/resourceUtils";
-import axios from "axios";
 import {addNotification} from "./notificationThunks";
 
 // fetch recordings from server

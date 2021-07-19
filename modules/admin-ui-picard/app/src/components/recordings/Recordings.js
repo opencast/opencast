@@ -2,17 +2,17 @@ import React, {useEffect, useState} from "react";
 import MainNav from "../shared/MainNav";
 import {useTranslation} from "react-i18next";
 import Link from "react-router-dom/Link";
+import {withRouter} from "react-router-dom";
+import {connect} from "react-redux";
 import cn from 'classnames';
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
-import {withRouter} from "react-router-dom";
-import {connect} from "react-redux";
+import Notifications from "../shared/Notifications";
 import {recordingsTemplateMap} from "../../configs/tableConfigs/recordingsTableConfig";
 import {getTotalRecordings} from "../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../thunks/recordingThunks";
 import {loadRecordingsIntoTable} from "../../thunks/tableThunks";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
-import Notifications from "../shared/Notifications";
 import {editTextFilter} from "../../actions/tableFilterActions";
 
 /**
