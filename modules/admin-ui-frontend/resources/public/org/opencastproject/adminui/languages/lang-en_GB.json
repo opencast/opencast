@@ -388,7 +388,7 @@
          "TITLE": "Capture"
       },
       "USERS": {
-         "TITLE": "Organization"
+         "TITLE": "Organisation"
       },
       "INTEGRATIONS": {
          "TITLE": "Integrations"
@@ -411,8 +411,8 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "Thank you for using Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
-            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you with the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding, and attract more companies to provide services around Opencast."
          },
          "FORM_STATE": {
             "ORGANISATION": "Organisation",
@@ -1523,7 +1523,7 @@
             "BUMPER": {
                "CAPTION": "Bumper (begin)",
                "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined video that is appended to the beginning of a recording.",
+               "DESCRIPTION": "Predefined video prepended to a recording.",
                "ACTIVE": "Active",
                "ENABLE": "Enable bumper",
                "SELECT": "Select",
@@ -1533,7 +1533,7 @@
             "TRAILER": {
                "CAPTION": "Bumper (end)",
                "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined video that is appended to the end of a recording.",
+               "DESCRIPTION": "Predefined video appended to a recording.",
                "ACTIVE": "Active",
                "ENABLE": "Enable bumper",
                "UPLOAD_LABEL": "Upload video",
@@ -1543,7 +1543,7 @@
             "TITLE": {
                "CAPTION": "Title",
                "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined slide including descriptive metadata appended to the beginning or end of a recording.",
+               "DESCRIPTION": "Predefined slide (including descriptive metadata) affixed to the beginning or end of a recording.",
                "ACTIVE": "Active",
                "ENABLE": "Enable title slide",
                "BACKGROUND": "Background",
