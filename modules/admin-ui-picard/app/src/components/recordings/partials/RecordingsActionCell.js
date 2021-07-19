@@ -3,17 +3,30 @@ import {useTranslation} from "react-i18next";
 import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteRecording} from "../../../thunks/recordingThunks";
 import {connect} from "react-redux";
+import RecordingDetailsModal from "./modal/RecordingDetailsModal";
+import {fetchRecordingDetails} from "../../../thunks/recordingDetailsThunks";
 
 /**
  * This component renders the action cells of recordings in the table view
  */
-const RecordingsActionCell = ({ row, deleteRecording }) => {
+const RecordingsActionCell = ({ row, deleteRecording, fetchRecordingDetails }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
+    const [displayRecordingDetails, setRecordingDetails] = useState(false);
 
     const hideDeleteConfirmation = () => {
         setDeleteConfirmation(false);
+    };
+
+    const hideRecordingDetails = () => {
+        setRecordingDetails(false);
+    };
+
+    const showRecordingDetails = async () => {
+        await fetchRecordingDetails(row.Name);
+
+        setRecordingDetails(true);
     };
 
     const deletingRecording = id => {
@@ -22,11 +35,15 @@ const RecordingsActionCell = ({ row, deleteRecording }) => {
 
     return (
         <>
-            {/*TODO: When recording details are implemented, remove placeholder */}
             {/*TODO: with-Role */}
             <a className="more"
                title={t('RECORDINGS.RECORDINGS.TABLE.TOOLTIP.DETAILS')}
-               onClick={() => onClickPlaceholder()}/>
+               onClick={() => showRecordingDetails()}/>
+
+            {displayRecordingDetails && (
+                <RecordingDetailsModal close={hideRecordingDetails}
+                                       recordingId={row.Name} />
+            )}
 
             {/*TODO: with-Role */}
             <a className="remove"
@@ -44,14 +61,10 @@ const RecordingsActionCell = ({ row, deleteRecording }) => {
     )
 }
 
-//todo: remove if not needed anymore
-const onClickPlaceholder = () => {
-    console.log("In the Future here opens an other component, which is not implemented yet");
-}
-
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    deleteRecording: (id) => dispatch(deleteRecording(id))
+    deleteRecording: (id) => dispatch(deleteRecording(id)),
+    fetchRecordingDetails: name => dispatch(fetchRecordingDetails(name))
 });
 
 export default connect(null, mapDispatchToProps)(RecordingsActionCell);
