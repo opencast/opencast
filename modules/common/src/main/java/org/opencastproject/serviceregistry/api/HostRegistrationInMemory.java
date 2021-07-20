@@ -54,6 +54,11 @@ public class HostRegistrationInMemory implements HostRegistration {
   }
 
   @Override
+  public Long getId() {
+    return (long) baseUrl.hashCode();
+  }
+
+  @Override
   public String getBaseUrl() {
     return baseUrl;
   }
