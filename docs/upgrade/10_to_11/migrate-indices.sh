@@ -1,6 +1,8 @@
 #!/bin/bash
 
 SERVER="http://localhost:9200"
+USER=""
+PASSWORD=""
 
 OLD_INDEX="adminui"  # Do not use external API index as source as that one doesn't contain themes!
 NEW_INDEX="apiindex"
@@ -17,7 +19,7 @@ set -e
 
 # show current indices to user
 echo "Indices before:"
-curl -X GET "$SERVER/_cat/indices?v" -w "\n"
+curl -u $USER:$PASSWORD -X GET "$SERVER/_cat/indices?v" -w "\n"
 
 # clone admin UI indices to new all-in-one indices
 echo "Starting to clone ${OLD_INDEX} indices to ${NEW_INDEX} indices."
@@ -28,11 +30,11 @@ for SUB_INDEX in $VERSION $EVENT $SERIES $THEME; do
 
 	# Make sure source index is open
 	echo "Making sure source index is open:"
-	curl  -X POST  "$SERVER/$SOURCE_INDEX/_open" -w "\n\n" -i -s
+	curl -u $USER:$PASSWORD -X POST  "$SERVER/$SOURCE_INDEX/_open" -w "\n\n" -i -s
 
 	# Put the source index in read-only mode
 	echo "Putting source index in read-only mode:"
-	curl  -X PUT  "$SERVER/$SOURCE_INDEX/_settings" \
+	curl -u $USER:$PASSWORD -X PUT  "$SERVER/$SOURCE_INDEX/_settings" \
 	-H 'Content-Type: application/json' -d '{
 		"settings": {
 			"index.blocks.write": "true"
@@ -41,7 +43,7 @@ for SUB_INDEX in $VERSION $EVENT $SERIES $THEME; do
 
 	echo "Cloning source index to target index:"
 	# Clone the source index to the target name and set the target to read-write mode
-	RESPONSE=$(curl  -X POST  "$SERVER/$SOURCE_INDEX/_clone/$TARGET_INDEX"  \
+	RESPONSE=$(curl -u $USER:$PASSWORD -X POST  "$SERVER/$SOURCE_INDEX/_clone/$TARGET_INDEX"  \
 	-H 'Content-Type: application/json'  -d '{
     		"settings": {
         		"index.blocks.write": null
@@ -61,4 +63,4 @@ echo -e "All indices cloned.\n"
 
 # show current indices to user
 echo "Indices after:"
-curl -X GET "$SERVER/_cat/indices?v" -w "\n"
+curl -u $USER:$PASSWORD -X GET "$SERVER/_cat/indices?v" -w "\n"

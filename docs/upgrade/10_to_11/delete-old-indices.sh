@@ -1,6 +1,8 @@
 #!/bin/bash
 
 SERVER="http://localhost:9200"
+USER=""
+PASSWORD=""
 
 # indices
 ADMIN_UI_INDEX="adminui"
@@ -25,11 +27,11 @@ delete_indices() {
 
 		# Make sure index is open
         	echo "Making sure index is open:"
-        	curl  -X POST  "$SERVER/$DELETE_INDEX/_open" -w "\n\n" -i -s
+         	curl -u $USER:$PASSWORD -X POST  "$SERVER/$DELETE_INDEX/_open" -w "\n\n" -i -s
 
 		# Delete index
 		echo "Deleting index:"
-		RESPONSE=$(curl  -X DELETE  "$SERVER/$DELETE_INDEX" -i -s)
+		RESPONSE=$(curl -u $USER:$PASSWORD -X DELETE  "$SERVER/$DELETE_INDEX" -i -s)
 	        echo -e "${RESPONSE}\n"
 
 	        # Check for errors
@@ -44,7 +46,7 @@ delete_indices() {
 # Delete old indices that will no longer be used in Opencast >= 11
 # Make sure you use the migration script first if you don't want to do an index rebuild!
 echo "Indices before:"
-curl -X GET "$SERVER/_cat/indices?v" -w "\n"
+curl -u $USER:$PASSWORD -X GET "$SERVER/_cat/indices?v" -w "\n"
 
 echo "Deleting all external api and admin ui indices."
 echo -e "Deleting the now unused group index might fail if you have already removed it or if you started with OC >= 10.\n"
@@ -58,4 +60,4 @@ delete_indices $EXTERNAL_API_INDEX "${SUB_INDICES[@]}"
 echo -e "Cleanup done.\n"
 
 echo "Indices after:"
-curl -X GET "$SERVER/_cat/indices?v" -w "\n"
+curl -u $USER:$PASSWORD -X GET "$SERVER/_cat/indices?v" -w "\n"
