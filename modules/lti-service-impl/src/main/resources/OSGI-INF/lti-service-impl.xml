@@ -4,7 +4,6 @@
                immediate="true">
   <implementation class="org.opencastproject.lti.service.impl.LtiServiceImpl"/>
   <property name="service.description" value="LTI Service"/>
-  <property name="opencast.service.type" value="org.opencastproject.lti.service"/>
   <service>
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.lti.service.api.LtiService"/>
