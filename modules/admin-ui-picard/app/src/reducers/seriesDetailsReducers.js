@@ -9,7 +9,7 @@ import {
     LOAD_SERIES_DETAILS_METADATA_SUCCESS,
     LOAD_SERIES_DETAILS_THEME_NAMES_FAILURE, LOAD_SERIES_DETAILS_THEME_NAMES_IN_PROGRESS,
     LOAD_SERIES_DETAILS_THEME_NAMES_SUCCESS,
-    LOAD_SERIES_DETAILS_THEME_SUCCESS,
+    LOAD_SERIES_DETAILS_THEME_SUCCESS, SET_SERIES_DETAILS_METADATA, SET_SERIES_DETAILS_THEME,
 } from "../actions/seriesDetailsActions";
 
 // Initial state of series details in redux store
@@ -88,6 +88,20 @@ const seriesDetails = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false
+            }
+        }
+        case SET_SERIES_DETAILS_THEME: {
+            const { seriesTheme } = payload;
+            return {
+                ...state,
+                theme: seriesTheme
+            }
+        }
+        case SET_SERIES_DETAILS_METADATA: {
+            const { seriesMetadata } = payload;
+            return {
+                ...state,
+                metadata: seriesMetadata
             }
         }
         default:

@@ -106,8 +106,8 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, upd
                     <DetailsMetadataTab metadataFields={metadataFields}
                                         resourceId={seriesId}
                                         header={tabs[page].tabNameTranslation}
-                                        buttonLabel={updateSeries}
-                                        updateResource='EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA'/>
+                                        buttonLabel='EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA'
+                                        updateResource={updateSeries}/>
                 )}
                 {page === 1 && (
                     <SeriesDetailsExtendedMetadataTab />

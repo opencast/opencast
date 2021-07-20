@@ -22,8 +22,7 @@ const SeriesDetailsModal = ({ handleClose, seriesTitle, seriesId }) => {
                     <h2>{t('EVENTS.SERIES.DETAILS.HEADER', { resourceId: seriesTitle })}</h2>
                 </header>
 
-                <SeriesDetails seriesId={seriesId}
-                               close={close}/>
+                <SeriesDetails seriesId={seriesId} />
             </section>
         </>
     )

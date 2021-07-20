@@ -7,7 +7,7 @@ import {
     loadSeriesDetailsThemeNamesFailure,
     loadSeriesDetailsThemeNamesInProgress,
     loadSeriesDetailsThemeNamesSuccess,
-    loadSeriesDetailsThemeSuccess
+    loadSeriesDetailsThemeSuccess, setSeriesDetailsMetadata, setSeriesDetailsTheme
 } from "../actions/seriesDetailsActions";
 import axios from "axios";
 import _ from 'lodash';
@@ -15,6 +15,7 @@ import {createPolicy, transformMetadataCollection} from "../utils/resourceUtils"
 import {getSeriesDetailsMetadata, getSeriesDetailsThemeNames} from "../selectors/seriesDetailsSelectors";
 import {transformToIdValueArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
+import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
 
 // fetch metadata of certain series from server
 export const fetchSeriesDetailsMetadata = id => async dispatch => {
@@ -194,7 +195,7 @@ export const updateSeriesMetadata = (id, values) => async (dispatch, getState) =
             title: metadataInfos.title,
             fields: fields
         };
-        dispatch(loadSeriesDetailsMetadataSuccess(seriesMetadata));
+        dispatch(setSeriesDetailsMetadata(seriesMetadata));
     } catch (e) {
         console.log(e);
     }
@@ -203,12 +204,7 @@ export const updateSeriesMetadata = (id, values) => async (dispatch, getState) =
 export const updateSeriesAccess = (id, policies) => async (dispatch) => {
     let data = new URLSearchParams();
 
-    let acls = {
-        acl: {
-            ace: policies
-        }
-    }
-    data.append("acl", JSON.stringify(acls));
+    data.append("acl", JSON.stringify(policies));
     data.append("override", true);
 
     return axios.post(`admin-ng/series/${id}/access`, data, {
@@ -218,12 +214,12 @@ export const updateSeriesAccess = (id, policies) => async (dispatch) => {
     })
         .then(res => {
             console.log(res);
-            dispatch(addNotification('info', 'SAVED_ACL_RULES'));
+            dispatch(addNotification('info', 'SAVED_ACL_RULES', -1, null, NOTIFICATION_CONTEXT));
             return true;
         })
         .catch(res => {
             console.log(res);
-            dispatch(addNotification('error', 'ACL_NOT_SAVED'));
+            dispatch(addNotification('error', 'ACL_NOT_SAVED', -1, null, NOTIFICATION_CONTEXT));
             return false;
         });
 }
@@ -242,7 +238,7 @@ export const updateSeriesTheme = (id, values) => async (dispatch, getState) => {
 
             let seriesTheme = (transformToIdValueArray(themeResponse))[0].value;
 
-            dispatch(loadSeriesDetailsThemeSuccess(seriesTheme));
+            dispatch(setSeriesDetailsTheme(seriesTheme));
         })
         .catch(response => {
             console.log(response);

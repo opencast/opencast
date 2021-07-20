@@ -19,6 +19,9 @@ export const LOAD_SERIES_DETAILS_THEME_NAMES_IN_PROGRESS = 'LOAD_SERIES_DETAILS_
 export const LOAD_SERIES_DETAILS_THEME_NAMES_SUCCESS = 'LOAD_SERIES_DETAILS_THEME_NAMES_SUCCESS';
 export const LOAD_SERIES_DETAILS_THEME_NAMES_FAILURE = 'LOAD_SERIES_DETAILS_THEME_NAMES_FAILURE';
 
+export const SET_SERIES_DETAILS_THEME = 'SET_SERIES_DETAILS_THEME';
+export const SET_SERIES_DETAILS_METADATA = 'SET_SERIES_DETAILS_METADATA';
+
 
 // Actions affecting fetching metadata of a certain series from server
 
@@ -67,4 +70,14 @@ export const loadSeriesDetailsThemeNamesSuccess = themeNames => ({
 
 export const loadSeriesDetailsThemeNamesFailure = () => ({
     type: LOAD_SERIES_DETAILS_THEME_NAMES_FAILURE
+});
+
+export const setSeriesDetailsTheme = seriesTheme => ({
+    type: SET_SERIES_DETAILS_THEME,
+    payload: { seriesTheme }
+});
+
+export const setSeriesDetailsMetadata = seriesMetadata => ({
+    type: SET_SERIES_DETAILS_METADATA,
+    payload: { seriesMetadata }
 });

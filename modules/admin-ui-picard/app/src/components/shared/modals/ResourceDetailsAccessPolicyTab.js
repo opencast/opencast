@@ -12,7 +12,7 @@ import {Formik, Field, FieldArray} from "formik";
 import {addNotification} from "../../../thunks/notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../../../configs/modalConfig";
 import {removeNotificationWizardForm} from "../../../actions/notificationActions";
-import {prepareAccessPolicyRulesForPost} from "../../../utils/resourceUtils";
+import {createPolicy, prepareAccessPolicyRulesForPost} from "../../../utils/resourceUtils";
 
 /**
  * This component manages the access policy tab of resource details modals
@@ -42,16 +42,6 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
 
     // this state tracks, whether data is currently being fetched
     const [loading, setLoading] = useState(false);
-
-    /* creates a new policy with the role from the argument and no rights or actions*/
-    const createPolicy = (role) => {
-        return {
-            role: role,
-            read: false,
-            write: false,
-            actions: []
-        };
-    };
 
     /* fetch initial values from backend */
     useEffect( () => {
@@ -445,7 +435,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                 disabled={ !formik.isValid}
                                                                 className={`save green  ${(!formik.isValid) ? "disabled" : ""}`}
                                                         >
-                                                            {t(buttonText)/* Save */}
+                                                            {t('EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS')/* Save */}
                                                         </button>
                                                     </div>
                                                 </footer>

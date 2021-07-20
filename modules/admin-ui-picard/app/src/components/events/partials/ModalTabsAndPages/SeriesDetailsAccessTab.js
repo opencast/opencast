@@ -8,8 +8,7 @@ import {fetchSeriesDetailsAcls, updateSeriesAccess} from "../../../../thunks/ser
 /**
  * This component manages the access policy tab of the series details modal
  */
-const SeriesDetailsAccessTab = ({ seriesId, header, policies, fetchAccessPolicies, fetchHasActiveTransactions,
-                                    saveNewAccessPolicies }) => {
+const SeriesDetailsAccessTab = ({ seriesId, header, policies, fetchAccessPolicies, saveNewAccessPolicies }) => {
     const { t } = useTranslation();
 
     return (
@@ -17,6 +16,7 @@ const SeriesDetailsAccessTab = ({ seriesId, header, policies, fetchAccessPolicie
                                         header={header}
                                         t={t}
                                         buttonText={'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LABEL'}
+                                        descriptionText={t("EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION")}
                                         policies={policies}
                                         fetchAccessPolicies={fetchAccessPolicies}
                                         saveNewAccessPolicies={saveNewAccessPolicies} />
