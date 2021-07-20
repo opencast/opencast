@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
+import {connect} from "react-redux";
 import {useTranslation} from "react-i18next";
 import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteGroup} from "../../../thunks/groupThunks";
-import {connect} from "react-redux";
 
 /**
  * This component renders the action cells of groups in the table view

@@ -1,6 +1,6 @@
+import axios from "axios";
 import {loadUsersFailure, loadUsersInProgress, loadUsersSuccess} from "../actions/userActions";
 import {getURLParams} from "../utils/resourceUtils";
-import axios from "axios";
 import {transformToIdValueArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
 

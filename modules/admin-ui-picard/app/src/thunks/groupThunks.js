@@ -1,6 +1,6 @@
+import axios from "axios";
 import {loadGroupsFailure, loadGroupsInProgress, loadGroupsSuccess} from "../actions/groupActions";
 import {getURLParams} from "../utils/resourceUtils";
-import axios from "axios";
 import {addNotification} from "./notificationThunks";
 
 // fetch groups from server

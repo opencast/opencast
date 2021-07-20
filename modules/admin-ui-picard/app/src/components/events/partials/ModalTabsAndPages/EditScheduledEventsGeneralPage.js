@@ -40,9 +40,6 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
             if(!events[i].selected || !isEditable(events[i])) {
                 continue;
             }
-            /*if (!) {
-                return false;
-            }*/
         }
         return true;
     }

@@ -1,6 +1,7 @@
+import axios from "axios";
 import {loadJobsFailure, loadJobsInProgress, loadJobsSuccess} from "../actions/jobActions";
 import {getURLParams} from "../utils/resourceUtils";
-import axios from "axios";
+
 
 // fetch jobs from server
 export const fetchJobs = () => async (dispatch, getState) => {

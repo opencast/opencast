@@ -6,17 +6,17 @@ import {connect} from "react-redux";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import {getCurrentLanguageInformation} from "../../../../utils/utils";
-import NewAssetUploadPage from "./NewAssetUploadPage";
-import NewMetadataExtendedPage from "./NewMetadataExtendedPage";
+import NewAssetUploadPage from "../ModalTabsAndPages/NewAssetUploadPage";
+import NewMetadataExtendedPage from "../ModalTabsAndPages/NewMetadataExtendedPage";
 import {postNewEvent} from "../../../../thunks/eventThunks";
-import NewMetadataPage from "./NewMetadataPage";
-import NewAccessPage from "./NewAccessPage";
-import NewProcessingPage from "./NewProcessingPage";
-import NewSourcePage from "./NewSourcePage";
+import NewMetadataPage from "../ModalTabsAndPages/NewMetadataPage";
+import NewAccessPage from "../ModalTabsAndPages/NewAccessPage";
+import NewProcessingPage from "../ModalTabsAndPages/NewProcessingPage";
+import NewSourcePage from "../ModalTabsAndPages/NewSourcePage";
 import {NewEventSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
 import {sourceMetadata, uploadAssetOptions} from "../../../../configs/sourceConfig";
-import {initialFormValuesNewEvents} from "../../../../configs/wizardConfig";
+import {initialFormValuesNewEvents} from "../../../../configs/modalConfig";
 
 
 // Get info about the current language and its date locale
@@ -91,6 +91,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
 
     const handleSubmit = (values) => {
         const response = postNewEvent(values, metadataFields);
+        console.log(response);
         close();
     }
 

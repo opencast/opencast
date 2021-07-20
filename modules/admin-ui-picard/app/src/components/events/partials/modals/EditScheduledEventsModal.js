@@ -1,12 +1,12 @@
 import React, {useState} from "react";
 import {Formik} from "formik";
 import {useTranslation} from "react-i18next";
-import {initialFormValuesEditScheduledEvents} from "../../../configs/wizardConfig";
-import WizardStepper from "../../shared/wizard/WizardStepper";
-import EditScheduledEventsGeneralPage from "./wizards/EditScheduledEventsGeneralPage";
-import EditScheduledEventsEditPage from "./wizards/EditScheduledEventsEditPage";
-import EditScheduledEventsSummaryPage from "./wizards/EditScheduledEventsSummaryPage";
-import {updateScheduledEventsBulk} from "../../../thunks/eventThunks";
+import {initialFormValuesEditScheduledEvents} from "../../../../configs/modalConfig";
+import WizardStepper from "../../../shared/wizard/WizardStepper";
+import EditScheduledEventsGeneralPage from "../ModalTabsAndPages/EditScheduledEventsGeneralPage";
+import EditScheduledEventsEditPage from "../ModalTabsAndPages/EditScheduledEventsEditPage";
+import EditScheduledEventsSummaryPage from "../ModalTabsAndPages/EditScheduledEventsSummaryPage";
+import {updateScheduledEventsBulk} from "../../../../thunks/eventThunks";
 import {connect} from "react-redux";
 
 /**
@@ -49,6 +49,7 @@ const EditScheduledEventsModal = ({ close, updateScheduledEventsBulk }) => {
         // Only update events if there are changes
         if (values.changedEvents.length > 0) {
             const response = updateScheduledEventsBulk(values);
+            console.log(response);
         }
         close();
     };

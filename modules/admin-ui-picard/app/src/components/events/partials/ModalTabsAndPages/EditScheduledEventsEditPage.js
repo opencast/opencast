@@ -1,16 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-import Notifications from "../../../shared/Notifications";
-import {getTimezoneOffset} from "../../../../utils/utils";
+import cn from "classnames";
+import {connect} from "react-redux";
 import {Field, FieldArray} from "formik";
-import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/wizardConfig";
+import Notifications from "../../../shared/Notifications";
+import RenderField from "../../../shared/wizard/RenderField";
+import {getTimezoneOffset} from "../../../../utils/utils";
+import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/modalConfig";
 import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../../../thunks/recordingThunks";
-import {connect} from "react-redux";
 import {checkForSchedulingConflicts, fetchScheduling} from "../../../../thunks/eventThunks";
 import {fetchSeriesOptions} from "../../../../thunks/seriesThunks";
-import RenderField from "./RenderField";
-import cn from "classnames";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 

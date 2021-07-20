@@ -1,15 +1,11 @@
-import React, {useState, useEffect} from "react";
+import React from "react";
 import {connect} from "react-redux";
 import {
+    fetchAccessPolicies,
+    fetchHasActiveTransactions,
     saveAccessPolicies
 } from "../../../../thunks/eventDetailsThunks";
-import {
-    getPolicies,
-} from "../../../../selectors/eventDetailsSelectors";
-import {
-    fetchAccessPolicies,
-    fetchHasActiveTransactions
-} from "../../../../thunks/eventDetailsThunks";
+import {getPolicies} from "../../../../selectors/eventDetailsSelectors";
 import ResourceDetailsAccessPolicyTab from "../../../shared/modals/ResourceDetailsAccessPolicyTab";
 
 /**
@@ -37,7 +33,7 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    fetchAccessPolicies: (eventId, test) => dispatch(fetchAccessPolicies(eventId)),
+    fetchAccessPolicies: (eventId) => dispatch(fetchAccessPolicies(eventId)),
     fetchHasActiveTransactions: (eventId) => dispatch(fetchHasActiveTransactions(eventId)),
     saveNewAccessPolicies: (eventId, policies) => dispatch(saveAccessPolicies(eventId, policies)),
 });

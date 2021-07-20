@@ -3,21 +3,22 @@ import MainNav from "../shared/MainNav";
 import Link from "react-router-dom/Link";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
-import TableFilters from "../shared/TableFilters";
-import Table from "../shared/Table";
-import {fetchSeries, fetchSeriesMetadata, fetchSeriesThemes} from "../../thunks/seriesThunks";
-import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
-import {seriesTemplateMap} from "../../configs/tableConfigs/seriesTableConfig";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
-import {fetchEvents} from "../../thunks/eventThunks";
-import {getTotalSeries, isShowActions} from "../../selectors/seriesSeletctor";
-import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
+import TableFilters from "../shared/TableFilters";
+import Table from "../shared/Table";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
+import DeleteSeriesModal from "./partials/modals/DeleteSeriesModal";
+import {seriesTemplateMap} from "../../configs/tableConfigs/seriesTableConfig";
+import {fetchSeries, fetchSeriesMetadata, fetchSeriesThemes} from "../../thunks/seriesThunks";
+import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
+import {fetchEvents} from "../../thunks/eventThunks";
+import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
+import {getTotalSeries, isShowActions} from "../../selectors/seriesSeletctor";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
-import DeleteSeriesModal from "./partials/DeleteSeriesModal";
+
 
 
 // References for detecting a click outside of the container of the dropdown menu

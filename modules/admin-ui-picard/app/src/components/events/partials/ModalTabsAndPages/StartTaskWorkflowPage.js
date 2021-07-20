@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {Field} from "formik";
 import {useTranslation} from "react-i18next";
-import RenderWorkflowConfig from "./RenderWorkflowConfig";
+import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
 import {fetchWorkflowDef} from "../../../../thunks/workflowThunks";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import {connect} from "react-redux";

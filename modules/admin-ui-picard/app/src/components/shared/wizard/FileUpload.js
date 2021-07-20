@@ -4,6 +4,7 @@ import axios from "axios";
 import {connect} from "react-redux";
 import {useField} from "formik";
 import {addNotification} from "../../../thunks/notificationThunks";
+import {NOTIFICATION_CONTEXT} from "../../../configs/modalConfig";
 
 /**
  * This component renders a custom file upload button in wizards.
@@ -52,7 +53,7 @@ const FileUpload = ({ descriptionKey, labelKey, buttonKey, acceptableTypes, form
 
             }
         }).catch(res => {
-            addNotification('error', 'NOTIFICATIONS.BUMPER_UPLOAD_ERROR', -1, null, 'wizard-form');
+            addNotification('error', 'NOTIFICATIONS.BUMPER_UPLOAD_ERROR', -1, null, NOTIFICATION_CONTEXT);
         })
     }
 

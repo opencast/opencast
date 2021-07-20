@@ -1,16 +1,9 @@
-// React imports
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-
-// service and library imports
+import {connect} from "react-redux";
 import i18n from "../i18n/i18n";
 import languages from "../i18n/languages";
-
-
-// image and icon imports
 import opencastLogo from '../img/opencast-white.svg';
-
-import {connect} from "react-redux";
 import {fetchHealthStatus} from "../thunks/healthThunks";
 import {getHealthStatus} from "../selectors/healthSelectors";
 import {getCurrentLanguageInformation} from "../utils/utils";

@@ -5,7 +5,7 @@ import {Field} from "formik";
 import {connect} from "react-redux";
 import {fetchWorkflowDef} from "../../../../thunks/workflowThunks";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
-import RenderWorkflowConfig from "./RenderWorkflowConfig";
+import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
 
 /**
  * This component renders the processing page for new events in the new event wizard.

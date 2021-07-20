@@ -1,21 +1,21 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-import MainNav from "../shared/MainNav";
 import Link from "react-router-dom/Link";
 import cn from 'classnames';
-import TableFilters from "../shared/TableFilters";
-import Table from "../shared/Table";
-import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
+import MainNav from "../shared/MainNav";
+import TableFilters from "../shared/TableFilters";
+import Table from "../shared/Table";
+import Notifications from "../shared/Notifications";
+import NewResourceModal from "../shared/NewResourceModal";
 import {usersTemplateMap} from "../../configs/tableConfigs/usersTableConfig";
 import {getTotalUsers} from "../../selectors/userSelectors";
 import {fetchUsers} from "../../thunks/userThunks";
 import {loadAclsIntoTable, loadGroupsIntoTable, loadUsersIntoTable} from "../../thunks/tableThunks";
+import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
-import Notifications from "../shared/Notifications";
-import NewResourceModal from "../shared/NewResourceModal";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 

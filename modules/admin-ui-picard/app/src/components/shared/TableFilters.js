@@ -19,18 +19,13 @@ import TableFilterProfiles from "./TableFilterProfiles";
 
 import {getCurrentLanguageInformation} from "../../utils/utils";
 
-//todo: implement/look if really needed (handleEnddatePicker is quite similar)
-function selectFilterPeriodValue() {
-    console.log("select filter period value");
-}
-
 
 /**
  * This component renders the table filters in the upper right corner of the table
  */
 const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, secondFilter,
                           onChangeTextFilter, removeTextFilter, editSelectedFilter, removeSelectedFilter,
-                          editSecondFilter, removeSecondFilter, resetFilterMap, editFilterValue,
+                          removeSecondFilter, resetFilterMap, editFilterValue,
                           loadResource, loadResourceIntoTable, resource }) => {
     const { t } = useTranslation();
 

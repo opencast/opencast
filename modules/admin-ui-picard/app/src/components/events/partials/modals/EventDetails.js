@@ -3,8 +3,8 @@ import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import {connect} from "react-redux";
 import {getCurrentLanguageInformation} from "../../../../utils/utils";
-import EventDetailsCommentsTab from "./EventDetailsCommentsTab";
-import EventDetailsAccessPolicyTab from "./EventDetailsAccessPolicyTab";
+import EventDetailsCommentsTab from "../ModalTabsAndPages/EventDetailsCommentsTab";
+import EventDetailsAccessPolicyTab from "../ModalTabsAndPages/EventDetailsAccessPolicyTab";
 
 
 // Get info about the current language and its date locale

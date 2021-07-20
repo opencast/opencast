@@ -3,6 +3,9 @@ import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import {connect} from "react-redux";
 import {Field, FieldArray} from "formik";
+import Notifications from "../../../shared/Notifications";
+import RenderMultiField from "../../../shared/wizard/RenderMultiField";
+import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/modalConfig";
 import {
     fetchAclActions,
     fetchAclTemplateById,
@@ -11,9 +14,6 @@ import {
 } from "../../../../thunks/aclThunks";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
-import Notifications from "../../../shared/Notifications";
-import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/wizardConfig";
-import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 
 
 const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess }) => {

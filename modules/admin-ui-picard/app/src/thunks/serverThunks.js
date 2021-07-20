@@ -1,6 +1,6 @@
+import axios from "axios";
 import {loadServersFailure, loadServersInProgress, loadServersSuccess} from "../actions/serverActions";
 import {getURLParams} from "../utils/resourceUtils";
-import axios from "axios";
 
 // fetch servers from server
 export const fetchServers = () => async (dispatch, getState) => {

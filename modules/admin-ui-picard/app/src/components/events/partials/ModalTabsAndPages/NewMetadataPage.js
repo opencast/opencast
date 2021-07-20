@@ -1,7 +1,7 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import {Field} from "formik";
-import RenderField from "./RenderField";
+import RenderField from "../../../shared/wizard/RenderField";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 

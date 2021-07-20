@@ -1,6 +1,7 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
+import {connect} from "react-redux";
 import {
     loadEventsIntoTable,
     loadJobsIntoTable,
@@ -13,7 +14,6 @@ import {fetchRecordings} from "../../thunks/recordingThunks";
 import {fetchJobs} from "../../thunks/jobThunks";
 import {fetchUsers} from "../../thunks/userThunks";
 import {fetchThemes} from "../../thunks/themeThunks";
-import {connect} from "react-redux";
 import {fetchStats} from "../../thunks/tableFilterThunks";
 import {setOffset} from "../../actions/tableActions";
 
