@@ -12,11 +12,12 @@ import {Formik, Field, FieldArray} from "formik";
 import {addNotification} from "../../../thunks/notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../../../configs/modalConfig";
 import {removeNotificationWizardForm} from "../../../actions/notificationActions";
+import {prepareAccessPolicyRulesForPost} from "../../../utils/resourceUtils";
 
 /**
  * This component manages the access policy tab of resource details modals
  */
-const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetchHasActiveTransactions, fetchAccessPolicies, saveNewAccessPolicies,
+const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetchHasActiveTransactions, fetchAccessPolicies, saveNewAccessPolicies, descriptionText,
                                           addNotification, fetchAclTemplates, fetchRoles, removeNotificationWizardForm }) => {
 
     const baseAclId = "";
@@ -54,6 +55,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
 
     /* fetch initial values from backend */
     useEffect( () => {
+        removeNotificationWizardForm();
         async function fetchData() {
             setLoading(true);
             const responseTemplates = await fetchAclTemplates();
@@ -69,7 +71,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                     setTransactions({read_only: fetchTransactionResult.active})
                     : setTransactions({read_only: true});
                 if (fetchTransactionResult.active == undefined || fetchTransactionResult.active) {
-                    addNotification('warning', 'ACTIVE_TRANSACTION', 5, null, NOTIFICATION_CONTEXT);
+                    addNotification('warning', 'ACTIVE_TRANSACTION', -1, null, NOTIFICATION_CONTEXT);
                 }
             }
             setLoading(false);
@@ -88,7 +90,8 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
     * if the policies are valid, the new policies are saved in the backend */
     const saveAccess = (values) => {
         removeNotificationWizardForm();
-        const {ace, roleWithFullRightsExists, allRulesValid} = validatePolicies(values);
+        const {roleWithFullRightsExists, allRulesValid} = validatePolicies(values);
+        const access = prepareAccessPolicyRulesForPost(values.policies);
 
         if(!allRulesValid){
             addNotification('warning','INVALID_ACL_RULES', -1, null, NOTIFICATION_CONTEXT);
@@ -99,7 +102,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
         }
 
         if(allRulesValid && roleWithFullRightsExists){
-            saveNewAccessPolicies(resourceId, ace).then(success => {
+            saveNewAccessPolicies(resourceId, access).then(success => {
                 // fetch new policies from the backend, if save successful
                 if(success){
                     setPolicyChanged(false);
@@ -122,13 +125,10 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
         return errors;
     }
 
-    /* transforms rules into proper format for saving and checks validity
-    * of the policies
+    /* checks validity of the policies
     * each policy needs a role and at least one of: read-rights, write-rights, additional action
-    * there needs to be at least one role, which has both read and write rights*/
+    * there needs to be at least one role, which has both read and write rights */
     const validatePolicies = (values) => {
-
-        let ace = [];
         let roleWithFullRightsExists = false;
         let allRulesValid = true;
 
@@ -137,36 +137,12 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                 roleWithFullRightsExists = true;
             }
 
-            if ((policy.read || policy.write || policy.actions.length > 0) && !!policy.role) {
-                if (policy.read) {
-                    ace.push({
-                        'action' : 'read',
-                        'allow'  : policy.read,
-                        'role'   : policy.role
-                    });
-                }
-
-                if (policy.write) {
-                    ace.push({
-                        'action' : 'write',
-                        'allow'  : policy.write,
-                        'role'   : policy.role
-                    });
-                }
-
-                policy.actions.map( customAction => {
-                    ace.push({
-                        'action' : customAction,
-                        'allow'  : true,
-                        'role'   : policy.role
-                    });
-                });
-            } else {
+            if ((!policy.read && !policy.write && policy.actions.length === 0) || (!policy.role || policy.role === "")) {
                 allRulesValid = false;
             }
         })
 
-        return {ace, roleWithFullRightsExists, allRulesValid};
+        return {roleWithFullRightsExists, allRulesValid};
     }
 
     /* checks whether the current state of the policies from the formik is different form the
@@ -245,7 +221,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                             <td>
                                                                 <div className="obj-container padded chosen-container chosen-container-single">
                                                                     <p>
-                                                                        {t("EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION") /* Description */}
+                                                                        {descriptionText /* Description text for policies*/}
                                                                     </p>
                                                                     {!transactions.read_only ? (
 
