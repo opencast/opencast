@@ -1,20 +1,35 @@
 import React, {useState} from 'react';
 import {useTranslation} from "react-i18next";
-import ConfirmModal from "../../shared/ConfirmModal";
 import {connect} from "react-redux";
+import ConfirmModal from "../../shared/ConfirmModal";
+import ThemeDetailsModal from "./wizard/ThemeDetailsModal";
 import {deleteTheme} from "../../../thunks/themeThunks";
+import {fetchThemeDetails, fetchUsage} from "../../../thunks/themeDetailsThunks";
+
 
 /**
  * This component renders the action cells of themes in the table view
  */
-const ThemesActionsCell = ({ row, deleteTheme }) => {
+const ThemesActionsCell = ({ row, deleteTheme, fetchThemeDetails, fetchUsage }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
+    const [displayThemeDetails, setThemeDetails] = useState(false);
 
     const hideDeleteConfirmation = () => {
         setDeleteConfirmation(false);
     };
+
+    const hideThemeDetails = () => {
+        setThemeDetails(false);
+    };
+
+    const showThemeDetails = async () => {
+        await fetchThemeDetails(row.id);
+        await fetchUsage(row.id);
+
+        setThemeDetails(true);
+    }
 
     const deletingTheme = id => {
         deleteTheme(id);
@@ -22,11 +37,15 @@ const ThemesActionsCell = ({ row, deleteTheme }) => {
 
     return (
         <>
-            {/*TODO: When theme details are implemented, remove placeholder */}
             {/*TODO: with-Role */}
-            <a onClick={() => onClickPlaceholder()}
+            <a onClick={() => showThemeDetails()}
                className="more"
                title={t('CONFIGURATION.THEMES.TABLE.TOOLTIP.DETAILS')}/>
+
+            {displayThemeDetails && (
+                <ThemeDetailsModal handleClose={hideThemeDetails}
+                                   themeId={row.id}/>
+            )}
 
             {/*// TODO: with-Role*/}
             <a onClick={() => setDeleteConfirmation(true)}
@@ -45,14 +64,11 @@ const ThemesActionsCell = ({ row, deleteTheme }) => {
     );
 };
 
-//todo: remove if not needed anymore
-const onClickPlaceholder = () => {
-    console.log("In the Future here opens an other component, which is not implemented yet");
-}
-
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    deleteTheme: (id) => dispatch(deleteTheme(id)),
+    deleteTheme: id => dispatch(deleteTheme(id)),
+    fetchThemeDetails: id => dispatch(fetchThemeDetails(id)),
+    fetchUsage: id => dispatch(fetchUsage(id))
 });
 
 export default connect(null, mapDispatchToProps)(ThemesActionsCell);

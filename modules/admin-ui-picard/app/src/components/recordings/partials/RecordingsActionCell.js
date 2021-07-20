@@ -2,8 +2,8 @@ import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import ConfirmModal from "../../shared/ConfirmModal";
-import {deleteRecording} from "../../../thunks/recordingThunks";
 import RecordingDetailsModal from "./modal/RecordingDetailsModal";
+import {deleteRecording} from "../../../thunks/recordingThunks";
 import {fetchRecordingDetails} from "../../../thunks/recordingDetailsThunks";
 
 /**
