@@ -22,7 +22,8 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
                                         policies={policies}
                                         fetchAccessPolicies={fetchAccessPolicies}
                                         fetchHasActiveTransactions={fetchHasActiveTransactions}
-                                        saveNewAccessPolicies={saveNewAccessPolicies} />
+                                        saveNewAccessPolicies={saveNewAccessPolicies}
+                                        descriptionText={t("EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION")} />
     );
 };
 

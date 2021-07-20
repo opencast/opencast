@@ -29,13 +29,7 @@ export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
     let headers = getHttpHeaders();
 
     let data = new URLSearchParams();
-    data.append("acl", JSON.stringify(
-        {
-            acl: {
-                ace: policies
-            }
-        })
-    );
+    data.append("acl", JSON.stringify(policies));
     data.append("override", true);
 
     return axios.post(`admin-ng/event/${eventId}/access`, data.toString(), headers)
