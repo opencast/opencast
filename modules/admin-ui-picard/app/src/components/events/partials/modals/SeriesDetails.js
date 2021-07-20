@@ -1,20 +1,24 @@
 import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
-import SeriesDetailsMetadataTab from "../wizards/SeriesDetailsMetadataTab";
-import SeriesDetailsExtendedMetadataTab from "../wizards/SeriesDetailsExtendedMetadataTab";
-import SeriesDetailsAccessTab from "../wizards/SeriesDetailsAccessTab";
-import SeriesDetailsThemeTab from "../wizards/SeriesDetailsThemeTab";
-import SeriesDetailsStatisticTab from "../wizards/SeriesDetailsStatisticTab";
-import SeriesDetailsFeedsTab from "../wizards/SeriesDetailsFeedsTab";
 import {
     getSeriesDetailsFeeds,
     getSeriesDetailsMetadata,
     getSeriesDetailsTheme, getSeriesDetailsThemeNames
 } from "../../../../selectors/seriesDetailsSelectors";
 import {connect} from "react-redux";
+import {updateSeriesMetadata} from "../../../../thunks/seriesDetailsThunks";
+import SeriesDetailsExtendedMetadataTab from "../ModalTabsAndPages/SeriesDetailsExtendedMetadataTab";
+import SeriesDetailsAccessTab from "../ModalTabsAndPages/SeriesDetailsAccessTab";
+import SeriesDetailsThemeTab from "../ModalTabsAndPages/SeriesDetailsThemeTab";
+import SeriesDetailsStatisticTab from "../ModalTabsAndPages/SeriesDetailsStatisticTab";
+import SeriesDetailsFeedsTab from "../ModalTabsAndPages/SeriesDetailsFeedsTab";
+import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
 
-const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames }) => {
+/**
+ * This component manages the tabs of the series details modal
+ */
+const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, updateSeries }) => {
     const { t } = useTranslation();
 
     const [page, setPage] = useState(0);
@@ -99,8 +103,11 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames }) =
             {/* render modal content depending on current page */}
             <div>
                 {page === 0 && (
-                    <SeriesDetailsMetadataTab metadataFields={metadataFields}
-                                              seriesId={seriesId}/>
+                    <DetailsMetadataTab metadataFields={metadataFields}
+                                        resourceId={seriesId}
+                                        header={tabs[page].tabNameTranslation}
+                                        buttonLabel={updateSeries}
+                                        updateResource='EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA'/>
                 )}
                 {page === 1 && (
                     <SeriesDetailsExtendedMetadataTab />
@@ -132,4 +139,9 @@ const mapStateToProps = state => ({
     themeNames: getSeriesDetailsThemeNames(state)
 });
 
-export default connect(mapStateToProps)(SeriesDetails);
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    updateSeries: (id, values) => dispatch(updateSeriesMetadata(id, values))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SeriesDetails);

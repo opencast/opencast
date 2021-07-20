@@ -3,17 +3,18 @@ import {useTranslation} from "react-i18next";
 import {Field, Formik} from "formik";
 import cn from "classnames";
 import _ from 'lodash';
-import {connect} from "react-redux";
 import Notifications from "../../../shared/Notifications";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
-import RenderField from "./RenderField";
-import {updateSeriesMetadata} from "../../../../thunks/seriesDetailsThunks";
+import RenderField from "../../../shared/wizard/RenderField";
 
-const SeriesDetailsMetadataTab = ({ metadataFields, updateSeries, seriesId }) => {
+/**
+ * This component renders metadata details of a certain event or series
+ */
+const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, buttonLabel, header }) => {
     const { t } = useTranslation();
 
     const handleSubmit = values => {
-        updateSeries(seriesId, values);
+        updateResource(resourceId, values);
     }
 
     // set current values of metadata fields as initial values
@@ -52,7 +53,7 @@ const SeriesDetailsMetadataTab = ({ metadataFields, updateSeries, seriesId }) =>
                             <div className="full-col">
                                 <div className="obj tbl-list">
                                     <header className="no-expand">
-                                        {t('EVENTS.SERIES.DETAILS.TABS.METADATA')}
+                                        {t(header)}
                                     </header>
                                     <div className="obj-container">
                                         <table className="main-tbl">
@@ -105,7 +106,7 @@ const SeriesDetailsMetadataTab = ({ metadataFields, updateSeries, seriesId }) =>
                                                                 inactive: !checkValidity(formik)
                                                             }
                                                         )}>
-                                                    {t('EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA')}
+                                                    {t(buttonLabel)}
                                                 </button>
                                                 <button onClick={() => formik.resetForm({values: ''})}
                                                         className="cancel">
@@ -127,9 +128,4 @@ const SeriesDetailsMetadataTab = ({ metadataFields, updateSeries, seriesId }) =>
     );
 };
 
-// Mapping actions to dispatch
-const mapDispatchToProps = dispatch => ({
-    updateSeries: (id, values) => dispatch(updateSeriesMetadata(id, values))
-});
-
-export default connect(null, mapDispatchToProps)(SeriesDetailsMetadataTab);
+export default DetailsMetadataTab;

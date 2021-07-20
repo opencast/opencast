@@ -1,12 +1,15 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import {Field, Formik} from "formik";
-import Notifications from "../../../shared/Notifications";
 import _ from "lodash";
 import cn from "classnames";
-import {updateSeriesTheme} from "../../../../thunks/seriesDetailsThunks";
 import {connect} from "react-redux";
+import Notifications from "../../../shared/Notifications";
+import {updateSeriesTheme} from "../../../../thunks/seriesDetailsThunks";
 
+/**
+ * This component renders the tab for editing the theme of a certain series
+ */
 const SeriesDetailsThemeTab = ({ theme, seriesId, themeNames, updateTheme }) => {
     const { t } = useTranslation();
 

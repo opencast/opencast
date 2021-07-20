@@ -1,5 +1,8 @@
 import React from "react";
 
+/**
+ * This component renders the feeds tab of a certain series
+ */
 const SeriesDetailsFeedsTab = ({ feeds }) => {
 
     return (
