@@ -65,12 +65,6 @@ public class AttachTranscriptionOperationHandler extends AbstractWorkflowOperati
     super.activate(cc);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -81,22 +75,26 @@ public class AttachTranscriptionOperationHandler extends AbstractWorkflowOperati
 
     // Get job id.
     String jobId = StringUtils.trimToNull(operation.getConfiguration(TRANSCRIPTION_JOB_ID));
-    if (jobId == null)
+    if (jobId == null) {
       throw new WorkflowOperationException(TRANSCRIPTION_JOB_ID + " missing");
+    }
 
     // Check which tags/flavors have been configured
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.many);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
+        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.many);
     List<String> targetTagOption = tagsAndFlavors.getTargetTags();
     List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
     // Target flavor is mandatory if target-caption-format was NOT informed and no conversion is done
-    if (targetFlavorOption.isEmpty() && captionFormatOption == null)
+    if (targetFlavorOption.isEmpty() && captionFormatOption == null) {
       throw new WorkflowOperationException(TARGET_FLAVOR + " missing");
+    }
     // Target flavor is optional if target-caption-format was informed because the default flavor
     // will be "captions/<format>". If informed, will override the default.
     MediaPackageElementFlavor flavor = null;
-    if (!targetFlavorOption.isEmpty())
+    if (!targetFlavorOption.isEmpty()) {
       flavor = targetFlavorOption.get(0);
+    }
 
     try {
       // Get transcription file from the service
@@ -113,8 +111,9 @@ public class AttachTranscriptionOperationHandler extends AbstractWorkflowOperati
       }
 
       // Set the target flavor if informed
-      if (flavor != null)
+      if (flavor != null) {
         transcription.setFlavor(flavor);
+      }
 
       // Add tags
       for (String tag : targetTagOption) {

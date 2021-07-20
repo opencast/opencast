@@ -73,7 +73,7 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     CONFIG_OPTIONS.put(LANGUAGE, "The \"language\" the transcription service will use");
     CONFIG_OPTIONS.put(JOBTYPE, "The \"jobtype\" the transcription service will use");
     CONFIG_OPTIONS.put(SKIP_IF_FLAVOR_EXISTS,
-      "If this \"flavor\" is already in the media package, skip this operation");
+        "If this \"flavor\" is already in the media package, skip this operation");
   }
 
   @Override
@@ -81,12 +81,6 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     super.activate(cc);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -98,8 +92,8 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
       MediaPackageElement[] mpes = mediaPackage.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor(skipOption));
       if (mpes != null && mpes.length > 0) {
         logger.info(
-                "Start transcription operation will be skipped because flavor '{}' already exists in the media package.",
-                skipOption);
+            "Start transcription operation will be skipped because flavor '{}' already exists in the media package.",
+            skipOption);
         return createResult(Action.SKIP);
       }
     }
@@ -107,7 +101,8 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     logger.debug("Start transcription for mediapackage '{}'.", mediaPackage);
 
     // Check which tags have been configured
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
+        workflowInstance, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
     List<String> sourceTagOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorOption = tagsAndFlavors.getSrcFlavors();
     String language = StringUtils.trimToEmpty(operation.getConfiguration(LANGUAGE));
@@ -116,20 +111,23 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Make sure either one of tags or flavors are provided
-    if (sourceTagOption.isEmpty() && sourceFlavorOption.isEmpty())
+    if (sourceTagOption.isEmpty() && sourceFlavorOption.isEmpty()) {
       throw new WorkflowOperationException("No source tag or flavor have been specified!");
+    }
 
     if (!sourceFlavorOption.isEmpty()) {
       elementSelector.addFlavor(sourceFlavorOption.get(0));
     }
-    if (!sourceTagOption.isEmpty())
+    if (!sourceTagOption.isEmpty()) {
       elementSelector.addTag(sourceTagOption.get(0));
+    }
 
     Collection<Track> elements = elementSelector.select(mediaPackage, false);
     Job job = null;
     for (Track track : elements) {
       try {
-        job = ((AmberscriptTranscriptionService)service).startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobtype);
+        job = ((AmberscriptTranscriptionService)service)
+            .startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobtype);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {
