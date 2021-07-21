@@ -216,18 +216,20 @@ public class LtiServiceRestEndpoint {
       description = "Copy an event to a different series",
       returnDescription = "",
       pathParameters = {
-          @RestParameter(
-              name = "eventId",
-              description = "The event (id) to copy",
-              isRequired = true,
-              type = STRING
-          ),
-          @RestParameter(
-              name = "seriesId",
-              description = "The series (id) to copy into",
-              isRequired = true,
-              type = STRING
-          )
+              @RestParameter(
+                      name = "eventId",
+                      description = "The event (id) to copy",
+                      isRequired = true,
+                      type = STRING
+              ),
+      },
+      restParameters = {
+              @RestParameter(
+                      name = "seriesId",
+                      description = "The series (id) to copy into",
+                      isRequired = true,
+                      type = STRING
+              )
       },
       responses = {
           @RestResponse(
