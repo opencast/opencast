@@ -27,17 +27,17 @@ import static org.easymock.EasyMock.anyString;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventSearchQuery;
-import org.opencastproject.api.index.objects.series.Series;
-import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.authorization.xacml.XACMLParsingException;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.impl.SearchResultImpl;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -94,7 +94,7 @@ public class AclScannerTest {
     SearchResultImpl<Series> seriesSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
     EasyMock.expect(seriesSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
 
-    final ApiIndex index = EasyMock.createNiceMock(ApiIndex.class);
+    final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(eventSearchResult)
             .anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(seriesSearchResult)

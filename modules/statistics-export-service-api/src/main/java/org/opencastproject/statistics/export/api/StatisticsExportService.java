@@ -21,8 +21,8 @@
 
 package org.opencastproject.statistics.export.api;
 
-import org.opencastproject.api.index.ApiIndex;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.statistics.api.DataResolution;
 import org.opencastproject.statistics.api.StatisticsProvider;
@@ -61,7 +61,7 @@ public interface StatisticsExportService {
    *           If the resource identified by resourceId could not be found.
    */
   String getCSV(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution dataResolution,
-                ApiIndex index, ZoneId zoneId) throws SearchIndexException, UnauthorizedException,
+                ElasticsearchIndex index, ZoneId zoneId) throws SearchIndexException, UnauthorizedException,
           NotFoundException;
 
   /**
@@ -98,7 +98,7 @@ public interface StatisticsExportService {
    *           If the resource identified by resourceId could not be found.
    */
   String getCSV(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution dataResolution,
-          ApiIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel, int limit,
+          ElasticsearchIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel, int limit,
           int offset, Map<String, String> filters)
           throws SearchIndexException, UnauthorizedException, NotFoundException;
 }

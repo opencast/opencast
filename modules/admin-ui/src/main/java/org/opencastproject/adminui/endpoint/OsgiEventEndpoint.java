@@ -22,11 +22,11 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.api.index.ApiIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -70,7 +70,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
 
   private AclServiceFactory aclServiceFactory;
   private AssetManager assetManager;
-  private ApiIndex index;
+  private ElasticsearchIndex index;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
   private EventCommentService eventCommentService;
@@ -224,13 +224,13 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public ApiIndex getIndex() {
+  public ElasticsearchIndex getIndex() {
     return index;
   }
 
   /** OSGi DI. */
   @Reference
-  public void setIndex(ApiIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 

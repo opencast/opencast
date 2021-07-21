@@ -27,7 +27,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.api.index.ApiIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
@@ -38,6 +37,7 @@ import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.persistence.Database;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
@@ -184,7 +184,7 @@ public class TestTasksEndpoint extends TasksEndpoint {
     MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
     EasyMock.replay(ms);
 
-    ApiIndex esIndex = EasyMock.createNiceMock(ApiIndex.class);
+    ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);

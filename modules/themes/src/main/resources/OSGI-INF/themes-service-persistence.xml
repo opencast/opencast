@@ -7,7 +7,7 @@
   <property name="service.description" value="Themes Database Service"/>
   <service>
     <provide interface="org.opencastproject.themes.ThemesServiceDatabase"/>
-    <provide interface="org.opencastproject.api.index.rebuild.IndexProducer"/>
+    <provide interface="org.opencastproject.elasticsearch.index.rebuild.IndexProducer"/>
   </service>
   <reference name="organization-directory-service"
              interface="org.opencastproject.security.api.OrganizationDirectoryService"
@@ -19,6 +19,6 @@
              cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
              cardinality="1..1" policy="static" bind="setSecurityService"/>
-  <reference name="api-index" interface="org.opencastproject.api.index.ApiIndex"
+  <reference name="elasticsearch-index" interface="org.opencastproject.elasticsearch.index.ElasticsearchIndex"
              bind="setIndex"/>
 </scr:component>

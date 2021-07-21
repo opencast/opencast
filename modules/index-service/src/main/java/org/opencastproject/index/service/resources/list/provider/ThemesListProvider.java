@@ -21,12 +21,12 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.theme.IndexTheme;
-import org.opencastproject.api.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
+import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
@@ -50,7 +50,7 @@ public class ThemesListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(ThemesListProvider.class);
 
-  private ApiIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
   private SecurityService securityService;
 
@@ -59,7 +59,7 @@ public class ThemesListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for the search index. */
-  public void setIndex(ApiIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }
 

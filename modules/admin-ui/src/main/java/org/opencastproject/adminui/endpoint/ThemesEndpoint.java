@@ -39,15 +39,15 @@ import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.QueryPreprocessor;
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.series.Series;
-import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.api.index.objects.theme.IndexTheme;
-import org.opencastproject.api.index.objects.theme.ThemeIndexSchema;
-import org.opencastproject.api.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
+import org.opencastproject.elasticsearch.index.objects.theme.ThemeIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.resources.list.query.ThemesListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.SecurityService;
@@ -138,7 +138,7 @@ public class ThemesEndpoint {
   private SecurityService securityService;
 
   /** The admin UI search index */
-  private ApiIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
   /** The series service */
   private SeriesService seriesService;
@@ -163,7 +163,7 @@ public class ThemesEndpoint {
 
   /** OSGi DI. */
   @Reference
-  public void setIndex(ApiIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }
 

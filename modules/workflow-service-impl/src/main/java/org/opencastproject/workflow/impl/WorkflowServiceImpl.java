@@ -31,16 +31,16 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.RU
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.STOPPED;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SUCCEEDED;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventIndexUtils;
-import org.opencastproject.api.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.api.index.rebuild.IndexProducer;
-import org.opencastproject.api.index.rebuild.IndexRebuildException;
-import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
+import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;
@@ -266,7 +266,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   private final Striped<Lock> mediaPackageLocks = Striped.lazyWeakLock(1024);
 
   /** The Elasticsearch indices */
-  private ApiIndex apiIndex;
+  private ElasticsearchIndex elasticsearchIndex;
 
   /**
    * Constructs a new workflow service impl, with a priority-sorted map of metadata services
@@ -1028,7 +1028,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         // Third, remove workflow instance job itself
         try {
           serviceRegistry.removeJobs(Collections.singletonList(workflowInstanceId));
-          removeWorkflowInstanceFromIndex(instance, apiIndex);
+          removeWorkflowInstanceFromIndex(instance, elasticsearchIndex);
         } catch (ServiceRegistryException e) {
           logger.warn("Problems while removing workflow instance job '%d'", workflowInstanceId, e);
         } catch (NotFoundException e) {
@@ -1335,7 +1335,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         // again right after those operations.
         if (op == null || op.getState() != OperationState.RUNNING) {
           updateWorkflowInstanceInIndex(workflowInstance, accessControlList, episodeDublinCoreCatalog,
-                  apiIndex);
+                  elasticsearchIndex);
         }
         index(workflowInstance);
       } catch (ServiceRegistryException e) {
@@ -2140,9 +2140,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param index
    *          the admin UI index.
    */
-  @Reference(name = "api-index")
-  public void setIndex(ApiIndex index) {
-    this.apiIndex = index;
+  @Reference(name = "elasticsearch-index")
+  public void setIndex(ElasticsearchIndex index) {
+    this.elasticsearchIndex = index;
   }
 
   /**
@@ -2326,7 +2326,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
 
   @Override
-  public void repopulate(final ApiIndex index) throws IndexRebuildException {
+  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
     final String startWorkflow = Operation.START_WORKFLOW.toString();
     final int total;
     try {
@@ -2420,7 +2420,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param index
    *         the index to update
    */
-  private void removeWorkflowInstanceFromIndex(WorkflowInstance workflowInstance, ApiIndex index) {
+  private void removeWorkflowInstanceFromIndex(WorkflowInstance workflowInstance, ElasticsearchIndex index) {
     final long workflowInstanceId = workflowInstance.getId();
     final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
 
@@ -2455,7 +2455,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *         the index to update
    */
   private void updateWorkflowInstanceInIndex(WorkflowInstance workflowInstance, AccessControlList accessControlList,
-          DublinCoreCatalog episodeDublincoreCatalog, ApiIndex index) {
+          DublinCoreCatalog episodeDublincoreCatalog, ElasticsearchIndex index) {
     final long workflowInstanceId = workflowInstance.getId();
     final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
     final String organization = securityService.getOrganization().getId();

@@ -235,7 +235,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-schema/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-api-index/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-index/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-feeds/${project.version}</bundle>
     <!-- load search impl later than its optional index rebuilding resources to have maximium support during search index rebuild -->
@@ -353,7 +353,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-schema/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-api-index/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-index/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
@@ -501,7 +501,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-schema/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-api-index/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-elasticsearch-index/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-feeds/${project.version}</bundle>
     <!-- load search impl later than its optional index rebuilding resources to have maximium support during search index rebuild -->

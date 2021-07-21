@@ -22,11 +22,11 @@
              policy="dynamic"
              bind="addCatalogUIAdapter"
              unbind="removeCatalogUIAdapter"/>
-  <reference name="ApiIndex"
-             interface="org.opencastproject.api.index.ApiIndex"
+  <reference name="ElasticsearchIndex"
+             interface="org.opencastproject.elasticsearch.index.ElasticsearchIndex"
              cardinality="1..1"
              policy="static"
-             bind="setApiIndex"/>
+             bind="setElasticsearchIndex"/>
   <reference name="IndexService"
              interface="org.opencastproject.index.service.api.IndexService"
              cardinality="1..1"

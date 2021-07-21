@@ -21,11 +21,11 @@
 
 package org.opencastproject.themes.persistence;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.theme.IndexTheme;
-import org.opencastproject.api.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
+import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -76,7 +76,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   protected OrganizationDirectoryService organizationDirectoryService;
 
   /** The elasticsearch indices */
-  protected ApiIndex index;
+  protected ElasticsearchIndex index;
 
   /** The component context for this themes service database */
   private ComponentContext cc;
@@ -122,7 +122,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   /** OSGi DI */
-  public void setIndex(ApiIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 
@@ -312,7 +312,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   @Override
-  public void repopulate(final ApiIndex index) {
+  public void repopulate(final ElasticsearchIndex index) {
     if (index.getIndexName() != this.index.getIndexName()) {
       logger.info("Themes are currently not part of the {} index, no re-indexing necessary.");
       return;
@@ -354,7 +354,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    * @param orgId
    *           the organization the theme belongs to
    */
-  private void removeThemeFromIndex(long themeId, ApiIndex index, String orgId) {
+  private void removeThemeFromIndex(long themeId, ElasticsearchIndex index, String orgId) {
     logger.debug("Removing theme {} from the {} index.", themeId, index.getIndexName());
 
     try {
@@ -375,7 +375,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    *           the organization the theme belongs to
    * @param user
    */
-  private void updateThemeInIndex(Theme theme, ApiIndex index, String orgId,
+  private void updateThemeInIndex(Theme theme, ElasticsearchIndex index, String orgId,
           User user) {
     logger.debug("Updating the theme with id '{}', name '{}', description '{}', organization '{}' in the {} index.",
             theme.getId(), theme.getName(), theme.getDescription(),

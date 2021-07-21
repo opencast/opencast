@@ -10,11 +10,11 @@
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.external.endpoint.GroupsEndpoint"/>
   </service>
-  <reference name="ApiIndex"
-             interface="org.opencastproject.api.index.ApiIndex"
+  <reference name="ElasticsearchIndex"
+             interface="org.opencastproject.elasticsearch.index.ElasticsearchIndex"
              cardinality="1..1"
              policy="static"
-             bind="setApiIndex"/>
+             bind="setElasticsearchIndex"/>
   <reference name="SecurityService"
              interface="org.opencastproject.security.api.SecurityService"
              bind="setSecurityService"/>

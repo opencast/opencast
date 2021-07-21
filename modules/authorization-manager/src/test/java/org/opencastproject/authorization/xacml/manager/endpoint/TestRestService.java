@@ -25,11 +25,6 @@ import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventSearchQuery;
-import org.opencastproject.api.index.objects.series.Series;
-import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
@@ -47,6 +42,11 @@ import org.opencastproject.authorization.xacml.manager.impl.persistence.JpaAclDb
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.impl.SearchResultImpl;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
@@ -90,8 +90,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   public static final AuthorizationService authorizationService;
   public static final AssetManager assetManager;
   public static final Workspace workspace;
-  public static final ApiIndex adminUiIndex;
-  public static final ApiIndex externalApiIndex;
+  public static final ElasticsearchIndex index;
   public static final EntityManagerFactory authorizationEMF = newTestEntityManagerFactory(
           "org.opencastproject.authorization.xacml.manager");
 
@@ -112,24 +111,23 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     SearchResultImpl<Series> seriesSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
     EasyMock.expect(seriesSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
 
-    adminUiIndex = EasyMock.createNiceMock(ApiIndex.class);
-    externalApiIndex = EasyMock.createNiceMock(ApiIndex.class);
+    index = EasyMock.createNiceMock(ElasticsearchIndex.class);
 
     try {
-      EasyMock.expect(adminUiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class)))
+      EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class)))
               .andReturn(eventSearchResult).anyTimes();
-      EasyMock.expect(adminUiIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class)))
+      EasyMock.expect(index.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class)))
               .andReturn(seriesSearchResult).anyTimes();
     } catch (SearchIndexException e) {
       // should never happen
     }
 
-    EasyMock.replay(adminUiIndex, eventSearchResult, seriesSearchResult);
+    EasyMock.replay(index, eventSearchResult, seriesSearchResult);
 
     aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
-        return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(), adminUiIndex,
+        return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(), index,
                 securityService);
       }
     };

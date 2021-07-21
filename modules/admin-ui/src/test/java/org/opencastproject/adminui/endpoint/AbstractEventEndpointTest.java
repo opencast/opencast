@@ -30,10 +30,10 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPo
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.api.index.ApiIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
@@ -696,7 +696,7 @@ public class AbstractEventEndpointTest {
     private AuthorizationService authorizationService;
     private SchedulerService schedulerService;
     private CaptureAgentStateService captureAgentStateService;
-    private ApiIndex index;
+    private ElasticsearchIndex index;
     private UrlSigningService urlSigningService;
 
     public WorkflowService getWorkflowService() {
@@ -787,11 +787,11 @@ public class AbstractEventEndpointTest {
       this.captureAgentStateService = captureAgentStateService;
     }
 
-    public void setIndex(ApiIndex index) {
+    public void setIndex(ElasticsearchIndex index) {
       this.index = index;
     }
 
-    public ApiIndex getIndex() {
+    public ElasticsearchIndex getIndex() {
       return index;
     }
 

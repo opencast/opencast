@@ -21,17 +21,17 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventSearchQuery;
-import org.opencastproject.api.index.objects.series.Series;
-import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -59,9 +59,9 @@ public final class AclServiceImpl implements AclService {
   private final SecurityService securityService;
 
   /** The Elasticsearch indices */
-  protected ApiIndex index;
+  protected ElasticsearchIndex index;
 
-  public AclServiceImpl(Organization organization, AclDb aclDb, ApiIndex index,
+  public AclServiceImpl(Organization organization, AclDb aclDb, ElasticsearchIndex index,
           SecurityService securityService) {
     this.organization = organization;
     this.aclDb = aclDb;
@@ -125,7 +125,7 @@ public final class AclServiceImpl implements AclService {
    * @param user
    *         the current user
    */
-  private void updateAclInIndex(String currentAclName, String newAclName, ApiIndex index, String orgId,
+  private void updateAclInIndex(String currentAclName, String newAclName, ElasticsearchIndex index, String orgId,
           User user) {
     logger.debug("Update the events to change the managed acl name from '{}' to '{}'.", currentAclName, newAclName);
     updateManagedAclForEvents(currentAclName, Optional.of(newAclName), index, orgId, user);
@@ -146,7 +146,7 @@ public final class AclServiceImpl implements AclService {
    * @param user
    *         the current user
    */
-  private void removeAclFromIndex(String currentAclName, ApiIndex index, String orgId,
+  private void removeAclFromIndex(String currentAclName, ElasticsearchIndex index, String orgId,
           User user) {
     logger.debug("Update the events to remove the managed acl name '{}'.", currentAclName);
     updateManagedAclForEvents(currentAclName, Optional.empty(), index, orgId, user);
@@ -169,7 +169,7 @@ public final class AclServiceImpl implements AclService {
    *         the current user
    */
   private void updateManagedAclForSeries(String currentAclName, Optional<String> newAclNameOpt,
-          ApiIndex index, String orgId, User user) {
+          ElasticsearchIndex index, String orgId, User user) {
     SearchResult<Series> result;
     try {
       result = index.getByQuery(new SeriesSearchQuery(orgId, user).withoutActions()
@@ -219,7 +219,7 @@ public final class AclServiceImpl implements AclService {
    *         the current user
    */
   private void updateManagedAclForEvents(String currentAclName, Optional<String> newAclNameOpt,
-          ApiIndex index, String orgId, User user) {
+          ElasticsearchIndex index, String orgId, User user) {
     SearchResult<Event> result;
     try {
       result = index.getByQuery(new EventSearchQuery(orgId, user).withoutActions()

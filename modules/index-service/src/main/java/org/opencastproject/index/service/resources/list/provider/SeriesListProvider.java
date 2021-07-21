@@ -21,13 +21,13 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.series.Series;
-import org.opencastproject.api.index.objects.series.SeriesIndexSchema;
-import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListFilter;
@@ -70,7 +70,7 @@ public class SeriesListProvider implements ResourceListProvider {
   private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, ORGANIZERS, TITLE_EXTENDED };
 
   /** The search index. */
-  private ApiIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
   /** The security service. */
   private SecurityService securityService;
@@ -80,7 +80,7 @@ public class SeriesListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for series services. */
-  public void setSearchIndex(ApiIndex searchIndex) {
+  public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 

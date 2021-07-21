@@ -61,10 +61,6 @@ import org.opencastproject.adminui.exception.JobEndpointException;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.util.BulkUpdateUtil;
 import org.opencastproject.adminui.util.QueryPreprocessor;
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventIndexSchema;
-import org.opencastproject.api.index.objects.event.EventSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -75,6 +71,10 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentReply;
@@ -238,7 +238,7 @@ public abstract class AbstractEventEndpoint {
 
   public abstract WorkflowService getWorkflowService();
 
-  public abstract ApiIndex getIndex();
+  public abstract ElasticsearchIndex getIndex();
 
   public abstract JobEndpoint getJobService();
 

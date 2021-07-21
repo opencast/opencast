@@ -21,9 +21,9 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventIndexSchema;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -59,13 +59,13 @@ public class EventsListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(EventsListProvider.class);
 
-  private ApiIndex index;
+  private ElasticsearchIndex index;
 
   protected void activate(BundleContext bundleContext) {
     logger.info("Events list provider activated!");
   }
 
-  public void setIndex(ApiIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 

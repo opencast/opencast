@@ -27,9 +27,9 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
 import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
@@ -130,7 +130,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
   public TestEventsEndpoint() throws Exception {
     this.endpointBaseUrl = "https://api.opencast.org";
 
-    ApiIndex elasticsearchIndex = new ApiIndex();
+    ElasticsearchIndex elasticsearchIndex = new ElasticsearchIndex();
 
     IndexService indexService = EasyMock.createMock(IndexService.class);
     EasyMock.expect(indexService.getEvent(MISSING_ID, elasticsearchIndex)).andReturn(Opt.<Event> none()).anyTimes();
@@ -272,7 +272,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     // Replay all mocks
     EasyMock.replay(deleteMetadataMP, indexService, schedulerService, noPublicationsMP, twoPublicationsMP);
 
-    setApiIndex(elasticsearchIndex);
+    setElasticsearchIndex(elasticsearchIndex);
     setIndexService(indexService);
     setSchedulerService(schedulerService);
     setupSecurityService();

@@ -37,7 +37,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_6_0;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.api.index.ApiIndex;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
@@ -98,13 +98,13 @@ public class GroupsEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(GroupsEndpoint.class);
 
   /* OSGi service references */
-  private ApiIndex apiIndex;
+  private ElasticsearchIndex elasticsearchIndex;
   private JpaGroupRoleProvider jpaGroupRoleProvider;
   private SecurityService securityService;
 
   /** OSGi DI */
-  void setApiIndex(ApiIndex apiIndex) {
-    this.apiIndex = apiIndex;
+  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI. */

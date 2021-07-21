@@ -60,7 +60,7 @@
     <module>modules/animate-workflowoperation</module>
     <module>modules/annotation-api</module>
     <module>modules/annotation-impl</module>
-    <module>modules/api-index</module>
+    <module>modules/elasticsearch-index</module>
     <module>modules/asset-manager-api</module>
     <module>modules/asset-manager-impl</module>
     <module>modules/asset-manager-workflowoperation</module>

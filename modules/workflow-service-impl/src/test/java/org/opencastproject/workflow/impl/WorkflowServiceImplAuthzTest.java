@@ -26,10 +26,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.EventSearchQuery;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
@@ -246,7 +246,7 @@ public class WorkflowServiceImplAuthzTest {
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
 
-    final ApiIndex index = EasyMock.createNiceMock(ApiIndex.class);
+    final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
     EasyMock.replay(result, index);

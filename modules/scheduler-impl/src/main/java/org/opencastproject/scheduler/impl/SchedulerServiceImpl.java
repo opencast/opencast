@@ -37,12 +37,6 @@ import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.RequireUtil.requireTrue;
 import static org.opencastproject.util.data.Monadics.mlist;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventIndexUtils;
-import org.opencastproject.api.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.api.index.rebuild.IndexRebuildException;
-import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
@@ -53,6 +47,12 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
+import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -224,7 +224,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private OrganizationDirectoryService orgDirectoryService;
 
   /** The Elasticsearch indices */
-  private ApiIndex index;
+  private ElasticsearchIndex index;
 
   /** The list of registered event catalog UI adapters */
   private List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
@@ -323,7 +323,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param index
    *          the API index.
    */
-  public void setIndex(ApiIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 
@@ -1385,7 +1385,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param properties
    * @param recordingStatus
    */
-  private void updateEventInIndex(String mediaPackageId, ApiIndex index, Opt<AccessControlList> acl,
+  private void updateEventInIndex(String mediaPackageId, ElasticsearchIndex index, Opt<AccessControlList> acl,
           Opt<DublinCoreCatalog> dublinCore, Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters,
           Opt<String> agentId, Opt<Map<String, String>> properties, Opt<String> recordingStatus) {
 
@@ -1449,7 +1449,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param mediaPackageId
    * @param index
    */
-  private void removeRecordingStatusFromIndex(String mediaPackageId, ApiIndex index) {
+  private void removeRecordingStatusFromIndex(String mediaPackageId, ElasticsearchIndex index) {
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
 
@@ -1474,7 +1474,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param mediaPackageId
    * @param index
    */
-  private void removeSchedulingFromIndex(String mediaPackageId, ApiIndex index) {
+  private void removeSchedulingFromIndex(String mediaPackageId, ElasticsearchIndex index) {
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
     try {
@@ -1665,7 +1665,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public void repopulate(final ApiIndex index) throws IndexRebuildException {
+  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
     final int[] current = {0};
     final int total;
     try {

@@ -21,7 +21,7 @@
 
 package org.opencastproject.index.service.impl.util;
 
-import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;

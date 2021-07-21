@@ -34,8 +34,8 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
@@ -115,7 +115,7 @@ public class WorkflowsEndpoint {
 
   /* OSGi service references */
   private WorkflowService workflowService;
-  private ApiIndex apiIndex;
+  private ElasticsearchIndex elasticsearchIndex;
   private IndexService indexService;
 
   /** OSGi DI */
@@ -124,8 +124,8 @@ public class WorkflowsEndpoint {
   }
 
   /** OSGi DI */
-  public void setApiIndex(ApiIndex apiIndex) {
-    this.apiIndex = apiIndex;
+  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
@@ -343,7 +343,7 @@ public class WorkflowsEndpoint {
 
     try {
       // Media Package
-      Opt<Event> event = indexService.getEvent(eventId, apiIndex);
+      Opt<Event> event = indexService.getEvent(eventId, elasticsearchIndex);
       if (event.isNone()) {
         return ApiResponses.notFound("Cannot find an event with id '%s'.", eventId);
       }

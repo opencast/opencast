@@ -32,7 +32,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-api-index</artifactId>
+      <artifactId>opencast-elasticsearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

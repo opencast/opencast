@@ -23,14 +23,14 @@ package org.opencastproject.adminui.endpoint;
 
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.series.Series;
-import org.opencastproject.api.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.api.index.objects.theme.IndexTheme;
-import org.opencastproject.api.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.impl.SearchResultImpl;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
+import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
@@ -98,7 +98,7 @@ public class TestThemesEndpoint extends ThemesEndpoint {
     EasyMock.replay(seriesService);
 
     // Create AdminUI Search Index
-    ApiIndex elasticsearchIndex = EasyMock.createNiceMock(ApiIndex.class);
+    ElasticsearchIndex elasticsearchIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     final Capture<ThemeSearchQuery> themeQueryCapture = EasyMock.newCapture();
     EasyMock.expect(elasticsearchIndex.getByQuery(EasyMock.capture(themeQueryCapture)))
             .andAnswer(() -> createThemeCaptureResult(themeQueryCapture)).anyTimes();

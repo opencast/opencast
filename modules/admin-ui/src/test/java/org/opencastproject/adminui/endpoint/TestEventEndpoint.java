@@ -31,10 +31,6 @@ import static org.opencastproject.util.PropertiesUtil.toDictionary;
 
 import org.opencastproject.adminui.endpoint.AbstractEventEndpointTest.TestEnv;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventSearchQuery;
-import org.opencastproject.api.index.objects.series.Series;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -45,6 +41,10 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.impl.SearchResultImpl;
 import org.opencastproject.elasticsearch.impl.SearchResultItemImpl;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.event.comment.EventCommentService;
@@ -508,8 +508,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(eventSearchResult.getItems()).andReturn(list).anyTimes();
     EasyMock.replay(eventSearchResult);
 
-    // ApiIndex
-    ApiIndex searchIndex = EasyMock.createNiceMock(ApiIndex.class);
+    ElasticsearchIndex searchIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(eventSearchResult)
             .anyTimes();
     EasyMock.replay(searchIndex);
@@ -537,9 +536,9 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(indexService.getEventSource(event3)).andReturn(Source.WORKFLOW).anyTimes();
     MetadataList metaDataList = new MetadataList();
     EasyMock.expect(indexService.updateAllEventMetadata(EasyMock.eq("updateFailure"), EasyMock.anyString(),
-      EasyMock.anyObject(ApiIndex.class))).andThrow(new IllegalArgumentException());
+      EasyMock.anyObject(ElasticsearchIndex.class))).andThrow(new IllegalArgumentException());
     EasyMock.expect(indexService.updateAllEventMetadata(EasyMock.anyString(), EasyMock.anyString(),
-      EasyMock.anyObject(ApiIndex.class))).andReturn(metaDataList).anyTimes();
+      EasyMock.anyObject(ElasticsearchIndex.class))).andReturn(metaDataList).anyTimes();
     EasyMock.replay(indexService);
     env.setIndexService(indexService);
 
@@ -731,7 +730,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public ApiIndex getIndex() {
+  public ElasticsearchIndex getIndex() {
     return env.getIndex();
   }
 

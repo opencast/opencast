@@ -31,13 +31,6 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.getMediaPacka
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventIndexUtils;
-import org.opencastproject.api.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.api.index.rebuild.IndexProducer;
-import org.opencastproject.api.index.rebuild.IndexRebuildException;
-import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetId;
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -72,6 +65,13 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
+import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -181,7 +181,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private String systemUserName;
   private Database db;
   private AclServiceFactory aclServiceFactory;
-  private ApiIndex index;
+  private ElasticsearchIndex index;
 
   // Settings for role filter
   private boolean includeAPIRoles;
@@ -273,7 +273,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Reference(name = "index")
-  public void setIndex(ApiIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 
@@ -472,7 +472,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @param index
    *         The API index to update
    */
-  private void updateEventInIndex(Snapshot snapshot, ApiIndex index) {
+  private void updateEventInIndex(Snapshot snapshot, ElasticsearchIndex index) {
     final MediaPackage mp = snapshot.getMediaPackage();
     String eventId = mp.getIdentifier().toString();
     final String organization = securityService.getOrganization().getId();
@@ -530,7 +530,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @param index
    *         The API index to update
    */
-  private void removeEventFromIndex(String eventId, ApiIndex index) {
+  private void removeEventFromIndex(String eventId, ElasticsearchIndex index) {
     final String organization = securityService.getOrganization().getId();
     final User user = securityService.getUser();
     logger.debug("Received AssetManager delete episode message {}", eventId);
@@ -837,7 +837,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate(final ApiIndex index) throws IndexRebuildException {
+  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
     final Organization org = securityService.getOrganization();
     final User user = (org != null ? securityService.getUser() : null);
     try {

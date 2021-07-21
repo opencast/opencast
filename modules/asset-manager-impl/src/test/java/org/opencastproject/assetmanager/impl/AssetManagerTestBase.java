@@ -25,7 +25,6 @@ import static com.entwinemedia.fn.fns.Booleans.eq;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.api.index.ApiIndex;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.Snapshots;
@@ -40,6 +39,7 @@ import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.util.TestUser;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -168,7 +168,7 @@ public abstract class AssetManagerTestBase {
     MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
     EasyMock.replay(ms);
 
-    ApiIndex esIndex = EasyMock.createNiceMock(ApiIndex.class);
+    ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);

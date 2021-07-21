@@ -20,7 +20,7 @@
  */
 package org.opencastproject.index.service.impl.util;
 
-import org.opencastproject.api.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.ingest.api.IngestException;

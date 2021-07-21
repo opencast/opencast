@@ -27,20 +27,20 @@ import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Option.some;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventSearchQuery;
-import org.opencastproject.api.index.objects.series.Series;
-import org.opencastproject.api.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.api.index.rebuild.IndexProducer;
-import org.opencastproject.api.index.rebuild.IndexRebuildException;
-import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.series.SeriesItem;
@@ -128,7 +128,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   private String systemUserName;
 
   /** The API index */
-  private ApiIndex apiIndex;
+  private ElasticsearchIndex elasticsearchIndex;
 
   private AclServiceFactory aclServiceFactory;
 
@@ -163,9 +163,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /** OSGi callbacks for setting the API index. */
-  @Reference(name = "api-index")
-  public void setApiIndex(ApiIndex index) {
-    this.apiIndex = index;
+  @Reference(name = "elasticsearch-index")
+  public void setElasticsearchIndex(ElasticsearchIndex index) {
+    this.elasticsearchIndex = index;
   }
 
   @Reference
@@ -271,7 +271,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         // Make sure store to persistence comes after index, return value can be null
         DublinCoreCatalog updated = persistence.storeSeries(dublinCore);
         // update API index
-        updateSeriesMetadataInIndex(id, apiIndex, dublinCore);
+        updateSeriesMetadataInIndex(id, elasticsearchIndex, dublinCore);
         // still sent for other asynchronous updates
         messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
                 SeriesItem.updateCatalog(dublinCore));
@@ -330,7 +330,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       try {
         updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
         //update API index
-        updateSeriesAclInIndex(seriesId, apiIndex, accessControl);
+        updateSeriesAclInIndex(seriesId, elasticsearchIndex, accessControl);
         // still sent for other asynchronous updates
         messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
                 SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
@@ -366,7 +366,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       persistence.deleteSeries(seriesID);
       // remove from API index
-      removeSeriesFromIndex(seriesID, apiIndex);
+      removeSeriesFromIndex(seriesID, elasticsearchIndex);
       // still sent for other asynchronous updates
       messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
               SeriesItem.delete(seriesID));
@@ -464,7 +464,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       // update API index
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
-        updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue), apiIndex);
+        updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue), elasticsearchIndex);
       }
     } catch (SeriesServiceDatabaseException e) {
       logger.error(
@@ -482,7 +482,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       // update API index
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
-        updateThemePropertyInIndex(seriesID, Optional.empty(), apiIndex);
+        updateThemePropertyInIndex(seriesID, Optional.empty(), elasticsearchIndex);
       }
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Failed to delete series property for series with series id '{}' and property name '{}'",
@@ -584,7 +584,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public void repopulate(final ApiIndex index) throws IndexRebuildException {
+  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
     try {
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       final int total = databaseSeries.size();
@@ -655,7 +655,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param index
    *          The API index to update
    */
-  private void removeSeriesFromIndex(String seriesId, ApiIndex index) {
+  private void removeSeriesFromIndex(String seriesId, ElasticsearchIndex index) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Removing series {} from the {} index.", seriesId, index.getIndexName());
 
@@ -677,7 +677,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param dc
    *          The dublin core catalog
    */
-  private void updateSeriesMetadataInIndex(String seriesId, ApiIndex index, DublinCoreCatalog dc) {
+  private void updateSeriesMetadataInIndex(String seriesId, ElasticsearchIndex index, DublinCoreCatalog dc) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating metadata of series {} in the {} index.", seriesId, index.getIndexName());
 
@@ -769,7 +769,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @param acl
    *          The acl to update
    */
-  private void updateSeriesAclInIndex(String seriesId, ApiIndex index, AccessControlList acl) {
+  private void updateSeriesAclInIndex(String seriesId, ElasticsearchIndex index, AccessControlList acl) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating ACL of series {} in the {} index.", seriesId, index.getIndexName());
     Function<Optional<Series>, Optional<Series>> updateFunction = getAclUpdateFunction(seriesId, acl, orgId);
@@ -814,7 +814,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The API index to update
    */
   private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt,
-          ApiIndex index) {
+          ElasticsearchIndex index) {
     String orgId = securityService.getOrganization().getId();
     logger.debug("Updating theme property of series {} in the {} index.", seriesId, index.getIndexName());
     Function<Optional<Series>, Optional<Series>> updateFunction =
@@ -860,7 +860,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * @return the updated series (optional)
    */
   @SafeVarargs
-  private final Optional<Series> updateSeriesInIndex(String seriesId, ApiIndex index, String orgId,
+  private final Optional<Series> updateSeriesInIndex(String seriesId, ElasticsearchIndex index, String orgId,
           Function<Optional<Series>, Optional<Series>>... updateFunctions) {
     User user = securityService.getUser();
     Function<Optional<Series>, Optional<Series>> updateFunction = Arrays.stream(updateFunctions)

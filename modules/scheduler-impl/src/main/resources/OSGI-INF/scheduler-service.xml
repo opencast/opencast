@@ -8,7 +8,7 @@
   <service>
     <provide interface="org.osgi.service.cm.ManagedService"/>
     <provide interface="org.opencastproject.scheduler.api.SchedulerService"/>
-    <provide interface="org.opencastproject.api.index.rebuild.IndexProducer"/>
+    <provide interface="org.opencastproject.elasticsearch.index.rebuild.IndexProducer"/>
   </service>
   <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
              cardinality="1..1" policy="static" bind="setMessageSender"/>
@@ -28,6 +28,6 @@
              cardinality="0..n" policy="dynamic" bind="addCatalogUIAdapter" unbind="removeCatalogUIAdapter"/>
   <reference name="org-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
              cardinality="1..1" policy="static" bind="setOrgDirectoryService"/>
-  <reference name="api-index" interface="org.opencastproject.api.index.ApiIndex"
+  <reference name="elasticsearch-index" interface="org.opencastproject.elasticsearch.index.ElasticsearchIndex"
              bind="setIndex"/>
 </scr:component>

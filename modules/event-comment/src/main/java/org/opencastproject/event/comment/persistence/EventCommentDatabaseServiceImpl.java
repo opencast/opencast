@@ -22,12 +22,12 @@ package org.opencastproject.event.comment.persistence;
 
 import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.api.index.rebuild.IndexRebuildException;
-import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -90,7 +90,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   private ComponentContext cc;
 
   /** The elasticsearch indices */
-  private ApiIndex index;
+  private ElasticsearchIndex index;
 
   /** OSGi component activation callback */
   public void activate(ComponentContext cc) {
@@ -140,7 +140,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param index
    *          the API index.
    */
-  public void setIndex(ApiIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 
@@ -386,7 +386,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   private void updateIndex(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting,
-          String organization, User user, ApiIndex index) {
+          String organization, User user, ElasticsearchIndex index) {
     logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
     if (!hasComments && hasOpenComments) {
       throw new IllegalStateException(
@@ -432,7 +432,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   };
 
   @Override
-  public void repopulate(final ApiIndex index) throws IndexRebuildException {
+  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
     try {
       final int total = countComments();
       final int[] current = new int[1];

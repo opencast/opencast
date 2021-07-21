@@ -21,11 +21,11 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.objects.event.Event;
-import org.opencastproject.api.index.objects.event.EventIndexSchema;
-import org.opencastproject.api.index.objects.series.Series;
-import org.opencastproject.api.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.util.ListProviderUtil;
@@ -67,7 +67,7 @@ public class ContributorsListProvider implements ResourceListProvider {
 
   private final Set<String> excludeUserProvider = new HashSet<>();
   private UserDirectoryService userDirectoryService;
-  private ApiIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
   protected void activate(Map<String, Object> properties) {
     modified(properties);
@@ -93,7 +93,7 @@ public class ContributorsListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for the search index. */
-  public void setIndex(ApiIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }
 
