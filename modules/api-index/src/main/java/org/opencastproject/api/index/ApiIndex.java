@@ -81,7 +81,7 @@ import javax.xml.bind.Unmarshaller;
 public class ApiIndex extends AbstractElasticsearchIndex {
 
   /** The name of this index */
-  private static final String INDEX_NAME = "apiindex";
+  private static final String INDEX_NAME = "index";
 
   /** The required index version */
   private static final int INDEX_VERSION = 101;

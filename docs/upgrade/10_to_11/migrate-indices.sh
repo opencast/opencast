@@ -5,7 +5,7 @@ USER=""
 PASSWORD=""
 
 OLD_INDEX="adminui"  # Do not use external API index as source as that one doesn't contain themes!
-NEW_INDEX="apiindex"
+NEW_INDEX="index"
 
 # sub indices
 VERSION="version"
