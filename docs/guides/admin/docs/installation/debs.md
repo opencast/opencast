@@ -115,7 +115,7 @@ For a basic installation (All-In-One) just run:
     apt-get install opencast-9-allinone elasticsearch-oss activemq-dist
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
-that while the repository provides a packaged version of ffmpeg, your distribution may have a version which is
+that while the repository provides a packaged version of FFmpeg, your distribution may have a version which is
 pre-installed or otherwise takes precedence.  This version may work, however Opencast only formally supports the
 version(s) in the repository.  To install the Opencast version of ffmpeg add `ffmpeg-dist` to the end of the command above.
 

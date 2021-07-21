@@ -2,7 +2,7 @@
 
 ## Description
 The SegmentVideoWorkflowOperation will try to identify and mark different segments of a video. A new segment is created
-when a major change in the video occurs. This might be the case for example if the video is a screenrecording and the
+when a major change in the video occurs. This might be the case for example if the video is a screen recording and the
 slides which were shown change.
 If both tag and flavor are used, the the element will be chosen by tag AND flavor.
 

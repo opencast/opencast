@@ -23,6 +23,7 @@ package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -40,6 +41,7 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
 import java.util.Dictionary;
+import java.util.Objects;
 
 import javax.ws.rs.Path;
 
@@ -48,6 +50,7 @@ import javax.ws.rs.Path;
 public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedService {
 
   private AclServiceFactory aclServiceFactory;
+  private AssetManager assetManager;
   private AdminUISearchIndex index;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
@@ -160,6 +163,16 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   @Override
+  public AssetManager getAssetManager() {
+    return assetManager;
+  }
+
+  /** OSGi DI. */
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
+  }
+
+  @Override
   public SchedulerService getSchedulerService() {
     return schedulerService;
   }
@@ -211,14 +224,10 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
             this.getClass().getSimpleName());
 
     Object dictionaryValue = properties.get(EVENTMODAL_ONLYSERIESWITHWRITEACCESS_KEY);
-    if (dictionaryValue != null) {
-      onlySeriesWithWriteAccessEventModal = BooleanUtils.toBoolean(dictionaryValue.toString());
-    }
+    onlySeriesWithWriteAccessEventModal = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
 
     dictionaryValue = properties.get(EVENTSTAB_ONLYEVENTSWITHWRITEACCESS_KEY);
-    if (dictionaryValue != null) {
-      onlyEventsWithWriteAccessEventsTab = BooleanUtils.toBoolean(dictionaryValue.toString());
-    }
+    onlyEventsWithWriteAccessEventsTab = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
   }
 
   @Override

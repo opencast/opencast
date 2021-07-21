@@ -6,7 +6,7 @@ The MultiencodeWorkflowHandler is used to encode source media into multiple form
 The source recording are selected by source-flavors AND source-tags.
 Each source media selector (eg presenter or presentation) can have an independent set of encoding profile ids
 (one for each target recording) and target tags.
-Encoding of each source medium runs as one ffmpeg command.
+Encoding of each source medium runs as one FFmpeg command.
 This operation will generate one multiencode operation per source medium,
 all of them running concurrently on the same or on different workers.
 In addition, the target media can be optionally tagged with the encoding profile ids.
@@ -67,7 +67,7 @@ The target flavors are additionally tagged with encoding profiles, so that they 
 This workflow supports HLS adaptive streaming.
 By:
   1) Using only H.264/HENV encodings in the list of encoding profiles. 
-  2) In the encoding profile, use the "-<option>:<a or v>" form in ffmpeg options when appropiate
+  2) In the encoding profile, use the "-<option>:<a or v>" form in FFmpeg options when appropriate
   (eg: "-b:a" instead of "-ab"),
   and add the suffix ":v" for options that apply to video and ":a" to options that apply to audio,
   (eg: -maxrate:v, -g:v )
@@ -96,7 +96,7 @@ Without HLS, it will look like the following.
 |target-flavors     | */preview                | Specifies the flavor of the new media                               |
 |target-tags        | rss,archive              | Specifies the tags of the new media                                 |
 |encoding-profiles  | mp4-low.http,mp4-medium.http*;*mp4-hd.http,mp4-hd.http | Encoding profiles for each source flavor |
-|tag-with-profile   | true (default to false)  | target medium are tagged with coresponding encoding profile Id      |
+|tag-with-profile   | true (default to false)  | target medium are tagged with corresponding encoding profile Id      |
 
 
 
@@ -117,10 +117,10 @@ Without HLS, it will look like the following.
     </operation>
 
 ## Note: (Important)
-Each source flavor generates all the target formats in one ffmpeg call by incorporating relevant parts
+Each source flavor generates all the target formats in one FFmpeg call by incorporating relevant parts
 of the encoding profile commands.
 
-* Care must be taken that no ffmpeg complex filters are used in the encoding profiles used for this workflow,
+* Care must be taken that no FFmpeg complex filters are used in the encoding profiles used for this workflow,
 as it can cause a conflict.
 
 * Encoded target recording are distinguished by the suffix, it is important that all the encoding profiles used have

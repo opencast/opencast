@@ -31,6 +31,7 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -47,6 +48,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -91,21 +93,26 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
 
     // Check which tags have been configured
-    String sourceTagsOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_SOURCE_TAGS));
-    String sourceFlavorOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_SOURCE_FLAVOR));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.many, Configuration.many, Configuration.none, Configuration.one);
+    List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
+    List<MediaPackageElementFlavor> sourceFlavorOptionList = tagsAndFlavors.getSrcFlavors();
     String targetFlavorOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_TARGET_FLAVOR));
 
     AbstractMediaPackageElementSelector<MediaPackageElement> elementSelector = new SimpleElementSelector();
 
     // Make sure either one of tags or flavors are provided
-    if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorOption)) {
+    if (sourceTagsOption.isEmpty() && sourceFlavorOptionList.isEmpty()) {
       logger.info("No source tags or flavors have been specified, not matching anything. Operation will be skipped.");
       return createResult(mediaPackage, Action.SKIP);
     }
 
     // if no source-favor is specified, all flavors will be checked for given tags
-    if (sourceFlavorOption == null) {
-      sourceFlavorOption = "*/*";
+    MediaPackageElementFlavor sourceFlavorOption;
+    if (sourceFlavorOptionList.isEmpty()) {
+      sourceFlavorOption = new MediaPackageElementFlavor("*","*");
+    } else {
+      sourceFlavorOption = sourceFlavorOptionList.get(0);
     }
 
     StringBuilder sb = new StringBuilder();
@@ -116,11 +123,11 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     logger.debug(sb.toString());
 
     // Select the source flavors
-    MediaPackageElementFlavor sourceFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavorOption);
+    MediaPackageElementFlavor sourceFlavor = sourceFlavorOption;
     elementSelector.addFlavor(sourceFlavor);
 
     // Select the source tags
-    for (String tag : asList(sourceTagsOption)) {
+    for (String tag : sourceTagsOption) {
       elementSelector.addTag(tag);
     }
 

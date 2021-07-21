@@ -28,6 +28,7 @@ import static org.junit.Assert.fail;
 
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -38,7 +39,6 @@ import java.io.FileInputStream;
 import java.net.URI;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Test case used to make sure the media package builder works as expected.
@@ -110,7 +110,7 @@ public class MediaPackageBuilderTest extends AbstractMediaPackageTest {
    */
   @Test
   public void testLoadFromNode() throws Exception {
-    DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
     Document xml = docBuilder.parse(manifestFile);
     MediaPackage mediaPackage = mediaPackageBuilder.loadFromXml(xml);
 

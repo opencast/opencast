@@ -86,7 +86,8 @@
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(seriesCatalog.flavor)">
+                    params="row" save="getSaveFunction(seriesCatalog.flavor)"
+                    sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
             </table>
@@ -112,7 +113,8 @@
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(catalog.flavor)">
+                    params="row" save="getSaveFunction(catalog.flavor)"
+                    sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
             </table>
@@ -161,7 +163,7 @@
                                     ng-options="id as name for (id, name) in acls"
                                     placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                     no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                    />
+                                    ></select>
                           </div>
                         </td>
                       </tr>
@@ -212,21 +214,19 @@
                                     call-on-search="getMatchingRoles"
                                     placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                     no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
-                                    />
+                                    ></select>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
-                                   ng-disabled="::aclLocked"
                                    ng-model="policy.read"
                                    ng-change="accessSave()"
-                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked"/>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
-                                   ng-disabled="::aclLocked"
                                    ng-model="policy.write"
                                    ng-change="accessSave()"
-                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked"/>
                           </td>
                           <td class="fit editable" ng-if="hasActions">
                             <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"

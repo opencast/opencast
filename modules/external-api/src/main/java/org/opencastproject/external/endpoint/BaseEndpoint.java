@@ -30,6 +30,7 @@ import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.index.ExternalIndex;
+import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
@@ -60,8 +61,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -80,7 +79,8 @@ import javax.ws.rs.core.Response;
  */
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
+            ApiMediaType.VERSION_1_6_0 })
 @RestService(name = "externalapiservice", title = "External API Service", notes = {},
              abstractText = "Provides a location for external apis to query the current server of the API.")
 public class BaseEndpoint {
@@ -101,6 +101,8 @@ public class BaseEndpoint {
   private SecurityService securityService;
   private ExternalIndex externalIndex;
 
+  private IndexRebuildService indexRebuildService = null;
+
   /** OSGi DI */
   void setExternalIndex(ExternalIndex externalIndex) {
     this.externalIndex = externalIndex;
@@ -109,6 +111,10 @@ public class BaseEndpoint {
   /** OSGi DI */
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  public void setIndexRebuildService(IndexRebuildService indexRebuildService) {
+    this.indexRebuildService = indexRebuildService;
   }
 
   /** OSGi activation method */
@@ -229,6 +235,7 @@ public class BaseEndpoint {
     versions.add(v(ApiVersion.VERSION_1_3_0.toString()));
     versions.add(v(ApiVersion.VERSION_1_4_0.toString()));
     versions.add(v(ApiVersion.VERSION_1_5_0.toString()));
+    versions.add(v(ApiVersion.VERSION_1_6_0.toString()));
     JValue json = obj(f("versions", arr(versions)), f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
   }
@@ -269,7 +276,7 @@ public class BaseEndpoint {
           description = "Repopulates the external Index from an specific service",
           returnDescription = "OK if repopulation has started", pathParameters = {
           @RestParameter(name = "service", isRequired = true, description = "The service to recreate index from. "
-                  + "The available services are: Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
+                  + "The available services are: Series, Scheduler, Workflow, AssetManager and Comments. "
                   + "The service order (see above) is very important! Make sure, you do not run index rebuild for more than one "
                   + "service at a time!",
                   type = RestParameter.Type.STRING) }, responses = {
@@ -280,13 +287,7 @@ public class BaseEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
-        externalIndex.recreateIndex(service);
-      } catch (InterruptedException e) {
-        logger.error("Repopulating the index was interrupted", e);
-      } catch (CancellationException e) {
-        logger.trace("Listening for index messages has been cancelled.");
-      } catch (ExecutionException e) {
-        logger.error("Repopulating the index failed to execute", e);
+        indexRebuildService.rebuildIndex(externalIndex, service);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -304,14 +305,8 @@ public class BaseEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the external index");
-        externalIndex.recreateIndex();
+        indexRebuildService.rebuildIndex(externalIndex);
         logger.info("Finished repopulating the external index");
-      } catch (InterruptedException e) {
-        logger.error("Repopulating the external index was interrupted", e);
-      } catch (CancellationException e) {
-        logger.trace("Listening for external index messages has been cancelled.");
-      } catch (ExecutionException e) {
-        logger.error("Repopulating the external index failed to execute", e);
       } catch (Throwable t) {
         logger.error("Repopulating the external index failed", t);
       }

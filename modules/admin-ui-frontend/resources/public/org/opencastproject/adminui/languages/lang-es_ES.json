@@ -428,7 +428,7 @@
             "LAST_NAME": "Apellido(s)",
             "STREET": "Calle",
             "NUMBER": "Número",
-            "ADDITIONAL_ADRESS_INFO": "Dirección",
+            "ADDITIONAL_ADDRESS_INFO": "Agregar información de la dirección ",
             "MAIL": "E-Mail",
             "CONTACT_ME": "Contactar conmigo para actualizaciones y problemas de seguridad",
             "WHICH_DATA_TO_SHARE": "¿Qué quieres compartir?",
@@ -646,7 +646,7 @@
             "PROCESSED": "Procesado",
             "RECORDING_FAILURE": "Fallo en la grabación",
             "PROCESSING_FAILURE": "Fallo en el procesamiento",
-            "PROCESSING_CANCELED": "Procesamiento cancelado"
+            "PROCESSING_CANCELLED": "Procesamiento cancelado"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retirando",
@@ -894,7 +894,7 @@
                   "REVIEW": "Pendiente de revisar",
                   "ASYNC": "Pistas de A/V asíncronas",
                   "AUDIO_ISSUE": "Pista de audio no disponible o defectuosa",
-                  "CANCELED": "Evento cancelado",
+                  "CANCELLED": "Evento cancelado",
                   "CONFLICTING_METADATA": "Conflicto de metadatos",
                   "IMPROPER_POINT": "Punto inicial o final incorrecto",
                   "MISSING_AGREEMENT": "Acuerdo no disponible",
@@ -1609,7 +1609,7 @@
             "INSTANTIATED": "Instanciado",
             "DISPATCHING": "Asignando",
             "RESTART": "Reiniciar",
-            "CANCELED": "Cancelado",
+            "CANCELLED": "Cancelado",
             "WAITING": "Esperando"
          }
       },

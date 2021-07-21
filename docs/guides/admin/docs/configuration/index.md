@@ -21,7 +21,7 @@ General Configuration
 - [Metadata Configuration](metadata.md)
 - [Multi Tenancy Configuration](multi.tenancy.md)
 - [Trim Segments Configuration](trim-segments.md)
-- [Authentication, Autorization and User Management](security.md)
+- [Authentication, Authorizations, and User Management](security.md)
     - [CAS Security Configuration](security.cas.md)
     - [LDAP Authentication and Authorization (without CAS)](security.ldap.md)
     - [Moodle User Provider](security.user.moodle.md)

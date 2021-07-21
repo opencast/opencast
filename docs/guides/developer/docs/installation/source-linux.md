@@ -66,7 +66,6 @@ Please make sure to install the following dependencies.
 Required:
 
     java-1.8.0-openjdk-devel.x86_64 / openjdk-8-jdk (other jdk versions untested / Oracle JDK strongly not recommended)
-    elasticsearch = 7.9.x
     ffmpeg >= 3.2.4
     maven >= 3.1
     python
@@ -79,6 +78,7 @@ Required:
 Required as a service for running Opencast:
 
     ActiveMQ >= 5.10
+    elasticsearch = 7.9.x
 
 Required for some services. Some tests may be skipped and some features
 may not be usable if they are not installed. Hence, it's generally a good idea to
@@ -113,14 +113,22 @@ $ curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 $ sudo apt-get install -y nodejs
 ```
 
-### Install and start Elasticsearch with Docker
+### Install and start Elasticsearch and ActiveMQ with Docker
+
+You can use `docker-compose` to easily run both ActiveMQ and Elasticsearch:
 
 ```sh
-$ docker run -d --rm --name oc-elasticsearch -p 9200:9200 -p 9300:9300 -e discovery.type=single-node elasticsearch:7.5.1
+$ cd docs/scripts/devel-dependency-containers
+$ docker-compose up -d
 ```
 
-Note that `--rm` automatically removes the container when it exits,
-so if it does you will need to start it again in order to run opencast properly.
+To shut the services down ahain, run:
+
+```sh
+$ cd docs/scripts/devel-dependency-containers
+$ docker-compose down
+```
+
 
 ### Set System Java JDK
 

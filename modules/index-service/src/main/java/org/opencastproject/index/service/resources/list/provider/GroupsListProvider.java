@@ -77,7 +77,7 @@ public class GroupsListProvider implements ResourceListProvider {
     }
 
     try {
-      groups = groupRoleProvider.getGroupsAsJson(limit, offset).getGroups();
+      groups = groupRoleProvider.getGroups(limit, offset).getGroups();
     } catch (IOException e) {
       logger.error("Not able to get the group list: " + e);
       return groupsList;

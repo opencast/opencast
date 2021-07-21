@@ -8,7 +8,7 @@ import Pagination from "react-js-pagination";
 import Helmet from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faEdit, faDownload } from "@fortawesome/free-solid-svg-icons";
-import i18next from "i18next";
+import * as i18next from "i18next";
 import { parsedQueryString, capitalize } from "../utils";
 import { sortByType } from "../trackUtils";
 import Dropdown from "react-bootstrap/esm/Dropdown";
@@ -86,7 +86,7 @@ const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, delete
                     </Dropdown.Toggle>
                     <DropdownMenu>
                       {sortByType(episode.mediapackage.tracks).map((track) => {
-                          if (track !== undefined && (track.url.endsWith('mp4') || track.url.endsWith('webm'))) {
+                          if (track.url.endsWith('mp4') || track.url.endsWith('webm')) {
                             return (
                               <Dropdown.Item onClick={(e) => { downloadCallback(track); e.stopPropagation(); }} >
                                 {capitalize(track.type.split('/')[0])} <br/>

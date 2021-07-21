@@ -57,6 +57,7 @@ import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -96,13 +97,8 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private static final Logger logger = LoggerFactory.getLogger(ImageWorkflowOperationHandler.class);
 
   // legacy option
-  public static final String OPT_SOURCE_FLAVOR = "source-flavor";
-  public static final String OPT_SOURCE_FLAVORS = "source-flavors";
-  public static final String OPT_SOURCE_TAGS = "source-tags";
   public static final String OPT_PROFILES = "encoding-profile";
   public static final String OPT_POSITIONS = "time";
-  public static final String OPT_TARGET_FLAVOR = "target-flavor";
-  public static final String OPT_TARGET_TAGS = "target-tags";
   public static final String OPT_TARGET_BASE_NAME_FORMAT_SECOND = "target-base-name-format-second";
   public static final String OPT_TARGET_BASE_NAME_FORMAT_PERCENT = "target-base-name-format-percent";
   public static final String OPT_END_MARGIN = "end-margin";
@@ -142,7 +138,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           throws WorkflowOperationException {
     logger.debug("Running image workflow operation on {}", wi);
     try {
-      final Extractor e = new Extractor(this, configure(wi.getMediaPackage(), wi.getCurrentOperation()));
+      final Extractor e = new Extractor(this, configure(wi.getMediaPackage(), wi));
       return e.main(MediaPackageSupport.copy(wi.getMediaPackage()));
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
@@ -440,7 +436,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     private final List<Track> sourceTracks;
     private final List<MediaPosition> positions;
     private final List<EncodingProfile> profiles;
-    private final Opt<MediaPackageElementFlavor> targetImageFlavor;
+    private final List<MediaPackageElementFlavor> targetImageFlavor;
     private final List<String> targetImageTags;
     private final Opt<String> targetBaseNameFormatSecond;
     private final Opt<String> targetBaseNameFormatPercent;
@@ -449,7 +445,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     Cfg(List<Track> sourceTracks,
         List<MediaPosition> positions,
         List<EncodingProfile> profiles,
-        Opt<MediaPackageElementFlavor> targetImageFlavor,
+        List<MediaPackageElementFlavor> targetImageFlavor,
         List<String> targetImageTags,
         Opt<String> targetBaseNameFormatSecond,
         Opt<String> targetBaseNameFormatPercent,
@@ -466,23 +462,29 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   }
 
   /** Get and parse the configuration options. */
-  private Cfg configure(MediaPackage mp, WorkflowOperationInstance woi) throws WorkflowOperationException {
+  private Cfg configure(MediaPackage mp, WorkflowInstance wi) throws WorkflowOperationException {
+    WorkflowOperationInstance woi = wi.getCurrentOperation();
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
+        Configuration.many, Configuration.many, Configuration.many, Configuration.one);
     final List<EncodingProfile> profiles = getOptConfig(woi, OPT_PROFILES).toStream().bind(asList.toFn())
             .map(fetchProfile(composerService)).toList();
-    final List<String> targetImageTags = getOptConfig(woi, OPT_TARGET_TAGS).toStream().bind(asList.toFn()).toList();
-    final Opt<MediaPackageElementFlavor> targetImageFlavor =
-            getOptConfig(woi, OPT_TARGET_FLAVOR).map(MediaPackageElementFlavor.parseFlavor.toFn());
+    final List<String> targetImageTags = tagsAndFlavors.getTargetTags();
+    final List<MediaPackageElementFlavor> targetImageFlavor = tagsAndFlavors.getTargetFlavors();
     final List<Track> sourceTracks;
     {
-      // get the source flavors
-      final Stream<MediaPackageElementFlavor> sourceFlavors = getOptConfig(woi, OPT_SOURCE_FLAVORS).toStream()
-              .bind(Strings.splitCsv)
-              .append(getOptConfig(woi, OPT_SOURCE_FLAVOR))
-              .map(MediaPackageElementFlavor.parseFlavor.toFn());
       // get the source tags
-      final Stream<String> sourceTags = getOptConfig(woi, OPT_SOURCE_TAGS).toStream().bind(Strings.splitCsv);
-      // fold both into a selector
-      final TrackSelector trackSelector = sourceTags.apply(tagFold(sourceFlavors.apply(flavorFold(new TrackSelector()))));
+      final List<String> sourceTags = tagsAndFlavors.getSrcTags();
+      final List<MediaPackageElementFlavor> sourceFlavors = tagsAndFlavors.getSrcFlavors();
+      TrackSelector trackSelector = new TrackSelector();
+
+      //add tags and flavors to TrackSelector
+      for (String tag : sourceTags) {
+        trackSelector.addTag(tag);
+      }
+      for (MediaPackageElementFlavor flavor : sourceFlavors) {
+        trackSelector.addFlavor(flavor);
+      }
+
       // select the tracks based on source flavors and tags and skip those that don't have video
       sourceTracks = trackSelector.select(mp, true).stream()
           .filter(Track::hasVideo)

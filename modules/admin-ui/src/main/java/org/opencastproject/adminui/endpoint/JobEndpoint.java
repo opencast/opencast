@@ -35,8 +35,6 @@ import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.matterhorn.search.SearchQuery;
-import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
@@ -55,6 +53,8 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
+import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -246,8 +246,8 @@ public class JobEndpoint {
       try {
         SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
         sortKey = JobSort.valueOf(sortCriterion.getFieldName().toUpperCase());
-        ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
-                || SearchQuery.Order.None == sortCriterion.getOrder();
+        ascending = Order.Ascending == sortCriterion.getOrder()
+                || Order.None == sortCriterion.getOrder();
       } catch (WebApplicationException ex) {
         logger.warn("Failed to parse sort criterion \"{}\", invalid format.", sort);
       } catch (IllegalArgumentException ex) {
@@ -359,8 +359,8 @@ public class JobEndpoint {
       try {
         SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
         Sort sortKey = Sort.valueOf(sortCriterion.getFieldName().toUpperCase());
-        boolean ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
-                || SearchQuery.Order.None == sortCriterion.getOrder();
+        boolean ascending = Order.Ascending == sortCriterion.getOrder()
+                || Order.None == sortCriterion.getOrder();
 
         query.withSort(sortKey, ascending);
       } catch (WebApplicationException ex) {

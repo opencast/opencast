@@ -142,10 +142,10 @@ public class StaticResourceServlet extends HttpServlet {
   public void activate(ComponentContext cc) {
     if (cc == null) {
       // set defaults
-      authRequired = false;
+      authRequired = true;
       xAccelRedirect = null;
     } else {
-      authRequired = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get(PROP_AUTH_REQUIRED), "false"));
+      authRequired = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get(PROP_AUTH_REQUIRED), "true"));
 
       xAccelRedirect = Objects.toString(cc.getProperties().get(PROP_X_ACCEL_REDIRECT), null);
 

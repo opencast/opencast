@@ -20,4 +20,7 @@
              cardinality="1..1"
              policy="static"
              bind="setExternalIndex"/>
+  <reference name="IndexRebuildService"
+             interface="org.opencastproject.index.rebuild.IndexRebuildService"
+             bind="setIndexRebuildService"/>
 </scr:component>

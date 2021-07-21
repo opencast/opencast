@@ -39,11 +39,11 @@ import org.opencastproject.editor.api.SegmentData;
 import org.opencastproject.editor.api.TrackData;
 import org.opencastproject.editor.api.TrackSubData;
 import org.opencastproject.editor.api.WorkflowData;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
-import org.opencastproject.index.service.impl.index.event.Event;
-import org.opencastproject.index.service.impl.index.event.EventUtils;
-import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -610,9 +610,11 @@ public class EditorServiceImpl implements EditorService {
 
   @Override
   public EditingData getEditData(final String mediaPackageId) throws EditorServiceException {
-    // Select tracks
+
     Event event = getEvent(mediaPackageId);
     MediaPackage mp = getMediaPackage(event);
+
+    boolean workflowActive = WorkflowUtil.isActive(event.getWorkflowState());
 
     final Opt<Publication> internalPubOpt = getInternalPublication(mp);
     if (internalPubOpt.isNone() || internalPubOpt.isEmpty()) {
@@ -676,7 +678,7 @@ public class EditorServiceImpl implements EditorService {
     }).collect(Collectors.toList());
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName());
+            event.getSeriesId(), event.getSeriesName(), workflowActive);
   }
 
   private MediaPackage getMediaPackage(Event event) throws EditorServiceException {

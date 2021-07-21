@@ -48,6 +48,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.framework.BundleContext;
@@ -88,8 +89,16 @@ public class ListProvidersEndpoint {
   private ListProvidersService listProvidersService;
   private SeriesEndpoint seriesEndpoint;
 
+  /** This regex is used to reduce the users in the filter selectbox.
+   * The filter is located in the top right corner in the admin ui. */
+  private static final String PROP_KEY_USER_FILTER_REGEX = "org.opencastproject.adminui.filter.user.regex";
+  private static final String PROP_KEY_USER_FILTER_REGEX_DEFAULT = ".*";
+
   protected void activate(BundleContext bundleContext) {
     logger.info("Activate list provider service");
+    JSONUtils.setUserRegex(StringUtils.defaultIfBlank(
+            bundleContext.getProperty(PROP_KEY_USER_FILTER_REGEX),
+            PROP_KEY_USER_FILTER_REGEX_DEFAULT));
   }
 
   /** OSGi callback for series services. */

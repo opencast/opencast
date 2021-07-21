@@ -145,7 +145,7 @@ public class ImageWorkflowOperationHandlerTest {
 
   private Cfg cfg(Opt<String> targetBaseNamePatternSecond, Opt<String> targetBaseNamePatternPercent) {
     return new Cfg(l.<Track> nil(), l.<MediaPosition> nil(), l.<EncodingProfile> nil(),
-            Opt.<MediaPackageElementFlavor> none(), l.<String> nil(), targetBaseNamePatternSecond,
+            l.<MediaPackageElementFlavor> nil(), l.<String> nil(), targetBaseNamePatternSecond,
             targetBaseNamePatternPercent, 0);
   }
 

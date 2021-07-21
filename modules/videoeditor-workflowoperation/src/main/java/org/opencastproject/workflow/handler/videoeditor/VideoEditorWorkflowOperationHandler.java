@@ -46,6 +46,7 @@ import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -68,6 +69,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -299,14 +301,17 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     logger.info("Skip video editor operation for mediapackage {}", mp.getIdentifier().toString());
 
     // Get configuration
+    // Check which tags have been configured
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.many, Configuration.none, Configuration.none);
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
+    List <MediaPackageElementFlavor> fallbackSourceFlavor = new ArrayList<MediaPackageElementFlavor>();
     String sourceTrackFlavorsProperty = StringUtils
             .trimToNull(worflowOperationInstance.getConfiguration(SKIPPED_FLAVORS_PROPERTY));
     if (sourceTrackFlavorsProperty == null || sourceTrackFlavorsProperty.isEmpty()) {
       logger.info("\"{}\" option not set, use value of \"{}\"", SKIPPED_FLAVORS_PROPERTY, SOURCE_FLAVORS_PROPERTY);
-      sourceTrackFlavorsProperty = StringUtils
-              .trimToNull(worflowOperationInstance.getConfiguration(SOURCE_FLAVORS_PROPERTY));
-      if (sourceTrackFlavorsProperty == null) {
+      fallbackSourceFlavor = tagsAndFlavors.getSrcFlavors();
+      if (fallbackSourceFlavor.isEmpty()) {
         throw new WorkflowOperationException(
                 format("Required configuration property %s not set.", SOURCE_FLAVORS_PROPERTY));
       }
@@ -327,9 +332,16 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
 
     // Get source tracks
     TrackSelector trackSelector = new TrackSelector();
-    for (String flavor : asList(sourceTrackFlavorsProperty)) {
-      trackSelector.addFlavor(flavor);
+    if (sourceTrackFlavorsProperty != null && !sourceTrackFlavorsProperty.isEmpty()) {
+      for (String flavor : asList(sourceTrackFlavorsProperty)) {
+        trackSelector.addFlavor(flavor);
+      }
+    } else {
+      for (MediaPackageElementFlavor flavor : fallbackSourceFlavor) {
+        trackSelector.addFlavor(flavor);
+      }
     }
+
     Collection<Track> sourceTracks = trackSelector.select(mp, false);
 
     for (Track sourceTrack : sourceTracks) {

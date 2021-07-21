@@ -35,7 +35,7 @@ import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.api.query.VersionField;
-import org.opencastproject.assetmanager.impl.AbstractAssetManager;
+import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.assetmanager.impl.persistence.QPropertyDto;
@@ -57,9 +57,9 @@ import javax.annotation.Nonnull;
 public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
   private static final Stream<QSnapshotDto> FROM_SNAPSHOT = $Q_SNAPSHOT;
 
-  private final AbstractAssetManager am;
+  private final AssetManagerImpl am;
 
-  public AQueryBuilderImpl(AbstractAssetManager am) {
+  public AQueryBuilderImpl(AssetManagerImpl am) {
     this.am = am;
   }
 

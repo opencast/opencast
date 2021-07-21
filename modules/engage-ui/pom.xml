@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -90,7 +90,6 @@
                         <file file="node_modules/requirejs/require.js" />
                         <file file="node_modules/seedrandom/seedrandom.min.js" />
                         <file file="node_modules/underscore/underscore.js" />
-                        <file file="node_modules/underscore/underscore.js.map" />
                       </resources>
                     </copy>
                   </target>
@@ -124,7 +123,6 @@
                 </goals>
                 <configuration>
                   <nodeVersion>${node.version}</nodeVersion>
-                  <npmVersion>${npm.version}</npmVersion>
                 </configuration>
               </execution>
 
@@ -167,7 +165,6 @@
                         <file file="node_modules/requirejs/require.js" />
                         <file file="node_modules/seedrandom/seedrandom.min.js" />
                         <file file="node_modules/underscore/underscore.js" />
-                        <file file="node_modules/underscore/underscore.js.map" />
                       </resources>
                     </copy>
                   </target>

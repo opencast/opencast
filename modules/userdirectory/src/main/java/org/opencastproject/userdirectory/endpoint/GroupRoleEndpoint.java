@@ -47,8 +47,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -116,11 +114,10 @@ public class GroupRoleEndpoint {
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
   public Response getGroupsAsJsonOrXml(@PathParam("format") String format, @QueryParam("limit") int limit,
-          @QueryParam("offset") int offset)
-          throws IOException {
+          @QueryParam("offset") int offset) {
     try {
       final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
-      JaxbGroupList list = jpaGroupRoleProvider.getGroupsAsXml(limit, offset);
+      JaxbGroupList list = jpaGroupRoleProvider.getGroups(limit, offset);
       return Response.ok().entity(list).type(type).build();
     } catch (Exception e) {
       logger.info("Unable to get groups", e);

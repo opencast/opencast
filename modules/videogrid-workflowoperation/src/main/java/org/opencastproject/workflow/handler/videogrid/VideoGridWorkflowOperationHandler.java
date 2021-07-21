@@ -45,6 +45,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.videogrid.api.VideoGridService;
 import org.opencastproject.videogrid.api.VideoGridServiceException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -98,9 +99,6 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
 
   private static final String OPT_RESOLUTION = "resolution";
   private static final String OPT_BACKGROUND_COLOR = "background-color";
-
-  private static final String TARGET_FLAVOR = "target-flavor";
-  private static final String OPT_TARGET_TAGS = "target-tags";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(VideoGridWorkflowOperationHandler.class);
@@ -370,21 +368,18 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     logger.debug("Running videogrid workflow operation on workflow {}", workflowInstance.getId());
 
     final MediaPackage mediaPackage = (MediaPackage) workflowInstance.getMediaPackage().clone();
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.many, Configuration.many, Configuration.one);
 
     // Read config options
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     final MediaPackageElementFlavor smilFlavor = MediaPackageElementFlavor.parseFlavor(
             getConfig(operation, SOURCE_SMIL_FLAVOR));
-    final MediaPackageElementFlavor targetPresenterFlavor = MediaPackageElementFlavor.parseFlavor(
-            getConfig(operation, TARGET_FLAVOR));
+    final MediaPackageElementFlavor targetPresenterFlavor = tagsAndFlavors.getSingleTargetFlavor();
     String concatEncodingProfile = StringUtils.trimToNull(operation.getConfiguration(CONCAT_ENCODING_PROFILE));
 
     // Get source flavors
-    String sourceFlavorNames = operation.getConfiguration(SOURCE_FLAVORS);
-    final List<MediaPackageElementFlavor> sourceFlavors = new ArrayList<>();
-    for (String flavorName : asList(sourceFlavorNames)) {
-      sourceFlavors.add(MediaPackageElementFlavor.parseFlavor(flavorName));
-    }
+    final List<MediaPackageElementFlavor> sourceFlavors = tagsAndFlavors.getSrcFlavors();
 
     // Get tracks from flavor
     final List<Track> sourceTracks = new ArrayList<>();
@@ -430,8 +425,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     logger.info("The background color of the final video: {}", bgColor);
 
     // Target tags
-    String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration(OPT_TARGET_TAGS));
-    List<String> targetTags = asList(targetTagsOption);
+    List<String> targetTags = tagsAndFlavors.getTargetTags();
 
     // Define general layout for the final video
     LayoutArea layoutArea = new LayoutArea("webcam", 0, 0, resolution.getLeft(), resolution.getRight(),

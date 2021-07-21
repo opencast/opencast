@@ -216,8 +216,8 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
       }
     } else {
       url.append("/series.xml?");
-      queryStringParams.add(new BasicNameValuePair("series", Boolean.toString(q.isIncludeSeries())));
-      queryStringParams.add(new BasicNameValuePair("episodes", Boolean.toString(q.isIncludeEpisodes())));
+      queryStringParams.add(new BasicNameValuePair("series", Boolean.toString(q.willIncludeSeries())));
+      queryStringParams.add(new BasicNameValuePair("episodes", Boolean.toString(q.willIncludeEpisodes())));
     }
 
     // General query parameters

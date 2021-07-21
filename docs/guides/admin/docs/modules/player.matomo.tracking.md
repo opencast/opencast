@@ -51,7 +51,7 @@ Comment this property to prevent event tracking.
 Events that can be tracked:
 
 * play: play has been pressed (will also be called if after seeking).
-* pause: pause has been pressend (will also be called if before seeking).
+* pause: pause has been pressed (will also be called if before seeking).
 * seek: user jumps to a different time. Time in seconds will be stored
 * ended: video has reached the end
 * playbackrate: user changes the playback speed (values 0.75 to 3.00)

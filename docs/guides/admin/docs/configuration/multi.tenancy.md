@@ -4,7 +4,7 @@ Multi Tenancy Configuration
 Introduction
 ------------
 
-A single Opencast instance can handle mutliple tenants, each of which have their own recordings in the system.
+A single Opencast instance can handle multiple tenants, each of which have their own recordings in the system.
 Opencast refers to tenants as *organizations*, and an HTTP request to the Opencast installation is mapped to an
 organization using the server name. Therefore, a Opencast instance will usually be set up with multiple DNS names
 pointing to the same IP, for example:
@@ -24,7 +24,7 @@ Out of the box, Opencast has one tenant configured, called `mh_default_org` that
 `localhost:8080`. As long as there is one tenant configuration only, Opencast will map every request to that tenant
 regardless of the server name. As soon as a second tenant configuration is available, requests will be mapped to
 organizations using the server name, and an HTTP status code 404 will be returned for requests that hit the Opencast
-intallation that cannot be mapped to any organization.
+installation that cannot be mapped to any organization.
 
 
 ### Limitations
@@ -37,25 +37,26 @@ Adding A Tenant
 ---------------
 
 To add a tenant to the installation, two things need to be put in place: a tenant configuration and a set of security
-rules. For this example we have a three node install of `admin.opencast.org`, `worker.opencast.org`, and
-`presentation.opencast.org`.  Assume that the new tenant is called `tenant1` and should be mapped to
-`tenant1-*.opencast.org`.
+rules. For this example we have a three node install of `admin.example.org`, `worker.example.org`, and
+`presentation.example.org`.  Assume that the new tenant is called `tenant1` and should be mapped to
+`tenant1-*.example.org`.
 
-### Tenant Configuration
+### Step 1: Tenant Configuration
 
 Create a file called org.opencastproject.organization-tenant1.cfg in the `etc/` directory of your Opencast
 installation, on each of the nodes.  As an example, this is what the admin node looks like:
 
     id=tenant1
     name=Tenant 1
-    server=tenant1-admin.opencast.org,tenant1-presentation.opencast.org
     port=8080
+    prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org
+    prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
     admin_role=ROLE_ADMIN
     anonymous_role=ROLE_ANONYMOUS
 
     # Admin and Presentation Server Urls
-    prop.org.opencastproject.admin.ui.url=https://tenant1-admin.opencast.org
-    prop.org.opencastproject.engage.ui.url=https://tenant1-presentation.opencast.org
+    prop.org.opencastproject.admin.ui.url=https://tenant1-admin.example.org
+    prop.org.opencastproject.engage.ui.url=https://tenant1-presentation.example.org
 
     # Default properties for the user interface
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
@@ -67,7 +68,8 @@ copy of the already existing `org.opencastproject.organization-mh_default_org.cf
 Note, the default organization file `org.opencastproject.organization-mh_default_org.org` *must* refer to the actual
 server names:
 
-    server=admin.opencast.org
+    prop.org.opencastproject.host.admin.example.org=admin.example.org
+    prop.org.opencastproject.host.presentation.example.org=presentation.example.org
 
 This file sets the default organization that is selected.  This is currently required because some Opencast components
 do not support multitenancy.
@@ -75,26 +77,16 @@ do not support multitenancy.
 Note that if you are running Apache httpd with mod\_proxy in front of the Opencast installation, the port number will be
 -1 in both files.
 
-### Tenant-specific capture agent users
+### Step 2: Security Configuration
 
-If you use tenant-specific capture agent users, you should use the `prop.org.opencastproject.host.<server url>` options
-to map the internal host addresses to the tenant specific ones in the endpoint services/available.
-Example:
-
-    prop.org.opencastproject.host.admin-presentation.opencast.com=tenant1.admin-presentation.opencast.com
-    prop.org.opencastproject.host.ingest.opencast.com=tenant1.ingest.opencast.com
-    prop.org.opencastproject.host.worker.opencast.com=tenant1.worker.opencast.com
-
-### Security Configuration
-
-Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual urls that specify
-which roles are needed in order to access a given url. In addition, it allows to define the directory services that are
+Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual URLs that specify
+which roles are needed in order to access a given URL. In addition, it allows to define the directory services that are
 used to authenticate users. The file follows the standard ways on configuring Spring Security and you are free to add
 anything that can go into a Spring Security configuration.
 
 The easiest way of creating that file is probably to create a copy of the already existing `mh_default_org.xml`.
 
-### Other Configuration
+### Step 3: Other Configuration
 
 Two additional files should be copied: `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg`
 should be copied to `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common-tenant1.cfg`, and

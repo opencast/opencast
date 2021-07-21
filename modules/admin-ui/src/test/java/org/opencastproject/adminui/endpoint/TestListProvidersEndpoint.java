@@ -23,6 +23,7 @@ package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.util.TestServiceRegistryFactory;
 import org.opencastproject.index.service.resources.list.provider.ServersListProvider;
+import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.impl.ListProvidersServiceImpl;
@@ -32,6 +33,9 @@ import org.opencastproject.security.api.SecurityService;
 
 import org.easymock.EasyMock;
 import org.junit.Ignore;
+import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +46,8 @@ import javax.ws.rs.Path;
 @Ignore
 public class TestListProvidersEndpoint extends ListProvidersEndpoint {
 
+  private static final Logger logger = LoggerFactory.getLogger(ListProvidersEndpoint.class);
+
   public static final String PROVIDER_NAME = "test";
   public static final String[] PROVIDER_VALUES = { "x", "a", "c", "z", "t", "h" };
   private final Map<String, String> baseMap = new HashMap<String, String>();
@@ -49,6 +55,11 @@ public class TestListProvidersEndpoint extends ListProvidersEndpoint {
   private ListProvidersServiceImpl listProvidersService = new ListProvidersServiceImpl();
   private SecurityService securityService;
   private Organization organization;
+
+  protected void activate(BundleContext bundleContext) {
+    logger.info("Activate list provider service");
+    JSONUtils.setUserRegex(".*");
+  }
 
   public TestListProvidersEndpoint() {
     this.securityService = EasyMock.createNiceMock(SecurityService.class);

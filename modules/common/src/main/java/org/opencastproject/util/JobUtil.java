@@ -194,7 +194,7 @@ public final class JobUtil {
     final Job.Status status = job.getStatus();
     // only create a barrier if the job is not done yet
     switch (status) {
-      case CANCELED:
+      case CANCELLED:
       case DELETED:
       case FAILED:
       case FINISHED:
@@ -242,7 +242,7 @@ public final class JobUtil {
    */
   public static boolean isReadyToDispatch(Job job) throws IllegalStateException {
     switch (job.getStatus()) {
-      case CANCELED:
+      case CANCELLED:
       case DELETED:
       case FAILED:
       case FINISHED:

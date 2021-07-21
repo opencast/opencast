@@ -65,7 +65,7 @@ only this will enable the recognition of special characters specific to your loc
 If you supply a reference to a list of additional words using `--user-words`, the path to that file must not be enclosed
 in quotation marks.
 
-Newer versions of Tesseract come with additional neural nets LSTM. Its performance might be significiantly different
+Newer versions of Tesseract come with additional neural nets LSTM. Its performance might be significantly different
 from the previous Tesseract engine. Its usage might be specified using `--oem N` with `N` being a number documented in
 your Tesseract manual.
 

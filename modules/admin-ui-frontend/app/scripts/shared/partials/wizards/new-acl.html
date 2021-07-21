@@ -14,6 +14,7 @@
                       class="hidden-input"
                       tabindex="1"
                       focushere
+                      sanitize-xml="wizard.step.metadata.name"
                       ng-model="wizard.step.metadata.name"
                       placeholder="{{ 'USERS.ACLS.NEW.METADATA.NAME.PLACEHOLDER' | translate }}">
                   </td>
@@ -61,7 +62,7 @@
                                          ng-options="id as name for (id, name) in wizard.step.acls"
                                          placeholder-text-single="'{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                          no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                         />
+                                         ></select>
                         </div>
                       </td>
                     </tr>
@@ -106,7 +107,7 @@
                                          ng-options="role as role for role in wizard.step.roles"
                                          placeholder-text-single="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.LABEL' | translate }}'"
                                          no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
-                                         />
+                                         ></select>
                         </td>
                         <td class="fit text-center"><input type="checkbox"  ng-model="policy.read"/></td>
                         <td class="fit text-center"><input type="checkbox"  ng-model="policy.write"/></td>
@@ -177,4 +178,3 @@
     </div>
   </div>
 </div>
-

@@ -21,23 +21,23 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
-import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.impl.index.series.SeriesIndexSchema;
-import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.series.Series;
+import org.opencastproject.elasticsearch.index.series.SeriesIndexSchema;
+import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.matterhorn.search.SearchIndexException;
-import org.opencastproject.matterhorn.search.SearchQuery;
-import org.opencastproject.matterhorn.search.SearchResult;
-import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -101,28 +101,28 @@ public class SeriesListProvider implements ResourceListProvider {
     SeriesSearchQuery seriesQuery = toSearchQuery(query);
     Map<String, String> result = new HashMap<>();
     if (TITLE.equals(listName)) {
-      seriesQuery.sortByTitle(SearchQuery.Order.Ascending);
+      seriesQuery.sortByTitle(SortCriterion.Order.Ascending);
       for (String title : searchIndex.getTermsForField(SeriesIndexSchema.TITLE,
           Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
         result.put(title, title);
       }
     } else if (CONTRIBUTORS.equals(listName)) {
-      seriesQuery.sortByContributors(SearchQuery.Order.Ascending);
+      seriesQuery.sortByContributors(SortCriterion.Order.Ascending);
       for (String contributor : searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS,
           Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
         result.put(contributor, contributor);
       }
     } else if (ORGANIZERS.equals(listName)) {
-      seriesQuery.sortByOrganizers(SearchQuery.Order.Ascending);
+      seriesQuery.sortByOrganizers(SortCriterion.Order.Ascending);
       for (String organizer : searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS,
           Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
         result.put(organizer, organizer);
       }
     } else {
       try {
-        seriesQuery.sortByTitle(SearchQuery.Order.Ascending);
-        seriesQuery.sortByCreatedDateTime(SearchQuery.Order.Descending);
-        seriesQuery.sortByOrganizers(SearchQuery.Order.Ascending);
+        seriesQuery.sortByTitle(SortCriterion.Order.Ascending);
+        seriesQuery.sortByCreatedDateTime(SortCriterion.Order.Descending);
+        seriesQuery.sortByOrganizers(SortCriterion.Order.Ascending);
         SearchResult searchResult = searchIndex.getByQuery(seriesQuery);
         Calendar calendar = Calendar.getInstance();
         for (SearchResultItem<Series> item : searchResult.getItems()) {

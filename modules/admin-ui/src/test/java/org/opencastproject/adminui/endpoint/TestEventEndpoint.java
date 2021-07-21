@@ -32,34 +32,34 @@ import static org.opencastproject.util.PropertiesUtil.toDictionary;
 import org.opencastproject.adminui.endpoint.AbstractEventEndpointTest.TestEnv;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.impl.SearchResultImpl;
+import org.opencastproject.elasticsearch.impl.SearchResultItemImpl;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.series.Series;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
-import org.opencastproject.index.service.impl.index.event.Event;
-import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
-import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentImpl;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.IncidentTreeImpl;
-import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.matterhorn.search.SearchResultItem;
-import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
-import org.opencastproject.matterhorn.search.impl.SearchResultItemImpl;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -243,8 +243,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     AclService aclService = EasyMock.createNiceMock(AclService.class);
     EasyMock.expect(aclService.getAcls()).andReturn(managedAcls).anyTimes();
-    EasyMock.expect(aclService.applyAclToEpisode(EasyMock.anyString(), EasyMock.anyObject(AccessControlList.class)))
-        .andReturn(true).anyTimes();
     EasyMock.replay(aclService);
 
     env.setAclService(aclService);
@@ -257,12 +255,12 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     job.setDateCreated(dateCreated);
     job.setDateCompleted(dateCompleted);
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
-    EasyMock.expect(serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
+    EasyMock.expect(serviceRegistry.createJob(EasyMock.anyObject(), EasyMock.anyObject(),
+            EasyMock.anyObject(), EasyMock.anyObject(), EasyMock.anyBoolean()))
             .andReturn(new JobImpl()).anyTimes();
-    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JobImpl()).anyTimes();
-    EasyMock.expect(serviceRegistry.getJobs((String) EasyMock.anyObject(), (Job.Status) EasyMock.anyObject()))
-            .andReturn(new ArrayList<Job>()).anyTimes();
+    EasyMock.expect(serviceRegistry.updateJob(EasyMock.anyObject())).andReturn(new JobImpl()).anyTimes();
+    EasyMock.expect(serviceRegistry.getJobs(EasyMock.anyObject(), EasyMock.anyObject()))
+            .andReturn(new ArrayList()).anyTimes();
     EasyMock.replay(serviceRegistry);
 
     // Org directory
@@ -544,6 +542,12 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       EasyMock.anyObject(AbstractSearchIndex.class))).andReturn(metaDataList).anyTimes();
     EasyMock.replay(indexService);
     env.setIndexService(indexService);
+
+    AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
+    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.some(new MediaPackageBuilderImpl()
+            .createNew())).anyTimes();
+    EasyMock.replay(assetManager);
+    env.setAssetManager(assetManager);
   }
 
   private Event createEvent(String id, String title, Source source) throws URISyntaxException {
@@ -669,6 +673,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   private Incident mkIncident(Severity s) throws Exception {
     Date date = new Date(DateTimeSupport.fromUTC("2014-06-05T09:15:56Z"));
     return new IncidentImpl(0, 0, "servicetype", "host", date, s, "code", Incidents.NO_DETAILS, Incidents.NO_PARAMS);
+  }
+
+  @Override
+  public AssetManager getAssetManager() {
+    return env.getAssetManager();
   }
 
   @Override

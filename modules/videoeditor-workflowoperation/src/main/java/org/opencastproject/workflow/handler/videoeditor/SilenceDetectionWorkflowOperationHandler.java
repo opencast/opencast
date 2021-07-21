@@ -40,6 +40,7 @@ import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
@@ -57,8 +58,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * workflowoperationhandler for silencedetection executes the silencedetection and adds a SMIL document to the
@@ -107,10 +110,9 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     MediaPackage mp = workflowInstance.getMediaPackage();
     logger.debug("Start silence detection workflow operation for mediapackage {}", mp.getIdentifier().toString());
 
-    String sourceFlavors = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
-            SOURCE_FLAVORS_PROPERTY));
-    String sourceFlavor = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
-            SOURCE_FLAVOR_PROPERTY));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.many, Configuration.none, Configuration.none);
+    List<MediaPackageElementFlavor> sourceFlavors = tagsAndFlavors.getSrcFlavors();
     String smilFlavorSubType = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
             SMIL_FLAVOR_SUBTYPE_PROPERTY));
     String smilTargetFlavorString = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
@@ -134,7 +136,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
       smilTargetFlavor = MediaPackageElementFlavor.parseFlavor(smilTargetFlavorString);
     }
 
-    if (sourceFlavor == null && sourceFlavors == null) {
+    if (sourceFlavors.isEmpty()) {
       throw new WorkflowOperationException(String.format("No %s or %s have been specified", SOURCE_FLAVOR_PROPERTY,
               SOURCE_FLAVORS_PROPERTY));
     }
@@ -149,9 +151,10 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
 
     final String finalSourceFlavors;
     if (smilTargetFlavor != null) {
-      finalSourceFlavors = sourceFlavor;
+      finalSourceFlavors = sourceFlavors.get(sourceFlavors.size()).toString();
     } else {
-      finalSourceFlavors = sourceFlavors;
+      finalSourceFlavors = sourceFlavors.stream().map(MediaPackageElementFlavor::toString)
+          .collect(Collectors.joining(","));
     }
 
     String referenceTracksFlavor = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(

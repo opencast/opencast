@@ -27,11 +27,12 @@ import static org.xmlmatchers.XmlMatchers.hasXPath;
 import static org.xmlmatchers.transform.XmlConverters.the;
 
 import org.opencastproject.coverimage.CoverImageException;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
-import org.dom4j.dom.DOMDocument;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xmlmatchers.namespace.SimpleNamespaceContext;
 
 import java.io.InputStream;
@@ -42,7 +43,6 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Test class for {@link AbstractCoverImageService}
@@ -98,15 +98,18 @@ public class CoverImageServiceTest {
    */
   @Test(expected = IllegalArgumentException.class)
   public void testTransformSvgNullSvg() throws Exception {
-    AbstractCoverImageService.transformSvg(null, new StreamSource(), new DOMDocument(), 0, 0, null);
+    Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder().newDocument();
+    AbstractCoverImageService.transformSvg(null, new InputSource(), doc, 0, 0, null);
   }
+
 
   /**
    * Tests {@link AbstractCoverImageService#transformSvg(Result, Source, Document, int, int, String)}
    */
   @Test(expected = IllegalArgumentException.class)
   public void testTransformSvgNullXmlSource() throws Exception {
-    AbstractCoverImageService.transformSvg(new StreamResult(), null, new DOMDocument(), 0, 0, null);
+    Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder().newDocument();
+    AbstractCoverImageService.transformSvg(new StreamResult(), null, doc, 0, 0, null);
   }
 
   /**
@@ -114,7 +117,7 @@ public class CoverImageServiceTest {
    */
   @Test(expected = IllegalArgumentException.class)
   public void testTransformSvgNullXslDoc() throws Exception {
-    AbstractCoverImageService.transformSvg(new StreamResult(), new StreamSource(), null, 0, 0, null);
+    AbstractCoverImageService.transformSvg(new StreamResult(), new InputSource(), null, 0, 0, null);
   }
 
   /**
@@ -126,7 +129,7 @@ public class CoverImageServiceTest {
     Result svg = new StreamResult(svgWriter);
 
     InputStream isXml = CoverImageServiceTest.class.getResourceAsStream("/metadata.xml");
-    Source xmlSource = new StreamSource(isXml);
+    InputSource xmlSource = new InputSource(isXml);
 
     InputStream isXsl = CoverImageServiceTest.class.getResourceAsStream("/metadata2svg.xsl");
     Document xslDoc = AbstractCoverImageService.parseXsl(IOUtils.toString(isXsl));

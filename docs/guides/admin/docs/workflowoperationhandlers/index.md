@@ -36,6 +36,7 @@ The following table contains the workflow operations that are available in an ou
 |comment             |Add, resolve or delete a comment                               |[Documentation](comment-woh.md)|
 |composite           |Compose two videos on one canvas.                              |[Documentation](composite-woh.md)|
 |concat              |Concatenate multiple video tracks into one video track         |[Documentation](concat-woh.md)|
+|conditional-config  |Configure workflow configuration variable based on coditions   |[Documentation](conditional-config-woh.md)|
 |configure-by-dcterm |Set workflow parameter if dublincore term matches value        |[Documentation](configure-by-dcterm-woh.md)|
 |copy                |Copy media package elements to target directory                |[Documentation](copy-woh.md)|
 |cover-image         |Generate a cover-image containing metadata                     |[Documentation](coverimage-woh.md)|
@@ -67,7 +68,6 @@ The following table contains the workflow operations that are available in an ou
 |multiencode         |Encode to multiple profiles in one operation                   |[Documentation](multiencode-woh.md)|
 |normalize-audio     |Normalize first audio stream                                   |[Documentation](normalizeaudio-woh.md)|
 |partial-import      |Import partial tracks and process according to a SMIL document |[Documentation](partial-import-woh.md)|
-|partial-retract     |Retract a subset of the mediapackage from a publication        |[Documentation](partial-import-woh.md)|
 |post-mediapackage   |Send mediapackage to remote service                            |[Documentation](postmediapackage-woh.md)|
 |prepare-av          |Preparing audio and video work versions                        |[Documentation](prepareav-woh.md)|
 |probe-resolution    |Set workflow instance variables based on video resolution      |[Documentation](probe-resolution-woh.md)|
@@ -82,6 +82,7 @@ The following table contains the workflow operations that are available in an ou
 |retract-configure   |Retracts media from configured publication                     |[Documentation](retract-configure-woh.md)|
 |retract-engage      |Retracts media from Opencast Media Module publication          |[Documentation](retract-engage-woh.md)|
 |retract-oaipmh      |Retracts media from a OAI-PMH repository                       |[Documentation](retract-oaipmh-woh.md)
+|retract-partial     |Retract a subset of the mediapackage from a publication        |[Documentation](retract-partial-woh.md)|
 |retract-youtube     |Retracts media from YouTube                                    |[Documentation](retract-youtube-woh.md)|
 |segment-video       |Extracting segments from presentation                          |[Documentation](segmentvideo-woh.md)|
 |segmentpreviews     |Extract segment images from a video using FFmpeg               |[Documentation](segmentpreviews-woh.md)|

@@ -23,6 +23,7 @@ export interface MediaPackage {
 }
 
 export interface SearchEpisodeResult {
+    readonly dcCreator?: string;
     readonly id: string;
     readonly dcTitle: string;
     readonly dcCreated: string;
@@ -201,6 +202,7 @@ export async function searchEpisode(
     const results = Array.isArray(resultsRaw) ? resultsRaw : resultsRaw !== undefined ? [resultsRaw] : [];
     return {
         results: results.map((result: any) => ({
+            dcCreator: result.dcCreator,
             id: result.id,
             dcTitle: result.dcTitle,
             dcCreated: result.dcCreated,
@@ -250,7 +252,9 @@ export async function uploadFile(
     seriesId: string,
     eventId?: string,
     presenterFile?: Blob,
-    captionFile?: Blob): Promise<{}> {
+    captionFile?: Blob,
+    setUploadPogress?: (progress: number) => void): Promise<{}> {
+    const percentage = 100;
     const data = new FormData();
     data.append("metadata", JSON.stringify([metadata]));
     if (eventId !== undefined)
@@ -260,5 +264,11 @@ export async function uploadFile(
         data.append("captions", captionFile);
     if (presenterFile !== undefined)
         data.append("presenter", presenterFile);
-    return axios.post(hostAndPort() + "/lti-service-gui", data);
+    return axios.post(
+        hostAndPort() + "/lti-service-gui",
+        data,
+        setUploadPogress !== undefined ? {
+            onUploadProgress: progressEvent => setUploadPogress(Math.round(progressEvent.loaded * percentage / progressEvent.total))
+        } : {}
+    );
 }

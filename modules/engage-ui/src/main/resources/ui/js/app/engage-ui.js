@@ -192,8 +192,8 @@ function($, bootbox, _, alertify, jsyaml) {
 
     sortMap['DATE_CREATED_DESC'] = tData.recording_date_new;
     sortMap['DATE_CREATED'] = tData.recording_date_old;
-    sortMap['DATE_PUBLISHED_DESC'] = tData.publishing_date_new;
-    sortMap['DATE_PUBLISHED'] = tData.publishing_date_old;
+    sortMap['DATE_MODIFIED_DESC'] = tData.publishing_date_new;
+    sortMap['DATE_MODIFIED'] = tData.publishing_date_old;
     sortMap['TITLE'] = tData.title_a_z;
     sortMap['TITLE_DESC'] = tData.title_z_a;
     sortMap['CREATOR'] = tData.author_a_z;
@@ -301,7 +301,7 @@ function($, bootbox, _, alertify, jsyaml) {
 
           $('#nextPage').attr('href', pageNotGet
             ? location.href + prefix + (page + 1)
-            : location.href.replace(/(p=[\d]*)/, 'p=' + (page - 1)));
+            : location.href.replace(/(p=[\d]*)/, 'p=' + (page + 1)));
         } else {
           $($next).addClass('disabled');
         }

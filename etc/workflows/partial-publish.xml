@@ -10,6 +10,33 @@
 
   <operations>
 
+    <!-- Fall back to */source if */prepared does not exist -->
+
+    <operation
+        id="analyze-tracks"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Analyze tracks in media package and set control variables">
+      <configurations>
+        <configuration key="source-flavor">*/prepared</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        if="NOT (${presentation_prepared_media} OR ${presenter_prepared_media})"
+        id="clone"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Preparing media">
+      <configurations>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="target-flavor">*/prepared</configuration>
+        <configuration key="target-tags">editor</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Continue processing -->
+
     <operation
         id="select-tracks"
         exception-handler-workflow="partial-error"
@@ -513,7 +540,7 @@
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
@@ -528,7 +555,7 @@
         <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="strategy">merge</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
@@ -543,7 +570,7 @@
         <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
         <configuration key="url-pattern">http://localhost:8080/api/events/${event_id}</configuration>
         <configuration key="with-published-elements">false</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 

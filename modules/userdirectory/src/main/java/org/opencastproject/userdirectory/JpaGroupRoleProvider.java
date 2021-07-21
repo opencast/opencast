@@ -21,21 +21,11 @@
 
 package org.opencastproject.userdirectory;
 
-import org.opencastproject.index.IndexProducer;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.group.GroupItem;
-import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.GroupProvider;
-import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.security.api.JaxbGroupList;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
@@ -46,14 +36,13 @@ import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
-import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.api.AAIRoleProvider;
 import org.opencastproject.userdirectory.api.GroupRoleProvider;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -66,6 +55,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -83,19 +73,13 @@ import javax.persistence.EntityTransaction;
   immediate = true,
   service = { RoleProvider.class, JpaGroupRoleProvider.class }
 )
-public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
+public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);
 
   /** The JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
-
-  /** The message broker service */
-  protected MessageSender messageSender;
-
-  /** The message broker receiver */
-  protected MessageReceiver messageReceiver;
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -130,24 +114,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
   }
 
   /**
-   * @param messageSender
-   *          The messageSender to set
-   */
-  @Reference(name = "message-broker-sender")
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
-  /**
-   * @param messageReceiver
-   *          The messageReceiver to set
-   */
-  @Reference(name = "message-broker-receiver")
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
-  }
-
-  /**
    * @param securityService
    *          the securityService to set
    */
@@ -175,9 +141,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
   public void activate(ComponentContext cc) {
     logger.debug("Activate group role provider");
     this.cc = cc;
-
-    // Set up persistence
-    super.activate();
   }
 
   /**
@@ -352,8 +315,20 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
    *          the organization id
    * @return the loaded group or <code>null</code> if not found
    */
-  public Group loadGroup(String groupId, String orgId) {
+  public JpaGroup loadGroup(String groupId, String orgId) {
     return UserDirectoryPersistenceUtil.findGroup(groupId, orgId, emf);
+  }
+
+  /**
+   * Get group.
+   *
+   * @param groupId
+   *
+   * @return the group
+   */
+  public JpaGroup getGroup(String groupId) {
+    String orgId = securityService.getOrganization().getId();
+    return loadGroup(groupId, orgId);
   }
 
   /**
@@ -396,8 +371,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
         em.merge(foundGroup);
       }
       tx.commit();
-      messageSender.sendObjectMessage(GroupItem.GROUP_QUEUE, MessageSender.DestinationType.Queue,
-              GroupItem.update(JaxbGroup.fromGroup(jpaGroup)));
     } finally {
       if (tx.isActive()) {
         tx.rollback();
@@ -413,8 +386,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
       throw new UnauthorizedException("The user is not allowed to delete a group with the admin role");
 
     UserDirectoryPersistenceUtil.removeGroup(groupId, orgId, emf);
-    messageSender.sendObjectMessage(GroupItem.GROUP_QUEUE, MessageSender.DestinationType.Queue,
-            GroupItem.delete(groupId));
   }
 
   /**
@@ -450,22 +421,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
   }
 
   /**
-   * Retrieves a group list based on input constraints.
-   *
-   * @param limit
-   *          the int amount to limit the results
-   * @param offset
-   *          the offset to start this result set at
-   * @return the JaxbGroupList of results
-   * @throws IOException
-   *           if unexpected IO exception occurs
-   */
-  public JaxbGroupList getGroupsAsJson(int limit, int offset)
-          throws IOException {
-    return getGroupsAsXml(limit, offset);
-  }
-
-  /**
    * Returns a XML representation of the list of groups available the current user's organization.
    *
    * @param limit
@@ -476,7 +431,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
    * @throws IOException
    *           if unexpected IO exception occurs
    */
-  public JaxbGroupList getGroupsAsXml(int limit, int offset)
+  public JaxbGroupList getGroups(int limit, int offset)
           throws IOException {
     if (limit < 1)
       limit = 100;
@@ -487,6 +442,43 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
       groupList.add(group);
     }
     return groupList;
+  }
+
+  /**
+   * Get groups by the defined filter and sorting criteria.
+   *
+   * @param limit
+   *          how many groups to get (optional)
+   * @param offset
+   *          where to start the list for pagination (optional)
+   * @param nameFilter
+   *          filter by group name (optional)
+   * @param textFilter
+   *          fulltext filter (optional)
+   * @param sortCriteria
+   *          the sorting criteria
+   *
+   * @return a list of groups
+   */
+  public List<JpaGroup> getGroups(Optional<Integer> limit, Optional<Integer> offset, Optional<String> nameFilter,
+          Optional<String> textFilter, Set<SortCriterion> sortCriteria) {
+    String orgId = securityService.getOrganization().getId();
+    return UserDirectoryPersistenceUtil.findGroups(orgId, limit, offset, nameFilter, textFilter, sortCriteria, emf);
+  }
+
+  /**
+   * Count groups that fit the filter criteria in total.
+   *
+   * @param nameFilter
+   *          filter by group name (optional)
+   * @param textFilter
+   *          fulltext filter (optional)
+   *
+   * @return a list of groups
+   */
+  public long countTotalGroups(Optional<String> nameFilter, Optional<String> textFilter) {
+    String orgId = securityService.getOrganization().getId();
+    return UserDirectoryPersistenceUtil.countTotalGroups(orgId, nameFilter, textFilter, emf);
   }
 
   /**
@@ -553,6 +545,60 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
   }
 
   /**
+   * Remove member from group.
+   *
+   * @param groupId
+   * @param member
+   *
+   * @return true if we updated the group, false otherwise
+   *
+   * @throws NotFoundException
+   * @throws UnauthorizedException
+   */
+  public boolean removeMemberFromGroup(String groupId, String member) throws NotFoundException, UnauthorizedException {
+    JpaGroup group = getGroup(groupId);
+    if (group == null) {
+      throw new NotFoundException();
+    }
+    Set<String> members = group.getMembers();
+    if (!members.contains(member)) {
+      return false; // nothing to do here
+    }
+    group.removeMember(member);
+    userDirectoryService.invalidate(member);
+
+    addGroup(group);
+    return true;
+  }
+
+  /**
+   * Add member to group.
+   *
+   * @param groupId
+   * @param member
+   *
+   * @return true if we updated the group, false otherwise
+   *
+   * @throws NotFoundException
+   * @throws UnauthorizedException
+   */
+  public boolean addMemberToGroup(String groupId, String member) throws NotFoundException, UnauthorizedException {
+    JpaGroup group = getGroup(groupId);
+    if (group == null) {
+      throw new NotFoundException();
+    }
+    Set<String> members = group.getMembers();
+    if (members.contains(member)) {
+      return false; // nothing to do here
+    }
+    group.addMember(member);
+    userDirectoryService.invalidate(member);
+
+    addGroup(group);
+    return true;
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.userdirectory.api.GroupRoleProvider#updateGroup(String, String, String, String, String)
@@ -612,65 +658,4 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRo
     }
     addGroup(group);
   }
-
-  @Override
-  public void repopulate(final String indexName) {
-    final String destinationId = GroupItem.GROUP_QUEUE_PREFIX + WordUtils.capitalize(indexName);
-    for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-        final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
-        int total = groups.size();
-        final int responseInterval = (total < 100) ? 1 : (total / 100);
-        int current = 1;
-        logger.info(
-                "Re-populating index '{}' with groups of organization {}. There are {} group(s) to add to the index.",
-                indexName, securityService.getOrganization().getId(), total);
-        for (JpaGroup group : groups) {
-          messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                  GroupItem.update(JaxbGroup.fromGroup(group)));
-          if (((current % responseInterval) == 0) || (current == total)) {
-            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                  IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Groups, total, current));
-          }
-          current++;
-        }
-      });
-    }
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
-      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Groups));
-    });
-  }
-
-  @Override
-  public MessageReceiver getMessageReceiver() {
-    return messageReceiver;
-  }
-
-  @Override
-  public Service getService() {
-    return Service.Groups;
-  }
-
-  @Override
-  public String getClassName() {
-    return JpaGroupRoleProvider.class.getName();
-  }
-
-  @Override
-  public MessageSender getMessageSender() {
-    return messageSender;
-  }
-
-  @Override
-  public SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  @Override
-  public String getSystemUserName() {
-    return SecurityUtil.getSystemUserName(cc);
-  }
-
 }

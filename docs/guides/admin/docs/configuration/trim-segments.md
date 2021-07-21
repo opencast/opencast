@@ -6,7 +6,7 @@ By default, when trimming a video there are no trim segments at the start and at
 Adding trim segments would help resolve the issue of out of sync audio and video.
 
 The video from a network camera is encoded (e.g. H264) which means when data is captured it could be between key frames 
-and therefore video and audio could be out of sync when it gets processed by ffmpeg.
+and therefore video and audio could be out of sync when it gets processed by FFmpeg.
 
 Setting the Configuration
 -------------------------

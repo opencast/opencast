@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -23,13 +23,17 @@
     <!-- opencast -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-index-service</artifactId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search</artifactId>
+      <artifactId>opencast-elasticsearch-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-elasticsearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -46,7 +50,7 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <!-- Doesn't compile without that dependency-->
-            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-search</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -66,14 +70,6 @@
               org.opencastproject.external.index
             </Export-Package>
             <Service-Component>
-              OSGI-INF/external-index.xml,
-              OSGI-INF/message-receiver-acl.xml,
-              OSGI-INF/message-receiver-assetmanager.xml,
-              OSGI-INF/message-receiver-comment.xml,
-              OSGI-INF/message-receiver-group.xml,
-              OSGI-INF/message-receiver-scheduler.xml,
-              OSGI-INF/message-receiver-series.xml,
-              OSGI-INF/message-receiver-workflow.xml
             </Service-Component>
           </instructions>
         </configuration>

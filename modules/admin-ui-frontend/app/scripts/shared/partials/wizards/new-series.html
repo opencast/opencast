@@ -11,7 +11,8 @@
                 <td admin-ng-editable
                     class="editable"
                     name="row.id"
-                    params="row" save="$parent.wizard.save">
+                    params="row" save="$parent.wizard.save"
+                    sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
             </table>
@@ -36,7 +37,8 @@
                     class="editable"
                     name="row.id"
                     target="{{name}}"
-                    params="row" save="$parent.wizard.save">
+                    params="row" save="$parent.wizard.save"
+                    sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
             </table>
@@ -86,7 +88,7 @@
                                   ng-options="id as name for (id, name) in wizard.step.acls"
                                   placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                  />
+                                  ></select>
                         </div>
                       </td>
                     </tr>

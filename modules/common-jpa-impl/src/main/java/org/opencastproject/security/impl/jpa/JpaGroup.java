@@ -27,6 +27,7 @@ import org.opencastproject.util.EqualsUtil;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -52,12 +53,28 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "oc_group", uniqueConstraints = { @UniqueConstraint(columnNames = { "group_id", "organization" }) })
+@Table(
+    name = "oc_group",
+    uniqueConstraints = { @UniqueConstraint(columnNames = { "group_id", "organization" }) }
+)
 @NamedQueries({
-        @NamedQuery(name = "Group.findAll", query = "Select g FROM JpaGroup g WHERE g.organization.id = :organization"),
-        @NamedQuery(name = "Group.findByUser", query = "Select g FROM JpaGroup g WHERE g.organization.id = :organization AND :username MEMBER OF g.members"),
-        @NamedQuery(name = "Group.findById", query = "Select g FROM JpaGroup g WHERE g.groupId = :groupId AND g.organization.id = :organization"),
-        @NamedQuery(name = "Group.findByRole", query = "Select g FROM JpaGroup g WHERE g.role = :role AND g.organization.id = :organization") })
+    @NamedQuery(
+        name = "Group.findAll",
+        query = "Select g FROM JpaGroup g WHERE g.organization.id = :organization"
+    ),
+    @NamedQuery(
+        name = "Group.findByUser",
+        query = "Select g FROM JpaGroup g WHERE g.organization.id = :organization AND :username MEMBER OF g.members"
+    ),
+    @NamedQuery(
+        name = "Group.findById",
+        query = "Select g FROM JpaGroup g WHERE g.groupId = :groupId AND g.organization.id = :organization"
+    ),
+    @NamedQuery(
+        name = "Group.findByRole",
+        query = "Select g FROM JpaGroup g WHERE g.role = :role AND g.organization.id = :organization"
+    ),
+})
 public final class JpaGroup implements Group {
   @Id
   @GeneratedValue
@@ -89,9 +106,9 @@ public final class JpaGroup implements Group {
   @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.LAZY)
   @JoinTable(name = "oc_group_role", joinColumns = {
       @JoinColumn(name = "group_id")
-    }, inverseJoinColumns = {
+      }, inverseJoinColumns = {
       @JoinColumn(name = "role_id")
-    }, uniqueConstraints = {
+      }, uniqueConstraints = {
       @UniqueConstraint(name = "UNQ_oc_group_role", columnNames = { "group_id", "role_id" }) })
   private Set<JpaRole> roles;
 
@@ -118,10 +135,12 @@ public final class JpaGroup implements Group {
   public JpaGroup(String groupId, JpaOrganization organization, String name, String description)
           throws IllegalArgumentException {
     super();
-    if (groupId.length() > 128)
+    if (groupId.length() > 128) {
       throw new IllegalArgumentException("Group id must not be longer than 128 Bytes");
-    if (name.length() > 128)
+    }
+    if (name.length() > 128) {
       throw new IllegalArgumentException("Name must not be longer than 128 Bytes");
+    }
     this.groupId = groupId;
     this.organization = organization;
     this.name = name;
@@ -248,9 +267,43 @@ public final class JpaGroup implements Group {
     this.members = members;
   }
 
+  /**
+   * Add a member
+   *
+   * @param member
+   *          The member's name.
+   */
+  public void addMember(String member) {
+    if (members == null) {
+      members = new HashSet<>();
+    }
+    members.add(member);
+  }
+
+  /**
+   * Remove a member
+   *
+   * @param member
+   *          The member's name.
+   */
+  public void removeMember(String member) {
+    if (members != null) {
+      members.remove(member);
+    }
+  }
+
   @Override
   public Set<Role> getRoles() {
     return new HashSet<Role>(roles);
+  }
+
+  /**
+   * Get only the names of the roles
+   *
+   * @return the role names in a set
+   */
+  public Set<String> getRoleNames() {
+    return roles.stream().map(role -> role.getName()).collect(Collectors.toSet());
   }
 
   /**
@@ -270,8 +323,9 @@ public final class JpaGroup implements Group {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Group))
+    if (!(obj instanceof Group)) {
       return false;
+    }
     Group other = (Group) obj;
     return groupId.equals(other.getGroupId()) && organization.equals(other.getOrganization());
   }

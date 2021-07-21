@@ -76,6 +76,7 @@ public class WowzaStreamingDistributionServiceTest {
   private static SecurityService securityService = null;
   private static OrganizationDirectoryService orgDirectoryService = null;
   private static UserDirectoryService userDirectoryService = null;
+  private static final String opencastStorageDirectory = "org.opencastproject.storage.dir";
 
   private static final String defaultTenant = "mh_default_org";
   private static final String defaultUrlProperty
@@ -105,9 +106,10 @@ public class WowzaStreamingDistributionServiceTest {
   @Before
   public void before() throws Exception {
     map = new HashMap();
+    map.put(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY, "/tmp/opencast/streams");
 
     bundleContext = createNiceMock(BundleContext.class);
-    expect(bundleContext.getProperty(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY)).andReturn("/")
+    expect(bundleContext.getProperty(opencastStorageDirectory)).andReturn("/tmp/opencast")
             .anyTimes();
     replay(bundleContext);
 
@@ -213,6 +215,22 @@ public class WowzaStreamingDistributionServiceTest {
     assertTrue(streamingService.streamingUrls.containsKey(defaultTenant));
     assertEquals(1, streamingService.streamingUrls.size());
     assertEquals(completeStreamingUrl, streamingService.streamingUrls.get(defaultTenant).toString());
+  }
+
+  @Test
+  public void testSetStreamingDirectory() throws Exception {
+    setUpDefault();
+    streamingService.activate(bundleContext, map);
+    assertEquals("/tmp/opencast/streams",streamingService.getDistributionDirectory().getAbsolutePath().toString());
+  }
+
+  @Test
+  public void testDefaultSetStreamingDirectory() throws Exception {
+    map.remove(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY);
+    setUpDefault();
+    streamingService.activate(bundleContext, map);
+    map.put(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY, "/tmp/opencast/streams");
+    assertEquals("/tmp/opencast/streams",streamingService.getDistributionDirectory().getAbsolutePath().toString());
   }
 
   @Test
