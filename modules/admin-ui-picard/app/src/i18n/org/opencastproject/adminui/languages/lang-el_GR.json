@@ -1172,7 +1172,9 @@
                "SUBJECT": "Θέμα",
                "LANGUAGE": "Γλώσσα",
                "LICENSE": "Άδεια χρήσης",
-               "DESCRIPTION": "Περιγραφή"
+               "DESCRIPTION": "Περιγραφή",
+               "REPLACE_SERIES_METADATA": "Update series metadata",
+               "REPLACE_SERIES_THEME": "Update series theme"
             },
             "EVENTS": {
                "TITLE": "Τίτλος",

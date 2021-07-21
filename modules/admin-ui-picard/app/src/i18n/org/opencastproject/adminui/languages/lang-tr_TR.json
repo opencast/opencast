@@ -1172,7 +1172,9 @@
                "SUBJECT": "Konu",
                "LANGUAGE": "Dil",
                "LICENSE": "Sürüm",
-               "DESCRIPTION": "Açıklama"
+               "DESCRIPTION": "Açıklama",
+               "REPLACE_SERIES_METADATA": "Update series metadata",
+               "REPLACE_SERIES_THEME": "Update series theme"
             },
             "EVENTS": {
                "TITLE": "Başlık",
