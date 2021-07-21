@@ -27,8 +27,6 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserIdRole;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 
-import org.opencastproject.api.index.ApiIndex;
-import org.opencastproject.api.index.rebuild.IndexRebuildService;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.rest.RestConstants;
@@ -36,13 +34,10 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.RestUtil;
-import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
@@ -61,14 +56,10 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -88,9 +79,6 @@ public class BaseEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(BaseEndpoint.class);
 
-  /** The executor service */
-  private final ExecutorService executor = Executors.newSingleThreadExecutor();
-
   /** The json serializer */
   private static final SimpleSerializer serializer = new SimpleSerializer();
 
@@ -99,22 +87,10 @@ public class BaseEndpoint {
 
   /* OSGi service references */
   private SecurityService securityService;
-  private ApiIndex apiIndex;
-
-  private IndexRebuildService indexRebuildService = null;
-
-  /** OSGi DI */
-  void setApiIndex(ApiIndex apiIndex) {
-    this.apiIndex = apiIndex;
-  }
 
   /** OSGi DI */
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  public void setIndexRebuildService(IndexRebuildService indexRebuildService) {
-    this.indexRebuildService = indexRebuildService;
   }
 
   /** OSGi activation method */
@@ -248,71 +224,6 @@ public class BaseEndpoint {
   public Response getVersionDefault() throws Exception {
     JValue json = obj(f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
-  }
-
-  @POST
-  @Path("clearIndex")
-  @RestQuery(name = "clearIndex", description = "Clear the External index",
-          returnDescription = "OK if index is cleared", responses = {
-          @RestResponse(description = "Index is cleared", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Unable to clear index", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) })
-  public Response clearIndex() {
-    final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
-            securityService.getUser());
-    return securityContext.runInContext(() -> {
-      try {
-        logger.info("Clear the external index");
-        apiIndex.clear();
-        return R.ok();
-      } catch (Throwable t) {
-        logger.error("Clearing the external index failed", t);
-        return R.serverError();
-      }
-    });
-  }
-
-  @POST
-  @Path("recreateIndex/{service}")
-  @RestQuery(name = "recreateIndexFromService",
-          description = "Repopulates the external Index from an specific service",
-          returnDescription = "OK if repopulation has started", pathParameters = {
-          @RestParameter(name = "service", isRequired = true, description = "The service to recreate index from. "
-                  + "The available services are: Series, Scheduler, Workflow, AssetManager and Comments. "
-                  + "The service order (see above) is very important! Make sure, you do not run index rebuild for more than one "
-                  + "service at a time!",
-                  type = RestParameter.Type.STRING) }, responses = {
-          @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
-  public Response recreateIndexFromService(@PathParam("service") final String service) {
-    final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
-            securityService.getUser());
-    executor.execute(() -> securityContext.runInContext(() -> {
-      try {
-        logger.info("Starting to repopulate the index from service {}", service);
-        indexRebuildService.rebuildIndex(apiIndex, service);
-      } catch (Throwable t) {
-        logger.error("Repopulating the index failed", t);
-      }
-    }));
-    return R.ok();
-  }
-
-  @POST
-  @Path("recreateIndex")
-  @RestQuery(name = "recreateIndex", description = "Repopulates the External Index directly from the Services", returnDescription = "OK if repopulation has started", responses = {
-          @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
-  public Response recreateIndex() {
-    final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
-            securityService.getUser());
-    executor.execute(() -> securityContext.runInContext(() -> {
-      try {
-        logger.info("Starting to repopulate the external index");
-        indexRebuildService.rebuildIndex(apiIndex);
-        logger.info("Finished repopulating the external index");
-      } catch (Throwable t) {
-        logger.error("Repopulating the external index failed", t);
-      }
-    }));
-    return R.ok();
   }
 
 }

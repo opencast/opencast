@@ -144,10 +144,4 @@ public class BaseEndpointTest {
     assertEquals("v1.7.0", json.get("default"));
   }
 
-  /** Test case for {@link BaseEndpoint#recreateIndex()} */
-  @Test
-  public void testRecreateIndex() throws Exception {
-    given().log().all().expect().statusCode(SC_OK).when().post(env.host("/recreateIndex"));
-  }
-
 }
