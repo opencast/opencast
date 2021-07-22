@@ -84,7 +84,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
 
   /** The name of this index */
   private static final String INDEX_NAME_PROPERTY = "index.name";
-  private static final String DEFAULT_INDEX_NAME = "index";
+  private static final String DEFAULT_INDEX_NAME = "opencast";
 
   /** The required index version */
   private static final int INDEX_VERSION = 101;

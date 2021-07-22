@@ -10,7 +10,7 @@ AUTO_EXPAND_REPLICAS="false"
 TIMEOUT="60s"
 
 OLD_INDEX="adminui"  # Do not use external API index as source as that one doesn't contain themes!
-NEW_INDEX="index"
+NEW_INDEX="opencast"
 
 # sub indices
 VERSION="version"
