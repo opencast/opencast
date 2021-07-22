@@ -36,9 +36,9 @@
     <httpcomponents-httpcore.version>4.4.13</httpcomponents-httpcore.version>
     <jackson.version>2.12.3</jackson.version>
     <jakarta.mail.version>1.6.7</jakarta.mail.version>
+    <java.release>11</java.release>
     <jersey.version>2.29.1</jersey.version>
     <jettison.version>1.4.1</jettison.version>
-    <jdk.version>1.8</jdk.version>
     <joda-time.version>2.10.10</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
     <karaf.version>4.2.9</karaf.version>
@@ -318,8 +318,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <source>${jdk.version}</source>
-          <target>${jdk.version}</target>
+          <release>${java.release}</release>
           <encoding>UTF-8</encoding>
           <compilerArgument>${compilerArgument}</compilerArgument>
         </configuration>
@@ -546,7 +545,6 @@
           <version>2.10.4</version>
           <configuration>
             <detectJavaApiLink>true</detectJavaApiLink>
-            <javadocVersion>${jdk.version}</javadocVersion>
             <maxmemory>512m</maxmemory>
             <quiet>true</quiet>
           </configuration>
@@ -568,7 +566,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>3.5.0</version>
+          <version>5.1.2</version>
           <inherited>true</inherited>
           <configuration>
             <instructions>
@@ -653,7 +651,7 @@
           <configuration>
             <!--<includeTests>true</includeTests> -->
             <typeResolution>true</typeResolution>
-            <targetJdk>${jdk.version}</targetJdk>
+            <targetJdk>${java.release}</targetJdk>
           </configuration>
           <executions>
             <execution>
@@ -1884,7 +1882,6 @@
           <!-- <detectLinks>true</detectLinks> -->
           <!-- http://jira.codehaus.org/browse/MJAVADOC-273 -->
           <detectJavaApiLink>true</detectJavaApiLink>
-          <javadocVersion>${jdk.version}</javadocVersion>
           <maxmemory>512m</maxmemory>
           <quiet>true</quiet>
         </configuration>
@@ -1937,7 +1934,7 @@
           <aggregate>true</aggregate>
           <!--<includeTests>true</includeTests>-->
           <typeResolution>true</typeResolution>
-          <targetJdk>${jdk.version}</targetJdk>
+          <targetJdk>${java.release}</targetJdk>
         </configuration>
       </plugin>
     </plugins>
