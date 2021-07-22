@@ -28,6 +28,8 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_DESCRI
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
+import org.opencastproject.mediapackage.TrackSupport;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchService;
@@ -323,12 +325,41 @@ public class TobiraApi {
             Jsons.p("updated", event.getModified().getTime())
         );
       } else {
+        final List<Jsons.Val> tracks = Arrays.stream(event.getMediaPackage().getTracks())
+            .map(track -> {
+              VideoStream[] videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
+              Jsons.Val resolution = null;
+              if (videoStreams.length > 0) {
+                final VideoStream stream = videoStreams[0];
+                resolution = Jsons.arr(Jsons.v(stream.getFrameWidth()), Jsons.v(stream.getFrameHeight()));
+
+                if (videoStreams.length > 1) {
+                  logger.warn(
+                      "Track of event {} has more than one video stream; we will ignore all but the first",
+                      event.getId()
+                  );
+                }
+              }
+
+              return Jsons.obj(
+                  Jsons.p("uri", track.getURI().toString()),
+                  Jsons.p("mimetype", track.getMimeType().toString()),
+                  Jsons.p("flavor", track.getFlavor().toString()),
+                  Jsons.p("resolution", resolution)
+              );
+            })
+            .collect(Collectors.toCollection(ArrayList::new));
+
         this.obj = Jsons.obj(
             Jsons.p("kind", "event"),
             Jsons.p("id", event.getId()),
             Jsons.p("title", event.getDcTitle()),
             Jsons.p("partOf", event.getDcIsPartOf()),
             Jsons.p("description", event.getDcDescription()),
+            Jsons.p("created", event.getDcCreated().getTime()),
+            Jsons.p("creator", event.getDcCreator()),
+            Jsons.p("duration", event.getDcExtent() < 0 ? null : event.getDcExtent()),
+            Jsons.p("tracks", Jsons.arr(tracks)),
             Jsons.p("updated", event.getModified().getTime())
         );
       }
