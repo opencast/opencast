@@ -60,8 +60,8 @@ with OC 10 or already removed them, this will fail, but that's okay.
 
 ### Option 3: Keep the Admin UI index
 
-If you don't have time for either and if you don't care about having an exact index identifier in your Elasticsearch, 
-you could also just set `index.identifier` in `org.opencastproject.elasticsearch.index.ElasticsearchIndex` to "adminui" 
+If you don't have time for either and if you don't care about having an exact index identifier in your Elasticsearch,
+you could also just set `index.identifier` in `org.opencastproject.elasticsearch.index.ElasticsearchIndex` to "adminui"
 to keep using the old admin ui index. Do this before starting Opencast to avoid creating a new index.
 
 The external API index can then be removed. (Please be aware that the External API index cannot be used any longer since
