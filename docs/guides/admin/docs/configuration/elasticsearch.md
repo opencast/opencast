@@ -23,6 +23,12 @@ HTTP basic authentication (which is unsecure without TLS encryption). Refer to [
 documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-stack-security.html)
 to properly secure Elasticsearch.
 
+Additionally, the base name of the index opencast is looking for can be configured in
+'org.opencastproject.elasticsearch.index.ElasticsearchIndex.cfg' under `name`. This might be interesting if you run an
+Elasticsearch cluster and want to follow a naming scheme. But you should be aware that this index actually consists of
+multiple subindices whose names will be appended to the base name with an _ (e.g. "index_event").
+If an index doesn't exist, Opencast will create it.
+
 Version
 -------
 

@@ -45,6 +45,7 @@ import org.opencastproject.util.NotFoundException;
 
 import com.google.common.util.concurrent.Striped;
 
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -61,6 +62,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
@@ -81,7 +83,8 @@ import javax.xml.bind.Unmarshaller;
 public class ElasticsearchIndex extends AbstractElasticsearchIndex {
 
   /** The name of this index */
-  private static final String INDEX_NAME = "index";
+  private static final String INDEX_NAME_PROPERTY = "index.name";
+  private static final String DEFAULT_INDEX_NAME = "index";
 
   /** The required index version */
   private static final int INDEX_VERSION = 101;
@@ -111,8 +114,11 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   @Activate
   public void activate(ComponentContext ctx) throws ComponentException {
     super.activate(ctx);
+
+    String indexName = StringUtils.defaultIfBlank(Objects.toString(ctx.getProperties().get(INDEX_NAME_PROPERTY)),
+            DEFAULT_INDEX_NAME);
     try {
-      init(INDEX_NAME, INDEX_VERSION);
+      init(indexName, INDEX_VERSION);
     } catch (Throwable t) {
       throw new ComponentException("Error initializing elastic search index", t);
     }
@@ -128,11 +134,6 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   @Deactivate
   public void deactivate(ComponentContext ctx) throws IOException {
     close();
-  }
-
-  @Override
-  public String getIndexName() {
-    return INDEX_NAME;
   }
 
   /**
