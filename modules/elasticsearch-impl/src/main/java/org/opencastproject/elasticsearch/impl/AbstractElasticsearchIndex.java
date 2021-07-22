@@ -213,7 +213,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         logger.error("Index '{}' could not be deleted", getIndexName());
       }
       preparedIndices
-              .removeAll(Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier).collect(Collectors.toList()));
+              .removeAll(Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier)
+                      .collect(Collectors.toList()));
       createIndex();
     } catch (ElasticsearchException exception) {
       if (exception.status() == RestStatus.NOT_FOUND) {
