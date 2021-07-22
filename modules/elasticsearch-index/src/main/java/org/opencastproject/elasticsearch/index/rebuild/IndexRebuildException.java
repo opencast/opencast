@@ -64,7 +64,7 @@ public class IndexRebuildException extends Exception {
    *           The cause.
    */
   public IndexRebuildException(String indexName, IndexRebuildService.Service service, Throwable cause) {
-    super(String.format("Error updating index %s for service %s", indexName, service.name()), cause);
+    super(String.format("Error updating the %s index for service %s", indexName, service.name()), cause);
   }
 
   /**
@@ -81,7 +81,7 @@ public class IndexRebuildException extends Exception {
    */
   public IndexRebuildException(String indexName, IndexRebuildService.Service service, Organization org,
           Throwable cause) {
-    super(String.format("Error updating index %s for service %s and organization %s", indexName, service.name(),
+    super(String.format("Error updating the %s index for service %s and organization %s", indexName, service.name(),
             org.getId()), cause);
   }
 }

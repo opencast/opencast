@@ -123,7 +123,7 @@ public class IndexRebuildService implements BundleActivator {
   public synchronized void rebuildIndex(ElasticsearchIndex index)
           throws IOException, IndexRebuildException {
     index.clear();
-    logger.info("Index '{}' cleared, starting complete rebuild.", index.getIndexName());
+    logger.info("{} Index cleared, starting complete rebuild.", index.getIndexName());
     for (IndexRebuildService.Service service: IndexRebuildService.Service.values()) {
       rebuildIndex(index, service);
     }
@@ -145,7 +145,7 @@ public class IndexRebuildService implements BundleActivator {
   public synchronized void rebuildIndex(ElasticsearchIndex index, String serviceName)
           throws IllegalArgumentException, IndexRebuildException {
     IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
-    logger.info("Starting partial rebuild of index '{}' from service '{}'.", index.getIndexName(), service);
+    logger.info("Starting partial rebuild of the {} index from service '{}'.", index.getIndexName(), service);
     rebuildIndex(index, service);
   }
 
@@ -168,9 +168,9 @@ public class IndexRebuildService implements BundleActivator {
     }
 
     IndexProducer indexProducer = indexProducers.get(service);
-    logger.info("Starting to rebuild index '{}' from service '{}'", index.getIndexName(), service);
+    logger.info("Starting to rebuild the {} index from service '{}'", index.getIndexName(), service);
     indexProducer.repopulate(index);
-    logger.info("Finished to rebuild index '{}' from service '{}'", index.getIndexName(), service);
+    logger.info("Finished to rebuild the {} index from service '{}'", index.getIndexName(), service);
   }
 
   /**

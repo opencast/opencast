@@ -43,7 +43,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The elements to be added (e.g. 'events').
    */
   protected void logIndexRebuildBegin(Logger logger, String indexName, int total, String elementName) {
-    logger.info("Starting update of index '{}' for service '{}' with {} {}", indexName, getService(), total,
+    logger.info("Starting update of the {} index from service '{}' with {} {}", indexName, getService(), total,
             elementName);
   }
 
@@ -63,7 +63,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    */
   protected void logIndexRebuildBegin(Logger logger, String indexName, int total, String elementName,
           Organization org) {
-    logger.info("Starting update of index '{}' for service '{}' with {} {} of organization '{}'", indexName,
+    logger.info("Starting update of the {} index from service '{}' with {} {} of organization '{}'", indexName,
             getService(), total, elementName, org);
   }
 
@@ -142,10 +142,10 @@ public abstract class AbstractIndexProducer implements IndexProducer {
             || current % responseInterval < batchSize) {
 
       if (org == null) {
-        logger.info("Updating index '{}' for service '{}': {}/{} finished, {}% complete.", indexName, getService(),
+        logger.info("Updating the {} index from service '{}': {}/{} finished, {}% complete.", indexName, getService(),
                 current, total, (current * 100 / total));
       } else {
-        logger.info("Updating index '{}' for service '{}' and organization '{}': {}/{} finished, {}% complete.",
+        logger.info("Updating the {} index from service '{}' and organization '{}': {}/{} finished, {}% complete.",
                 indexName, getService(), org.getId(), current, total, (current * 100 / total));
       }
     }
@@ -196,7 +196,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The error that occurred.
    */
   protected void logIndexRebuildError(Logger logger, String indexName, Throwable t) {
-    logger.error("Error updating index '{}' for service '{}'.", indexName, getService(), t);
+    logger.error("Error updating the {} index from service '{}'.", indexName, getService(), t);
   }
 
   /**
@@ -214,7 +214,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The error that occurred.
    */
   protected void logIndexRebuildError(Logger logger, String indexName, int total, int current, Throwable t) {
-    logger.error("Error updating index '{}' for service '{}': {}/{} could be finished.", indexName, getService(),
+    logger.error("Error updating the {} index for service '{}': {}/{} could be finished.", indexName, getService(),
             current, total, t);
   }
 
@@ -231,7 +231,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The organization.
    */
   protected void logIndexRebuildError(Logger logger, String indexName, Throwable t, Organization org) {
-    logger.error("Error updating index '{}' for service '{}' and organization '{}'.", indexName, getService(),
+    logger.error("Error updating the {} index for service '{}' and organization '{}'.", indexName, getService(),
             org.getId(), t);
   }
 }
