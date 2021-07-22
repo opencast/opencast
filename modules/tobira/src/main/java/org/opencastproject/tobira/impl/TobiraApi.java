@@ -336,7 +336,7 @@ public class TobiraApi {
         final List<Jsons.Val> tracks = Arrays.stream(event.getMediaPackage().getTracks())
             .map(track -> {
               VideoStream[] videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
-              Jsons.Val resolution = null;
+              Jsons.Val resolution = Jsons.NULL;
               if (videoStreams.length > 0) {
                 final VideoStream stream = videoStreams[0];
                 resolution = Jsons.arr(Jsons.v(stream.getFrameWidth()), Jsons.v(stream.getFrameHeight()));
