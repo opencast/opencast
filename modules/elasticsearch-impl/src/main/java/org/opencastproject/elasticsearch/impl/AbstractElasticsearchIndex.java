@@ -132,7 +132,10 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   private static final String VERSION_TYPE = "version";
 
   /** The index identifier */
-  private String index = null;
+  private String indexIdentifier = null;
+
+  /** The index name */
+  private String indexName = null;
 
   /** The high level client */
   private RestHighLevelClient client = null;
@@ -204,13 +207,13 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   public void clear() throws IOException {
     try {
       final DeleteIndexRequest request = new DeleteIndexRequest(
-              Arrays.stream(getDocumentTypes()).map(this::getIndexName).toArray(String[]::new));
+              Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier).toArray(String[]::new));
       final AcknowledgedResponse delete = client.indices().delete(request, RequestOptions.DEFAULT);
       if (!delete.isAcknowledged()) {
         logger.error("Index '{}' could not be deleted", getIndexName());
       }
       preparedIndices
-              .removeAll(Arrays.stream(getDocumentTypes()).map(this::getIndexName).collect(Collectors.toList()));
+              .removeAll(Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier).collect(Collectors.toList()));
       createIndex();
     } catch (ElasticsearchException exception) {
       if (exception.status() == RestStatus.NOT_FOUND) {
@@ -234,7 +237,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
     final BulkRequest bulkRequest = new BulkRequest().setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
     for (ElasticsearchDocument doc : documents) {
-      bulkRequest.add(new IndexRequest(getIndexName(doc.getType())).id(doc.getUID()).source(doc));
+      bulkRequest.add(new IndexRequest(getSubIndexIdentifier(doc.getType())).id(doc.getUID()).source(doc));
     }
 
     try {
@@ -259,8 +262,10 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /**
    * Initializes an Elasticsearch node for the given index.
    *
-   * @param index
-   *          the index identifier
+   * @param indexIdentifier
+   *          the index name used by Elasticsearch
+   * @param indexName
+   *          the index name used for logging
    * @param version
    *          the index version
    * @throws SearchIndexException
@@ -270,12 +275,14 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * @throws IllegalArgumentException
    *           if the index identifier is blank.
    */
-  protected void init(String index, int version) throws IOException, IllegalArgumentException, SearchIndexException {
-    if (StringUtils.isBlank(index)) {
+  protected void init(String indexIdentifier, String indexName, int version)
+          throws IOException, IllegalArgumentException, SearchIndexException {
+    if (StringUtils.isBlank(indexIdentifier)) {
       throw new IllegalArgumentException("Search index identifier must be set");
     }
 
-    this.index = index;
+    this.indexIdentifier = indexIdentifier;
+    this.indexName = indexName;
     this.indexVersion = version;
 
     if (client == null) {
@@ -319,7 +326,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    */
   private void createIndex() throws SearchIndexException, IOException {
     for (String type : getDocumentTypes()) {
-      createSubIndex(type, getIndexName(type));
+      createSubIndex(type, getSubIndexIdentifier(type));
     }
   }
 
@@ -469,7 +476,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
           break;
       }
     }
-    return new SearchRequest(Arrays.stream(query.getTypes()).map(this::getIndexName).toArray(String[]::new))
+    return new SearchRequest(Arrays.stream(query.getTypes()).map(this::getSubIndexIdentifier).toArray(String[]::new))
             .searchType(SearchType.QUERY_THEN_FETCH).preference("_local").source(searchSource);
   }
 
@@ -479,7 +486,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * @return the index name
    */
   public String getIndexName() {
-    return index;
+    return indexName;
   }
 
   /*
@@ -498,8 +505,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *          The type to get the sub index for.
    * @return the index name
    */
-  public String getIndexName(String type) {
-    return getIndexName() + "_" + type;
+  protected String getSubIndexIdentifier(String type) {
+    return this.indexIdentifier + "_" + type;
   }
 
   protected RestHighLevelClient getClient() {
@@ -593,7 +600,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     final String facetName = "terms";
     final AggregationBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field);
     final SearchSourceBuilder searchSource = new SearchSourceBuilder().aggregation(aggBuilder);
-    final SearchRequest searchRequest = new SearchRequest(this.getIndexName(type)).source(searchSource);
+    final SearchRequest searchRequest = new SearchRequest(this.getSubIndexIdentifier(type)).source(searchSource);
     try {
       final SearchResponse response = getClient().search(searchRequest, RequestOptions.DEFAULT);
 

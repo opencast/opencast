@@ -83,8 +83,10 @@ import javax.xml.bind.Unmarshaller;
 public class ElasticsearchIndex extends AbstractElasticsearchIndex {
 
   /** The name of this index */
+  private static final String INDEX_IDENTIFIER_PROPERTY = "index.identifier";
+  private static final String DEFAULT_INDEX_IDENTIFIER = "opencast";
   private static final String INDEX_NAME_PROPERTY = "index.name";
-  private static final String DEFAULT_INDEX_NAME = "opencast";
+  private static final String DEFAULT_INDEX_NAME = "Elasticsearch";
 
   /** The required index version */
   private static final int INDEX_VERSION = 101;
@@ -115,10 +117,12 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   public void activate(ComponentContext ctx) throws ComponentException {
     super.activate(ctx);
 
+    String indexIdentifier = StringUtils.defaultIfBlank(Objects.toString(ctx.getProperties()
+                    .get(INDEX_IDENTIFIER_PROPERTY)), DEFAULT_INDEX_IDENTIFIER);
     String indexName = StringUtils.defaultIfBlank(Objects.toString(ctx.getProperties().get(INDEX_NAME_PROPERTY)),
             DEFAULT_INDEX_NAME);
     try {
-      init(indexName, INDEX_VERSION);
+      init(indexIdentifier, indexName, INDEX_VERSION);
     } catch (Throwable t) {
       throw new ComponentException("Error initializing elastic search index", t);
     }
@@ -426,13 +430,13 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     logger.debug("Locked {} '{}'.", type, id);
     try {
       String idWithOrgId = id.concat(orgId);
-      logger.debug("Removing element with id '{}' from search index '{}'", idWithOrgId, getIndexName(type));
-      final DeleteRequest deleteRequest = new DeleteRequest(getIndexName(type), idWithOrgId)
+      logger.debug("Removing element with id '{}' from search index '{}'", idWithOrgId, getSubIndexIdentifier(type));
+      final DeleteRequest deleteRequest = new DeleteRequest(getSubIndexIdentifier(type), idWithOrgId)
               .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
 
       final DeleteResponse delete = getClient().delete(deleteRequest, RequestOptions.DEFAULT);
       if (delete.getResult().equals(DocWriteResponse.Result.NOT_FOUND)) {
-        logger.trace("Document {} to delete was not found on index '{}'", idWithOrgId, getIndexName(type));
+        logger.trace("Document {} to delete was not found on index '{}'", idWithOrgId, getSubIndexIdentifier(type));
         return false;
       }
     } catch (IOException e) {

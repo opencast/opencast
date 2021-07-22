@@ -6,7 +6,7 @@ Elasticsearch powers the external API as well as the administrative user interfa
 Configuring External Nodes
 --------------------------
 
-Opencast's Elasticsearch settings can be found in the 'etc/custom.properties' configuration file.
+Opencast's Elasticsearch settings can be found in the `etc/custom.properties` configuration file.
 
 Relevant configuration keys are:
 
@@ -23,11 +23,17 @@ HTTP basic authentication (which is unsecure without TLS encryption). Refer to [
 documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-stack-security.html)
 to properly secure Elasticsearch.
 
-Additionally, the base name of the index opencast is looking for can be configured in
-'org.opencastproject.elasticsearch.index.ElasticsearchIndex.cfg' under `name`. This might be interesting if you run an
-Elasticsearch cluster and want to follow a naming scheme. But you should be aware that this index actually consists of
-multiple subindices whose names will be appended to the base name with an _ (e.g. "index_event").
+Additionally, the following settings can be configured in
+`org.opencastproject.elasticsearch.index.ElasticsearchIndex.cfg`:
+* `index.indentifier`
+* `index.name`
+
+The identifier defines which index opencast is looking for. This might be interesting if you run an
+Elasticsearch cluster and want to follow a naming scheme. But you should be aware that the index actually consists of
+multiple subindices whose identifiers will be appended to the base name with an _ (e.g. "opencast_event").
 If an index doesn't exist, Opencast will create it.
+
+The name is used for logging purposes only.
 
 Version
 -------
