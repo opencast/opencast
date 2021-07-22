@@ -62,7 +62,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
@@ -117,9 +116,9 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   public void activate(ComponentContext ctx) throws ComponentException {
     super.activate(ctx);
 
-    String indexIdentifier = StringUtils.defaultIfBlank(Objects.toString(ctx.getProperties()
-                    .get(INDEX_IDENTIFIER_PROPERTY)), DEFAULT_INDEX_IDENTIFIER);
-    String indexName = StringUtils.defaultIfBlank(Objects.toString(ctx.getProperties().get(INDEX_NAME_PROPERTY)),
+    String indexIdentifier = StringUtils.defaultIfBlank((String) ctx.getProperties()
+                    .get(INDEX_IDENTIFIER_PROPERTY), DEFAULT_INDEX_IDENTIFIER);
+    String indexName = StringUtils.defaultIfBlank((String) ctx.getProperties().get(INDEX_NAME_PROPERTY),
             DEFAULT_INDEX_NAME);
     try {
       init(indexIdentifier, indexName, INDEX_VERSION);
