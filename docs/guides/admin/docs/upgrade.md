@@ -14,9 +14,9 @@ please refer to [older release notes](https://docs.opencast.org).
 Elasticsearch Migration
 -----------------------
 
-In Opencast 11, instead of having two separate Elasticsearch indices for the Admin UI and the External API that share 
-most of their content, there will be only one index supporting both. Since this index will have a new name, this index 
-will either have to be rebuilt from scratch, or you can migrate your Admin UI index, since its structure is completely 
+In Opencast 11, instead of having two separate Elasticsearch indices for the Admin UI and the External API that share
+most of their content, there will be only one index supporting both. Since this index will have a new name, this index
+will either have to be rebuilt from scratch, or you can migrate your Admin UI index, since its structure is completely
 identical to the new index. However, if you don't care about accuracy, you could just keep using the Admin UI index.
 
 ### Option 1: Rebuild
@@ -36,9 +36,9 @@ In both cases you should get a 200 HTTP status.
 
 ### Option 2: Migration
 
-To migrate your index, you can use the `migrate-indices.sh` bash script contained in 
+To migrate your index, you can use the `migrate-indices.sh` bash script contained in
 [`docs/upgrade/10_to_11/`](https://github.com/opencast/opencast/blob/develop/docs/upgrade/10_to_11/).
-This will clone the Admin UI index to an index with the new name. If your storage supports hardlinks, the cloning 
+This will clone the Admin UI index to an index with the new name. If your storage supports hardlinks, the cloning
 process should be pretty quick.
 
 If you want to clean up the old indices afterwards, you can use `delete-indices.sh` for this.
@@ -47,12 +47,12 @@ If you want to clean up the old indices afterwards, you can use `delete-indices.
 
 - Please take a quick look at the scripts before using them and adjust them if needed.
 - Do not start your new Opencast before migrating the index! This will create a new empty index which will cause the
-  cloning process to fail. To fix this, delete all subindices of the new index (event, series, theme, version) before 
+  cloning process to fail. To fix this, delete all subindices of the new index (event, series, theme, version) before
   attempting migration again.
 - The old indices cannot be used during migration, so at least the Admin node shouldn't be running.
-- By default the cloning process will not copy over the index metadata and the two index settings `number_of_replicas` 
+- By default the cloning process will not copy over the index metadata and the two index settings `number_of_replicas`
   and `auto_expand_replicas`. The script will set `number_of_replicas` to 0 (assuming you have a single node) and
-  `auto_expand_replicas` to false (the default). This should be fine for most people, but if you have a more intricate 
+  `auto_expand_replicas` to false (the default). This should be fine for most people, but if you have a more intricate
   setup, you might need to change these.
 - The cleanup script will also attempt to delete the group indices that are no longer used since OC 10. If you started
 with OC 10 or already removed them, this will fail, but that's okay.
@@ -60,9 +60,9 @@ with OC 10 or already removed them, this will fail, but that's okay.
 
 ### Option 3: Keep the Admin UI index
 
-If you don't have time for either and if you don't care about having an exact index name, you could also just set 
+If you don't have time for either and if you don't care about having an exact index name, you could also just set
 `index.name` in `org.opencastproject.elasticsearch.index.ElasticsearchIndex` to "adminui" to keep using the old admin ui
 index. Do this before starting Opencast to avoid creating a new index.
 
-The external API index can then be removed. (Please be aware that the External API index cannot be used any longer since 
+The external API index can then be removed. (Please be aware that the External API index cannot be used any longer since
 it doesn't contain the themes.)
