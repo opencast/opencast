@@ -34,7 +34,7 @@
 # export KARAF_DEBUG       # Enable debug mode
 # export KARAF_REDIRECT    # Enable/set the std/err redirection when using bin/start
 
-export KARAF_DATA={{ opencast_data_path }}
+export KARAF_DATA={{ opencast_fast_data_path }}
 export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8"
 export JAVA_MAX_MEM="${JAVA_MAX_MEM:-3G}"
 export JAVA_PERM_MEM="${JAVA_PERM_MEM:-256M}"

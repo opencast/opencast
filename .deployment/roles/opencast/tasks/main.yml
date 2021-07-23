@@ -49,11 +49,16 @@
     group: root
     state: link
 
-- name: set ownership of storage
+- name: set ownership of storage directories
   file:
-    path: '{{ opencast_data_path }}'
+    path: '{{ item }}'
+    state: directory
+    mode: '0755'
     owner: opencast
     group: opencast
+  loop:
+    - '{{ opencast_data_path }}'
+    - '{{ opencast_fast_data_path }}'
 
 - name: install dependencies
   package:
