@@ -1,13 +1,13 @@
 ---
 
 dependencies:
-  - lkiesow.opencast_activemq
+  - elan.opencast_activemq
   # configure firewalld before certbot
-  - lkiesow.opencast_firewalld
-  - lkiesow.opencast_certbot
-  - lkiesow.opencast_elasticsearch
-  - lkiesow.opencast_nginx
-  - lkiesow.opencast_postgresql
-  - lkiesow.opencast_repository
-  - lkiesow.opencast_selinux
-  - lkiesow.opencast_user
+  - elan.opencast_firewalld
+  - elan.opencast_certbot
+  - elan.opencast_elasticsearch
+  - elan.opencast_nginx
+  - elan.opencast_postgresql
+  - elan.opencast_repository
+  - elan.opencast_selinux
+  - elan.opencast_user
