@@ -39,6 +39,7 @@ export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.ma
 export JAVA_MAX_MEM="${JAVA_MAX_MEM:-3G}"
 export JAVA_PERM_MEM="${JAVA_PERM_MEM:-256M}"
 export KARAF_NOROOT=true
+export KARAF_DEBUG=true
 
 # Mitigation for new Tesseract 4.x locking up the system
 export OMP_THREAD_LIMIT=1
