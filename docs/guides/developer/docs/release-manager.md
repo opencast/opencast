@@ -36,6 +36,17 @@ schedule by six months).
 It's usually a good idea to create or clean the release notes page early in the release cycle. This allows for a place
 to put the release schedule, short descriptions of features or noteworthy configuration changes early on.
 
+### Upgrade script
+
+In general, everyone assumes someone else is testing the upgrade guides and scripts.  That means it's your job to take
+a quick peek every one in a while and make sure that they work.  Things to think about:
+
+* Do we need Solr index rebuilds?
+* Do we need Elasticsearch index rebuilds?
+* Is there any database migration necessary?
+* Are there any leftover steps in the upgrade docs from previous Opencast versions?
+* Is the table of content in the guide correct?
+
 ### The  Release Schedule
 
 Releases should happen twice a year, usually within a time span of 9.5 months between the cut of the previous release
