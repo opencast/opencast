@@ -33,6 +33,14 @@
     owner: opencast
     group: opencast
 
+- name: create karaf instances directory
+  file:
+    path: /opt/opencast-dist-allinone/instances
+    state: directory
+    mode: '0755'
+    owner: opencast
+    group: opencast
+
 - name: link to systemd unit
   file:
     src: /opt/opencast/docs/scripts/service/opencast.service
