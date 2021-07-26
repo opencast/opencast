@@ -167,6 +167,8 @@
               com.google.api.*
             </_exportcontents>
             <Import-Package>
+              !com.google.appengine*,
+              !com.google.apphosting*,
               !javax.annotation,
               !oracle.xml.parser.*,
               !org.jaxen.*,

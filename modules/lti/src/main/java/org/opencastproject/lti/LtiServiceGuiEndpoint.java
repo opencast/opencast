@@ -66,7 +66,7 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("/")
 @RestService(
-    name = "ltirestserviceendpoint",
+    name = "ltirestserviceguiendpoint",
     title = "LTI Service",
     notes = {},
     abstractText = "Provides operations to LTI clients"
