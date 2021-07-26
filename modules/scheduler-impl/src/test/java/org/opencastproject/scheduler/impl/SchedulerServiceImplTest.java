@@ -174,6 +174,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -200,6 +201,7 @@ import javax.ws.rs.core.Response;
 public class SchedulerServiceImplTest {
 
   public static final File baseDir = new File(new File(IoSupport.getSystemTmpDir()), "schedulerservicetest");
+  public static final File archiveDir = new File(baseDir, "archive");
 
   private SeriesService seriesService;
   private static UnitTestWorkspace workspace;
@@ -1712,8 +1714,9 @@ public class SchedulerServiceImplTest {
             String baseName = AssetManagerImpl.getFileNameFromUrn(mpe).getOr(mpe.getElementType().toString());
 
             // the returned uri must match the path of the {@link #getAsset} method
-            return uri(baseDir.toURI(),
+            return uri(archiveDir.toURI(),
                     mpe.getMediaPackage().getIdentifier().toString(),
+                    snapshot.getVersion().toString(),
                     mpe.getIdentifier(),
                     baseName);
           }
@@ -1775,10 +1778,21 @@ public class SchedulerServiceImplTest {
         return Option.none();
       }
 
+      /**
+       * For this test we don't store assets with media package element id as filename so it matches the workspace
+       * paths. But we can assume that in each folder is only one media package element.
+       * @param path
+       *          Path to directory
+       * @return  First file in that directory
+       */
+      private File getFirstFile(File path) {
+        return path.listFiles()[0];
+      }
+
       @Override
       public void put(StoragePath path, Source source) throws AssetStoreException {
-        File destFile = new File(baseDir, UrlSupport.concat(path.getMediaPackageId(), path.getMediaPackageElementId(),
-                path.getVersion().toString()));
+        File destFile = new File(archiveDir, UrlSupport.concat(path.getMediaPackageId(), path.getVersion().toString(),
+                path.getMediaPackageElementId(), Paths.get(source.getUri()).getFileName().toString()));
         try {
           FileUtils.copyFile(workspace.get(source.getUri()), destFile);
         } catch (IOException e) {
@@ -1790,8 +1804,8 @@ public class SchedulerServiceImplTest {
 
       @Override
       public Opt<InputStream> get(StoragePath path) throws AssetStoreException {
-        File file = new File(baseDir, UrlSupport.concat(path.getMediaPackageId(), path.getMediaPackageElementId(),
-                path.getVersion().toString()));
+        File file = getFirstFile(new File(archiveDir, UrlSupport.concat(path.getMediaPackageId(),
+                path.getVersion().toString(), path.getMediaPackageElementId())));
         InputStream inputStream;
         try {
           inputStream = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
@@ -1808,10 +1822,10 @@ public class SchedulerServiceImplTest {
 
       @Override
       public boolean copy(StoragePath from, StoragePath to) throws AssetStoreException {
-        File file = new File(baseDir, UrlSupport.concat(from.getMediaPackageId(), from.getMediaPackageElementId(),
-                from.getVersion().toString()));
-        File destFile = new File(baseDir,
-                UrlSupport.concat(to.getMediaPackageId(), to.getMediaPackageElementId(), to.getVersion().toString()));
+        File file = getFirstFile(new File(archiveDir, UrlSupport.concat(from.getMediaPackageId(),
+                from.getVersion().toString(), from.getMediaPackageElementId())));
+        File destFile = getFirstFile(new File(archiveDir,
+                UrlSupport.concat(to.getMediaPackageId(), to.getVersion().toString(), to.getMediaPackageElementId())));
         try {
           FileUtils.copyFile(file, destFile);
           return true;
