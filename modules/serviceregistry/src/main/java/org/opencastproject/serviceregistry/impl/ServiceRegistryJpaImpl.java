@@ -29,7 +29,6 @@ import static org.opencastproject.job.api.AbstractJobProducer.ACCEPT_JOB_LOADS_E
 import static org.opencastproject.job.api.AbstractJobProducer.DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING;
 import static org.opencastproject.job.api.Job.FailureReason.DATA;
 import static org.opencastproject.job.api.Job.Status.FAILED;
-import static org.opencastproject.job.jpa.JpaJob.fnToJob;
 import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
 import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
 import static org.opencastproject.serviceregistry.api.ServiceState.ERROR;
@@ -975,15 +974,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return job;
   }
 
-  private Fn<JpaJob, JpaJob> fnSetJobUri() {
-    return new Fn<JpaJob, JpaJob>() {
-      @Override
-      public JpaJob apply(JpaJob job) {
-        return setJobUri(job);
-      }
-    };
-  }
-
   /**
    * Internal method to update a job, throwing unwrapped JPA exceptions.
    *
@@ -1714,16 +1704,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (jobs.size() == 0) {
         jobs = getChildren(em, id);
       }
-      return $(jobs).sort(new Comparator<JpaJob>() {
-        @Override
-        public int compare(JpaJob job1, JpaJob job2) {
-          if (job1.getDateCreated() == null || job2.getDateCreated() == null) {
-            return 0;
-          } else {
-            return job1.getDateCreated().compareTo(job2.getDateCreated());
-          }
-        }
-      }).map(fnSetJobUri()).map(fnToJob()).toList();
+      return jobs.stream()
+          .map(this::setJobUri)
+          .map(JpaJob::toJob)
+          .collect(Collectors.toList());
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
@@ -1774,7 +1758,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         setJobUri(job);
       }
 
-      return $(jobs).map(fnToJob()).toList();
+      return jobs.stream()
+          .map(JpaJob::toJob)
+          .collect(Collectors.toList());
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
