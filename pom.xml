@@ -205,6 +205,7 @@
     <module>modules/security-ldap</module>
     <module>modules/security-lti</module>
     <module>modules/security-shibboleth</module>
+    <module>modules/security-jwt</module>
     <module>modules/series-service-api</module>
     <module>modules/series-service-impl</module>
     <module>modules/series-service-remote</module>

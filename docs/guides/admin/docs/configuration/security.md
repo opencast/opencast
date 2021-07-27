@@ -62,3 +62,4 @@ userdirectory-jpa jar with the userdirectory-ldap jar.
 * [Configure Central Authentication Service (CAS)](security.cas.md)
 * [Configure LDAP Authentication and Authorization](security.ldap.md)
 * [Configure Authentication and Authorization Infrastructure (AAI)](security.aai.md)
+* [Configure JWT-based Authentication and Authorization (e.g. for OIDC)](security.jwt.md)
