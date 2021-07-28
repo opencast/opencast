@@ -9,6 +9,37 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### PR and release process changes
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Thu, 17 Jun 2021
+
+```no-highlight
+Hi all,
+
+As discussed at the technical meeting today, I'm proposing a few changes to our
+current process:
+
+1) Intra-organization reviews should be permitted.  This means that, for example, Elan can now review Elan's PRs.
+Considering our current developmentresources, it's not reasonable to continue with the current methodology - I'm ending
+up being the primary non-Elan reviewer, and that's bottlenecking our reviews.  This change also has far less impact
+given that the larger committer groups are generally supporting multiple separate installs, leading to less drive for a
+single institution's goals to be pushed into the project.
+
+2) PRs must still be discussed at the technical meeting prior to merge.  Yes, this imposes a potential 1 week delay in
+merging a PR, but it also gives you (committers) a chance to object to a potential merge.  It's also a *very* good
+reason to show up at the technical meeting.
+
+3) Releases shall be on Wednesday, rather than Tuesday.  I'm not sure if we've formalized that releases are on Tuesday
+currently, but doing them on Wednesday means that last minute PRs can be discussed on Tuesday, then immediately merged,
+rather than waiting around for a full week and missing a release.
+
+WIth this change, I'd also like to modify the committer expectations: We used to say 20% of your time.  That would be
+nice, but it's obviously not happening.  Instead, I propose that committers be expected to review 2-3 PRs per week.
+
+Proposal closes EOD 2021-06-18 UTC-6.
+
+G
+```
+
 ### Closing old Pull Requests
 Proposed by Katrin Ihler <ihler@elan-ev.de>, passed on Mon, 9 Mar 2021
 
