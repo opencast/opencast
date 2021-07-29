@@ -22,19 +22,40 @@
 package org.opencastproject.engage.theodul.plugin.tab.shortcuts;
 
 import org.opencastproject.engage.theodul.api.AbstractEngagePlugin;
+import org.opencastproject.engage.theodul.api.EngagePlugin;
+import org.opencastproject.engage.theodul.api.EngagePluginManager;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
 
 @Path("/")
+@Component(
+    property = {
+        "opencast.engage.plugin.name=EngagePluginTabShortcuts",
+        "opencast.engage.plugin.description=Simple implementation of a tab with the shortcuts",
+        "opencast.engage.plugin.rest=false"
+    },
+    immediate = true,
+    service = EngagePlugin.class
+)
 public class EngagePluginTabShortcuts extends AbstractEngagePlugin {
 
   private static final Logger log = LoggerFactory.getLogger(EngagePluginTabShortcuts.class);
 
+  @Activate
   protected void activate(ComponentContext cc) {
     log.info("Activated engage plugin: Shortcuts.");
+  }
+
+  @Override
+  @Reference
+  protected void setPluginManager(final EngagePluginManager pluginManager) {
+    this.pluginManager = pluginManager;
   }
 }
