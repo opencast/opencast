@@ -165,4 +165,30 @@ public class IndexEndpoint {
     }));
     return R.ok();
   }
+
+  @POST
+  @Path("resume/{service}")
+  @RestQuery(name = "resumeIndexRebuild",
+          description = "Starts repopulating the Index from an specific service and will then continue with the rest "
+                  + "of the services that come afterwards",
+          returnDescription = "OK if repopulation has started", pathParameters = {
+          @RestParameter(name = "service", isRequired = true, description = "The service to start recreating the index "
+                  + "from. "
+                  + "The available services are: Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
+                  + "All services that come after the specified service in the order above will also run.",
+                  type = RestParameter.Type.STRING) }, responses = {
+          @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
+  public Response resumeIndexRebuild(@PathParam("service") final String service) {
+    final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
+            securityService.getUser());
+    executor.execute(() -> securityContext.runInContext(() -> {
+      try {
+        logger.info("Resume repopulating the index from service {}", service);
+        indexRebuildService.resumeIndexRebuild(elasticsearchIndex, service);
+      } catch (Throwable t) {
+        logger.error("Repopulating the index failed", t);
+      }
+    }));
+    return R.ok();
+  }
 }
