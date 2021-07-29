@@ -32,7 +32,7 @@ import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.Path;
@@ -51,24 +51,19 @@ public class TestServerEndpoint extends ServerEndpoint {
 
   public TestServerEndpoint() throws Exception {
     mpBuilder = new MediaPackageBuilderImpl();
-    this.serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
+    this.serviceRegistry = EasyMock.createMock(ServiceRegistry.class);
 
-    List<HostRegistration> hosts = new ArrayList<HostRegistration>();
-    hosts.add(new JaxbHostRegistration(HOST1, "1.1.1.1", "node1", 100000, 8, 8, true, false));
-    hosts.add(new JaxbHostRegistration(HOST2, "1.1.1.2", "node2", 400000, 4, 8, true, true));
-    hosts.add(new JaxbHostRegistration(HOST3, "1.1.1.3", "node3", 200000, 2, 8, false, false));
-    hosts.add(new JaxbHostRegistration(HOST4, "1.1.1.4", "node4", 500000, 6, 8, true, true));
+    List<HostRegistration> hosts = Arrays.asList(
+        new JaxbHostRegistration(HOST1, "1.1.1.1", "node1", 100000, 8, 8, true, false),
+        new JaxbHostRegistration(HOST2, "1.1.1.2", "node2", 400000, 4, 8, true, true),
+        new JaxbHostRegistration(HOST3, "1.1.1.3", "node3", 200000, 2, 8, false, false),
+        new JaxbHostRegistration(HOST4, "1.1.1.4", "node4", 500000, 6, 8, true, true));
 
-    JaxbServiceRegistration service1 = new JaxbServiceRegistration("test", HOST1, "");
-    JaxbServiceRegistration service2 = new JaxbServiceRegistration("test", HOST2, "");
-    JaxbServiceRegistration service3 = new JaxbServiceRegistration("test", HOST3, "");
-    JaxbServiceRegistration service4 = new JaxbServiceRegistration("test", HOST4, "");
-
-    List<ServiceStatistics> statistics = new ArrayList<ServiceStatistics>();
-    statistics.add(new JaxbServiceStatistics(service1, 200000, 3000, 2, 2, 2));
-    statistics.add(new JaxbServiceStatistics(service2, 300000, 2000, 4, 4, 2));
-    statistics.add(new JaxbServiceStatistics(service3, 100000, 4000, 2, 4, 2));
-    statistics.add(new JaxbServiceStatistics(service4, 400000, 5000, 2, 4, 2));
+    List<ServiceStatistics> statistics = Arrays.asList(
+        new JaxbServiceStatistics(new JaxbServiceRegistration("test", HOST1, ""), 200000, 3000, 2, 2, 2),
+        new JaxbServiceStatistics(new JaxbServiceRegistration("test", HOST2, ""), 300000, 2000, 4, 4, 2),
+        new JaxbServiceStatistics(new JaxbServiceRegistration("test", HOST3, ""), 100000, 4000, 2, 4, 2),
+        new JaxbServiceStatistics(new JaxbServiceRegistration("test", HOST4, ""), 400000, 5000, 2, 4, 2));
 
     EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(hosts).anyTimes();
     EasyMock.expect(serviceRegistry.getServiceStatistics()).andReturn(statistics).anyTimes();

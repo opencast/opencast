@@ -21,20 +21,14 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.BLANK;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.index.service.resources.list.provider.ServersListProvider;
-import org.opencastproject.index.service.resources.list.query.ServersListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
-import org.opencastproject.util.SmartIterator;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -42,11 +36,9 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
-import com.entwinemedia.fn.data.json.JValue;
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -54,13 +46,17 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -90,29 +86,32 @@ import javax.ws.rs.core.Response;
 )
 public class ServerEndpoint {
 
+  private static final Gson gson = new Gson();
+
   private enum Sort {
     COMPLETED, CORES, HOSTNAME, MAINTENANCE, MEANQUEUETIME, MEANRUNTIME, NODENAME, ONLINE, QUEUED, RUNNING
   }
 
-  // List of property keys for the JSON job object
-  private static final String KEY_ONLINE = "online";
-  private static final String KEY_MAINTENANCE = "maintenance";
+  private enum Status {
+    ONLINE, OFFLINE, MAINTENANCE
+  }
+
+  // List of filter keys
   private static final String KEY_HOSTNAME = "hostname";
   private static final String KEY_NODE_NAME = "nodeName";
-  private static final String KEY_CORES = "cores";
-  private static final String KEY_RUNNING = "running";
-  private static final String KEY_COMPLETED = "completed";
-  private static final String KEY_QUEUED = "queued";
-  private static final String KEY_MEAN_RUN_TIME = "meanRunTime";
-  private static final String KEY_MEAN_QUEUE_TIME = "meanQueueTime";
+  private static final String KEY_STATUS = "status";
+  private static final String KEY_TEXT_FILTER = "textFilter";
+
+  /** Cache time */
+  private static final long CACHE_SECONDS = 60;
 
   /**
    * Comparator for the servers list
    */
-  private class ServerComparator implements Comparator<JSONObject> {
+  private class ServerComparator implements Comparator<Server> {
 
-    private Sort sortType;
-    private Boolean ascending = true;
+    private final Sort sortType;
+    private final boolean ascending;
 
     ServerComparator(Sort sortType, Boolean ascending) {
       this.sortType = sortType;
@@ -120,65 +119,56 @@ public class ServerEndpoint {
     }
 
     @Override
-    public int compare(JSONObject host1, JSONObject host2) {
-      int result;
+    public int compare(Server host1, Server host2) {
+      return (ascending ? 1 : -1) * compareByType(host1, host2);
+    }
 
+    private int compareByType(final Server host1, final Server host2) {
       switch (sortType) {
         case ONLINE:
-          Boolean status1 = (Boolean) host1.get(KEY_ONLINE);
-          Boolean status2 = (Boolean) host2.get(KEY_ONLINE);
-          result = status1.compareTo(status2);
-          break;
+          return Boolean.compare(host1.online, host2.online);
         case CORES:
-          result = ((Integer) host1.get(KEY_CORES)).compareTo((Integer) host2.get(KEY_CORES));
-          break;
+          return Long.compare(host1.cores, host2.cores);
         case COMPLETED:
-          result = ((Long) host1.get(KEY_COMPLETED)).compareTo((Long) host2.get(KEY_COMPLETED));
-          break;
+          return Long.compare(host1.completed, host2.completed);
         case QUEUED:
-          result = ((Integer) host1.get(KEY_QUEUED)).compareTo((Integer) host2.get(KEY_QUEUED));
-          break;
+          return Long.compare(host1.queued, host2.queued);
         case MAINTENANCE:
-          Boolean mtn1 = (Boolean) host1.get(KEY_MAINTENANCE);
-          Boolean mtn2 = (Boolean) host2.get(KEY_MAINTENANCE);
-          result = mtn1.compareTo(mtn2);
-          break;
+          return Boolean.compare(host1.maintenance, host2.maintenance);
         case RUNNING:
-          result = ((Integer) host1.get(KEY_RUNNING)).compareTo((Integer) host2.get(KEY_RUNNING));
-          break;
+          return Long.compare(host1.running, host2.running);
         case MEANQUEUETIME:
-          result = ((Long) host1.get(KEY_MEAN_QUEUE_TIME)).compareTo((Long) host2.get(KEY_MEAN_QUEUE_TIME));
-          break;
+          return Long.compare(host1.meanQueueTime, host2.meanQueueTime);
         case MEANRUNTIME:
-          result = ((Long) host1.get(KEY_MEAN_RUN_TIME)).compareTo((Long) host2.get(KEY_MEAN_RUN_TIME));
-          break;
+          return Long.compare(host1.meanRunTime, host2.meanRunTime);
         case NODENAME:
-        {
-          String name1 = (String) host1.get(KEY_NODE_NAME);
-          String name2 = (String) host2.get(KEY_NODE_NAME);
-          result = name1.compareTo(name2);
-          break;
-        }
+          return host1.nodeName.compareTo(host2.nodeName);
         case HOSTNAME:
         default:
-        {
-          String name1 = (String) host1.get(KEY_HOSTNAME);
-          String name2 = (String) host2.get(KEY_HOSTNAME);
-          result = name1.compareTo(name2);
-        }
+          return host1.hostname.compareTo(host2.hostname);
       }
-
-      return ascending ? result : -1 * result;
     }
+  }
+
+  private class Server {
+    protected boolean online;
+    protected boolean maintenance;
+    protected String hostname;
+    protected String nodeName;
+    protected long cores;
+    protected long running;
+    protected long queued;
+    protected long completed;
+    protected long meanRunTime;
+    protected long meanQueueTime;
   }
 
   private static final Logger logger = LoggerFactory.getLogger(ServerEndpoint.class);
 
-  public static final Response UNAUTHORIZED = Response.status(Response.Status.UNAUTHORIZED).build();
-  public static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
-  public static final Response SERVER_ERROR = Response.serverError().build();
-
   private ServiceRegistry serviceRegistry;
+
+  private long lastUpdated = 0;
+  private final List<Server> serverData = new ArrayList<>();
 
   /** OSGi callback for the service registry. */
   @Reference
@@ -204,167 +194,147 @@ public class ServerEndpoint {
                   + "The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. HOSTNAME:DESC).", isRequired = false, type = STRING) },
           responses = { @RestResponse(description = "Returns the list of jobs from Opencast", responseCode = HttpServletResponse.SC_OK) },
           returnDescription = "The list of servers")
-  public Response getServers(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
+  public Response getServers(@QueryParam("limit") int limit, @QueryParam("offset") int offset,
           @QueryParam("filter") String filter, @QueryParam("sort") String sort)
           throws Exception {
 
-    ServersListQuery query = new ServersListQuery();
-    EndpointUtil.addRequestFiltersToQuery(filter, query);
-    query.setLimit(limit);
-    query.setOffset(offset);
+    final Map<String, String> filters;
+    try {
+      filters = Arrays.stream(StringUtils.split(Objects.toString(filter, ""), ","))
+          .map(f -> f.split(":", 2))
+          .collect(Collectors.toMap(f -> f[0], f -> f[1]));
+    } catch (ArrayIndexOutOfBoundsException e) {
+      return badRequest("Invalid filter string", e);
+    }
 
-    List<JSONObject> servers = new ArrayList<>();
-    // Get service statistics for all hosts and services
+    List<Server> servers = new ArrayList<>();
+    for (Server server: getServerData()) {
+      if (!filters.getOrDefault(KEY_HOSTNAME, server.hostname).equalsIgnoreCase(server.hostname)) {
+        continue;
+      }
+
+      if (!filters.getOrDefault(KEY_NODE_NAME, server.nodeName).equalsIgnoreCase(server.nodeName)) {
+        continue;
+      }
+
+      if (filters.containsKey(KEY_STATUS)) {
+        final Status status = Status.valueOf(filters.get(KEY_STATUS).toUpperCase());
+        if (Status.ONLINE.equals(status) && !server.online) {
+          continue;
+        }
+        if (Status.OFFLINE.equals(status) && server.online) {
+          continue;
+        }
+        if (Status.MAINTENANCE.equals(status) && !server.maintenance) {
+          continue;
+        }
+      }
+
+      final String text = filters.getOrDefault(KEY_TEXT_FILTER, "");
+      if (Stream.of(server.hostname, server.nodeName).noneMatch(v -> StringUtils.containsIgnoreCase(v, text))) {
+        continue;
+      }
+
+      servers.add(server);
+    }
+
+    // Sorting
+    Sort sortKey = Sort.HOSTNAME;
+    boolean ascending = true;
+    if (StringUtils.isNotBlank(sort)) {
+      try {
+        SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
+        sortKey = Sort.valueOf(sortCriterion.getFieldName().toUpperCase());
+        ascending = Order.Ascending == sortCriterion.getOrder() || Order.None == sortCriterion.getOrder();
+      } catch (WebApplicationException | IllegalArgumentException e) {
+        return badRequest(String.format("Invalid sort parameter `%s`", sort), e);
+      }
+    }
+    servers.sort(new ServerComparator(sortKey, ascending));
+
+    offset = Math.min(offset, servers.size());
+    final List<Server> serverResults;
+    try {
+      serverResults = servers.subList(offset, Math.min(servers.size(), limit + offset));
+    } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+      return badRequest("Invalid offset and limit", e);
+    }
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("total", servers.size());
+    result.put("offset", offset);
+    result.put("count", serverResults.size());
+    result.put("limit", limit);
+    result.put("results", serverResults);
+    return Response.ok(gson.toJson(result)).build();
+  }
+
+  /**
+   * Get service statistics for all hosts and services
+   * @return List of all servers
+   * @throws ServiceRegistryException
+   *          If the host data could not be retrieved
+   */
+  private synchronized List<Server> getServerData() throws ServiceRegistryException {
+    // Check if cache is still valid
+    if (lastUpdated + CACHE_SECONDS > Instant.now().getEpochSecond()) {
+      logger.debug("Using server data cache.");
+      return serverData;
+    }
+
+    // Update cache
+    serverData.clear();
+    logger.debug("Updating server data");
     List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
-    for (HostRegistration server : serviceRegistry.getHostRegistrations()) {
+    for (HostRegistration host : serviceRegistry.getHostRegistrations()) {
       // Calculate statistics per server
-      long jobsCompleted = 0;
-      int jobsRunning = 0;
-      int jobsQueued = 0;
+      Server server = new Server();
+      server.online = host.isOnline();
+      server.maintenance = host.isMaintenanceMode();
+      server.hostname = host.getBaseUrl();
+      server.nodeName = host.getNodeName();
+      server.cores = host.getCores();
+      server.running = 0;
+      server.queued = 0;
+      server.completed = 0;
       long sumMeanRuntime = 0;
       long sumMeanQueueTime = 0;
       int totalServiceOnHost = 0;
-      int offlineJobProducerServices = 0;
-      int totalJobProducerServices = 0;
-      Set<String> serviceTypes = new HashSet<>();
       for (ServiceStatistics serviceStat : servicesStatistics) {
-        if (server.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
+        if (host.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
           totalServiceOnHost++;
-          jobsCompleted += serviceStat.getFinishedJobs();
-          jobsRunning += serviceStat.getRunningJobs();
-          jobsQueued += serviceStat.getQueuedJobs();
+          server.completed += serviceStat.getFinishedJobs();
+          server.running += serviceStat.getRunningJobs();
+          server.queued += serviceStat.getQueuedJobs();
           // mean time values are given in milliseconds,
           // we should convert them to seconds,
           // because the adminNG UI expect it in this format
           sumMeanRuntime += TimeUnit.MILLISECONDS.toSeconds(serviceStat.getMeanRunTime());
           sumMeanQueueTime += TimeUnit.MILLISECONDS.toSeconds(serviceStat.getMeanQueueTime());
-          if (!serviceStat.getServiceRegistration().isOnline()
-                  && serviceStat.getServiceRegistration().isJobProducer()) {
-            offlineJobProducerServices++;
-            totalJobProducerServices++;
-          } else if (serviceStat.getServiceRegistration().isJobProducer()) {
-            totalJobProducerServices++;
-          }
-          serviceTypes.add(serviceStat.getServiceRegistration().getServiceType());
         }
       }
-      long meanRuntime = totalServiceOnHost > 0 ? Math.round((double)sumMeanRuntime / totalServiceOnHost) : 0L;
-      long meanQueueTime = totalServiceOnHost > 0 ? Math.round((double)sumMeanQueueTime / totalServiceOnHost) : 0L;
-
-      boolean vOnline = server.isOnline();
-      boolean vMaintenance = server.isMaintenanceMode();
-      String vHostname = server.getBaseUrl();
-      String vNodeName = server.getNodeName();
-      int vCores = server.getCores();
-
-      if (query.getHostname().isSome()
-              && !StringUtils.equalsIgnoreCase(vHostname, query.getHostname().get()))
-          continue;
-
-      if (query.getNodeName().isSome()
-              && !StringUtils.equalsIgnoreCase(vNodeName, query.getNodeName().get()))
-          continue;
-
-      if (query.getStatus().isSome()) {
-        if (StringUtils.equalsIgnoreCase(
-                ServersListProvider.SERVER_STATUS_ONLINE,
-                query.getStatus().get())
-                && !vOnline)
-          continue;
-        if (StringUtils.equalsIgnoreCase(
-                ServersListProvider.SERVER_STATUS_OFFLINE,
-                query.getStatus().get())
-                && vOnline)
-          continue;
-        if (StringUtils.equalsIgnoreCase(
-                ServersListProvider.SERVER_STATUS_MAINTENANCE,
-                query.getStatus().get())
-                && !vMaintenance)
-          continue;
-      }
-
-      if (query.getFreeText().isSome()
-                && !StringUtils.containsIgnoreCase(vHostname, query.getFreeText().get())
-                && !StringUtils.containsIgnoreCase(vNodeName, query.getFreeText().get())
-                && !StringUtils.containsIgnoreCase(server.getIpAddress(), query.getFreeText().get()))
-        continue;
-
-      JSONObject jsonServer = new JSONObject();
-      jsonServer.put(KEY_ONLINE, vOnline && offlineJobProducerServices <= totalJobProducerServices / 2);
-      jsonServer.put(KEY_MAINTENANCE, vMaintenance);
-      jsonServer.put(KEY_HOSTNAME, vHostname);
-      jsonServer.put(KEY_NODE_NAME, vNodeName);
-      jsonServer.put(KEY_CORES, vCores);
-      jsonServer.put(KEY_RUNNING, jobsRunning);
-      jsonServer.put(KEY_QUEUED, jobsQueued);
-      jsonServer.put(KEY_COMPLETED, jobsCompleted);
-      jsonServer.put(KEY_MEAN_RUN_TIME, meanRuntime);
-      jsonServer.put(KEY_MEAN_QUEUE_TIME, meanQueueTime);
-      servers.add(jsonServer);
+      server.meanRunTime = totalServiceOnHost > 0 ? Math.round((double) sumMeanRuntime / totalServiceOnHost) : 0L;
+      server.meanQueueTime = totalServiceOnHost > 0 ? Math.round((double) sumMeanQueueTime / totalServiceOnHost) : 0L;
+      serverData.add(server);
     }
-
-    // Sorting
-    Sort sortKey = Sort.HOSTNAME;
-    Boolean ascending = true;
-    if (StringUtils.isNotBlank(sort)) {
-      try {
-        SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
-        sortKey = Sort.valueOf(sortCriterion.getFieldName().toUpperCase());
-        ascending = Order.Ascending == sortCriterion.getOrder()
-                || Order.None == sortCriterion.getOrder();
-      } catch (WebApplicationException ex) {
-        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", sort);
-      } catch (IllegalArgumentException ex) {
-        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", sort);
-      }
-    }
-
-    JSONArray jsonList = new JSONArray();
-    if (!servers.isEmpty()) {
-      Collections.sort(servers, new ServerComparator(sortKey, ascending));
-      jsonList.addAll(new SmartIterator(
-              query.getLimit().getOrElse(0),
-              query.getOffset().getOrElse(0))
-              .applyLimitAndOffset(servers));
-    }
-
-    return RestUtils.okJsonList(
-            getServersListAsJson(jsonList),
-            query.getOffset().getOrElse(0),
-            query.getLimit().getOrElse(0),
-            servers.size());
+    lastUpdated = Instant.now().getEpochSecond();
+    return serverData;
   }
 
   /**
-   * Transform each list item to JValue representation.
-   * @param servers list with servers JSONObjects
-   * @return servers list
+   * Return a bad request response but log additional details in debug mode.
+   *
+   * @param message
+   *          Message to send
+   * @param e
+   *          Exception to log. If <pre>null</pre>, a new exception is created to log a stack trace.
+   * @return 400 BAD REQUEST HTTP response
    */
-  private List<JValue> getServersListAsJson(List<JSONObject> servers) {
-    List<JValue> jsonServers = new ArrayList<JValue>();
-    for (JSONObject server : servers) {
-      Boolean vOnline = (Boolean) server.get(KEY_ONLINE);
-      Boolean vMaintenance = (Boolean) server.get(KEY_MAINTENANCE);
-      String vHostname = (String) server.get(KEY_HOSTNAME);
-      String vNodeName = (String) server.get(KEY_NODE_NAME);
-      Integer vCores = (Integer) server.get(KEY_CORES);
-      Integer vRunning = (Integer) server.get(KEY_RUNNING);
-      Integer vQueued = (Integer) server.get(KEY_QUEUED);
-      Long vCompleted = (Long) server.get(KEY_COMPLETED);
-      Long vMeanRunTime = (Long) server.get(KEY_MEAN_RUN_TIME);
-      Long vMeanQueueTime = (Long) server.get(KEY_MEAN_QUEUE_TIME);
-
-      jsonServers.add(obj(f(KEY_ONLINE, v(vOnline)),
-              f(KEY_MAINTENANCE, v(vMaintenance)),
-              f(KEY_HOSTNAME, v(vHostname, BLANK)),
-              f(KEY_NODE_NAME, v(vNodeName, BLANK)),
-              f(KEY_CORES, v(vCores)),
-              f(KEY_RUNNING, v(vRunning)),
-              f(KEY_QUEUED, v(vQueued)),
-              f(KEY_COMPLETED, v(vCompleted)),
-              f(KEY_MEAN_RUN_TIME, v(vMeanRunTime)),
-              f(KEY_MEAN_QUEUE_TIME, v(vMeanQueueTime))));
-    }
-    return jsonServers;
+  private Response badRequest(final String message, final Exception e) {
+    logger.debug(message, e == null && logger.isDebugEnabled() ? new IllegalArgumentException(message) : e);
+    return Response.status(Response.Status.BAD_REQUEST)
+        .entity(gson.toJson(message))
+        .build();
   }
+
 }
