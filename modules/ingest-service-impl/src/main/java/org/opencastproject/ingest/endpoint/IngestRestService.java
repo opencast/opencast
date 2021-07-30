@@ -732,6 +732,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       returnDescription = "")
   public Response addMediaPackage(@Context HttpServletRequest request, @PathParam("wdID") String wdID) {
     logger.trace("add mediapackage as multipart-form-data with workflow definition id: {}", wdID);
+    // For compatibility, we will support re-use of flavors for now but will print a warning.
+    // If there are no major complaints, we will remove this with Opencast 11 or 12
+    boolean flavorAlreadyUsed = false;
     MediaPackageElementFlavor flavor = null;
     List<String> tags = new ArrayList<>();
     try {
@@ -757,6 +760,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             if ("flavor".equals(fieldName)) {
               try {
                 flavor = MediaPackageElementFlavor.parseFlavor(value);
+                flavorAlreadyUsed = false;
               } catch (IllegalArgumentException e) {
                 return badRequest(String.format("Could not parse flavor '%s'", value), e);
               }
@@ -845,7 +849,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               } catch (java.net.URISyntaxException e) {
                 return badRequest(String.format("Invalid URI %s for media", value), e);
               }
+              warnIfFlavorAlreadyUsed(flavorAlreadyUsed);
               ingestService.addTrack(mediaUrl, flavor, tags.toArray(new String[0]), mp);
+              flavorAlreadyUsed = true;
               tags.clear();
               hasMedia = true;
 
@@ -860,7 +866,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               /* A flavor has to be specified in the request prior the video file */
               return badRequest("A flavor has to be specified in the request prior to the content BODY", null);
             }
+            warnIfFlavorAlreadyUsed(flavorAlreadyUsed);
             ingestService.addTrack(item.openStream(), item.getName(), flavor, tags.toArray(new String[0]), mp);
+            flavorAlreadyUsed = true;
             tags.clear();
             hasMedia = true;
           }
@@ -899,6 +907,21 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     } catch (Exception e) {
       logger.warn("Unable to add mediapackage", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @Deprecated
+  private void warnIfFlavorAlreadyUsed(final boolean used) {
+    if (used) {
+      logger.warn("\n"
+          + "********************************************\n"
+          + "* Warning: Re-use of flavors during ingest *\n"
+          + "*          is deprecated and will be       *\n"
+          + "*          removed soon! Declare a flavor  *\n"
+          + "*          for each media file or create   *\n"
+          + "*          an issue if you need this.      *\n"
+          + "********************************************"
+      );
     }
   }
 
