@@ -68,17 +68,23 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.FileEntity;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
@@ -92,6 +98,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -153,6 +160,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     String COMPLETED = "completed";
     String FAILED = "failed";
     String PROCESSING = "processing";
+    String WAITING = "waiting";
   }
 
   /** Service dependencies */
@@ -199,8 +207,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   /** Service configuration values */
   private boolean enabled = false; // Disabled by default
   private String watsonServiceUrl = UrlSupport.concat(IBM_WATSON_SERVICE_URL, API_VERSION);
-  private String user; // user name or 'apikey'
-  private String psw; // password or api key
   private String model;
   private String workflowDefinitionId = DEFAULT_WF_DEF;
   private long workflowDispatchInterval = DEFAULT_DISPATCH_INTERVAL;
@@ -217,11 +223,15 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   private String callbackUrl;
   private boolean callbackAlreadyRegistered = false;
   private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
+  // For preemptive basic authentication
+  private AuthCache authCache;
+  private CredentialsProvider credentialsProvider;
 
   public IBMWatsonTranscriptionService() {
     super(JOB_TYPE);
   }
 
+  @Override
   public void activate(ComponentContext cc) {
     if (cc != null) {
       // Has this service been enabled?
@@ -236,6 +246,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
         // Api key is checked first. If not entered, user and password are mandatory (to
         // support older instances of the STT service)
+        String user; // user name or 'apikey'
+        String psw; // user password or api key
         Option<String> keyOpt = OsgiUtil.getOptCfg(cc.getProperties(), IBM_WATSON_API_KEY_CONFIG);
         if (keyOpt.isSome()) {
           user = APIKEY;
@@ -247,6 +259,17 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           // Password (mandatory if api key is empty)
           psw = OsgiUtil.getComponentContextProperty(cc, IBM_WATSON_PSW_CONFIG);
           logger.info("Using transcription service at {} with username {}", watsonServiceUrl, user);
+        }
+        // We will use preemptive basic auth
+        try {
+          URI uri = new URI(watsonServiceUrl);
+          HttpHost targetHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+          credentialsProvider = new BasicCredentialsProvider();
+          credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, psw));
+          authCache = new BasicAuthCache();
+          authCache.put(targetHost, new BasicScheme());
+        } catch (URISyntaxException e) {
+          throw new RuntimeException("Watson STT service url is not valid: " + watsonServiceUrl, e);
         }
 
         // Language model to be used (optional)
@@ -506,10 +529,14 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     CloseableHttpClient httpClient = makeHttpClient();
     HttpPost httpPost = new HttpPost(
             UrlSupport.concat(watsonServiceUrl, REGISTER_CALLBACK) + String.format("?callback_url=%s", callbackUrl));
+    // Add AuthCache to the execution context for preemptive auth
+    HttpClientContext context = HttpClientContext.create();
+    context.setCredentialsProvider(credentialsProvider);
+    context.setAuthCache(authCache);
     CloseableHttpResponse response = null;
 
     try {
-      response = httpClient.execute(httpPost);
+      response = httpClient.execute(httpPost, context);
       int code = response.getStatusLine().getStatusCode();
 
       switch (code) {
@@ -574,24 +601,27 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     CloseableHttpClient httpClient = makeHttpClient();
     String additionalParms = "";
     if (callbackAlreadyRegistered) {
-      additionalParms = String.format("&callback_url=%s&events=%s,%s", callbackUrl, JobEvent.COMPLETED_WITH_RESULTS,
-              JobEvent.FAILED);
+      additionalParms = String.format("&user_token=%s&callback_url=%s&events=%s,%s", mpId, callbackUrl,
+              JobEvent.COMPLETED_WITH_RESULTS, JobEvent.FAILED);
     }
     if (!StringUtils.isEmpty(model)) {
       additionalParms += String.format("&model=%s", model);
     }
+    // Add AuthCache to the execution context for preemptive auth
+    HttpClientContext context = HttpClientContext.create();
+    context.setCredentialsProvider(credentialsProvider);
+    context.setAuthCache(authCache);
     CloseableHttpResponse response = null;
     try {
       HttpPost httpPost = new HttpPost(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS)
               + String.format(
-                      "?user_token=%s&inactivity_timeout=-1&timestamps=true&smart_formatting=true%s",
-                      mpId, additionalParms));
+                      "?inactivity_timeout=-1&timestamps=true&smart_formatting=true%s", additionalParms));
       logger.debug("Url to invoke ibm watson service: {}", httpPost.getURI().toString());
       httpPost.setHeader(HttpHeaders.CONTENT_TYPE, track.getMimeType().toString());
       FileEntity fileEntity = new FileEntity(audioFile);
       fileEntity.setChunked(true);
       httpPost.setEntity(fileEntity);
-      response = httpClient.execute(httpPost);
+      response = httpClient.execute(httpPost, context);
       int code = response.getStatusLine().getStatusCode();
 
       switch (code) {
@@ -656,11 +686,15 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
    */
   String getAndSaveJobResults(String jobId) throws TranscriptionServiceException {
     CloseableHttpClient httpClient = makeHttpClient();
+    // Add AuthCache to the execution context for preemptive auth
+    HttpClientContext context = HttpClientContext.create();
+    context.setCredentialsProvider(credentialsProvider);
+    context.setAuthCache(authCache);
     CloseableHttpResponse response = null;
     String mpId = "unknown";
     try {
       HttpGet httpGet = new HttpGet(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS, jobId));
-      response = httpClient.execute(httpGet);
+      response = httpClient.execute(httpGet, context);
       int code = response.getStatusLine().getStatusCode();
 
       switch (code) {
@@ -762,12 +796,10 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   protected CloseableHttpClient makeHttpClient() {
-    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, psw));
     RequestConfig reqConfig = RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT)
             .setSocketTimeout(SOCKET_TIMEOUT).setConnectionRequestTimeout(CONNECTION_TIMEOUT).build();
-    return HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).setDefaultRequestConfig(reqConfig)
-            .build();
+    return HttpClients.custom().setDefaultRequestConfig(reqConfig)
+            .setRetryHandler(new DefaultHttpRequestRetryHandler(3, true)).build();
   }
 
   protected void retryOrError(String jobId, String mpId, String errorMsg) throws TranscriptionDatabaseException {
@@ -931,14 +963,15 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
                   retryOrError(jobId, mpId,
                           String.format("Transcription job failed for mpId %s, jobId %s", mpId, jobId));
                   continue;
-                } else if (RecognitionJobStatus.PROCESSING.equals(jobStatus)) {
-                  // Job still running so check if it should have finished more than N seconds ago
+                } else if (RecognitionJobStatus.PROCESSING.equals(jobStatus)
+                        || RecognitionJobStatus.WAITING.equals(jobStatus)) {
+                  // Job still waiting/running so check if it should have finished more than N seconds ago
                   if (j.getDateCreated().getTime() + j.getTrackDuration()
                           + (completionCheckBuffer + maxProcessingSeconds) * 1000 < System.currentTimeMillis()) {
                     // Processing for too long, mark job as error or retry and don't check anymore
                     retryOrError(jobId, mpId, String.format(
-                            "Transcription job was in processing state for too long (media package %s, job id %s)",
-                            mpId, jobId));
+                            "Transcription job was in waiting or processing state for too long "
+                                + "(media package %s, job id %s)", mpId, jobId));
                   }
                   // else job still running, not finished
                   continue;

@@ -630,11 +630,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-textextractor-tesseract/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-ffmpeg/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-google-speech-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-amberscript/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-persistence/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-ffmpeg-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-api/${project.version}</bundle>
