@@ -34,7 +34,6 @@
     <suppress checks="LineLength" files="modules/userdirectory-brightspace/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-ldap/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-moodle/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/userdirectory-sakai/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-condition-parser/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-service-api/.+\.(java|properties)"/>
@@ -61,7 +60,6 @@
     <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="Indentation" files="modules/userdirectory-sakai/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-workflowoperation/.+\.java"/>
@@ -95,7 +93,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-ldap/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-moodle/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-sakai/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/usertracking-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-condition-parser/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-service-api/.+\.java"/>
