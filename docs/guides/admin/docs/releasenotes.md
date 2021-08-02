@@ -46,8 +46,14 @@ API changes
 Additional Notes about 10.1
 ---------------------------
 
-This release contains many bugfixes.  In particular, the email libraries are now working properly!
+This release contains many bugfixes.  In particular, the email libraries are now working properly! You might also
+encounter issues with updating the Elasticsearch indices with 10.0, especially when deleting elements, that are fixed
+with this minor release.
 
+From this release onwards there's also no longer the need to run the Elasticsearch index rebuild separately for each
+service to avoid concurrency issues. Instead, you can simply use the /admin-ng/index/recreateIndex or /api/recreateIndex
+endpoints to trigger the complete rebuild and be sure that everything will happen in order, since there is no longer any
+asynchronicity involved.
 
 Release Schedule
 ----------------
