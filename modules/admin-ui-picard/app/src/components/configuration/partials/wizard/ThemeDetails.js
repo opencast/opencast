@@ -8,58 +8,66 @@ import GeneralPage from "./GeneralPage";
 import BumperPage from "./BumperPage";
 import TitleSlidePage from "./TitleSlidePage";
 import WatermarkPage from "./WatermarkPage";
-import {getThemeDetails} from "../../../../selectors/themeDetailsSelectors";
+import {getThemeDetails, getThemeUsage} from "../../../../selectors/themeDetailsSelectors";
 import UsagePage from "./UsagePage";
+import {updateThemeDetails} from "../../../../thunks/themeDetailsThunks";
 
-
-const ThemeDetails = ({ close, themeDetails }) => {
+/**
+ * This component manages the pages of the theme details
+ */
+const ThemeDetails = ({ close, themeDetails, themeUsage, updateTheme }) => {
     const { t } = useTranslation();
 
-    const initialValues = themeDetails;
-
     const [page, setPage] = useState(0);
-    const [snapshot, setSnapshot] = useState(initialValues);
 
-    // Caption of steps used by Stepper
+    // set initial values for formik form
+    const initialValues = {
+        ...themeDetails,
+        titleSlideMode: themeDetails.titleSlideActive && !!themeDetails.titleSlideBackgroundName
+            ? 'upload'
+            : 'extract'
+    };
+
+    // information about tabs
     const tabs = [
         {
             name: 'generalForm',
-            tabTranslation: '',
+            tabTranslation: 'CONFIGURATION.THEMES.DETAILS.GENERAL.CAPTION',
             translation: 'CONFIGURATION.THEMES.DETAILS.GENERAL.CAPTION'
         },
         {
             name: 'bumperForm',
-            tabTranslation: '',
+            tabTranslation: 'CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION',
             translation: 'CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION'
         },
         {
             name: 'trailerForm',
-            tabTranslation: '',
+            tabTranslation: 'CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION',
             translation: 'CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION'
         },
         {
             name: 'titleSlideForm',
-            tabTranslation: '',
+            tabTranslation: 'CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION',
             translation: 'CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION'
         },
         {
             name: 'watermarkForm',
-            tabTranslation: '',
+            tabTranslation: 'CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION',
             translation: 'CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION'
         },
         {
             name: 'usage',
-            tabTranslation: '',
-            // todo: check for actual translation
-            translation: 'CONFIGURATION.THEMES.DETAILS.SUMMARY.CAPTION'
+            tabTranslation: 'CONFIGURATION.THEMES.DETAILS.USAGE.CAPTION',
+            translation: 'CONFIGURATION.THEMES.DETAILS.USAGE.CAPTION'
         }
     ];
 
     // Validation schema of current page
     const currentValidationSchema = NewThemeSchema[page];
 
+    // update theme
     const handleSubmit = values => {
-        console.log("to be implemented");
+        updateTheme(themeDetails.id, values);
         close();
     };
 
@@ -96,33 +104,51 @@ const ThemeDetails = ({ close, themeDetails }) => {
                 </a>
             </nav>
 
-            {/* Initialize overall form */}
-            <Formik initialValues={snapshot}
+            {/* initialize overall form */}
+            <Formik initialValues={initialValues}
                     validationSchema={currentValidationSchema}
                     onSubmit={values => handleSubmit(values)}>
-                {/* Render modal pages depending on current value of page variable */}
+                {/* render modal pages depending on current value of page variable */}
                 {formik => (
                     <div>
                         {page === 0 && (
-                            <GeneralPage formik={formik}/>
+                            <GeneralPage formik={formik}
+                                         isEdit/>
                         )}
                         {page === 1 && (
-                            <BumperPage formik={formik}/>
+                            <BumperPage formik={formik}
+                                        isEdit/>
                         )}
                         {page === 2 && (
                             <BumperPage formik={formik}
-                                        isTrailer />
+                                        isTrailer
+                                        isEdit/>
                         )}
                         {page === 3 && (
-                            <TitleSlidePage formik={formik}/>
+                            <TitleSlidePage formik={formik}
+                                            isEdit/>
                         )}
                         {page === 4 && (
-                            <WatermarkPage formik={formik}/>
+                            <WatermarkPage formik={formik}
+                                           isEdit/>
                         )}
                         {page === 5 && (
-                            <UsagePage />
+                            <UsagePage themeUsage={themeUsage} />
                         )}
-                        {/*todo: add buttons*/}
+                        {/* submit and cancel button */}
+                        <footer>
+                            <button className={cn("submit", {
+                                active: (formik.dirty && formik.isValid),
+                                inactive: !(formik.dirty && formik.isValid)
+                            })} disabled={!(formik.dirty && formik.isValid)}
+                                    onClick={() => formik.handleSubmit()}>{t('SUBMIT')}</button>
+                            <button className="cancel"
+                                    onClick={() => close()}>
+                                {t('CANCEL')}
+                            </button>
+                        </footer>
+
+                        <div className="btm-spacer"/>
                     </div>
                 )}
             </Formik>
@@ -133,10 +159,12 @@ const ThemeDetails = ({ close, themeDetails }) => {
 // get current state out of redux store
 const mapStateToProps = state => ({
     themeDetails: getThemeDetails(state),
+    themeUsage: getThemeUsage(state)
 });
 
+// map actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    // todo: update Theme thunk
+    updateTheme: (id, values) => dispatch(updateThemeDetails(id, values))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ThemeDetails);

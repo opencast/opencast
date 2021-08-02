@@ -44,7 +44,8 @@ const ThemesActionsCell = ({ row, deleteTheme, fetchThemeDetails, fetchUsage }) 
 
             {displayThemeDetails && (
                 <ThemeDetailsModal handleClose={hideThemeDetails}
-                                   themeId={row.id}/>
+                                   themeId={row.id}
+                                   themeName={row.name}/>
             )}
 
             {/*// TODO: with-Role*/}

@@ -1,11 +1,12 @@
-/**
- * This file contains redux reducer for actions affecting the state of a theme
- */
 import {
     LOAD_THEME_DETAILS_FAILURE,
     LOAD_THEME_DETAILS_IN_PROGRESS,
     LOAD_THEME_DETAILS_SUCCESS, LOAD_THEME_USAGE_SUCCESS
 } from "../actions/themeDetailsActions";
+
+/**
+ * This file contains redux reducer for actions affecting the state of a theme
+ */
 
 // Initial state of theme details in redux store
 const initialState = {
@@ -35,7 +36,8 @@ const themeDetails = (state=initialState, action) => {
         case LOAD_THEME_DETAILS_FAILURE: {
             return {
                 ...state,
-                isLoading: false
+                isLoading: false,
+                details: {}
             }
         }
         case LOAD_THEME_USAGE_SUCCESS: {

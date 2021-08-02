@@ -2,7 +2,10 @@ import React from "react";
 import {useTranslation} from "react-i18next";
 import ThemeDetails from "./ThemeDetails";
 
-const ThemeDetailsModal = ({ handleClose, themeId }) => {
+/**
+ * This component renders the modal for displaying theme details
+ */
+const ThemeDetailsModal = ({ handleClose, themeId, themeName }) => {
     const { t } = useTranslation();
 
     const close = () => {
@@ -16,10 +19,11 @@ const ThemeDetailsModal = ({ handleClose, themeId }) => {
                 <header>
                     <a className="fa fa-times close-modal" onClick={() => close()}/>
                     <h2>
-                        {t('')}
+                        {t('CONFIGURATION.THEMES.DETAILS.EDITCAPTION', { name: themeName })}
                     </h2>
                 </header>
 
+                {/* component that manages tabs of theme details modal*/}
                 <ThemeDetails themeId={themeId}
                               close={close}/>
             </section>
