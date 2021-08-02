@@ -25,8 +25,7 @@ Start your new Opencast and make an HTTP POST request to `/index/rebuild`.
 
 Example (using cURL):
 
-    curl -i --digest -u <digest_user>:<digest_password> -H "X-Requested-Auth: Digest" -s -X POST \
-      https://example.opencast.org/index/rebuild
+    curl -i -u <admin_user>:<password> -s -X POST https://example.opencast.org/index/rebuild
 
 You can also just open the REST documentation, which can be found under the “Help” section in the admin interface (the
 “?” symbol at the top right corner). Then go to the “Index Endpoint” section and use the testing form on
