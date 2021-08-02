@@ -110,10 +110,12 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   private static final String GROUP_CHECK_PREFIX_KEY = "org.opencastproject.userdirectory.ldap.groupcheckprefix";
 
   /** Specifies, whether the roleattributes should be added as a role */
-  private static final String APPLY_ROLEATTRIBUTES_AS_ROLES_KEY = "org.opencastproject.userdirectory.ldap.roleattributes.applyasroles";
+  private static final String APPLY_ROLEATTRIBUTES_AS_ROLES_KEY
+      = "org.opencastproject.userdirectory.ldap.roleattributes.applyasroles";
 
   /** Specifies, whether the roleattributes should be added as a group */
-  private static final String APPLY_ROLEATTRIBUTES_AS_GROUPS_KEY = "org.opencastproject.userdirectory.ldap.roleattributes.applyasgroups";
+  private static final String APPLY_ROLEATTRIBUTES_AS_GROUPS_KEY
+      = "org.opencastproject.userdirectory.ldap.roleattributes.applyasgroups";
 
   /** The prefix of the keys, which map a ldap attribute to opencast roles */
   private static final String ATTRIBUTE_MAPPING_KEY_PREFIX = "org.opencastproject.userdirectory.ldap.map.";
@@ -394,10 +396,12 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
         }
       }
     } finally {
-      if (providerRegistration != null)
+      if (providerRegistration != null) {
         providerRegistration.unregister();
-      if (authoritiesPopulatorRegistration != null)
+      }
+      if (authoritiesPopulatorRegistration != null) {
         authoritiesPopulatorRegistration.unregister();
+      }
     }
   }
 

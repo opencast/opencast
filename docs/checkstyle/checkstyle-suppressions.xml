@@ -31,7 +31,6 @@
     <suppress checks="LineLength" files="modules/scheduler-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/userdirectory-ldap/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/userdirectory-moodle/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-condition-parser/.+\.(java|properties)"/>
@@ -90,7 +89,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/schema/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-ldap/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/userdirectory-moodle/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/usertracking-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-condition-parser/.+\.java"/>
