@@ -253,6 +253,8 @@ export async function uploadFile(
     eventId?: string,
     presenterFile?: Blob,
     captionFile?: Blob,
+    captionFormat?: string,
+    captionLanguage?: string,
     setUploadPogress?: (progress: number) => void): Promise<{}> {
     const percentage = 100;
     const data = new FormData();
@@ -260,6 +262,10 @@ export async function uploadFile(
     if (eventId !== undefined)
         data.append("eventId", eventId);
     data.append("seriesId", seriesId);
+    if (captionFormat !== undefined)
+        data.append("captionFormat", captionFormat);
+    if (captionLanguage !== undefined)
+        data.append("captionLanguage", captionLanguage);
     if (captionFile !== undefined)
         data.append("captions", captionFile);
     if (presenterFile !== undefined)

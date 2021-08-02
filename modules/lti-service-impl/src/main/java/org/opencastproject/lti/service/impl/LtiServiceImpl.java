@@ -235,6 +235,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   public void upsertEvent(
           final LtiFileUpload file,
           final String captions,
+          final String captionFormat,
+          final String captionLanguage,
           final String eventId,
           final String seriesId,
           final String metadataJson) throws UnauthorizedException, NotFoundException {
@@ -246,38 +248,46 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       throw new RuntimeException("No workflow configured, cannot upload");
     }
     try {
-      MediaPackage mp = ingestService.createMediaPackage();
-      if (mp == null) {
+      MediaPackage mediaPackage = ingestService.createMediaPackage();
+      if (mediaPackage == null) {
         throw new RuntimeException("Unable to create media package for event");
       }
+
       if (captions != null) {
-        final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor("captions", "vtt+en");
-        final MediaPackageElementBuilder elementBuilder
-            = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-        final MediaPackageElement captionsMpe = elementBuilder
+        final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor(
+            "captions", captionFormat + "+" + captionLanguage
+        );
+        final MediaPackageElementBuilder elementBuilder =
+            MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+        final MediaPackageElement captionsMediaPackage = elementBuilder
                 .newElement(MediaPackageElement.Type.Attachment, captionsFlavor);
-        captionsMpe.setMimeType(mimeType("text", "vtt"));
-        captionsMpe.addTag("lang:en");
-        mp.add(captionsMpe);
+        if ("dfxp".equals(captionFormat)) {
+          captionsMediaPackage.setMimeType(mimeType("application", "xml"));
+        } else {
+          captionsMediaPackage.setMimeType(mimeType("text", captionFormat));
+        }
+        captionsMediaPackage.addTag("lang:" + captionLanguage);
+        mediaPackage.add(captionsMediaPackage);
         final URI captionsUri = workspace
                 .put(
-                        mp.getIdentifier().toString(),
-                        captionsMpe.getIdentifier(),
-                        "captions.vtt",
+                        mediaPackage.getIdentifier().toString(),
+                        captionsMediaPackage.getIdentifier(),
+                        "captions." + captionFormat,
                         new ByteArrayInputStream(captions.getBytes(StandardCharsets.UTF_8)));
-        captionsMpe.setURI(captionsUri);
+        captionsMediaPackage.setURI(captionsUri);
       }
 
-      JSONArray metadataJsonArray = (JSONArray) new JSONParser().parse(metadataJson);
-
       final EventCatalogUIAdapter adapter = getEventCatalogUIAdapter();
+
       final DublinCoreMetadataCollection collection = adapter.getRawFields();
+
+      JSONArray metadataJsonArray = (JSONArray) new JSONParser().parse(metadataJson);
 
       JSONArray collectionJsonArray = MetadataJson.extractSingleCollectionfromListJson(metadataJsonArray);
       MetadataJson.fillCollectionFromJson(collection, collectionJsonArray);
 
       replaceField(collection, "isPartOf", seriesId);
-      adapter.storeFields(mp, collection);
+      adapter.storeFields(mediaPackage, collection);
 
       AccessControlList accessControlList = null;
 
@@ -290,16 +300,20 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         accessControlList = new AccessControlList(
           new AccessControlEntry("ROLE_ADMIN", "write", true),
           new AccessControlEntry("ROLE_ADMIN", "read", true),
-          new AccessControlEntry("ROLE_OAUTH_USER", "write", true),
-          new AccessControlEntry("ROLE_OAUTH_USER", "read", true));
+          new AccessControlEntry("ROLE_USER", "read", true));
       }
 
-      this.authorizationService.setAcl(mp, AclScope.Episode, accessControlList);
-      mp = ingestService.addTrack(file.getStream(), file.getSourceName(), MediaPackageElements.PRESENTER_SOURCE, mp);
+      this.authorizationService.setAcl(mediaPackage, AclScope.Episode, accessControlList);
+      mediaPackage = ingestService.addTrack(
+            file.getStream(),
+            file.getSourceName(),
+            MediaPackageElements.PRESENTER_SOURCE,
+            mediaPackage
+      );
 
       final Map<String, String> configuration = gson.fromJson(workflowConfiguration, Map.class);
       configuration.put("workflowDefinitionId", workflow);
-      ingestService.ingest(mp, workflow, configuration);
+      ingestService.ingest(mediaPackage, workflow, configuration);
     } catch (Exception e) {
       throw new RuntimeException("unable to create event", e);
     }
@@ -338,10 +352,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     final EventCatalogUIAdapter adapter = catalogUIAdapters.stream()
         .filter(e -> e.getFlavor().equals(flavor))
         .findAny()
-        .orElse(null);
-    if (adapter == null) {
-      throw new RuntimeException("no adapter found");
-    }
+        .orElseThrow(() -> new RuntimeException("no adapter found"));
     return adapter;
   }
 

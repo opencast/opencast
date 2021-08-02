@@ -93,8 +93,8 @@ public class InfluxStatisticsProviderTest {
       final Instant from = Ordering.natural().min(a, b);
       final Instant to = Ordering.natural().max(a, b);
       logger.info("from {} to {} {}", from, to, DataResolution.MONTHLY.name());
-      final List<Tuple<Instant, Instant>> periods = InfluxStatisticsProvider.getPeriods(from, to, DataResolution.MONTHLY,
-          ZoneId.of("Z"));
+      final List<Tuple<Instant, Instant>> periods
+          = InfluxStatisticsProvider.getPeriods(from, to, DataResolution.MONTHLY, ZoneId.of("Z"));
       assertEquals(from, periods.get(0).getA());
       if (periods.size() > 1) {
         assertEquals(
@@ -134,8 +134,8 @@ public class InfluxStatisticsProviderTest {
       final Instant from = Ordering.natural().min(a, b);
       final Instant to = Ordering.natural().max(a, b);
       logger.info("from {} to {} {}", from, to, DataResolution.YEARLY.name());
-      final List<Tuple<Instant, Instant>> periods = InfluxStatisticsProvider.getPeriods(from, to, DataResolution.YEARLY,
-          ZoneId.of("Z"));
+      final List<Tuple<Instant, Instant>> periods
+          = InfluxStatisticsProvider.getPeriods(from, to, DataResolution.YEARLY, ZoneId.of("Z"));
       assertEquals(from, periods.get(0).getA());
       if (periods.size() > 1) {
         assertEquals(
