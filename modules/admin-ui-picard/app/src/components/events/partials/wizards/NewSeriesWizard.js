@@ -8,9 +8,9 @@ import NewMetadataPage from "../ModalTabsAndPages/NewMetadataPage";
 import NewMetadataExtendedPage from "../ModalTabsAndPages/NewMetadataExtendedPage";
 import NewAccessPage from "../ModalTabsAndPages/NewAccessPage";
 import {postNewSeries} from "../../../../thunks/seriesThunks";
-import {NewSeriesSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
 import {initialFormValuesNewSeries} from "../../../../configs/modalConfig";
+import {NewSeriesSchema} from "../../../../utils/validate";
 
 
 /**

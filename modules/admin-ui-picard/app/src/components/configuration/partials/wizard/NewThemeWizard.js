@@ -1,6 +1,5 @@
-import React, {useState} from "react";
+import React from "react";
 import {Formik} from "formik";
-import {NewThemeSchema} from "../../../shared/wizard/validate";
 import {connect} from "react-redux";
 import GeneralPage from "./GeneralPage";
 import BumperPage from "./BumperPage";
@@ -10,6 +9,8 @@ import ThemeSummaryPage from "./ThemeSummaryPage";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
 import {postNewTheme} from "../../../../thunks/themeThunks";
 import {initialFormValuesNewThemes} from "../../../../configs/modalConfig";
+import {usePageFunctions} from "../../../../hooks/wizardHooks";
+import {NewThemeSchema} from "../../../../utils/validate";
 
 /**
  * This component manages the pages of the new theme wizard and the submission of values
@@ -18,8 +19,7 @@ const NewThemeWizard = ({ close, postNewTheme }) => {
 
     const initialValues = initialFormValuesNewThemes;
 
-    const [page, setPage] = useState(0);
-    const [snapshot, setSnapshot] = useState(initialValues);
+    const [snapshot, page, nextPage, previousPage] = usePageFunctions(0, initialValues);
 
     // Caption of steps used by Stepper
     const steps = [
@@ -52,15 +52,6 @@ const NewThemeWizard = ({ close, postNewTheme }) => {
     // Validation schema of current page
     const currentValidationSchema = NewThemeSchema[page];
 
-    const nextPage = values => {
-        setSnapshot(values);
-        setPage(page + 1);
-    }
-
-    const previousPage = values => {
-        setSnapshot(values);
-        setPage(page - 1);
-    }
 
     const handleSubmit = values => {
         const response = postNewTheme(values);

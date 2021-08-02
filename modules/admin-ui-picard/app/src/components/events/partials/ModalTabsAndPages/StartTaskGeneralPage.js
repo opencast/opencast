@@ -4,6 +4,7 @@ import Notifications from "../../../shared/Notifications";
 import {connect} from "react-redux";
 import cn from 'classnames';
 import {getSelectedRows} from "../../../../selectors/tableSelectors";
+import {useSelectionChanges} from "../../../../hooks/wizardHooks";
 
 /**
  * This component renders the table overview of selected events in start task bulk action
@@ -11,8 +12,7 @@ import {getSelectedRows} from "../../../../selectors/tableSelectors";
 const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
     const { t } = useTranslation();
 
-    const [allChecked, setAllChecked] = useState(true);
-    const [selectedEvents, setSelectedEvents] = useState(selectedRows);
+    const [selectedEvents, allChecked, onChangeSelected, onChangeAllSelected] = useSelectionChanges(formik, selectedRows);
 
     useEffect(() => {
         // Set field value for formik on mount, because initially all events are selected
@@ -35,44 +35,6 @@ const StartTaskGeneralPage = ({ formik, nextPage, selectedRows }) => {
         }
         return true;
     }
-
-    // Select or deselect all rows in table
-    const onChangeAllSelected = e => {
-        const selected = e.target.checked;
-        setAllChecked(selected);
-        let changedSelection = selectedEvents.map(event => {
-            return {
-                ...event,
-                selected: selected
-            }
-        });
-        setSelectedEvents(changedSelection);
-        formik.setFieldValue('events', changedSelection);
-    };
-
-    // Handle change of checkboxes indicating which events to consider further
-    const onChangeSelected = (e, id) => {
-        const selected = e.target.checked;
-        let changedEvents = selectedEvents.map(event => {
-            if (event.id === id) {
-                return {
-                    ...event,
-                    selected: selected
-                }
-            } else {
-                return event
-            }
-        });
-        setSelectedEvents(changedEvents);
-        formik.setFieldValue('events', changedEvents);
-
-        if (!selected) {
-            setAllChecked(false);
-        }
-        if (changedEvents.every(event => event.selected === true)) {
-            setAllChecked(true);
-        }
-    };
 
     // Check validity for activating next button
     const checkValidity = () => {

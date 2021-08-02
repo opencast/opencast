@@ -17,6 +17,7 @@ import {fetchServers} from "../../thunks/serverThunks";
 import {getTotalServices} from "../../selectors/serviceSelector";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 
 /**
  * This component renders the table view of services
@@ -76,13 +77,6 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
     }
-
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
 
     return (
         <>

@@ -18,6 +18,7 @@ import {fetchAcls} from "../../thunks/aclThunks";
 import {getTotalAcls} from "../../selectors/aclSelectors";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 
 /**
  * This component renders the table view of acls
@@ -86,13 +87,6 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     const hideNewAclModal = () => {
         setNewAclModal(false);
     }
-
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
 
     return (
         <>

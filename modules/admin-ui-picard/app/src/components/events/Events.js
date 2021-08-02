@@ -22,6 +22,7 @@ import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import {getTotalEvents, isLoading, isShowActions} from "../../selectors/eventSelectors";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -130,12 +131,6 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         setEditMetadataEventsModal(false);
     };
 
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
     return (
         <>
             <section className="action-nav-bar">

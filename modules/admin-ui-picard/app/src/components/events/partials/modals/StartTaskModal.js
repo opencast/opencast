@@ -8,6 +8,7 @@ import StartTaskGeneralPage from "../ModalTabsAndPages/StartTaskGeneralPage";
 import StartTaskWorkflowPage from "../ModalTabsAndPages/StartTaskWorkflowPage";
 import StartTaskSummaryPage from "../ModalTabsAndPages/StartTaskSummaryPage";
 import {postTasks} from "../../../../thunks/taskThunks";
+import {usePageFunctions} from "../../../../hooks/wizardHooks";
 
 /**
  * This component manages the pages of the task start bulk action
@@ -17,8 +18,7 @@ const StartTaskModal = ({ close, postTasks }) => {
 
     const initialValues = initialFormValuesStartTask;
 
-    const [page, setPage] = useState(0);
-    const [snapshot, setSnapshot] = useState(initialValues);
+    const [snapshot, page, nextPage, previousPage] = usePageFunctions(0, initialValues);
 
     const steps = [
         {
@@ -34,16 +34,6 @@ const StartTaskModal = ({ close, postTasks }) => {
             name: 'summary'
         }
     ];
-
-    const nextPage = values => {
-        setSnapshot(values);
-        setPage(page + 1);
-    };
-
-    const previousPage = values => {
-        setSnapshot(values);
-        setPage(page - 1);
-    };
 
     const handleSubmit = values => {
         const response = postTasks(values);

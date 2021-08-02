@@ -1,14 +1,15 @@
-import React, {useState} from "react";
+import React from "react";
 import {Formik} from "formik";
 import {connect} from "react-redux";
 import {initialFormValuesNewGroup} from "../../../../configs/modalConfig";
-import {NewGroupSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
 import NewGroupMetadataPage from "./NewGroupMetadataPage";
 import NewGroupRolesPage from "./NewGroupRolesPage";
 import NewGroupUsersPage from "./NewGroupUsersPage";
 import NewGroupSummaryPage from "./NewGroupSummaryPage";
 import {postNewGroup} from "../../../../thunks/groupThunks";
+import {usePageFunctions} from "../../../../hooks/wizardHooks";
+import {NewGroupSchema} from "../../../../utils/validate";
 
 /**
  * This component renders the new group wizard
@@ -17,8 +18,7 @@ const NewGroupWizard = ({ close, postNewGroup }) => {
 
     const initialValues = initialFormValuesNewGroup;
 
-    const [page, setPage] = useState(0);
-    const [snapshot, setSnapshot] = useState(initialValues);
+    const [snapshot, page, nextPage, previousPage] = usePageFunctions(0, initialValues);
 
     // Caption of steps used by Stepper
     const steps = [
@@ -39,16 +39,6 @@ const NewGroupWizard = ({ close, postNewGroup }) => {
 
     // Validation schema of current page
     const currentValidationSchema = NewGroupSchema[page];
-
-    const nextPage = values => {
-        setSnapshot(values);
-        setPage(page + 1);
-    };
-
-    const previousPage = values => {
-        setSnapshot(values);
-        setPage(page - 1);
-    };
 
     const handleSubmit = values => {
         const response = postNewGroup(values);

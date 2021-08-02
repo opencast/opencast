@@ -18,6 +18,7 @@ import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import {getTotalSeries, isShowActions} from "../../selectors/seriesSeletctor";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 
 
 
@@ -111,12 +112,6 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         setDeleteSeriesModal(false);
     };
 
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
     return (
         <>
             <section className="action-nav-bar">

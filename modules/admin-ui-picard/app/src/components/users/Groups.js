@@ -18,6 +18,7 @@ import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 
 /**
  * This component renders the table view of groups
@@ -85,13 +86,6 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
 
     const hideNewGroupModal = () => {
         setNewGroupModal(false);
-    };
-
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
     };
 
     return (

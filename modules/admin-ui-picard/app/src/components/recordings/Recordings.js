@@ -14,6 +14,7 @@ import {fetchRecordings} from "../../thunks/recordingThunks";
 import {loadRecordingsIntoTable} from "../../thunks/tableThunks";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {editTextFilter} from "../../actions/tableFilterActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 
 /**
  * This component renders the table view of recordings
@@ -44,13 +45,6 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
     }
-
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
 
     return (
         <>

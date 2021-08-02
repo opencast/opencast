@@ -15,6 +15,7 @@ import {loadThemesIntoTable} from "../../thunks/tableThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
 import {editTextFilter} from "../../actions/tableFilterActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 
 /**
  * This component renders the table view of events
@@ -59,13 +60,6 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
     const hideNewThemesModal = () => {
         setNewThemesModal(false);
     }
-
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
 
     return (
         <>

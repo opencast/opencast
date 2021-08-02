@@ -17,6 +17,7 @@ import {fetchServers} from "../../thunks/serverThunks";
 import {fetchServices} from "../../thunks/serviceThunks";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 
 /**
  * This component renders the table view of jobs
@@ -76,13 +77,6 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
     }
-
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
 
     return (
         <>
