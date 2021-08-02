@@ -23,9 +23,11 @@ interface EditFormProps extends WithTranslation {
     readonly onDataChange: (newData: EventMetadataContainer) => void;
     readonly onPresenterFileChange: (file: Blob) => void;
     readonly onCaptionFileChange: (file: Blob) => void;
+    readonly onCaptionLanguageChange: (language: string) => void;
     readonly onSubmit: () => void;
     readonly pending: boolean;
     readonly hasSubmit: boolean;
+    readonly captionFormat?: string;
 }
 
 interface MetadataFieldProps {
@@ -145,6 +147,11 @@ class TranslatedEditForm extends React.Component<EditFormProps> {
     }
 
     render() {
+        const languageField = this.props.data.fields.filter((field) => field.id === "language")[0];
+        let languageOptions: OptionType[] = [];
+        if(languageField.collection !== undefined){
+            languageOptions = collectionToOptions(languageField.collection, languageField.translatable, this.props.t);
+        }
         return <form>
             {this.props.data.fields
                 .filter((field) => allowedFields.includes(field.id))
@@ -161,11 +168,25 @@ class TranslatedEditForm extends React.Component<EditFormProps> {
                 </div>
             }
             {this.props.withUpload === true &&
-                <div className="form-group">
-                    <label htmlFor="caption">{this.props.t("LTI.CAPTION")}</label>
-                    <input type="file" className="form-control-file" onChange={this.onChangeCaptionFile.bind(this)} />
-                    <small className="form-text text-muted">{this.props.t("LTI.CAPTION_DESCRIPTION")}</small>
-                </div>
+                <>
+                    <div className="form-group">
+                        <label htmlFor="caption">{this.props.t("LTI.CAPTION")}</label>
+                        <input type="file" className="form-control-file" onChange={this.onChangeCaptionFile.bind(this)} />
+                        <small className="form-text text-muted">{this.props.t("LTI.CAPTION_DESCRIPTION")}</small>
+                    </div>
+                    { this.props.captionFormat === "vtt" && languageOptions.length > 0 &&
+                        <div className="form-group">
+                            <label htmlFor="caption_language">{this.props.t("LTI.CAPTION")} {this.props.t("LTI.LANGUAGE")}</label>
+                            <Select
+                                id="caption_language"
+                                onChange={(value) => this.props.onCaptionLanguageChange((value as OptionType).value)}
+                                options={languageOptions}
+                                placeholder={this.props.t("LTI.SELECT_OPTION")}
+                                required
+                            />
+                        </div>
+                    }
+                </>
             }
             {this.props.hasSubmit === true &&
                 <button
