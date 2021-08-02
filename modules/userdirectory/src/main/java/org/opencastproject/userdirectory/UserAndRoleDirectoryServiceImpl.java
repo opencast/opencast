@@ -76,11 +76,11 @@ import java.util.stream.Stream;
  * security.
  */
 @Component(
-  property = {
-    "service.description=Provides a user directory"
-  },
-  immediate = true,
-  service = { UserDirectoryService.class, RoleDirectoryService.class, UserDetailsService.class }
+    property = {
+        "service.description=Provides a user directory"
+    },
+    immediate = true,
+    service = { UserDirectoryService.class, RoleDirectoryService.class, UserDetailsService.class }
 )
 public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, UserDetailsService, RoleDirectoryService {
 
@@ -108,13 +108,14 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   /** A token to store in the miss cache */
   private Object nullToken = new Object();
 
-  private final CacheLoader<Tuple<String, String>, Object> userLoader = new CacheLoader<Tuple<String, String>, Object>() {
-    @Override
-    public Object load(Tuple<String, String> orgUser) {
-      final User user = loadUser(orgUser);
-      return user == null ? nullToken : user;
-    }
-  };
+  private final CacheLoader<Tuple<String, String>, Object> userLoader
+      = new CacheLoader<Tuple<String, String>, Object>() {
+        @Override
+        public Object load(Tuple<String, String> orgUser) {
+          final User user = loadUser(orgUser);
+          return user == null ? nullToken : user;
+        }
+      };
 
   /** The user cache */
   private LoadingCache<Tuple<String, String>, Object> cache;
@@ -158,10 +159,13 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     }
 
     // Create the user cache
-    cache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpiryTimeInMinutes, TimeUnit.MINUTES).maximumSize(cacheSize).build(userLoader);
+    cache = CacheBuilder.newBuilder()
+        .expireAfterWrite(cacheExpiryTimeInMinutes, TimeUnit.MINUTES)
+        .maximumSize(cacheSize)
+        .build(userLoader);
 
     logger.info("Activated UserAndRoleDirectoryService with user cache of size {}, expiry time {} minutes",
-      cacheSize, cacheExpiryTimeInMinutes);
+        cacheSize, cacheExpiryTimeInMinutes);
 
   }
 
@@ -171,7 +175,12 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @param userProvider
    *          the user provider to add
    */
-  @Reference(name = "userProviders", cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, unbind = "removeUserProvider")
+  @Reference(
+      name = "userProviders",
+      cardinality = ReferenceCardinality.AT_LEAST_ONE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeUserProvider"
+  )
   protected synchronized void addUserProvider(UserProvider userProvider) {
     logger.debug("Adding {} to the list of user providers", userProvider);
     if (InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(userProvider.getName())) {
@@ -198,7 +207,12 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @param roleProvider
    *          the role provider to add
    */
-  @Reference(name = "roleProviders", cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, unbind = "removeRoleProvider")
+  @Reference(
+      name = "roleProviders",
+      cardinality = ReferenceCardinality.AT_LEAST_ONE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeRoleProvider"
+  )
   protected synchronized void addRoleProvider(RoleProvider roleProvider) {
     logger.debug("Adding {} to the list of role providers", roleProvider);
     roleProviders.add(roleProvider);
@@ -223,8 +237,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   @Override
   public Iterator<User> getUsers() {
     final Organization org = securityService.getOrganization();
-    if (org == null)
+    if (org == null) {
       throw new IllegalStateException("No organization is set");
+    }
 
     // Get all users from the user providers
     final List<User> users = new ArrayList<>();
@@ -313,8 +328,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       }
     }
 
-    if (user == null)
+    if (user == null) {
       return null;
+    }
 
     // Add additional roles from role providers
     Set<JaxbRole> roles = new HashSet<>();
@@ -336,7 +352,11 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     for (Role role : roles) {
       if (Role.Type.EXTERNAL_GROUP.equals(role.getType())) {
         // Load roles granted to this group
-        logger.debug("Resolving transitive roles for user {} from external group {}", user.getUsername(), role.getName());
+        logger.debug(
+            "Resolving transitive roles for user {} from external group {}",
+            user.getUsername(),
+            role.getName()
+        );
         for (RoleProvider roleProvider : roleProviders) {
           if (roleProvider instanceof GroupProvider) {
             List<Role> groupRoles = ((GroupProvider) roleProvider).getRolesForGroup(role.getName());
@@ -344,9 +364,18 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
               for (Role groupRole : groupRoles) {
                 derivedRoles.add(JaxbRole.fromRole(groupRole));
               }
-              logger.debug("Adding {} derived role(s) for user {} from internal group {}", derivedRoles.size(), user.getUsername(), role.getName());
+              logger.debug(
+                  "Adding {} derived role(s) for user {} from internal group {}",
+                  derivedRoles.size(),
+                  user.getUsername(),
+                  role.getName()
+              );
             } else {
-              logger.warn("Cannot resolve externallly provided group reference for user {} to internal group {}", user.getUsername(), role.getName());
+              logger.warn(
+                  "Cannot resolve externallly provided group reference for user {} to internal group {}",
+                  user.getUsername(),
+                  role.getName()
+              );
             }
           }
         }
@@ -369,8 +398,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   @Override
   public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
     User user = loadUser(userName);
-    if (user == null)
+    if (user == null) {
       throw new UsernameNotFoundException(userName);
+    }
 
     // Store the user in the security service
     securityService.setUser(user);
@@ -384,8 +414,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     if (!InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(user.getProvider())) {
       for (RoleProvider roleProvider : roleProviders) {
         List<Role> rolesForUser = roleProvider.getRolesForUser(userName);
-        for (Role role : rolesForUser)
+        for (Role role : rolesForUser) {
           authorities.add(new SimpleGrantedAuthority(role.getName()));
+        }
       }
     }
 
@@ -440,11 +471,13 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   @Override
   public Iterator<User> findUsers(String query, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
     Organization org = securityService.getOrganization();
-    if (org == null)
+    if (org == null) {
       throw new IllegalStateException("No organization is set");
+    }
 
     // Find all users from the user providers
     final List<User> users = new ArrayList<>();
@@ -463,11 +496,13 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   @Override
   public List<Role> findRoles(String query, Role.Target target, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
     Organization org = securityService.getOrganization();
-    if (org == null)
+    if (org == null) {
       throw new IllegalStateException("No organization is set");
+    }
 
     // Find all roles from the role providers
     final List<Role> roles = new ArrayList<>();
@@ -496,8 +531,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     }
 
     Organization org = securityService.getOrganization();
-    if (org == null)
+    if (org == null) {
       throw new IllegalStateException("No organization is set");
+    }
 
     cache.invalidate(tuple(org.getId(), userName));
     logger.trace("Invalidated user {} from user directories", userName);
