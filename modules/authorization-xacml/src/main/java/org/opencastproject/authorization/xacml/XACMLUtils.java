@@ -59,7 +59,8 @@ import javax.xml.bind.JAXBException;
 public final class XACMLUtils {
 
   /** XACML rule for combining policies */
-  public static final String RULE_COMBINING_ALG = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides";
+  public static final String RULE_COMBINING_ALG
+      = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides";
   /** XACML urn for actions */
   public static final String ACTION_IDENTIFIER = "urn:oasis:names:tc:xacml:1.0:action:action-id";
   /** XACML urn for resources */
@@ -115,9 +116,12 @@ public final class XACMLUtils {
       @SuppressWarnings("unchecked")
       final AccessControlList acl = new AccessControlList();
       final List<AccessControlEntry> entries = acl.getEntries();
-      final PolicyType policy = ((JAXBElement<PolicyType>) XACMLUtils.jBossXacmlJaxbContext.createUnmarshaller().unmarshal(XmlSafeParser.parse(xacml))).getValue();
-      for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
+      final PolicyType policy = ((JAXBElement<PolicyType>) XACMLUtils.jBossXacmlJaxbContext
+          .createUnmarshaller()
+          .unmarshal(XmlSafeParser.parse(xacml)))
+          .getValue();
 
+      for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
         if (!(object instanceof RuleType)) {
           throw new XACMLParsingException("Object " + object + " of policy " + policy + " is not of type RuleType");
         }
@@ -136,7 +140,8 @@ public final class XACMLUtils {
           ActionType action = rule.getTarget().getActions().getAction().get(0);
           actionForAce = (String) action.getActionMatch().get(0).getAttributeValue().getContent().get(0);
 
-          @SuppressWarnings("unchecked") JAXBElement<ApplyType> apply = (JAXBElement<ApplyType>) rule.getCondition().getExpression();
+          @SuppressWarnings("unchecked") JAXBElement<ApplyType> apply
+              = (JAXBElement<ApplyType>) rule.getCondition().getExpression();
           for (JAXBElement<?> element : apply.getValue().getExpression()) {
             if (element.getValue() instanceof AttributeValueType) {
               role = (String) ((AttributeValueType) element.getValue()).getContent().get(0);

@@ -73,7 +73,8 @@ public final class TerminationStateServiceImpl extends AbstractJobTerminationSta
 
 
   protected void configure(Dictionary config) throws ConfigurationException {
-    this.jobPollingPeriod = OsgiUtil.getOptCfgAsInt(config, CONFIG_JOB_POLLING_PERIOD).getOrElse(DEFAULT_JOB_POLLING_PERIOD);
+    this.jobPollingPeriod = OsgiUtil.getOptCfgAsInt(config, CONFIG_JOB_POLLING_PERIOD)
+        .getOrElse(DEFAULT_JOB_POLLING_PERIOD);
   }
 
   @Override
@@ -128,7 +129,8 @@ public final class TerminationStateServiceImpl extends AbstractJobTerminationSta
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-      TerminationStateServiceImpl parent = (TerminationStateServiceImpl) context.getJobDetail().getJobDataMap().get(SCHEDULE_JOB_PARAM_PARENT);
+      TerminationStateServiceImpl parent
+          = (TerminationStateServiceImpl) context.getJobDetail().getJobDataMap().get(SCHEDULE_JOB_PARAM_PARENT);
 
       if (parent.readyToTerminate()) {
         logger.info("No jobs running, sent complete Lifecycle action");
