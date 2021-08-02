@@ -277,8 +277,6 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         captionsMediaPackage.setURI(captionsUri);
       }
 
-      final MetadataList metadataList = new MetadataList();
-      final MediaPackageElementFlavor flavor = new MediaPackageElementFlavor("dublincore", "episode");
       final EventCatalogUIAdapter adapter = getEventCatalogUIAdapter();
 
       final DublinCoreMetadataCollection collection = adapter.getRawFields();
