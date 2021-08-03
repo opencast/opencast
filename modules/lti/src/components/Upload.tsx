@@ -343,7 +343,7 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
                 </>
             }
             { this.state.uploadProgress > 0 && <ProgressBar className="my-2" now={this.state.uploadProgress} label={`${this.state.uploadProgress}%`} />}
-            <h2>{this.props.t("LTI.CURRENT_JOBS")}</h2>
+            <h2 className="mt-4">{this.props.t("LTI.CURRENT_JOBS")}</h2>
             <JobList seriesId={this.state.metadata.seriesId} />
         </>;
     }
