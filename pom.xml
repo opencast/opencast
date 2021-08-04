@@ -138,6 +138,7 @@
     <module>modules/fileupload</module>
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
+    <module>modules/hello-world-workflowoperation</module>
     <module>modules/adopter-registration-api</module>
     <module>modules/adopter-registration-impl</module>
     <module>modules/incident-workflowoperation</module>
