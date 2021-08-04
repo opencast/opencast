@@ -11,9 +11,6 @@
         as filtered
         track by $index">
     <hr>
-<!--    <div class="date">{{ comment.creationDate | localizeDate : 'dateTime' : 'short' }}</div>-->
-<!--    <h4>{{ comment.author.name }}</h4>-->
-<!--    <p>{{ comment.text }}</p>-->
     <textarea type="text" class="textarea"
               ng-model="comment.text"
               ng-change="table.updateComment(comment, row.id)"
