@@ -99,4 +99,9 @@ jobs:
     - name: push updates
       working-directory: docs.opencast.org/
       run: |
+        set -e
+        if ! git push origin gh-pages; then
+        git fetch origin
+        git rebase origin/gh-pages
         git push origin gh-pages
+        fi
