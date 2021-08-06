@@ -30,8 +30,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 
-import com.entwinemedia.fn.Fn;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -301,15 +299,6 @@ public class JpaJob {
     return new JobImpl(id, creator, organization, version, jobType, operation, arguments, Status.values()[status],
             createdHost, processingHost, dateCreated, dateStarted, dateCompleted, queueTime, runTime, payload,
             parentJobId, rootJobId, dispatchable, uri, jobLoad);
-  }
-
-  public static Fn<JpaJob, Job> fnToJob() {
-    return new Fn<JpaJob, Job>() {
-      @Override
-      public Job apply(JpaJob jobJpa) {
-        return jobJpa.toJob();
-      }
-    };
   }
 
   @PostLoad
