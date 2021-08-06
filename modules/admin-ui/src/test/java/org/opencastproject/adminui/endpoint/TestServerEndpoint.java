@@ -23,11 +23,9 @@ package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
 import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.HostStatistics;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
-import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
-import org.opencastproject.serviceregistry.api.JaxbServiceStatistics;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceStatistics;
 
 import org.easymock.EasyMock;
 import org.junit.Ignore;
@@ -59,14 +57,18 @@ public class TestServerEndpoint extends ServerEndpoint {
         new JaxbHostRegistration(HOST3, "1.1.1.3", "node3", 200000, 2, 8, false, false),
         new JaxbHostRegistration(HOST4, "1.1.1.4", "node4", 500000, 6, 8, true, true));
 
-    List<ServiceStatistics> statistics = Arrays.asList(
-        new JaxbServiceStatistics(new JaxbServiceRegistration("test", HOST1, ""), 200000, 3000, 2, 2, 2),
-        new JaxbServiceStatistics(new JaxbServiceRegistration("test", HOST2, ""), 300000, 2000, 4, 4, 2),
-        new JaxbServiceStatistics(new JaxbServiceRegistration("test", HOST3, ""), 100000, 4000, 2, 4, 2),
-        new JaxbServiceStatistics(new JaxbServiceRegistration("test", HOST4, ""), 400000, 5000, 2, 4, 2));
+    HostStatistics statistics = new HostStatistics();
+    statistics.addRunning(HOST1.hashCode(), 2);
+    statistics.addRunning(HOST2.hashCode(), 4);
+    statistics.addRunning(HOST3.hashCode(), 2);
+    statistics.addRunning(HOST4.hashCode(), 2);
+    statistics.addQueued(HOST1.hashCode(), 2);
+    statistics.addQueued(HOST2.hashCode(), 4);
+    statistics.addQueued(HOST3.hashCode(), 4);
+    statistics.addQueued(HOST4.hashCode(), 4);
 
     EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(hosts).anyTimes();
-    EasyMock.expect(serviceRegistry.getServiceStatistics()).andReturn(statistics).anyTimes();
+    EasyMock.expect(serviceRegistry.getHostStatistics()).andReturn(statistics).anyTimes();
 
     EasyMock.replay(serviceRegistry);
 

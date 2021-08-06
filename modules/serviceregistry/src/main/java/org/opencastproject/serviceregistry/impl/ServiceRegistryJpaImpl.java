@@ -48,6 +48,7 @@ import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.HostStatistics;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.JaxbServiceStatistics;
@@ -1658,6 +1659,32 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (em != null)
         em.close();
     }
+  }
+
+  @Override
+  public HostStatistics getHostStatistics() {
+    HostStatistics statistics = new HostStatistics();
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      List<Object[]> results = em.createNamedQuery("HostRegistration.jobStatistics", Object[].class)
+          .setParameter("status", Arrays.asList(Status.QUEUED.ordinal(), Status.RUNNING.ordinal()))
+          .getResultList();
+      for (Object[] row: results) {
+        final long host = ((Number) row[0]).longValue();
+        final int status = ((Number) row[1]).intValue();
+        final long count = ((Number) row[2]).longValue();
+        if (status == Status.RUNNING.ordinal()) {
+          statistics.addRunning(host, count);
+        } else {
+          statistics.addQueued(host, count);
+        }
+      }
+    } finally {
+      if (em != null)
+        em.close();
+    }
+    return statistics;
   }
 
   /**

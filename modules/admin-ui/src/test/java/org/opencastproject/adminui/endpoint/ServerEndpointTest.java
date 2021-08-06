@@ -279,63 +279,6 @@ public class ServerEndpointTest {
   }
 
   @Test
-  public void testSortMeanRunTime() {
-    given().param("sort", "meanRunTime:ASC")
-        .param("limit", 5)
-        .expect()
-        .statusCode(HttpStatus.SC_OK)
-        .contentType(ContentType.JSON)
-        .body("count", equalTo(4))
-        .body("total", equalTo(4))
-        .body("results[0].hostname", equalTo("host3"))
-        .body("results[1].hostname", equalTo("host1"))
-        .body("results[2].hostname", equalTo("host2"))
-        .when()
-        .get(rt.host("/servers.json"));
-
-    given().param("sort", "meanRunTime:DESC")
-        .param("limit", 5)
-        .expect()
-        .statusCode(HttpStatus.SC_OK)
-        .contentType(ContentType.JSON)
-        .body("count", equalTo(4))
-        .body("total", equalTo(4))
-        .body("results[0].hostname", equalTo("host4"))
-        .body("results[1].hostname", equalTo("host2"))
-        .body("results[2].hostname", equalTo("host1"))
-        .when()
-        .get(rt.host("/servers.json"));
-  }
-
-  @Test
-  public void testSortMeanQueueTime() {
-    given().param("sort", "meanQueueTime:asc")
-        .param("limit", 5)
-        .expect()
-        .statusCode(HttpStatus.SC_OK)
-        .contentType(ContentType.JSON)
-        .body("count", equalTo(4))
-        .body("total", equalTo(4))
-        .body("results[0].hostname", equalTo("host2"))
-        .body("results[1].hostname", equalTo("host1"))
-        .body("results[2].hostname", equalTo("host3"))
-        .when()
-        .get(rt.host("/servers.json"));
-
-    given().param("sort", "meanQueueTime:desc")
-        .param("limit", 5)
-        .expect().statusCode(HttpStatus.SC_OK)
-        .contentType(ContentType.JSON)
-        .body("count", equalTo(4))
-        .body("total", equalTo(4))
-        .body("results[0].hostname", equalTo("host4"))
-        .body("results[1].hostname", equalTo("host3"))
-        .body("results[2].hostname", equalTo("host1"))
-        .when()
-        .get(rt.host("/servers.json"));
-  }
-
-  @Test
   public void testSortStatus() throws ParseException {
     given().param("sort", "ONLINE:ASC")
         .param("limit", 5)

@@ -26,9 +26,9 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.HostStatistics;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -54,7 +54,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -89,7 +88,7 @@ public class ServerEndpoint {
   private static final Gson gson = new Gson();
 
   private enum Sort {
-    COMPLETED, CORES, HOSTNAME, MAINTENANCE, MEANQUEUETIME, MEANRUNTIME, NODENAME, ONLINE, QUEUED, RUNNING
+    CORES, HOSTNAME, MAINTENANCE, NODENAME, ONLINE, QUEUED, RUNNING
   }
 
   private enum Status {
@@ -129,18 +128,12 @@ public class ServerEndpoint {
           return Boolean.compare(host1.online, host2.online);
         case CORES:
           return Long.compare(host1.cores, host2.cores);
-        case COMPLETED:
-          return Long.compare(host1.completed, host2.completed);
         case QUEUED:
           return Long.compare(host1.queued, host2.queued);
         case MAINTENANCE:
           return Boolean.compare(host1.maintenance, host2.maintenance);
         case RUNNING:
           return Long.compare(host1.running, host2.running);
-        case MEANQUEUETIME:
-          return Long.compare(host1.meanQueueTime, host2.meanQueueTime);
-        case MEANRUNTIME:
-          return Long.compare(host1.meanRunTime, host2.meanRunTime);
         case NODENAME:
           return host1.nodeName.compareTo(host2.nodeName);
         case HOSTNAME:
@@ -158,9 +151,6 @@ public class ServerEndpoint {
     protected long cores;
     protected long running;
     protected long queued;
-    protected long completed;
-    protected long meanRunTime;
-    protected long meanQueueTime;
   }
 
   private static final Logger logger = LoggerFactory.getLogger(ServerEndpoint.class);
@@ -188,9 +178,8 @@ public class ServerEndpoint {
           @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = INTEGER),
           @RestParameter(name = "offset", description = "The offset", isRequired = false, type = INTEGER),
           @RestParameter(name = "filter", description = "Filter results by hostname, status or free text query", isRequired = false, type = STRING),
-          @RestParameter(name = "sort", description = "The sort order.  May include any "
-                  + "of the following: COMPLETED (jobs), CORES, HOSTNAME, MAINTENANCE, MEANQUEUETIME (mean for jobs), "
-                  + "MEANRUNTIME (mean for jobs), ONLINE, QUEUED (jobs), RUNNING (jobs)."
+          @RestParameter(name = "sort", description = "The sort order.  May include any of the following: "
+                  + "CORES, HOSTNAME, MAINTENANCE, ONLINE, QUEUED (jobs), RUNNING (jobs)."
                   + "The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. HOSTNAME:DESC).", isRequired = false, type = STRING) },
           responses = { @RestResponse(description = "Returns the list of jobs from Opencast", responseCode = HttpServletResponse.SC_OK) },
           returnDescription = "The list of servers")
@@ -285,7 +274,7 @@ public class ServerEndpoint {
     // Update cache
     serverData.clear();
     logger.debug("Updating server data");
-    List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
+    HostStatistics statistics = serviceRegistry.getHostStatistics();
     for (HostRegistration host : serviceRegistry.getHostRegistrations()) {
       // Calculate statistics per server
       Server server = new Server();
@@ -294,27 +283,8 @@ public class ServerEndpoint {
       server.hostname = host.getBaseUrl();
       server.nodeName = host.getNodeName();
       server.cores = host.getCores();
-      server.running = 0;
-      server.queued = 0;
-      server.completed = 0;
-      long sumMeanRuntime = 0;
-      long sumMeanQueueTime = 0;
-      int totalServiceOnHost = 0;
-      for (ServiceStatistics serviceStat : servicesStatistics) {
-        if (host.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
-          totalServiceOnHost++;
-          server.completed += serviceStat.getFinishedJobs();
-          server.running += serviceStat.getRunningJobs();
-          server.queued += serviceStat.getQueuedJobs();
-          // mean time values are given in milliseconds,
-          // we should convert them to seconds,
-          // because the adminNG UI expect it in this format
-          sumMeanRuntime += TimeUnit.MILLISECONDS.toSeconds(serviceStat.getMeanRunTime());
-          sumMeanQueueTime += TimeUnit.MILLISECONDS.toSeconds(serviceStat.getMeanQueueTime());
-        }
-      }
-      server.meanRunTime = totalServiceOnHost > 0 ? Math.round((double) sumMeanRuntime / totalServiceOnHost) : 0L;
-      server.meanQueueTime = totalServiceOnHost > 0 ? Math.round((double) sumMeanQueueTime / totalServiceOnHost) : 0L;
+      server.running = statistics.runningJobs(host.getId());
+      server.queued = statistics.queuedJobs(host.getId());
       serverData.add(server);
     }
     lastUpdated = Instant.now().getEpochSecond();

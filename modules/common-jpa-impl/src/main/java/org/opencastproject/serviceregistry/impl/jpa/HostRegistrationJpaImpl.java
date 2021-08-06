@@ -63,6 +63,13 @@ import javax.persistence.UniqueConstraint;
         query = "SELECT hr from HostRegistration hr where hr.baseUrl = :host"
     ),
     @NamedQuery(
+        name = "HostRegistration.jobStatistics",
+        query = "select j.processorServiceRegistration.hostRegistration.id, j.status, count(j) "
+            + "from Job j "
+            + "where j.status in :status "
+            + "group by j.processorServiceRegistration.hostRegistration.id, j.status"
+    ),
+    @NamedQuery(
         name = "HostRegistration.getAll",
         query = "SELECT hr FROM HostRegistration hr where hr.active = true"
     ),
@@ -131,6 +138,7 @@ public class HostRegistrationJpaImpl implements HostRegistration {
     this.active = true;
   }
 
+  @Override
   public Long getId() {
     return id;
   }
