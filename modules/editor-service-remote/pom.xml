@@ -4,6 +4,16 @@
   <artifactId>opencast-editor-service-remote</artifactId>
   <packaging>bundle</packaging>
   <name>Opencast :: editor-service-remote</name>
+  <parent>
+    <groupId>org.opencastproject</groupId>
+    <artifactId>base</artifactId>
+    <version>11-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <properties>
+    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
+    <checkstyle.skip>false</checkstyle.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -28,17 +38,16 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
-  <parent>
-    <groupId>org.opencastproject</groupId>
-    <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
-  </parent>
-  <properties>
-    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
-  </properties>
   <build>
     <plugins>
       <plugin>
@@ -53,10 +62,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Export-Package>org.opencastproject.editor.remote;version=${project.version}</Export-Package>
-            <Service-Component>
-              OSGI-INF/editor_service_remote.xml
-            </Service-Component>
+            <Export-Package>org.opencastproject.editor.*;version=${project.version}</Export-Package>
           </instructions>
         </configuration>
       </plugin>
