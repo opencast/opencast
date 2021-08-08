@@ -488,7 +488,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         SearchQuery seriesSearch = new SearchQuery();
         seriesSearch.includeSeries(true)
             .includeEpisodes(false)
-            .withQuery("dc_title___:" + SolrUtils.clean(seriesName));
+            .withQuery("dc_title_:" + SolrUtils.clean(seriesName));
         result = searchService.getByQuery(seriesSearch);
       } catch (SearchException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
