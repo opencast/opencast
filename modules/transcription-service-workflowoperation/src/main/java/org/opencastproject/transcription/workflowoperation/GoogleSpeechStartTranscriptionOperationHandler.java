@@ -122,7 +122,8 @@ public class GoogleSpeechStartTranscriptionOperationHandler extends AbstractWork
     String langCode = operation.getConfiguration(LANGUAGE_CODE);
 
     // Check which tags have been configured
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
+        workflowInstance, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
     List<String> sourceTagOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorOption = tagsAndFlavors.getSrcFlavors();
 

@@ -78,7 +78,14 @@ public interface StatisticsService {
    *          The timezone to use for date calculations.
    * @return The time series data.
    */
-  TimeSeries getTimeSeriesData(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution resolution, ZoneId zoneId);
+  TimeSeries getTimeSeriesData(
+      StatisticsProvider provider,
+      String resourceId,
+      Instant from,
+      Instant to,
+      DataResolution resolution,
+      ZoneId zoneId
+  );
 
   /**
    * Write a duration to a statistics data base

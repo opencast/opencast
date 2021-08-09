@@ -21,13 +21,13 @@
 
 package org.opencastproject.assetmanager.aws.s3;
 
+import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.AssetStoreException;
+import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.assetmanager.aws.AwsAbstractArchive;
 import org.opencastproject.assetmanager.aws.AwsUploadOperationResult;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
-import org.opencastproject.assetmanager.impl.storage.AssetStore;
-import org.opencastproject.assetmanager.impl.storage.AssetStoreException;
-import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;

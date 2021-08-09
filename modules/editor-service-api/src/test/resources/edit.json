@@ -1,6 +1,7 @@
 {
   "date": "2021-01-13T12:34:35Z",
   "duration": 30000,
+  "workflow_active": true,
   "series": {
     "id": "c60d6a65-2948-489d-95a4-894422b4f59d",
     "title": "Test-Series"

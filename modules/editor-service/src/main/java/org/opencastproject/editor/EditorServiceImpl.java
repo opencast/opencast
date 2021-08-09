@@ -87,7 +87,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -115,13 +117,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
 
 
-//@Component(
-//        property = {
-//                "service.description=Editor Service"
-//        },
-//        immediate = true,
-//        service =  { EditorService.class }
-//)
+@Component(
+    property = {
+        "service.description=Editor Service"
+    },
+    immediate = true,
+    service = EditorService.class
+)
 public class EditorServiceImpl implements EditorService {
 
   /** The module specific logger */
@@ -168,34 +170,42 @@ public class EditorServiceImpl implements EditorService {
 
   private final Set<String> smilCatalogTagSet = new HashSet<>();
 
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference
   void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
 
+  @Reference
   void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
+  @Reference
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference
   void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
 
+  @Reference
   void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
+  @Reference
   public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
     this.searchIndex = adminUISearchIndex;
   }
 
+  @Reference
   public void setIndexService(IndexService index) {
     this.index = index;
   }
@@ -610,9 +620,11 @@ public class EditorServiceImpl implements EditorService {
 
   @Override
   public EditingData getEditData(final String mediaPackageId) throws EditorServiceException {
-    // Select tracks
+
     Event event = getEvent(mediaPackageId);
     MediaPackage mp = getMediaPackage(event);
+
+    boolean workflowActive = WorkflowUtil.isActive(event.getWorkflowState());
 
     final Opt<Publication> internalPubOpt = getInternalPublication(mp);
     if (internalPubOpt.isNone() || internalPubOpt.isEmpty()) {
@@ -676,7 +688,7 @@ public class EditorServiceImpl implements EditorService {
     }).collect(Collectors.toList());
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName());
+            event.getSeriesId(), event.getSeriesName(), workflowActive);
   }
 
   private MediaPackage getMediaPackage(Event event) throws EditorServiceException {

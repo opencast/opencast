@@ -58,7 +58,8 @@ public class EventCommentDatabaseImplTest {
   private static final User USER = new JaxbUser("wilfried.meyer", "matterhorn", new DefaultOrganization());
 
   private static final String EVENT_1_ID = "1";
-  private static final EventComment COMMENT_1 = EventComment.create(none(Long.class), EVENT_1_ID, ORGANIZATION.getId(), "test", USER);
+  private static final EventComment COMMENT_1
+      = EventComment.create(none(Long.class), EVENT_1_ID, ORGANIZATION.getId(), "test", USER);
 
   private EventCommentDatabaseServiceImpl persistence;
 

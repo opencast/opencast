@@ -26,20 +26,16 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageImpl;
-import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
-import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultImpl;
+import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -94,9 +90,6 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   /** The search service */
   protected SearchServiceImpl searchService;
-
-  /** The optional series service; has to be volatile by the OSGi spec */
-  private volatile SeriesService seriesService;
 
   /** The service registry */
   private ServiceRegistry serviceRegistry;
@@ -227,7 +220,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
                   + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
           ),
@@ -300,26 +293,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     query.withSort(SearchQuery.Sort.DATE_CREATED, false);
-    if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      SearchQuery.Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
-        try {
-          sortField = SearchQuery.Sort.valueOf(enumKey);
-          query.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = SearchQuery.Sort.valueOf(sort);
-          query.withSort(sortField);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
-      }
-    }
+    parseSortParameter(sort, query);
     query.withLimit(limit);
     query.withOffset(offset);
 
@@ -387,7 +361,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
                   + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
           ),
@@ -465,35 +439,34 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
     boolean invalidSeries = false;
     if (seriesName != null) {
-      if (seriesService == null) {
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
-      }
-      DublinCoreCatalogList result;
+      SearchResult result = new SearchResultImpl();
       try {
-        result = seriesService.getSeries(new SeriesQuery().setSeriesTitle(seriesName));
-      } catch (SeriesException e) {
+        SearchQuery seriesSearch = new SearchQuery();
+        seriesSearch.includeSeries(true)
+            .includeEpisodes(false)
+            .withQuery("dc_title___:" + SolrUtils.clean(seriesName));
+        result = searchService.getByQuery(seriesSearch);
+      } catch (SearchException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
             .entity("Error while searching for series")
             .build();
       }
       // Specifying a nonexistent series ID is not an error, so a nonexistent
       // series name shouldn't be, either.
-      if (result.getTotalCount() == 0) {
+      if (result.getTotalSize() == 0) {
+        logger.debug("Retrieved 0 series results");
         invalidSeries = true;
       } else {
-        if (result.getTotalCount() > 1) {
+        if (result.getTotalSize() > 1) {
+          logger.debug("Retrieved {} series with sname parameter {}, we only expect a single series to be returned",
+                        result.getTotalSize(), seriesName);
           return Response.status(Response.Status.BAD_REQUEST)
               .entity("more than one series matches given series name")
               .build();
         }
-        DublinCoreCatalog seriesResult = result.getCatalogList().get(0);
-        final List<DublinCoreValue> identifiers = seriesResult.get(DublinCore.PROPERTY_IDENTIFIER);
-        if (identifiers.size() != 1) {
-          return Response.status(Response.Status.BAD_REQUEST)
-              .entity("more than one identifier in dublin core catalog for series")
-              .build();
-        }
-        seriesId = identifiers.get(0).getValue();
+        SearchResultItem seriesResult = result.getItems()[0];
+        seriesId = seriesResult.getId();
+        logger.debug("Using sname parameter, series {} found with ID {}", seriesName, seriesId);
       }
     }
 
@@ -513,26 +486,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     search.withSort(SearchQuery.Sort.DATE_CREATED, false);
-    if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      SearchQuery.Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
-        try {
-          sortField = SearchQuery.Sort.valueOf(enumKey);
-          search.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = SearchQuery.Sort.valueOf(sort);
-          search.withSort(sortField);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
-      }
-    }
+    parseSortParameter(sort, search);
 
     // Build the response
     ResponseBuilder rb = Response.ok();
@@ -577,11 +531,18 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               description = "The lucene query."
           ),
           @RestParameter(
+              name = "series",
+              isRequired = false,
+              type = RestParameter.Type.STRING,
+              defaultValue = "false",
+              description = "Include series in the search result."
+          ),
+          @RestParameter(
               name = "sort",
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following: "
-                  + "DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "DATE_CREATED, DATE_MODIFIED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER. "
                   + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC)."
           ),
@@ -624,6 +585,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   )
   public Response getByLuceneQuery(
       @QueryParam("q") String q,
+      @QueryParam("series") boolean includeSeries,
       @QueryParam("sort") String sort,
       @QueryParam("limit") int limit,
       @QueryParam("offset") int offset,
@@ -637,27 +599,11 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       query.withQuery(q);
     }
 
+    // Include series data in the results?
+    query.includeSeries(includeSeries);
+
     query.withSort(SearchQuery.Sort.DATE_CREATED, false);
-    if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      SearchQuery.Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
-        try {
-          sortField = SearchQuery.Sort.valueOf(enumKey);
-          query.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = SearchQuery.Sort.valueOf(sort);
-          query.withSort(sortField);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
-      }
-    }
+    parseSortParameter(sort, query);
     query.withLimit(limit);
     query.withOffset(offset);
 
@@ -708,16 +654,6 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   }
 
   /**
-   * Callback from OSGi to set the series service implementation.
-   *
-   * @param seriesService
-   *          the series servie
-   */
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
-  }
-
-  /**
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override
@@ -725,4 +661,41 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     return serviceRegistry;
   }
 
+  /**
+   * Parses the given sort parameter and calls {@code query.sortWith} with the
+   * parsed value. If the {@code sort} parameter is the empty string, nothing
+   * happens.
+   */
+  private void parseSortParameter(String sort, SearchQuery query) {
+    if (StringUtils.isBlank(sort)) {
+      return;
+    }
+
+    boolean ascending;
+    String enumKey;
+    if (sort.endsWith(DESCENDING_SUFFIX)) {
+      enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
+      ascending = false;
+    } else {
+      enumKey = sort;
+      ascending = true;
+    }
+
+    // Backwards compatibility check. The enum variant was changed from
+    // `DATE_PUBLISHED` to `DATE_MODIFIED`. To not break existing applications,
+    // we fix an old `sort` value. This will be removed in a future version
+    // of Opencast.
+    if ("DATE_PUBLISHED".equals(enumKey)) {
+      enumKey = "DATE_MODIFIED";
+      logger.warn("Search API was used with deprecated sort parameter 'DATE_PUBLISHED'. "
+          + "Update all applications using this API to switch to 'DATE_MODIFIED'");
+    }
+
+    try {
+      SearchQuery.Sort sortField = SearchQuery.Sort.valueOf(enumKey);
+      query.withSort(sortField, ascending);
+    } catch (IllegalArgumentException e) {
+      logger.warn("No sort enum matches '{}'", enumKey);
+    }
+  }
 }

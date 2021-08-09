@@ -83,66 +83,71 @@ import javax.persistence.Version;
     @Index(name = "IX_oc_job_operation", columnList = ("operation")),
     @Index(name = "IX_oc_job_statistics", columnList = ("processor_service, status, queue_time, run_time")) })
 @NamedQueries({
-        @NamedQuery(name = "Job", query = "SELECT j FROM Job j "
-                + "where j.status = :status and j.creatorServiceRegistration.serviceType = :serviceType "
-                + "order by j.dateCreated"),
-        @NamedQuery(name = "Job.type", query = "SELECT j FROM Job j "
-                + "where j.creatorServiceRegistration.serviceType = :serviceType order by j.dateCreated"),
-        @NamedQuery(name = "Job.status", query = "SELECT j FROM Job j "
-                + "where j.status = :status order by j.dateCreated"),
-        @NamedQuery(name = "Job.statuses", query = "SELECT j FROM Job j "
-                + "where j.status in :statuses order by j.dateCreated"),
-        @NamedQuery(name = "Job.all", query = "SELECT j FROM Job j order by j.dateCreated"),
-        @NamedQuery(name = "Job.dispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = true and "
-                + "j.status in :statuses order by j.dateCreated"),
-        @NamedQuery(name = "Job.dispatchable.status.idfilter", query = "SELECT j.id FROM Job j "
-                + "WHERE j.dispatchable = true AND j.status IN :statuses AND j.id IN :jobids ORDER BY j.dateCreated"),
-        @NamedQuery(name = "Job.undispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = false and "
-                + "j.status in :statuses order by j.dateCreated"),
-        @NamedQuery(name = "Job.payload", query = "SELECT j.payload FROM Job j where j.operation = :operation "
-                + "order by j.dateCreated"),
-        @NamedQuery(name = "Job.processinghost.status", query = "SELECT j FROM Job j "
-                + "where j.status in :statuses and j.processorServiceRegistration is not null and "
-                + "j.processorServiceRegistration.serviceType = :serviceType and "
-                + "j.processorServiceRegistration.hostRegistration.baseUrl = :host order by j.dateCreated"),
-        @NamedQuery(name = "Job.root.children", query = "SELECT j FROM Job j WHERE j.rootJob.id = :id ORDER BY j.dateCreated"),
-        @NamedQuery(name = "Job.children", query = "SELECT j FROM Job j WHERE j.parentJob.id = :id ORDER BY j.dateCreated"),
-        @NamedQuery(name = "Job.withoutParent", query = "SELECT j FROM Job j WHERE j.parentJob IS NULL"),
-        @NamedQuery(name = "Job.avgOperation", query = "SELECT j.operation, AVG(j.runTime), AVG(j.queueTime) FROM Job j GROUP BY j.operation"),
+    @NamedQuery(name = "Job", query = "SELECT j FROM Job j "
+        + "where j.status = :status and j.creatorServiceRegistration.serviceType = :serviceType "
+        + "order by j.dateCreated"),
+    @NamedQuery(name = "Job.type", query = "SELECT j FROM Job j "
+        + "where j.creatorServiceRegistration.serviceType = :serviceType order by j.dateCreated"),
+    @NamedQuery(name = "Job.status", query = "SELECT j FROM Job j "
+        + "where j.status = :status order by j.dateCreated"),
+    @NamedQuery(name = "Job.statuses", query = "SELECT j FROM Job j "
+        + "where j.status in :statuses order by j.dateCreated"),
+    @NamedQuery(name = "Job.all", query = "SELECT j FROM Job j order by j.dateCreated"),
+    @NamedQuery(name = "Job.dispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = true and "
+        + "j.status in :statuses order by j.dateCreated"),
+    @NamedQuery(name = "Job.dispatchable.status.idfilter", query = "SELECT j.id FROM Job j "
+        + "WHERE j.dispatchable = true AND j.status IN :statuses AND j.id IN :jobids ORDER BY j.dateCreated"),
+    @NamedQuery(name = "Job.undispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = false and "
+        + "j.status in :statuses order by j.dateCreated"),
+    @NamedQuery(name = "Job.payload", query = "SELECT j.payload FROM Job j where j.operation = :operation "
+        + "order by j.dateCreated"),
+    @NamedQuery(name = "Job.processinghost.status", query = "SELECT j FROM Job j "
+        + "where j.status in :statuses and j.processorServiceRegistration is not null and "
+        + "j.processorServiceRegistration.serviceType = :serviceType and "
+        + "j.processorServiceRegistration.hostRegistration.baseUrl = :host order by j.dateCreated"),
+    @NamedQuery(name = "Job.root.children", query = "SELECT j FROM Job j "
+        + "WHERE j.rootJob.id = :id ORDER BY j.dateCreated"),
+    @NamedQuery(name = "Job.children", query = "SELECT j FROM Job j "
+        + "WHERE j.parentJob.id = :id ORDER BY j.dateCreated"),
+    @NamedQuery(name = "Job.withoutParent", query = "SELECT j FROM Job j WHERE j.parentJob IS NULL"),
+    @NamedQuery(name = "Job.avgOperation", query = "SELECT j.operation, AVG(j.runTime), AVG(j.queueTime) "
+        + "FROM Job j GROUP BY j.operation"),
 
-        // Job count queries
-        @NamedQuery(name = "Job.count", query = "SELECT COUNT(j) FROM Job j "
-                + "where j.status = :status and j.creatorServiceRegistration.serviceType = :serviceType"),
-        @NamedQuery(name = "Job.count.all", query = "SELECT COUNT(j) FROM Job j"),
-        @NamedQuery(name = "Job.count.nullType", query = "SELECT COUNT(j) FROM Job j " + "where j.status = :status"),
-        @NamedQuery(name = "Job.count.nullStatus", query = "SELECT COUNT(j) FROM Job j "
-                + "where j.creatorServiceRegistration.serviceType = :serviceType"),
-        @NamedQuery(name = "Job.countByHost", query = "SELECT COUNT(j) FROM Job j "
-                + "where j.status = :status and j.processorServiceRegistration is not null and "
-                + "j.processorServiceRegistration.serviceType = :serviceType and "
-                + "j.creatorServiceRegistration.hostRegistration.baseUrl = :host"),
-        @NamedQuery(name = "Job.countByHost.nullType", query = "SELECT COUNT(j) FROM Job j "
-                + "where j.status = :status and j.processorServiceRegistration is not null and "
-                + "j.creatorServiceRegistration.hostRegistration.baseUrl = :host"),
-        @NamedQuery(name = "Job.countByOperation", query = "SELECT COUNT(j) FROM Job j "
-                + "where j.status = :status and j.operation = :operation and "
-                + "j.creatorServiceRegistration.serviceType = :serviceType"),
-        @NamedQuery(name = "Job.countByOperationOnly", query = "SELECT COUNT(j) FROM Job j "
-                + "where j.operation = :operation"),
-        @NamedQuery(name = "Job.fullMonty", query = "SELECT COUNT(j) FROM Job j "
-                + "where j.status = :status and j.operation = :operation "
-                + "and j.processorServiceRegistration is not null and "
-                + "j.processorServiceRegistration.serviceType = :serviceType and "
-                + "j.creatorServiceRegistration.hostRegistration.baseUrl = :host"),
-        @NamedQuery(name = "Job.count.history.failed", query = "SELECT COUNT(j) FROM Job j "
-                + "WHERE j.status = 4 AND j.processorServiceRegistration IS NOT NULL "
-                + "AND j.processorServiceRegistration.serviceType = :serviceType AND j.processorServiceRegistration.hostRegistration.baseUrl = :host "
-                + "AND j.dateCompleted >= j.processorServiceRegistration.stateChanged"),
-        @NamedQuery(name = "Job.countPerHostService", query = "SELECT h.baseUrl, s.serviceType, j.status, count(j) "
-                + "FROM Job j, ServiceRegistration s, HostRegistration h "
-                + "WHERE ((j.processorServiceRegistration IS NOT NULL AND j.processorServiceRegistration = s) "
-                + "OR (j.creatorServiceRegistration IS NOT NULL AND j.creatorServiceRegistration = s)) "
-                + "AND s.hostRegistration = h GROUP BY h.baseUrl, s.serviceType, j.status") })
+    // Job count queries
+    @NamedQuery(name = "Job.count", query = "SELECT COUNT(j) FROM Job j "
+        + "where j.status = :status and j.creatorServiceRegistration.serviceType = :serviceType"),
+    @NamedQuery(name = "Job.count.all", query = "SELECT COUNT(j) FROM Job j"),
+    @NamedQuery(name = "Job.count.nullType", query = "SELECT COUNT(j) FROM Job j where j.status = :status"),
+    @NamedQuery(name = "Job.count.nullStatus", query = "SELECT COUNT(j) FROM Job j "
+        + "where j.creatorServiceRegistration.serviceType = :serviceType"),
+    @NamedQuery(name = "Job.countByHost", query = "SELECT COUNT(j) FROM Job j "
+        + "where j.status = :status and j.processorServiceRegistration is not null and "
+        + "j.processorServiceRegistration.serviceType = :serviceType and "
+        + "j.creatorServiceRegistration.hostRegistration.baseUrl = :host"),
+    @NamedQuery(name = "Job.countByHost.nullType", query = "SELECT COUNT(j) FROM Job j "
+        + "where j.status = :status and j.processorServiceRegistration is not null and "
+        + "j.creatorServiceRegistration.hostRegistration.baseUrl = :host"),
+    @NamedQuery(name = "Job.countByOperation", query = "SELECT COUNT(j) FROM Job j "
+        + "where j.status = :status and j.operation = :operation and "
+        + "j.creatorServiceRegistration.serviceType = :serviceType"),
+    @NamedQuery(name = "Job.countByOperationOnly", query = "SELECT COUNT(j) FROM Job j "
+        + "where j.operation = :operation"),
+    @NamedQuery(name = "Job.fullMonty", query = "SELECT COUNT(j) FROM Job j "
+        + "where j.status = :status and j.operation = :operation "
+        + "and j.processorServiceRegistration is not null and "
+        + "j.processorServiceRegistration.serviceType = :serviceType and "
+        + "j.creatorServiceRegistration.hostRegistration.baseUrl = :host"),
+    @NamedQuery(name = "Job.count.history.failed", query = "SELECT COUNT(j) FROM Job j "
+        + "WHERE j.status = 4 AND j.processorServiceRegistration IS NOT NULL "
+        + "AND j.processorServiceRegistration.serviceType = :serviceType "
+        + "AND j.processorServiceRegistration.hostRegistration.baseUrl = :host "
+        + "AND j.dateCompleted >= j.processorServiceRegistration.stateChanged"),
+    @NamedQuery(name = "Job.countPerHostService", query = "SELECT h.baseUrl, s.serviceType, j.status, count(j) "
+        + "FROM Job j, ServiceRegistration s, HostRegistration h "
+        + "WHERE ((j.processorServiceRegistration IS NOT NULL AND j.processorServiceRegistration = s) "
+        + "OR (j.creatorServiceRegistration IS NOT NULL AND j.creatorServiceRegistration = s)) "
+        + "AND s.hostRegistration = h GROUP BY h.baseUrl, s.serviceType, j.status")
+})
 public class JpaJob {
 
   /** The logger */
@@ -323,10 +328,12 @@ public class JpaJob {
       this.jobType = processorServiceRegistration.getServiceType();
     }
 
-    if (rootJob != null)
+    if (rootJob != null) {
       rootJobId = rootJob.id;
-    if (parentJob != null)
+    }
+    if (parentJob != null) {
       parentJobId = parentJob.id;
+    }
   }
 
   public void setProcessorServiceRegistration(ServiceRegistrationJpaImpl processorServiceRegistration) {

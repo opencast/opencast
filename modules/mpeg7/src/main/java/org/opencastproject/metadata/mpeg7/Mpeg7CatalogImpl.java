@@ -22,6 +22,8 @@
 
 package org.opencastproject.metadata.mpeg7;
 
+import org.opencastproject.util.XmlSafeParser;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -32,7 +34,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -143,7 +144,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    * Create a DOM representation of the Mpeg-7.
    */
   private Document createDocument() throws ParserConfigurationException {
-    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+    Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder().newDocument();
     Element rootElement = doc.createElementNS("urn:mpeg:mpeg7:schema:2001", "Mpeg7");
     rootElement.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:mpeg7", "urn:mpeg7:schema:2001");
     rootElement.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xsi",

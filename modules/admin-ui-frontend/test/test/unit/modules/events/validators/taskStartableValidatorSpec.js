@@ -41,9 +41,9 @@ describe('adminNg.modules.events.validators.taskStartableValidator', function ()
         });
     });
 
-    describe('event_status_raw === PROCESSING_CANCELED', function () {
+    describe('event_status_raw === PROCESSING_CANCELLED', function () {
         beforeEach(function () {
-            $rootScope.row.event_status_raw = 'PROCESSING_CANCELED';
+            $rootScope.row.event_status_raw = 'PROCESSING_CANCELLED';
             $compile(element)($rootScope);
             $rootScope.$digest();
         });
@@ -52,7 +52,7 @@ describe('adminNg.modules.events.validators.taskStartableValidator', function ()
             expect($rootScope.row.selected).toBeTruthy();
         });
 
-        it('is valid if it is selected and event_status_raw equals PROCESSING_CANCELED', function () {
+        it('is valid if it is selected and event_status_raw equals PROCESSING_CANCELLED', function () {
             expect($rootScope.testform.$valid).toBeTruthy();
         });
     });
@@ -75,7 +75,7 @@ describe('adminNg.modules.events.validators.taskStartableValidator', function ()
 
 
     describe('event_status_raw === RECORDING_FAILURE', function () {
-        it('is invalid if source does not equal PROCESSED, nor PROCESSING_CANCELED, nor PROCESSING_FAILURE', function () {
+        it('is invalid if source does not equal PROCESSED, nor PROCESSING_CANCELLED, nor PROCESSING_FAILURE', function () {
             $rootScope.row.event_status_raw = 'RECORDING_FAILURE';
             $compile(element)($rootScope);
             $rootScope.$digest();

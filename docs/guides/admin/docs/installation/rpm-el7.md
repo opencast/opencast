@@ -8,14 +8,6 @@ University](https://uni-osnabrueck.de). This repository provides preconfigured O
 3rd-party-tools.
 
 
-Availability
-------------
-
-Note that it may take some time (usually about two weeks after a new release is out) before the RPMs are available.
-Watch for announcements on [the users list](https://docs.opencast.org/#mailing-lists) or just check which versions are
-available in the repository.
-
-
 Currently Supported
 -------------------
 
@@ -32,7 +24,7 @@ Activate Repository
 First you have to install the necessary repositories:
 
 ```sh
-yum install -y https://pkg.opencast.org/rpms/release/el/7/oc-09/noarch/opencast-repository-9-1.el7.noarch.rpm
+yum install -y https://pkg.opencast.org/rpms/release/el/7/oc-10/noarch/opencast-repository-10-1.el7.noarch.rpm
 ```
 
 It might take some time after the release of a new Opencast version before the RPMs are moved to the stable repository.
@@ -165,17 +157,23 @@ For an RPM-based upgrade, first, stop Opencast:
 systemctl stop opencast.service
 ```
 
-Then, replace the repository
+Then, update the repository:
 
 ```sh
-rm -f /etc/yum.repos.d/opencast*.repo* || :
-yum install -y https://pkg.opencast.org/rpms/release/el/7/oc-09/noarch/opencast-repository-9-1.el7.noarch.rpm
+yum install -y https://pkg.opencast.org/rpms/release/el/7/oc-10/noarch/opencast-repository-10-1.el7.noarch.rpm
 ```
 
 Upgrade to the new Opencast package by running:
 
 ```sh
-yum  install opencast-<distribution>
+yum update
+```
+
+Finally, since Opencast 10 switched to using Java 11, make sure that Java 8 is no longer installed.
+Alternative, you can also set Java 11 as default.
+
+```
+yum remove 'java-1.8*'
 ```
 
 At this point you must follow the relevant [upgrade instructions](../upgrade.md), prior to starting Opencast again.

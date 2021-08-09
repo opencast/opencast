@@ -23,7 +23,6 @@ package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.nul;
-import static com.entwinemedia.fn.data.Opt.some;
 import static com.entwinemedia.fn.data.json.Jsons.BLANK;
 import static com.entwinemedia.fn.data.json.Jsons.NULL;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
@@ -63,9 +62,10 @@ import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.BulkUpdateUtil;
 import org.opencastproject.adminui.util.QueryPreprocessor;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
-import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -86,7 +86,6 @@ import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
-import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.Attachment;
@@ -243,6 +242,8 @@ public abstract class AbstractEventEndpoint {
 
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
+
+  public abstract AssetManager getAssetManager();
 
   public abstract WorkflowService getWorkflowService();
 
@@ -843,12 +844,37 @@ public abstract class AbstractEventEndpoint {
 
       Source eventSource = getIndexService().getEventSource(optEvent.get());
       if (eventSource == Source.ARCHIVE) {
-        if (getAclService().applyAclToEpisode(eventId, accessControlList)) {
+        Opt<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(eventId);
+        Option<AccessControlList> aclOpt = Option.option(accessControlList);
+        // the episode service is the source of authority for the retrieval of media packages
+        if (mediaPackage.isSome()) {
+          MediaPackage episodeSvcMp = mediaPackage.get();
+          aclOpt.fold(new Option.EMatch<AccessControlList>() {
+            // set the new episode ACL
+            @Override
+            public void esome(final AccessControlList acl) {
+              // update in episode service
+              try {
+                MediaPackage mp = getAuthorizationService().setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
+                getAssetManager().takeSnapshot(mp);
+              } catch (MediaPackageException e) {
+                logger.error("Error getting ACL from media package", e);
+              }
+            }
+
+            // if none EpisodeACLTransition#isDelete returns true so delete the episode ACL
+            @Override
+            public void enone() {
+              // update in episode service
+              MediaPackage mp = getAuthorizationService().removeAcl(episodeSvcMp, AclScope.Episode);
+              getAssetManager().takeSnapshot(mp);
+            }
+
+          });
           return ok();
-        } else {
-          logger.warn("Unable to find the event '{}'", eventId);
-          return notFound();
         }
+        logger.warn("Unable to find the event '{}'", eventId);
+        return notFound();
       } else if (eventSource == Source.WORKFLOW) {
         logger.warn("An ACL cannot be edited while an event is part of a current workflow because it might"
                 + " lead to inconsistent ACLs i.e. changed after distribution so that the old ACL is still "
@@ -860,12 +886,11 @@ public abstract class AbstractEventEndpoint {
         MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
         mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();
         // We could check agent access here if we want to forbid updating ACLs for users without access.
-        getSchedulerService().updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-                Opt.<Set<String>> none(), some(mediaPackage), Opt.<Map<String, String>> none(),
-                Opt.<Map<String, String>> none());
+        getSchedulerService().updateEvent(eventId, Opt.none(), Opt.none(), Opt.none(), Opt.none(),
+                Opt.some(mediaPackage), Opt.none(), Opt.none());
         return ok();
       }
-    } catch (AclServiceException | MediaPackageException e) {
+    } catch (MediaPackageException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         return forbidden();
       }

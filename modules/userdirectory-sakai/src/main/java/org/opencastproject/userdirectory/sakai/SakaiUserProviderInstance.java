@@ -31,6 +31,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.util.XmlSafeParser;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -69,7 +70,6 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * A UserProvider that reads user roles from Sakai.
@@ -428,8 +428,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
       String xml = IOUtils.toString(new BufferedInputStream(connection.getInputStream()));
       logger.debug(xml);
 
-      DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder parser = documentBuilderFactory.newDocumentBuilder();
+      DocumentBuilder parser = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
 
       Document document = parser.parse(new org.xml.sax.InputSource(new StringReader(xml)));
 
@@ -487,8 +486,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
       logger.debug(xml);
 
       // Parse the document
-      DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder parser = documentBuilderFactory.newDocumentBuilder();
+      DocumentBuilder parser = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
       Document document = parser.parse(new org.xml.sax.InputSource(new StringReader(xml)));
       Element root = document.getDocumentElement();
 

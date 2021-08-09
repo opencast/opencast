@@ -376,6 +376,11 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
           }
 
           @Override
+          public Date getDeletionDate() {
+            return null;
+          }
+
+          @Override
           public double getScore() {
             return 0.0;
           }

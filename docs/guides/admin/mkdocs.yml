@@ -7,6 +7,7 @@ markdown_extensions:
 
 plugins:
   - search:
+  - macros:
   - mermaid2:
       arguments:
         theme: neutral
@@ -69,6 +70,7 @@ nav:
    - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
+   - Elasticsearch: 'configuration/elasticsearch.md'
    - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
    - Inbox: 'configuration/inbox.md'

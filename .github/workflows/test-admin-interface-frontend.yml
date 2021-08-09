@@ -36,3 +36,4 @@ jobs:
       run: |
         cd modules/admin-ui-frontend
         npm run test-${{ matrix.browser }}
+        npm run html-validate
