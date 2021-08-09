@@ -25,7 +25,6 @@ package org.opencastproject.search.impl.solr;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.util.RequireUtil.notNull;
-import static org.opencastproject.util.data.Collections.flatMap;
 import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Option.option;
 
@@ -34,7 +33,6 @@ import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.metadata.api.MetadataValue;
@@ -91,7 +89,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -101,6 +98,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -172,13 +170,8 @@ public class SolrIndexManager {
 
   /** Dynamic reference. */
   public void setStaticMetadataServices(List<StaticMetadataService> mdServices) {
-    this.mdServices = new ArrayList<StaticMetadataService>(mdServices);
-    Collections.sort(this.mdServices, new Comparator<StaticMetadataService>() {
-      @Override
-      public int compare(StaticMetadataService a, StaticMetadataService b) {
-        return b.getPriority() - a.getPriority();
-      }
-    });
+    this.mdServices = new ArrayList<>(mdServices);
+    this.mdServices.sort((a, b) -> b.getPriority() - a.getPriority());
   }
 
   /**
@@ -423,11 +416,8 @@ public class SolrIndexManager {
    * @param acl
    *          the access control list for this mediapackage
    * @return an input document ready to be posted to solr
-   * @throws MediaPackageException
-   *           if serialization of the media package fails
    */
-  private SolrInputDocument createEpisodeInputDocument(MediaPackage mediaPackage, AccessControlList acl)
-          throws MediaPackageException, IOException {
+  private SolrInputDocument createEpisodeInputDocument(MediaPackage mediaPackage, AccessControlList acl) {
 
     SolrInputDocument doc = new SolrInputDocument();
     String mediaPackageId = mediaPackage.getIdentifier().toString();
@@ -665,17 +655,17 @@ public class SolrIndexManager {
 
       @Override
       public List<DField<String>> getOcAcl() {
-        return Collections.EMPTY_LIST; // set elsewhere
+        return Collections.emptyList(); // set elsewhere
       }
 
       @Override
       public List<DField<String>> getSegmentText() {
-        return Collections.EMPTY_LIST; // set elsewhere
+        return Collections.emptyList(); // set elsewhere
       }
 
       @Override
       public List<DField<String>> getSegmentHint() {
-        return Collections.EMPTY_LIST; // set elsewhere
+        return Collections.emptyList(); // set elsewhere
       }
     });
   }
@@ -701,12 +691,12 @@ public class SolrIndexManager {
    *          the access control list
    */
   static void setAuthorization(SolrInputDocument doc, SecurityService securityService, AccessControlList acl) {
-    Map<String, List<String>> permissions = new HashMap<String, List<String>>();
+    Map<String, List<String>> permissions = new HashMap<>();
 
     // Define containers for common permissions
-    List<String> reads = new ArrayList<String>();
+    List<String> reads = new ArrayList<>();
     permissions.put(READ.toString(), reads);
-    List<String> writes = new ArrayList<String>();
+    List<String> writes = new ArrayList<>();
     permissions.put(WRITE.toString(), writes);
 
     String adminRole = securityService.getOrganization().getAdminRole();
@@ -779,7 +769,7 @@ public class SolrIndexManager {
     try {
       dc = seriesService.getSeries(seriesId);
     } catch (SeriesException | NotFoundException e) {
-      logger.debug("No series dublincore found for series id " + seriesId);
+      logger.debug("No series dublincore found for series id {}", seriesId);
       return null;
     }
 
@@ -796,7 +786,7 @@ public class SolrIndexManager {
         }
       }
     } catch (Exception e) {
-      logger.error("Error trying to load series " + seriesId, e);
+      logger.error("Error trying to load series {}", seriesId, e);
     }
 
     // Fill document
@@ -1127,8 +1117,8 @@ public class SolrIndexManager {
             }
           }
 
-          logger.trace("Adding segment: " + timepoint.toString());
-          Schema.setSegmentHint(doc, new DField<String>(hintField.toString(), Integer.toString(segmentCount)));
+          logger.trace("Adding segment: {}", timepoint);
+          Schema.setSegmentHint(doc, new DField<>(hintField.toString(), Integer.toString(segmentCount)));
 
           // increase segment counter
           segmentCount++;
@@ -1277,16 +1267,10 @@ public class SolrIndexManager {
    * Get metadata from all registered metadata services.
    */
   static List<StaticMetadata> getMetadata(final List<StaticMetadataService> mdServices, final MediaPackage mp) {
-    return flatMap(
-        mdServices,
-        new ArrayList<StaticMetadata>(),
-        new Function<StaticMetadataService, Collection<StaticMetadata>>() {
-            @Override
-            public Collection<StaticMetadata> apply(StaticMetadataService s) {
-              StaticMetadata md = s.getMetadata(mp);
-              return md != null ? Arrays.asList(md) : Collections.<StaticMetadata> emptyList();
-            }
-          });
+    return mdServices.stream()
+            .map(s -> s.getMetadata(mp))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
   }
 
   /**
