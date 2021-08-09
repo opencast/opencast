@@ -1620,11 +1620,8 @@
             "HOST_NAME": "Hostname",
             "NODE_NAME": "Knotenname",
             "CORES": "Kerne",
-            "COMPLETED": "Jobs abgeschlossen",
             "RUNNING": "Jobs in Bearbeitung",
             "QUEUED": "Jobs in Warteschlange",
-            "MEAN_RUN_TIME": "Mittlere Laufzeit",
-            "MEAN_QUEUE_TIME": "Mittlere Wartezeit",
             "MAINTENANCE": "Wartungsarbeiten",
             "MAINTENANCE_OFF": "Wartungsmodus aktivieren",
             "MAINTENANCE_ON": "Wartungsmodus beenden"

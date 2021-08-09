@@ -1620,11 +1620,8 @@
             "HOST_NAME": "Hostnaam",
             "NODE_NAME": "Node naam",
             "CORES": "Kernen",
-            "COMPLETED": "Jobs afgewerkt",
             "RUNNING": "Jobs in verwerking",
             "QUEUED": "Jobs in wachtrij",
-            "MEAN_RUN_TIME": "Gemiddelde looptijd",
-            "MEAN_QUEUE_TIME": "Gemiddelde wachttijd",
             "MAINTENANCE": "Onderhoud",
             "MAINTENANCE_OFF": "Activeer onderhoudsmodus",
             "MAINTENANCE_ON": "Beëindig onderhoudsmodus"

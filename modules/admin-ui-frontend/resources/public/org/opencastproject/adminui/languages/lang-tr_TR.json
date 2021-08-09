@@ -1620,11 +1620,8 @@
             "HOST_NAME": "Ana bilgisayar adı",
             "NODE_NAME": "Düğüm adı",
             "CORES": "Çekirdekler",
-            "COMPLETED": "Tamamlanan işler",
             "RUNNING": "Çalışan işler",
             "QUEUED": "Kuyruktaki işler",
-            "MEAN_RUN_TIME": "Ortalama çalışma süresi",
-            "MEAN_QUEUE_TIME": "Ortalama kuyruk süresi",
             "MAINTENANCE": "Bakım",
             "MAINTENANCE_OFF": "Bakım moduna gir",
             "MAINTENANCE_ON": "Bakım modundan çık"

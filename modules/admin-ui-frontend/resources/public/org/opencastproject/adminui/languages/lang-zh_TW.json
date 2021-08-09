@@ -1620,11 +1620,8 @@
             "HOST_NAME": "主機名稱",
             "NODE_NAME": "Node name",
             "CORES": "核心",
-            "COMPLETED": "工作已完成",
             "RUNNING": "工作運行中",
             "QUEUED": "工作排序中",
-            "MEAN_RUN_TIME": "平均運行時間",
-            "MEAN_QUEUE_TIME": "平均排序時間",
             "MAINTENANCE": "維護",
             "MAINTENANCE_OFF": "進入維護模式",
             "MAINTENANCE_ON": "離開維護模式"

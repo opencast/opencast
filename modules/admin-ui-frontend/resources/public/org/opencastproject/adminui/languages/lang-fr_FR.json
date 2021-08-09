@@ -1620,11 +1620,8 @@
             "HOST_NAME": "Nom d'hôte",
             "NODE_NAME": "Nom du nœud",
             "CORES": "Coeurs",
-            "COMPLETED": "Tâches achevées",
             "RUNNING": "Tâches en cours",
             "QUEUED": "Tâches en attente",
-            "MEAN_RUN_TIME": "Temps moyen d'exécution",
-            "MEAN_QUEUE_TIME": "Temps moyen d'attente",
             "MAINTENANCE": "Maintenance",
             "MAINTENANCE_OFF": "Activer mode de maintenance",
             "MAINTENANCE_ON": "Désactiver mode de maintenance"

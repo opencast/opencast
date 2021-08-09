@@ -1620,11 +1620,8 @@
             "HOST_NAME": "Host name",
             "NODE_NAME": "Node name",
             "CORES": "Cores",
-            "COMPLETED": "Jobs completed",
             "RUNNING": "Jobs running",
             "QUEUED": "Jobs queued",
-            "MEAN_RUN_TIME": "Mean run time",
-            "MEAN_QUEUE_TIME": "Mean queue time",
             "MAINTENANCE": "Maintenance",
             "MAINTENANCE_OFF": "Enter maintenance mode",
             "MAINTENANCE_ON": "Leave maintenance mode"

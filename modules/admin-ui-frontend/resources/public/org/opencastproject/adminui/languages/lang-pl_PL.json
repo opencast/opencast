@@ -1620,11 +1620,8 @@
             "HOST_NAME": "Nazwa hosta",
             "NODE_NAME": "Node name",
             "CORES": "Rdzenie",
-            "COMPLETED": "Zadania wykonane",
             "RUNNING": "Uruchomione zadania",
             "QUEUED": "Zadania w kolejce",
-            "MEAN_RUN_TIME": "Średni czas trwania",
-            "MEAN_QUEUE_TIME": "Średni czas w kolejce",
             "MAINTENANCE": "Obsługa",
             "MAINTENANCE_OFF": "Tryb konserwacji",
             "MAINTENANCE_ON": "Opuścić tryb konserwacji"

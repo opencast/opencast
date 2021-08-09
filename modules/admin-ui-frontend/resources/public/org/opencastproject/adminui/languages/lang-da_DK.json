@@ -1620,11 +1620,8 @@
             "HOST_NAME": "Værtsnavn",
             "NODE_NAME": "Node name",
             "CORES": "Kerner",
-            "COMPLETED": "Jobs fuldført",
             "RUNNING": "Jobs kører",
             "QUEUED": "Jobs i kø",
-            "MEAN_RUN_TIME": "Gennemsnitlig afviklingstid",
-            "MEAN_QUEUE_TIME": "Gennemsnitlig køtid",
             "MAINTENANCE": "Vedligeholdelse",
             "MAINTENANCE_OFF": "Skift til vedligeholdelsestilstand",
             "MAINTENANCE_ON": "Forlad vedligeholdelsestilstand"

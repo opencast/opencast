@@ -1620,11 +1620,8 @@
             "HOST_NAME": "主机名",
             "NODE_NAME": "节点名",
             "CORES": "核",
-            "COMPLETED": "已完成任务",
             "RUNNING": "进行中的任务",
             "QUEUED": "排队中的任务",
-            "MEAN_RUN_TIME": "平均运行时间",
-            "MEAN_QUEUE_TIME": "平均排队时间",
             "MAINTENANCE": "维护",
             "MAINTENANCE_OFF": "进入维护模式",
             "MAINTENANCE_ON": "退出维护模式"
