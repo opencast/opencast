@@ -23,12 +23,14 @@
 package org.opencastproject.mediapackage;
 
 import org.opencastproject.mediapackage.identifier.Id;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -100,7 +102,13 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#loadFromXml(java.io.InputStream)
    */
   public MediaPackage loadFromXml(InputStream is) throws MediaPackageException {
-    return MediaPackageImpl.valueOf(is);
+    try {
+      return loadFromXml(XmlSafeParser.parse(is));
+    } catch (IOException | SAXException e) {
+      throw new MediaPackageException(e);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
   }
 
   /**
