@@ -82,6 +82,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -165,7 +166,7 @@ public class SearchServiceImplTest {
     // workspace
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
-        .andAnswer(() -> getClass().getResourceAsStream("/" + EasyMock.getCurrentArguments()[0].toString()))
+        .andAnswer(() -> new FileInputStream(((URI)EasyMock.getCurrentArguments()[0]).getPath()))
         .anyTimes();
     EasyMock.replay(workspace);
 

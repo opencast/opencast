@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -108,6 +109,7 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#loadFromXml(java.io.InputStream)
    */
   public MediaPackage loadFromXml(InputStream is) throws MediaPackageException {
+
     if (serializer != null) {
       try {
 
