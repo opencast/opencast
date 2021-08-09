@@ -1624,7 +1624,7 @@
             "RUNNING": "משימות רצות",
             "QUEUED": "משימות בתור",
             "MEAN_RUN_TIME": "זמן ריצה ממוצע",
-            "MEAN_QUEUE_TIME": "זמן ממוצע בתור",
+            "MEAN_QUEUE_TIME": "זמן תור ממוצע",
             "MAINTENANCE": "תחזוקה",
             "MAINTENANCE_OFF": "הפעל מצב תחזוקה",
             "MAINTENANCE_ON": "צא ממצב תחזוקה"

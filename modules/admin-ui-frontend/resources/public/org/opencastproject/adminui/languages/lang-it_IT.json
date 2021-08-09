@@ -1624,7 +1624,7 @@
             "RUNNING": "Processi in corso",
             "QUEUED": "Processi in coda",
             "MEAN_RUN_TIME": "Durata effettiva",
-            "MEAN_QUEUE_TIME": "Tempo di attesa medio",
+            "MEAN_QUEUE_TIME": "Tempo di coda di carne",
             "MAINTENANCE": "Manutenzione",
             "MAINTENANCE_OFF": "Inserisci modalità manutenzione",
             "MAINTENANCE_ON": "Lascia modalità manutenzione"
