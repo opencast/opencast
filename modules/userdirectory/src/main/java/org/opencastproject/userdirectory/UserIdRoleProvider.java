@@ -107,14 +107,11 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
     this.userDirectoryService = userDirectoryService;
   }
 
-  public static final String getUserIdRole(String userName) {
-    String safeUserName;
+  public static String getUserIdRole(String userName) {
     if (sanitize) {
-      safeUserName = SAFE_USERNAME.replaceFrom(userName, "_").toUpperCase();
-    } else {
-      safeUserName = userName;
+      userName = SAFE_USERNAME.replaceFrom(userName, "_").toUpperCase();
     }
-    return userRolePrefix.concat(safeUserName);
+    return userRolePrefix.concat(userName);
   }
 
   /**
