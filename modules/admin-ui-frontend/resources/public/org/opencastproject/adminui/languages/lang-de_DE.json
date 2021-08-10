@@ -619,6 +619,7 @@
             "NOCONTENT": "Keine Daten verfügbar",
             "PUBLISHED": "Veröffentlicht",
             "WEEKDAY": "Wochentag",
+            "ADMINUI_NOTES": "Notizen",
             "TOOLTIP": {
                "ASSETS": "Anlagedetails öffnen",
                "START": "Nach diesem Startdatum filtern",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "Metadaten benötigen Korrektur",
                   "WRONG_SERIES_PUBLICATION": "Falsche Serie oder falscher Publikations-Kanal",
                   "WRONG_WORKFLOW": "Falscher Workflow",
-                  "PROCESSING_FAILURE": "Verarbeitungs-Fehler"
+                  "PROCESSING_FAILURE": "Verarbeitungs-Fehler",
+                  "ADMINUI_NOTES": "Notizen in Admin UI"
                }
             },
             "STATISTICS": {
