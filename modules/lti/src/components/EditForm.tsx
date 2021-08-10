@@ -8,7 +8,7 @@ import {
 } from "../OpencastRest";
 import Select, { ValueType } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import * as i18next from "i18next";
+import i18n, { TFunction } from "i18next";
 
 const allowedFields = ["title", "language", "license", "creator"];
 
@@ -35,7 +35,7 @@ interface MetadataFieldProps {
     // ESlint false positive.
     // eslint-disable-next-line react/no-unused-prop-types
     readonly valueChange: (id: string, newValue: string | string[]) => void;
-    readonly t: i18next.TFunction;
+    readonly t: TFunction;
 }
 
 interface MetadataCollectionKey {
@@ -50,7 +50,7 @@ function parseMetadataCollectionKey(s: string): MetadataCollectionKey {
     return JSON.parse(s);
 }
 
-function collectionToOptions(collection: EventMetadataCollection, translatable: boolean, t: i18next.TFunction): OptionType[] {
+function collectionToOptions(collection: EventMetadataCollection, translatable: boolean, t: TFunction): OptionType[] {
     const pairs = collectionToPairs(collection);
     //Check if we get a JSON object back, and that this contains the order field
     //Use the order field in this case to determine to order of the items in the dropdown
@@ -68,7 +68,7 @@ function collectionToOptions(collection: EventMetadataCollection, translatable: 
         .map(([k, v]) => [parseMetadataCollectionKey(k).label, v])
         .map(([k, v]) => [translatable ? t(k) : k, v])
         .map(([k, v]) => ({ value: v, label: k}))
-        .sort((a,b) => a.label.localeCompare(b.label, i18next.language));
+        .sort((a,b) => a.label.localeCompare(b.label, i18n.language));
 }
 
 function MetadataFieldReadOnly(props: MetadataFieldProps) {
