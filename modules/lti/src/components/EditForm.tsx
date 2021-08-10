@@ -162,7 +162,7 @@ class TranslatedEditForm extends React.Component<EditFormProps> {
                     valueChange={this.fieldValueChange.bind(this)} />)}
             {this.props.withUpload === true &&
                 <div className="form-group my-4">
-                    <label className="px-3" htmlFor="presenter">{this.props.t("LTI.VIDEOFILE")}</label>
+                    <label className="pr-3" htmlFor="presenter">{this.props.t("LTI.VIDEOFILE")}</label>
                     <input type="file" className="form-control-file px-3" onChange={this.onChangePresenterFile.bind(this)} />
                     <small className="form-text text-muted">{this.props.t("LTI.VIDEOFILE_DESCRIPTION")}</small>
                 </div>
