@@ -541,6 +541,12 @@ function($, bootbox, _, alertify, jsyaml) {
     });
 
     $($oc_sort_dropdown).on('change', function() {
+      let epFrom = GetURLParameter('epFrom');
+      if (epFrom) {
+        $('#oc-search-form .form-group').append(
+          '<input type=\'hidden\' name=\'epFrom\' value=\'' + _.escape(epFrom) + '\' />'
+        );
+      }
       $($oc_search_form).submit();
     });
 
