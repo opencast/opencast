@@ -23,6 +23,7 @@ import workflows from "./reducers/workflowReducers";
 import eventDetails from "./reducers/eventDeatilsReducers";
 import seriesDetails from "./reducers/seriesDetailsReducers";
 import recordingDetails from "./reducers/recordingDetailsReducer";
+import userDetails from "./reducers/userDetailsReducer";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -48,7 +49,8 @@ const reducers = {
     workflows,
     eventDetails,
     seriesDetails,
-    recordingDetails
+    recordingDetails,
+    userDetails
 };
 
 // Configuration for persisting store

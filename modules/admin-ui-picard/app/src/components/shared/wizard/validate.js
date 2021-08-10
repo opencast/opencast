@@ -127,3 +127,13 @@ export const NewUserSchema = usernames => (
         passwordConfirmation: Yup.string()
             .oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required')
 }));
+
+export const EditUserSchema = Yup.object().shape({
+    name: Yup.string().required('Required'),
+    email: Yup.string().email().required('Required'),
+    passwordConfirmation: Yup.string().when('password', {
+        is: value => !!value,
+        then: Yup.string()
+            .oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required')
+    })
+})

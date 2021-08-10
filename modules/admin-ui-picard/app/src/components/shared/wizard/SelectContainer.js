@@ -6,7 +6,7 @@ import {useField} from "formik";
 /**
  * This component renders the select container used for roles and user pages in new group and new user pages.
  */
-const SelectContainer = ({ resource, formikField }) => {
+const SelectContainer = ({ resource, formikField, manageable=true }) => {
     const { t } = useTranslation();
 
     // Formik hook for getting data of specific form field
@@ -38,6 +38,14 @@ const SelectContainer = ({ resource, formikField }) => {
         setDefaultItems(initialItems);
     }, []);
 
+    const disabledStyle = {
+        backgroundColor: '#eeeff0'
+    };
+
+    const disabledSelectStyle = {
+        backgroundColor: '#eeeff0',
+
+    };
 
     const clearSearchField = () => {
         setSearchField('');
@@ -169,6 +177,8 @@ const SelectContainer = ({ resource, formikField }) => {
                                 <input type="text"
                                        id="search"
                                        className="search"
+                                       disabled={!manageable}
+                                       style={manageable ? {} : disabledStyle}
                                        placeholder={t('TABLE_FILTERS.PLACEHOLDER')}
                                        onChange={e => handleChangeSearch(e.target.value)}
                                        value={searchField}/>
@@ -178,7 +188,8 @@ const SelectContainer = ({ resource, formikField }) => {
                         {/*Select with options provided by backend*/}
                         <select multiple
                                 className="available"
-                                style={{minHeight: '11em'}}
+                                disabled={!manageable}
+                                style={manageable ? {minHeight: '11em'} : disabledSelectStyle}
                                 value={markedForAddition}
                                 onChange={e => handleChangeAdd(e)}>
                             {items.map((item, key) => (
@@ -188,7 +199,7 @@ const SelectContainer = ({ resource, formikField }) => {
                     </div>
                     <div className="row">
                         <div className="button-container">
-                            <button className={cn("submit", {disabled: !markedForAddition.length})}
+                            <button className={cn("submit", {disabled: (!markedForAddition.length || !manageable)})}
                                     onClick={() => handleClickAdd()}>
                                 {t(resource.label + '.ADD')}
                             </button>
@@ -205,7 +216,8 @@ const SelectContainer = ({ resource, formikField }) => {
                         <label>{t(resource.label + '.RIGHT')}</label>
                         <select multiple
                                 className="selected"
-                                style={{minHeight: '11em'}}
+                                disabled={!manageable}
+                                style={manageable ? {minHeight: '11em'} : disabledSelectStyle}
                                 onChange={e => handleChangeRemove(e)}
                                 value={markedForRemoval}>
                             {selectedItems.map((item, key) => (
@@ -215,7 +227,7 @@ const SelectContainer = ({ resource, formikField }) => {
                     </div>
                     <div className="row">
                         <div className="button-container">
-                            <button className={cn("remove", {disabled: !markedForRemoval.length})}
+                            <button className={cn("remove", {disabled: !markedForRemoval.length || !manageable})}
                                     onClick={() => handleClickRemove()}>
                                 {t(resource.label + '.REMOVE')}
                             </button>

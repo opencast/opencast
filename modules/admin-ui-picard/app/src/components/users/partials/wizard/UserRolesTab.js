@@ -3,9 +3,9 @@ import {fetchRolesWithTarget} from "../../../../thunks/aclThunks";
 import SelectContainer from "../../../shared/wizard/SelectContainer";
 
 /**
- * This component renders the role selection tab of the new user wizard
+ * This component renders the role selection tab of the new user wizard and the user details modal
  */
-const NewUserRolesTab = ({ formik }) => {
+const UserRolesTab = ({ formik }) => {
 
     // roles that can be chosen by user
     const [roles, setRoles] = useState([]);
@@ -34,7 +34,7 @@ const NewUserRolesTab = ({ formik }) => {
                             searchable: true,
                             label: 'USERS.USERS.DETAILS.ROLES',
                             items: roles
-                        }} formikField="roles"/>
+                        }} formikField="roles" manageable={formik.values.manageable}/>
                     )}
                 </div>
             </div>
@@ -42,4 +42,4 @@ const NewUserRolesTab = ({ formik }) => {
     );
 };
 
-export default NewUserRolesTab;
+export default UserRolesTab;

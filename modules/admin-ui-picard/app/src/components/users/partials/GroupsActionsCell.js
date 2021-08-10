@@ -3,6 +3,7 @@ import {connect} from "react-redux";
 import {useTranslation} from "react-i18next";
 import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteGroup} from "../../../thunks/groupThunks";
+import GroupDetailsModal from "./modal/GroupDetailsModal";
 
 /**
  * This component renders the action cells of groups in the table view
@@ -11,6 +12,7 @@ const GroupsActionsCell = ({ row, deleteGroup }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
+    const [displayGroupDetails, setGroupDetails] = useState(false);
 
     const hideDeleteConfirmation = () => {
         setDeleteConfirmation(false);
@@ -20,13 +22,27 @@ const GroupsActionsCell = ({ row, deleteGroup }) => {
         deleteGroup(id);
     };
 
+    const hideGroupDetails = () => {
+        setGroupDetails(false);
+    };
+
+    const showGroupDetails = async () => {
+        // todo: fetch group details
+
+        setGroupDetails(true);
+    };
+
     return (
         <>
-            {/*TODO: When group details are implemented, remove placeholder */}
             {/*TODO: with-Role */}
-            <a onClick={() => onClickPlaceholder()}
+            <a onClick={() => showGroupDetails()}
                className="more"
                title={t('USERS.GROUPS.TABLE.TOOLTIP.DETAILS')}/>
+
+            {displayGroupDetails && (
+                <GroupDetailsModal close={hideGroupDetails}
+                                   groupname={row.name}/>
+            )}
 
             {/*// TODO: with-Role*/}
             <a onClick={() => setDeleteConfirmation(true)}
@@ -44,11 +60,6 @@ const GroupsActionsCell = ({ row, deleteGroup }) => {
 
         </>
     );
-}
-
-//todo: remove if not needed anymore
-const onClickPlaceholder = () => {
-    console.log("In the Future here opens an other component, which is not implemented yet");
 }
 
 const mapDispatchToProps = dispatch => ({

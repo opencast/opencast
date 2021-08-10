@@ -46,6 +46,19 @@ export const getURLParams = state => {
     return params;
 }
 
+// used for create URLSearchParams for API requests used to create/update user
+export const buildUserBody = values => {
+    let data = new URLSearchParams();
+    // fill form data with user inputs
+    data.append('username', values.username);
+    data.append('name', values.name);
+    data.append('email', values.email);
+    data.append('password', values.password);
+    data.append('roles', JSON.stringify(values.roles));
+
+    return data;
+}
+
 // transform collection of metadata into object with name and value
 export const transformMetadataCollection = (metadata, noField) => {
     if (noField) {
