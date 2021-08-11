@@ -63,6 +63,7 @@
 </a>
 
 <a ng-click="row.embeddingCode()"
+   ng-show="{{ row.showEmbed }}"
    class="fa fa-link"
    title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.EMBEDDING_CODE' | translate }}"
    with-role="ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW">

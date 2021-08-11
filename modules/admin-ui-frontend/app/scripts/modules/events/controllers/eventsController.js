@@ -30,6 +30,8 @@ angular.module('adminNg.controllers')
 
     $scope.stats = Stats;
 
+    $scope.showEmbedButtons = true;
+
     var statsConfiguration = ResourcesListResource.queryRecursive({ resource: 'STATS' });
     statsConfiguration.$promise.then(function (configuration) {
 
@@ -48,6 +50,12 @@ angular.module('adminNg.controllers')
       $scope.editorUrl = user.org.properties['admin.editor.url'];
       if (!$scope.editorUrl) {
         $scope.editorUrl = '#!/events/events/$id/tools/editor';
+      }
+      if (angular.isDefined(user.org.properties['adminui.embed_button_display'])) {
+        var embedButtonConfig = user.org.properties['adminui.embed_button_display'];
+        if (embedButtonConfig === 'false') {
+          $scope.showEmbedButtons = embedButtonConfig;
+        }
       }
     }).catch(angular.noop);
 
@@ -132,6 +140,7 @@ angular.module('adminNg.controllers')
         row.comments = CommentResource.query({ resource: 'event', resourceId: row.id, type: 'comments' });
 
         row.editorUrl = $scope.editorUrl.replace('$id', row.id);
+        row.showEmbed = $scope.showEmbedButtons;
       }
     });
 
