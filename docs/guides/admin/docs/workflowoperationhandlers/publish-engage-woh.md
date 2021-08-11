@@ -30,7 +30,6 @@ Parameter Table
 |streaming-target-subflavors|Subflavor to use for distributed material                                                    |
 |merge-force-flavors        |Flavors of elements for which an update is enforced when merging catalogs.                   |
 |                           |Defaults to `dublincore/*,security/*`.
-|list-elements              |Include all media package elements in the publication. Defaults to `true`.                   |
 
 Operation Example
 -----------------
