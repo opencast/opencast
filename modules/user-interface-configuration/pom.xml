@@ -94,9 +94,6 @@
             <Export-Package>
               org.opencastproject.uiconfig;version=${project.version},
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/uiconfig.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
