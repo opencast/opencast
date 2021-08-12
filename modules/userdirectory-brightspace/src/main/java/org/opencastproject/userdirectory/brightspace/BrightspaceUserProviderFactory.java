@@ -152,19 +152,14 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
 
     logger.debug("creating new brightspace user provider for pid={}", pid);
 
-
-    BrightspaceUserProviderInstance provider = new BrightspaceUserProviderInstance(
-        pid,
-        new BrightspaceClientImpl(urlStr, applicationId, applicationKey, systemUserId, systemUserKey),
-        org,
-        cacheSize,
-        cacheExpiration,
-        adminUserName
-    );
+    BrightspaceClientImpl clientImpl
+        = new BrightspaceClientImpl(urlStr, applicationId, applicationKey, systemUserId, systemUserKey);
+    BrightspaceUserProviderInstance provider
+        = new BrightspaceUserProviderInstance(pid, clientImpl, org, cacheSize, cacheExpiration, adminUserName);
     this.providerRegistrations
-            .put(pid, this.bundleContext.registerService(UserProvider.class.getName(), provider, null));
+        .put(pid, this.bundleContext.registerService(UserProvider.class.getName(), provider, null));
     this.providerRegistrations
-            .put(pid, this.bundleContext.registerService(RoleProvider.class.getName(), provider, null));
+        .put(pid, this.bundleContext.registerService(RoleProvider.class.getName(), provider, null));
   }
 
   /**

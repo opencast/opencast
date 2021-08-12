@@ -354,9 +354,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
         // Load roles granted to this group
         logger.debug(
             "Resolving transitive roles for user {} from external group {}",
-            user.getUsername(),
-            role.getName()
-        );
+            user.getUsername(), role.getName());
         for (RoleProvider roleProvider : roleProviders) {
           if (roleProvider instanceof GroupProvider) {
             List<Role> groupRoles = ((GroupProvider) roleProvider).getRolesForGroup(role.getName());
@@ -366,16 +364,11 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
               }
               logger.debug(
                   "Adding {} derived role(s) for user {} from internal group {}",
-                  derivedRoles.size(),
-                  user.getUsername(),
-                  role.getName()
-              );
+                  derivedRoles.size(), user.getUsername(), role.getName());
             } else {
               logger.warn(
                   "Cannot resolve externallly provided group reference for user {} to internal group {}",
-                  user.getUsername(),
-                  role.getName()
-              );
+                  user.getUsername(), role.getName());
             }
           }
         }

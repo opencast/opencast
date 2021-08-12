@@ -373,9 +373,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
       if (!organization.equals(org)) {
         throw new SecurityException(String.format(
             "Current request belongs to the organization \"%s\". Expected \"%s\"",
-            org.getId(),
-            organization.getId()
-        ));
+            org.getId(), organization.getId()));
       }
 
       for (String value : values) {
