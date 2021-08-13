@@ -67,12 +67,11 @@ function monitorService($http, $location, $translate, Storage) {
             services.service[LATEST_VERSION_NAME].error = false;
           } else if (parseInt(my_version) == parseInt(latest_version)) {
             $translate('UPDATE.MINOR').then(function(translation) {
-              services.service[LATEST_VERSION_NAME].status = translation;
+              Monitoring.setWarning(LATEST_VERSION_NAME, translation);
             }).catch(angular.noop);
-            services.service[LATEST_VERSION_NAME].error = true;
           } else if (parseInt(latest_version) - parseInt(my_version) < 2) {
             $translate('UPDATE.MAJOR').then(function(translation) {
-              Monitoring.setError(LATEST_VERSION_NAME, translation);
+              Monitoring.setWarning(LATEST_VERSION_NAME, translation);
             }).catch(angular.noop);
           } else {
             $translate('UPDATE.UNSUPPORTED', {'version': my_version}).then(function(translation) {
