@@ -89,7 +89,7 @@ public class JWTRequestHeaderAuthenticationFilter extends RequestHeaderAuthentic
         builder.append(hv.nextElement());
         first = false;
       }
-      logger.info(builder.toString());
+      logger.debug(builder.toString());
     }
   }
 

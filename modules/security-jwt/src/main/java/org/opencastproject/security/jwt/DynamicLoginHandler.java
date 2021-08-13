@@ -37,6 +37,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -349,6 +350,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    *
    * @param userDetailsService The user details service.
    */
+  @Reference
   public void setUserDetailsService(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
   }
@@ -358,6 +360,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    *
    * @param userDirectoryService The user directory service.
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -367,6 +370,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    *
    * @param securityService The security service.
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -376,6 +380,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    *
    * @param userReferenceProvider The user reference provider.
    */
+  @Reference
   public void setUserReferenceProvider(UserReferenceProvider userReferenceProvider) {
     this.userReferenceProvider = userReferenceProvider;
   }
