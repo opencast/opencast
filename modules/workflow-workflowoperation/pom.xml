@@ -169,6 +169,7 @@
               OSGI-INF/operations/copy.xml,
               OSGI-INF/operations/defaults.xml,
               OSGI-INF/operations/duplicate-event.xml,
+              OSGI-INF/operations/duplicate-event-aws.xml,
               OSGI-INF/operations/error-resolution.xml,
               OSGI-INF/operations/export-wf-properties.xml,
               OSGI-INF/operations/failing.xml,
