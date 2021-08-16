@@ -118,7 +118,8 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   @Override
   public void updated(String pid, Dictionary properties) throws ConfigurationException {
     logger.debug("updated BrightspaceUserProviderFactory");
-    String adminUserName = StringUtils.trimToNull(bundleContext.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
+    String adminUserName = StringUtils.trimToNull(
+        bundleContext.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
     String organization = (String) properties.get(ORGANIZATION_KEY);
     String urlStr = (String) properties.get(BRIGHTSPACE_URL);
     String systemUserId = (String) properties.get(BRIGHTSPACE_USER_ID);
@@ -151,14 +152,14 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
 
     logger.debug("creating new brightspace user provider for pid={}", pid);
 
-
-    BrightspaceUserProviderInstance provider = new BrightspaceUserProviderInstance(pid,
-            new BrightspaceClientImpl(urlStr, applicationId, applicationKey, systemUserId, systemUserKey), org, cacheSize,
-            cacheExpiration, adminUserName);
+    BrightspaceClientImpl clientImpl
+        = new BrightspaceClientImpl(urlStr, applicationId, applicationKey, systemUserId, systemUserKey);
+    BrightspaceUserProviderInstance provider
+        = new BrightspaceUserProviderInstance(pid, clientImpl, org, cacheSize, cacheExpiration, adminUserName);
     this.providerRegistrations
-            .put(pid, this.bundleContext.registerService(UserProvider.class.getName(), provider, null));
+        .put(pid, this.bundleContext.registerService(UserProvider.class.getName(), provider, null));
     this.providerRegistrations
-            .put(pid, this.bundleContext.registerService(RoleProvider.class.getName(), provider, null));
+        .put(pid, this.bundleContext.registerService(RoleProvider.class.getName(), provider, null));
   }
 
   /**
