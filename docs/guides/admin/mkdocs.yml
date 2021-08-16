@@ -85,6 +85,7 @@ nav:
       - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
+      - JWT-based Authentication and Authorization (e.g. for OIDC): 'configuration/security.jwt.md'
       - Moodle User Provider: 'configuration/security.user.moodle.md'
       - Sakai User Provider: 'configuration/security.user.sakai.md'
       - Brightspace User Provider: 'configuration/security.user.brightspace.md'
