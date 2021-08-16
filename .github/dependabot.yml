@@ -18,7 +18,7 @@ updates:
 - package-ecosystem: npm
   directory: "/modules/lti"
   schedule:
-    interval: weekly
+    interval: monthly
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/modules/runtime-info-ui-ng"
