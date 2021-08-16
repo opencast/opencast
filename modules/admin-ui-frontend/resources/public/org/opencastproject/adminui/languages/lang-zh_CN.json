@@ -619,6 +619,7 @@
             "NOCONTENT": "无可用数据",
             "PUBLISHED": "已发布",
             "WEEKDAY": "工作日",
+            "ADMINUI_NOTES": "注意",
             "TOOLTIP": {
                "ASSETS": "打开资源文件详情",
                "START": "只显示此开始日期的事件",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "元数据需要校正",
                   "WRONG_SERIES_PUBLICATION": "系列或发布频道错误",
                   "WRONG_WORKFLOW": "错误工作流",
-                  "PROCESSING_FAILURE": "处理失败"
+                  "PROCESSING_FAILURE": "处理失败",
+                  "ADMINUI_NOTES": "关于管理界面的说明"
                }
             },
             "STATISTICS": {

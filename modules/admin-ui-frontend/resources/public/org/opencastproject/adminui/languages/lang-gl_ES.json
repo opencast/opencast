@@ -619,6 +619,7 @@
             "NOCONTENT": "Non hai información dispoñible",
             "PUBLISHED": "Publicado",
             "WEEKDAY": "Día da semana",
+            "ADMINUI_NOTES": "Notes",
             "TOOLTIP": {
                "ASSETS": "Abrir o detalles do recurso",
                "START": "Filtro para esta data de inicio",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "Necesario corrixir os metadatos",
                   "WRONG_SERIES_PUBLICATION": "Serie ou canle de publicación incorrecta",
                   "WRONG_WORKFLOW": "Fluxo de traballo incorrecto",
-                  "PROCESSING_FAILURE": "Fallo no procesamento"
+                  "PROCESSING_FAILURE": "Fallo no procesamento",
+                  "ADMINUI_NOTES": "Notes in Admin UI"
                }
             },
             "STATISTICS": {

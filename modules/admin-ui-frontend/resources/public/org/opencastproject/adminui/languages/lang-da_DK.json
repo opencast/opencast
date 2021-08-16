@@ -619,6 +619,7 @@
             "NOCONTENT": "Ingen tilgængelige data",
             "PUBLISHED": "Offentliggjort",
             "WEEKDAY": "Ugedag",
+            "ADMINUI_NOTES": "Notes",
             "TOOLTIP": {
                "ASSETS": "Open asset details",
                "START": "Filtrer til denne startdato",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "Metadata skal rettes",
                   "WRONG_SERIES_PUBLICATION": "Forkert serie- eller offentliggørelseskanal",
                   "WRONG_WORKFLOW": "Forkert arbejdsgang",
-                  "PROCESSING_FAILURE": "Behandlingsfejl"
+                  "PROCESSING_FAILURE": "Behandlingsfejl",
+                  "ADMINUI_NOTES": "Notes in Admin UI"
                }
             },
             "STATISTICS": {
