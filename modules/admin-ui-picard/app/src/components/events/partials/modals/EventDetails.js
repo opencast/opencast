@@ -1,10 +1,11 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import {connect} from "react-redux";
 import {getCurrentLanguageInformation} from "../../../../utils/utils";
 import EventDetailsCommentsTab from "../ModalTabsAndPages/EventDetailsCommentsTab";
 import EventDetailsAccessPolicyTab from "../ModalTabsAndPages/EventDetailsAccessPolicyTab";
+import EventDetailsWorkflowTab from "../ModalTabsAndPages/EventDetailsWorkflowTab";
 
 
 // Get info about the current language and its date locale
@@ -150,8 +151,10 @@ const EventDetails = ({ tabIndex, eventId }) => {
                                                  t={t}/>
                             )}
                             {page === 5 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
+                                <EventDetailsWorkflowTab
+                                    eventId={eventId}
+                                    header={tabs[page].bodyHeaderTranslation}
+                                    t={t}/>
                             )}
                             {page === 6 && (
                                 <EventDetailsAccessPolicyTab
@@ -185,12 +188,14 @@ const MockDataPage = ({ header, t }) => {
                         <header>{t(header)}</header>
                         {/* Table view containing input fields for metadata */}
                         <div className="obj-container">
-                            <table class="main-tbl">
-                                <tr>
-                                    <td>
-                                        <span>Content coming soon!</span>
-                                    </td>
-                                </tr>
+                            <table className="main-tbl">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span>Content coming soon!</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -203,7 +208,5 @@ const MockDataPage = ({ header, t }) => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
 });
-
-
 
 export default connect(mapStateToProps)(EventDetails);

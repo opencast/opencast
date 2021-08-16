@@ -10,9 +10,16 @@ import {
     saveCommentDone,
     saveCommentReplyInProgress,
     saveCommentReplyDone,
+    loadEventWorkflowsInProgress,
+    loadEventWorkflowsSuccess,
+    loadEventWorkflowsFailure,
+    setEventWorkflowDefinitions, setEventWorkflow,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
+import {getBaseWorkflow, getWorkflow, getWorkflowDefinitions, getWorkflows} from "../selectors/eventDetailsSelectors";
+import {fetchWorkflowDef} from "./workflowThunks";
+import {getWorkflowDef} from "../selectors/workflowSelectors";
 
 // prepare http headers for posting to resources
 const getHttpHeaders = () => {
@@ -32,6 +39,9 @@ const createPolicy = (role) => {
         actions: []
     };
 };
+
+
+// thunks for access policies
 
 export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
 
@@ -97,6 +107,9 @@ export const fetchHasActiveTransactions = (eventId) => async () => {
         console.log(e);
     }
 }
+
+
+// thunks for comments
 
 export const fetchComments = (eventId) => async (dispatch) => {
     try {
@@ -183,4 +196,76 @@ export const deleteCommentReply = (eventId, commentId, replyId) => async () => {
         console.log(e);
         return false;
     }
+}
+
+
+// thunks for workflows
+
+export const fetchWorkflows = (eventId) => async (dispatch, getState) => {
+    try {
+        dispatch(loadEventWorkflowsInProgress());
+
+        const data = await axios.get(`admin-ng/event/${eventId}/workflows.json`);
+        const workflowsData = await data.data;
+
+        if(!!workflowsData.results){
+            const workflows = {
+                entries: workflowsData.results,
+                scheduling: false,
+                workflow: {
+                    description: ""
+                }
+            };
+
+            dispatch(loadEventWorkflowsSuccess(workflows));
+        } else {
+            const workflows = {
+                workflow: workflowsData,
+                scheduling: true,
+                entries: []
+            };
+
+            await dispatch(fetchWorkflowDef("event-details"));
+
+            const state = getState();
+
+            const workflowDefinitions = getWorkflowDef(state);
+
+            dispatch(setEventWorkflowDefinitions(workflowsData, workflowDefinitions));
+            dispatch(changeWorkflow(false));
+
+            dispatch(loadEventWorkflowsSuccess(workflows));
+        }
+    } catch (e) {
+        dispatch(loadEventWorkflowsFailure());
+        console.log(e);
+    }
+}
+
+export const changeWorkflow = (saveWorkflow) => async (dispatch, getState) => {
+    const state = getState();
+    const workflow = getWorkflow(state);
+
+    if(workflow.id){
+        const workflowDefinitions = getWorkflowDefinitions(state);
+        let newWorkflow = workflowDefinitions.find(def => def.id === workflow.id);
+        if(!newWorkflow){
+            newWorkflow = getBaseWorkflow(state);
+        }
+        dispatch(setEventWorkflow(newWorkflow));
+        updateWorkflowConfiguration(getWorkflows(state).workflow.configuration_panel);
+    } else {
+        updateWorkflowConfiguration();
+    }
+    if(saveWorkflow){
+        saveWorkflowConfig();
+    }
+}
+
+const saveWorkflowConfig = () => {
+    //todo
+}
+
+const updateWorkflowConfiguration = () => {
+    //todo
 }
