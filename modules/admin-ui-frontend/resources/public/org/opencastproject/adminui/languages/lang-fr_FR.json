@@ -619,6 +619,7 @@
             "NOCONTENT": "Aucune donnée disponible",
             "PUBLISHED": "Publié",
             "WEEKDAY": "Jour de la semaine",
+            "ADMINUI_NOTES": "Notes",
             "TOOLTIP": {
                "ASSETS": "Voir les détails de l'élément",
                "START": "Filtrer pour cette date de début",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "Métadonnées a besoin de correction",
                   "WRONG_SERIES_PUBLICATION": "Mauvaise série au canal de publication",
                   "WRONG_WORKFLOW": "Mauvais flux de travail",
-                  "PROCESSING_FAILURE": "Erreur de traitement"
+                  "PROCESSING_FAILURE": "Erreur de traitement",
+                  "ADMINUI_NOTES": "Notes in Admin UI"
                }
             },
             "STATISTICS": {

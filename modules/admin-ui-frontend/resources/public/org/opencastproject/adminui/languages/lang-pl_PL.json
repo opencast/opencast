@@ -619,6 +619,7 @@
             "NOCONTENT": "Brak danych",
             "PUBLISHED": "Opublikowano",
             "WEEKDAY": "Dzień tygodnia",
+            "ADMINUI_NOTES": "Notes",
             "TOOLTIP": {
                "ASSETS": "Open asset details",
                "START": "Filtr do tej daty rozpoczęcia",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "Metadane wymagają korekty",
                   "WRONG_SERIES_PUBLICATION": "Zła seria lub kanał publikacji",
                   "WRONG_WORKFLOW": "Zły przepływ pracy",
-                  "PROCESSING_FAILURE": "Błąd przetwarzania"
+                  "PROCESSING_FAILURE": "Błąd przetwarzania",
+                  "ADMINUI_NOTES": "Notes in Admin UI"
                }
             },
             "STATISTICS": {

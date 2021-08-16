@@ -619,6 +619,7 @@
             "NOCONTENT": "Veri yok",
             "PUBLISHED": "Yayınlandı",
             "WEEKDAY": "Hafta içi günü",
+            "ADMINUI_NOTES": "Notes",
             "TOOLTIP": {
                "ASSETS": "Detayları görüntüle",
                "START": "Bu başlangıç tarihi için filtre",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "Metaveri'nin düzeltilmeye ihtiyacı var",
                   "WRONG_SERIES_PUBLICATION": "Yanlış seri veya yanlış yayın kanalı",
                   "WRONG_WORKFLOW": "Yanlıs iş akışı",
-                  "PROCESSING_FAILURE": "İşem hatası"
+                  "PROCESSING_FAILURE": "İşem hatası",
+                  "ADMINUI_NOTES": "Notes in Admin UI"
                }
             },
             "STATISTICS": {

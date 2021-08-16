@@ -619,6 +619,7 @@
             "NOCONTENT": "Ni podatkov",
             "PUBLISHED": "Objavljeno",
             "WEEKDAY": "Delovni dan",
+            "ADMINUI_NOTES": "Notes",
             "TOOLTIP": {
                "ASSETS": "Open asset details",
                "START": "Filter za ta začetni datum",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "Metapodatke je treba popraviti",
                   "WRONG_SERIES_PUBLICATION": "Napačna serija ali kanal za objavo",
                   "WRONG_WORKFLOW": "Napačen potek dela",
-                  "PROCESSING_FAILURE": "Napaka pri obdelavi"
+                  "PROCESSING_FAILURE": "Napaka pri obdelavi",
+                  "ADMINUI_NOTES": "Notes in Admin UI"
                }
             },
             "STATISTICS": {
