@@ -22,6 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
@@ -66,6 +67,9 @@ public class IndexEndpoint {
   /** The admin UI index */
   private AdminUISearchIndex adminUISearchIndex;
 
+  /** The External index */
+  private ExternalIndex externalIndex;
+
   /** The security service */
   protected SecurityService securityService = null;
 
@@ -76,6 +80,10 @@ public class IndexEndpoint {
    */
   public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
     this.adminUISearchIndex = adminUISearchIndex;
+  }
+
+  public void setExternalIndex(ExternalIndex externalIndex) {
+    this.externalIndex = externalIndex;
   }
 
   public void setIndexRebuildService(IndexRebuildService indexRebuildService) {
@@ -106,6 +114,7 @@ public class IndexEndpoint {
       try {
         logger.info("Clear the Admin UI index");
         adminUISearchIndex.clear();
+        externalIndex.clear();
         return R.ok();
       } catch (Throwable t) {
         logger.error("Clearing the Admin UI index failed", t);
@@ -132,6 +141,7 @@ public class IndexEndpoint {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
         indexRebuildService.rebuildIndex(adminUISearchIndex, service);
+        indexRebuildService.rebuildIndex(externalIndex, service);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -151,6 +161,7 @@ public class IndexEndpoint {
       try {
         logger.info("Starting to repopulate the index");
         indexRebuildService.rebuildIndex(adminUISearchIndex);
+        indexRebuildService.rebuildIndex(externalIndex);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }

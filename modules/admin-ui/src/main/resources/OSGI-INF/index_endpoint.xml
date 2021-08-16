@@ -15,6 +15,11 @@
              cardinality="1..1"
              policy="static"
              bind="setAdminUISearchIndex"/>
+  <reference name="ExternalIndex"
+             interface="org.opencastproject.external.index.ExternalIndex"
+             cardinality="1..1"
+             policy="static"
+             bind="setExternalIndex"/>
   <reference name="SecurityService"
              interface="org.opencastproject.security.api.SecurityService"
              cardinality="1..1"
