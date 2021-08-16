@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "http-mock-server": "^0.5.2",
-    "@types/jest": "26.0.24",
+    "@types/jest": "27.0.1",
     "@types/node": "16.6.1",
     "@types/react": "17.0.16",
     "@types/react-dom": "17.0.9",
