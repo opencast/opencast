@@ -234,10 +234,12 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       tmpPath = Paths.get(cc.getBundleContext().getProperty(OPENCAST_STORAGE_DIR), DEFAULT_TEMP_DIR);
 
       // clean up old data and delete directory if it exists
-      try (Stream<Path> walk = Files.walk(tmpPath)) {
-        walk.map(Path::toFile).sorted(Comparator.reverseOrder()).forEach(File::delete);
-      } catch (IOException e) {
-        logger.warn("Unable to delete {}", tmpPath, e);
+      if (tmpPath.toFile().exists()) {
+        try (Stream<Path> walk = Files.walk(tmpPath)) {
+          walk.map(Path::toFile).sorted(Comparator.reverseOrder()).forEach(File::delete);
+        } catch (IOException e) {
+          logger.warn("Unable to delete {}", tmpPath, e);
+        }
       }
       logger.info("AWS S3 Distribution uses temp storage in {}", tmpPath);
       try { // create a new temp directory
