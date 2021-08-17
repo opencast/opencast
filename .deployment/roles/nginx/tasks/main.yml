@@ -15,6 +15,7 @@
   loop:
     - ssl
     - conf.d
+    - conf.d/servers
 
 - name: configure nginx for opencast
   template:
@@ -28,6 +29,7 @@
     - nginx.conf
     - conf.d/tls.conf
     - conf.d/http.conf
+    - conf.d/servers/opencast.conf
 
 - name: generate diffie-hellman parameters
   openssl_dhparam:
@@ -36,16 +38,6 @@
     mode: '0640'
     owner: root
     group: root
-  notify: reload nginx
-
-- name: create extra configuration file
-  copy:
-    src: extra.conf
-    dest: /etc/nginx/conf.d/extra.conf
-    owner: root
-    group: root
-    mode: '0644'
-    force: false
   notify: reload nginx
 
 - name: install dummy tls certificate
