@@ -1,0 +1,12 @@
+---
+
+- name: restart certbot
+  systemd:
+    name: certbot-renew.timer
+    state: restarted
+    daemon_reload: true
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded

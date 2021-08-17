@@ -3,7 +3,6 @@
 roles:
   - lkiesow.dnf_autoupdate
   - elan.opencast_activemq
-  - elan.opencast_certbot
   - elan.opencast_elasticsearch
   - elan.opencast_firewalld
   - elan.opencast_postgresql

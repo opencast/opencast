@@ -1,0 +1,50 @@
+---
+
+- name: activate epel repository
+  dnf:
+    name: epel-release
+
+- name: install certbot
+  dnf:
+    name: certbot
+
+- name: install certbot services
+  template:
+    src: '{{ item }}'
+    dest: /etc/systemd/system/{{ item }}
+    mode: '0644'
+  loop:
+    - certbot-renew@.service
+    - certbot-renew@.timer
+  notify: restart certbot
+
+- name: start certbot service
+  service:
+    name: certbot-renew@{{ inventory_hostname }}.timer
+    state: started
+    enabled: true
+
+- name: generate initial certificate
+  shell:
+    cmd: >
+      certbot -n
+      -a webroot
+      --webroot-path /var/lib/nginx/
+      --agree-tos
+      -m {{ opencast_letsencrypt_email }}
+      certonly
+      --domains {{ inventory_hostname }}
+    creates: /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
+
+- name: symlink certificates
+  file:
+    src: /etc/letsencrypt/live/{{ item.src }}
+    dest: /etc/nginx/ssl/{{ item.dest }}
+    state: link
+    force: true
+  loop:
+    - src: '{{ inventory_hostname }}/fullchain.pem'
+      dest: '{{ inventory_hostname }}.crt'
+    - src: '{{ inventory_hostname }}/privkey.pem'
+      dest: '{{ inventory_hostname }}.key'
+  notify: reload nginx

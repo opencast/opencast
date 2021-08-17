@@ -1,0 +1,7 @@
+[Unit]
+Description=Certbot Renew %i
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/certbot -a webroot --webroot-path /var/lib/nginx/ --agree-tos -m {{ opencast_letsencrypt_email }} -n certonly --domains %i
+ExecStopPost=-/bin/systemctl reload nginx.service
