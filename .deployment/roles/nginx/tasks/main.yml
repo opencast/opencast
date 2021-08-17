@@ -1,0 +1,68 @@
+---
+
+- name: install nginx
+  package:
+    name: nginx
+    state: present
+
+- name: create configuration directories
+  file:
+    path: /etc/nginx/{{ item }}
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - ssl
+    - conf.d
+
+- name: configure nginx for opencast
+  template:
+    src: '{{ item }}'
+    dest: /etc/nginx/{{ item }}
+    mode: '0644'
+    owner: root
+    group: root
+  notify: reload nginx
+  loop:
+    - nginx.conf
+    - conf.d/tls.conf
+    - conf.d/http.conf
+
+- name: generate diffie-hellman parameters
+  openssl_dhparam:
+    path: /etc/nginx/ssl/dhparam.pem
+    size: 2048
+    mode: '0640'
+    owner: root
+    group: root
+  notify: reload nginx
+
+- name: create extra configuration file
+  copy:
+    src: extra.conf
+    dest: /etc/nginx/conf.d/extra.conf
+    owner: root
+    group: root
+    mode: '0644'
+    force: false
+  notify: reload nginx
+
+- name: install dummy tls certificate
+  copy:
+    src: dummy-tls-{{ item }}.pem
+    dest: /etc/nginx/ssl/{{ inventory_hostname }}.{{ item }}
+    owner: root
+    group: root
+    mode: '0400'
+    force: false
+  notify: reload nginx
+  loop:
+    - key
+    - crt
+
+- name: enable nginx
+  service:
+    name: nginx
+    enabled: true
+    state: started

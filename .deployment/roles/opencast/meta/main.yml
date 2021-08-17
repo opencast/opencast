@@ -6,7 +6,7 @@ dependencies:
   - elan.opencast_firewalld
   - elan.opencast_certbot
   - elan.opencast_elasticsearch
-  - elan.opencast_nginx
+  - nginx
   - elan.opencast_postgresql
   - elan.opencast_repository
   - elan.opencast_selinux

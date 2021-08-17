@@ -28,5 +28,4 @@ opencast_data_path: /mnt/share
 opencast_fast_data_path: /var/opt/opencast
 
 # allow direct downloads via nginx
-# https://github.com/elan-ev/opencast_nginx#role-variables
 opencast_storage_downloads_path: '{{ opencast_data_path }}/downloads'
