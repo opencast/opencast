@@ -55,6 +55,26 @@ service to avoid concurrency issues. Instead, you can simply use the /admin-ng/i
 endpoints to trigger the complete rebuild and be sure that everything will happen in order, since there is no longer any
 asynchronicity involved.
 
+
+Additional Notes about 10.1
+---------------------------
+
+This release fixes a number of bugs including two very important fixes related Extron SMP capture agent compatibility
+and problems during publication.
+
+__Manual action required if upgrading from Opencast 10.1__:
+Opencast 10.1 contains a bug which can cause problems with republishing events.
+If you never ran 10.1 in production, e.g. upgraded from 9.7 to 10.2, no manual action is required.
+
+If you have, to fix the problem, you will need to re-write the search service's Solr entries set in Opencast 10.1
+by re-indexing those events. To re-index, stop your presentation/allinone node,
+remove `<karaf-data>/solr-indexes/search` (often `/var/lib/opencast/solr-indexes/search`)
+and restart Opencast. The re-index progress will be logged. Once Opencast is up again, everything should be fine.
+All other indexes are not effected.
+
+More details can be found at [pull request #2923](https://github.com/opencast/opencast/pull/2923).
+
+
 Release Schedule
 ----------------
 
