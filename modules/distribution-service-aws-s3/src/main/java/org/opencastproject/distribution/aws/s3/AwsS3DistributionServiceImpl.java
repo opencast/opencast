@@ -140,7 +140,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   public static final String RESTORE_JOB_LOAD_KEY = "job.load.aws.s3.restore";
 
   // config.properties
-  public static final String OPENCAST_DOWNLOAD_URL = "org.opencastproject.download.url";
   public static final String OPENCAST_STORAGE_DIR = "org.opencastproject.storage.dir";
   public static final String DEFAULT_TEMP_DIR = "tmp/s3dist";
 
