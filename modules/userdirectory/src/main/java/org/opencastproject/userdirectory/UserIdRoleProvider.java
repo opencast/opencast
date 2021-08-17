@@ -55,11 +55,11 @@ import java.util.regex.Pattern;
  * The user id role provider assigns the user id role.
  */
 @Component(
-  property = {
-    "service.description=Provides the user id role"
-  },
-  immediate = true,
-  service = { RoleProvider.class, UserIdRoleProvider.class, ManagedService.class }
+    property = {
+        "service.description=Provides the user id role"
+    },
+    immediate = true,
+    service = { RoleProvider.class, UserIdRoleProvider.class, ManagedService.class }
 )
 public class UserIdRoleProvider implements RoleProvider, ManagedService {
 
@@ -124,8 +124,18 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
   public List<Role> getRolesForUser(String userName) {
     Organization organization = securityService.getOrganization();
     List<Role> roles = new ArrayList<Role>();
-    roles.add(new JaxbRole(getUserIdRole(userName), JaxbOrganization.fromOrganization(organization), "The user id role", Role.Type.SYSTEM));
-    roles.add(new JaxbRole(ROLE_USER, JaxbOrganization.fromOrganization(organization), "The authenticated user role", Role.Type.SYSTEM));
+    roles.add(new JaxbRole(
+        getUserIdRole(userName),
+        JaxbOrganization.fromOrganization(organization),
+        "The user id role",
+        Role.Type.SYSTEM
+    ));
+    roles.add(new JaxbRole(
+        ROLE_USER,
+        JaxbOrganization.fromOrganization(organization),
+        "The authenticated user role",
+        Role.Type.SYSTEM
+    ));
     return Collections.unmodifiableList(roles);
   }
 
@@ -142,8 +152,9 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
 
     // These roles are not meaningful for users/groups
     if (target == Role.Target.USER) {
@@ -157,7 +168,12 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
 
     // Return authenticated user role if it matches the query pattern
     if (like(ROLE_USER, query)) {
-      foundRoles.add(new JaxbRole(ROLE_USER, JaxbOrganization.fromOrganization(organization), "The authenticated user role", Role.Type.SYSTEM));
+      foundRoles.add(new JaxbRole(
+          ROLE_USER,
+          JaxbOrganization.fromOrganization(organization),
+          "The authenticated user role",
+          Role.Type.SYSTEM
+      ));
     }
 
     // Include user id roles only if wildcard search or query matches user id role prefix
@@ -176,7 +192,12 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
       User u = users.next();
       // We exclude the digest user, but then add the global ROLE_USER above
       if (!"system".equals(u.getProvider())) {
-        foundRoles.add(new JaxbRole(getUserIdRole(u.getUsername()), JaxbOrganization.fromOrganization(u.getOrganization()), "User id role", Role.Type.SYSTEM));
+        foundRoles.add(new JaxbRole(
+            getUserIdRole(u.getUsername()),
+            JaxbOrganization.fromOrganization(u.getOrganization()),
+            "User id role",
+            Role.Type.SYSTEM
+        ));
       }
     }
 

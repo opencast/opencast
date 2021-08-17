@@ -150,9 +150,6 @@
             <Export-Package>
               org.opencastproject.engage.theodul.plugin.custom.mhConnection;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/engage-plugin.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

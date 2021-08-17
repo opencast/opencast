@@ -366,6 +366,10 @@
     <sec:custom-filter position="FORM_LOGIN_FILTER" ref="casFilter" />
     -->
 
+    <!-- JWT header authentication filter
+    <sec:custom-filter ref="jwtHeaderFilter" position="PRE_AUTH_FILTER"/>
+    -->
+
     <!-- Enables "remember me" functionality -->
     <sec:remember-me services-ref="rememberMeServices" />
 
@@ -388,6 +392,11 @@
     <!-- Shibboleth log out
          Please specifiy the URL to return to after logging out
     <sec:logout logout-success-url="/Shibboleth.sso/Logout?return=http://www.opencast.org" />
+    -->
+
+    <!-- JWT single log out
+         Please specify the URL to return to after logging out. Comment out the logoutSuccessHandler above.
+    <sec:logout logout-success-url="https://auth.example.org/sign_out?rd=http://www.opencast.org" />
     -->
 
   </sec:http>
@@ -428,6 +437,9 @@
 
         <!-- Uncomment the line below to support Shibboleth. -->
         <!-- <ref bean="shibbolethHeaderFilter" /> -->
+
+        <!-- Uncomment the line below to support JWT.
+        <ref bean="jwtHeaderFilter" /> -->
       </list>
     </property>
   </bean>
@@ -670,6 +682,72 @@
   </bean>
 
   <!-- ################ -->
+  <!-- # JWT Support # -->
+  <!-- ################ -->
+
+  <!-- General JWT header extraction filter
+  <bean id="jwtHeaderFilter" class="org.opencastproject.security.jwt.JWTRequestHeaderAuthenticationFilter">
+    <property name="principalRequestHeader" value="Authorization"/>
+    <property name="principalPrefix" value="Bearer "/>
+    <property name="authenticationManager" ref="authenticationManager" />
+    <property name="loginHandler" ref="jwtLoginHandler" />
+    <property name="exceptionIfHeaderMissing" value="false" />
+    <property name="debug" value="false" />
+  </bean>-->
+
+  <!-- JWT login handler
+  <bean id="jwtLoginHandler" class="org.opencastproject.security.jwt.DynamicLoginHandler">
+    <property name="userDetailsService" ref="userDetailsService" />
+    <property name="userDirectoryService" ref="userDirectoryService" />
+    <property name="securityService" ref="securityService" />
+    <property name="userReferenceProvider" ref="userReferenceProvider" />
+    <property name="jwksUrl" value="https://auth.example.org/.well-known/jwks.json" />
+    <property name="jwksCacheExpiresIn" value="1440" />
+    <property name="secret" value="***" />
+    <property name="expectedAlgorithms" ref="jwtExpectedAlgorithms" />
+    <property name="claimConstraints" ref="jwtClaimConstraints" />
+    <property name="usernameMapping" value="['username'].asString()" />
+    <property name="nameMapping" value="['name'].asString()" />
+    <property name="emailMapping" value="['email'].asString()" />
+    <property name="roleMappings" ref="jwtRoleMappings" />
+    <property name="jwtCacheSize" value="500" />
+    <property name="jwtCacheExpiresIn" value="60" />
+  </bean>-->
+
+  <!-- The signing algorithms expected for the JWT signature
+  <util:list id="jwtExpectedAlgorithms" value-type="java.lang.String">
+    <value>RS256</value>
+  </util:list>-->
+
+  <!-- The claim constraints that are expected to be fulfilled by the JWT
+       If you are using JWTs for OpenID Connect, see the specification for claims that must be validated:
+       https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation
+  <util:list id="jwtClaimConstraints" value-type="java.lang.String">
+    <value>containsKey('iss')</value>
+    <value>containsKey('aud')</value>
+    <value>containsKey('username')</value>
+    <value>containsKey('name')</value>
+    <value>containsKey('email')</value>
+    <value>containsKey('domain')</value>
+    <value>containsKey('affiliation')</value>
+    <value>['iss'].asString() eq 'https://auth.example.org'</value>
+    <value>['aud'].asString() eq 'client-id'</value>
+    <value>['username'].asString() matches '.*@example\.org'</value>
+    <value>['domain'].asString() eq 'example.org'</value>
+    <value>['affiliation'].asList(T(String)).contains('faculty@example.org')</value>
+  </util:list>-->
+
+  <!-- The mapping from JWT claims to Opencast roles
+  <util:list id="jwtRoleMappings" value-type="java.lang.String">
+    <value>'ROLE_JWT_USER'</value>
+    <value>'ROLE_JWT_USER_' + ['username'].asString()</value>
+    <value>('ROLE_JWT_OWNER_' + ['username'].asString()).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+    <value>['domain'] != null ? 'ROLE_JWT_ORG_' + ['domain'].asString() + '_MEMBER' : null</value>
+    <value>['username'].asString() eq ('j_doe01@example.org') ? 'ROLE_ADMIN' : null</value>
+    <value>['affiliation'].asList(T(String)).contains('faculty@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null</value>
+  </util:list>-->
+
+  <!-- ################ -->
   <!-- # LDAP Support # -->
   <!-- ################ -->
 
@@ -730,7 +808,7 @@
   <osgi:reference id="securityService" cardinality="1..1"
                   interface="org.opencastproject.security.api.SecurityService" />
 
-  <!-- Uncomment to enable external users e.g. used together shibboleth -->
+  <!-- Uncomment to enable external users e.g. used together with shibboleth and JWT -->
   <!-- <osgi:reference id="userReferenceProvider" cardinality="1..1"
                   interface="org.opencastproject.userdirectory.api.UserReferenceProvider"  /> -->
 
@@ -762,7 +840,7 @@
     <sec:authentication-provider ref="rememberMeAuthenticationProvider"/>
     <!-- CAS Auth: Uncomment this if using CAS authentication -->
     <!-- <sec:authentication-provider ref="casAuthenticationProvider" /> -->
-    <!-- Uncomment this if using Shibboleth authentication -->
+    <!-- Uncomment this if using Shibboleth or JWT authentication -->
     <!-- <sec:authentication-provider ref="preauthAuthProvider" /> -->
     <!-- Uncomment the following line if using LDAP -->
     <!-- <sec:authentication-provider ref="ldapAuthProvider" /> -->
