@@ -20,15 +20,8 @@ Watch for announcements on list or just check which versions are available in th
 Currently Supported
 -------------------
 
-* Debian 9 and newer amd64
+* Debian 10 and newer amd64
 * Ubuntu 18.04 amd64
-
-
-Supported JDKs
---------------
-
-For Opencast 9 we support JDK 8 and JDK 11, however Opencast 10 will drop support for JDK 8.  We strongly encourage you
-to use JDK 11 for Opencast 9.
 
 
 Activate Repository
