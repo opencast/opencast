@@ -340,66 +340,6 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
     return Response.ok(MediaPackageElementParser.getArrayAsXml(result)).build();
   }
 
-  /* TODO
-  Commented out due to changes in the way the element IDs are passed (ie, a list rather than individual ones
-  per job).  This code is still useful long term, but I don't have time to write the necessary wrapper code
-  around it right now.
-  @POST
-  @Path("/restore")
-  @Produces(MediaType.TEXT_XML)
-  @RestQuery(
-      name = "restore",
-      description = "Restore a media package element from this distribution channel",
-      returnDescription = "The job that can be used to track the restoration",
-      restParameters = {
-          @RestParameter(
-              name = "mediapackage",
-              isRequired = true,
-              description = "The mediapackage",
-              type = Type.TEXT),
-          @RestParameter(
-              name = "channelId",
-              isRequired = true,
-              description = "The publication channel ID",
-              type = Type.TEXT),
-          @RestParameter(
-              name = "elementId",
-              isRequired = true,
-              description = "The element to retract",
-              type = Type.STRING),
-          @RestParameter(
-              name = "fileName",
-              isRequired = false,
-              description = "The filename of the file to restore",
-              type = Type.TEXT
-          )
-      },
-      reponses = {
-          @RestResponse(responseCode = SC_OK, description = "An XML representation of the restoration job")
-      }
-  )
-  public Response restore(@FormParam("mediapackage") String mediaPackageXml, @FormParam("channelId") String channelId,
-          @FormParam("elementId") String elementId, @FormParam("fileName") String fileName) throws Exception {
-    Job job = null;
-    try {
-      MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
-      if (StringUtils.isNotBlank(fileName)) {
-        job = service.restore(channelId, mediapackage, elementId, fileName);
-      } else {
-        job = service.restore(channelId, mediapackage, elementId);
-      }
-    } catch (IllegalArgumentException e) {
-      logger.debug("Unable to restore element: {}", e.getMessage());
-      return status(Status.BAD_REQUEST).build();
-    } catch (Exception e) {
-      logger.warn("Unable to restore media package {}, element {} from aws s3 channel: {}",
-          mediaPackageXml, elementId, e);
-      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
-    }
-    return Response.ok(new JaxbJob(job)).build();
-  }
-  */
-
   /**
    * {@inheritDoc}
    *
