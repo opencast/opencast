@@ -52,10 +52,7 @@ angular.module('adminNg.controllers')
         $scope.editorUrl = '#!/events/events/$id/tools/editor';
       }
       if (angular.isDefined(user.org.properties['adminui.embed_button_display'])) {
-        var embedButtonConfig = user.org.properties['adminui.embed_button_display'];
-        if (embedButtonConfig === 'false') {
-          $scope.showEmbedButtons = embedButtonConfig;
-        }
+        $scope.showEmbedButtons = user.org.properties['adminui.embed_button_display'] !== 'false';
       }
     }).catch(angular.noop);
 
