@@ -1,6 +1,6 @@
 import axios from "axios";
 import {loadGroupsFailure, loadGroupsInProgress, loadGroupsSuccess} from "../actions/groupActions";
-import {getURLParams} from "../utils/resourceUtils";
+import {buildGroupBody, getURLParams} from "../utils/resourceUtils";
 import {addNotification} from "./notificationThunks";
 
 // fetch groups from server
@@ -24,21 +24,8 @@ export const fetchGroups = () => async (dispatch, getState) => {
 
 // post new group to backend
 export const postNewGroup = values => async dispatch => {
-    let roles = [], users = [];
-
-    // fill form data depending on user inputs
-    let data = new URLSearchParams();
-    data.append('name', values.name);
-    data.append('description', values.description);
-
-    for(let i = 0 ; i < values.roles.length; i++) {
-        roles.push(values.roles[i].name);
-    }
-    for(let i = 0 ; i < values.users.length; i++) {
-        users.push(values.users[i].name);
-    }
-    data.append('roles', roles.join(','));
-    data.append('users', users.join(','));
+    // get URL params used for post request
+    let data = buildGroupBody(values);
 
     // POST request
     axios.post('/admin-ng/groups', data, {

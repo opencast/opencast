@@ -127,7 +127,10 @@ const SelectContainer = ({ resource, formikField, manageable=true }) => {
 
             // add marked item to items considered for search bar if not already containing
             if (!editableDefaultItems.some(item => item.name === markedForRemoval[i])) {
-                editableDefaultItems.push({name: markedForRemoval[i]});
+                editableDefaultItems.push({
+                    id: !!markedForRemoval[i].id ? markedForRemoval.id : '',
+                    name: markedForRemoval[i]
+                });
             }
         }
 

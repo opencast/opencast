@@ -42,6 +42,6 @@
   ],
   "name": "IT Team",
   "description": "members of the IT team",
-  "id": "GROUP_IT_TEAM",
+  "id": "it_team",
   "users": []
 }

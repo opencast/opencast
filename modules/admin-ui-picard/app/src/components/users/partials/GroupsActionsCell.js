@@ -4,11 +4,12 @@ import {useTranslation} from "react-i18next";
 import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteGroup} from "../../../thunks/groupThunks";
 import GroupDetailsModal from "./modal/GroupDetailsModal";
+import {fetchGroupDetails} from "../../../thunks/groupDetailsThunks";
 
 /**
  * This component renders the action cells of groups in the table view
  */
-const GroupsActionsCell = ({ row, deleteGroup }) => {
+const GroupsActionsCell = ({ row, deleteGroup, fetchGroupDetails }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
@@ -27,7 +28,7 @@ const GroupsActionsCell = ({ row, deleteGroup }) => {
     };
 
     const showGroupDetails = async () => {
-        // todo: fetch group details
+        await fetchGroupDetails(row.id);
 
         setGroupDetails(true);
     };
@@ -39,9 +40,10 @@ const GroupsActionsCell = ({ row, deleteGroup }) => {
                className="more"
                title={t('USERS.GROUPS.TABLE.TOOLTIP.DETAILS')}/>
 
+            {/*modal displaying details about group*/}
             {displayGroupDetails && (
                 <GroupDetailsModal close={hideGroupDetails}
-                                   groupname={row.name}/>
+                                   groupName={row.name} />
             )}
 
             {/*// TODO: with-Role*/}
@@ -63,7 +65,8 @@ const GroupsActionsCell = ({ row, deleteGroup }) => {
 }
 
 const mapDispatchToProps = dispatch => ({
-    deleteGroup: (id) => dispatch(deleteGroup(id))
-})
+    deleteGroup: (id) => dispatch(deleteGroup(id)),
+    fetchGroupDetails: groupName => dispatch(fetchGroupDetails(groupName))
+});
 
 export default connect(null, mapDispatchToProps)(GroupsActionsCell);

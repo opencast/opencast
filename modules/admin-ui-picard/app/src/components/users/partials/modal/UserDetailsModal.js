@@ -12,11 +12,15 @@ const UserDetailsModal = ({ close, username}) => {
         close();
     };
 
+    const modalStyle = {
+        fontSize: '14px'
+    };
+
     return (
         // todo: add hotkeys
         <>
             <div className="modal-animation modal-overlay"/>
-            <section id="" className="modal wizard modal-animation">
+            <section id="" className="modal wizard modal-animation" style={modalStyle}>
                 <header>
                     <a className="fa fa-times close-modal" onClick={() => handleClose()}/>
                     <h2>

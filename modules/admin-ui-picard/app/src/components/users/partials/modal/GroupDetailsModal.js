@@ -1,30 +1,35 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
+import GroupDetails from "./GroupDetails";
 
 /**
  * This component renders the modal for displaying group details
  */
-const GroupDetailsModal = ({ close, groupname}) => {
+const GroupDetailsModal = ({ close, groupName}) => {
     const { t } = useTranslation();
 
     const handleClose = () => {
         close();
     };
 
+    const modalStyle = {
+        fontSize: '14px'
+    };
+
     return (
         // todo: add hotkeys
         <>
             <div className="modal-animation modal-overlay"/>
-            <section>
+            <section id="group-modal" className="modal wizard modal-animation" style={modalStyle}>
                 <header>
                     <a className="fa fa-times close-modal" onClick={() => handleClose()}/>
                     <h2>
-                        {t('', { resourceId: groupname })}
+                        {t('USERS.GROUPS.DETAILS.EDITCAPTION', { name: groupName })}
                     </h2>
                 </header>
 
                 {/* component that manages tabs of group details modal*/}
-                <GroupDetailsModal />
+                <GroupDetails close={close}/>
             </section>
         </>
     );

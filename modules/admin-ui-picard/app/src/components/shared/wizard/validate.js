@@ -128,6 +128,7 @@ export const NewUserSchema = usernames => (
             .oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required')
 }));
 
+// Validation Schema used in user details modal
 export const EditUserSchema = Yup.object().shape({
     name: Yup.string().required('Required'),
     email: Yup.string().email().required('Required'),
@@ -136,4 +137,9 @@ export const EditUserSchema = Yup.object().shape({
         then: Yup.string()
             .oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required')
     })
-})
+});
+
+// Validation Schema used in group details modal
+export const EditGroupSchema = Yup.object().shape({
+    name: Yup.string().required('Required')
+});
