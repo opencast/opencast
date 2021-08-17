@@ -231,7 +231,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
         return;
       }
 
-      tmpPath = Paths.get(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_TEMP_DIR);
+      tmpPath = Paths.get(cc.getBundleContext().getProperty(OPENCAST_STORAGE_DIR), DEFAULT_TEMP_DIR);
 
       // clean up old data and delete directory if it exists
       try (Stream<Path> walk = Files.walk(tmpPath)) {
