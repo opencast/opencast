@@ -4,6 +4,23 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.8
+
+*Released on August 18th, 2021*
+
+- [[#2926](https://github.com/opencast/opencast/pull/2926)] -
+  Add exception for extron smp351 technical catalog
+- [[#2918](https://github.com/opencast/opencast/pull/2918)] -
+  Add CMAF mime types
+- [[#2854](https://github.com/opencast/opencast/pull/2854)] -
+  Fixed publication pop-overs overlaying each other
+- [[#2846](https://github.com/opencast/opencast/pull/2846)] -
+  Some bug fixes to IBM Watson transcription service
+- [[#2739](https://github.com/opencast/opencast/pull/2739)] -
+  Prevent search service endpoint from querying series service
+- [[#2650](https://github.com/opencast/opencast/pull/2650)] -
+  sort the options alphabeticaly, this makes the languages field etc more readable
+
 ### Opencast 9.7
 
 *Released on July 15th, 2021*

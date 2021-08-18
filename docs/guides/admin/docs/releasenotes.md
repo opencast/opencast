@@ -113,6 +113,13 @@ API changes
   different types of events in one request
 - The Series API can now return ACLs within its response, if you tell it to
 
+Additional Notes about 9.8
+--------------------------
+
+This release contains a few minor bugfixes.  Notably this contains a fix which
+resolves an issue related to Extron's SMP351 devices.  This fix is temporary,
+and will be removed in future Opencast versions.
+
 Additional Notes about 9.7
 --------------------------
 
