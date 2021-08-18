@@ -43,20 +43,7 @@ API changes
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
 
-Additional Notes about 10.1
----------------------------
-
-This release contains many bugfixes.  In particular, the email libraries are now working properly! You might also
-encounter issues with updating the Elasticsearch indices with 10.0, especially when deleting elements, that are fixed
-with this minor release.
-
-From this release onwards there's also no longer the need to run the Elasticsearch index rebuild separately for each
-service to avoid concurrency issues. Instead, you can simply use the /admin-ng/index/recreateIndex or /api/recreateIndex
-endpoints to trigger the complete rebuild and be sure that everything will happen in order, since there is no longer any
-asynchronicity involved.
-
-
-Additional Notes about 10.1
+Additional Notes about 10.2
 ---------------------------
 
 This release fixes a number of bugs including two very important fixes related Extron SMP capture agent compatibility
@@ -73,6 +60,18 @@ and restart Opencast. The re-index progress will be logged. Once Opencast is up 
 All other indexes are not effected.
 
 More details can be found at [pull request #2923](https://github.com/opencast/opencast/pull/2923).
+
+Additional Notes about 10.1
+---------------------------
+
+This release contains many bugfixes.  In particular, the email libraries are now working properly! You might also
+encounter issues with updating the Elasticsearch indices with 10.0, especially when deleting elements, that are fixed
+with this minor release.
+
+From this release onwards there's also no longer the need to run the Elasticsearch index rebuild separately for each
+service to avoid concurrency issues. Instead, you can simply use the /admin-ng/index/recreateIndex or /api/recreateIndex
+endpoints to trigger the complete rebuild and be sure that everything will happen in order, since there is no longer any
+asynchronicity involved.
 
 
 Release Schedule
