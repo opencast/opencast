@@ -168,6 +168,7 @@
     <module>modules/message-broker-impl</module>
     <module>modules/metadata</module>
     <module>modules/metadata-api</module>
+    <module>modules/metadata-to-acl-workflowoperation</module>
     <module>modules/metrics-exporter</module>
     <module>modules/mpeg7</module>
     <module>modules/notification-workflowoperation</module>
