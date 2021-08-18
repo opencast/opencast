@@ -203,6 +203,7 @@ nav:
    - Inspect: 'workflowoperationhandlers/inspect-woh.md'
    - Log: 'workflowoperationhandlers/log-woh.md'
    - Mattermost Notification Module: 'workflowoperationhandlers/notification.md'
+   - Metadata to ACL: 'workflowoperationhandlers/metadata-to-acl.md'
    - Move Storage: 'workflowoperationhandlers/move-storage-woh.md'
    - Multiencode: 'workflowoperationhandlers/multiencode-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'

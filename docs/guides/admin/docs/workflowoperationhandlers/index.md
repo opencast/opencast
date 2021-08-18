@@ -65,6 +65,7 @@ The following table contains the workflow operations that are available in an ou
 |ingest-download     |Download files from external URL for ingest                    |[Documentation](ingestdownload-woh.md)|
 |inspect             |Inspect the media (check if it is valid)                       |[Documentation](inspect-woh.md)|
 |log                 |Log workflow status                                            |[Documentation](log-woh.md)|
+|metadata-to-acl     |Add read/write access based on metadata                        |[Documentation](metadata-to-acl.md)
 |multiencode         |Encode to multiple profiles in one operation                   |[Documentation](multiencode-woh.md)|
 |normalize-audio     |Normalize first audio stream                                   |[Documentation](normalizeaudio-woh.md)|
 |partial-import      |Import partial tracks and process according to a SMIL document |[Documentation](partial-import-woh.md)|
