@@ -294,7 +294,8 @@
     <sec:intercept-url pattern="/studio/**" access="ROLE_ADMIN, ROLE_STUDIO" />
 
     <!-- Enable access to Opencast Editor -->
-    <sec:intercept-url pattern="/editor-ui/**" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/editor/**" access="ROLE_USER" />
+    <sec:intercept-url pattern="/editor-ui/**" access="ROLE_USER" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->
     <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS, ROLE_CAPTURE_AGENT" />
