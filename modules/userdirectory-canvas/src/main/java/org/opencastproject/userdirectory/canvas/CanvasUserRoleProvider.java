@@ -54,6 +54,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -340,6 +342,11 @@ public class CanvasUserRoleProvider implements UserProvider, RoleProvider {
   }
 
   private String[] getCanvasUserInfo(String userName) {
+    try {
+      userName = URLEncoder.encode(userName, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      // Should never be happen, UTF-8 is always supported
+    }
     String urlString = String.format("%s/api/v1/users/sis_login_id:%s", url, userName);
     try {
       JsonNode node = getRequestJson(urlString);
@@ -355,7 +362,12 @@ public class CanvasUserRoleProvider implements UserProvider, RoleProvider {
 
   private List<String> getRolesFromCanvas(String userName) {
     logger.debug("getRolesFromCanvas({})", userName);
-        // Only list 'active' enrollments. That means, only courses in active terms will be used.
+    try {
+      userName = URLEncoder.encode(userName, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      // Should never be happen, UTF-8 is always supported
+    }
+    // Only list 'active' enrollments. That means, only courses in active terms will be used.
     String urlString = String.format(
         "%s/api/v1/users/sis_login_id:%s/courses.json?per_page=500&enrollment_state=active&"
             + "state[]=unpublished&state[]=available",
@@ -392,6 +404,11 @@ public class CanvasUserRoleProvider implements UserProvider, RoleProvider {
 
   private boolean verifyCanvasUser(String userName) {
     logger.debug("verifyCanvasUser({})", userName);
+    try {
+      userName = URLEncoder.encode(userName, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      // Should never be happen, UTF-8 is always supported
+    }
     String urlString = String.format("%s/api/v1/users/sis_login_id:%s", url, userName);
     try {
       getRequestJson(urlString);
