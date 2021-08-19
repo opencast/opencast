@@ -28,7 +28,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import com.auth0.jwk.JwkException;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -78,8 +77,6 @@ public class JWTVerifierTest {
 
   @Test
   public void testVerifySymmetric() {
-    Exception exception;
-
     // Valid JWT + valid claim constraints
     DecodedJWT decodedJWT = JWTVerifier.verify(
         generator.generateValidSymmetricJWT(),
@@ -89,7 +86,7 @@ public class JWTVerifierTest {
     assertEquals(generator.getUsername(), decodedJWT.getClaim("username").asString());
 
     // Valid JWT + invalid claim constraints
-    exception = assertThrows(
+    assertThrows(
         JWTVerificationException.class,
         () -> JWTVerifier.verify(
             generator.generateValidSymmetricJWT(),
@@ -97,10 +94,9 @@ public class JWTVerifierTest {
             generator.generateInvalidClaimConstraints()
         )
     );
-    assertTrue(exception.getMessage().startsWith("The claims did not fulfill constraint"));
 
     // Valid JWT + invalid secret
-    exception = assertThrows(
+    assertThrows(
         JWTVerificationException.class,
         () -> JWTVerifier.verify(
             generator.generateValidSymmetricJWT(),
@@ -108,10 +104,9 @@ public class JWTVerifierTest {
             generator.generateValidClaimConstraints()
         )
     );
-    assertTrue(exception.getMessage().startsWith("The Token's Signature resulted invalid"));
 
     // Invalid JWT
-    exception = assertThrows(
+    assertThrows(
         JWTVerificationException.class,
         () -> JWTVerifier.verify(
             generator.generateExpiredSymmetricJWT(),
@@ -119,12 +114,10 @@ public class JWTVerifierTest {
             generator.generateValidClaimConstraints()
         )
     );
-    assertTrue(exception.getMessage().startsWith("The Token has expired on"));
   }
 
   @Test
   public void testVerifyAsymmetric() throws Exception {
-    Exception exception;
     DecodedJWT decodedJWT;
 
     // Valid JWT + valid claim constraints
@@ -136,7 +129,7 @@ public class JWTVerifierTest {
     assertEquals(generator.getUsername(), decodedJWT.getClaim("username").asString());
 
     // Valid JWT + invalid claim constraints
-    exception = assertThrows(
+    assertThrows(
         JWTVerificationException.class,
         () -> JWTVerifier.verify(
             generator.generateValidAsymmetricJWT(),
@@ -144,10 +137,9 @@ public class JWTVerifierTest {
             generator.generateInvalidClaimConstraints()
         )
     );
-    assertTrue(exception.getMessage().startsWith("The claims did not fulfill constraint"));
 
     // Valid JWT + invalid provider
-    exception = assertThrows(
+    assertThrows(
         JWTVerificationException.class,
         () -> JWTVerifier.verify(
             generator.generateValidAsymmetricJWT(),
@@ -155,10 +147,9 @@ public class JWTVerifierTest {
             generator.generateValidClaimConstraints()
         )
     );
-    assertTrue(exception.getMessage().startsWith("The Token's Signature resulted invalid"));
 
     // Invalid JWT
-    exception = assertThrows(
+    assertThrows(
         JWTVerificationException.class,
         () -> JWTVerifier.verify(
             generator.generateExpiredAsymmetricJWT(),
@@ -166,7 +157,6 @@ public class JWTVerifierTest {
             generator.generateValidClaimConstraints()
         )
     );
-    assertTrue(exception.getMessage().startsWith("The Token has expired on"));
 
     // Simulate key rotation
     decodedJWT = JWTVerifier.verify(
