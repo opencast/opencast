@@ -4,6 +4,88 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.2
+
+*Released on August 18th, 2021*
+
+- [[#2939](https://github.com/opencast/opencast/pull/2939)] -
+  Document Version Warning Conditions
+- [[#2937](https://github.com/opencast/opencast/pull/2937)] -
+  Update supported Ubuntu versions
+- [[#2935](https://github.com/opencast/opencast/pull/2935)] -
+  Update Editor to 2021-08-17
+- [[#2929](https://github.com/opencast/opencast/pull/2929)] -
+  Display version updates only as warning in the admin interface
+- [[#2922](https://github.com/opencast/opencast/pull/2922)] -
+  Fix i18next import
+- [[#2920](https://github.com/opencast/opencast/pull/2920)] -
+  Add search form input field epFrom on sort if url parameter is set
+- [[#2917](https://github.com/opencast/opencast/pull/2917)] -
+  Remove execution of `npm cache verify`
+- [[#2914](https://github.com/opencast/opencast/pull/2914)] -
+  Metadata to ACL Operation
+- [[#2913](https://github.com/opencast/opencast/pull/2913)] -
+  Fix series endpoint update series method by skipping the ACL update if the parameter is empty
+- [[#2912](https://github.com/opencast/opencast/pull/2912)] -
+  Delete extra colon in paella description plugin's localization key
+- [[#2897](https://github.com/opencast/opencast/pull/2897)] -
+  LTI upload / edit form styling, adding some sensible padding and margins
+- [[#2894](https://github.com/opencast/opencast/pull/2894)] -
+  Bump commons-compress from 1.20 to 1.21
+- [[#2893](https://github.com/opencast/opencast/pull/2893)] -
+  Add index changes to release notes of 10.1
+- [[#2892](https://github.com/opencast/opencast/pull/2892)] -
+  Fix checkstyle violations in 6 `userdirectory*` modules
+- [[#2882](https://github.com/opencast/opencast/pull/2882)] -
+  Silence Unknown Action Warning
+- [[#2881](https://github.com/opencast/opencast/pull/2881)] -
+  Player Plugin Loading
+- [[#2880](https://github.com/opencast/opencast/pull/2880)] -
+  Remove Unwanted Logs
+- [[#2879](https://github.com/opencast/opencast/pull/2879)] -
+  Editor Service Build
+- [[#2874](https://github.com/opencast/opencast/pull/2874)] -
+  Add JWT-based Authentication and Authorization
+- [[#2873](https://github.com/opencast/opencast/pull/2873)] -
+  Fix Paella Player usertracking log
+- [[#2870](https://github.com/opencast/opencast/pull/2870)] -
+  Don't run Transcription Services on Workers
+- [[#2863](https://github.com/opencast/opencast/pull/2863)] -
+  Fix Maven Plugin Multithreading Problems
+- [[#2858](https://github.com/opencast/opencast/pull/2858)] -
+  Remove Commented out Imports from `pom.xml`
+- [[#2852](https://github.com/opencast/opencast/pull/2852)] -
+  Document Database Defaults
+- [[#2851](https://github.com/opencast/opencast/pull/2851)] -
+  Server statistics can overwelm database
+- [[#2850](https://github.com/opencast/opencast/pull/2850)] -
+  Fix lti rest endpoint annotations and ogsi properties
+- [[#2849](https://github.com/opencast/opencast/pull/2849)] -
+  Add exception for extron smp351 technical catalog
+- [[#2847](https://github.com/opencast/opencast/pull/2847)] -
+  Notes in Admin UI
+- [[#2836](https://github.com/opencast/opencast/pull/2836)] -
+  Target Java 11
+- [[#2835](https://github.com/opencast/opencast/pull/2835)] -
+  Mark 10 as Stable in Docs
+- [[#2833](https://github.com/opencast/opencast/pull/2833)] -
+  Changed preencode encoding profile to handle divBy2 problems
+- [[#2832](https://github.com/opencast/opencast/pull/2832)] -
+  Default is defined now, for the admin interface user filter
+- [[#2809](https://github.com/opencast/opencast/pull/2809)] -
+  Ingest with tags
+- [[#2804](https://github.com/opencast/opencast/pull/2804)] -
+  Add dfxp as subtitle format to LTI upload
+- [[#2784](https://github.com/opencast/opencast/pull/2784)] -
+  Add opencast_major_version to docs
+- [[#2701](https://github.com/opencast/opencast/pull/2701)] -
+  Fix checkstyle violations in 6 modules
+- [[#2700](https://github.com/opencast/opencast/pull/2700)] -
+  Fix checkstyle violations in 5 `transcription-service*` modules
+- [[#2666](https://github.com/opencast/opencast/pull/2666)] -
+  Fix checkstyle violations in 11 modules
+
+
 ### Opencast 10.1
 
 *Released on July 14th, 2021*
@@ -571,6 +653,23 @@ Opencast 10
 
 Opencast 9
 ----------
+
+### Opencast 9.8
+
+*Released on August 18th, 2021*
+
+- [[#2926](https://github.com/opencast/opencast/pull/2926)] -
+  Add exception for extron smp351 technical catalog
+- [[#2918](https://github.com/opencast/opencast/pull/2918)] -
+  Add CMAF mime types
+- [[#2854](https://github.com/opencast/opencast/pull/2854)] -
+  Fixed publication pop-overs overlaying each other
+- [[#2846](https://github.com/opencast/opencast/pull/2846)] -
+  Some bug fixes to IBM Watson transcription service
+- [[#2739](https://github.com/opencast/opencast/pull/2739)] -
+  Prevent search service endpoint from querying series service
+- [[#2650](https://github.com/opencast/opencast/pull/2650)] -
+  sort the options alphabeticaly, this makes the languages field etc more readable
 
 ### Opencast 9.7
 

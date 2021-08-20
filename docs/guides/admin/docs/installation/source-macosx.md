@@ -50,7 +50,7 @@ Required:
     Xcode
     jdk 11
     ffmpeg >= 3.2.4
-    maven >= 3.1
+    maven >= 3.6
     python >= 2.6
 
 (If you are using [jEnv](http://www.jenv.be/) to set up your environment, make sure to [enable the maven plugin

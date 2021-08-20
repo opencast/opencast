@@ -65,11 +65,11 @@ Please make sure to install the following dependencies.
 
 Required:
 
-    java-11-openjdk-devel.x86_64 / openjdk-11-jdk (other jdk versions untested / Oracle JDK strongly not recommended)
+    java-11-openjdk-devel
     ffmpeg >= 3.2.4
-    maven >= 3.1
+    maven >= 3.6
     python
-    firefox/chrome/some other major browser
+    firefox/chrome
     unzip
     gcc-c++
     tar
@@ -103,7 +103,7 @@ $ apt upgrade -y
 ### Install Packages via APT
 
 ```sh
-$ apt install -y git openjdk-8-jdk maven gcc g++ build-essential cmake curl sox hunspell synfig ffmpeg
+$ apt install -y git openjdk-11-jdk maven gcc g++ build-essential cmake curl sox hunspell synfig ffmpeg
 ```
 
 ### Install NodeJS (optional)
@@ -132,7 +132,7 @@ $ docker-compose down
 
 ### Set System Java JDK
 
-Choose the Java Version 1.8.0 by entering:
+Choose the Java Version 11 by entering:
 
 ```sh
 $ update-alternatives --config java
@@ -153,7 +153,7 @@ $ dnf update -y
 ```sh
 $ dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
 $ dnf group install 'Development Tools'
-$ dnf install -y java-1.8.0-openjdk ffmpeg maven tesseract hunspell sox synfig unzip gcc-c++ tar bzip2 nodejs
+$ dnf install -y ffmpeg maven tesseract hunspell sox synfig unzip gcc-c++ tar bzip2 nodejs
 ```
 
 
@@ -164,9 +164,9 @@ macOS 10.14
 
 Try to install all updates via the App Store or the Apple Icon on the top left corner.
 
-### Java JDK 8
+### Java JDK 11
 
-Install the JDK 8 by downloading it from https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+Install the JDK 11
 
 ### XCode
 
@@ -218,7 +218,7 @@ $ brew install bash-completion
 Find the location of the configuration file
 
 ```sh
-$ sudo find / -type f -name "git-completion.bash" 
+$ sudo find / -type f -name "git-completion.bash"
 ```
 
 Normally it should be in

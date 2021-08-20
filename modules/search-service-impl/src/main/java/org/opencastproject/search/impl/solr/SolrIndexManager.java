@@ -36,6 +36,7 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.metadata.api.MetadataValue;
+import org.opencastproject.metadata.api.MetadataValues;
 import org.opencastproject.metadata.api.StaticMetadata;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.api.util.Interval;
@@ -672,13 +673,13 @@ public class SolrIndexManager {
 
   static List<DField<String>> fromMValue(List<MetadataValue<String>> as) {
     return as.stream()
-        .map(v -> new DField<>(v.getValue(), ""))
+        .map(v -> new DField<>(v.getValue(), MetadataValues.LANGUAGE_UNDEFINED))
         .collect(Collectors.toList());
   }
 
   static List<DField<String>> fromDCValue(List<DublinCoreValue> as) {
     return as.stream()
-        .map(v -> new DField<>(v.getValue(), ""))
+        .map(v -> new DField<>(v.getValue(), DublinCore.LANGUAGE_UNDEFINED))
         .collect(Collectors.toList());
   }
 
