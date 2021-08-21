@@ -47,7 +47,6 @@ paella.addPlugin(function() {
       })
       .then((paused) => {
         var opencastLog = {
-          _method: 'PUT',
           'id': paella.player.videoIdentifier,
           'type': undefined,
           'in': videoCurrentTime,
