@@ -437,7 +437,7 @@ var SearchEpisode = Class.create({
 
 
     // author
-    var author = '&nbsp;';
+    var author = ' ';
     var author_search = '';
     if(recording.dcCreator) {
       author = 'by ' + recording.dcCreator;
