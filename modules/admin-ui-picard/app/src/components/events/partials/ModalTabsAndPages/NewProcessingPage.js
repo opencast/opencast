@@ -60,7 +60,7 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
                                     <div id="new-event-workflow-configuration"
                                          className="checkbox-container obj-container">
                                         {formik.values.processingWorkflow ? (
-                                            <RenderWorkflowConfig workflowId={formik.values.processingWorkflow} />
+                                            <RenderWorkflowConfig displayDescription={true} workflowId={formik.values.processingWorkflow} />
                                         ) : null}
                                     </div>
                                 </div>

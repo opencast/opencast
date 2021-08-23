@@ -2,14 +2,14 @@ import React, {useEffect} from "react";
 import {connect} from "react-redux";
 import {Field, Formik} from "formik";
 import {
+    updateWorkflow,
     fetchWorkflows
-
 } from "../../../../thunks/eventDetailsThunks";
 import {
     getWorkflowConfiguration,
     getWorkflows,
     isFetchingWorkflows,
-    getWorkflowDefinitions
+    getWorkflowDefinitions, getWorkflow
 } from "../../../../selectors/eventDetailsSelectors";
 import Notifications from "../../../shared/Notifications";
 import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
@@ -18,8 +18,8 @@ import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
  * This component manages the workflows tab of the event details modal
  */
 const EventDetailsWorkflowTab = ({ eventId, header, t,
-                                   workflows, isLoading, workflowDefinitions, workflowConfiguration,
-                                   loadWorkflows}) => {
+                                   workflow, workflows, isLoading, workflowDefinitions, workflowConfiguration,
+                                   loadWorkflows, updateWorkflow}) => {
     const isRoleWorkflowEdit = true; /*todo: if: "$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"*/
     const isRoleWorkflowDelete = true; /*todo: if: "$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE')"*/
 
@@ -27,30 +27,36 @@ const EventDetailsWorkflowTab = ({ eventId, header, t,
     useEffect(() => {
         loadWorkflows(eventId).then(r => {});
     }, [])
-
-    const hasCurrentAgentAccess= () => {
-        return true;
-    }
     
     const isCurrentWorkflow = (workflowId) => {
+        //todo
         return false;
     }
 
     const workflowAction = (workflowId, action) => {
+        //todo
         console.log(`Perform action ${action} on workflow ${workflowId}!`);
     }
 
-    const changeWorkflow = (someBoolean, value, changeFormikValue) => {
-        console.log(`Changing Workflow ${someBoolean}!`);
-        changeFormikValue('workflowDefinition', value);
-    }
-
     const deleteWorkflow = (workflowId) => {
-        console.log(`Deleting workflow ${workflowId}!`);
+        //todo
+        console.log(`Delete workflow ${workflowId}!`);
     }
 
     const openSubTab = (tabType, resourceType, id, someBool=false) => {
+        //todo
         console.log(`Open Sub Tab ${tabType}, res: ${resourceType}, id: ${id}, ${someBool}`);
+    }
+
+    const hasCurrentAgentAccess= () => {
+        //todo
+        return true;
+    }
+
+    const changeWorkflow = (value, changeFormikValue) => {
+        const saveWorkflow = false;
+        changeFormikValue('workflowDefinition', value);
+        updateWorkflow(saveWorkflow, value);
     }
 
     return (
@@ -197,19 +203,26 @@ const EventDetailsWorkflowTab = ({ eventId, header, t,
                                                                                        style={{width: '360px'}}
                                                                                        name={"workflowDefinition"}
                                                                                        as="select"
-                                                                                       onChange={r => changeWorkflow(false, r.target.value, formik.setFieldValue)}
+                                                                                       onChange={r => changeWorkflow(r.target.value, formik.setFieldValue)}
                                                                                        disabled={!hasCurrentAgentAccess() || !isRoleWorkflowEdit}
                                                                                 > {/*pre-select-from="workflowDefinitionIds"*/}
                                                                                     { (workflowDefinitions && workflowDefinitions.length > 0) && (
                                                                                         <>
-                                                                                            <option value="" defaultValue hidden>
-                                                                                                {t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
-                                                                                            </option>
+                                                                                            {!!workflow.workflowId && (
+                                                                                                <option value={workflow.workflowId} defaultValue hidden>
+                                                                                                    {workflowDefinitions.find(workflowDef => workflowDef.id === workflow.workflowId).title}
+                                                                                                </option>
+                                                                                            )}
+                                                                                            {!!workflow.id && (
+                                                                                                <option value="" defaultValue hidden>
+                                                                                                    {t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
+                                                                                                </option>
+                                                                                            )}
                                                                                             { workflowDefinitions.map((workflowDef, key) => ( /*w.id as w.title for w in workflowDefinitions | orderBy: 'displayOrder':true*/
                                                                                                 <option value={workflowDef.id}
                                                                                                         key={key}
                                                                                                 >
-                                                                                                    {workflowDef.id}
+                                                                                                    {workflowDef.title}
                                                                                                 </option>
                                                                                             ))}
                                                                                         </>
@@ -223,7 +236,7 @@ const EventDetailsWorkflowTab = ({ eventId, header, t,
                                                                             )}
                                                                         </Formik>
                                                                         <div className="obj-container padded">
-                                                                        {workflows.workflow.description}
+                                                                            {workflow.description}
                                                                         </div>
                                                                     </>
                                                                 )}
@@ -249,14 +262,14 @@ const EventDetailsWorkflowTab = ({ eventId, header, t,
                                                     <tr>
                                                         <td>
                                                             <div className="obj-container padded">
-                                                                {(hasCurrentAgentAccess() && isRoleWorkflowEdit) && (
+                                                                {(hasCurrentAgentAccess() && isRoleWorkflowEdit && !!workflowConfiguration && !!workflowConfiguration.workflowId) && (
                                                                     <div id="event-workflow-configuration"
                                                                          className="checkbox-container obj-container"
                                                                     >{/* ng-bind-html="workflowConfiguration"*/}
-                                                                        {/*<RenderWorkflowConfig workflowId={workflowConfiguration.id} />*/}
+                                                                        <RenderWorkflowConfig displayDescription={false} workflowId={workflowConfiguration.workflowId} />
                                                                     </div>
                                                                 )}
-                                                                {workflowConfiguration.id || (
+                                                                {(!!workflowConfiguration && !!workflowConfiguration.workflowId) || (
                                                                     <div>
                                                                         {t("EVENTS.EVENTS.DETAILS.WORKFLOWS.NO_CONFIGURATION") /* No config */}
                                                                     </div>
@@ -280,6 +293,7 @@ const EventDetailsWorkflowTab = ({ eventId, header, t,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
+    workflow: getWorkflow(state),
     workflows: getWorkflows(state),
     isLoading: isFetchingWorkflows(state),
     workflowDefinitions: getWorkflowDefinitions(state),
@@ -288,7 +302,8 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    loadWorkflows: (eventId) => dispatch(fetchWorkflows(eventId))
+    loadWorkflows: (eventId) => dispatch(fetchWorkflows(eventId)),
+    updateWorkflow: (saveWorkflow, workflow) => dispatch(updateWorkflow(saveWorkflow, workflow))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsWorkflowTab);

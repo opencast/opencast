@@ -13,7 +13,7 @@ import {
     loadEventWorkflowsInProgress,
     loadEventWorkflowsSuccess,
     loadEventWorkflowsFailure,
-    setEventWorkflowDefinitions, setEventWorkflow,
+    setEventWorkflowDefinitions, setEventWorkflow, setEventWorkflowConfiguration,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
@@ -213,6 +213,7 @@ export const fetchWorkflows = (eventId) => async (dispatch, getState) => {
                 entries: workflowsData.results,
                 scheduling: false,
                 workflow: {
+                    id: "",
                     description: ""
                 }
             };
@@ -225,13 +226,13 @@ export const fetchWorkflows = (eventId) => async (dispatch, getState) => {
                 entries: []
             };
 
-            await dispatch(fetchWorkflowDef("event-details"));
+            await dispatch(fetchWorkflowDef('event-details'));
 
             const state = getState();
 
             const workflowDefinitions = getWorkflowDef(state);
 
-            dispatch(setEventWorkflowDefinitions(workflowsData, workflowDefinitions));
+            dispatch(setEventWorkflowDefinitions(workflows, workflowDefinitions));
             dispatch(changeWorkflow(false));
 
             dispatch(loadEventWorkflowsSuccess(workflows));
@@ -242,30 +243,32 @@ export const fetchWorkflows = (eventId) => async (dispatch, getState) => {
     }
 }
 
-export const changeWorkflow = (saveWorkflow) => async (dispatch, getState) => {
+const changeWorkflow = (saveWorkflow) => async (dispatch, getState) => {
     const state = getState();
     const workflow = getWorkflow(state);
 
-    if(workflow.id){
-        const workflowDefinitions = getWorkflowDefinitions(state);
-        let newWorkflow = workflowDefinitions.find(def => def.id === workflow.id);
-        if(!newWorkflow){
-            newWorkflow = getBaseWorkflow(state);
-        }
-        dispatch(setEventWorkflow(newWorkflow));
-        updateWorkflowConfiguration(getWorkflows(state).workflow.configuration_panel);
+    if(!!workflow.workflowId){
+        dispatch(setEventWorkflowConfiguration(workflow));
     } else {
-        updateWorkflowConfiguration();
+        dispatch(setEventWorkflowConfiguration(getBaseWorkflow(state)));
     }
     if(saveWorkflow){
         saveWorkflowConfig();
     }
 }
 
-const saveWorkflowConfig = () => {
-    //todo
+export const updateWorkflow = (saveWorkflow, workflowId) => async (dispatch, getState) => {
+    const state = getState();
+    const workflowDefinitions = getWorkflowDefinitions(state);
+    const workflowDef = workflowDefinitions.find(def => def.id === workflowId);
+    await dispatch(setEventWorkflow({
+        workflowId: workflowId,
+        description: workflowDef.description,
+        configuration: workflowDef.configuration
+    }));
+    dispatch(changeWorkflow(saveWorkflow));
 }
 
-const updateWorkflowConfiguration = () => {
+const saveWorkflowConfig = () => {
     //todo
 }

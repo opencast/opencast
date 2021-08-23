@@ -13,5 +13,5 @@ export const getWorkflows = state => state.eventDetails.workflows;
 export const isFetchingWorkflows = state => state.eventDetails.fetchingWorkflowsInProgress;
 export const getWorkflowDefinitions = state => state.eventDetails.workflowDefinitions;
 export const getWorkflowConfiguration = state => state.eventDetails.workflowConfiguration;
-export const getWorkflow = state => state.eventDetails.workflow;
+export const getWorkflow = state => state.eventDetails.workflows.workflow;
 export const getBaseWorkflow = state => state.eventDetails.baseWorkflow;

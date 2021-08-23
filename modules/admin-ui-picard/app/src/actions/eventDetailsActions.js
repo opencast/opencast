@@ -22,6 +22,7 @@ export const LOAD_EVENT_WORKFLOWS_SUCCESS = 'LOAD_EVENT_WORKFLOWS_SUCCESS';
 export const LOAD_EVENT_WORKFLOWS_FAILURE = 'LOAD_EVENT_WORKFLOWS_FAILURE';
 export const SET_EVENT_WORKFLOW_DEFINITIONS = 'SET_EVENT_WORKFLOW_DEFINITIONS';
 export const SET_EVENT_WORKFLOW = 'SET_EVENT_WORKFLOW';
+export const SET_EVENT_WORKFLOW_CONFIGURATION = 'SET_EVENT_WORKFLOW_CONFIGURATION';
 
 
 // actions for access policies
@@ -89,10 +90,10 @@ export const loadEventWorkflowsFailure = () => ({
     type: LOAD_EVENT_WORKFLOWS_FAILURE
 });
 
-export const setEventWorkflowDefinitions = (baseWorkflow, workflowDefinitions) => ({
+export const setEventWorkflowDefinitions = (workflows, workflowDefinitions) => ({
     type: SET_EVENT_WORKFLOW_DEFINITIONS,
     payload: {
-        baseWorkflow,
+        workflows,
         workflowDefinitions
     }
 });
@@ -101,5 +102,12 @@ export const setEventWorkflow = (workflow) => ({
     type: SET_EVENT_WORKFLOW,
     payload: {
         workflow
+    }
+});
+
+export const setEventWorkflowConfiguration = (workflow_configuration) => ({
+    type: SET_EVENT_WORKFLOW_CONFIGURATION,
+    payload: {
+        workflow_configuration
     }
 });

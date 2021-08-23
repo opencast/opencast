@@ -11,7 +11,7 @@ import {
     SAVE_COMMENT_REPLY_DONE,
     LOAD_EVENT_WORKFLOWS_IN_PROGRESS,
     LOAD_EVENT_WORKFLOWS_SUCCESS,
-    LOAD_EVENT_WORKFLOWS_FAILURE, SET_EVENT_WORKFLOW_DEFINITIONS, SET_EVENT_WORKFLOW
+    LOAD_EVENT_WORKFLOWS_FAILURE, SET_EVENT_WORKFLOW_DEFINITIONS, SET_EVENT_WORKFLOW, SET_EVENT_WORKFLOW_CONFIGURATION
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
@@ -27,16 +27,17 @@ const initialState = {
     workflows: {
         scheduling: false,
         entries: [],
-        workflow: {description: ""}
+        workflow: {
+            workflowId: "",
+            description: ""
+        }
     },
     workflowConfiguration: {
-        id: "",
-        description: "",
-        configuration_panel: ""
+        workflowId: "",
+        description: ""
     },
     workflowDefinitions: [],
     baseWorkflow: {},
-    workflow: {},
     eventId: ""
 }
 
@@ -130,14 +131,11 @@ const eventDetails = (state=initialState, action) => {
             };
         }
         case SET_EVENT_WORKFLOW_DEFINITIONS: {
-            const { baseWorkflow, workflowDefinitions } = payload;
+            const { workflows, workflowDefinitions } = payload;
             return {
                 ...state,
-                baseWorkflow: baseWorkflow,
-                workflow: {
-                    ...state.workflow,
-                    id: baseWorkflow.workflowId
-                },
+                baseWorkflow: {...workflows.workflow},
+                workflows: workflows,
                 workflowDefinitions: workflowDefinitions
             };
         }
@@ -145,7 +143,17 @@ const eventDetails = (state=initialState, action) => {
             const { workflow } = payload;
             return {
                 ...state,
-                workflow: workflow
+                workflows: {
+                    ...state.workflows,
+                    workflow: workflow
+                }
+            }
+        }
+        case SET_EVENT_WORKFLOW_CONFIGURATION: {
+            const { workflow_configuration } = payload;
+            return {
+                ...state,
+                workflowConfiguration: workflow_configuration
             }
         }
         default:
