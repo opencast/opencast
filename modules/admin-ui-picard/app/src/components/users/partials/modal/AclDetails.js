@@ -2,20 +2,29 @@ import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Formik} from "formik";
 import cn from "classnames";
-import {NewAclSchema} from "../../../shared/wizard/validate";
+import {connect} from "react-redux";
+import AclAccessPage from "../wizard/AclAccessPage";
 import AclMetadataPage from "../wizard/AclMetadataPage";
-import NewAclAccessPage from "../wizard/NewAclAccessPage";
 import {getAclDetails} from "../../../../selectors/aclDetailsSelectors";
 import {updateAclDetails} from "../../../../thunks/aclDetailsThunks";
-import {connect} from "react-redux";
+import {NewAclSchema} from "../../../shared/wizard/validate";
 
+
+/**
+ * This component manages the pages of the acl details modal
+ */
 const AclDetails = ({close, aclDetails, updateAclDetails}) => {
     const { t } = useTranslation();
 
     const [page, setPage] = useState(0);
 
-    const initialValues = {...aclDetails}
+    // set initial values
+    const initialValues = {
+        name: aclDetails.name,
+        acls: aclDetails.acl
+    };
 
+    // information about tabs
     const tabs = [
         {
             tabNameTranslation: 'USERS.ACLS.DETAILS.TABS.METADATA',
@@ -32,7 +41,7 @@ const AclDetails = ({close, aclDetails, updateAclDetails}) => {
     };
 
     const handleSubmit = values => {
-        console.log("to be implemented")
+        updateAclDetails(values, aclDetails.id);
         close();
     }
 
@@ -50,16 +59,19 @@ const AclDetails = ({close, aclDetails, updateAclDetails}) => {
                 </a>
             </nav>
 
+            {/* formik form used in entire modal */}
             <Formik initialValues={initialValues}
-                    //validationSchema={NewAclSchema[0]}
+                    validationSchema={NewAclSchema[0]}
                     onSubmit={values => handleSubmit(values)}>
                 {formik => (
                     <>
                         {page === 0 && (
-                            <AclMetadataPage formik={formik} isEdit/>
+                            <AclMetadataPage formik={formik}
+                                             isEdit />
                         )}
                         {page === 1 && (
-                            <NewAclAccessPage formik={formik} />
+                            <AclAccessPage formik={formik}
+                                           isEdit />
                         )}
 
                         {/* Navigation buttons and validation */}
@@ -86,12 +98,14 @@ const AclDetails = ({close, aclDetails, updateAclDetails}) => {
     );
 }
 
+// getting state data out of redux store
 const mapStateToProps = state => ({
     aclDetails: getAclDetails(state)
 });
 
+// mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     updateAclDetails: (values, aclId) => dispatch(updateAclDetails(values, aclId))
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(AclDetails);

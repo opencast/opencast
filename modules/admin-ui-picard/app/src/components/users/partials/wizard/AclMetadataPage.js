@@ -3,6 +3,9 @@ import {useTranslation} from "react-i18next";
 import {Field} from "formik";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 
+/**
+ * This component renders the metadata page in the new ACL wizard and in the ACL details modal
+ */
 const AclMetadataPage = ({ nextPage, formik, isEdit }) => {
     const { t } = useTranslation();
     return (

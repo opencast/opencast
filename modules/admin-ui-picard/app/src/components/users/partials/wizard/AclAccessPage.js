@@ -15,8 +15,10 @@ import {
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
 
-
-const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess, isEdit }) => {
+/**
+ * This component renders the access policy page in the new ACL wizard and in the ACL details modal
+ */
+const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess, isEdit }) => {
     const { t } = useTranslation();
 
     const [aclTemplates, setAclTemplates] = useState([]);
@@ -304,4 +306,4 @@ const mapDispatchToProps = dispatch => ({
     removeNotificationWizardAccess: () => dispatch(removeNotificationWizardAccess())
 });
 
-export default connect(null, mapDispatchToProps)(NewAclAccessPage);
+export default connect(null, mapDispatchToProps)(AclAccessPage);

@@ -2,11 +2,11 @@ import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Formik} from "formik";
 import cn from "classnames";
+import {connect} from "react-redux";
 import GroupMetadataPage from "../wizard/GroupMetadataPage";
 import GroupRolesPage from "../wizard/GroupRolesPage";
 import GroupUsersPage from "../wizard/GroupUsersPage";
 import {EditGroupSchema} from "../../../shared/wizard/validate";
-import {connect} from "react-redux";
 import {getGroupDetails} from "../../../../selectors/groupDetailsSelectors";
 import {updateGroupDetails} from "../../../../thunks/groupDetailsThunks";
 
