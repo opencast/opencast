@@ -153,7 +153,7 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
       properties.append(" or property_name = ?");
     }
     String sql = "select count(1) from oc_assets_properties "
-        + "where val_bool = 1 "
+        + "where val_bool = true "
         + "and namespace = ? "
         + "and mediapackage_id = ? "
         + "and (" + properties + ")";
