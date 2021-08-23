@@ -34,7 +34,7 @@
     "grunt-wiredep": "^3.0.1",
     "html-linter": "^1.1.1",
     "html-validate": "^5.2.1",
-    "jasmine-core": "^3.8.0",
+    "jasmine-core": "^3.9.0",
     "jit-grunt": "^0.10.0",
     "jshint-stylish": "^2.2.1",
     "karma": "^6.3.4",
