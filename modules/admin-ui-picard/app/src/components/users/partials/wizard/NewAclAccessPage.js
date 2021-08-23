@@ -16,7 +16,7 @@ import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
 
 
-const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess }) => {
+const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess, isEdit }) => {
     const { t } = useTranslation();
 
     const [aclTemplates, setAclTemplates] = useState([]);
@@ -270,26 +270,31 @@ const NewAclAccessPage = ({ previousPage, nextPage, formik, addNotification, rem
                 </div>
             </div>
             {/* Button for navigation to next page and previous page */}
-            <footer>
-                <button type="submit"
-                        className={cn("submit",
-                            {
-                                active: (formik.dirty && formik.isValid),
-                                inactive: !(formik.dirty && formik.isValid)
-                            })}
-                        disabled={!(formik.dirty && formik.isValid)}
-                        onClick={() => {
-                            if(checkAcls()) {
-                                nextPage(formik.values);
-                            }
-                        }}
-                        tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
-                <button className="cancel"
-                        onClick={() => previousPage(formik.values, false)}
-                        tabIndex="101">{t('WIZARD.BACK')}</button>
-            </footer>
+            {!isEdit && (
+                <>
+                    <footer>
+                        <button type="submit"
+                                className={cn("submit",
+                                    {
+                                        active: (formik.dirty && formik.isValid),
+                                        inactive: !(formik.dirty && formik.isValid)
+                                    })}
+                                disabled={!(formik.dirty && formik.isValid)}
+                                onClick={() => {
+                                    if(checkAcls()) {
+                                        nextPage(formik.values);
+                                    }
+                                }}
+                                tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
+                        <button className="cancel"
+                                onClick={() => previousPage(formik.values, false)}
+                                tabIndex="101">{t('WIZARD.BACK')}</button>
+                    </footer>
 
-            <div className="btm-spacer"/>
+                    <div className="btm-spacer"/>
+                </>
+            )}
+
         </>
     );
 };

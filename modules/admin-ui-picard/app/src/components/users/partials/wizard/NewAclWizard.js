@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import {Formik} from "formik";
 import {NewAclSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
-import NewAclMetadataPage from "./NewAclMetadataPage";
+import AclMetadataPage from "./AclMetadataPage";
 import NewAclAccessPage from "./NewAclAccessPage";
 import NewAclSummaryPage from "./NewAclSummaryPage";
 import {postNewAcl} from "../../../../thunks/aclThunks";
@@ -61,8 +61,8 @@ const NewAclWizard = ({ close, postNewAcl }) => {
                 {formik => (
                     <div>
                         {page === 0 && (
-                            <NewAclMetadataPage formik={formik}
-                                                nextPage={nextPage}/>
+                            <AclMetadataPage formik={formik}
+                                             nextPage={nextPage}/>
                         )}
                         {page === 1 && (
                             <NewAclAccessPage formik={formik}

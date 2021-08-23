@@ -25,6 +25,7 @@ import seriesDetails from "./reducers/seriesDetailsReducers";
 import recordingDetails from "./reducers/recordingDetailsReducer";
 import userDetails from "./reducers/userDetailsReducer";
 import groupDetails from "./reducers/groupDetailsReducer";
+import aclDetails from "./reducers/aclDetailsReducer";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -52,7 +53,8 @@ const reducers = {
     seriesDetails,
     recordingDetails,
     userDetails,
-    groupDetails
+    groupDetails,
+    aclDetails
 };
 
 // Configuration for persisting store

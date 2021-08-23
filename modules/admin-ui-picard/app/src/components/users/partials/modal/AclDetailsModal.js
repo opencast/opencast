@@ -5,7 +5,7 @@ import AclDetails from "./AclDetails";
 /**
  * This component renders the modal for displaying acl details
  */
-const AclDetailsModal = ({ close, aclId }) => {
+const AclDetailsModal = ({ close, aclName }) => {
     const { t } = useTranslation();
 
     const handleClose = () => {
@@ -16,16 +16,16 @@ const AclDetailsModal = ({ close, aclId }) => {
         // todo: add hotkeys
         <>
             <div className="modal-animation modal-overlay"/>
-            <section>
+            <section className="modal wizard modal-animation" id="acl-details-modal">
                 <header>
                     <a className="fa fa-times close-modal" onClick={() => handleClose()}/>
                     <h2>
-                        {t('', { resourceId: aclId })}
+                        {t('USERS.ACLS.DETAILS.HEADER', { name: aclName })}
                     </h2>
                 </header>
 
                 {/* component that manages tabs of acl details modal*/}
-                <AclDetails />
+                <AclDetails close={close}/>
             </section>
         </>
     );

@@ -20,7 +20,7 @@ const UserDetailsModal = ({ close, username}) => {
         // todo: add hotkeys
         <>
             <div className="modal-animation modal-overlay"/>
-            <section id="" className="modal wizard modal-animation" style={modalStyle}>
+            <section id="user-details-modal" className="modal wizard modal-animation" style={modalStyle}>
                 <header>
                     <a className="fa fa-times close-modal" onClick={() => handleClose()}/>
                     <h2>

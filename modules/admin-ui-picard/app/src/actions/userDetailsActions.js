@@ -20,4 +20,4 @@ export const loadUserDetailsSuccess = userDetails => ({
 
 export const loadUserDetailsFailure = () => ({
     type: LOAD_USER_DETAILS_FAILURE
-})
+});

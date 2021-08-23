@@ -4,11 +4,12 @@ import {connect} from "react-redux";
 import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteAcl} from "../../../thunks/aclThunks";
 import AclDetailsModal from "./modal/AclDetailsModal";
+import {fetchAclDetails} from "../../../thunks/aclDetailsThunks";
 
 /**
  * This component renders the action cells of acls in the table view
  */
-const AclsActionsCell = ({ row, deleteAcl }) => {
+const AclsActionsCell = ({ row, deleteAcl, fetchAclDetails }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
@@ -27,7 +28,7 @@ const AclsActionsCell = ({ row, deleteAcl }) => {
     };
 
     const showAclDetails = async () => {
-        // todo: fetch acl details
+        await fetchAclDetails(row.id);
 
         setAclDetails(true);
     };
@@ -40,7 +41,8 @@ const AclsActionsCell = ({ row, deleteAcl }) => {
                title={t('USERS.ACLS.TABLE.TOOLTIP.DETAILS')}/>
 
             {displayAclDetails && (
-                <AclDetailsModal close={hideAclDetails} aclId={row.id}/>
+                <AclDetailsModal close={hideAclDetails}
+                                 aclName={row.name} />
             )}
 
             {/*// TODO: with-Role*/}
@@ -62,7 +64,8 @@ const AclsActionsCell = ({ row, deleteAcl }) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-    deleteAcl: (id) => dispatch(deleteAcl(id))
+    deleteAcl: (id) => dispatch(deleteAcl(id)),
+    fetchAclDetails: aclId => dispatch(fetchAclDetails(aclId))
 })
 
 export default connect(null, mapDispatchToProps)(AclsActionsCell);
