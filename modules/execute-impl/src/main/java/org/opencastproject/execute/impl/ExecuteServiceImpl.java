@@ -57,6 +57,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
@@ -315,7 +316,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     String params = arguments.remove(1);
 
     File outFile = null;
-    MediaPackageElement[] elementsByFlavor = null;
+    MediaPackageElement[] elements = null;
 
     try {
       if (outFileName != null) {
@@ -343,15 +344,27 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         if (matcher.group(1).equals("id")) {
           matcher.appendReplacement(sb, mp.getIdentifier().toString());
         } else if (matcher.group(1).equals("flavor")) {
-          elementsByFlavor = mp.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor(matcher.group(2)));
-          if (elementsByFlavor.length == 0)
+          elements = mp.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor(matcher.group(2)));
+          if (elements.length == 0)
             throw new ExecuteException("No elements in the MediaPackage match the flavor '" + matcher.group(2) + "'.");
 
-          if (elementsByFlavor.length > 1)
+          if (elements.length > 1)
             logger.warn("Found more than one element with flavor '{}'. Using {} by default...", matcher.group(2),
-                    elementsByFlavor[0].getIdentifier());
+                    elements[0].getIdentifier());
 
-          File elementFile = workspace.get(elementsByFlavor[0].getURI());
+          File elementFile = workspace.get(elements[0].getURI());
+          matcher.appendReplacement(sb, elementFile.getAbsolutePath());
+        } else if (matcher.group(1).equals("tags")) {
+          elements = mp.getElementsByTags(Arrays.asList(StringUtils.split(matcher.group(2), ",")));
+
+          if (elements.length == 0)
+            throw new ExecuteException("No elements in the MediaPackage match the tags '" + matcher.group(2) + "'.");
+
+          if (elements.length > 1)
+            logger.warn("Found more than one element with matching tags '{}'. Using {} by default...", matcher.group(2),
+                elements[0].getIdentifier());
+
+          File elementFile = workspace.get(elements[0].getURI());
           matcher.appendReplacement(sb, elementFile.getAbsolutePath());
         } else if (matcher.group(1).equals("out")) {
           matcher.appendReplacement(sb, outFile.getAbsolutePath());
@@ -367,10 +380,10 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
       throw new ExecuteException("Tag 'flavor' must specify a valid MediaPackage element flavor.", e);
     } catch (NotFoundException e) {
       throw new ExecuteException(
-              "The element '" + elementsByFlavor[0].getURI().toString() + "' does not exist in the workspace.", e);
+              "The element '" + elements[0].getURI().toString() + "' does not exist in the workspace.", e);
     } catch (IOException e) {
       throw new ExecuteException("Error retrieving MediaPackage element from workspace: '"
-              + elementsByFlavor[0].getURI().toString() + "'.", e);
+              + elements[0].getURI().toString() + "'.", e);
     }
 
     arguments.addAll(splitParameters(params));
