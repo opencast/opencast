@@ -12,11 +12,16 @@ const AclDetailsModal = ({ close, aclName }) => {
         close();
     };
 
+    const modalStyle = {
+        fontSize: '14px',
+        color: '#666666'
+    };
+
     return (
         // todo: add hotkeys
         <>
             <div className="modal-animation modal-overlay"/>
-            <section className="modal wizard modal-animation" id="acl-details-modal">
+            <section className="modal wizard modal-animation" id="acl-details-modal" style={modalStyle}>
                 <header>
                     <a className="fa fa-times close-modal" onClick={() => handleClose()}/>
                     <h2>

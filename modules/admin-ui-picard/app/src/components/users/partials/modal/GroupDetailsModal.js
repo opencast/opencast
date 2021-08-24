@@ -13,7 +13,8 @@ const GroupDetailsModal = ({ close, groupName}) => {
     };
 
     const modalStyle = {
-        fontSize: '14px'
+        fontSize: '14px',
+        color: '#666666'
     };
 
     return (

@@ -18,7 +18,10 @@ const UserDetails = ({close, userDetails, updateUserDetails }) => {
 
     const [page, setPage] = useState(0);
 
-    const initialValues = {...userDetails, password: ''};
+    const initialValues = {
+        ...userDetails,
+        password: ''
+    };
 
     // information about tabs
     const tabs = [

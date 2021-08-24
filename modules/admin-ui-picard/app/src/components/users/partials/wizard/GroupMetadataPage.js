@@ -10,6 +10,7 @@ const GroupMetadataPage = ({ nextPage, formik, isEdit }) => {
 
     const { t } = useTranslation();
 
+
     return(
         <>
             {/* Fields for name and description */}
@@ -17,10 +18,9 @@ const GroupMetadataPage = ({ nextPage, formik, isEdit }) => {
                 <div className="modal-body">
                     <div className="form-container">
                         <div className="row">
-                           <label className="required">{t('USERS.GROUPS.DETAILS.FORM.NAME')}</label>
+                           <label>{t('USERS.GROUPS.DETAILS.FORM.NAME')}<i className="required">*</i></label>
                             <Field tabIndex="1"
                                    type="text"
-                                   focushere
                                    placeholder={t('USERS.GROUPS.DETAILS.FORM.NAME')}
                                    name="name"/>
                         </div>

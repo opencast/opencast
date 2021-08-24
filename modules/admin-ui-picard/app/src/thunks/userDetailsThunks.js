@@ -36,6 +36,6 @@ export const updateUserDetails = (values, username) => async dispatch => {
             dispatch(addNotification('success', 'USER_UPDATED'));
         }).catch(response => {
             console.log(response);
-            dispatch(addNotification('error', 'USER_NOT_SAVES'));
+            dispatch(addNotification('error', 'USER_NOT_SAVED'));
     });
 }

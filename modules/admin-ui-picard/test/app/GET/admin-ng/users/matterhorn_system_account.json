@@ -4,11 +4,21 @@
   "name": "•mock• MH System Account",
   "provider": "system",
   "roles": [
-    "•mock• ROLE_ADMIN",
-    "•mock• ROLE_USER",
-    "•mock• ROLE_OAUTH_USER",
-    "•mock• MATTERHORN_ADMINISTRATOR",
-    "•mock• ROLE_ANONYMOUS"
+    {
+      "name": "•mock• ROLE_ADMIN"
+    },
+    {
+      "name": "•mock• ROLE_USER"
+    },
+    {
+      "name": "•mock• ROLE_OAUTH_USER"
+    },
+    {
+      "name": "•mock• MATTERHORN_ADMINISTRATOR"
+    },
+    {
+      "name": "•mock• ROLE_ANONYMOUS"
+    }
   ],
   "username": "matterhorn_system_account"
 }
