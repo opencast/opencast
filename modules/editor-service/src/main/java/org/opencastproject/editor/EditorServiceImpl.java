@@ -56,8 +56,12 @@ import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
@@ -145,6 +149,8 @@ public class EditorServiceImpl implements EditorService {
   private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
   private Workspace workspace;
+  private AuthorizationService authorizationService;
+
 
   private MediaPackageElementFlavor smilCatalogFlavor;
   private String previewVideoSubtype;
@@ -208,6 +214,11 @@ public class EditorServiceImpl implements EditorService {
   @Reference
   public void setIndexService(IndexService index) {
     this.index = index;
+  }
+
+  @Reference
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
   }
 
   public MediaPackageElementFlavor getSmilCatalogFlavor() {
@@ -619,10 +630,14 @@ public class EditorServiceImpl implements EditorService {
   }
 
   @Override
-  public EditingData getEditData(final String mediaPackageId) throws EditorServiceException {
+  public EditingData getEditData(final String mediaPackageId) throws EditorServiceException, UnauthorizedException {
 
     Event event = getEvent(mediaPackageId);
     MediaPackage mp = getMediaPackage(event);
+
+    if (!isAdmin() && !authorizationService.hasPermission(mp, "write")) {
+      throw new UnauthorizedException("User has no write access to this event");
+    }
 
     boolean workflowActive = WorkflowUtil.isActive(event.getWorkflowState());
 
@@ -689,6 +704,21 @@ public class EditorServiceImpl implements EditorService {
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
             event.getSeriesId(), event.getSeriesName(), workflowActive);
+  }
+
+
+  private boolean isAdmin() {
+    final User currentUser = securityService.getUser();
+
+    // Global admin
+    if (currentUser.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)) {
+      return true;
+    }
+
+    // Organization admin
+    final Organization currentOrg = securityService.getOrganization();
+    return currentUser.getOrganization().getId().equals(currentOrg.getId())
+            && currentUser.hasRole(currentOrg.getAdminRole());
   }
 
   private MediaPackage getMediaPackage(Event event) throws EditorServiceException {
