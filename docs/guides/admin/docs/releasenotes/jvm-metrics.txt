@@ -1,2 +1,0 @@
-Opencast 10 [adds JVM metrics to the metrics endpoint](https://github.com/opencast/opencast/pull/2694)
-so you can monitor Opencast's memory and CPU behavior more closely using Prometheus.
