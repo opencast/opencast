@@ -12,6 +12,7 @@ import {
     saveCommentReplyDone,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
+import {createPolicy} from "../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
 
 // prepare http headers for posting to resources
@@ -22,16 +23,6 @@ const getHttpHeaders = () => {
             }
     };
 }
-
-// creates an empty policy with the role from the argument
-const createPolicy = (role) => {
-    return {
-        role: role,
-        read: false,
-        write: false,
-        actions: []
-    };
-};
 
 export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
 

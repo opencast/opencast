@@ -1149,7 +1149,7 @@
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
                   "DETAILS": "Details",
-                  "REPLACE_EVENT_ACLS": "Zugriffsrechte des Videos aktualisieren",
+                  "REPLACE_EVENT_ACLS": "Zugriffsrechte der Serie aktualisieren",
                   "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Videos dieser Serie genau diese Zugriffsrechte haben",
                   "LOAD_MORE_LIMIT": "policies shown.",
                   "LOAD_MORE_LINK": "Mehr laden"
@@ -1172,7 +1172,9 @@
                "SUBJECT": "Betreff",
                "LANGUAGE": "Sprache",
                "LICENSE": "Lizenz",
-               "DESCRIPTION": "Beschreibung"
+               "DESCRIPTION": "Beschreibung",
+               "REPLACE_SERIES_METADATA": "Metadaten der Serie aktualisieren",
+               "REPLACE_SERIES_THEME": "Theme der Serie aktualisieren"
             },
             "EVENTS": {
                "TITLE": "Titel",

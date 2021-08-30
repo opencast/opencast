@@ -6,9 +6,10 @@ import {Field} from "formik";
 import Notifications from "../../../shared/Notifications";
 
 /**
- * This component renders the bumper/trailer (depending on isTrailer flag) page for new themes in the new themes wizard.
+ * This component renders the bumper/trailer (depending on isTrailer flag) page for new themes in the new themes wizard
+ * and for themes in themes details modal.
  */
-const BumperPage = ({ formik, nextPage, previousPage, isTrailer }) => {
+const BumperPage = ({ formik, nextPage, previousPage, isTrailer, isEdit }) => {
     const { t } = useTranslation();
 
     return (
@@ -45,9 +46,12 @@ const BumperPage = ({ formik, nextPage, previousPage, isTrailer }) => {
                                 <div className="obj-container padded">
                                     {/* Upload file for bumper/trailer */}
                                     <FileUpload acceptableTypes="video/*"
-                                                formikField={!isTrailer ? 'bumperFile' : 'trailerFile'}
+                                                fileId={!isTrailer ? 'bumperFile' : 'trailerFile'}
+                                                fileName={!isTrailer ? 'bumperFileName' : 'trailerFileName'}
+                                                formik={formik}
                                                 buttonKey="CONFIGURATION.THEMES.DETAILS.BUMPER.UPLOAD_BUTTON"
-                                                labelKey="CONFIGURATION.THEMES.DETAILS.BUMPER.UPLOAD_LABEL"/>
+                                                labelKey="CONFIGURATION.THEMES.DETAILS.BUMPER.UPLOAD_LABEL"
+                                                isEdit={isEdit}/>
                                 </div>
                             </div>
                         )}
@@ -55,10 +59,14 @@ const BumperPage = ({ formik, nextPage, previousPage, isTrailer }) => {
                 </div>
             </div>
 
-            {/* Button for navigation to next page */}
-            <WizardNavigationButtons formik={formik}
-                                     previousPage={previousPage}
-                                     nextPage={nextPage}/>
+            {/* Show navigation buttons only if page is used for a new theme*/}
+            {!isEdit && (
+                //Button for navigation to next page
+                <WizardNavigationButtons formik={formik}
+                                         previousPage={previousPage}
+                                         nextPage={nextPage}/>
+            )}
+
         </>
     );
 };

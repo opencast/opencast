@@ -9,12 +9,8 @@ import {NOTIFICATION_CONTEXT} from "../../../configs/modalConfig";
 /**
  * This component renders a custom file upload button in wizards.
  */
-const FileUpload = ({ descriptionKey, labelKey, buttonKey, acceptableTypes, formikField, addNotification }) => {
+const FileUpload = ({ descriptionKey, labelKey, buttonKey, acceptableTypes, fileId, fileName, formik, addNotification, isEdit }) => {
     const { t } = useTranslation();
-
-    // Formik hook for getting data of specific form field
-    // DON'T delete meta, hook works with indices not variable names
-    const [field, meta, helpers] = useField(formikField);
 
     // Temporary storage for uploaded file
     const [file, setFile] = useState({});
@@ -27,7 +23,8 @@ const FileUpload = ({ descriptionKey, labelKey, buttonKey, acceptableTypes, form
     const handleDelete = () => {
         setFile({});
         setLoaded(0);
-        helpers.setValue({});
+        formik.setFieldValue(fileId, '');
+        formik.setFieldValue(fileName, '');
     }
 
     // upload file to backend
@@ -46,10 +43,8 @@ const FileUpload = ({ descriptionKey, labelKey, buttonKey, acceptableTypes, form
         }).then(res => {
             if (res.status === 201) {
                 // set information about file later needed for POST request and summary
-                helpers.setValue({
-                    id: res.data,
-                    name: file.name
-                })
+                formik.setFieldValue(fileId, res.data);
+                formik.setFieldValue(fileName, file.name);
 
             }
         }).catch(res => {
@@ -81,9 +76,11 @@ const FileUpload = ({ descriptionKey, labelKey, buttonKey, acceptableTypes, form
                     <div className="content-container">
                         {/* If user already uploaded a file, its name and a delete button is rendered */}
                         {/* else render button for upload */}
-                        {!!field.value.id ? (
+                        {!!formik.values[fileId] ? (
                             <div className="upload-file-info">
-                                <p><a href={file.url} target="_blank">{field.value.name}</a></p>
+                                <p style={isEdit ? { padding: "0px 10px" } : { padding: "4px 10px" }}>
+                                    <a href={file.url} target="_blank">{formik.values[fileName]}</a>
+                                </p>
                                 <div className="button-container">
                                     <button id="remove-file-1" className="remove-file-button" onClick={() => handleDelete()}>
                                         <div className="remove-icon" />

@@ -27,8 +27,7 @@ const EventDetailsModal = ({ handleClose, showModal, tabIndex, eventTitle, event
                     </header>
 
                     <EventDetails tabIndex={tabIndex}
-                                  eventId={eventId}
-                                    close={close}/>
+                                  eventId={eventId}/>
                 </section>
             </>
         )

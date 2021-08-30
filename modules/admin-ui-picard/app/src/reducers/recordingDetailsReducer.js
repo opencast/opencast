@@ -8,9 +8,9 @@ import {
  * This file contains redux reducer for actions affecting the state of a recording/capture agent
  */
 
-// Initial state of series details in redux store
+// Initial state of recording details in redux store
 const initialState = {
-    isLoading: [],
+    isLoading: false,
     name: '',
     status: '',
     update: '',
@@ -20,7 +20,7 @@ const initialState = {
     inputs: []
 };
 
-// Reducer for series details
+// Reducer for recording details
 const recordingDetails = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {

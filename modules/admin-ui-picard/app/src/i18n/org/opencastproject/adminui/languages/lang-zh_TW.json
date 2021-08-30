@@ -1149,7 +1149,7 @@
                   "ACTION": "操作",
                   "NEW": "新政策",
                   "DETAILS": "詳細信息",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS": "Update series permissions",
                   "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
                   "LOAD_MORE_LIMIT": "policies shown.",
                   "LOAD_MORE_LINK": "Load more"
@@ -1172,7 +1172,9 @@
                "SUBJECT": "主題",
                "LANGUAGE": "語言",
                "LICENSE": "許可證",
-               "DESCRIPTION": "說明"
+               "DESCRIPTION": "說明",
+               "REPLACE_SERIES_METADATA": "Update series metadata",
+               "REPLACE_SERIES_THEME": "Update series theme"
             },
             "EVENTS": {
                "TITLE": "標題",

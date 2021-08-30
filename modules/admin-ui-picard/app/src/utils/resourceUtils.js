@@ -249,3 +249,41 @@ export const transformAclTemplatesResponse = acl => {
 
     return template;
 }
+
+// build body for post/put request in theme context
+export const buildThemeBody = values => {
+    // fill form data depending on user inputs
+    let data = new URLSearchParams();
+    data.append('name', values.name);
+    data.append('description', values.description);
+    data.append('bumperActive', values.bumperActive);
+    if (values.bumperActive) {
+        data.append('bumperFile', values.bumperFile);
+    }
+    data.append('trailerActive', values.trailerActive);
+    if (values.trailerActive) {
+        data.append('trailerFile', values.trailerFile);
+    }
+    data.append('titleSlideActive', values.titleSlideActive);
+    if (values.titleSlideActive && values.titleSlideMode === 'upload') {
+        data.append('titleSlideBackground', values.titleSlideBackground);
+    }
+    data.append('licenseSlideActive', values.licenseSlideActive);
+    data.append('watermarkActive', values.watermarkActive);
+    if (values.watermarkActive) {
+        data.append('watermarkFile', values.watermarkFile);
+        data.append('watermarkPosition', values.watermarkPosition);
+    }
+
+    return data;
+}
+
+// creates an empty policy with the role from the argument
+export const createPolicy = (role) => {
+    return {
+        role: role,
+        read: false,
+        write: false,
+        actions: []
+    };
+};
