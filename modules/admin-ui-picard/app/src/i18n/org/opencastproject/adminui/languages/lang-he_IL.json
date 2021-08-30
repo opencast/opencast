@@ -1172,7 +1172,9 @@
                "SUBJECT": "נושא",
                "LANGUAGE": "שפה",
                "LICENSE": "רישיון",
-               "DESCRIPTION": "תאור"
+               "DESCRIPTION": "תאור",
+               "REPLACE_SERIES_METADATA": "Update series metadata",
+               "REPLACE_SERIES_THEME": "Update series theme"
             },
             "EVENTS": {
                "TITLE": "כותרת",

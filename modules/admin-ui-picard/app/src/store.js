@@ -21,6 +21,7 @@ import health from "./reducers/healthReducers";
 import {notifications} from "./reducers/notificationReducers";
 import workflows from "./reducers/workflowReducers";
 import eventDetails from "./reducers/eventDeatilsReducers";
+import seriesDetails from "./reducers/seriesDetailsReducers";
 import recordingDetails from "./reducers/recordingDetailsReducer";
 import themeDetails from "./reducers/themeDetailsReducer";
 
@@ -47,8 +48,9 @@ const reducers = {
     notifications,
     workflows,
     eventDetails,
-    recordingDetails,
-    themeDetails
+    themeDetails,
+    seriesDetails,
+    recordingDetails
 };
 
 // Configuration for persisting store

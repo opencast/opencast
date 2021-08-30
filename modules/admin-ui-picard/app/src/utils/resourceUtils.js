@@ -211,3 +211,13 @@ export const buildThemeBody = values => {
 
     return data;
 }
+
+// creates an empty policy with the role from the argument
+export const createPolicy = (role) => {
+    return {
+        role: role,
+        read: false,
+        write: false,
+        actions: []
+    };
+};

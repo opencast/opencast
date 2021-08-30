@@ -91,7 +91,7 @@ app.delete("/*", (req, res) => {
 app.put("/*", (req, res) => {
     let filePath = path.join(__dirname, 'test/app/' + req.method + req.url);
     setTimeout(function () {
-        res.send(filePath);
+        res.sendFile(filePath);
     }, 1000);
 });
 
