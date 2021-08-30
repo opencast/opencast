@@ -21,3 +21,18 @@ export const fetchServices = () => async (dispatch, getState) => {
         dispatch(loadServicesFailure())
     }
 }
+
+// restarts a service after initiated by user
+export const restartService = async (host, serviceType) => {
+    let data = new URLSearchParams();
+    data.append("host", host);
+    data.append("serviceType", serviceType);
+
+    axios.post('services/sanitize', data)
+        .then(response => {
+            console.log(response);
+        }).catch(response => {
+        console.log(response);
+    });
+
+}
