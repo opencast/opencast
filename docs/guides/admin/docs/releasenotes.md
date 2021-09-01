@@ -28,10 +28,10 @@ Release Schedule
 
 | Date                        | Phase                    |
 |-----------------------------|--------------------------|
-| Oct 6th 2021                | Feature freeze           |
-| Nov 1st - Nov 8th 2021      | Translation week         |
-| Nov 8th - Nov 22nd 2021     | Public QA phase          |
-| December 15th 2021          | Release of Opencast 11.0 |
+| November 17, 2021           | Feature freeze           |
+| November 22, 2021           | Translation week         |
+| November 29, 2021           | Public QA phase          |
+| December 15, 2021           | Release of Opencast 11.0 |
 
 
 Release managers
