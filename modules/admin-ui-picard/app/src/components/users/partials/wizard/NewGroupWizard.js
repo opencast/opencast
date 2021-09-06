@@ -3,9 +3,9 @@ import {Formik} from "formik";
 import {connect} from "react-redux";
 import {initialFormValuesNewGroup} from "../../../../configs/modalConfig";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
-import NewGroupMetadataPage from "./NewGroupMetadataPage";
-import NewGroupRolesPage from "./NewGroupRolesPage";
-import NewGroupUsersPage from "./NewGroupUsersPage";
+import GroupMetadataPage from "./GroupMetadataPage";
+import GroupRolesPage from "./GroupRolesPage";
+import GroupUsersPage from "./GroupUsersPage";
 import NewGroupSummaryPage from "./NewGroupSummaryPage";
 import {postNewGroup} from "../../../../thunks/groupThunks";
 import {usePageFunctions} from "../../../../hooks/wizardHooks";
@@ -60,18 +60,18 @@ const NewGroupWizard = ({ close, postNewGroup }) => {
                 {formik => (
                     <div>
                         {page === 0 && (
-                            <NewGroupMetadataPage formik={formik}
-                                                  nextPage={nextPage}/>
+                            <GroupMetadataPage formik={formik}
+                                               nextPage={nextPage}/>
                         )}
                         {page === 1 && (
-                            <NewGroupRolesPage formik={formik}
-                                               nextPage={nextPage}
-                                               previousPage={previousPage}/>
+                            <GroupRolesPage formik={formik}
+                                            nextPage={nextPage}
+                                            previousPage={previousPage}/>
                         )}
                         {page === 2 && (
-                            <NewGroupUsersPage formik={formik}
-                                               nextPage={nextPage}
-                                               previousPage={previousPage}/>
+                            <GroupUsersPage formik={formik}
+                                            nextPage={nextPage}
+                                            previousPage={previousPage}/>
                         )}
                         {page === 3 && (
                             <NewGroupSummaryPage formik={formik}

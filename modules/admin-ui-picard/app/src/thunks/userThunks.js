@@ -1,6 +1,6 @@
 import axios from "axios";
 import {loadUsersFailure, loadUsersInProgress, loadUsersSuccess} from "../actions/userActions";
-import {getURLParams} from "../utils/resourceUtils";
+import {buildUserBody, getURLParams} from "../utils/resourceUtils";
 import {transformToIdValueArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
 import {logger} from "../utils/logger";
@@ -36,13 +36,8 @@ export const fetchUsersAndUsernames = async () => {
 
 // new user to backend
 export const postNewUser = values => async dispatch => {
-    let data = new URLSearchParams();
-    // fill form data with user inputs
-    data.append('username', values.username);
-    data.append('name', values.name);
-    data.append('email', values.email);
-    data.append('password', values.password);
-    data.append('roles', JSON.stringify(values.roles));
+    // get URL params used for post request
+    let data = buildUserBody(values);
 
     // POST request
     axios.post('/admin-ng/users', data, {

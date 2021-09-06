@@ -46,6 +46,40 @@ export const getURLParams = state => {
     return params;
 }
 
+// used for create URLSearchParams for API requests used to create/update user
+export const buildUserBody = values => {
+    let data = new URLSearchParams();
+    // fill form data with user inputs
+    data.append('username', values.username);
+    data.append('name', values.name);
+    data.append('email', values.email);
+    data.append('password', values.password);
+    data.append('roles', JSON.stringify(values.roles));
+
+    return data;
+}
+
+// used for create URLSearchParams for API requests used to create/update group
+export const buildGroupBody = values => {
+    let roles = [], users = [];
+
+    // fill form data depending on user inputs
+    let data = new URLSearchParams();
+    data.append('name', values.name);
+    data.append('description', values.description);
+
+    for(let i = 0 ; i < values.roles.length; i++) {
+        roles.push(values.roles[i].name);
+    }
+    for(let i = 0 ; i < values.users.length; i++) {
+        users.push(values.users[i].id);
+    }
+    data.append('roles', roles.join(','));
+    data.append('users', users.join(','));
+
+    return data;
+}
+
 // transform collection of metadata into object with name and value
 export const transformMetadataCollection = (metadata, noField) => {
     if (noField) {

@@ -23,6 +23,9 @@ import workflows from "./reducers/workflowReducers";
 import eventDetails from "./reducers/eventDeatilsReducers";
 import seriesDetails from "./reducers/seriesDetailsReducers";
 import recordingDetails from "./reducers/recordingDetailsReducer";
+import userDetails from "./reducers/userDetailsReducer";
+import groupDetails from "./reducers/groupDetailsReducer";
+import aclDetails from "./reducers/aclDetailsReducer";
 import themeDetails from "./reducers/themeDetailsReducer";
 
 /**
@@ -50,7 +53,10 @@ const reducers = {
     eventDetails,
     themeDetails,
     seriesDetails,
-    recordingDetails
+    recordingDetails,
+    userDetails,
+    groupDetails,
+    aclDetails
 };
 
 // Configuration for persisting store

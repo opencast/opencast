@@ -4,9 +4,9 @@ import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButt
 import {fetchUsersAndUsernames} from "../../../../thunks/userThunks";
 
 /**
- * This component renders the user selection page of the new group wizard
+ * This component renders the user selection page of the new group wizard and group details wizard
  */
-const NewGroupUsersPage = ({ previousPage, nextPage, formik }) => {
+const GroupUsersPage = ({ previousPage, nextPage, formik, isEdit }) => {
 
     // users that can be chosen by user
     const [users, setUsers] = useState([]);
@@ -22,6 +22,7 @@ const NewGroupUsersPage = ({ previousPage, nextPage, formik }) => {
             let userNames = [];
             for (let i = 0; i < responseUsers.length; i++) {
                 userNames.push({
+                    id: responseUsers[i].id,
                     name: responseUsers[i].value
                 });
             }
@@ -51,11 +52,13 @@ const NewGroupUsersPage = ({ previousPage, nextPage, formik }) => {
             </div>
 
             {/* Button for navigation to next page */}
-            <WizardNavigationButtons previousPage={previousPage}
-                                     formik={formik}
-                                     nextPage={nextPage}/>
+            {!isEdit && (
+                <WizardNavigationButtons previousPage={previousPage}
+                                         formik={formik}
+                                         nextPage={nextPage}/>
+            )}
         </>
     );
 };
 
-export default NewGroupUsersPage;
+export default GroupUsersPage;

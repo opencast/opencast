@@ -15,6 +15,7 @@ export const fetchServers = () => async (dispatch, getState) => {
         let data = await axios.get('admin-ng/server/servers.json', { params: params });
 
         const servers = await data.data;
+
         logger.info(servers);
 
         dispatch(loadServersSuccess(servers));
@@ -22,4 +23,18 @@ export const fetchServers = () => async (dispatch, getState) => {
         logger.error(e);
        dispatch(loadServersFailure());
     }
+}
+
+// change maintenance status of a server/host
+export const setServerMaintenance = async (host, maintenance) => {
+    let data = new URLSearchParams();
+    data.append("host", host);
+    data.append("maintenance", maintenance);
+
+    axios.post('services/maintenance', data)
+        .then(response => {
+        logger.info(response);
+    }).catch(response => {
+        logger.error(response);
+    });
 }
