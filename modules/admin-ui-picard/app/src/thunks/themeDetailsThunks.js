@@ -6,6 +6,7 @@ import {
 } from "../actions/themeDetailsActions";
 import {buildThemeBody} from "../utils/resourceUtils";
 import {addNotification} from "./notificationThunks";
+import {logger} from "../utils/logger";
 
 // fetch details of certain theme from server
 export const fetchThemeDetails = id => async dispatch => {
@@ -50,10 +51,10 @@ export const updateThemeDetails = (id, values) => async dispatch => {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }).then(response => {
-        console.log(response);
+        logger.info(response);
         dispatch(addNotification('success', 'THEME_CREATED'));
     }).catch(response => {
-        console.log(response);
+        logger.error(response);
         dispatch(addNotification('error', 'THEME_NOT_CREATED'));
     });
 };

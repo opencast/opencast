@@ -19,6 +19,7 @@ import {fetchAcls} from "../../thunks/aclThunks";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
 
 /**
  * This component renders the table view of groups
@@ -64,7 +65,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
         resetTextFilter();
 
         // Load groups on mount
-        loadGroups().then(r => console.log(r));
+        loadGroups().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('groups');

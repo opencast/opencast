@@ -15,6 +15,7 @@ import {removeNotificationWizardForm} from "../../../../actions/notificationActi
 import {checkForConflicts} from "../../../../thunks/eventThunks";
 import {sourceMetadata} from "../../../../configs/sourceConfig";
 import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/modalConfig";
+import {logger} from "../../../../utils/logger";
 
 
 // Style to bring date picker pop up to front
@@ -42,7 +43,7 @@ const NewSourcePage = ({ previousPage, nextPage, formik, loadingInputDevices, in
         loadingInputDevices();
 
         // validate form because dependent default values need to be checked
-        formik.validateForm().then(r => console.log(r));
+        formik.validateForm().then(r => logger.info(r));
     }, []);
 
     // check user input for conflicts

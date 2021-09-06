@@ -2,6 +2,7 @@ import {loadThemesFailure, loadThemesInProgress, loadThemesSuccess} from "../act
 import {buildThemeBody, getURLParams} from "../utils/resourceUtils";
 import axios from "axios";
 import {addNotification} from "./notificationThunks";
+import {logger} from "../utils/logger";
 
 // fetch themes from server
 export const fetchThemes = () => async (dispatch, getState) => {
@@ -33,21 +34,21 @@ export const postNewTheme = values => async dispatch => {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }).then(response => {
-        console.log(response);
+        logger.info(response);
         dispatch(addNotification('success', 'THEME_CREATED'));
     }).catch(response => {
-        console.log(response);
+        logger.error(response);
         dispatch(addNotification('error', 'THEME_NOT_CREATED'));
     });
 };
 
 export const deleteTheme = id => async dispatch => {
     axios.delete(`/admin-ng/themes/${id}`).then(res => {
-        console.log(res);
+        logger.info(res);
         // add success notification
         dispatch(addNotification('success', 'THEME_DELETED'));
     }).catch(res => {
-        console.log(res);
+        logger.error(res);
         // add error notification
         dispatch(addNotification('error', 'THEME_NOT_DELETED'));
     })

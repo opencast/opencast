@@ -7,6 +7,7 @@ import opencastLogo from '../img/opencast-white.svg';
 import {fetchHealthStatus} from "../thunks/healthThunks";
 import {getHealthStatus} from "../selectors/healthSelectors";
 import {getCurrentLanguageInformation} from "../utils/utils";
+import {logger} from "../utils/logger";
 
 
 // Todo: Find suitable place to define them and get these links out of config-file or whatever
@@ -82,7 +83,7 @@ const Header = ({ loadingHealthStatus, healthStatus }) => {
         }
 
         // Fetching health status information at mount
-        loadHealthStatus().then(r => console.log(r));
+        loadHealthStatus().then(r => logger.info(r));
         // Fetch health status every minute
         setInterval(loadingHealthStatus, 100000);
 

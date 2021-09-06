@@ -2,6 +2,7 @@ import axios from "axios";
 import {loadRecordingsFailure, loadRecordingsInProgress, loadRecordingsSuccess} from "../actions/recordingActions";
 import {getURLParams} from "../utils/resourceUtils";
 import {addNotification} from "./notificationThunks";
+import {logger} from "../utils/logger";
 
 // fetch recordings from server
 export const fetchRecordings = flag => async (dispatch, getState) => {
@@ -25,7 +26,7 @@ export const fetchRecordings = flag => async (dispatch, getState) => {
 
     } catch (e) {
         dispatch(loadRecordingsFailure());
-        console.log(e);
+        logger.error(e);
     }
 };
 
@@ -33,11 +34,11 @@ export const fetchRecordings = flag => async (dispatch, getState) => {
 export const deleteRecording = id => async dispatch => {
     // API call for deleting a location
     axios.delete(`/admin-ng/capture-agents/${id}`).then(res => {
-        console.log(res);
+        logger.info(res);
         // add success notification
         dispatch(addNotification('success', 'LOCATION_DELETED'));
     }).catch(res => {
-        console.log(res);
+        logger.error(res);
         // add error notification depending on status code
         if (res.status === 401) {
             dispatch(addNotification('error', 'LOCATION_NOT_DELETED_NOT_AUTHORIZED'));

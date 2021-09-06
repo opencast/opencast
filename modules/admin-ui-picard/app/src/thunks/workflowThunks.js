@@ -1,5 +1,6 @@
 import axios from "axios";
 import {loadWorkflowDefFailure, loadWorkflowDefInProgress, loadWorkflowDefSuccess} from "../actions/workflowActions";
+import {logger} from "../utils/logger";
 
 // fetch workflow definitions from server
 export const fetchWorkflowDef = (type) => async (dispatch) => {
@@ -39,6 +40,6 @@ export const fetchWorkflowDef = (type) => async (dispatch) => {
         dispatch(loadWorkflowDefSuccess(workflowDef));
     } catch (e) {
         dispatch(loadWorkflowDefFailure());
-        console.log(e);
+        logger.error(e);
     }
 }

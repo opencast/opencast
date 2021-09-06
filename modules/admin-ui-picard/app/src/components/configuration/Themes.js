@@ -16,6 +16,7 @@ import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
 
 /**
  * This component renders the table view of events
@@ -37,7 +38,7 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
         resetTextFilter();
 
         // Load themes on mount
-        loadThemes().then(r => console.log(r));
+        loadThemes().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('themes');

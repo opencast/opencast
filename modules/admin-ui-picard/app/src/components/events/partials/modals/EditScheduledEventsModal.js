@@ -9,6 +9,7 @@ import EditScheduledEventsSummaryPage from "../ModalTabsAndPages/EditScheduledEv
 import {updateScheduledEventsBulk} from "../../../../thunks/eventThunks";
 import {connect} from "react-redux";
 import {usePageFunctions} from "../../../../hooks/wizardHooks";
+import {logger} from "../../../../utils/logger";
 
 /**
  * This component manages the pages of the edit scheduled bulk action
@@ -39,7 +40,7 @@ const EditScheduledEventsModal = ({ close, updateScheduledEventsBulk }) => {
         // Only update events if there are changes
         if (values.changedEvents.length > 0) {
             const response = updateScheduledEventsBulk(values);
-            console.log(response);
+            logger.info(response);
         }
         close();
     };

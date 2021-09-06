@@ -9,6 +9,7 @@ import {initialFormValuesNewUser} from "../../../../configs/modalConfig";
 import {getUsernames} from "../../../../selectors/userSelectors";
 import {postNewUser} from "../../../../thunks/userThunks";
 import {NewUserSchema} from "../../../../utils/validate";
+import {logger} from "../../../../utils/logger";
 
 /**
  * This component renders the new user wizard
@@ -30,7 +31,7 @@ const NewUserWizard = ({ close, usernames, postNewUser }) => {
 
     const handleSubmit = values => {
         const response = postNewUser(values);
-        console.log(response);
+        logger.info(response);
         close();
     }
 

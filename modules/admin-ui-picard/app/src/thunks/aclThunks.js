@@ -3,6 +3,7 @@ import {loadAclsFailure, loadAclsInProgress, loadAclsSuccess} from "../actions/a
 import {getURLParams, prepareAccessPolicyRulesForPost, transformAclTemplatesResponse} from "../utils/resourceUtils";
 import {transformToIdValueArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
+import {logger} from "../utils/logger";
 
 // fetch acls from server
 export const fetchAcls = () => async (dispatch, getState) => {
@@ -86,10 +87,10 @@ export const postNewAcl = values => async dispatch => {
             }
         }
     ).then(response => {
-        console.log(response);
+        logger.info(response);
         dispatch(addNotification('success', 'ACL_ADDED'));
     }).catch(response => {
-        console.log(response);
+        logger.error(response);
         dispatch(addNotification('error', 'ACL_NOT_SAVED'));
     });
 
@@ -97,11 +98,11 @@ export const postNewAcl = values => async dispatch => {
 // delete acl with provided id
 export const deleteAcl = id => async dispatch => {
     axios.delete(`/admin-ng/acl/${id}`).then(res => {
-        console.log(res);
+        logger.info(res);
         //add success notification
         dispatch(addNotification('success', 'ACL_DELETED'));
     }).catch(res => {
-        console.log(res);
+        logger.error(res);
         // add error notification
         dispatch(addNotification('error', 'ACL_NOT_DELETED'));
     })

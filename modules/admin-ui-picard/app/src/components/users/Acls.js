@@ -19,6 +19,7 @@ import {getTotalAcls} from "../../selectors/aclSelectors";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
 
 /**
  * This component renders the table view of acls
@@ -64,7 +65,7 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
         resetTextFilter();
 
         // Load acls on mount
-        loadAcls().then(r => console.log(r));
+        loadAcls().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('acls');

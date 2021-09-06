@@ -19,6 +19,7 @@ import {getTotalSeries, isShowActions} from "../../selectors/seriesSeletctor";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
 
 
 
@@ -63,7 +64,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         resetTextFilter();
 
         // Load series on mount
-        loadSeries().then(r => console.log(r));
+        loadSeries().then(r => logger.info(r));
 
         // Load series filters
         loadingFilters("series");

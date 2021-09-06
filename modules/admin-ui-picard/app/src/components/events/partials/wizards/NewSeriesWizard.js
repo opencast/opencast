@@ -11,6 +11,7 @@ import {postNewSeries} from "../../../../thunks/seriesThunks";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
 import {initialFormValuesNewSeries} from "../../../../configs/modalConfig";
 import {NewSeriesSchema} from "../../../../utils/validate";
+import {logger} from "../../../../utils/logger";
 
 
 /**
@@ -66,7 +67,7 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
 
     const handleSubmit = (values) => {
         const response = postNewSeries(values, metadataFields);
-        console.log(response);
+        logger.info(response);
         close();
     }
 

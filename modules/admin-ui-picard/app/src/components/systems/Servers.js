@@ -18,6 +18,7 @@ import {fetchServices} from "../../thunks/serviceThunks";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
 
 /**
  * This component renders the table view of servers
@@ -62,7 +63,7 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
         resetTextFilter();
 
         // Load servers on mount
-        loadServers().then(r => console.log(r));
+        loadServers().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('servers');

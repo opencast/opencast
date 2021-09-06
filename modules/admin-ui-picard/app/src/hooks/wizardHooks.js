@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 export const usePageFunctions = (initialPage, initialValues) => {
     const [page, setPage] = useState(initialPage);
@@ -60,4 +60,32 @@ export const useSelectionChanges = (formik, selectedRows) => {
     };
 
     return [selectedEvents, allChecked, onChangeSelected, onChangeAllSelected];
+}
+
+export const useClickOutsideField = childRef => {
+    // Indicator if currently edit mode is activated
+    const [editMode, setEditMode] = useState(false);
+
+    useEffect(() => {
+        // Handle click outside the field and leave edit mode
+        const handleClickOutside = e => {
+            if(childRef.current && !childRef.current.contains(e.target)) {
+                setEditMode(false);
+            }
+        }
+
+        // Focus current field
+        if (childRef && childRef.current && editMode === true) {
+            childRef.current.focus();
+        }
+
+        // Adding event listener for detecting click outside
+        window.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            window.removeEventListener('mousedown', handleClickOutside);
+        }
+    }, [editMode]);
+
+    return [editMode, setEditMode];
 }

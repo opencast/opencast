@@ -7,6 +7,7 @@ import {
     setError
 } from "../actions/healthActions";
 import {getErrorStatus} from "../selectors/healthSelectors";
+import {logger} from "../utils/logger";
 
 
 /**
@@ -130,6 +131,6 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
 
     } catch (e) {
         dispatch(loadStatusFailure());
-        console.log(e);
+        logger.error(e);
     }
 }

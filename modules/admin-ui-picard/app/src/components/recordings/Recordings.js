@@ -15,6 +15,7 @@ import {loadRecordingsIntoTable} from "../../thunks/tableThunks";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
 
 /**
  * This component renders the table view of recordings
@@ -35,7 +36,7 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
         resetTextFilter();
 
         // Load recordings on mount
-        loadRecordings().then(r => console.log(r));
+        loadRecordings().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('recordings');

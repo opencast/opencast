@@ -3,7 +3,6 @@ import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import cn from 'classnames';
 import {Formik} from "formik";
-import {NewThemeSchema} from "../../../shared/wizard/validate";
 import GeneralPage from "./GeneralPage";
 import BumperPage from "./BumperPage";
 import TitleSlidePage from "./TitleSlidePage";
@@ -11,6 +10,8 @@ import WatermarkPage from "./WatermarkPage";
 import {getThemeDetails, getThemeUsage} from "../../../../selectors/themeDetailsSelectors";
 import UsagePage from "./UsagePage";
 import {updateThemeDetails} from "../../../../thunks/themeDetailsThunks";
+import ModalNavigation from "../../../shared/modals/ModalNavigation";
+import {NewThemeSchema} from "../../../../utils/validate";
 
 /**
  * This component manages the pages of the theme details
@@ -77,32 +78,10 @@ const ThemeDetails = ({ close, themeDetails, themeUsage, updateTheme }) => {
 
     return (
         <>
-            <nav className="modal-nav" id="modal-nav">
-                <a className={cn({active: page === 0})}
-                   onClick={() => openTab(0)}>
-                    {t(tabs[0].tabTranslation)}
-                </a>
-                <a className={cn({active: page === 1})}
-                   onClick={() => openTab(1)}>
-                    {t(tabs[1].tabTranslation)}
-                </a>
-                <a className={cn({active: page === 2})}
-                   onClick={() => openTab(2)}>
-                    {t(tabs[2].tabTranslation)}
-                </a>
-                <a className={cn({active: page === 3})}
-                   onClick={() => openTab(3)}>
-                    {t(tabs[3].tabTranslation)}
-                </a>
-                <a className={cn({active: page === 4})}
-                   onClick={() => openTab(4)}>
-                    {t(tabs[4].tabTranslation)}
-                </a>
-                <a className={cn({active: page === 5})}
-                   onClick={() => openTab(5)}>
-                    {t(tabs[5].tabTranslation)}
-                </a>
-            </nav>
+            {/* navigation */}
+            <ModalNavigation tabInformation={tabs}
+                             openTab={openTab}
+                             page={page}/>
 
             {/* initialize overall form */}
             <Formik initialValues={initialValues}

@@ -14,6 +14,7 @@ import {
 import {addNotification} from "./notificationThunks";
 import {createPolicy} from "../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
+import {logger} from "../utils/logger";
 
 // prepare http headers for posting to resources
 const getHttpHeaders = () => {
@@ -34,12 +35,12 @@ export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
 
     return axios.post(`admin-ng/event/${eventId}/access`, data.toString(), headers)
         .then(response => {
-            console.log(response);
+            logger.info(response);
             dispatch(addNotification('info', 'SAVED_ACL_RULES', -1, null, NOTIFICATION_CONTEXT));
             return true;
         })
         .catch(response => {
-            console.log(response);
+            logger.error(response);
             dispatch(addNotification('error', 'ACL_NOT_SAVED', -1, null, NOTIFICATION_CONTEXT));
             return false;
         });
@@ -74,7 +75,7 @@ export const fetchAccessPolicies = (eventId) => async (dispatch) => {
 
         dispatch(loadEventPoliciesSuccess(policies));
     } catch (e) {
-        console.log(e);
+        logger.error(e);
         dispatch(loadEventPoliciesFailure());
     }
 }
@@ -85,7 +86,7 @@ export const fetchHasActiveTransactions = (eventId) => async () => {
         const hasActiveTransactions = await transactionsData.data;
         return hasActiveTransactions;
     } catch (e) {
-        console.log(e);
+        logger.error(e);
     }
 }
 
@@ -102,7 +103,7 @@ export const fetchComments = (eventId) => async (dispatch) => {
         dispatch(loadEventCommentsSuccess(comments, commentReasons));
     } catch (e) {
         dispatch(loadEventCommentsFailure());
-        console.log(e);
+        logger.error(e);
     }
 }
 
@@ -124,7 +125,7 @@ export const saveComment = (eventId, commentText, commentReason) => async (dispa
         return true;
     } catch (e) {
         dispatch(saveCommentDone());
-        console.log(e);
+        logger.error(e);
         return false;
     }
 }
@@ -135,7 +136,7 @@ export const deleteComment = (eventId, commentId) => async () => {
         await commentDeleted.data;
         return true;
     } catch (e) {
-        console.log(e);
+        logger.error(e);
         return false;
     }
 }
@@ -159,7 +160,7 @@ export const saveCommentReply = (eventId, commentId, replyText, commentResolved)
         return true;
     } catch (e) {
         dispatch(saveCommentReplyDone());
-        console.log(e);
+        logger.error(e);
         return false;
     }
 }
@@ -171,7 +172,7 @@ export const deleteCommentReply = (eventId, commentId, replyId) => async () => {
 
         return true;
     } catch (e) {
-        console.log(e);
+        logger.error(e);
         return false;
     }
 }

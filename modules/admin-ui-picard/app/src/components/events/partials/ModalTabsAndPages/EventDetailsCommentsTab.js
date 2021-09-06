@@ -15,6 +15,7 @@ import {
     isSavingCommentReply,
 } from "../../../../selectors/eventDetailsSelectors";
 import Notifications from "../../../shared/Notifications";
+import {logger} from "../../../../utils/logger";
 
 /**
  * This component manages the comment tab of the event details modal
@@ -24,7 +25,7 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                      comments, isSavingComment, isSavingCommentReply, commentReasons }) => {
 
     useEffect( () => {
-        loadComments(eventId).then(r => console.log(r));
+        loadComments(eventId).then(r => logger.info(r));
     }, []);
 
     const [ replyToComment, setReplyToComment ] = useState(false);

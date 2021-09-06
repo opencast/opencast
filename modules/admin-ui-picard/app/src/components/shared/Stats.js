@@ -6,6 +6,7 @@ import {connect} from "react-redux";
 import {fetchEvents} from "../../thunks/eventThunks";
 import {loadEventsIntoTable} from "../../thunks/tableThunks";
 import {fetchStats} from "../../thunks/tableFilterThunks";
+import {logger} from "../../utils/logger";
 
 
 /**
@@ -35,7 +36,7 @@ const Stats = ({ loadingStats, stats, filterMap, editFilterValue, loadEvents, lo
 
     useEffect(() => {
         // Load stats on mount
-        loadStats().then(r => console.log(r));
+        loadStats().then(r => logger.info(r));
 
     }, [])
 

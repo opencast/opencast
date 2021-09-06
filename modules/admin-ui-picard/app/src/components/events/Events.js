@@ -23,6 +23,7 @@ import {getTotalEvents, isLoading, isShowActions} from "../../selectors/eventSel
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -70,7 +71,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         resetTextFilter();
 
         // Load events on mount
-        loadEvents().then(r => console.log(r));
+        loadEvents().then(r => logger.info(r));
 
         // Load event filters
         loadingFilters("events");

@@ -31,7 +31,6 @@ const FileUpload = ({ descriptionKey, labelKey, buttonKey, acceptableTypes, file
     const upload = file => {
         const data = new FormData();
         data.append('BODY', file, file.name);
-        console.log(data);
         axios.post('/staticfiles', data, {
             headers: {
                 'Content-Type': 'multipart/form-data'

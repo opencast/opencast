@@ -10,6 +10,7 @@ import NewGroupSummaryPage from "./NewGroupSummaryPage";
 import {postNewGroup} from "../../../../thunks/groupThunks";
 import {usePageFunctions} from "../../../../hooks/wizardHooks";
 import {NewGroupSchema} from "../../../../utils/validate";
+import {logger} from "../../../../utils/logger";
 
 /**
  * This component renders the new group wizard
@@ -42,7 +43,7 @@ const NewGroupWizard = ({ close, postNewGroup }) => {
 
     const handleSubmit = values => {
         const response = postNewGroup(values);
-        console.log(response);
+        logger.info(response);
         close();
     }
 

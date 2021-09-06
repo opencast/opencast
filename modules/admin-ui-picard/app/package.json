@@ -40,6 +40,7 @@
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
     "styled-components": "^5.1.1",
+    "winston": "^3.3.3",
     "yup": "^0.31.0"
   },
   "scripts": {
@@ -71,6 +72,7 @@
     "babel-preset-react": "^6.24.1",
     "customize-cra": "^0.9.1",
     "prop-types": "^15.7.2",
-    "react-app-rewired": "^2.1.5"
+    "react-app-rewired": "^2.1.5",
+    "winston-transport-browserconsole": "^1.0.5"
   }
 }

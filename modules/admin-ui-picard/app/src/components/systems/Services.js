@@ -18,6 +18,7 @@ import {getTotalServices} from "../../selectors/serviceSelector";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
 
 /**
  * This component renders the table view of services
@@ -62,7 +63,7 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
         resetTextFilter();
 
         // Load services on mount
-        loadServices().then(r => console.log(r));
+        loadServices().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('services');
