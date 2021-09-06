@@ -88,15 +88,19 @@ export const initialFormValuesNewThemes = {
     name: '',
     description: '',
     bumperActive: false,
-    bumperFile: {},
+    bumperFile: '',
+    bumperFileName: '',
     trailerActive: false,
-    trailerFile: {},
+    trailerFile: '',
+    trailerFileName: '',
     titleSlideActive: false,
     titleSlideMode: 'extract',
-    titleSlideBackground: {},
+    titleSlideBackground: '',
+    titleSlideBackgroundName: '',
     licenseSlideActive: false,
     watermarkActive: false,
-    watermarkFile: {},
+    watermarkFile: '',
+    watermarkFileName: '',
     watermarkPosition: 'topRight'
 };
 

@@ -5,9 +5,9 @@ import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButt
 import FileUpload from "../../../shared/wizard/FileUpload";
 
 /**
- * This component renders the title slide page for new themes in the new theme wizard.
+ * This component renders the title slide page for new themes in the new theme wizard and for themes in themes details modal.
  */
-const TitleSlidePage = ({ formik, nextPage, previousPage }) => {
+const TitleSlidePage = ({ formik, nextPage, previousPage, isEdit }) => {
     const { t } = useTranslation();
 
     return (
@@ -64,19 +64,25 @@ const TitleSlidePage = ({ formik, nextPage, previousPage }) => {
                                 {/*If title slide mode upload is chosen, use component for file upload */}
                                 {formik.values.titleSlideMode === 'upload' && (
                                     <FileUpload acceptableTypes="image/*"
-                                                formikField="titleSlideBackground"
+                                                fileId="titleSlideBackground"
+                                                fileName="titleSlideBackgroundName"
+                                                formik={formik}
                                                 labelKey="CONFIGURATION.THEMES.DETAILS.TITLE.UPLOAD_LABEL"
-                                                buttonKey="CONFIGURATION.THEMES.DETAILS.TITLE.UPLOAD_BUTTON"/>
+                                                buttonKey="CONFIGURATION.THEMES.DETAILS.TITLE.UPLOAD_BUTTON"
+                                                isEdit={isEdit}/>
                                 )}
                             </div>
                         </div>
                     )}
                 </div>
             </div>
-            {/* Button for navigation to next page */}
-            <WizardNavigationButtons formik={formik}
-                                     previousPage={previousPage}
-                                     nextPage={nextPage}/>
+            {/* Show navigation buttons only if page is used for a new theme*/}
+            {!isEdit && (
+                //Button for navigation to next page
+                <WizardNavigationButtons formik={formik}
+                                         previousPage={previousPage}
+                                         nextPage={nextPage}/>
+            )}
         </>
     );
 };

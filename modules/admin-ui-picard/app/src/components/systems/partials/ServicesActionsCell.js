@@ -1,26 +1,35 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
+import {connect} from "react-redux";
+import {fetchServices, restartService} from "../../../thunks/serviceThunks";
+import {loadServicesIntoTable} from "../../../thunks/tableThunks";
 
 /**
  * This component renders the action cells of services in the table view
  */
-const ServicesActionCell = ({ row }) => {
+const ServicesActionCell = ({ row, loadServices, loadServicesIntoTable }) => {
     const { t } = useTranslation();
+
+    const onClickRestart = async () => {
+        await restartService(row.hostname, row.name);
+        await loadServices();
+        loadServicesIntoTable();
+    }
 
     return (
         row.status !== 'SYSTEMS.SERVICES.STATUS.NORMAL' ? (
             // todo: with-role
-            // TODO: When action for sanitize is implemented, remove placeholder
             <a className="sanitize fa fa-undo"
-               onChange={() => onClickPlaceholder()}
+               onClick={() => onClickRestart()}
                title={t('SYSTEMS.SERVICES.TABLE.SANITIZE')}/>
         ) : null
     );
 }
 
-//todo: remove if not needed anymore
-const onClickPlaceholder = () => {
-    console.log("In the Future here opens an other component, which is not implemented yet");
-}
+// mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    loadServices: () => dispatch(fetchServices()),
+    loadServicesIntoTable: () => dispatch(loadServicesIntoTable())
+});
 
-export default ServicesActionCell;
+export default connect(null, mapDispatchToProps)(ServicesActionCell);

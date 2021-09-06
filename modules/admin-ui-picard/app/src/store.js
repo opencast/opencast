@@ -26,6 +26,7 @@ import recordingDetails from "./reducers/recordingDetailsReducer";
 import userDetails from "./reducers/userDetailsReducer";
 import groupDetails from "./reducers/groupDetailsReducer";
 import aclDetails from "./reducers/aclDetailsReducer";
+import themeDetails from "./reducers/themeDetailsReducer";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -50,6 +51,7 @@ const reducers = {
     notifications,
     workflows,
     eventDetails,
+    themeDetails,
     seriesDetails,
     recordingDetails,
     userDetails,
