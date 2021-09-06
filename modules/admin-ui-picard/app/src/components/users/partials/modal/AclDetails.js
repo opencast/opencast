@@ -8,6 +8,7 @@ import AclMetadataPage from "../wizard/AclMetadataPage";
 import {getAclDetails} from "../../../../selectors/aclDetailsSelectors";
 import {updateAclDetails} from "../../../../thunks/aclDetailsThunks";
 import {NewAclSchema} from "../../../shared/wizard/validate";
+import ModalNavigation from "../../../shared/modals/ModalNavigation";
 
 
 /**
@@ -48,16 +49,9 @@ const AclDetails = ({close, aclDetails, updateAclDetails}) => {
     return (
         <>
             {/* Navigation */}
-            <nav className="modal-nav" id="modal-nav">
-                <a className={cn({active: page === 0})}
-                   onClick={() => openTab(0)}>
-                    {t(tabs[0].tabNameTranslation)}
-                </a>
-                <a className={cn({active: page === 1})}
-                   onClick={() => openTab(1)}>
-                    {t(tabs[1].tabNameTranslation)}
-                </a>
-            </nav>
+            <ModalNavigation tabInformation={tabs}
+                             openTab={openTab}
+                             page={page}/>
 
             {/* formik form used in entire modal */}
             <Formik initialValues={initialValues}

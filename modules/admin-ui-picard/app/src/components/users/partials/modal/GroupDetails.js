@@ -9,6 +9,7 @@ import GroupUsersPage from "../wizard/GroupUsersPage";
 import {EditGroupSchema} from "../../../shared/wizard/validate";
 import {getGroupDetails} from "../../../../selectors/groupDetailsSelectors";
 import {updateGroupDetails} from "../../../../thunks/groupDetailsThunks";
+import ModalNavigation from "../../../shared/modals/ModalNavigation";
 
 /**
  * This component manages the pages of the group details
@@ -61,20 +62,9 @@ const GroupDetails = ({close, groupDetails, updateGroupDetails}) => {
     return (
         <>
             {/* Navigation */}
-            <nav className="modal-nav" id="modal-nav">
-                <a className={cn({active: page === 0})}
-                   onClick={() => openTab(0)}>
-                    {t(tabs[0].tabNameTranslation)}
-                </a>
-                <a className={cn({active: page === 1})}
-                   onClick={() => openTab(1)}>
-                    {t(tabs[1].tabNameTranslation)}
-                </a>
-                <a className={cn({active: page === 2})}
-                   onClick={() => openTab(2)}>
-                    {t(tabs[2].tabNameTranslation)}
-                </a>
-            </nav>
+            <ModalNavigation tabInformation={tabs}
+                             page={page}
+                             openTab={openTab}/>
 
             {/* formik form used in entire modal */}
             <Formik initialValues={initialValues}

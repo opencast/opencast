@@ -36,6 +36,7 @@ export const fetchUsage = id => async dispatch => {
 
         dispatch(loadThemeUsageSuccess(themeUsage));
     } catch (e) {
+        logger.log(e);
         dispatch(loadThemeDetailsFailure());
     }
 }

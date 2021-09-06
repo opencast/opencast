@@ -4,6 +4,7 @@ import {
     loadRecordingDetailsInProgress,
     loadRecordingDetailsSuccess
 } from "../actions/recordingDetailsActions";
+import {logger} from "../utils/logger";
 
 // fetch details of certain recording from server
 export const fetchRecordingDetails = name => async dispatch => {
@@ -19,5 +20,6 @@ export const fetchRecordingDetails = name => async dispatch => {
 
     } catch (e) {
         dispatch(loadRecordingDetailsFailure());
+        logger.error(e);
     }
 }

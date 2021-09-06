@@ -70,6 +70,7 @@ export const fetchSeriesDetailsAcls = id => async dispatch => {
 
     } catch (e) {
         dispatch(loadSeriesDetailsFailure());
+        logger.error(e);
     }
 }
 
@@ -139,6 +140,7 @@ export const fetchSeriesDetailsTheme = id => async dispatch => {
 
         dispatch(loadSeriesDetailsThemeSuccess(seriesTheme));
     } catch (e) {
+        logger.error(e);
         dispatch(loadSeriesDetailsFailure());
     }
 }

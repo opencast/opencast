@@ -2,6 +2,7 @@ import axios from "axios";
 import {loadUserDetailsFailure, loadUserDetailsInProgress, loadUserDetailsSuccess} from "../actions/userDetailsActions";
 import {addNotification} from "./notificationThunks";
 import {buildUserBody} from "../utils/resourceUtils";
+import {logger} from "../utils/logger";
 
 
 // fetch details about certain user from server
@@ -20,6 +21,7 @@ export const fetchUserDetails = username => async dispatch => {
 
         dispatch(loadUserDetailsSuccess(userDetails));
     } catch (e) {
+        logger.error(e);
         dispatch(loadUserDetailsFailure());
     }
 }
@@ -32,10 +34,10 @@ export const updateUserDetails = (values, username) => async dispatch => {
     // PUT request
     axios.put(`/admin-ng/users/${username}.json`, data)
         .then(response => {
-            console.log(response);
+            logger.info(response);
             dispatch(addNotification('success', 'USER_UPDATED'));
         }).catch(response => {
-            console.log(response);
+            logger.error(response);
             dispatch(addNotification('error', 'USER_NOT_SAVED'));
     });
 }

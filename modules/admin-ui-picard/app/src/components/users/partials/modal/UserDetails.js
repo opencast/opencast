@@ -9,6 +9,7 @@ import {getUserDetails} from "../../../../selectors/userDetailsSelectors";
 import EditUserGeneralTab from "../wizard/EditUserGeneralTab";
 import UserEffectiveRolesTab from "../wizard/UserEffectiveRolesTab";
 import {updateUserDetails} from "../../../../thunks/userDetailsThunks";
+import ModalNavigation from "../../../shared/modals/ModalNavigation";
 
 /**
  * This component manages the pages of the user details
@@ -51,20 +52,9 @@ const UserDetails = ({close, userDetails, updateUserDetails }) => {
     return (
         <>
             {/* Navigation */}
-            <nav className="modal-nav" id="modal-nav">
-                <a className={cn({active: page === 0})}
-                   onClick={() => openTab(0)}>
-                    {t(tabs[0].tabNameTranslation)}
-                </a>
-                <a className={cn({active: page === 1})}
-                   onClick={() => openTab(1)}>
-                    {t(tabs[1].tabNameTranslation)}
-                </a>
-                <a className={cn({active: page === 2})}
-                   onClick={() => openTab(2)}>
-                    {t(tabs[2].tabNameTranslation)}
-                </a>
-            </nav>
+            <ModalNavigation tabInformation={tabs}
+                             openTab={openTab}
+                             page={page}/>
 
             {/* formik form used in entire modal */}
             <Formik initialValues={initialValues}

@@ -18,7 +18,7 @@ const SeriesDetailsFeedsTab = ({ feeds }) => {
                                         <th>Version</th>
                                         <th>Link</th>
                                     </tr>
-                                    {/*todo: repeat for each feed link*/}
+                                    {/*repeat for each feed link*/}
                                     {feeds.length > 0 && feeds.map((feed, key) => (
                                         <tr key={key}>
                                             <td>{feed.type}</td>
