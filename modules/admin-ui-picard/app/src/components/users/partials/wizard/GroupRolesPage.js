@@ -4,9 +4,9 @@ import SelectContainer from "../../../shared/wizard/SelectContainer";
 import {fetchRolesWithTarget} from "../../../../thunks/aclThunks";
 
 /**
- * This component renders the role selection page of the new group wizard
+ * This component renders the role selection page of the new group wizard and group details modal
  */
-const NewGroupRolesPage = ({ previousPage, nextPage, formik }) => {
+const GroupRolesPage = ({ previousPage, nextPage, formik, isEdit }) => {
 
     // roles that can be chosen by user
     const [roles, setRoles] = useState([]);
@@ -51,11 +51,13 @@ const NewGroupRolesPage = ({ previousPage, nextPage, formik }) => {
             </div>
 
             {/* Button for navigation to next page */}
-            <WizardNavigationButtons previousPage={previousPage}
-                                     formik={formik}
-                                     nextPage={nextPage}/>
+            {!isEdit && (
+                <WizardNavigationButtons previousPage={previousPage}
+                                         formik={formik}
+                                         nextPage={nextPage}/>
+            )}
         </>
     );
 };
 
-export default NewGroupRolesPage;
+export default GroupRolesPage;
