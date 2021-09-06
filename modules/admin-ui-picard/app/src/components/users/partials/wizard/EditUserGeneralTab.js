@@ -25,7 +25,11 @@ const EditUserGeneralTab = ({ formik }) => {
         <div className="modal-content">
             <div className="modal-body">
                 <div className="form-container">
-                    <Notifications />
+                    {!formik.values.manageable && (
+                        <div className="modal-alert warning">
+                            <p>{t('NOTIFICATIONS.USER_NOT_MANAGEABLE')}</p>
+                        </div>
+                    )}
                     <div className="row" style={editStyle}>
                         <label>{t('USERS.USERS.DETAILS.FORM.USERNAME')}<i className="required">*</i></label>
                         <input type="text"

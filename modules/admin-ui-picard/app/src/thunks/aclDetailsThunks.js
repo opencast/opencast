@@ -24,7 +24,7 @@ export const fetchAclDetails = aclId => async dispatch => {
                         if (acl.ace[i].action === "read") {
                             transformedAcls[j] = {
                                 ...transformedAcls[j],
-                                write: acl.ace[i].allow
+                                read: acl.ace[i].allow
                             };
                             break;
                         }

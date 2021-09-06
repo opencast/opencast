@@ -83,21 +83,23 @@ const UserDetails = ({close, userDetails, updateUserDetails }) => {
                         )}
 
                         {/* Navigation buttons and validation */}
-                        <footer>
-                            <button className={cn("submit", {
-                                        active: (formik.dirty && formik.isValid),
-                                        inactive: !(formik.dirty && formik.isValid)})
-                                    }
-                                    disabled={!(formik.dirty && formik.isValid)}
-                                    onClick={() => formik.handleSubmit()}
-                                    type="submit">
-                                {t('SUBMIT')}
-                            </button>
-                            <button className="cancel"
-                                    onClick={() => close()}>
-                                {t('CANCEL')}
-                            </button>
-                        </footer>
+                        {page !== 2 && (
+                            <footer>
+                                <button className={cn("submit", {
+                                    active: (formik.dirty && formik.isValid),
+                                    inactive: !(formik.dirty && formik.isValid)})
+                                }
+                                        disabled={!(formik.dirty && formik.isValid)}
+                                        onClick={() => formik.handleSubmit()}
+                                        type="submit">
+                                    {t('SUBMIT')}
+                                </button>
+                                <button className="cancel"
+                                        onClick={() => close()}>
+                                    {t('CANCEL')}
+                                </button>
+                            </footer>
+                        )}
                     </>
                 )}
             </Formik>
