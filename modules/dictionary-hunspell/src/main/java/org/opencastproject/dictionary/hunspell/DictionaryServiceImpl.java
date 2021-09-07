@@ -92,19 +92,15 @@ public class DictionaryServiceImpl implements DictionaryService {
         new ReadinessIndicator(), properties);
 
     /* Get hunspell binary from config file */
-    String binary = (String) ctx.getProperty(HUNSPELL_BINARY_CONFIG_KEY);
+    String binary = ctx.getProperty(HUNSPELL_BINARY_CONFIG_KEY);
     if (binary != null) {
-      /* Fix special characters */
-      binary = new String(binary.getBytes("ISO-8859-1"), "UTF-8");
       logger.info("Setting hunspell binary to '{}'", binary);
       this.binary = binary;
     }
 
     /* Get hunspell command line options from config file */
-    String command = (String) ctx.getProperty(HUNSPELL_COMMAND_CONFIG_KEY);
+    String command = ctx.getProperty(HUNSPELL_COMMAND_CONFIG_KEY);
     if (command != null) {
-      /* Fix special characters */
-      command = new String(command.getBytes("ISO-8859-1"), "UTF-8");
       logger.info("Setting hunspell command line options to '{}'", command);
       this.command = command;
     }
