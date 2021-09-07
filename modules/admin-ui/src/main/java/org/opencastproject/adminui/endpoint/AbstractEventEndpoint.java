@@ -1749,7 +1749,7 @@ public abstract class AbstractEventEndpoint {
         return okJson(obj(f("workflowId", v(agentConfiguration.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION), Jsons.BLANK)),
                 f("configuration", obj(fields))));
       } else {
-        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withMediaPackage(id)));
+        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withCount(999999).withMediaPackage(id)));
       }
     } catch (NotFoundException e) {
       return notFound("Cannot find workflows for event %s", id);
