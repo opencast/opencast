@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
-import cn from 'classnames';
 import GeneralDetailsTab from "../wizards/GeneralDetailsTab";
 import ConfigurationDetailsTab from "../wizards/ConfigurationDetailsTab";
 import CapabilitiesDetailsTab from "../wizards/CapabilitiesDetailsTab";

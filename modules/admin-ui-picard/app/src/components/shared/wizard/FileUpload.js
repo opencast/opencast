@@ -2,7 +2,6 @@ import {useTranslation} from "react-i18next";
 import React, {useRef, useState} from "react";
 import axios from "axios";
 import {connect} from "react-redux";
-import {useField} from "formik";
 import {addNotification} from "../../../thunks/notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../../../configs/modalConfig";
 

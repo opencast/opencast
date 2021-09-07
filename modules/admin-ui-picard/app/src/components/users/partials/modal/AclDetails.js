@@ -7,8 +7,9 @@ import AclAccessPage from "../wizard/AclAccessPage";
 import AclMetadataPage from "../wizard/AclMetadataPage";
 import {getAclDetails} from "../../../../selectors/aclDetailsSelectors";
 import {updateAclDetails} from "../../../../thunks/aclDetailsThunks";
-import {NewAclSchema} from "../../../shared/wizard/validate";
+import {NewAclSchema} from "../../../../utils/validate";
 import ModalNavigation from "../../../shared/modals/ModalNavigation";
+
 
 
 /**

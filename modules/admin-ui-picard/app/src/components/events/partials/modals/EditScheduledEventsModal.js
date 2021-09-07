@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {Formik} from "formik";
 import {useTranslation} from "react-i18next";
 import {initialFormValuesEditScheduledEvents} from "../../../../configs/modalConfig";
