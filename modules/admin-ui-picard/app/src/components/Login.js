@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
+import {Formik, Field} from "formik";
 import languages from "../i18n/languages";
 import i18n from "../i18n/i18n";
 import cn from 'classnames';
@@ -76,44 +77,44 @@ const Login = () => {
                     <div className="login-form">
                         <div className="form-container">
                             {/*Login form*/}
-                            <form onSubmit={e => handleSubmit(e)}>
-                                <div className="row" >
-                                    <p>
-                                        <span>{t('LOGIN.WELCOME')}</span><br />
-                                    </p>
-                                </div>
+                                <Formik>
+                                    {formik => (
+                                        <>
+                                            <div className="row" >
+                                                <p>
+                                                    <span>{t('LOGIN.WELCOME')}</span><br />
+                                                </p>
+                                            </div>
 
-                                {/*Only show if error occurs on login*/}
-                                {isError && (
-                                    <div className="error-container">{t('LOGIN.ERROR')}</div>
-                                )}
+                                            {/*Only show if error occurs on login*/}
+                                            {isError && (
+                                                <div className="error-container">{t('LOGIN.ERROR')}</div>
+                                            )}
+                                            <div className="row">
+                                                <Field name="j_username"
+                                                       type="text"
+                                                       placeholder={t('LOGIN.USERNAME')}
+                                                       className={cn("login-input", {error: isError})}
+                                                       autoFocus="autoFocus"/>
+                                            </div>
+                                            <div className="row">
+                                                <Field name="j_password"
+                                                       type="password"
+                                                       placeholder={t('LOGIN.PASSWORD')}
+                                                       className={cn("login-input", {error: isError})}/>
+                                            </div>
 
-                                <div className="row">
-                                    <input name="j_username"
-                                           type="text"
-                                           id="email"
-                                           placeholder={t('LOGIN.USERNAME')}
-                                           className={cn("login-input", {error: isError})}
-                                           autoFocus="autoFocus"
-                                           onChange={e => handleChange(e)}/>
-                                </div>
-                                <div className="row">
-                                    <input name="j_password"
-                                           type="password"
-                                           id="password"
-                                           placeholder={t('LOGIN.PASSWORD')}
-                                           className={cn("login-input", {error: isError})}
-                                           onChange={e => handleChange(e)} />
-                                </div>
-
-                                <div className="row remember-me">
-                                    <input type="checkbox" id="remember" name="_spring_security_remember_me" checked />
-                                    <label for="remember">{t('LOGIN.REMEMBER')}</label>
-                                </div>
-                                <div className="row">
-                                    <button className="submit">{t('LOGIN.LOGIN')}</button>
-                                </div>
-                            </form>
+                                            <div className="row remember-me">
+                                                <Field type="checkbox" id="remember" name="_spring_security_remember_me"
+                                                       checked/>
+                                                <label htmlFor="remember">{t('LOGIN.REMEMBER')}</label>
+                                            </div>
+                                            <div className="row">
+                                                <button className="submit">{t('LOGIN.LOGIN')}</button>
+                                            </div>
+                                        </>
+                                    )}
+                                </Formik>
                         </div>
 
                         {/*Language dropdown menu*/}
