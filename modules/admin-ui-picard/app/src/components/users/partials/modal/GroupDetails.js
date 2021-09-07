@@ -6,10 +6,11 @@ import {connect} from "react-redux";
 import GroupMetadataPage from "../wizard/GroupMetadataPage";
 import GroupRolesPage from "../wizard/GroupRolesPage";
 import GroupUsersPage from "../wizard/GroupUsersPage";
-import {EditGroupSchema} from "../../../shared/wizard/validate";
+import {EditGroupSchema} from "../../../../utils/validate";
 import {getGroupDetails} from "../../../../selectors/groupDetailsSelectors";
 import {updateGroupDetails} from "../../../../thunks/groupDetailsThunks";
 import ModalNavigation from "../../../shared/modals/ModalNavigation";
+
 
 /**
  * This component manages the pages of the group details

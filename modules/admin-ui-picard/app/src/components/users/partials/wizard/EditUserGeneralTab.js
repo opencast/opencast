@@ -1,6 +1,5 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import Notifications from "../../../shared/Notifications";
 import cn from "classnames";
 import {Field} from "formik";
 

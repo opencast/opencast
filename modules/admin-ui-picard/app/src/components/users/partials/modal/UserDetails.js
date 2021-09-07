@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Formik} from "formik";
 import cn from "classnames";
-import {EditUserSchema} from "../../../shared/wizard/validate";
+import {EditUserSchema} from "../../../../utils/validate";
 import UserRolesTab from "../wizard/UserRolesTab";
 import {connect} from "react-redux";
 import {getUserDetails} from "../../../../selectors/userDetailsSelectors";
@@ -10,6 +10,7 @@ import EditUserGeneralTab from "../wizard/EditUserGeneralTab";
 import UserEffectiveRolesTab from "../wizard/UserEffectiveRolesTab";
 import {updateUserDetails} from "../../../../thunks/userDetailsThunks";
 import ModalNavigation from "../../../shared/modals/ModalNavigation";
+
 
 /**
  * This component manages the pages of the user details
