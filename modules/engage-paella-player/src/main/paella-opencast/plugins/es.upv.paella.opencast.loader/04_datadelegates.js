@@ -176,8 +176,7 @@ class MHFootPrintsDataDelegate extends paella.DataDelegate {
 
   write(context,params,value,onSuccess) {
     var episodeId = params.id;
-    paella.ajax.get({url: '/usertracking/', params: {
-      _method: 'PUT',
+    paella.ajax.put({url: '/usertracking/', params: {
       id: episodeId,
       type:'FOOTPRINT',
       in:value.in,
