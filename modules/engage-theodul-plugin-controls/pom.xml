@@ -151,12 +151,13 @@
           </instructions>
         </configuration>
       </plugin>
+<!--
       <plugin>
         <groupId>com.github.klieber</groupId>
         <artifactId>phantomjs-maven-plugin</artifactId>
       </plugin>
       <plugin>
-        <!-- Further plugin parameter information http://searls.github.io/jasmine-maven-plugin/bdd-mojo.html -->
+        <!- - Further plugin parameter information http://searls.github.io/jasmine-maven-plugin/bdd-mojo.html - ->
         <groupId>com.github.searls</groupId>
         <artifactId>jasmine-maven-plugin</artifactId>
         <configuration>
@@ -185,6 +186,7 @@
           <format>progress</format>
         </configuration>
       </plugin>
+-->
     </plugins>
   </build>
 </project>
