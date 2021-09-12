@@ -1,6 +1,24 @@
 Development Environment
 =======================
 
+Common Developer Pitfalls
+-------------------------
+
+Every development environment has its quirks, so here are a few which have been collected by the community:
+
+### General
+* Build Opencast, then open your IDE.  Opencast generates a number of classes as part of its build process (eg:
+  QSnapshotDto), which will not be found by your IDE and thus cause build errors.  It is possible to get your IDE
+  to run the appropriate Maven lifecycle event, but that can be hit-and-miss in terms of functionality.
+* If your IDE stubbornly refuses to acknowledge that a class exists, even when you're sure it's there, try closing your
+  IDE, then running `git clean -fdx`, then building.  This will ensure everything in your clone is up to date.  Also
+  ensure you find your project workspace to make sure your IDE isn't keeping a cache of things.
+* Absolute worst case, remove your Maven cache (typically ~/.m2), and possibly your Node cache (typically ~/.npm) and
+  repeat the above steps.  This is completely starting from scratch.
+
+### IntelliJ
+* Do not use the prebuilt indexes.
+
 Developer Builds
 ----------------
 
@@ -87,4 +105,3 @@ For more information on remote debugging with Karaf you can visit [this
 site.](https://karaf.apache.org/manual/latest/#_debugging)
 
 It is **not recommended** to enable remote debugging on production systems!
-
