@@ -42,6 +42,12 @@ API changes
 - Rename value for `sort` parameter in search API from `DATE_PUBLISHED` to `DATE_MODIFIED`.
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
+Additional Notes about 10.3
+---------------------------
+
+This release fixes a number of bugs.  This release also includes [a fix](https://github.com/opencast/opencast/pull/2964)
+which prevents ActiveMQ from eventually blocking operations.  This fix must be manually deployed.  Please follow the
+existing the [message broker](configuration/message-broker.md) configuration instructions with the updated file.
 
 Additional Notes about 10.2
 ---------------------------
