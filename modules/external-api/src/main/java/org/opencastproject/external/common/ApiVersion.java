@@ -33,7 +33,7 @@ public enum ApiVersion {
   VERSION_1_7_0(1, 7, 0);
 
   /** The most recent version of the External API */
-  public static final ApiVersion CURRENT_VERSION = VERSION_1_6_0;
+  public static final ApiVersion CURRENT_VERSION = VERSION_1_7_0;
 
   private int major;
   private int minor;

@@ -236,6 +236,7 @@ public class BaseEndpoint {
     versions.add(v(ApiVersion.VERSION_1_4_0.toString()));
     versions.add(v(ApiVersion.VERSION_1_5_0.toString()));
     versions.add(v(ApiVersion.VERSION_1_6_0.toString()));
+    versions.add(v(ApiVersion.VERSION_1_7_0.toString()));
     JValue json = obj(f("versions", arr(versions)), f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
   }
