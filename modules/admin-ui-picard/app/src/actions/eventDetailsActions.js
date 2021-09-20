@@ -23,6 +23,13 @@ export const LOAD_EVENT_WORKFLOWS_FAILURE = 'LOAD_EVENT_WORKFLOWS_FAILURE';
 export const SET_EVENT_WORKFLOW_DEFINITIONS = 'SET_EVENT_WORKFLOW_DEFINITIONS';
 export const SET_EVENT_WORKFLOW = 'SET_EVENT_WORKFLOW';
 export const SET_EVENT_WORKFLOW_CONFIGURATION = 'SET_EVENT_WORKFLOW_CONFIGURATION';
+export const DO_EVENT_WORKFLOW_ACTION_IN_PROGRESS = 'DO_EVENT_WORKFLOW_ACTION_IN_PROGRESS';
+export const DO_EVENT_WORKFLOW_ACTION_SUCCESS = 'DO_EVENT_WORKFLOW_ACTION_SUCCESS';
+export const DO_EVENT_WORKFLOW_ACTION_FAILURE = 'DO_EVENT_WORKFLOW_ACTION_FAILURE';
+export const DELETE_EVENT_WORKFLOW_IN_PROGRESS = 'DELETE_EVENT_WORKFLOW_IN_PROGRESS';
+export const DELETE_EVENT_WORKFLOW_SUCCESS = 'DELETE_EVENT_WORKFLOW_SUCCESS';
+export const DELETE_EVENT_WORKFLOW_FAILURE = 'DELETE_EVENT_WORKFLOW_FAILURE';
+
 
 
 // actions for access policies
@@ -110,4 +117,30 @@ export const setEventWorkflowConfiguration = (workflow_configuration) => ({
     payload: {
         workflow_configuration
     }
+});
+
+export const doEventWorkflowActionInProgress = () => ({
+    type: DO_EVENT_WORKFLOW_ACTION_IN_PROGRESS
+});
+
+export const doEventWorkflowActionSuccess = () => ({
+    type: DO_EVENT_WORKFLOW_ACTION_SUCCESS
+});
+
+export const doEventWorkflowActionFailure = () => ({
+    type: DO_EVENT_WORKFLOW_ACTION_FAILURE
+});
+
+export const deleteEventWorkflowInProgress = () => ({
+    type: DELETE_EVENT_WORKFLOW_IN_PROGRESS
+});
+
+export const deleteEventWorkflowSuccess = () => ({
+    type: DELETE_EVENT_WORKFLOW_SUCCESS,
+    payload: {
+    }
+});
+
+export const deleteEventWorkflowFailure = () => ({
+    type: DELETE_EVENT_WORKFLOW_FAILURE
 });

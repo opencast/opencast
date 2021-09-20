@@ -3,13 +3,13 @@ import {connect} from "react-redux";
 import {Field, Formik} from "formik";
 import {
     updateWorkflow,
-    fetchWorkflows
+    fetchWorkflows, performWorkflowAction
 } from "../../../../thunks/eventDetailsThunks";
 import {
     getWorkflowConfiguration,
     getWorkflows,
     isFetchingWorkflows,
-    getWorkflowDefinitions, getWorkflow
+    getWorkflowDefinitions, getWorkflow, performingWorkflowAction, deletingWorkflow
 } from "../../../../selectors/eventDetailsSelectors";
 import Notifications from "../../../shared/Notifications";
 import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
@@ -17,9 +17,9 @@ import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
 /**
  * This component manages the workflows tab of the event details modal
  */
-const EventDetailsWorkflowTab = ({ eventId, header, t,
-                                   workflow, workflows, isLoading, workflowDefinitions, workflowConfiguration,
-                                   loadWorkflows, updateWorkflow}) => {
+const EventDetailsWorkflowTab = ({ eventId, header, t, close,
+                                   workflow, workflows, isLoading, workflowDefinitions, workflowConfiguration, performingWorkflowAction, deletingWorkflow,
+                                   loadWorkflows, updateWorkflow, performWorkflowAction}) => {
     const isRoleWorkflowEdit = true; /*todo: if: "$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"*/
     const isRoleWorkflowDelete = true; /*todo: if: "$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE')"*/
 
@@ -34,8 +34,11 @@ const EventDetailsWorkflowTab = ({ eventId, header, t,
     }
 
     const workflowAction = (workflowId, action) => {
-        //todo
-        console.log(`Perform action ${action} on workflow ${workflowId}!`);
+        if(performingWorkflowAction){
+            return;
+        } else {
+            performWorkflowAction(eventId, workflowId, action, close);
+        }
     }
 
     const deleteWorkflow = (workflowId) => {
@@ -323,13 +326,16 @@ const mapStateToProps = state => ({
     workflows: getWorkflows(state),
     isLoading: isFetchingWorkflows(state),
     workflowDefinitions: getWorkflowDefinitions(state),
-    workflowConfiguration: getWorkflowConfiguration(state)
+    workflowConfiguration: getWorkflowConfiguration(state),
+    performingWorkflowAction: performingWorkflowAction(state),
+    deletingWorkflow: deletingWorkflow(state),
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadWorkflows: (eventId) => dispatch(fetchWorkflows(eventId)),
-    updateWorkflow: (saveWorkflow, workflow) => dispatch(updateWorkflow(saveWorkflow, workflow))
+    updateWorkflow: (saveWorkflow, workflow) => dispatch(updateWorkflow(saveWorkflow, workflow)),
+    performWorkflowAction: (eventId, workflowId, action, close) => dispatch(performWorkflowAction(eventId, workflowId, action, close))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsWorkflowTab);

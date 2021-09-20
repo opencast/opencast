@@ -14,7 +14,7 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manages the pages of the event details
  */
-const EventDetails = ({ tabIndex, eventId }) => {
+const EventDetails = ({ tabIndex, eventId, close }) => {
     const { t } = useTranslation();
 
 
@@ -154,7 +154,8 @@ const EventDetails = ({ tabIndex, eventId }) => {
                                 <EventDetailsWorkflowTab
                                     eventId={eventId}
                                     header={tabs[page].bodyHeaderTranslation}
-                                    t={t}/>
+                                    t={t}
+                                    close={close}/>
                             )}
                             {page === 6 && (
                                 <EventDetailsAccessPolicyTab

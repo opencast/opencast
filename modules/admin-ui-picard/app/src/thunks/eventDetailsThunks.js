@@ -13,7 +13,11 @@ import {
     loadEventWorkflowsInProgress,
     loadEventWorkflowsSuccess,
     loadEventWorkflowsFailure,
-    setEventWorkflowDefinitions, setEventWorkflow, setEventWorkflowConfiguration,
+    setEventWorkflowDefinitions,
+    setEventWorkflow,
+    setEventWorkflowConfiguration,
+    doEventWorkflowActionInProgress,
+    doEventWorkflowActionSuccess, doEventWorkflowActionFailure,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
@@ -271,4 +275,28 @@ export const updateWorkflow = (saveWorkflow, workflowId) => async (dispatch, get
 
 const saveWorkflowConfig = () => {
     //todo
+}
+
+export const performWorkflowAction = (eventId, workflowId, action, close) => async (dispatch) => {
+    dispatch(doEventWorkflowActionInProgress());
+
+    let headers = {headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+    }};
+
+    let data = new URLSearchParams();
+    data.append("action", action);
+    data.append("id", eventId);
+    data.append("wfId", workflowId);
+
+    axios.put(`admin-ng/event/${eventId}/workflows/${workflowId}/action/${action}`, data, headers)
+        .then( response => {
+            dispatch(addNotification('success', 'EVENTS_PROCESSING_ACTION_' + action, -1, null, NOTIFICATION_CONTEXT));
+            dispatch(doEventWorkflowActionSuccess());
+        })
+        .catch( response => {
+            dispatch(addNotification('error', 'EVENTS_PROCESSING_ACTION_NOT_' + action, -1, null, NOTIFICATION_CONTEXT));
+            close();
+            dispatch(doEventWorkflowActionFailure());
+        });
 }

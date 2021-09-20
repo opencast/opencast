@@ -11,11 +11,21 @@ import {
     SAVE_COMMENT_REPLY_DONE,
     LOAD_EVENT_WORKFLOWS_IN_PROGRESS,
     LOAD_EVENT_WORKFLOWS_SUCCESS,
-    LOAD_EVENT_WORKFLOWS_FAILURE, SET_EVENT_WORKFLOW_DEFINITIONS, SET_EVENT_WORKFLOW, SET_EVENT_WORKFLOW_CONFIGURATION
+    LOAD_EVENT_WORKFLOWS_FAILURE,
+    SET_EVENT_WORKFLOW_DEFINITIONS,
+    SET_EVENT_WORKFLOW,
+    SET_EVENT_WORKFLOW_CONFIGURATION,
+    DO_EVENT_WORKFLOW_ACTION_IN_PROGRESS,
+    DO_EVENT_WORKFLOW_ACTION_SUCCESS,
+    DO_EVENT_WORKFLOW_ACTION_FAILURE,
+    DELETE_EVENT_WORKFLOW_IN_PROGRESS,
+    DELETE_EVENT_WORKFLOW_SUCCESS,
+    DELETE_EVENT_WORKFLOW_FAILURE
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
 const initialState = {
+    eventId: "",
     policies: [],
     fetchingPoliciesInProgress: false,
     savingCommentReplyInProgress: false,
@@ -38,7 +48,8 @@ const initialState = {
     },
     workflowDefinitions: [],
     baseWorkflow: {},
-    eventId: ""
+    workflowActionInProgress: false,
+    deleteWorkflowInProgress: false
 }
 
 // Reducer for event details
@@ -154,6 +165,43 @@ const eventDetails = (state=initialState, action) => {
             return {
                 ...state,
                 workflowConfiguration: workflow_configuration
+            }
+        }
+        case DO_EVENT_WORKFLOW_ACTION_IN_PROGRESS: {
+            return {
+                ...state,
+                workflowActionInProgress: true
+            }
+        }
+        case DO_EVENT_WORKFLOW_ACTION_SUCCESS: {
+            return {
+                ...state,
+                workflowActionInProgress: false
+            }
+        }
+        case DO_EVENT_WORKFLOW_ACTION_FAILURE: {
+            return {
+                ...state,
+                workflowActionInProgress: false
+            }
+        }
+        case DELETE_EVENT_WORKFLOW_IN_PROGRESS: {
+            return {
+                ...state,
+                deleteWorkflowInProgress: true
+            }
+        }
+        case DELETE_EVENT_WORKFLOW_SUCCESS: {
+            const {} = payload;
+            return {
+                ...state,
+                deleteWorkflowInProgress: false
+            }
+        }
+        case DELETE_EVENT_WORKFLOW_FAILURE: {
+            return {
+                ...state,
+                deleteWorkflowInProgress: false
             }
         }
         default:
