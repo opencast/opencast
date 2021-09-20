@@ -16,17 +16,9 @@ import Services from "./components/systems/Services";
 import Groups from "./components/users/Groups";
 import Acls from "./components/users/Acls";
 
-const version = {
-  version: '8.03',
-  buildNumber: '42'
-};
-const feedbackUrl = 'https://opencast.org/';
-
-
 function App() {
   return (
           <HashRouter>
-              <Header />
               <Switch>
                   <Route exact path={"/"}>
                       <Login />
@@ -66,7 +58,6 @@ function App() {
                       <Statistics />
                   </Route>
               </Switch>
-              <Footer version={version}  feedbackUrl={feedbackUrl}/>
           </HashRouter>
   );
 }

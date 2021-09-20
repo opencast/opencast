@@ -3,7 +3,13 @@ import React from "react";
 /**
  * Component that renders the footer
  */
-const Footer = ({ version, feedbackUrl }) => (
+const version = {
+    version: '8.03',
+    buildNumber: '42'
+};
+const feedbackUrl = 'https://opencast.org/';
+
+const Footer = () => (
         <footer id="main-footer" >
             <div className="default-footer">
                 {/* Only render if a version is set */}

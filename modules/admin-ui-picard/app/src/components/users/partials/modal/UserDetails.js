@@ -28,15 +28,15 @@ const UserDetails = ({close, userDetails, updateUserDetails }) => {
     // information about tabs
     const tabs = [
         {
-            tabNameTranslation: 'USERS.USERS.DETAILS.TABS.USER',
+            tabTranslation: 'USERS.USERS.DETAILS.TABS.USER',
             name: 'general'
         },
         {
-            tabNameTranslation: 'USERS.USERS.DETAILS.TABS.ROLES',
+            tabTranslation: 'USERS.USERS.DETAILS.TABS.ROLES',
             name: 'roles'
         },
         {
-            tabNameTranslation: 'USERS.USERS.DETAILS.TABS.EFFECTIVEROLES',
+            tabTranslation: 'USERS.USERS.DETAILS.TABS.EFFECTIVEROLES',
             name: 'effectiveRoles'
         }
     ];

@@ -24,6 +24,8 @@ import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -134,6 +136,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
                 {/*TODO: include with role things */}
                 <div className="btn-group">
@@ -242,6 +245,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                 {/*Include table component*/}
                 <Table templateMap={eventsTemplateMap} resourceType="events"/>
             </div>
+            <Footer />
         </>
     );
 }

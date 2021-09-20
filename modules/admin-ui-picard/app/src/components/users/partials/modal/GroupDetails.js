@@ -38,15 +38,15 @@ const GroupDetails = ({close, groupDetails, updateGroupDetails}) => {
     // information about tabs
     const tabs = [
         {
-            tabNameTranslation: 'USERS.GROUPS.DETAILS.TABS.GROUP',
+            tabTranslation: 'USERS.GROUPS.DETAILS.TABS.GROUP',
             name: 'group'
         },
         {
-            tabNameTranslation: 'USERS.GROUPS.DETAILS.TABS.ROLES',
+            tabTranslation: 'USERS.GROUPS.DETAILS.TABS.ROLES',
             name: 'roles'
         },
         {
-            tabNameTranslation: 'USERS.GROUPS.DETAILS.TABS.USERS',
+            tabTranslation: 'USERS.GROUPS.DETAILS.TABS.USERS',
             name: 'users'
         }
     ];

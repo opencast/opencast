@@ -16,6 +16,8 @@ import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 /**
  * This component renders the table view of recordings
@@ -49,6 +51,7 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
 
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
 
                 {/* Include Burger-button menu*/}
@@ -81,6 +84,7 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
                 {/* Include table component */}
                 <Table templateMap={recordingsTemplateMap} />
             </div>
+            <Footer />
         </>
     )
 }
