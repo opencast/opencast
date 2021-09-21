@@ -62,7 +62,7 @@ const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, delete
         <div>
             <img alt="Preview" className="img-fluid" src={image} />
         </div>
-        <div className="ml-3">
+        <div className="ms-3">
             <h4>{episode.dcTitle}</h4>
             {episode.mediapackage.creators.length > 0 && <p className="text-muted">
                 {t("LTI.CREATOR", { creator: episode.mediapackage.creators.join(', ') })}
@@ -70,7 +70,7 @@ const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, delete
             <p className="text-muted">{new Date(episode.dcCreated).toLocaleString()}</p>
         </div>
         {(deleteCallback !== undefined || editCallback !== undefined || downloadCallback !== undefined) &&
-            <div className="ml-auto">
+            <div className="ms-auto">
                 {deleteCallback !== undefined &&
                     <button onClick={(e) => { deleteCallback(episode.id); e.stopPropagation(); }}>
                         <FontAwesomeIcon icon={faTrash} />
