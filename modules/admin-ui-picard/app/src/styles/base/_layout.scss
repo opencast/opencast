@@ -34,9 +34,6 @@ body {
     position: relative;
     color: $global-text-color;
 
-    &.login-body {
-        @include radial-gradient($off-white, #d8dfe4);
-    }
 }
 
 // Resets

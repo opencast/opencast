@@ -19,6 +19,8 @@ import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 /**
  * This component renders the table view of services
@@ -81,6 +83,7 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
 
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
 
                 {/* Include Burger-button menu*/}
@@ -122,6 +125,7 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
                 {/* Include table component */}
                 <Table templateMap={servicesTemplateMap} />
             </div>
+            <Footer />
         </>
     );
 }

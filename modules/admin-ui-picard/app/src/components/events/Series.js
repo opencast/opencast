@@ -20,6 +20,8 @@ import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 
 
@@ -115,6 +117,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
 
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
                 {/*TODO: include with role ROLE_UI_SERIES_CREATE */}
                 <div className="btn-group">
@@ -188,6 +191,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                 </div>
                 <Table templateMap={seriesTemplateMap} />
             </div>
+            <Footer />
         </>
     )
 }

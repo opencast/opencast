@@ -29,11 +29,11 @@ const AclDetails = ({close, aclDetails, updateAclDetails}) => {
     // information about tabs
     const tabs = [
         {
-            tabNameTranslation: 'USERS.ACLS.DETAILS.TABS.METADATA',
+            tabTranslation: 'USERS.ACLS.DETAILS.TABS.METADATA',
             name: 'metadata'
         },
         {
-            tabNameTranslation: 'USERS.ACLS.DETAILS.TABS.ACCESS',
+            tabTranslation: 'USERS.ACLS.DETAILS.TABS.ACCESS',
             name: 'access'
         }
     ];

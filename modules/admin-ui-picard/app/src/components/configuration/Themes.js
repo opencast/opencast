@@ -17,6 +17,8 @@ import NewResourceModal from "../shared/NewResourceModal";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 /**
  * This component renders the table view of events
@@ -64,6 +66,7 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
 
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
                 {/* Add theme button */}
                 <div className="btn-group">
@@ -108,6 +111,7 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
                 {/* Include table component */}
                 <Table templateMap={themesTemplateMap} />
             </div>
+            <Footer />
         </>
     );
 };

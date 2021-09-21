@@ -18,15 +18,15 @@ const RecordingsDetails = ({ agent }) => {
     // information about tabs
     const tabs = [
         {
-            tabNameTranslation: 'RECORDINGS.RECORDINGS.DETAILS.TAB.GENERAL',
+            tabTranslation: 'RECORDINGS.RECORDINGS.DETAILS.TAB.GENERAL',
             name: 'general'
         },
         {
-            tabNameTranslation: 'RECORDINGS.RECORDINGS.DETAILS.TAB.CONFIGURATION',
+            tabTranslation: 'RECORDINGS.RECORDINGS.DETAILS.TAB.CONFIGURATION',
             name: 'configuration'
         },
         {
-            tabNameTranslation: 'RECORDINGS.RECORDINGS.DETAILS.TAB.CAPABILITIES',
+            tabTranslation: 'RECORDINGS.RECORDINGS.DETAILS.TAB.CAPABILITIES',
             name: 'capabilities'
         }
     ];
