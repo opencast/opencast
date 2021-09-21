@@ -192,9 +192,13 @@ const eventDetails = (state=initialState, action) => {
             }
         }
         case DELETE_EVENT_WORKFLOW_SUCCESS: {
-            const {} = payload;
+            const { workflowsEntries } = payload;
             return {
                 ...state,
+                workflows: {
+                    ...state.workflows,
+                    entries: workflowsEntries
+                },
                 deleteWorkflowInProgress: false
             }
         }

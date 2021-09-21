@@ -6,6 +6,7 @@ import {getCurrentLanguageInformation} from "../../../../utils/utils";
 import EventDetailsCommentsTab from "../ModalTabsAndPages/EventDetailsCommentsTab";
 import EventDetailsAccessPolicyTab from "../ModalTabsAndPages/EventDetailsAccessPolicyTab";
 import EventDetailsWorkflowTab from "../ModalTabsAndPages/EventDetailsWorkflowTab";
+import EventDetailsWorkflowDetails from "../ModalTabsAndPages/EventDetailsWorkflowDetails";
 
 
 // Get info about the current language and its date locale
@@ -19,6 +20,7 @@ const EventDetails = ({ tabIndex, eventId, close }) => {
 
 
     const [page, setPage] = useState(tabIndex);
+    const [workflowTabHierarchy, setWorkflowTabHierarchy] = useState("entry")
 
     const tabs = [
         {
@@ -72,6 +74,7 @@ const EventDetails = ({ tabIndex, eventId, close }) => {
     ];
 
     const openTab = (tabNr) => {
+        setWorkflowTabHierarchy("entry")
         setPage(tabNr);
     }
 
@@ -151,11 +154,20 @@ const EventDetails = ({ tabIndex, eventId, close }) => {
                                                  t={t}/>
                             )}
                             {page === 5 && (
-                                <EventDetailsWorkflowTab
-                                    eventId={eventId}
-                                    header={tabs[page].bodyHeaderTranslation}
-                                    t={t}
-                                    close={close}/>
+                                workflowTabHierarchy === "entry" && (
+                                    <EventDetailsWorkflowTab
+                                        eventId={eventId}
+                                        header={tabs[page].bodyHeaderTranslation}
+                                        t={t}
+                                        close={close}
+                                        setHierarchy={setWorkflowTabHierarchy}/>
+                                )) || (
+                                workflowTabHierarchy === "workflow-details" && (
+                                    <EventDetailsWorkflowDetails
+                                        eventId={eventId}
+                                        t={t}
+                                        setHierarchy={setWorkflowTabHierarchy}/>
+                                )
                             )}
                             {page === 6 && (
                                 <EventDetailsAccessPolicyTab

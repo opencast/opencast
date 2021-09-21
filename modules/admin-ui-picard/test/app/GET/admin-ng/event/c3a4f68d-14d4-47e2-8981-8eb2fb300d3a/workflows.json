@@ -19,6 +19,14 @@
       "id": 1677,
       "title": "Mock Event Processing Complete",
       "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
+    },
+    {
+      "submitted": "2018-08-10T11:39:32Z",
+      "workflow": "Process upon upload and schedule",
+      "series": "",
+      "id": 1678,
+      "title": "Mock Event Processing Complete (Copy)",
+      "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
     }
   ]
 }

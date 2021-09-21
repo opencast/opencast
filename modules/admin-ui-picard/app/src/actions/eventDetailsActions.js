@@ -135,9 +135,10 @@ export const deleteEventWorkflowInProgress = () => ({
     type: DELETE_EVENT_WORKFLOW_IN_PROGRESS
 });
 
-export const deleteEventWorkflowSuccess = () => ({
+export const deleteEventWorkflowSuccess = (workflowsEntries) => ({
     type: DELETE_EVENT_WORKFLOW_SUCCESS,
     payload: {
+        workflowsEntries
     }
 });
 

@@ -17,7 +17,11 @@ import {
     setEventWorkflow,
     setEventWorkflowConfiguration,
     doEventWorkflowActionInProgress,
-    doEventWorkflowActionSuccess, doEventWorkflowActionFailure,
+    doEventWorkflowActionSuccess,
+    doEventWorkflowActionFailure,
+    deleteEventWorkflowInProgress,
+    deleteEventWorkflowFailure,
+    deleteEventWorkflowSuccess,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
@@ -209,6 +213,9 @@ export const fetchWorkflows = (eventId) => async (dispatch, getState) => {
     try {
         dispatch(loadEventWorkflowsInProgress());
 
+        // todo: show notification if there are active transactions
+        // dispatch(addNotification('warning', 'ACTIVE_TRANSACTION', -1, null, NOTIFICATION_CONTEXT));
+
         const data = await axios.get(`admin-ng/event/${eventId}/workflows.json`);
         const workflowsData = await data.data;
 
@@ -284,19 +291,42 @@ export const performWorkflowAction = (eventId, workflowId, action, close) => asy
         'Content-Type': 'application/json;charset=utf-8'
     }};
 
-    let data = new URLSearchParams();
-    data.append("action", action);
-    data.append("id", eventId);
-    data.append("wfId", workflowId);
+    let data = {
+        "action": action,
+        "id": eventId,
+        "wfId": workflowId
+    };
 
     axios.put(`admin-ng/event/${eventId}/workflows/${workflowId}/action/${action}`, data, headers)
         .then( response => {
             dispatch(addNotification('success', 'EVENTS_PROCESSING_ACTION_' + action, -1, null, NOTIFICATION_CONTEXT));
+            close();
             dispatch(doEventWorkflowActionSuccess());
         })
         .catch( response => {
             dispatch(addNotification('error', 'EVENTS_PROCESSING_ACTION_NOT_' + action, -1, null, NOTIFICATION_CONTEXT));
-            close();
             dispatch(doEventWorkflowActionFailure());
+        });
+}
+
+export const deleteWorkflow = (eventId, workflowId) => async (dispatch, getState) => {
+    dispatch(deleteEventWorkflowInProgress());
+
+    axios.delete(`/admin-ng/event/${eventId}/workflows/${workflowId}`)
+        .then( response => {
+            dispatch(addNotification('success', 'EVENTS_PROCESSING_DELETE_WORKFLOW', -1, null, NOTIFICATION_CONTEXT));
+
+            const state = getState();
+            const workflows = getWorkflows(state);
+
+            if(!!workflows.entries){
+                dispatch(deleteEventWorkflowSuccess(workflows.entries.filter( wf => wf.id !== workflowId)));
+            } else {
+                dispatch(deleteEventWorkflowSuccess(workflows.entries));
+            }
+        })
+        .catch( response => {
+            dispatch(addNotification('error', 'EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED', -1, null, NOTIFICATION_CONTEXT));
+            dispatch(deleteEventWorkflowFailure());
         });
 }

@@ -9,7 +9,7 @@ import Notifications from "../../../shared/Notifications";
 /**
  * This component manages the workflow details for the workflows tab of the event details modal
  */
-const EventDetailsWorkflowDetails =  ({ eventId, header, t,
+const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
 
                                        }) => {
     const subNavData = {
@@ -40,6 +40,8 @@ const EventDetailsWorkflowDetails =  ({ eventId, header, t,
     const humanDuration = "5h"
 
     const openSubTab = (tabType, resourceType, id, someBool) => {
+        // todo
+        setHierarchy(tabType);
         console.log(`Open Sub Tab ${tabType}, res: ${resourceType}, id: ${id}, ${someBool}`);
     }
 

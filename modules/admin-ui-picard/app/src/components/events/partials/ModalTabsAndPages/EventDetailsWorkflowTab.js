@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import {Field, Formik} from "formik";
 import {
     updateWorkflow,
-    fetchWorkflows, performWorkflowAction
+    fetchWorkflows, performWorkflowAction, deleteWorkflow
 } from "../../../../thunks/eventDetailsThunks";
 import {
     getWorkflowConfiguration,
@@ -13,24 +13,26 @@ import {
 } from "../../../../selectors/eventDetailsSelectors";
 import Notifications from "../../../shared/Notifications";
 import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
+import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 
 /**
  * This component manages the workflows tab of the event details modal
  */
-const EventDetailsWorkflowTab = ({ eventId, header, t, close,
+const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
                                    workflow, workflows, isLoading, workflowDefinitions, workflowConfiguration, performingWorkflowAction, deletingWorkflow,
-                                   loadWorkflows, updateWorkflow, performWorkflowAction}) => {
+                                   loadWorkflows, updateWorkflow, performWorkflowAction, deleteWf}) => {
     const isRoleWorkflowEdit = true; /*todo: if: "$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"*/
     const isRoleWorkflowDelete = true; /*todo: if: "$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE')"*/
 
 
     useEffect(() => {
+        removeNotificationWizardForm();
         loadWorkflows(eventId).then(r => {});
     }, [])
     
     const isCurrentWorkflow = (workflowId) => {
-        //todo
-        return false;
+        let currentWorkflow = workflows.entries[ workflows.entries.length - 1];
+        return currentWorkflow.id === workflowId;
     }
 
     const workflowAction = (workflowId, action) => {
@@ -42,11 +44,15 @@ const EventDetailsWorkflowTab = ({ eventId, header, t, close,
     }
 
     const deleteWorkflow = (workflowId) => {
-        //todo
-        console.log(`Delete workflow ${workflowId}!`);
+        if(deletingWorkflow){
+            return;
+        } else {
+            deleteWf(eventId, workflowId);
+        }
     }
 
     const openSubTab = (tabType, resourceType, id, someBool=false) => {
+        setHierarchy(tabType);
         //todo
         console.log(`Open Sub Tab ${tabType}, res: ${resourceType}, id: ${id}, ${someBool}`);
     }
@@ -335,7 +341,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     loadWorkflows: (eventId) => dispatch(fetchWorkflows(eventId)),
     updateWorkflow: (saveWorkflow, workflow) => dispatch(updateWorkflow(saveWorkflow, workflow)),
-    performWorkflowAction: (eventId, workflowId, action, close) => dispatch(performWorkflowAction(eventId, workflowId, action, close))
+    performWorkflowAction: (eventId, workflowId, action, close) => dispatch(performWorkflowAction(eventId, workflowId, action, close)),
+    deleteWf: (eventId, workflowId) => dispatch(deleteWorkflow(eventId, workflowId))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventDetailsWorkflowTab);
