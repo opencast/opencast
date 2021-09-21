@@ -9,11 +9,29 @@ import {
     saveCommentInProgress,
     saveCommentDone,
     saveCommentReplyInProgress,
-    saveCommentReplyDone, loadEventPublicationsInProgress, loadEventPublicationsSuccess, loadEventPublicationsFailure,
+    saveCommentReplyDone,
+    loadEventWorkflowsInProgress,
+    loadEventWorkflowsSuccess,
+    loadEventWorkflowsFailure,
+    setEventWorkflowDefinitions,
+    setEventWorkflow,
+    setEventWorkflowConfiguration,
+    doEventWorkflowActionInProgress,
+    doEventWorkflowActionSuccess,
+    doEventWorkflowActionFailure,
+    deleteEventWorkflowInProgress,
+    deleteEventWorkflowFailure,
+    deleteEventWorkflowSuccess,
+    loadEventPublicationsInProgress,
+    loadEventPublicationsSuccess,
+    loadEventPublicationsFailure,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {createPolicy} from "../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
+import {getBaseWorkflow, getWorkflow, getWorkflowDefinitions, getWorkflows} from "../selectors/eventDetailsSelectors";
+import {fetchWorkflowDef} from "./workflowThunks";
+import {getWorkflowDef} from "../selectors/workflowSelectors";
 import {logger} from "../utils/logger";
 
 // prepare http headers for posting to resources
@@ -25,6 +43,8 @@ const getHttpHeaders = () => {
     };
 }
 
+
+// thunks for access policies
 export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
 
     let headers = getHttpHeaders();
@@ -89,6 +109,9 @@ export const fetchHasActiveTransactions = (eventId) => async () => {
         logger.error(e);
     }
 }
+
+
+// thunks for comments
 
 export const fetchComments = (eventId) => async (dispatch) => {
     try {
@@ -176,6 +199,134 @@ export const deleteCommentReply = (eventId, commentId, replyId) => async () => {
         return false;
     }
 }
+
+
+// thunks for workflows
+
+export const fetchWorkflows = (eventId) => async (dispatch, getState) => {
+    try {
+        dispatch(loadEventWorkflowsInProgress());
+
+        // todo: show notification if there are active transactions
+        // dispatch(addNotification('warning', 'ACTIVE_TRANSACTION', -1, null, NOTIFICATION_CONTEXT));
+
+        const data = await axios.get(`admin-ng/event/${eventId}/workflows.json`);
+        const workflowsData = await data.data;
+
+        if(!!workflowsData.results){
+            const workflows = {
+                entries: workflowsData.results,
+                scheduling: false,
+                workflow: {
+                    id: "",
+                    description: ""
+                }
+            };
+
+            dispatch(loadEventWorkflowsSuccess(workflows));
+        } else {
+            const workflows = {
+                workflow: workflowsData,
+                scheduling: true,
+                entries: []
+            };
+
+            await dispatch(fetchWorkflowDef('event-details'));
+
+            const state = getState();
+
+            const workflowDefinitions = getWorkflowDef(state);
+
+            dispatch(setEventWorkflowDefinitions(workflows, workflowDefinitions));
+            dispatch(changeWorkflow(false));
+
+            dispatch(loadEventWorkflowsSuccess(workflows));
+        }
+    } catch (e) {
+        dispatch(loadEventWorkflowsFailure());
+        console.log(e);
+    }
+}
+
+const changeWorkflow = (saveWorkflow) => async (dispatch, getState) => {
+    const state = getState();
+    const workflow = getWorkflow(state);
+
+    if(!!workflow.workflowId){
+        dispatch(setEventWorkflowConfiguration(workflow));
+    } else {
+        dispatch(setEventWorkflowConfiguration(getBaseWorkflow(state)));
+    }
+    if(saveWorkflow){
+        saveWorkflowConfig();
+    }
+}
+
+export const updateWorkflow = (saveWorkflow, workflowId) => async (dispatch, getState) => {
+    const state = getState();
+    const workflowDefinitions = getWorkflowDefinitions(state);
+    const workflowDef = workflowDefinitions.find(def => def.id === workflowId);
+    await dispatch(setEventWorkflow({
+        workflowId: workflowId,
+        description: workflowDef.description,
+        configuration: workflowDef.configuration
+    }));
+    dispatch(changeWorkflow(saveWorkflow));
+}
+
+const saveWorkflowConfig = () => {
+    //todo
+}
+
+export const performWorkflowAction = (eventId, workflowId, action, close) => async (dispatch) => {
+    dispatch(doEventWorkflowActionInProgress());
+
+    let headers = {headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+    }};
+
+    let data = {
+        "action": action,
+        "id": eventId,
+        "wfId": workflowId
+    };
+
+    axios.put(`admin-ng/event/${eventId}/workflows/${workflowId}/action/${action}`, data, headers)
+        .then( response => {
+            dispatch(addNotification('success', 'EVENTS_PROCESSING_ACTION_' + action, -1, null, NOTIFICATION_CONTEXT));
+            close();
+            dispatch(doEventWorkflowActionSuccess());
+        })
+        .catch( response => {
+            dispatch(addNotification('error', 'EVENTS_PROCESSING_ACTION_NOT_' + action, -1, null, NOTIFICATION_CONTEXT));
+            dispatch(doEventWorkflowActionFailure());
+        });
+}
+
+export const deleteWorkflow = (eventId, workflowId) => async (dispatch, getState) => {
+    dispatch(deleteEventWorkflowInProgress());
+
+    axios.delete(`/admin-ng/event/${eventId}/workflows/${workflowId}`)
+        .then( response => {
+            dispatch(addNotification('success', 'EVENTS_PROCESSING_DELETE_WORKFLOW', -1, null, NOTIFICATION_CONTEXT));
+
+            const state = getState();
+            const workflows = getWorkflows(state);
+
+            if(!!workflows.entries){
+                dispatch(deleteEventWorkflowSuccess(workflows.entries.filter( wf => wf.id !== workflowId)));
+            } else {
+                dispatch(deleteEventWorkflowSuccess(workflows.entries));
+            }
+        })
+        .catch( response => {
+            dispatch(addNotification('error', 'EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED', -1, null, NOTIFICATION_CONTEXT));
+            dispatch(deleteEventWorkflowFailure());
+        });
+}
+
+
+// thunks for publications
 
 export const fetchEventPublications = eventId => async dispatch => {
     try {

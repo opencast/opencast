@@ -17,6 +17,7 @@ const RenderWorkflowConfig = (props) => {
     // Get html for configuration panel
     const configurationPanel = props.configuration_panel;
     const description = props.description;
+    const displayDescription = props.displayDescription;
 
     // Use sanitizer that sanitize html used in dangerouslySetInnerHTML
     // In order to it is protected against XSS attacks
@@ -47,7 +48,7 @@ const RenderWorkflowConfig = (props) => {
 
     return (
         <>
-            {description.length > 0 && (
+            {(displayDescription && description.length) > 0 && (
                 <div className="collapsible-box" style={descriptionBoxStyle}>
                     <div style={descriptionTextStyle}>{description}</div>
                 </div>

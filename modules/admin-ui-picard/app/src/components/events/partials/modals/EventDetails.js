@@ -1,10 +1,12 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import {connect} from "react-redux";
 import {getCurrentLanguageInformation} from "../../../../utils/utils";
 import EventDetailsCommentsTab from "../ModalTabsAndPages/EventDetailsCommentsTab";
 import EventDetailsAccessPolicyTab from "../ModalTabsAndPages/EventDetailsAccessPolicyTab";
+import EventDetailsWorkflowTab from "../ModalTabsAndPages/EventDetailsWorkflowTab";
+import EventDetailsWorkflowDetails from "../ModalTabsAndPages/EventDetailsWorkflowDetails";
 import EventDetailsPublicationTab from "../ModalTabsAndPages/EventDetailsPublicationTab";
 
 
@@ -14,11 +16,12 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manages the pages of the event details
  */
-const EventDetails = ({ tabIndex, eventId }) => {
+const EventDetails = ({ tabIndex, eventId, close }) => {
     const { t } = useTranslation();
 
 
     const [page, setPage] = useState(tabIndex);
+    const [workflowTabHierarchy, setWorkflowTabHierarchy] = useState("entry")
 
     const tabs = [
         {
@@ -72,6 +75,7 @@ const EventDetails = ({ tabIndex, eventId }) => {
     ];
 
     const openTab = (tabNr) => {
+        setWorkflowTabHierarchy("entry")
         setPage(tabNr);
     }
 
@@ -150,8 +154,20 @@ const EventDetails = ({ tabIndex, eventId }) => {
                                                  t={t}/>
                             )}
                             {page === 5 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
+                                workflowTabHierarchy === "entry" && (
+                                    <EventDetailsWorkflowTab
+                                        eventId={eventId}
+                                        header={tabs[page].bodyHeaderTranslation}
+                                        t={t}
+                                        close={close}
+                                        setHierarchy={setWorkflowTabHierarchy}/>
+                                )) || (
+                                workflowTabHierarchy === "workflow-details" && (
+                                    <EventDetailsWorkflowDetails
+                                        eventId={eventId}
+                                        t={t}
+                                        setHierarchy={setWorkflowTabHierarchy}/>
+                                )
                             )}
                             {page === 6 && (
                                 <EventDetailsAccessPolicyTab
@@ -185,12 +201,14 @@ const MockDataPage = ({ header, t }) => {
                         <header>{t(header)}</header>
                         {/* Table view containing input fields for metadata */}
                         <div className="obj-container">
-                            <table class="main-tbl">
-                                <tr>
-                                    <td>
-                                        <span>Content coming soon!</span>
-                                    </td>
-                                </tr>
+                            <table className="main-tbl">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span>Content coming soon!</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -203,7 +221,5 @@ const MockDataPage = ({ header, t }) => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
 });
-
-
 
 export default connect(mapStateToProps)(EventDetails);
