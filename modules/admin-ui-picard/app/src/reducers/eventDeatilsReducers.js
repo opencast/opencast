@@ -9,6 +9,9 @@ import {
     SAVE_COMMENT_DONE,
     SAVE_COMMENT_REPLY_IN_PROGRESS,
     SAVE_COMMENT_REPLY_DONE,
+    LOAD_EVENT_PUBLICATIONS_SUCCESS,
+    LOAD_EVENT_PUBLICATIONS_IN_PROGRESS,
+    LOAD_EVENT_PUBLICATIONS_FAILURE,
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
@@ -20,7 +23,9 @@ const initialState = {
     fetchingCommentsInProgress: false,
     comments: [],
     commentReasons: [],
-    eventId: ""
+    eventId: "",
+    loadingPublications: false,
+    publications: []
 }
 
 // Reducer for event details
@@ -67,6 +72,26 @@ const eventDetails = (state=initialState, action) => {
                 ...state,
                 fetchingCommentsInProgress: false
             };
+        }
+        case LOAD_EVENT_PUBLICATIONS_SUCCESS: {
+            const { publications } = payload;
+            return {
+                ...state,
+                loadingPublications: false,
+                publications: publications
+            }
+        }
+        case LOAD_EVENT_PUBLICATIONS_IN_PROGRESS: {
+            return {
+                ...state,
+                loadingPublications: true
+            }
+        }
+        case LOAD_EVENT_PUBLICATIONS_FAILURE: {
+            return {
+                ...state,
+                loadingPublications: false
+            }
         }
         case SAVE_COMMENT_IN_PROGRESS: {
             return {
