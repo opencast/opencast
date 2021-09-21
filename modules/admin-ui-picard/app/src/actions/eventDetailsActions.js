@@ -4,10 +4,14 @@ export const LOAD_EVENT_POLICIES_IN_PROGRESS = 'LOAD_EVENT_POLICIES_IN_PROGRESS'
 export const LOAD_EVENT_COMMENTS_SUCCESS = 'LOAD_EVENT_COMMENTS_SUCCESS';
 export const LOAD_EVENT_COMMENTS_FAILURE = 'LOAD_EVENT_COMMENTS_FAILURE';
 export const LOAD_EVENT_COMMENTS_IN_PROGRESS = 'LOAD_EVENT_COMMENTS_IN_PROGRESS';
+export const LOAD_EVENT_PUBLICATIONS_SUCCESS = 'LOAD_EVENT_PUBLICATIONS_SUCCESS';
+export const LOAD_EVENT_PUBLICATIONS_FAILURE = 'LOAD_EVENT_PUBLICATIONS_FAILURE';
+export const LOAD_EVENT_PUBLICATIONS_IN_PROGRESS = 'LOAD_EVENT_PUBLICATIONS_IN_PROGRESS';
 export const SAVE_COMMENT_DONE = 'SAVE_COMMENT_DONE';
 export const SAVE_COMMENT_IN_PROGRESS = 'SAVE_COMMENT_IN_PROGRESS';
 export const SAVE_COMMENT_REPLY_DONE = 'SAVE_COMMENT_REPLY_DONE';
 export const SAVE_COMMENT_REPLY_IN_PROGRESS = 'SAVE_COMMENT_REPLY_IN_PROGRESS';
+
 
 // Actions affecting fetching of event details from server
 
@@ -40,6 +44,21 @@ export const loadEventCommentsSuccess = ( comments, commentReasons ) => ({
 
 export const loadEventCommentsFailure = () => ({
     type: LOAD_EVENT_COMMENTS_FAILURE
+});
+
+export const loadEventPublicationsInProgress = () => ({
+    type: LOAD_EVENT_PUBLICATIONS_IN_PROGRESS
+});
+
+export const loadEventPublicationsSuccess = (publications) => ({
+    type: LOAD_EVENT_PUBLICATIONS_SUCCESS,
+    payload: {
+        publications
+    }
+});
+
+export const loadEventPublicationsFailure = () => ({
+    type: LOAD_EVENT_PUBLICATIONS_FAILURE
 });
 
 export const saveCommentInProgress = ( ) => ({

@@ -4,3 +4,4 @@ export const getCommentReasons = state => state.eventDetails.commentReasons;
 export const isFetchingComments = state => state.eventDetails.fetchingCommentsInProgress;
 export const isSavingComment = state => state.eventDetails.savingCommentInProgress;
 export const isSavingCommentReply = state => state.eventDetails.savingCommentReplyInProgress;
+export const getPublications = state => state.eventDetails.publications;

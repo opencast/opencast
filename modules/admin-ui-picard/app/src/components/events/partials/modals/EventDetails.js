@@ -5,6 +5,7 @@ import {connect} from "react-redux";
 import {getCurrentLanguageInformation} from "../../../../utils/utils";
 import EventDetailsCommentsTab from "../ModalTabsAndPages/EventDetailsCommentsTab";
 import EventDetailsAccessPolicyTab from "../ModalTabsAndPages/EventDetailsAccessPolicyTab";
+import EventDetailsPublicationTab from "../ModalTabsAndPages/EventDetailsPublicationTab";
 
 
 // Get info about the current language and its date locale
@@ -138,8 +139,7 @@ const EventDetails = ({ tabIndex, eventId }) => {
                                                  t={t}/>
                             )}
                             {page === 2 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
+                                <EventDetailsPublicationTab eventId={eventId} />
                             )}
                             {page === 3  && (
                                 <MockDataPage header={tabs[page].bodyHeaderTranslation}

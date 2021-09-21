@@ -9,7 +9,7 @@ import {
     saveCommentInProgress,
     saveCommentDone,
     saveCommentReplyInProgress,
-    saveCommentReplyDone,
+    saveCommentReplyDone, loadEventPublicationsInProgress, loadEventPublicationsSuccess, loadEventPublicationsFailure,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {createPolicy} from "../utils/resourceUtils";
@@ -174,5 +174,56 @@ export const deleteCommentReply = (eventId, commentId, replyId) => async () => {
     } catch (e) {
         logger.error(e);
         return false;
+    }
+}
+
+export const fetchEventPublications = eventId => async dispatch => {
+    try {
+        dispatch(loadEventPublicationsInProgress());
+
+        let data = await axios.get(`admin-ng/event/${eventId}/publications.json`);
+
+        let publications = (await data.data);
+
+        // get information about possible publication channels
+        data = await axios.get('admin-ng/resources/PUBLICATION.CHANNELS.json');
+
+        let publicationChannels = await data.data;
+
+        let now = new Date();
+
+        // fill publication objects with additional information
+        publications.publications.forEach(publication => {
+
+            publication.enabled =
+                !(publication.id === 'engage-live' &&
+                    (now < new Date(publications['start-date']) || now > new Date(publications['end-date'])));
+
+            if (publicationChannels[publication.id]) {
+                let channel = JSON.parse(publicationChannels[publication.id]);
+
+                if (channel.label) {
+                    publication.label = channel.label
+                }
+                if (channel.icon) {
+                    publication.icon = channel.icon;
+                }
+                if (channel.hide) {
+                    publication.hide = channel.hide;
+                }
+                if (channel.description) {
+                    publication.description = channel.description;
+                }
+                if (channel.order) {
+                    publication.order = channel.order;
+                }
+            }
+        });
+
+        dispatch(loadEventPublicationsSuccess(publications.publications));
+
+    } catch (e) {
+        dispatch(loadEventPublicationsFailure());
+        logger.error(e);
     }
 }
