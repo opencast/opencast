@@ -31,9 +31,8 @@ const Login = () => {
     const { t } = useTranslation();
     // State for opening (true) and closing (false) the dropdown menus for language
     const [displayMenuLang, setMenuLang] = useState(false);
+    const [isError, setError] = useState(false);
 
-    // TODO: This is only a placeholder. Implement actual error handling of login
-    let isError = false;
 
     let initialValues = {
         j_username: '',
@@ -70,7 +69,7 @@ const Login = () => {
             })
             .catch(response => {
                 logger.error(response);
-                isError = true;
+                setError(true);
             });
     }
 
