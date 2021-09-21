@@ -39,8 +39,6 @@ export const fetchWorkflowDef = (type) => async (dispatch) => {
 
         const workflows = response.workflows;
 
-        console.log(workflows)
-
         const workflowDef = {
             defaultWorkflowId: response.default_workflow_id,
             workflows: workflows
