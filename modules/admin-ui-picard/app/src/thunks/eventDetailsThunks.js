@@ -24,6 +24,7 @@ import {
     deleteEventWorkflowSuccess,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
+import {createPolicy} from "../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
 import {getBaseWorkflow, getWorkflow, getWorkflowDefinitions, getWorkflows} from "../selectors/eventDetailsSelectors";
 import {fetchWorkflowDef} from "./workflowThunks";
@@ -38,19 +39,8 @@ const getHttpHeaders = () => {
     };
 }
 
-// creates an empty policy with the role from the argument
-const createPolicy = (role) => {
-    return {
-        role: role,
-        read: false,
-        write: false,
-        actions: []
-    };
-};
-
 
 // thunks for access policies
-
 export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
 
     let headers = getHttpHeaders();
