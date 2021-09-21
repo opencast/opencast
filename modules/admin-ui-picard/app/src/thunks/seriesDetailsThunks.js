@@ -16,6 +16,7 @@ import {getSeriesDetailsMetadata, getSeriesDetailsThemeNames} from "../selectors
 import {transformToIdValueArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
+import {logger} from "../utils/logger";
 
 // fetch metadata of certain series from server
 export const fetchSeriesDetailsMetadata = id => async dispatch => {
@@ -69,6 +70,7 @@ export const fetchSeriesDetailsAcls = id => async dispatch => {
 
     } catch (e) {
         dispatch(loadSeriesDetailsFailure());
+        logger.error(e);
     }
 }
 
@@ -82,7 +84,7 @@ export const fetchSeriesDetailsFeeds = id => async dispatch => {
 
         const feedsResponse = await data.data;
 
-        console.log(feedsResponse);
+        logger.info(feedsResponse);
 
         let seriesFeeds = [];
         for (let i = 0; i < feedsResponse.length; i++) {
@@ -114,6 +116,7 @@ export const fetchSeriesDetailsFeeds = id => async dispatch => {
         dispatch(loadSeriesDetailsFeedsSuccess(seriesFeeds));
 
     } catch (e) {
+        logger.error(e);
         dispatch(loadSeriesDetailsFailure());
     }
 }
@@ -137,6 +140,7 @@ export const fetchSeriesDetailsTheme = id => async dispatch => {
 
         dispatch(loadSeriesDetailsThemeSuccess(seriesTheme));
     } catch (e) {
+        logger.error(e);
         dispatch(loadSeriesDetailsFailure());
     }
 }
@@ -197,7 +201,7 @@ export const updateSeriesMetadata = (id, values) => async (dispatch, getState) =
         };
         dispatch(setSeriesDetailsMetadata(seriesMetadata));
     } catch (e) {
-        console.log(e);
+        logger.error(e);
     }
 }
 
@@ -213,12 +217,12 @@ export const updateSeriesAccess = (id, policies) => async (dispatch) => {
         }
     })
         .then(res => {
-            console.log(res);
+            logger.info(res);
             dispatch(addNotification('info', 'SAVED_ACL_RULES', -1, null, NOTIFICATION_CONTEXT));
             return true;
         })
         .catch(res => {
-            console.log(res);
+            logger.error(res);
             dispatch(addNotification('error', 'ACL_NOT_SAVED', -1, null, NOTIFICATION_CONTEXT));
             return false;
         });
@@ -241,6 +245,6 @@ export const updateSeriesTheme = (id, values) => async (dispatch, getState) => {
             dispatch(setSeriesDetailsTheme(seriesTheme));
         })
         .catch(response => {
-            console.log(response);
+            logger.error(response);
         });
 }

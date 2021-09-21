@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {Formik} from "formik";
 import {useTranslation} from "react-i18next";
 import {initialFormValuesEditScheduledEvents} from "../../../../configs/modalConfig";
@@ -8,6 +8,8 @@ import EditScheduledEventsEditPage from "../ModalTabsAndPages/EditScheduledEvent
 import EditScheduledEventsSummaryPage from "../ModalTabsAndPages/EditScheduledEventsSummaryPage";
 import {updateScheduledEventsBulk} from "../../../../thunks/eventThunks";
 import {connect} from "react-redux";
+import {usePageFunctions} from "../../../../hooks/wizardHooks";
+import {logger} from "../../../../utils/logger";
 
 /**
  * This component manages the pages of the edit scheduled bulk action
@@ -17,8 +19,7 @@ const EditScheduledEventsModal = ({ close, updateScheduledEventsBulk }) => {
 
     const initialValues = initialFormValuesEditScheduledEvents;
 
-    const [page, setPage] = useState(0);
-    const [snapshot, setSnapshot] = useState(initialValues);
+    const [snapshot, page, nextPage, previousPage] = usePageFunctions(0, initialValues);
 
     const steps = [
         {
@@ -35,21 +36,11 @@ const EditScheduledEventsModal = ({ close, updateScheduledEventsBulk }) => {
         }
     ];
 
-    const nextPage = values => {
-        setSnapshot(values);
-        setPage(page + 1);
-    };
-
-    const previousPage = values => {
-        setSnapshot(values);
-        setPage(page - 1);
-    };
-
     const handleSubmit = values => {
         // Only update events if there are changes
         if (values.changedEvents.length > 0) {
             const response = updateScheduledEventsBulk(values);
-            console.log(response);
+            logger.info(response);
         }
         close();
     };

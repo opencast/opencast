@@ -1,5 +1,6 @@
 import axios from "axios";
 import {addNotification} from "./notificationThunks";
+import {logger} from "../utils/logger";
 
 export const postTasks = values => async dispatch => {
     let configuration = {};
@@ -27,10 +28,10 @@ export const postTasks = values => async dispatch => {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }).then(response => {
-        console.log(response);
+        logger.info(response);
         dispatch(addNotification('success', 'TASK_CREATED'));
     }).catch(response => {
-        console.log(response);
+        logger.error(response);
         dispatch(addNotification('error', 'TASK_NOT_CREATED'));
     });
 }

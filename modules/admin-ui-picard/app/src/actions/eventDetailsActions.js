@@ -11,6 +11,9 @@ export const LOAD_EVENT_POLICIES_IN_PROGRESS = 'LOAD_EVENT_POLICIES_IN_PROGRESS'
 export const LOAD_EVENT_COMMENTS_SUCCESS = 'LOAD_EVENT_COMMENTS_SUCCESS';
 export const LOAD_EVENT_COMMENTS_FAILURE = 'LOAD_EVENT_COMMENTS_FAILURE';
 export const LOAD_EVENT_COMMENTS_IN_PROGRESS = 'LOAD_EVENT_COMMENTS_IN_PROGRESS';
+export const LOAD_EVENT_PUBLICATIONS_SUCCESS = 'LOAD_EVENT_PUBLICATIONS_SUCCESS';
+export const LOAD_EVENT_PUBLICATIONS_FAILURE = 'LOAD_EVENT_PUBLICATIONS_FAILURE';
+export const LOAD_EVENT_PUBLICATIONS_IN_PROGRESS = 'LOAD_EVENT_PUBLICATIONS_IN_PROGRESS';
 export const SAVE_COMMENT_DONE = 'SAVE_COMMENT_DONE';
 export const SAVE_COMMENT_IN_PROGRESS = 'SAVE_COMMENT_IN_PROGRESS';
 export const SAVE_COMMENT_REPLY_DONE = 'SAVE_COMMENT_REPLY_DONE';
@@ -31,6 +34,7 @@ export const DELETE_EVENT_WORKFLOW_SUCCESS = 'DELETE_EVENT_WORKFLOW_SUCCESS';
 export const DELETE_EVENT_WORKFLOW_FAILURE = 'DELETE_EVENT_WORKFLOW_FAILURE';
 
 
+// Actions affecting fetching of event details from server
 
 // actions for access policies
 export const loadEventPoliciesInProgress = () => ({
@@ -79,6 +83,22 @@ export const saveCommentReplyInProgress = ( ) => ({
 
 export const saveCommentReplyDone = ( ) => ({
     type: SAVE_COMMENT_REPLY_DONE
+});
+
+// actions for publications
+export const loadEventPublicationsInProgress = () => ({
+    type: LOAD_EVENT_PUBLICATIONS_IN_PROGRESS
+});
+
+export const loadEventPublicationsSuccess = (publications) => ({
+    type: LOAD_EVENT_PUBLICATIONS_SUCCESS,
+    payload: {
+        publications
+    }
+});
+
+export const loadEventPublicationsFailure = () => ({
+    type: LOAD_EVENT_PUBLICATIONS_FAILURE
 });
 
 // actions for workflows

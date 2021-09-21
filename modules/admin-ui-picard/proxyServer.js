@@ -119,4 +119,14 @@ app.use(
         changeOrigin: true
     }));
 
-app.listen(port, () => console.log(`Listing on port ${port}`));
+app.use(
+    "/services",
+    createProxyMiddleware({
+        target: host,
+        headers: {
+            'X-Requested-Auth': 'Digest'
+        },
+        changeOrigin: true
+    }));
+
+app.listen(port, () => console.log(`Listening on port ${port}`));

@@ -15,6 +15,10 @@ import {loadThemesIntoTable} from "../../thunks/tableThunks";
 import Notifications from "../shared/Notifications";
 import NewResourceModal from "../shared/NewResourceModal";
 import {editTextFilter} from "../../actions/tableFilterActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 /**
  * This component renders the table view of events
@@ -36,7 +40,7 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
         resetTextFilter();
 
         // Load themes on mount
-        loadThemes().then(r => console.log(r));
+        loadThemes().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('themes');
@@ -60,15 +64,9 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
         setNewThemesModal(false);
     }
 
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
-
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
                 {/* Add theme button */}
                 <div className="btn-group">
@@ -113,6 +111,7 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
                 {/* Include table component */}
                 <Table templateMap={themesTemplateMap} />
             </div>
+            <Footer />
         </>
     );
 };

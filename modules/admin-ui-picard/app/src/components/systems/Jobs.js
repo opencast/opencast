@@ -17,6 +17,10 @@ import {fetchServers} from "../../thunks/serverThunks";
 import {fetchServices} from "../../thunks/serviceThunks";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 /**
  * This component renders the table view of jobs
@@ -61,7 +65,7 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
         resetTextFilter();
 
         // Load jobs on mount
-        loadJobs().then(r => console.log(r));
+        loadJobs().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('jobs');
@@ -77,15 +81,9 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
         setNavigation(!displayNavigation);
     }
 
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
-
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
 
                 {/* Include Burger-button menu*/}
@@ -127,6 +125,7 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
                 {/* Include table component */}
                 <Table templateMap={jobsTemplateMap} />
             </div>
+            <Footer />
         </>
     )
 

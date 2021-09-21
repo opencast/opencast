@@ -7,6 +7,7 @@ import EventDetailsCommentsTab from "../ModalTabsAndPages/EventDetailsCommentsTa
 import EventDetailsAccessPolicyTab from "../ModalTabsAndPages/EventDetailsAccessPolicyTab";
 import EventDetailsWorkflowTab from "../ModalTabsAndPages/EventDetailsWorkflowTab";
 import EventDetailsWorkflowDetails from "../ModalTabsAndPages/EventDetailsWorkflowDetails";
+import EventDetailsPublicationTab from "../ModalTabsAndPages/EventDetailsPublicationTab";
 
 
 // Get info about the current language and its date locale
@@ -142,8 +143,7 @@ const EventDetails = ({ tabIndex, eventId, close }) => {
                                                  t={t}/>
                             )}
                             {page === 2 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
+                                <EventDetailsPublicationTab eventId={eventId} />
                             )}
                             {page === 3  && (
                                 <MockDataPage header={tabs[page].bodyHeaderTranslation}

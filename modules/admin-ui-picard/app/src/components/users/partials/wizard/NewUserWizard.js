@@ -4,11 +4,12 @@ import {Formik} from "formik";
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import NewUserGeneralTab from "./NewUserGeneralTab";
-import NewUserRolesTab from "./NewUserRolesTab";
-import {NewUserSchema} from "../../../shared/wizard/validate";
+import UserRolesTab from "./UserRolesTab";
 import {initialFormValuesNewUser} from "../../../../configs/modalConfig";
 import {getUsernames} from "../../../../selectors/userSelectors";
 import {postNewUser} from "../../../../thunks/userThunks";
+import {NewUserSchema} from "../../../../utils/validate";
+import {logger} from "../../../../utils/logger";
 
 /**
  * This component renders the new user wizard
@@ -30,7 +31,7 @@ const NewUserWizard = ({ close, usernames, postNewUser }) => {
 
     const handleSubmit = values => {
         const response = postNewUser(values);
-        console.log(response);
+        logger.info(response);
         close();
     }
 
@@ -61,7 +62,7 @@ const NewUserWizard = ({ close, usernames, postNewUser }) => {
                             <NewUserGeneralTab formik={formik}/>
                         )}
                         {tab === 1 && (
-                            <NewUserRolesTab formik={formik}/>
+                            <UserRolesTab formik={formik}/>
                         )}
 
                         {/* Navigation buttons and validation */}
@@ -84,10 +85,12 @@ const NewUserWizard = ({ close, usernames, postNewUser }) => {
     )
 };
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     usernames: getUsernames(state)
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     postNewUser: values => dispatch(postNewUser(values))
 });

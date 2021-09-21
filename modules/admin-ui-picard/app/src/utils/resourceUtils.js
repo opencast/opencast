@@ -46,6 +46,40 @@ export const getURLParams = state => {
     return params;
 }
 
+// used for create URLSearchParams for API requests used to create/update user
+export const buildUserBody = values => {
+    let data = new URLSearchParams();
+    // fill form data with user inputs
+    data.append('username', values.username);
+    data.append('name', values.name);
+    data.append('email', values.email);
+    data.append('password', values.password);
+    data.append('roles', JSON.stringify(values.roles));
+
+    return data;
+}
+
+// used for create URLSearchParams for API requests used to create/update group
+export const buildGroupBody = values => {
+    let roles = [], users = [];
+
+    // fill form data depending on user inputs
+    let data = new URLSearchParams();
+    data.append('name', values.name);
+    data.append('description', values.description);
+
+    for(let i = 0 ; i < values.roles.length; i++) {
+        roles.push(values.roles[i].name);
+    }
+    for(let i = 0 ; i < values.users.length; i++) {
+        users.push(values.users[i].id);
+    }
+    data.append('roles', roles.join(','));
+    data.append('users', users.join(','));
+
+    return data;
+}
+
 // transform collection of metadata into object with name and value
 export const transformMetadataCollection = (metadata, noField) => {
     if (noField) {
@@ -182,6 +216,100 @@ export const prepareAccessPolicyRulesForPost = policies => {
     }
 
     return access;
+}
+
+// transform response data in form that is used in wizards and modals for policies (for each role one entry)
+export const transformAclTemplatesResponse = acl => {
+    let template = [];
+
+    for (let i = 0; acl.ace.length > i; i++) {
+        if (template.find(rule => rule.role === acl.ace[i].role)) {
+            for (let j = 0; template.length > j; j++) {
+                // Only update entry for policy if already added with other action
+                if(template[j].role === acl.ace[i].role) {
+                    if (acl.ace[i].action === "read") {
+                        template[j] = {
+                            ...template[j],
+                            read: acl.ace[i].allow
+                        }
+                        break;
+                    }
+                    if (acl.ace[i].action === "write") {
+                        template[j] = {
+                            ...template[j],
+                            write: acl.ace[i].allow
+                        }
+                        break;
+                    }
+                    if (acl.ace[i].action !== "read" && acl.ace[i].action !== "write"
+                        && acl.ace[i].allow === true) {
+                        template[j] = {
+                            ...template[j],
+                            actions: template[j].actions.concat(acl.ace[i].action)
+                        }
+                        break;
+                    }
+                }
+            }
+        } else {
+            // add policy if role not seen before
+            if (acl.ace[i].action === "read") {
+                template = template.concat({
+                    role: acl.ace[i].role,
+                    read: acl.ace[i].allow,
+                    write: false,
+                    actions: []
+                });
+            }
+            if (acl.ace[i].action === "write") {
+                template = template.concat({
+                    role: acl.ace[i].role,
+                    read: false,
+                    write: acl.ace[i].allow,
+                    actions: []
+                });
+            }
+            if (acl.ace[i].action !== "read" && acl.ace[i].action !== "write"
+                && acl.ace[i].allow === true) {
+                template = template.concat({
+                    role: acl.ace[i].role,
+                    read: false,
+                    write: false,
+                    actions: [acl.ace[i].action]
+                })
+            }
+        }
+    }
+
+    return template;
+}
+
+// build body for post/put request in theme context
+export const buildThemeBody = values => {
+    // fill form data depending on user inputs
+    let data = new URLSearchParams();
+    data.append('name', values.name);
+    data.append('description', values.description);
+    data.append('bumperActive', values.bumperActive);
+    if (values.bumperActive) {
+        data.append('bumperFile', values.bumperFile);
+    }
+    data.append('trailerActive', values.trailerActive);
+    if (values.trailerActive) {
+        data.append('trailerFile', values.trailerFile);
+    }
+    data.append('titleSlideActive', values.titleSlideActive);
+    if (values.titleSlideActive && values.titleSlideMode === 'upload') {
+        data.append('titleSlideBackground', values.titleSlideBackground);
+    }
+    data.append('licenseSlideActive', values.licenseSlideActive);
+    data.append('watermarkActive', values.watermarkActive);
+    if (values.watermarkActive) {
+        data.append('watermarkFile', values.watermarkFile);
+        data.append('watermarkPosition', values.watermarkPosition);
+    }
+
+    return data;
 }
 
 // creates an empty policy with the role from the argument

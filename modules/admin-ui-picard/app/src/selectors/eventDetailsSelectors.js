@@ -17,3 +17,6 @@ export const getWorkflow = state => state.eventDetails.workflows.workflow;
 export const getBaseWorkflow = state => state.eventDetails.baseWorkflow;
 export const performingWorkflowAction = state => state.eventDetails.workflowActionInProgress;
 export const deletingWorkflow = state => state.eventDetails.deleteWorkflowInProgress;
+
+/* selectors for publications */
+export const getPublications = state => state.eventDetails.publications;

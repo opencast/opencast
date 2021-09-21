@@ -13,10 +13,11 @@ import NewMetadataPage from "../ModalTabsAndPages/NewMetadataPage";
 import NewAccessPage from "../ModalTabsAndPages/NewAccessPage";
 import NewProcessingPage from "../ModalTabsAndPages/NewProcessingPage";
 import NewSourcePage from "../ModalTabsAndPages/NewSourcePage";
-import {NewEventSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
 import {sourceMetadata, uploadAssetOptions} from "../../../../configs/sourceConfig";
 import {initialFormValuesNewEvents} from "../../../../configs/modalConfig";
+import {NewEventSchema} from "../../../../utils/validate";
+import {logger} from "../../../../utils/logger";
 
 
 // Get info about the current language and its date locale
@@ -91,7 +92,7 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
 
     const handleSubmit = (values) => {
         const response = postNewEvent(values, metadataFields);
-        console.log(response);
+        logger.info(response);
         close();
     }
 

@@ -42,6 +42,6 @@
   ],
   "name": "Sales Team",
   "description": "members of the Sales team",
-  "id": "GROUP_SALES_TEAM",
+  "id": "sales_team",
   "users": []
 }

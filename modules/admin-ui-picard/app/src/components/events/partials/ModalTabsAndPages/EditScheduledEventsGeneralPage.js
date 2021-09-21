@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import {getSelectedRows} from "../../../../selectors/tableSelectors";
 import {connect} from "react-redux";
+import {useSelectionChanges} from "../../../../hooks/wizardHooks";
 
 /**
  * This component renders the table overview of selected events in edit scheduled events bulk action
@@ -10,8 +11,7 @@ import {connect} from "react-redux";
 const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
     const { t } = useTranslation();
 
-    const [allChecked, setAllChecked] = useState(true);
-    const [selectedEvents, setSelectedEvents] = useState(selectedRows);
+    const [selectedEvents, allChecked, onChangeSelected, onChangeAllSelected] = useSelectionChanges(formik, "events", selectedRows);
 
     useEffect(() => {
         // Set field value for formik on mount, because initially all events are selected
@@ -43,44 +43,6 @@ const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
         }
         return true;
     }
-
-    // Select or deselect all rows in table
-    const onChangeAllSelected = e => {
-        const selected = e.target.checked;
-        setAllChecked(selected);
-        let changedSelection = selectedEvents.map(event => {
-            return {
-                ...event,
-                selected: selected
-            }
-        });
-        setSelectedEvents(changedSelection);
-        formik.setFieldValue('events', changedSelection);
-    };
-
-    // Handle change of checkboxes indicating which events to consider further
-    const onChangeSelected = (e, id) => {
-        const selected = e.target.checked;
-        let changedEvents = selectedEvents.map(event => {
-            if (event.id === id) {
-                return {
-                    ...event,
-                    selected: selected
-                }
-            } else {
-                return event
-            }
-        });
-        setSelectedEvents(changedEvents);
-        formik.setFieldValue('events', changedEvents);
-
-        if (!selected) {
-            setAllChecked(false);
-        }
-        if (changedEvents.every(event => event.selected === true)) {
-            setAllChecked(true);
-        }
-    };
 
     // Check validity for activating next button
     const checkValidity = () => {

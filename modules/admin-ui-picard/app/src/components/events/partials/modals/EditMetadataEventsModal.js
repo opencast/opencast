@@ -10,6 +10,7 @@ import cn from "classnames";
 import RenderField from "../../../shared/wizard/RenderField";
 import {postEditMetadata, updateBulkMetadata} from "../../../../thunks/eventThunks";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
+import {logger} from "../../../../utils/logger";
 
 
 // Get info about the current language and its date locale
@@ -53,7 +54,7 @@ const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata}) => 
 
     const handleSubmit = values => {
         const response = updateBulkMetadata(metadataFields, values);
-        console.log(response);
+        logger.info(response);
         close();
     };
 

@@ -1,7 +1,8 @@
 import {loadThemesFailure, loadThemesInProgress, loadThemesSuccess} from "../actions/themeActions";
-import {getURLParams} from "../utils/resourceUtils";
+import {buildThemeBody, getURLParams} from "../utils/resourceUtils";
 import axios from "axios";
 import {addNotification} from "./notificationThunks";
+import {logger} from "../utils/logger";
 
 // fetch themes from server
 export const fetchThemes = () => async (dispatch, getState) => {
@@ -25,28 +26,7 @@ export const fetchThemes = () => async (dispatch, getState) => {
 // post new theme to backend
 export const postNewTheme = values => async dispatch => {
 
-    // fill form data depending on user inputs
-    let data = new URLSearchParams();
-    data.append('name', values.name);
-    data.append('description', values.description);
-    data.append('bumperActive', values.bumperActive);
-    if (values.bumperActive) {
-        data.append('bumperFile', values.bumperFile.id);
-    }
-    data.append('trailerActive', values.trailerActive);
-    if (values.trailerActive) {
-        data.append('trailerFile', values.trailerFile.id);
-    }
-    data.append('titleSlideActive', values.titleSlideActive);
-    if (values.titleSlideActive && values.titleSlideMode === 'upload') {
-        data.append('titleSlideBackground', values.titleSlideBackground.id);
-    }
-    data.append('licenseSlideActive', values.licenseSlideActive);
-    data.append('watermarkActive', values.watermarkActive);
-    if (values.watermarkActive) {
-        data.append('watermarkFile', values.watermarkFile.id);
-        data.append('watermarkPosition', values.watermarkPosition);
-    }
+    let data = buildThemeBody(values);
 
     // POST request
     axios.post('/admin-ng/themes', data, {
@@ -54,21 +34,21 @@ export const postNewTheme = values => async dispatch => {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
     }).then(response => {
-        console.log(response);
+        logger.info(response);
         dispatch(addNotification('success', 'THEME_CREATED'));
     }).catch(response => {
-        console.log(response);
+        logger.error(response);
         dispatch(addNotification('error', 'THEME_NOT_CREATED'));
     });
 };
 
 export const deleteTheme = id => async dispatch => {
     axios.delete(`/admin-ng/themes/${id}`).then(res => {
-        console.log(res);
+        logger.info(res);
         // add success notification
         dispatch(addNotification('success', 'THEME_DELETED'));
     }).catch(res => {
-        console.log(res);
+        logger.error(res);
         // add error notification
         dispatch(addNotification('error', 'THEME_NOT_DELETED'));
     })

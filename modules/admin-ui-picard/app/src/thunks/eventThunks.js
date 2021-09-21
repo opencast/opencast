@@ -18,6 +18,7 @@ import {getTimezoneOffset, makeTwoDigits} from "../utils/utils";
 import {sourceMetadata, uploadAssetOptions} from "../configs/sourceConfig";
 import {NOTIFICATION_CONTEXT, weekdays, WORKFLOW_UPLOAD_ASSETS_NON_TRACK} from "../configs/modalConfig";
 import {addNotification} from "./notificationThunks";
+import {logger} from "../utils/logger";
 
 
 
@@ -60,7 +61,7 @@ export const fetchEvents = () => async (dispatch, getState) => {
         dispatch(loadEventsSuccess(events));
     } catch (e) {
         dispatch(loadEventsFailure());
-        console.log(e);
+        logger.error(e);
     }
 }
 
@@ -77,7 +78,7 @@ export const fetchEventMetadata = () => async dispatch => {
         dispatch(loadEventMetadataSuccess(metadata));
     } catch (e) {
         dispatch(loadEventMetadataFailure());
-        console.log(e);
+        logger.error(e);
     }
 };
 
@@ -140,11 +141,11 @@ export const updateBulkMetadata = (metadataFields, values) => async dispatch => 
         }
     })
         .then(res => {
-            console.log(res);
+            logger.info(res);
             dispatch(addNotification('success', 'BULK_METADATA_UPDATE.ALL_EVENTS_UPDATED'));
         })
         .catch(err => {
-            console.log(err);
+            logger.error(err);
             // if an internal server error occurred, then backend sends further information
             if (err.status === 500) {
                 // backend should send data containing further information about occurred internal error
@@ -324,11 +325,11 @@ export const postNewEvent = (values, metadataInfo) => async dispatch => {
             }
         }
     ).then(response => {
-        console.log(response);
+        logger.info(response);
         dispatch(addNotification('success', 'EVENTS_CREATED'));
 
     }).catch(response => {
-        console.log(response);
+        logger.error(response);
         dispatch(addNotification('error', 'EVENTS_NOT_CREATED'));
     });
 
@@ -367,11 +368,11 @@ export const deleteMultipleEvent = events => async dispatch => {
 
     axios.post('/admin-ng/event/deleteEvents', data)
         .then(res => {
-            console.log(res);
+            logger.info(res);
             //add success notification
             dispatch(addNotification('success', 'EVENTS_DELETED'));
         }).catch(res => {
-        console.log(res);
+        logger.error(res);
         //add error notification
         dispatch(addNotification('error', 'EVENTS_NOT_DELETED'));
     });
@@ -455,13 +456,13 @@ export const checkForSchedulingConflicts = events =>  async dispatch => {
     let response = [];
 
     axios.post('/admin-ng/event/bulk/conflicts', formData)
-        .then(res => console.log(res))
+        .then(res => logger.info(res))
         .catch(res => {
             if (res.status === 409) {
                 dispatch(addNotification('error', 'CONFLICT_BULK_DETECTED', -1, null, NOTIFICATION_CONTEXT));
                 response = res.data;
             }
-            console.log(res);
+            logger.error(res);
         });
 
     return response;
@@ -523,11 +524,11 @@ export const updateScheduledEventsBulk = values => async dispatch => {
 
     axios.put('/admin-ng/event/bulk/update', formData)
         .then(res => {
-            console.log(res);
+            logger.info(res);
             dispatch(addNotification('success', 'EVENTS_UPDATED_ALL'));
         })
         .catch(res => {
-            console.log(res);
+            logger.error(res);
             dispatch(addNotification('error', 'EVENTS_NOT_UPDATED'));
         });
 };

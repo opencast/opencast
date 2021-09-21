@@ -20,7 +20,10 @@ import {
     DO_EVENT_WORKFLOW_ACTION_FAILURE,
     DELETE_EVENT_WORKFLOW_IN_PROGRESS,
     DELETE_EVENT_WORKFLOW_SUCCESS,
-    DELETE_EVENT_WORKFLOW_FAILURE
+    DELETE_EVENT_WORKFLOW_FAILURE,
+    LOAD_EVENT_PUBLICATIONS_SUCCESS,
+    LOAD_EVENT_PUBLICATIONS_IN_PROGRESS,
+    LOAD_EVENT_PUBLICATIONS_FAILURE,
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
@@ -49,7 +52,9 @@ const initialState = {
     workflowDefinitions: [],
     baseWorkflow: {},
     workflowActionInProgress: false,
-    deleteWorkflowInProgress: false
+    deleteWorkflowInProgress: false,
+    loadingPublications: false,
+    publications: []
 }
 
 // Reducer for event details
@@ -96,6 +101,26 @@ const eventDetails = (state=initialState, action) => {
                 ...state,
                 fetchingCommentsInProgress: false
             };
+        }
+        case LOAD_EVENT_PUBLICATIONS_SUCCESS: {
+            const { publications } = payload;
+            return {
+                ...state,
+                loadingPublications: false,
+                publications: publications
+            }
+        }
+        case LOAD_EVENT_PUBLICATIONS_IN_PROGRESS: {
+            return {
+                ...state,
+                loadingPublications: true
+            }
+        }
+        case LOAD_EVENT_PUBLICATIONS_FAILURE: {
+            return {
+                ...state,
+                loadingPublications: false
+            }
         }
         case SAVE_COMMENT_IN_PROGRESS: {
             return {

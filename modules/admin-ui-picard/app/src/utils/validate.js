@@ -74,32 +74,24 @@ export const NewSeriesSchema = [Yup.object().shape({
 export const NewThemeSchema = [Yup.object().shape({
     name: Yup.string().required('Required')
 }), Yup.object().shape({
-    bumperFile: Yup.object().when('bumperActive', {
+    bumperFile: Yup.string().when('bumperActive', {
         is: true,
-        then: Yup.object().shape({
-            id: Yup.string().required('Required')
-        })
+        then: Yup.string().required('Required')
     })
 }), Yup.object().shape({
-    trailerFile: Yup.object().when('trailerActive', {
+    trailerFile: Yup.string().when('trailerActive', {
         is: true,
-        then: Yup.object().shape({
-            id: Yup.string().required('Required')
-        })
+        then: Yup.string().required('Required')
     })
 }), Yup.object().shape({
-    titleSlideBackground: Yup.object().when('titleSlideMode', {
+    titleSlideBackground: Yup.string().when('titleSlideMode', {
         is: 'upload',
-        then: Yup.object().shape({
-            id: Yup.string().required('Required')
-        })
+        then: Yup.string().required('Required')
     })
 }), Yup.object().shape({
-    watermarkFile: Yup.object().when('watermarkActive', {
+    watermarkFile: Yup.string().when('watermarkActive', {
         is: true,
-        then: Yup.object().shape({
-            id: Yup.string().required('Required')
-        })
+        then: Yup.string().required('Required')
     })
 })];
 
@@ -127,3 +119,19 @@ export const NewUserSchema = usernames => (
         passwordConfirmation: Yup.string()
             .oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required')
 }));
+
+// Validation Schema used in user details modal
+export const EditUserSchema = Yup.object().shape({
+    name: Yup.string().required('Required'),
+    email: Yup.string().email().required('Required'),
+    passwordConfirmation: Yup.string().when('password', {
+        is: value => !!value,
+        then: Yup.string()
+            .oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required')
+    })
+});
+
+// Validation Schema used in group details modal
+export const EditGroupSchema = Yup.object().shape({
+    name: Yup.string().required('Required')
+});

@@ -1,6 +1,7 @@
 import {loadFiltersSuccess, loadFiltersFailure, loadFiltersInProgress, loadStats} from '../actions/tableFilterActions';
 import axios from "axios";
 import {relativeDateSpanToFilterValue} from "../utils/dateUtils";
+import {logger} from "../utils/logger";
 /**
 * This file contains methods/thunks used to query the REST-API of Opencast to get the filters of a certain resource type.
 * This information is used to filter the entries of the table in the main view.
@@ -11,80 +12,10 @@ export const fetchFilters = resource => async dispatch => {
     try {
         dispatch(loadFiltersInProgress());
 
-        let response;
+        const data = await axios.get(`admin-ng/resources/${resource}/filters.json`);
+        const resourceData = await data.data;
 
-        switch (resource) {
-            case 'events': {
-                const data = await axios.get('admin-ng/resources/events/filters.json');
-                const eventsData =  await data.data;
-
-                response = transformResponse(eventsData);
-                break;
-            }
-            case 'series': {
-                const data = await axios.get('admin-ng/resources/series/filters.json');
-                const seriesData =  await data.data;
-
-                response = transformResponse(seriesData);
-                break;
-            }
-            case 'recordings': {
-                const data = await axios.get('admin-ng/resources/recordings/filters.json');
-                const recordingsData = await data.data;
-
-                response = transformResponse(recordingsData);
-                break;
-            }
-            case 'jobs': {
-                const data = await axios.get('admin-ng/resources/jobs/filters.json');
-                const jobsData = await data.data;
-
-                response = transformResponse(jobsData);
-                break;
-            }
-            case 'servers': {
-                const data = await axios.get('admin-ng/resources/servers/filters.json');
-                const serversData = await data.data;
-
-                response = transformResponse(serversData);
-                break;
-            }
-            case 'services': {
-                const data = await axios.get('admin-ng/resources/services/filters.json');
-                const servicesData = await data.data;
-
-                response = transformResponse(servicesData);
-                break;
-            }
-            case 'users': {
-                const data = await axios.get('admin-ng/resources/users/filters.json');
-                const usersData = await data.data;
-
-                response = transformResponse(usersData);
-                break;
-            }
-            case 'groups': {
-                const data = await axios.get('admin-ng/resources/groups/filters.json');
-                const groupsData = await data.data;
-
-                response = transformResponse(groupsData);
-                break;
-            }
-            case 'acls': {
-                const data = await axios.get('admin-ng/resources/acls/filters.json');
-                const aclsData = await data.data;
-
-                response = transformResponse(aclsData);
-                break;
-            }
-            case 'themes': {
-                const data = await axios.get('admin-ng/resources/themes/filters.json');
-                const themesData = await data.data;
-
-                response = transformResponse(themesData);
-                break;
-            }
-        }
+        let response = transformResponse(resourceData);
 
         const filters = response
         const filtersList = Object.keys(filters.filters).map(key => {
@@ -95,7 +26,7 @@ export const fetchFilters = resource => async dispatch => {
         dispatch(loadFiltersSuccess(filtersList));
     } catch (e) {
         dispatch(loadFiltersFailure());
-        console.log(e);
+        logger.error(e);
     }
 }
 
@@ -150,7 +81,7 @@ export const fetchStats = () => async dispatch => {
         dispatch(loadStats(stats));
 
     } catch (e) {
-        console.log(e);
+        logger.error(e);
     }
 }
 
@@ -181,7 +112,7 @@ function transformResponse(data) {
             });
             filters[key].options = filterArr;
         }
-    } catch (e) {  console.log(e.message);}
+    } catch (e) {  logger.error(e.message);}
 
     return {filters: filters};
 }

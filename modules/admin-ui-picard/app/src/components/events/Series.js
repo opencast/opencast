@@ -18,6 +18,10 @@ import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import {getTotalSeries, isShowActions} from "../../selectors/seriesSeletctor";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 
 
@@ -62,7 +66,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         resetTextFilter();
 
         // Load series on mount
-        loadSeries().then(r => console.log(r));
+        loadSeries().then(r => logger.info(r));
 
         // Load series filters
         loadingFilters("series");
@@ -111,14 +115,9 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         setDeleteSeriesModal(false);
     };
 
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
                 {/*TODO: include with role ROLE_UI_SERIES_CREATE */}
                 <div className="btn-group">
@@ -192,6 +191,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                 </div>
                 <Table templateMap={seriesTemplateMap} />
             </div>
+            <Footer />
         </>
     )
 }

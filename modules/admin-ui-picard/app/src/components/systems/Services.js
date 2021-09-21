@@ -17,6 +17,10 @@ import {fetchServers} from "../../thunks/serverThunks";
 import {getTotalServices} from "../../selectors/serviceSelector";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 /**
  * This component renders the table view of services
@@ -61,7 +65,7 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
         resetTextFilter();
 
         // Load services on mount
-        loadServices().then(r => console.log(r));
+        loadServices().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('services');
@@ -77,15 +81,9 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
         setNavigation(!displayNavigation);
     }
 
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
-
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
 
                 {/* Include Burger-button menu*/}
@@ -127,6 +125,7 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
                 {/* Include table component */}
                 <Table templateMap={servicesTemplateMap} />
             </div>
+            <Footer />
         </>
     );
 }

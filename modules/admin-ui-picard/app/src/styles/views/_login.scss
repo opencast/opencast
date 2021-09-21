@@ -24,6 +24,16 @@
 // ----------------------------------
 //
 
+.login-body {
+    background: $body-background;
+    font-size: 14px;
+    font-family: $font-stack;
+    position: relative;
+    height: inherit;
+    color: $global-text-color;
+    @include radial-gradient($off-white, #d8dfe4);
+}
+
 .login-container {
     $width: 490px;
     background: #fff;
@@ -36,13 +46,16 @@
     position: relative;
     top: 150px;
 
-    .login-form form {
-        box-sizing: border-box;
-        float: right;
-        margin: 0px 70px 0px 0px;
-        display: inline-block;
-        width: 350px;
-        padding: 35px 0;
+    .login-form {
+
+        .formik-container {
+            box-sizing: border-box;
+            float: right;
+            margin: 0px 70px 0px 0px;
+            display: inline-block;
+            width: 350px;
+            padding: 35px 0;
+        }
 
         input {
             margin: 0;

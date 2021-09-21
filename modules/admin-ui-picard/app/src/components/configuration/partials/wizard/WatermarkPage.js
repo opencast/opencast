@@ -6,9 +6,10 @@ import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButt
 import FileUpload from "../../../shared/wizard/FileUpload";
 
 /**
- * This component renders the watermark page for new themes in the new themes wizard.
+ * This component renders the watermark page for new themes in the new themes wizard
+ * and for themes in themes details modal.
  */
-const WatermarkPage = ({ formik, nextPage, previousPage }) => {
+const WatermarkPage = ({ formik, nextPage, previousPage, isEdit }) => {
     const { t } = useTranslation();
 
     const handleButtonClick = position => {
@@ -48,15 +49,18 @@ const WatermarkPage = ({ formik, nextPage, previousPage }) => {
                                     <header>{t('CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD')}</header>
                                     <div className="obj-container padded">
                                         <FileUpload acceptableTypes="image/*"
-                                                    formikField="watermarkFile"
+                                                    fileId="watermarkFile"
+                                                    fileName="watermarkFileName"
+                                                    formik={formik}
                                                     buttonKey="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD_BUTTON"
                                                     labelKey="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD_LABEL"
-                                                    descriptionKey="CONFIGURATION.THEMES.DETAILS.WATERMARK.FILEUPLOAD_DESCRIPTION" />
+                                                    descriptionKey="CONFIGURATION.THEMES.DETAILS.WATERMARK.FILEUPLOAD_DESCRIPTION"
+                                                    isEdit={isEdit}/>
                                     </div>
                                 </div>
 
                                 {/*if file uploaded, then render buttons for choice of position*/}
-                                {formik.values.watermarkFile.id && (
+                                {formik.values.watermarkFile && (
                                     <div className="obj">
                                         <header>{t('CONFIGURATION.THEMES.DETAILS.WATERMARK.POSITION')}</header>
                                         <div className="obj-container padded">
@@ -95,10 +99,13 @@ const WatermarkPage = ({ formik, nextPage, previousPage }) => {
                     </div>
                 </div>
             </div>
-            {/* Button for navigation to next page */}
-            <WizardNavigationButtons formik={formik}
-                                     previousPage={previousPage}
-                                     nextPage={nextPage}/>
+            {/* Show navigation buttons only if page is used for a new theme*/}
+            {!isEdit && (
+                //Button for navigation to next page
+                <WizardNavigationButtons formik={formik}
+                                         previousPage={previousPage}
+                                         nextPage={nextPage}/>
+            )}
         </>
     );
 };

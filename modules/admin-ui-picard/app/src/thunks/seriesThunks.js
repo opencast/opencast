@@ -16,6 +16,7 @@ import {
 } from "../utils/resourceUtils";
 import {transformToIdValueArray, transformToObjectArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
+import {logger} from "../utils/logger";
 
 
 // fetch series from server
@@ -35,7 +36,7 @@ export const fetchSeries = () => async (dispatch, getState) => {
 
    } catch (e) {
        dispatch(loadSeriesFailure());
-       console.log(e);
+       logger.error(e);
    }
 }
 
@@ -52,7 +53,7 @@ export const fetchSeriesMetadata = () => async dispatch => {
        dispatch(loadSeriesMetadataSuccess(metadata));
     } catch (e) {
         dispatch(loadSeriesFailure());
-        console.log(e);
+        logger.error(e);
     }
 }
 
@@ -70,7 +71,7 @@ export const fetchSeriesThemes = () => async dispatch => {
         dispatch(loadSeriesThemesSuccess(themes));
     } catch (e) {
         dispatch(loadSeriesThemesFailure());
-        console.log(e);
+        logger.error(e);
     }
 
 };
@@ -115,10 +116,10 @@ export const postNewSeries = (values, metadataInfo) => async dispatch => {
             }
         }
     ).then(response => {
-        console.log(response);
+        logger.info(response);
         dispatch(addNotification('success', 'SERIES_ADDED'));
     }).catch(response => {
-        console.log(response);
+        logger.error(response);
         dispatch(addNotification('error', 'SERIES_NOT_SAVED'));
     });
 
@@ -128,11 +129,11 @@ export const postNewSeries = (values, metadataInfo) => async dispatch => {
 export const deleteSeries = id => async dispatch => {
     // API call for deleting a series
     axios.delete(`/admin-ng/series/${id}`).then(res => {
-        console.log(res);
+        logger.info(res);
         // add success notification
         dispatch(addNotification('success', 'SERIES_DELETED'));
     }).catch(res => {
-        console.log(res);
+        logger.error(res);
         // add error notification
         dispatch(addNotification('error', 'SERIES_NOT_DELETED'));
     });
@@ -150,11 +151,11 @@ export const deleteMultipleSeries = series => async dispatch => {
     }
 
     axios.post('/admin-ng/series/deleteSeries', data).then(res => {
-        console.log(res);
+        logger.info(res);
         //add success notification
         dispatch(addNotification('success', 'SERIES_DELETED'));
     }).catch(res => {
-        console.log(res);
+        logger.error(res);
         //add error notification
         dispatch(addNotification('error', 'SERIES_NOT_DELETED'));
     });

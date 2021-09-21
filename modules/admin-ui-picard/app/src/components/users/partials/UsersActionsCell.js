@@ -3,14 +3,17 @@ import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteUser} from "../../../thunks/userThunks";
+import UserDetailsModal from "./modal/UserDetailsModal";
+import {fetchUserDetails} from "../../../thunks/userDetailsThunks";
 
 /**
  * This component renders the action cells of users in the table view
  */
-const UsersActionCell = ({ row, deleteUser }) => {
+const UsersActionCell = ({ row, deleteUser, fetchUserDetails }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
+    const [displayUserDetails, setUserDetails] = useState(false);
 
     const hideDeleteConfirmation = () => {
         setDeleteConfirmation(false);
@@ -20,13 +23,27 @@ const UsersActionCell = ({ row, deleteUser }) => {
         deleteUser(id);
     };
 
+    const showUserDetails = async () => {
+        await fetchUserDetails(row.username);
+
+        setUserDetails(true);
+    };
+
+    const hideUserDetails = () => {
+      setUserDetails(false);
+    };
+
     return (
         <>
-            {/*TODO: When user details are implemented, remove placeholder */}
             {/*TODO: with-Role */}
-            <a onClick={() => onClickPlaceholder()}
+            <a onClick={() => showUserDetails()}
                className="more"
                title={t('USERS.USERS.TABLE.TOOLTIP.DETAILS')}/>
+
+            {displayUserDetails && (
+                <UserDetailsModal close={hideUserDetails}
+                                  username={row.username} />
+            )}
 
             {row.manageable ? (
                 // TODO: with-Role
@@ -49,14 +66,10 @@ const UsersActionCell = ({ row, deleteUser }) => {
     );
 }
 
-//todo: remove if not needed anymore
-const onClickPlaceholder = () => {
-    console.log("In the Future here opens an other component, which is not implemented yet");
-}
-
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    deleteUser: (id) => dispatch(deleteUser(id))
+    deleteUser: (id) => dispatch(deleteUser(id)),
+    fetchUserDetails: username => dispatch(fetchUserDetails(username))
 });
 
 export default connect(null, mapDispatchToProps)(UsersActionCell);

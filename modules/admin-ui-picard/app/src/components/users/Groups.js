@@ -18,6 +18,10 @@ import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 /**
  * This component renders the table view of groups
@@ -63,7 +67,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
         resetTextFilter();
 
         // Load groups on mount
-        loadGroups().then(r => console.log(r));
+        loadGroups().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('groups');
@@ -87,15 +91,9 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
         setNewGroupModal(false);
     };
 
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
-
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
 
                 {/* Add group button */}
@@ -151,6 +149,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
                 {/* Include table component */}
                 <Table templateMap={groupsTemplateMap} />
             </div>
+            <Footer />
         </>
     );
 

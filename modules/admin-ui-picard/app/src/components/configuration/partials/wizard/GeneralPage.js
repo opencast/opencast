@@ -5,11 +5,18 @@ import {Field} from "formik";
 import WizardNavigationButtons from "../../../shared/wizard/WizardNavigationButtons";
 
 /**
- * This component renders the general page for new themes in the new themes wizard.
+ * This component renders the general page for new themes in the new themes wizard
+ * and for themes in the themes details modal.
  * Here, additional information, like name, for themes can be provided.
  */
-const GeneralPage = ({ formik, nextPage }) => {
+const GeneralPage = ({ formik, nextPage, isEdit }) => {
     const { t } = useTranslation();
+
+    // Style used in themes details modal
+    const editStyle = {
+        color: '#666666',
+        fontSize: '14px'
+    }
 
     return (
         <>
@@ -20,7 +27,7 @@ const GeneralPage = ({ formik, nextPage }) => {
                         <div className="form-container">
                             <div className="row">
                                 <Notifications />
-                                <label className="required">
+                                <label className="required" style={isEdit && editStyle}>
                                     {t('CONFIGURATION.THEMES.DETAILS.GENERAL.NAME')}
                                 </label>
                                 <Field name="name"
@@ -28,7 +35,7 @@ const GeneralPage = ({ formik, nextPage }) => {
                                        placeholder={t('CONFIGURATION.THEMES.DETAILS.GENERAL.NAME') + '...'} />
                             </div>
                             <div className="row">
-                                <label>{t('CONFIGURATION.THEMES.DETAILS.GENERAL.DESCRIPTION')}</label>
+                                <label style={isEdit && editStyle}>{t('CONFIGURATION.THEMES.DETAILS.GENERAL.DESCRIPTION')}</label>
                                 <Field name="description"
                                        as="textarea"
                                        placeholder={t('CONFIGURATION.THEMES.DETAILS.GENERAL.DESCRIPTION') + '...'}/>
@@ -38,10 +45,13 @@ const GeneralPage = ({ formik, nextPage }) => {
                 </div>
             </div>
 
-            {/* Button for navigation to next page */}
-            <WizardNavigationButtons isFirst
-                                     formik={formik}
-                                     nextPage={nextPage}/>
+            {/* Show navigation buttons only if page is used for a new theme*/}
+            {!isEdit && (
+                //Button for navigation to next page
+                <WizardNavigationButtons isFirst
+                                         formik={formik}
+                                         nextPage={nextPage}/>
+            )}
         </>
     );
 };

@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {useTranslation} from "react-i18next";
 import {DateTimePicker} from "@material-ui/pickers";
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import cn from "classnames";
+import {useClickOutsideField} from "../../../hooks/wizardHooks";
 
 
 const childRef = React.createRef();
@@ -11,28 +12,7 @@ const childRef = React.createRef();
  */
 const RenderField = ({ field, metadataField, form, showCheck=false }) => {
     // Indicator if currently edit mode is activated
-    const [editMode, setEditMode] = useState(false);
-
-    useEffect(() => {
-        // Handle click outside the field and leave edit mode
-        const handleClickOutside = e => {
-            if(childRef.current && !childRef.current.contains(e.target)) {
-                setEditMode(false);
-            }
-        }
-
-        // Focus current field
-        if (childRef && childRef.current && editMode === true) {
-            childRef.current.focus();
-        }
-
-        // Adding event listener for detecting click outside
-        window.addEventListener('mousedown', handleClickOutside);
-
-        return () => {
-            window.removeEventListener('mousedown', handleClickOutside);
-        }
-    }, [editMode]);
+    const [editMode, setEditMode] = useClickOutsideField(childRef);
 
     // Handle key down event and check if pressed key leads to leaving edit mode
     const handleKeyDown = (event, type) => {

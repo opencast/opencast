@@ -1,19 +1,24 @@
-import React, {useState} from "react";
+import React from "react";
 import {connect} from "react-redux";
 import {Formik} from "formik";
-import {NewAclSchema} from "../../../shared/wizard/validate";
 import WizardStepper from "../../../shared/wizard/WizardStepper";
-import NewAclMetadataPage from "./NewAclMetadataPage";
-import NewAclAccessPage from "./NewAclAccessPage";
+import AclMetadataPage from "./AclMetadataPage";
 import NewAclSummaryPage from "./NewAclSummaryPage";
 import {postNewAcl} from "../../../../thunks/aclThunks";
 import {initialFormValuesNewAcl} from "../../../../configs/modalConfig";
+import {usePageFunctions} from "../../../../hooks/wizardHooks";
+import {NewAclSchema} from "../../../../utils/validate";
+import {logger} from "../../../../utils/logger";
+import AclAccessPage from "./AclAccessPage";
 
+
+/**
+ * This component manages the pages of the new ACL wizard
+ */
 const NewAclWizard = ({ close, postNewAcl }) => {
     const initialValues = initialFormValuesNewAcl;
 
-    const [page, setPage] = useState(0);
-    const [snapshot, setSnapshot] = useState(initialValues);
+    const [snapshot, page, nextPage, previousPage] = usePageFunctions(0, initialValues);
 
     const steps = [
         {
@@ -32,19 +37,10 @@ const NewAclWizard = ({ close, postNewAcl }) => {
 
     const currentValidationSchema = NewAclSchema[page];
 
-    const nextPage = values => {
-        setSnapshot(values);
-        setPage(page + 1);
-    }
-
-    const previousPage = values => {
-        setSnapshot(values);
-        setPage(page - 1);
-    }
 
     const handleSubmit = values => {
         const response = postNewAcl(values);
-        console.log(response);
+        logger.info(response);
         close();
     }
 
@@ -61,11 +57,11 @@ const NewAclWizard = ({ close, postNewAcl }) => {
                 {formik => (
                     <div>
                         {page === 0 && (
-                            <NewAclMetadataPage formik={formik}
-                                                nextPage={nextPage}/>
+                            <AclMetadataPage formik={formik}
+                                             nextPage={nextPage}/>
                         )}
                         {page === 1 && (
-                            <NewAclAccessPage formik={formik}
+                            <AclAccessPage formik={formik}
                                               nextPage={nextPage}
                                               previousPage={previousPage}/>
                         )}

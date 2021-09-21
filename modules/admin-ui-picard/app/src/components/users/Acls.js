@@ -18,13 +18,17 @@ import {fetchAcls} from "../../thunks/aclThunks";
 import {getTotalAcls} from "../../selectors/aclSelectors";
 import {editTextFilter} from "../../actions/tableFilterActions";
 import {setOffset} from "../../actions/tableActions";
+import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
+import {logger} from "../../utils/logger";
+import Header from "../Header";
+import Footer from "../Footer";
 
 /**
  * This component renders the table view of acls
  */
 const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
-                    loadingUsers, loadingUsersIntoTable, loadingGroups,
-                    loadingGroupsIntoTable, resetTextFilter, resetOffset }) => {
+                  loadingUsers, loadingUsersIntoTable, loadingGroups,
+                  loadingGroupsIntoTable, resetTextFilter, resetOffset }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewAclModal, setNewAclModal] = useState(false);
@@ -63,7 +67,7 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
         resetTextFilter();
 
         // Load acls on mount
-        loadAcls().then(r => console.log(r));
+        loadAcls().then(r => logger.info(r));
 
         // Load filters
         loadingFilters('acls');
@@ -87,15 +91,9 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
         setNewAclModal(false);
     }
 
-    const styleNavOpen = {
-        marginLeft: '130px',
-    };
-    const styleNavClosed = {
-        marginLeft: '20px',
-    };
-
     return (
         <>
+            <Header />
             <section className="action-nav-bar">
 
                 {/* Add acl button */}
@@ -151,6 +149,7 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                 {/* Include table component */}
                 <Table templateMap={aclsTemplateMap} />
             </div>
+            <Footer />
         </>
     );
 };

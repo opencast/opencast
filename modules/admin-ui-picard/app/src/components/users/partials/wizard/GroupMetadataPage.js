@@ -4,11 +4,12 @@ import {useTranslation} from "react-i18next";
 import {Field} from "formik";
 
 /**
- * This component renders the metadata page for new groups in the new groups wizard
+ * This component renders the metadata page for groups in the new groups wizard and group details modal
  */
-const NewGroupMetadataPage = ({ nextPage, formik }) => {
+const GroupMetadataPage = ({ nextPage, formik, isEdit }) => {
 
     const { t } = useTranslation();
+
 
     return(
         <>
@@ -17,10 +18,9 @@ const NewGroupMetadataPage = ({ nextPage, formik }) => {
                 <div className="modal-body">
                     <div className="form-container">
                         <div className="row">
-                           <label className="required">{t('USERS.GROUPS.DETAILS.FORM.NAME')}</label>
+                           <label>{t('USERS.GROUPS.DETAILS.FORM.NAME')}<i className="required">*</i></label>
                             <Field tabIndex="1"
                                    type="text"
-                                   focushere
                                    placeholder={t('USERS.GROUPS.DETAILS.FORM.NAME')}
                                    name="name"/>
                         </div>
@@ -35,12 +35,15 @@ const NewGroupMetadataPage = ({ nextPage, formik }) => {
                 </div>
             </div>
 
-            {/* Button for navigation to next page */}
-            <WizardNavigationButtons isFirst
-                                     formik={formik}
-                                     nextPage={nextPage}/>
+            {!isEdit && (
+                //{/* Button for navigation to next page */}
+                <WizardNavigationButtons isFirst
+                                         formik={formik}
+                                         nextPage={nextPage}/>
+            )}
+
         </>
     );
 };
 
-export default NewGroupMetadataPage;
+export default GroupMetadataPage;
