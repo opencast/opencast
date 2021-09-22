@@ -213,7 +213,7 @@ public class ServerEndpoint {
         continue;
       }
 
-      if (!filters.getOrDefault(KEY_NODE_NAME, server.nodeName).equalsIgnoreCase(server.nodeName)) {
+      if (!StringUtils.equalsIgnoreCase(filters.getOrDefault(KEY_NODE_NAME, server.nodeName), server.nodeName)) {
         continue;
       }
 
