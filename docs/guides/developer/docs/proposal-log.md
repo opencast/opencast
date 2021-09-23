@@ -102,6 +102,8 @@ be deprecated 4 (Four) next releases of Opencast.
 - This proposal is only for the external API
 
 ```
+Example of deprecation policy:
+![deprecation-api-policy](img/api-depr-example.png)
 
 ### Release Notes
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Tue, 26 Jan 2021
