@@ -48,6 +48,7 @@ Please make sure to compare your configuration against the current configuration
   now specified as a string in the TOML file and not as a separate file (usually `acl.xml`) anymore. Finally,
   the variables passed into the Mustache ACL template have changed. For more information, see
   [this document](https://github.com/elan-ev/opencast-studio/blob/2020-09-14/CONFIGURATION.md).
+- In larger installations: raise the Java memory limits in `/usr/share/opencast/bin/setenv` and `/etc/elasticsearch/jvm.options`
 
 
 Install and configure a standalone Elasticsearch node
