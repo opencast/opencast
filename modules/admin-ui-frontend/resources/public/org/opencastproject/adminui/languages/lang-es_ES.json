@@ -428,7 +428,7 @@
             "LAST_NAME": "Apellido(s)",
             "STREET": "Calle",
             "NUMBER": "Número",
-            "ADDITIONAL_ADDRESS_INFO": "Agregar información de la dirección ",
+            "ADDITIONAL_ADDRESS_INFO": "Agregar información Adicional de la dirección ",
             "MAIL": "E-Mail",
             "CONTACT_ME": "Contactar conmigo para actualizaciones y problemas de seguridad",
             "WHICH_DATA_TO_SHARE": "¿Qué quieres compartir?",
@@ -619,7 +619,7 @@
             "NOCONTENT": "No hay información disponible",
             "PUBLISHED": "Publicado",
             "WEEKDAY": "Día de la semana",
-            "ADMINUI_NOTES": "Notes",
+            "ADMINUI_NOTES": "Notas",
             "TOOLTIP": {
                "ASSETS": "Abrir los detalles del recurso",
                "START": "Filtrar para esta fecha de inicio",
@@ -909,7 +909,7 @@
                   "WRONG_SERIES_PUBLICATION": "Serie o canal de publicación incorrectos",
                   "WRONG_WORKFLOW": "Flujo de trabajo incorrecto",
                   "PROCESSING_FAILURE": "Fallo en el procesamiento",
-                  "ADMINUI_NOTES": "Notes in Admin UI"
+                  "ADMINUI_NOTES": "Notas en la interfaz de usuario del administrador"
                }
             },
             "STATISTICS": {
