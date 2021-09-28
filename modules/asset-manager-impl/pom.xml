@@ -218,10 +218,6 @@
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>de.empulse.eclipselink</groupId>
-        <artifactId>staticweave-maven-plugin</artifactId>
-      </plugin>
       <!--
         - http://pitest.org/quickstart/maven/
         - run with mvn org.pitest:pitest-maven:mutationCoverage
