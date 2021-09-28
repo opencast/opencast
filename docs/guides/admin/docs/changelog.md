@@ -4,6 +4,48 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.3
+
+*Released on September 15th, 2021*
+
+- [[#2982](https://github.com/opencast/opencast/pull/2982)] -
+  Fix display of more than 20 workflows in admin interface
+- [[#2971](https://github.com/opencast/opencast/pull/2971)] -
+  Editor on admin node
+- [[#2970](https://github.com/opencast/opencast/pull/2970)] -
+  Fix ICLA Test
+- [[#2969](https://github.com/opencast/opencast/pull/2969)] -
+  Only allow access with write permissions
+- [[#2968](https://github.com/opencast/opencast/pull/2968)] -
+  Fix isActive check for workflows
+- [[#2967](https://github.com/opencast/opencast/pull/2967)] -
+  Prevent workflows from running in parallel on the same event
+- [[#2964](https://github.com/opencast/opencast/pull/2964)] -
+  ActiveMQ configuration needs an update
+- [[#2963](https://github.com/opencast/opencast/pull/2963)] -
+  Fix issue with duplicate entries in role list
+- [[#2960](https://github.com/opencast/opencast/pull/2960)] -
+  Fix SQL query in static file authorization by using `true` instead of `1` for bool comparison
+- [[#2955](https://github.com/opencast/opencast/pull/2955)] -
+  userTrackingSaverPlugin wrongly invoke PUT request
+- [[#2948](https://github.com/opencast/opencast/pull/2948)] -
+  Standalone editor REST endpoints configuration updated
+- [[#2947](https://github.com/opencast/opencast/pull/2947)] -
+  Improve `security-jwt` tests
+- [[#2944](https://github.com/opencast/opencast/pull/2944)] -
+  Fix Dependency Documentation
+- [[#2943](https://github.com/opencast/opencast/pull/2943)] -
+  Revert "Remove Series Service from Authorization Service"
+- [[#2941](https://github.com/opencast/opencast/pull/2941)] -
+  Opencast 10.2 Release Notes
+- [[#2923](https://github.com/opencast/opencast/pull/2923)] -
+  Fix Solr Metadata Field
+- [[#2914](https://github.com/opencast/opencast/pull/2914)] -
+  Metadata to ACL Operation
+- [[#2593](https://github.com/opencast/opencast/pull/2593)] -
+  Use UTF-8 for config files
+
+
 ### Opencast 10.2
 
 *Released on August 18th, 2021*

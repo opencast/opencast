@@ -32,7 +32,6 @@ import static org.easymock.EasyMock.reset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
@@ -166,9 +165,10 @@ public class JWTLoginTest {
   @Test
   public void testLoginWithCache() {
     Object username;
+    String jwt = generator.generateValidSymmetricJWT();
 
     username = authFilter.getPreAuthenticatedPrincipal(
-        mockRequest(generator.generateValidSymmetricJWT())
+        mockRequest(jwt)
     );
     assertEquals(username, generator.getUsername());
 
@@ -176,7 +176,7 @@ public class JWTLoginTest {
     reset(userReferenceProvider);
 
     username = authFilter.getPreAuthenticatedPrincipal(
-        mockRequest(generator.generateValidSymmetricJWT())
+        mockRequest(jwt)
     );
     assertEquals(username, generator.getUsername());
   }
@@ -270,13 +270,12 @@ public class JWTLoginTest {
   @Test
   public void testLoginWithInvalidRequestHeader() {
     authFilter.setPrincipalRequestHeader("XY");
-    Exception exception = assertThrows(
+    assertThrows(
         PreAuthenticatedCredentialsNotFoundException.class,
         () -> authFilter.getPreAuthenticatedPrincipal(
             mockRequest(generator.generateExpiredSymmetricJWT())
         )
     );
-    assertTrue(exception.getMessage().startsWith("XY header not found in request"));
   }
 
   @Test

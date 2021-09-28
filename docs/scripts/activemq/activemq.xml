@@ -64,20 +64,8 @@
         <destinationInterceptors>
           <virtualDestinationInterceptor>
             <virtualDestinations>
-              <compositeQueue name="ACL.QUEUE">
-                <forwardTo>
-                  <queue physicalName="ACL.Adminui" />
-                  <queue physicalName="ACL.Externalapi" />
-                </forwardTo>
-              </compositeQueue>
-            </virtualDestinations>
-          </virtualDestinationInterceptor>
-          <virtualDestinationInterceptor>
-            <virtualDestinations>
               <compositeQueue name="ASSETMANAGER.QUEUE">
                 <forwardTo>
-                  <queue physicalName="ASSETMANAGER.Adminui" />
-                  <queue physicalName="ASSETMANAGER.Externalapi" />
                   <queue physicalName="ASSETMANAGER.Conductor" />
                   <queue physicalName="ASSETMANAGER.Liveschedule" />
                 </forwardTo>
@@ -86,30 +74,8 @@
           </virtualDestinationInterceptor>
           <virtualDestinationInterceptor>
             <virtualDestinations>
-              <compositeQueue name="COMMENT.QUEUE">
-                <forwardTo>
-                  <queue physicalName="COMMENT.Adminui" />
-                  <queue physicalName="COMMENT.Externalapi" />
-                </forwardTo>
-              </compositeQueue>
-            </virtualDestinations>
-          </virtualDestinationInterceptor>
-          <virtualDestinationInterceptor>
-            <virtualDestinations>
-              <compositeQueue name="GROUP.QUEUE">
-                <forwardTo>
-                  <queue physicalName="GROUP.Adminui" />
-                  <queue physicalName="GROUP.Externalapi" />
-                </forwardTo>
-              </compositeQueue>
-            </virtualDestinations>
-          </virtualDestinationInterceptor>
-          <virtualDestinationInterceptor>
-            <virtualDestinations>
               <compositeQueue name="SCHEDULER.QUEUE">
                 <forwardTo>
-                  <queue physicalName="SCHEDULER.Adminui" />
-                  <queue physicalName="SCHEDULER.Externalapi" />
                   <queue physicalName="SCHEDULER.Liveschedule" />
                 </forwardTo>
               </compositeQueue>
@@ -119,29 +85,7 @@
             <virtualDestinations>
               <compositeQueue name="SERIES.QUEUE">
                 <forwardTo>
-                  <queue physicalName="SERIES.Adminui" />
                   <queue physicalName="SERIES.Conductor" />
-                  <queue physicalName="SERIES.Externalapi" />
-                </forwardTo>
-              </compositeQueue>
-            </virtualDestinations>
-          </virtualDestinationInterceptor>
-          <virtualDestinationInterceptor>
-            <virtualDestinations>
-              <compositeQueue name="THEME.QUEUE">
-                <forwardTo>
-                  <queue physicalName="THEME.Adminui" />
-                  <queue physicalName="THEME.Externalapi" />
-                </forwardTo>
-              </compositeQueue>
-            </virtualDestinations>
-          </virtualDestinationInterceptor>
-          <virtualDestinationInterceptor>
-            <virtualDestinations>
-              <compositeQueue name="WORKFLOW.QUEUE">
-                <forwardTo>
-                  <queue physicalName="WORKFLOW.Adminui" />
-                  <queue physicalName="WORKFLOW.Externalapi" />
                 </forwardTo>
               </compositeQueue>
             </virtualDestinations>

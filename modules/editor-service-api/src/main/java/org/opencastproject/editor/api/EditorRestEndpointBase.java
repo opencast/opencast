@@ -24,6 +24,7 @@ package org.opencastproject.editor.api;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -81,6 +82,8 @@ public abstract class EditorRestEndpointBase {
       }
     } catch (EditorServiceException e) {
       return checkErrorState(mediaPackageId, e);
+    } catch (UnauthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity("No write access to this event.").build();
     }
   }
 
