@@ -452,6 +452,14 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
+  public List<EventCatalogUIAdapter> getExtendedEventCatalogUIAdapters() {
+    List<EventCatalogUIAdapter> catalogUiAdapters = new ArrayList<>(
+            getEventCatalogUIAdapters(securityService.getOrganization().getId()));
+    catalogUiAdapters.remove(getCommonEventCatalogUIAdapter());
+    return catalogUiAdapters;
+  }
+
+  @Override
   public List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters() {
     return new LinkedList<>(getSeriesCatalogUIAdapters(securityService.getOrganization().getId()));
   }
