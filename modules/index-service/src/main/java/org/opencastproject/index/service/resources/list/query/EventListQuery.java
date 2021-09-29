@@ -89,16 +89,16 @@ public class EventListQuery extends ResourceListQueryImpl {
 
   public EventListQuery() {
     super();
-    this.availableFilters.add(createSeriesFilter(Option.<String> none()));
-    this.availableFilters.add(createPresentersFilter(Option.<String> none()));
-    this.availableFilters.add(createTechnicalPresentersFilter(Option.<String> none()));
-    this.availableFilters.add(createContributorsFilter(Option.<String> none()));
-    this.availableFilters.add(createLocationFilter(Option.<String> none()));
-    this.availableFilters.add(createAgentFilter(Option.<String> none()));
-    this.availableFilters.add(createStartDateFilter(Option.<Tuple<Date, Date>> none()));
-    this.availableFilters.add(createStatusFilter(Option.<String> none()));
-    this.availableFilters.add(createCommentsFilter(Option.<String> none()));
-    this.availableFilters.add(createPublisherFilter(Option.<String> none()));
+    this.availableFilters.add(createSeriesFilter(Option.none()));
+    this.availableFilters.add(createPresentersFilter(Option.none()));
+    this.availableFilters.add(createTechnicalPresentersFilter(Option.none()));
+    this.availableFilters.add(createContributorsFilter(Option.none()));
+    this.availableFilters.add(createLocationFilter(Option.none()));
+    this.availableFilters.add(createAgentFilter(Option.none()));
+    this.availableFilters.add(createStartDateFilter(Option.none()));
+    this.availableFilters.add(createStatusFilter(Option.none()));
+    this.availableFilters.add(createCommentsFilter(Option.none()));
+    this.availableFilters.add(createPublisherFilter(Option.none()));
   }
 
   /**
