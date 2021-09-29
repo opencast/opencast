@@ -90,15 +90,11 @@ public class EventListQuery extends ResourceListQueryImpl {
   public EventListQuery() {
     super();
     this.availableFilters.add(createSeriesFilter(Option.none()));
-    this.availableFilters.add(createPresentersFilter(Option.none()));
-    this.availableFilters.add(createTechnicalPresentersFilter(Option.none()));
-    this.availableFilters.add(createContributorsFilter(Option.none()));
     this.availableFilters.add(createLocationFilter(Option.none()));
     this.availableFilters.add(createAgentFilter(Option.none()));
     this.availableFilters.add(createStartDateFilter(Option.none()));
     this.availableFilters.add(createStatusFilter(Option.none()));
     this.availableFilters.add(createCommentsFilter(Option.none()));
-    this.availableFilters.add(createPublisherFilter(Option.none()));
   }
 
   /**
@@ -403,7 +399,7 @@ public class EventListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<Tuple<Date, Date>> createStartDateFilter(Option<Tuple<Date, Date>> period) {
     return FiltersUtils.generateFilter(period, FILTER_STARTDATE_NAME, FILTER_STARTDATE_LABEL, SourceType.PERIOD,
-            Option.some(EventsListProvider.START_DATE));
+            Option.none());
   }
 
   /**
