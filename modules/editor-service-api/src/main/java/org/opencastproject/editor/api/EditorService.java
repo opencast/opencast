@@ -21,6 +21,8 @@
 
 package org.opencastproject.editor.api;
 
+import org.opencastproject.security.api.UnauthorizedException;
+
 /**
  * Api for the Editor Service
  */
@@ -34,7 +36,7 @@ public interface EditorService {
   /**
    * Provide information to edit video and audio data relevant to the given mediaPackageId
    */
-  EditingData getEditData(String mediaPackageId) throws EditorServiceException;
+  EditingData getEditData(String mediaPackageId) throws EditorServiceException, UnauthorizedException;
 
   /**
    * Store information about edited data relevant to the given mediaPackageId

@@ -69,4 +69,8 @@ public interface SearchResultItem {
    *            or if the dublincore catalog can not be parsed
    */
   DublinCoreCatalog getSeriesDublinCore() throws OaiPmhDatabaseException;
+
+  List<String> getSetSpecs();
+
+  void addSetSpec(String setSpec);
 }

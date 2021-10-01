@@ -37,7 +37,12 @@ public final class StatisticsUtil {
   private StatisticsUtil() {
   }
 
-  public static List<Instant> getBuckets(final Instant from, final Instant to, final DataResolution resolution, final ZoneId zoneId) {
+  public static List<Instant> getBuckets(
+      final Instant from,
+      final Instant to,
+      final DataResolution resolution,
+      final ZoneId zoneId
+  ) {
     final List<Instant> result = new ArrayList<>();
     LocalDateTime localStart = LocalDateTime.ofInstant(from, zoneId);
     final LocalDateTime localEnd = LocalDateTime.ofInstant(to, zoneId);
@@ -53,7 +58,8 @@ public final class StatisticsUtil {
           final Instant currentYearStart = YearMonth.of(localStart.getYear(), 1)
                   .atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
           result.add(Ordering.natural().max(from, currentYearStart));
-          localStart = localStart.plusYears(1).withMonth(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+          localStart = localStart.plusYears(1).withMonth(1)
+              .withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
           break;
         case DAILY:
           final Instant currentDayStart = localStart.withHour(0).withMinute(0).withSecond(0).withNano(0)

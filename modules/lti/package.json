@@ -4,24 +4,24 @@
   "private": true,
   "homepage": "/ltitools",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.35",
-    "@fortawesome/free-solid-svg-icons": "^5.15.3",
-    "@fortawesome/react-fontawesome": "^0.1.14",
-    "axios": "^0.21.1",
-    "bootstrap": "^5.0.1",
-    "i18next": "^20.3.0",
-    "i18next-browser-languagedetector": "^6.1.1",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.15",
+    "axios": "^0.21.2",
+    "bootstrap": "^5.1.1",
+    "i18next": "^21.1.1",
+    "i18next-browser-languagedetector": "^6.1.2",
     "iframe-resizer": "^4.3.2",
-    "query-string": "^7.0.0",
+    "query-string": "^7.0.1",
     "react": "^17.0.2",
-    "react-bootstrap": "^1.6.0",
+    "react-bootstrap": "^1.6.3",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
-    "react-i18next": "^11.8.15",
+    "react-i18next": "^11.12.0",
     "react-js-pagination": "^3.0.2",
     "react-scripts": "^4.0.3",
     "react-select": "^4.3.1",
-    "typescript": "3.9.9"
+    "typescript": "4.4.3"
   },
   "scripts": {
     "i18n": "./copy-translations.sh",
@@ -64,12 +64,12 @@
   },
   "devDependencies": {
     "http-mock-server": "^0.5.2",
-    "@types/jest": "26.0.23",
-    "@types/node": "15.6.0",
-    "@types/react": "17.0.6",
-    "@types/react-dom": "17.0.5",
-    "@types/react-helmet": "^6.1.1",
-    "@types/react-js-pagination": "^3.0.3",
-    "@types/react-select": "^4.0.15"
+    "@types/jest": "27.0.1",
+    "@types/node": "16.10.1",
+    "@types/react": "17.0.20",
+    "@types/react-dom": "17.0.9",
+    "@types/react-helmet": "^6.1.2",
+    "@types/react-js-pagination": "^3.0.4",
+    "@types/react-select": "^4.0.17"
   }
 }

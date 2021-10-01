@@ -56,8 +56,12 @@ import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
@@ -87,7 +91,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -115,13 +121,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
 
 
-//@Component(
-//        property = {
-//                "service.description=Editor Service"
-//        },
-//        immediate = true,
-//        service =  { EditorService.class }
-//)
+@Component(
+    property = {
+        "service.description=Editor Service"
+    },
+    immediate = true,
+    service = EditorService.class
+)
 public class EditorServiceImpl implements EditorService {
 
   /** The module specific logger */
@@ -143,6 +149,8 @@ public class EditorServiceImpl implements EditorService {
   private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
   private Workspace workspace;
+  private AuthorizationService authorizationService;
+
 
   private MediaPackageElementFlavor smilCatalogFlavor;
   private String previewVideoSubtype;
@@ -168,36 +176,49 @@ public class EditorServiceImpl implements EditorService {
 
   private final Set<String> smilCatalogTagSet = new HashSet<>();
 
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference
   void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
 
+  @Reference
   void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
+  @Reference
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference
   void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
 
+  @Reference
   void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
+  @Reference
   public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
     this.searchIndex = adminUISearchIndex;
   }
 
+  @Reference
   public void setIndexService(IndexService index) {
     this.index = index;
+  }
+
+  @Reference
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
   }
 
   public MediaPackageElementFlavor getSmilCatalogFlavor() {
@@ -609,10 +630,16 @@ public class EditorServiceImpl implements EditorService {
   }
 
   @Override
-  public EditingData getEditData(final String mediaPackageId) throws EditorServiceException {
-    // Select tracks
+  public EditingData getEditData(final String mediaPackageId) throws EditorServiceException, UnauthorizedException {
+
     Event event = getEvent(mediaPackageId);
     MediaPackage mp = getMediaPackage(event);
+
+    if (!isAdmin() && !authorizationService.hasPermission(mp, "write")) {
+      throw new UnauthorizedException("User has no write access to this event");
+    }
+
+    boolean workflowActive = WorkflowUtil.isActive(event.getWorkflowState());
 
     final Opt<Publication> internalPubOpt = getInternalPublication(mp);
     if (internalPubOpt.isNone() || internalPubOpt.isEmpty()) {
@@ -676,7 +703,22 @@ public class EditorServiceImpl implements EditorService {
     }).collect(Collectors.toList());
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName());
+            event.getSeriesId(), event.getSeriesName(), workflowActive);
+  }
+
+
+  private boolean isAdmin() {
+    final User currentUser = securityService.getUser();
+
+    // Global admin
+    if (currentUser.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)) {
+      return true;
+    }
+
+    // Organization admin
+    final Organization currentOrg = securityService.getOrganization();
+    return currentUser.getOrganization().getId().equals(currentOrg.getId())
+            && currentUser.hasRole(currentOrg.getAdminRole());
   }
 
   private MediaPackage getMediaPackage(Event event) throws EditorServiceException {

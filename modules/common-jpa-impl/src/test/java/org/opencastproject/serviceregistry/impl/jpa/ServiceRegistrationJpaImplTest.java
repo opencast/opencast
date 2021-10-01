@@ -90,8 +90,8 @@ public class ServiceRegistrationJpaImplTest {
 
   @Test
   public void testQueryStatistics() throws Exception {
-    HostRegistrationJpaImpl host = new HostRegistrationJpaImpl("http://localhost:8081", "http://localhost:8081", "Admin", 1024L,
-            1, 1, true, false);
+    HostRegistrationJpaImpl host = new HostRegistrationJpaImpl(
+        "http://localhost:8081", "http://localhost:8081", "Admin", 1024L, 1, 1, true, false);
     ServiceRegistrationJpaImpl serviceReg = new ServiceRegistrationJpaImpl(host, "NOP", "/nop", false);
 
     Date now = new Date();
@@ -104,7 +104,7 @@ public class ServiceRegistrationJpaImplTest {
 
     /* find the job created at 'now' should reveal exactly one job */
     List<Object> statistic = env.tx(
-      Queries.named.findAll("ServiceRegistration.statistics",
+        Queries.named.findAll("ServiceRegistration.statistics",
         P.p2("minDateCreated", now), P.p2("maxDateCreated", now)));
 
     Object[] stats = (Object[]) statistic.get(0);
@@ -125,13 +125,13 @@ public class ServiceRegistrationJpaImplTest {
 
   }
 
- @Test
- public void testToString() throws Exception {
-   Job newJob = new JobImpl(3L, "test", "test_org", 0L, "simple", "do", null, DISPATCHING, "localhost",
+  @Test
+  public void testToString() throws Exception {
+    Job newJob = new JobImpl(3L, "test", "test_org", 0L, "simple", "do", null, DISPATCHING, "localhost",
             "remotehost", null, null, null, 100L, 200L, "result", 3L, 1L, true, null, 1.5F);
-   JpaJob jpaJob = JpaJob.from(newJob);
-   String jobString = "Job {id:3, operation:do, status:DISPATCHING}";
-   assertEquals(jpaJob.toString(), jobString);
- }
+    JpaJob jpaJob = JpaJob.from(newJob);
+    String jobString = "Job {id:3, operation:do, status:DISPATCHING}";
+    assertEquals(jpaJob.toString(), jobString);
+  }
 
 }

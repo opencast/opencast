@@ -1,7 +1,7 @@
 Partial Import Operation
 ========================
 
-ID: `animate`
+ID: `partial-import`
 
 
 Description
@@ -64,7 +64,9 @@ records three sources:
 
 While the capture agent internally triggers the recording for all sources at the same time, the actual recording of the
 individual sources might not necessarily start at the exact same time, e.g. due to latency of the recording
-devices.</br> Also, while recording, a watch dog in our example capture agent recognizes that for whatever reason, the
+devices.
+
+Also, while recording, a watch dog in our example capture agent recognizes that for whatever reason, the
 recording of the sources had stopped and restarted again several times - resulting in multiple audio and/or video files
 per source.
 
@@ -305,6 +307,6 @@ profile.encode.partial-import.output = audiovisual
 profile.encode.partial-import.suffix = -editor.mp4
 profile.encode.partial-import.mimetype = video/mp4
 profile.encode.partial-import.ffmpeg.command = -i #{in.video.path} \
-  -filter:v fps=25 -shortest -c:v libx264 -preset superfast -pix_fmt yuv420p -crf 18 -c:a aac -b:a 196k \
+  -filter:v crop=trunc(iw/2)*2:trunc(ih/2)*2,fps=25 -shortest -c:v libx264 -preset superfast -pix_fmt yuv420p -crf 18 -c:a aac -b:a 196k \
   #{out.dir}/#{out.name}#{out.suffix}
 ```

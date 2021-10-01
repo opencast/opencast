@@ -121,8 +121,10 @@ public class OrganizationParsingTest {
     assertTrue("Organization XML not formed as expected", val);
 
     StreamSource streamSource = new StreamSource(new StringReader(producedOutput));
+    // CHECKSTYLE:OFF
     JaxbOrganization organization = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbOrganization.class)
             .getValue();
+    // CHECKSTYLE:ON
     compareOrgs(org, organization);
   }
 
@@ -137,8 +139,10 @@ public class OrganizationParsingTest {
     assertTrue("Organization XML not formed as expected", val);
 
     StreamSource streamSource = new StreamSource(new StringReader(producedOutput));
+    // CHECKSTYLE:OFF
     JaxbOrganization organization = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbOrganization.class)
             .getValue();
+    // CHECKSTYLE:ON
     compareOrgs(org, organization);
   }
 
@@ -147,8 +151,10 @@ public class OrganizationParsingTest {
     Organization org = new DefaultOrganization();
 
     StreamSource streamSource = new StreamSource(getClass().getResourceAsStream(ORG_XML_FILE));
+    // CHECKSTYLE:OFF
     JaxbOrganization organization = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbOrganization.class)
             .getValue();
+    // CHECKSTYLE:ON
     compareOrgs(org, organization);
   }
 

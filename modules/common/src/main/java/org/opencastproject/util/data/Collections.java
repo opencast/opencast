@@ -41,7 +41,10 @@ import java.util.Set;
  * the extent Java's type system allows -- immutable and more functional style.
  *
  * Note that all functions do <i>not</i> mutate input collections unless otherwise stated.
+ *
+ * @deprecated By now, all of this is natively available in Java.
  */
+@Deprecated
 public final class Collections {
   private Collections() {
   }
@@ -79,22 +82,6 @@ public final class Collections {
   }
 
   /**
-   * Apply a binary function (operator) to a start value and all elements of the list in turn.
-   *
-   * Example: (+) 0 [1, 2, 3] -&gt; (((0 + 1) + 2) + 3)
-   *
-   * @deprecated use {@link Monadics}
-   */
-  @Deprecated
-  public static <A, B> B foldl(Collection<A> as, B start, Function2<B, A, B> f) {
-    B fold = start;
-    for (A a : as) {
-      fold = f.apply(fold, a);
-    }
-    return fold;
-  }
-
-  /**
    * Apply a function <code>f</code> to all elements of collection <code>as</code> to produce a new collection
    * <code>bs</code>.
    *
@@ -114,70 +101,6 @@ public final class Collections {
       b.add(f.apply(x));
     }
     return b;
-  }
-
-  /**
-   * Apply a function <code>f</code> to all elements of collection <code>as</code> to produce a new collection
-   * <code>bs</code> by concatenating the results.
-   *
-   * The type of collection <code>as</code> needs a parameterless constructor.
-   *
-   * Please note that since java does not support higher-order polymorphism -- which is needed to capture the type of
-   * the collection -- some casting on the client side may still be necessary.
-   *
-   * @throws RuntimeException
-   *           if the result collection cannot be created
-   * @deprecated use {@link Monadics}
-   */
-  @Deprecated
-  public static <A, B> Collection<B> flatMap(Collection<A> as, Function<A, Collection<B>> f) {
-    Collection<B> bs = buildFrom(as);
-    for (A a : as) {
-      bs.addAll(f.apply(a));
-    }
-    return bs;
-  }
-
-  /**
-   * Exactly like {@link #flatMap(java.util.Collection, Function)} but you have to provide the target collection
-   * yourself.
-   *
-   * @deprecated use {@link Monadics}
-   */
-  @Deprecated
-  public static <A, B, M extends Collection<B>> M flatMap(Collection<A> as, M bs, Function<A, Collection<B>> f) {
-    for (A a : as) {
-      bs.addAll(f.apply(a));
-    }
-    return bs;
-  }
-
-  /**
-   * Returns the first element in <code>as</code> that satisfies a predicate <code>p</code>.
-   *
-   * @deprecated use {@link Monadics}
-   */
-  @Deprecated
-  public static <A> Option<A> find(Collection<A> as, Predicate<A> p) {
-    for (A x : as) {
-      if (p.apply(x))
-        return some(x);
-    }
-    return Option.none();
-  }
-
-  /**
-   * Tests if at least one element in <code>as</code> satisfies predicate <code>p</code>.
-   *
-   * @deprecated use {@link Monadics}
-   */
-  @Deprecated
-  public static <A> boolean exists(Collection<A> as, Predicate<A> p) {
-    for (A a : as) {
-      if (p.apply(a))
-        return true;
-    }
-    return false;
   }
 
   /**

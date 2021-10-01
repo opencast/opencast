@@ -38,7 +38,6 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
@@ -71,10 +70,10 @@ import javax.xml.bind.JAXBException;
  * A XACML implementation of the {@link AuthorizationService}.
  */
 @Component(
-  property = {
-    "service.description=Provides translation between access control entries and xacml documents"
-  },
-  service = { AuthorizationService.class, ManagedService.class }
+    property = {
+        "service.description=Provides translation between access control entries and xacml documents"
+    },
+    service = { AuthorizationService.class, ManagedService.class }
 )
 public class XACMLAuthorizationService implements AuthorizationService, ManagedService {
 
@@ -89,9 +88,6 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
 
   /** The security service */
   protected SecurityService securityService;
-
-  /** The series service */
-  protected SeriesService seriesService;
 
   /** The serializer for media pacakge */
   private MediaPackageSerializer serializer;
@@ -156,7 +152,9 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
       for (Attachment xacml : mp.getAttachments(XACML_POLICY_EPISODE)) {
         URI uri = xacml.getURI();
         try {
-          if (serializer != null) uri = serializer.decodeURI(uri);
+          if (serializer != null) {
+            uri = serializer.decodeURI(uri);
+          }
         } catch (URISyntaxException e) {
           logger.warn("URI {} syntax error, skip decoding", uri);
         }
@@ -167,7 +165,9 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
       for (Attachment xacml : mp.getAttachments(XACML_POLICY_SERIES)) {
         URI uri = xacml.getURI();
         try {
-          if (serializer != null) uri = serializer.decodeURI(uri);
+          if (serializer != null) {
+            uri = serializer.decodeURI(uri);
+          }
         } catch (URISyntaxException e) {
           logger.warn("URI {} syntax error, skip decoding", uri);
         }
@@ -203,8 +203,11 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   }
 
   @Override
-  public Tuple<MediaPackage, Attachment> setAcl(final MediaPackage mp, final AclScope scope, final AccessControlList acl)
-          throws MediaPackageException {
+  public Tuple<MediaPackage, Attachment> setAcl(
+      final MediaPackage mp,
+      final AclScope scope,
+      final AccessControlList acl
+  ) throws MediaPackageException {
     // Get XACML representation of these role + action tuples
     String xacmlContent;
     try {
@@ -353,17 +356,6 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   @Reference(name = "security")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  /**
-   * Declarative services callback to set the series service.
-   *
-   * @param seriesService
-   *          the series service
-   */
-  @Reference(name = "series")
-  protected void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
   }
 
 }

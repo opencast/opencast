@@ -43,7 +43,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -53,10 +52,10 @@ public final class XmlUtil {
   private static final DocumentBuilderFactory dbf;
 
   static {
-    nsDbf = DocumentBuilderFactory.newInstance();
+    nsDbf = XmlSafeParser.newDocumentBuilderFactory();
     nsDbf.setNamespaceAware(true);
     //
-    dbf = DocumentBuilderFactory.newInstance();
+    dbf = XmlSafeParser.newDocumentBuilderFactory();
     dbf.setNamespaceAware(false);
   }
 
@@ -92,7 +91,8 @@ public final class XmlUtil {
     try {
       DOMSource domSource = new DOMSource(doc);
       StreamResult result = new StreamResult(out);
-      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      Transformer transformer = XmlSafeParser.newTransformerFactory()
+              .newTransformer();
       transformer.setOutputProperty(OutputKeys.VERSION, doc.getXmlVersion());
       transformer.transform(domSource, result);
     } catch (TransformerException e) {

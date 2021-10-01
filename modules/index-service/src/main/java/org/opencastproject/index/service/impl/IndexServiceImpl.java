@@ -1192,7 +1192,6 @@ public class IndexServiceImpl implements IndexService {
       metadataList = getMetadataListWithAllEventCatalogUIAdapters();
       MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadataJSON));
     } catch (final org.json.simple.parser.ParseException e) {
-      logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
     return updateEventMetadata(id, metadataList, index);

@@ -224,10 +224,11 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
-        Configuration.none, Configuration.one, Configuration.none, Configuration.one);
+        Configuration.none, Configuration.one, Configuration.many, Configuration.one);
 
     final MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
     final MediaPackageElementFlavor targetTrackFlavor = tagsAndFlavors.getSingleTargetFlavor();
+    final List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
 
     final Track[] tracks = mediaPackage.getTracks(sourceFlavor);
 
@@ -341,10 +342,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     });
 
     // Update Tags here
-    getConfiguration(workflowInstance, "target-tags").ifPresent(tags -> {
-      final WorkflowOperationTagUtil.TagDiff tagDiff = WorkflowOperationTagUtil.createTagDiff(tags);
-      result.forEachTrack(t -> WorkflowOperationTagUtil.applyTagDiff(tagDiff, t));
-    });
+    final WorkflowOperationTagUtil.TagDiff tagDiff = WorkflowOperationTagUtil.createTagDiff(targetTrackTags);
+    result.forEachTrack(t -> WorkflowOperationTagUtil.applyTagDiff(tagDiff, t));
 
     return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE, result.queueTime);
   }

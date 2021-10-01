@@ -16,18 +16,22 @@ better use of multiple CPU cores.
 Parameter Table
 ---------------
 
-|configuration keys|example           |description                           |
-|------------------|------------------|--------------------------------------|
-|source-flavor     |presenter/work    |Which media should be encoded         |
-|target-flavor     |presenter/delivery|Specifies the flavor of the new media |
-|source-tags       |sometag           |Tags of media to encode               |
-|target-tags       |sometag           |Specifies the tags of the new media   |
-|encoding-profile  |webm-hd           |Specifies the encoding profile to use |
+|configuration keys|example                             |description                                                    |
+|------------------|------------------------------------|---------------------------------------------------------------|
+|source-flavor¹    |presenter/work                      |Single flavor specifying media to be encoded                   |
+|source-flavors¹   |presenter/work,presentation/work    |Comma-separated list of flavors specifying media to be encoded |
+|target-flavor     |presenter/delivery                  |Flavor of the new media                                        |
+|source-tags       |sometag                             |Comma-separated list of tags of media to encode                |
+|target-tags       |sometag                             |Comma-separated list of tags to be assigned to the new media   |
+|encoding-profile  |parallel.http                       |Encoding profile to use                                        |
 
-As explained in the "Encoding Profile" section, every media file created by an encode operation has its own named
-suffix. The suffix name is defined in the encode profile definition. It will be added as a tag to the corresponding
-track in the media package. This is different from the `target-tags` workflow operation parameter, which will cause the
-specified tag list to be added to every media file created by the operation.
+¹If source-flavour**s** are specified, media of these flavors are considered, if not, media matching the source-flavour
+configuration option is considered.
+
+As explained in the ["Encoding Profile Example" section](#encoding-profile-example), every media file created by an encode operation
+has its own named suffix. The suffix name is defined in the encode profile definition. It will be added as a tag to the
+corresponding track in the media package. This is different from the `target-tags` workflow operation parameter, which
+will cause the specified tag list to be added to every media file created by the operation.
 
 For instance, let us take the example operation and encoding profile defined in this documentation. After a successful
 run of the operation, the media package will contain four new tracks: the first one containing the new tags

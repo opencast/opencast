@@ -30,9 +30,6 @@ angular.module('adminNg.resources')
         var row = data.results[i];
         row.id = row.name;
 
-        row.meanRunTime = JsHelper.secondsToTime(row.meanRunTime);
-        row.meanQueueTime = JsHelper.secondsToTime(row.meanQueueTime);
-
         result.push(row);
       }
 

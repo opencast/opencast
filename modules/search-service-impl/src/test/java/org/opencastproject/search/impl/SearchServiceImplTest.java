@@ -422,10 +422,10 @@ public class SearchServiceImplTest {
     assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
     query.withSort(SearchQuery.Sort.DATE_CREATED, false);
     assertEquals(newerTitle, service.getByQuery(query).getItems()[0].getDcTitle());
-    // FYI: DATE_PUBLISHED is the time of Search update, not DC modified (MH-10573)
-    query.withSort(SearchQuery.Sort.DATE_PUBLISHED);
+    // FYI: DATE_MODIFIED is the time of Search update, not DC modified (MH-10573)
+    query.withSort(SearchQuery.Sort.DATE_MODIFIED);
     assertEquals(newerTitle, service.getByQuery(query).getItems()[0].getDcTitle());
-    query.withSort(SearchQuery.Sort.DATE_PUBLISHED, false);
+    query.withSort(SearchQuery.Sort.DATE_MODIFIED, false);
     assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
     SearchQuery q = new SearchQuery();
     q.withSort(SearchQuery.Sort.TITLE);

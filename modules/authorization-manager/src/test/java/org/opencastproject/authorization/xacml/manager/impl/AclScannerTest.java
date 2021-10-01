@@ -50,13 +50,12 @@ import org.opencastproject.util.data.Option;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXParseException;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.xml.bind.UnmarshalException;
 
 public class AclScannerTest {
 
@@ -106,8 +105,7 @@ public class AclScannerTest {
     AclServiceFactory aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
-        return new AclServiceImpl(new DefaultOrganization(), aclDb, null, null, null,
-                index, index, securityService);
+        return new AclServiceImpl(new DefaultOrganization(), aclDb, index, index, securityService);
       }
     };
 
@@ -141,7 +139,7 @@ public class AclScannerTest {
       aclScanner.install(file);
       fail("Should not be parsed.");
     } catch (XACMLParsingException e) {
-      assertTrue("The file can not be parsed.", e.getCause() instanceof UnmarshalException);
+      assertTrue("The file can not be parsed.", e.getCause() instanceof SAXParseException);
     }
   }
 
@@ -192,7 +190,7 @@ public class AclScannerTest {
       aclScanner.update(file);
       fail("Should not be parsed.");
     } catch (XACMLParsingException e) {
-      assertTrue("The file can not be parsed.", e.getCause() instanceof UnmarshalException);
+      assertTrue("The file can not be parsed.", e.getCause() instanceof SAXParseException);
     }
   }
 

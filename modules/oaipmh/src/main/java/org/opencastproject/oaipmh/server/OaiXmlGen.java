@@ -193,17 +193,19 @@ public abstract class OaiXmlGen extends XmlGen {
    * Create the header element for a result item.
    */
   Element header(final SearchResultItem item) {
-    // todo output setSpec
     // How to determine the media type?
     // There is a field oc_mediatype in the index but this one distinguishes
     // only audioVisual and series.
+    Element header = $e("header",
+                        $eTxt("identifier", item.getId()),
+                        $eTxt("datestamp", repository.toSupportedGranularity(item.getModificationDate())));
     if (item.isDeleted()) {
-      return $e("header", $a("status", "deleted"), $eTxt("identifier", item.getId()),
-                $eTxt("datestamp", repository.toSupportedGranularity.apply(item.getModificationDate())));
-    } else {
-      return $e("header", $eTxt("identifier", item.getId()),
-                $eTxt("datestamp", repository.toSupportedGranularity(item.getModificationDate())));
+      header.setAttribute("status", "deleted");
     }
+    for (String setSpec: item.getSetSpecs()) {
+      header.appendChild($eTxt("setSpec", setSpec));
+    }
+    return header;
   }
 
   /**

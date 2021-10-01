@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * The <tt>prepare media</tt> operation will make sure that media where audio and video track come in separate files
@@ -145,7 +146,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // Read the configuration properties
     MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
-    String targetTrackTags = tagsAndFlavors.getTargetTags().toString();
+    List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
     String muxEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("mux-encoding-profile"));
     String audioVideoEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("audio-video-encoding-profile"));

@@ -23,6 +23,7 @@ package org.opencastproject.oaipmh.persistence;
 import org.opencastproject.util.data.Option;
 
 import java.util.Date;
+import java.util.List;
 
 /** Query the database. */
 public interface Query {
@@ -43,6 +44,10 @@ public interface Query {
   Option<Integer> getLimit();
 
   Option<Integer> getOffset();
+
+  List<OaiPmhSetDefinition> getSetDefinitions();
+
+  Option<String> getSetSpec();
 
   boolean isSubsequentRequest();
 }
