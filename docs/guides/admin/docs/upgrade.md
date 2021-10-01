@@ -49,6 +49,9 @@ Please make sure to compare your configuration against the current configuration
 - The configuration keys `source-tags` and `source-flavors` of the _publish-configure_ workflow operation were renamed
   to `download-source-tags` and `download-source-flavors` respectively. If you use custom workflows, you may need to
   adjust them accordingly.
+- In large installations, consider raising the Java memory limits…
+    - of Opencast in `/usr/share/opencast/bin/setenv` or `etc/setenv`
+    - of Elasticsearch in `/etc/elasticsearch/jvm.options`
 
 
 ### Wowza streaming configuration changes
