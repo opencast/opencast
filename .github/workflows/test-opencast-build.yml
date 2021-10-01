@@ -67,7 +67,7 @@ jobs:
       - name: build opencast
         run: |
           mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-            clean install -Pnone -T 1C
+            clean install -Pnone
 
       - name: build assemblies
         if: matrix.java == 11
