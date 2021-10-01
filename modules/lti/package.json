@@ -7,7 +7,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
-    "axios": "^0.21.2",
+    "axios": "^0.22.0",
     "bootstrap": "^5.1.1",
     "i18next": "^21.2.0",
     "i18next-browser-languagedetector": "^6.1.2",
