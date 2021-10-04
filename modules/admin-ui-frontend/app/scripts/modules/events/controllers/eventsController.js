@@ -160,8 +160,6 @@ angular.module('adminNg.controllers')
       });
     };
 
-    // Text for events without notes
-    $scope.noCommentTextArea = '';
     // Type of comments in the notes column
     $scope.table.notesCommentReason = 'EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ADMINUI_NOTES';
 

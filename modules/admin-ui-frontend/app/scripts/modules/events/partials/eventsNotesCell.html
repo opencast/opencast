@@ -1,8 +1,9 @@
 <div class="comment-container">
   <textarea type="text" class="textarea"
             ng-if="filtered.length === 0"
-            ng-model="noCommentTextArea"
-            ng-blur="table.createComment(noCommentTextArea, row.id)"> </textarea>
+            ng-model="row.noCommentYet"
+            ng-focus="table.stopRefresh()"
+            ng-blur="table.startRefresh(); table.createComment(row.noCommentYet, row.id)"> </textarea>
 
   <div class="comment" ng-class="{ active : $parent.replyToId === comment.id }"
        ng-repeat="comment in row.comments
