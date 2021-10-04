@@ -65,7 +65,7 @@ public class AssetDto {
   @Column(name = "checksum", nullable = false, length = 64)
   private String checksum;
 
-  @Column(name = "mime_type", nullable = true, length = 64)
+  @Column(name = "mime_type", nullable = true, length = 255)
   private String mimeType;
 
   @Column(name = "size", nullable = false)
