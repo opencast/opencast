@@ -156,7 +156,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
     hasSeriesParameters() {
         const qs = parsedQueryString();
         /* eslint-disable */
-        return qs.series !== undefined || qs.series_name !== undefined;
+        return qs.series !== "" || qs.series_name !== "";
         /* eslint-enable */
     }
 
