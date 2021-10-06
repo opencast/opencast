@@ -112,8 +112,11 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -159,7 +162,16 @@ import javax.xml.bind.JAXBException;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
-public class ToolsEndpoint implements ManagedService {
+@Component(
+        immediate = true,
+        service = ToolsEndpoint.class,
+        property = {
+                "service.description=Admin UI - Tools Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.ToolsEndpoint",
+                "opencast.service.path=/admin-ng/tools",
+        }
+)
+public class ToolsEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ToolsEndpoint.class);
 
@@ -218,68 +230,74 @@ public class ToolsEndpoint implements ManagedService {
   private Workspace workspace;
   private boolean thumbnailEnabled = true;
 
-  void setConfigurablePublicationService(ConfigurablePublicationService configurablePublicationService) {
+  /** OSGi DI. */
+  @Reference
+  public void setConfigurablePublicationService(ConfigurablePublicationService configurablePublicationService) {
     this.configurablePublicationService = configurablePublicationService;
   }
 
-  /** OSGi DI. */
-  void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
+  @Reference
+  public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
     this.adminUIConfiguration = adminUIConfiguration;
   }
 
-  /** OSGi DI */
-  void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
+  @Reference
+  public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
     this.searchIndex = adminUISearchIndex;
   }
 
-  /** OSGi DI */
-  void setAssetManager(AssetManager assetManager) {
+  @Reference
+  public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
-  /** OSGi DI */
-  void setIndexService(IndexService index) {
+  /** OSGi DI. */
+  @Reference
+  public void setIndexService(IndexService index) {
     this.index = index;
   }
 
-  /** OSGi DI */
-  void setOaiPmhPublicationService(OaiPmhPublicationService oaiPmhPublicationService) {
+  /** OSGi DI. */
+  @Reference
+  public void setOaiPmhPublicationService(OaiPmhPublicationService oaiPmhPublicationService) {
     this.oaiPmhPublicationService = oaiPmhPublicationService;
   }
 
-  /** OSGi DI */
-  void setSecurityService(SecurityService securityService) {
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  /** OSGi DI */
-  void setSmilService(SmilService smilService) {
+  @Reference
+  public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
 
-  /** OSGi DI */
-  void setUrlSigningService(UrlSigningService urlSigningService) {
+  @Reference
+  public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
 
-  /** OSGi DI */
-  void setWorkflowService(WorkflowService workflowService) {
+  @Reference
+  public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
-  /** OSGi DI */
-  void setWorkspace(Workspace workspace) {
+  @Reference
+  public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  /** OSGi DI */
-  void setComposerService(ComposerService composerService) {
+  @Reference
+  public void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
 
   /** OSGi callback if properties file is present */
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Activate
+  @Modified
+  public void activate(ComponentContext cc) {
+    Dictionary<String, Object> properties = cc.getProperties();
     if (properties == null) {
       logger.info("No configuration available, using defaults");
       return;
@@ -291,6 +309,7 @@ public class ToolsEndpoint implements ManagedService {
 
     thumbnailEnabled = BooleanUtils.toBoolean(Objects.toString(properties.get(OPT_THUMBNAIL_ENABLED), "false"));
     logger.debug("Thumbnail feature enabled: {}", thumbnailEnabled);
+    logger.info("Configuration updated");
   }
 
   @GET

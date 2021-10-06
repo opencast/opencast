@@ -47,7 +47,6 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-index-service</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -389,7 +388,6 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               net.fortuna.ical4j.*,
-              org.opencastproject.index.service.message,
               org.opencastproject.adminui.index,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
@@ -410,21 +408,11 @@
               org.opencastproject.adminui.usersettings.persistence;version=${project.version},
               org.opencastproject.adminui.util;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/acl_endpoint.xml,
-              OSGI-INF/event_endpoint.xml,
-              OSGI-INF/groups_endpoint.xml,
-              OSGI-INF/index_endpoint.xml,
-              OSGI-INF/list_providers_endpoint.xml,
-              OSGI-INF/presets_endpoint.xml,
-              OSGI-INF/series_endpoint.xml,
-              OSGI-INF/statistics_endpoint.xml,
-              OSGI-INF/themes_endpoint.xml,
-              OSGI-INF/tools_endpoint.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>
+            <!-- Remove once the Admin UI backend uses OSGi annotations and generates capabilities -->
+            <_dsannotations-options>norequirements</_dsannotations-options>
           </instructions>
         </configuration>
       </plugin>

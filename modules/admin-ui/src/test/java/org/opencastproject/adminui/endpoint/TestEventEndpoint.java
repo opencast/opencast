@@ -24,6 +24,7 @@ package org.opencastproject.adminui.endpoint;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.opencastproject.capture.CaptureParameters.INGEST_WORKFLOW_DEFINITION;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 import static org.opencastproject.util.DateTimeSupport.fromUTC;
@@ -124,6 +125,7 @@ import org.easymock.IAnswer;
 import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -210,9 +212,14 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     // Preview subtype
     AdminUIConfiguration adminUIConfiguration = new AdminUIConfiguration();
-    Hashtable<String, String> dictionary = new Hashtable<>();
+    Hashtable<String, Object> dictionary = new Hashtable<>();
     dictionary.put(AdminUIConfiguration.OPT_PREVIEW_SUBTYPE, PREVIEW_SUBTYPE);
-    adminUIConfiguration.updated(dictionary);
+
+    ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
+    expect(cc.getProperties()).andReturn(dictionary).anyTimes();
+    replay(cc);
+
+    adminUIConfiguration.updated(cc);
     env.setAdminUIConfiguration(adminUIConfiguration);
 
     // acl
