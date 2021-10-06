@@ -33,51 +33,7 @@
       "has_comments": false,
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
-      "start_date": "2013-03-20T04:00:00Z",
-      "comments": [
-        {
-          "id": 65,
-          "author": {
-            "username": "sample",
-            "email": "with@permissions.com",
-            "name": "WithPermissions"
-          },
-          "creationDate": "2014-06-05T09:15:56Z",
-          "text": "Comment 1",
-          "reason": "Sick",
-          "replies": [
-
-          ],
-          "modificationDate": "2014-06-05T09:15:56Z",
-          "resolvedStatus": true
-        },
-        {
-          "id": 65,
-          "author": {
-            "username": "sample",
-            "email": "with@permissions.com",
-            "name": "WithPermissions"
-          },
-          "creationDate": "2014-06-05T09:15:56Z",
-          "text": "Comment 2",
-          "reason": "Defect",
-          "replies": [
-            {
-              "id": 78,
-              "creationDate": "2014-06-05T09:15:56Z",
-              "author": {
-                "username": "sample",
-                "email": "without@permissions.com",
-                "name": "WithoutPermissions"
-              },
-              "text": "Cant reproduce",
-              "modificationDate": "2014-06-05T09:15:56Z"
-            }
-          ],
-          "modificationDate": "2014-06-05T09:15:56Z",
-          "resolvedStatus": false
-        }
-      ]
+      "start_date": "2013-03-20T04:00:00Z"
     },
     {
       "technical_end": "2013-03-20T05:00:00Z",
@@ -109,51 +65,7 @@
       "has_comments": false,
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
-      "start_date": "2013-03-20T04:00:00Z",
-      "comments": [
-        {
-          "id": 65,
-          "author": {
-            "username": "sample",
-            "email": "with@permissions.com",
-            "name": "WithPermissions"
-          },
-          "creationDate": "2014-06-05T09:15:56Z",
-          "text": "Comment 1",
-          "reason": "Sick",
-          "replies": [
-
-          ],
-          "modificationDate": "2014-06-05T09:15:56Z",
-          "resolvedStatus": true
-        },
-        {
-          "id": 65,
-          "author": {
-            "username": "sample",
-            "email": "with@permissions.com",
-            "name": "WithPermissions"
-          },
-          "creationDate": "2014-06-05T09:15:56Z",
-          "text": "Comment 2",
-          "reason": "Defect",
-          "replies": [
-            {
-              "id": 78,
-              "creationDate": "2014-06-05T09:15:56Z",
-              "author": {
-                "username": "sample",
-                "email": "without@permissions.com",
-                "name": "WithoutPermissions"
-              },
-              "text": "Cant reproduce",
-              "modificationDate": "2014-06-05T09:15:56Z"
-            }
-          ],
-          "modificationDate": "2014-06-05T09:15:56Z",
-          "resolvedStatus": false
-        }
-      ]
+      "start_date": "2013-03-20T04:00:00Z"
     },
     {
       "technical_end": "2013-03-20T05:00:00Z",
@@ -185,51 +97,7 @@
       "has_comments": false,
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
-      "start_date": "2013-03-20T04:00:00Z",
-      "comments": [
-        {
-          "id": 65,
-          "author": {
-            "username": "sample",
-            "email": "with@permissions.com",
-            "name": "WithPermissions"
-          },
-          "creationDate": "2014-06-05T09:15:56Z",
-          "text": "Comment 1",
-          "reason": "Sick",
-          "replies": [
-
-          ],
-          "modificationDate": "2014-06-05T09:15:56Z",
-          "resolvedStatus": true
-        },
-        {
-          "id": 65,
-          "author": {
-            "username": "sample",
-            "email": "with@permissions.com",
-            "name": "WithPermissions"
-          },
-          "creationDate": "2014-06-05T09:15:56Z",
-          "text": "Comment 2",
-          "reason": "Defect",
-          "replies": [
-            {
-              "id": 78,
-              "creationDate": "2014-06-05T09:15:56Z",
-              "author": {
-                "username": "sample",
-                "email": "without@permissions.com",
-                "name": "WithoutPermissions"
-              },
-              "text": "Cant reproduce",
-              "modificationDate": "2014-06-05T09:15:56Z"
-            }
-          ],
-          "modificationDate": "2014-06-05T09:15:56Z",
-          "resolvedStatus": false
-        }
-      ]
+      "start_date": "2013-03-20T04:00:00Z"
     }
   ],
   "offset": 0
