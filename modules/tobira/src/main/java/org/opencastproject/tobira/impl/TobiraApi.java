@@ -33,6 +33,8 @@ import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.series.api.Series;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Jsons;
@@ -314,7 +316,7 @@ public class TobiraApi {
     private Date modifiedDate;
     private Jsons.Val obj;
 
-    /** Converts a series into the corresponding JSON representation */
+    /** Converts a event into the corresponding JSON representation */
     Item(SearchResultItem event) {
       this.modifiedDate = event.getModified();
 
@@ -358,6 +360,21 @@ public class TobiraApi {
             })
             .collect(Collectors.toCollection(ArrayList::new));
 
+        // Assemble ACL
+        final List<Jsons.Val> canReadRoles = new ArrayList();
+        final List<Jsons.Val> canWriteRoles = new ArrayList();
+        for (final AccessControlEntry entry: event.getAccessControlList().getEntries()) {
+          if (entry.getAction().equals(Permissions.Action.READ.toString())) {
+            canReadRoles.add(Jsons.v(entry.getRole()));
+          } else if (entry.getAction().equals(Permissions.Action.WRITE.toString())) {
+            canWriteRoles.add(Jsons.v(entry.getRole()));
+          }
+        }
+        final Jsons.Obj acl = Jsons.obj(
+            Jsons.p("read", Jsons.arr(canReadRoles)),
+            Jsons.p("write", Jsons.arr(canWriteRoles))
+        );
+
         this.obj = Jsons.obj(
             Jsons.p("kind", "event"),
             Jsons.p("id", event.getId()),
@@ -369,6 +386,7 @@ public class TobiraApi {
             Jsons.p("duration", event.getDcExtent() < 0 ? null : event.getDcExtent()),
             Jsons.p("thumbnail", thumbnail),
             Jsons.p("tracks", Jsons.arr(tracks)),
+            Jsons.p("acl", acl),
             Jsons.p("updated", event.getModified().getTime())
         );
       }
