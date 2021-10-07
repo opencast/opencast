@@ -156,7 +156,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
     hasSeriesParameters() {
         const qs = parsedQueryString();
         /* eslint-disable */
-        return qs.series !== "" || qs.series_name !== "";
+        return qs.series !== undefined || qs.series_name !== undefined;
         /* eslint-enable */
     }
 
@@ -303,6 +303,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                         handlePageChange={this.handlePageChange.bind(this)}
                     />
                 </Tab>
+
                 { !this.hasSeriesParameters() && <Tab eventKey="series" title="Series">
                     <Row id="series-searchfield" className="searchfield">
                         <Col>
