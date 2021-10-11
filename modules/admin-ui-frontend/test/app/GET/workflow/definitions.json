@@ -352,7 +352,7 @@
               }
             },
             {
-              "id": "compose",
+              "id": "encode",
               "description": "Encoding video",
               "fail-on-error": "true",
               "exception-handler-workflow": "partial-error",
@@ -1015,7 +1015,7 @@
               }
             },
             {
-              "id": "compose",
+              "id": "encode",
               "description": "Create single-stream video preview",
               "fail-on-error": "true",
               "if": "NOT (${presenter_work_video} AND ${presentation_work_video})",
@@ -2472,7 +2472,7 @@
               }
             },
             {
-              "id": "compose",
+              "id": "encode",
               "description": "Encoding 360p video to MP4 download",
               "fail-on-error": "true",
               "if": "${flagQuality360p}",
@@ -2501,7 +2501,7 @@
               }
             },
             {
-              "id": "compose",
+              "id": "encode",
               "description": "Encoding 480p video to MP4 download",
               "fail-on-error": "true",
               "if": "${flagQuality480p}",
@@ -2530,7 +2530,7 @@
               }
             },
             {
-              "id": "compose",
+              "id": "encode",
               "description": "Encoding 720p video to MP4 download",
               "fail-on-error": "true",
               "if": "${flagQuality720p}",
@@ -2559,7 +2559,7 @@
               }
             },
             {
-              "id": "compose",
+              "id": "encode",
               "description": "Encoding 1080p video to MP4 download",
               "fail-on-error": "true",
               "if": "${flagQuality1080p}",
@@ -2588,7 +2588,7 @@
               }
             },
             {
-              "id": "compose",
+              "id": "encode",
               "description": "Encoding 2160p video to MP4 download",
               "fail-on-error": "true",
               "if": "${flagQuality2160p}",

@@ -193,7 +193,7 @@ ${trimHold} variable like in the current workflow definitions with trimming.
     **Workflow operation to create WebM preview videos**
 
         <operation
-          id="compose"
+          id="encode"
           if="${trimHold}"
           fail-on-error="true"
           exception-handler-workflow="error"
@@ -209,7 +209,7 @@ ${trimHold} variable like in the current workflow definitions with trimming.
    prepare-av operation.  Workflow operation to compose the audio-only file(s)
 
         <operation
-          id="compose"
+          id="encode"
           if="${trimHold}"
           fail-on-error="false"
           description="Extracting audio for waveform generation">
