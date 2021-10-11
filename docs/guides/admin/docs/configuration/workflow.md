@@ -155,7 +155,7 @@ The next operations will encode the media to the Mp4 format:
 
         <!-- encode: mp4 -->
         <operation
-          id="compose"
+          id="encode"
           fail-on-error="true"
           exception-handler-workflow="error"
           description="Encode camera to mp4">
@@ -168,7 +168,7 @@ The next operations will encode the media to the Mp4 format:
         </operation>
 
         <operation
-          id="compose"
+          id="encode"
           fail-on-error="true"
           exception-handler-workflow="error"
           description="Encode screen to mp4">

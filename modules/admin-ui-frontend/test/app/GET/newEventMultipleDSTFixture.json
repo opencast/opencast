@@ -345,7 +345,7 @@
             "if": "${videoPreview}",
             "fail-on-error": "true",
             "description": "Encoding presenter (camera) video for preview",
-            "id": "compose",
+            "id": "encode",
             "configurations": {
               "configuration": [
                 {
@@ -517,7 +517,7 @@
             "exception-handler-workflow": "error",
             "fail-on-error": "true",
             "description": "Encoding presenter (camera) to Flash video",
-            "id": "compose",
+            "id": "encode",
             "configurations": {
               "configuration": [
                 {
@@ -545,7 +545,7 @@
             "exception-handler-workflow": "error",
             "fail-on-error": "true",
             "description": "Encoding presentation (screen) to Flash video",
-            "id": "compose",
+            "id": "encode",
             "configurations": {
               "configuration": [
                 {
@@ -573,7 +573,7 @@
             "exception-handler-workflow": "error",
             "fail-on-error": "false",
             "description": "Encoding presenter (camera) to Flash audio",
-            "id": "compose",
+            "id": "encode",
             "configurations": {
               "configuration": [
                 {
