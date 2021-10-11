@@ -406,7 +406,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   @Override
   public List<Series> getAllForAdministrativeRead(Date from, Optional<Date> to, int limit)
-          throws SeriesServiceDatabaseException {
+          throws SeriesServiceDatabaseException, UnauthorizedException {
     // Validate parameters
     if (limit <= 0) {
       throw new IllegalArgumentException("limit has to be > 0");
@@ -415,9 +415,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     // Make sure the user is actually an administrator of sorts
     User user = securityService.getUser();
     if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
-      throw new SeriesServiceDatabaseException(
-          new UnauthorizedException(user, getClass().getName() + ".getModifiedInRangeForAdministrativeRead")
-      );
+      throw new UnauthorizedException(user, getClass().getName() + ".getModifiedInRangeForAdministrativeRead");
     }
 
     // Load series from DB.
