@@ -162,7 +162,7 @@ public interface SeriesService {
    * checked as this is only intended to be used in an administrative context.
    */
   List<Series> getAllForAdministrativeRead(Date from, Optional<Date> to, int limit)
-          throws SeriesException;
+          throws SeriesException, UnauthorizedException;
 
   /**
    * Returns a map of series Id to title of all series the user can access

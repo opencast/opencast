@@ -115,7 +115,7 @@ public interface SeriesServiceDatabase {
    * checked as this is only intended to be used in an administrative context.
    */
   List<Series> getAllForAdministrativeRead(Date from, Optional<Date> to, int limit)
-          throws SeriesServiceDatabaseException;
+          throws SeriesServiceDatabaseException, UnauthorizedException;
 
   /**
    * Retrieves ACL for series with given ID.

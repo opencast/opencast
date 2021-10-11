@@ -408,7 +408,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       Date from,
       Optional<Date> to,
       int limit
-  ) throws SeriesException {
+  ) throws SeriesException, UnauthorizedException {
     try {
       return persistence.getAllForAdministrativeRead(from, to, limit);
     } catch (SeriesServiceDatabaseException e) {
