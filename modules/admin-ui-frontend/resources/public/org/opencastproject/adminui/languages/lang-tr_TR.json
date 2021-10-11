@@ -5,7 +5,7 @@
    "BUILD": {
       "BUILT_ON": "Üzerine inşa",
       "DATE_DESC": "Bu sistemin çekirdek modülünün oluşturulduğu tarih.",
-      "COMMIT": "Git commit bu sürümden oluştur",
+      "COMMIT": "Bu sürümü yaratmak için kullanılan Git commit.",
       "VERSION": "Toplu sürümü yükle"
    },
    "NO": "Hayır",
@@ -13,7 +13,7 @@
    "UPDATE": {
       "MINOR": "Küçük bir güncelleme mevcut",
       "MAJOR": "Büyük bir güncelleme mevcut",
-      "UNSUPPORTED": "Version {{ version }} no longer supported",
+      "UNSUPPORTED": "Bu {{ version }} versiyon artık desteklenmiyor",
       "UNDETERMINED": "Belirsiz versiyon "
    },
    "CANCEL": "İptal Et",
@@ -53,13 +53,13 @@
       "UPLOAD_SUCCESS": "Karşıya Yükleme başarılı",
       "UPLOAD_FAILURE": "Gönderme başarısız oldu",
       "UPLOAD_FAILURE_DESCRIPTION": "Lütfen daha sonra tekrar deneyin.",
-      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
+      "EDIT_SUCCESS": "Düzenleme başarılı, yeniden yayınlamaya başlandı.",
       "EDIT_FAILURE": "Düzenleme Başarısız Oldu",
       "COPY_SUCCESS": "Kopyalanıyor...",
       "COPY_SUCCESS_DESCRIPTION": "Lütfen bir süre bekleyin",
       "GENERIC_ERROR": "Hata iletisi:",
       "DELETION_SUCCESS": "Başarı ile silindi",
-      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
+      "DELETION_SUCCESS_DESCRIPTION": "Etkinlik birkaç dakika içinde listeden kaldırılacak…",
       "EVENT_LOCKED": "Bu dosya şu anda kullanılıyor. Lütfen değişiklik yapmadan bekleyin.",
       "DELETION_FAILURE": "Etkinlik silme işlemi başarısız oldu",
       "DELETION_FAILURE_DESCRIPTION": "Lütfen daha sonra tekrar deneyin.",
@@ -143,7 +143,7 @@
       "DOCUMENTATION": "Dökümantasyon",
       "REST_DOC": "REST API Dökümanları",
       "HOTKEY_CHEAT_SHEET": "Klavye Kısayolları",
-      "ADOPTER_REGISTRATION": "Adopter Registration"
+      "ADOPTER_REGISTRATION": "Adopter Kayıt"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Erişim ilkesi oluşturuldu",
@@ -237,8 +237,8 @@
       "BULK_METADATA_UPDATE": {
          "UNEXPECTED_ERROR": "Güncelleme yapılırken beklenmeyen bir hata oluştu. Bazı etkinlikler güncellenmiş olabilir.",
          "ALL_EVENTS_UPDATED": "Tüm etkinlikler başarıyla güncellendi.",
-         "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+         "NO_EVENTS_UPDATED": "Tüm güncellemeler başarısız oldu.",
+         "SOME_EVENTS_NOT_UPDATED": "Bazı etkinlikler güncellenemedi."
       },
       "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
       "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
