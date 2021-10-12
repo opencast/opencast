@@ -721,10 +721,6 @@ public class SolrIndexManager {
         logger.debug("Search service doesn't know how to handle action: {}", entry.getAction());
         continue;
       }
-      if (acl == null) {
-        actionPermissions = new ArrayList<String>();
-        permissions.put(entry.getAction(), actionPermissions);
-      }
       if (adminRole != null && !entry.getRole().equals(adminRole)) {
         actionPermissions.add(entry.getRole());
       }
