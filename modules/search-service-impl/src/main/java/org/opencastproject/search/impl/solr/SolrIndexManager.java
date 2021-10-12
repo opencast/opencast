@@ -725,8 +725,9 @@ public class SolrIndexManager {
         actionPermissions = new ArrayList<String>();
         permissions.put(entry.getAction(), actionPermissions);
       }
-      actionPermissions.add(entry.getRole());
-
+      if (adminRole != null && !entry.getRole().equals(adminRole)) {
+        actionPermissions.add(entry.getRole());
+      }
     }
 
     // Write the permissions to the solr document
