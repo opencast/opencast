@@ -181,7 +181,7 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
     }
 
     annotateEpisodeCallback(id: string) {
-        window.top.location.href = "/annotation-tool/index.html?id=" + id
+        window.top!.location.href = "/annotation-tool/index.html?id=" + id
     }
 
     downloadEventCallback(track: Track) {
