@@ -32,6 +32,9 @@ The configuration options for requiring authentication can be found in the servi
 An alternative method to this is Opencast's [token based authorization system](stream-security.md) which allows (and
 requires) to defer all security checks to external systems.
 
+With Opencast 10, a new default configuration for static files authorization was introduced.
+For some external software, like Ilias, it is required that all of your media is accessable to every user. If that is not the case, the static files authorization must be disabled by setting the `authentication.required` option in `etc/org.opencastproject.fsresources.StaticResourceServlet.cfg` to `false`.  
+
 
 Available Static File Authorization Plug-ins
 --------------------------------------------

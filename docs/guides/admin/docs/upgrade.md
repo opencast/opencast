@@ -68,3 +68,5 @@ in:
 ```
 etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
 ```
+
+If you are using external software, like Ilias for example, it is required that all of your media is accessable to every user. If that is not the case, the static files authorization must be disabled by setting the `authentication.required` option in the file above to `false`.
