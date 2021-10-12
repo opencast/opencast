@@ -4,6 +4,17 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.9
+
+*Released on October 12th, 2021*
+
+- [[#3041](https://github.com/opencast/opencast/pull/3041)] -
+  Point out memory limits
+- [[#2992](https://github.com/opencast/opencast/pull/2992)] -
+  Fix create new event in admin UI when multiple extended catalogs are used
+- [[#2951](https://github.com/opencast/opencast/pull/2951)] -
+  Add Missing Translations Files
+
 ### Opencast 9.8
 
 *Released on August 18th, 2021*
