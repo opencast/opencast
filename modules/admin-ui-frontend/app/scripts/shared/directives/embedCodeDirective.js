@@ -23,9 +23,8 @@
 angular.module('adminNg.directives')
 .directive('adminNgEmbedCode',['$timeout', function($timeout) {
   return {
-    template: '<div>Made by a directive!</div>',
+    template: '<div>HELLO THERE</div>',
     replace: true,
-    transclude: true,
     scope: true
   };
 }]);

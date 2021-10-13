@@ -23,9 +23,9 @@
 // Controller for all event screens.
 angular.module('adminNg.controllers')
 .controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource',
-  'ResourcesListResource', 'Notifications', 'ConfirmationModal', 'RelativeDatesService', 'AuthService',
+  'ResourcesListResource', 'Notifications', 'ConfirmationModal', 'RelativeDatesService', 'AuthService', '$http',
   function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications,
-    ConfirmationModal, RelativeDatesService, AuthService) {
+    ConfirmationModal, RelativeDatesService, AuthService, $http) {
 
     $scope.stats = Stats;
 
@@ -152,6 +152,47 @@ angular.module('adminNg.controllers')
           Notifications.add('error', 'EVENTS_NOT_DELETED');
         }
       });
+    };
+
+    $scope.embedCode = '';
+    //TODO Error Handling
+    $scope.getEmbedCode = function (size, id) {
+      $scope.selectedBox = size;
+      var engageUrl = '<SERVER_URL>';
+      var embedID = id;
+      $http.get('/api/info/organization/properties/engageuiurl')
+      .then(function(response) {
+        engageUrl = response.data['org.opencastproject.engage.ui.url'];
+        var url = engageUrl + '/play/' + embedID;
+        var sizeArray = size.split('x');
+        $scope.embedCode = '<iframe allowfullscreen src="' + url +
+        '" style="border:0px #FFFFFF none;" name="Player" scrolling="no"' +
+         ' frameborder="0" marginheight="0px" marginwidth="0px" width="' +
+        sizeArray[0] + '" height="' + sizeArray[1] + '"></iframe>';
+      });
+    };
+
+    $scope.copyToClipboard = function(toCopy) {
+      // create temp element
+      var copyElement = document.createElement('span');
+      copyElement.appendChild(document.createTextNode(toCopy));
+      copyElement.id = 'tempCopyToClipboard';
+      angular.element(document.body.append(copyElement));
+
+      // select the text
+      var range = document.createRange();
+      range.selectNode(copyElement);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+
+      // copy & cleanup
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      copyElement.remove();
+
+      //update & show confirmation message
+      $scope.copiedBox = $scope.selectedBox;
+      $scope.confirmMsgVisibility = {'visibility': 'visible'};
     };
   }
 ]);
