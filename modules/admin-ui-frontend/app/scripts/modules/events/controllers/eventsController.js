@@ -23,16 +23,10 @@
 // Controller for all event screens.
 angular.module('adminNg.controllers')
 .controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource',
-<<<<<<< HEAD
-  'ResourcesListResource', 'Notifications', 'ConfirmationModal', 'RelativeDatesService', 'AuthService', '$http',
-  function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications,
-    ConfirmationModal, RelativeDatesService, AuthService, $http) {
-=======
   'ResourcesListResource', 'Notifications', 'ConfirmationModal', 'RelativeDatesService', 'AuthService',
-  'CommentResource',
+  'CommentResource','$http',
   function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications,
-    ConfirmationModal, RelativeDatesService, AuthService, CommentResource) {
->>>>>>> develop
+    ConfirmationModal, RelativeDatesService, AuthService, CommentResource, $http) {
 
     $scope.stats = Stats;
 
