@@ -35,6 +35,7 @@ import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchResultItemImpl;
+import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.data.Function;
 
 import com.google.common.cache.CacheBuilder;
@@ -242,6 +243,11 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
 
           @Override
           public MediaPackage getMediaPackage() {
+            return null;
+          }
+
+          @Override
+          public AccessControlList getAccessControlList() {
             return null;
           }
 

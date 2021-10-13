@@ -40,6 +40,8 @@ import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchResultItem.SearchResultItemType;
 import org.opencastproject.search.api.SearchResultItemImpl;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -62,6 +64,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
@@ -69,6 +72,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Class implementing <code>LookupRequester</code> to provide connection to solr indexing facility.
@@ -207,6 +211,18 @@ public class SolrRequester {
             }
           }
           return null;
+        }
+
+        @Override
+        public AccessControlList getAccessControlList() {
+          final List<AccessControlEntry> entries = Schema.getOcAcl(doc)
+              .stream()
+              .flatMap(field -> {
+                return Arrays.stream(field.getValue().strip().split("\\s+"))
+                    .map(role -> new AccessControlEntry(role, field.getSuffix(), true));
+              })
+              .collect(Collectors.toCollection(ArrayList::new));
+          return new AccessControlList(entries);
         }
 
         @Override
