@@ -23,7 +23,7 @@
              bind="setJobService"/>
   <reference name="seriesEndpoint"
              interface="org.opencastproject.adminui.endpoint.SeriesEndpoint"
-             bind="setSeriesService"/>
+             bind="setSeriesEndpoint"/>
   <reference name="AclServiceFactory"
              interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
              bind="setAclServiceFactory"/>
@@ -51,4 +51,6 @@
   <reference name="UrlSigningService"
              interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
              bind="setUrlSigningService"/>
+  <reference name="asset-manager" interface="org.opencastproject.assetmanager.api.AssetManager"
+             cardinality="1..1" policy="dynamic" bind="setAssetManager"/>
 </scr:component>

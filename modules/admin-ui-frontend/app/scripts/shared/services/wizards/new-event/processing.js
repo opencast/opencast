@@ -148,9 +148,11 @@ angular.module('adminNg.services')
 
     // Most of the stuff we do here with input elements doesn't distinguish between
     // input type="text" and input type="number", so we need this getter a few times.
-    function elementIsTextual(angularElement) {
-      return angularElement.is('[type=text]') || angularElement.is('[type=number]') ||
-             angularElement.is('[type=hidden]');
+    function elementWhoseValueMatters(angularElement) {
+      const matters = ['color', 'date', 'datetime-local', 'email', 'hidden',
+        'month', 'number', 'password', 'range', 'tel', 'text', 'time', 'url',
+        'week'];
+      return matters.indexOf(angularElement.prop('type')) !== -1;
     }
 
     // Gather all input elements used in the workflow configuration HTML into a dictionary:
@@ -158,7 +160,7 @@ angular.module('adminNg.services')
     function gatherHtmlFormElements(htmlElement) {
       var result = {};
       forEachHtmlFormElement(htmlElement, function(id, angularElement) {
-        if (elementIsTextual(angularElement)) {
+        if (elementWhoseValueMatters(angularElement)) {
           if (angularElement.val() === '') {
             result[id] = null;
           } else {
@@ -211,7 +213,7 @@ angular.module('adminNg.services')
     // Set a HTML form value (abstracts over "set checked" or "set
     // value" for checkboxes and text fields, respectively)
     function setHtmlFormValue(angularElement, value) {
-      if (elementIsTextual(angularElement)) {
+      if (elementWhoseValueMatters(angularElement)) {
         angularElement.val(value);
       } else if (angularElement.is('[type=checkbox]') || angularElement.is('[type=radio]')) {
         if (value === 'true') {
@@ -225,7 +227,7 @@ angular.module('adminNg.services')
     // Set an indeterminate HTML form value (depends on the type
     // of the form element)
     function setIndeterminateHtmlFormValue(angularElement) {
-      if (elementIsTextual(angularElement)) {
+      if (elementWhoseValueMatters(angularElement)) {
         angularElement.val('');
       } else if (angularElement.is('[type=checkbox]')) {
         angularElement.prop('indeterminate', true);

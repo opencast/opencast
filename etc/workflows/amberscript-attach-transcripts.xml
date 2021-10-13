@@ -19,7 +19,7 @@
       <configurations>
         <!-- This is filled out by the transcription service when starting this workflow -->
         <configuration key="transcription-job-id">${transcriptionJobId}</configuration>
-        <!-- Caption generated will have the default flavor based on the target-caption-format and language e.g. captions/vtt+en -->
+        <!-- Caption generated will have the default flavor based on the target-caption-format e.g. captions/vtt -->
         <configuration key="target-caption-format">vtt</configuration>
         <configuration key="target-tag">engage-download</configuration>
       </configurations>
@@ -34,7 +34,7 @@
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="strategy">merge</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 

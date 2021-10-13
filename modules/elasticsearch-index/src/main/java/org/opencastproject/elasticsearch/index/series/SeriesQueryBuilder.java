@@ -27,7 +27,6 @@ import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.api.SearchTerms.Quantifier;
 import org.opencastproject.elasticsearch.impl.AbstractElasticsearchQueryBuilder;
 import org.opencastproject.elasticsearch.impl.IndexSchema;
-import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 
@@ -79,7 +78,7 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
       if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
         for (Role role : user.getRoles()) {
           for (String action : query.getActions()) {
-            and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
+            and(SeriesIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
           }
         }
       }

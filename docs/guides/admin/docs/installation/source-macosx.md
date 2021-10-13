@@ -50,7 +50,7 @@ Required:
     Xcode
     jdk 11
     ffmpeg >= 3.2.4
-    maven >= 3.1
+    maven >= 3.6
     python >= 2.6
 
 (If you are using [jEnv](http://www.jenv.be/) to set up your environment, make sure to [enable the maven plugin
@@ -95,6 +95,11 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
     brew install sox
     brew install synfig
 
+#### Elasticsearch on macOS
+
+If you want to install Elasticsearch in the same machine run Elasticsearch as a Docker container
+
+    docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e 'discovery.type=single-node' elasticsearch:7.9.3
 #### Using pre-built binaries
 
 Pre-built versions of most dependencies can be downloaded from the respective project website:

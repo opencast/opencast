@@ -1,5 +1,5 @@
-import React from "react";
-import { SearchEpisodeResults, searchEpisode, getLti, SearchEpisodeResult, deleteEvent } from "../OpencastRest";
+import React, { DOMAttributes } from "react";
+import { SearchEpisodeResults, searchEpisode, getLti, SearchEpisodeResult, deleteEvent, Track } from "../OpencastRest";
 import { Loading } from "./Loading";
 import { withTranslation, WithTranslation } from "react-i18next";
 import "../App.css";
@@ -7,9 +7,12 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Pagination from "react-js-pagination";
 import Helmet from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faEdit, faComments, faDownload } from "@fortawesome/free-solid-svg-icons";
 import * as i18next from "i18next";
-import { parsedQueryString } from "../utils";
+import { parsedQueryString, capitalize } from "../utils";
+import { sortByType } from "../trackUtils";
+import Dropdown from "react-bootstrap/esm/Dropdown";
+import DropdownMenu from "react-bootstrap/esm/DropdownMenu";
 
 interface SeriesState {
     readonly searchResults?: SearchEpisodeResults;
@@ -26,10 +29,31 @@ interface EpisodeProps {
     readonly episode: SearchEpisodeResult;
     readonly deleteCallback?: (episodeId: string) => void;
     readonly editCallback?: (episodeId: string) => void;
+    readonly annotateCallback?: (episodeId: string) => void;
+    readonly downloadCallback?: (track: Track) => void;
     readonly t: i18next.TFunction;
 }
 
-const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, deleteCallback, editCallback, t }) => {
+/**
+ * To allow for full css control, the bootstrap-dropdown requires you to employ custom components
+ */
+const dropdownCustomToggle = React.forwardRef<any, DOMAttributes<any>>(({children, onClick}, ref) =>
+  <button
+    ref={ref}
+    onClick={(e) => {
+      e.preventDefault();
+      if ( onClick !== undefined ) {
+        onClick(e);
+      }
+      e.stopPropagation();
+    }}
+  >
+    {children}
+    &#x25bc;
+  </button>
+);
+
+const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, deleteCallback, editCallback, annotateCallback, downloadCallback, t }) => {
     const attachments = episode.mediapackage.attachments;
     const imageAttachment = attachments.find((a) => a.type.endsWith("/search+preview"));
     const image = imageAttachment !== undefined ? imageAttachment.url : "";
@@ -39,15 +63,16 @@ const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, delete
         <div>
             <img alt="Preview" className="img-fluid" src={image} />
         </div>
-        <div className="ml-3">
+        <div className="ms-3">
             <h4>{episode.dcTitle}</h4>
-            {episode.dcCreator !== undefined && <p className="text-muted">
-                {t("LTI.CREATOR", { creator: episode.dcCreator })}
+            {episode.mediapackage.creators.length > 0 && <p className="text-muted">
+                {t("LTI.CREATOR", { creator: episode.mediapackage.creators.join(', ') })}
             </p>}
             <p className="text-muted">{new Date(episode.dcCreated).toLocaleString()}</p>
         </div>
-        {(deleteCallback !== undefined || editCallback !== undefined) &&
-            <div className="ml-auto">
+        {(deleteCallback !== undefined || editCallback !== undefined || annotateCallback !== undefined
+            || downloadCallback !== undefined) &&
+            <div className="ms-auto">
                 {deleteCallback !== undefined &&
                     <button onClick={(e) => { deleteCallback(episode.id); e.stopPropagation(); }}>
                         <FontAwesomeIcon icon={faTrash} />
@@ -56,6 +81,30 @@ const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, delete
                     <button onClick={(e) => { editCallback(episode.id); e.stopPropagation(); }}>
                         <FontAwesomeIcon icon={faEdit} />
                     </button>}
+                {annotateCallback !== undefined &&
+                                    <button onClick={(e) => { annotateCallback(episode.id); e.stopPropagation(); }}>
+                                        <FontAwesomeIcon icon={faComments} />
+                                    </button>}
+                {downloadCallback !== undefined && Array.isArray(episode.mediapackage.tracks) && episode.mediapackage.tracks.length > 0 &&
+                  <Dropdown style={{display: 'inline-block'}}>
+                    <Dropdown.Toggle as={dropdownCustomToggle} >
+                      <FontAwesomeIcon icon={faDownload}/>
+                    </Dropdown.Toggle>
+                    <DropdownMenu>
+                      {sortByType(episode.mediapackage.tracks).map((track) => {
+                          if (track.url.endsWith('mp4') || track.url.endsWith('webm')) {
+                            return (
+                              <Dropdown.Item onClick={(e) => { downloadCallback(track); e.stopPropagation(); }} >
+                                {capitalize(track.type.split('/')[0])} <br/>
+                                {track.resolution !== undefined ? `${track.resolution.width} x ${track.resolution.height}` : undefined}
+                              </Dropdown.Item>
+                            );
+                          }
+                          return undefined;
+                      })}
+                    </DropdownMenu>
+                  </Dropdown>
+                }
             </div>}
     </div>;
 }
@@ -131,6 +180,29 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
         });
     }
 
+    annotateEpisodeCallback(id: string) {
+        window.top!.location.href = "/annotation-tool/index.html?id=" + id
+    }
+
+    downloadEventCallback(track: Track) {
+      if (track.url !== "") {
+        // Create a temporary HTML element to hide download url. Probably fine, seems kinda hacky?
+        // Creating an invisible element
+        const element = document.createElement('a');
+        element.setAttribute('href', track.url);                       // filepath
+        const filename = track.url.split('/').pop()
+        element.setAttribute('download',                               // filename
+          filename !== undefined ? filename : track.type
+        );
+
+        // Add the element, click it and remove it before anyone notices it was even there
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+      }
+      return null;
+    }
+
     hasDeletion() {
         return parsedQueryString().deletion === "true";
     }
@@ -138,6 +210,14 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
     hasEdit() {
         return parsedQueryString().edit === "true";
     }
+
+    hasAnnotate() {
+        return parsedQueryString().annotate === "true";
+    }
+
+    hasDownload() {
+      return parsedQueryString().download === "true";
+  }
 
     componentDidMount() {
         this.loadCurrentPage();
@@ -187,6 +267,8 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
                         episode={episode}
                         deleteCallback={this.isInstructor() && this.hasDeletion() ? this.deleteEventCallback.bind(this) : undefined}
                         editCallback={this.isInstructor() && this.hasEdit() ? this.editEpisodeCallback.bind(this) : undefined}
+                        annotateCallback={this.hasAnnotate() ? this.annotateEpisodeCallback.bind(this) : undefined}
+                        downloadCallback={this.hasDownload() ? this.downloadEventCallback.bind(this) : undefined}
                         t={this.props.t} />)}
                 </div>
                 <footer className="mt-3">

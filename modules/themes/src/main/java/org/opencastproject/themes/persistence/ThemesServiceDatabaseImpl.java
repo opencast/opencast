@@ -21,15 +21,15 @@
 
 package org.opencastproject.themes.persistence;
 
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.theme.IndexTheme;
 import org.opencastproject.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.index.rebuild.IndexRebuildService;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.theme.SerializableTheme;
-import org.opencastproject.message.broker.api.theme.ThemeItem;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.themes.Theme;
@@ -37,13 +37,14 @@ import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -71,14 +72,11 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   /** The user directory service */
   protected UserDirectoryService userDirectoryService;
 
-  /** The message broker sender service */
-  protected MessageSender messageSender;
-
-  /** The message broker receiver service */
-  protected MessageReceiver messageReceiver;
-
   /** The organization directory service to get organizations */
   protected OrganizationDirectoryService organizationDirectoryService;
+
+  /** The elasticsearch indices */
+  protected AbstractSearchIndex adminUiIndex;
 
   /** The component context for this themes service database */
   private ComponentContext cc;
@@ -119,18 +117,13 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   /** OSGi DI */
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
-  /** OSGi DI */
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
-  }
-
-  /** OSGi DI */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  /** OSGi DI */
+  public void setAdminUiIndex(AbstractSearchIndex index) {
+    this.adminUiIndex = index;
   }
 
   @Override
@@ -205,8 +198,12 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       }
       tx.commit();
       theme = themeDto.toTheme(userDirectoryService);
-      messageSender.sendObjectMessage(ThemeItem.THEME_QUEUE, MessageSender.DestinationType.Queue,
-              ThemeItem.update(toSerializableTheme(theme)));
+
+      // update the elasticsearch indices
+      String orgId = securityService.getOrganization().getId();
+      User user = securityService.getUser();
+      updateThemeInIndex(theme, adminUiIndex, orgId, user);
+
       return theme;
     } catch (Exception e) {
       logger.error("Could not update theme {}", theme, e);
@@ -257,7 +254,10 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       tx.begin();
       em.remove(themeDto);
       tx.commit();
-      messageSender.sendObjectMessage(ThemeItem.THEME_QUEUE, MessageSender.DestinationType.Queue, ThemeItem.delete(id));
+
+      // update the elasticsearch indices
+      String organization = securityService.getOrganization().getId();
+      removeThemeFromIndex(id, adminUiIndex, organization);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -311,38 +311,24 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     }
   }
 
-  /**
-   * Converts a theme to a {@link SerializableTheme} for using by the theme message queue
-   *
-   * @param theme
-   *          the theme
-   * @return the {@link SerializableTheme}
-   */
-  private SerializableTheme toSerializableTheme(Theme theme) {
-    String creator = StringUtils.isNotBlank(theme.getCreator().getName()) ? theme.getCreator().getName()
-            : theme.getCreator().getUsername();
-    return new SerializableTheme(theme.getId().getOrElse(org.apache.commons.lang3.math.NumberUtils.LONG_MINUS_ONE),
-            theme.getCreationDate(), theme.isDefault(), creator, theme.getName(), theme.getDescription(),
-            theme.isBumperActive(), theme.getBumperFile(), theme.isTrailerActive(), theme.getTrailerFile(),
-            theme.isTitleSlideActive(), theme.getTitleSlideMetadata(), theme.getTitleSlideBackground(),
-            theme.isLicenseSlideActive(), theme.getLicenseSlideBackground(), theme.getLicenseSlideDescription(),
-            theme.isWatermarkActive(), theme.getWatermarkFile(), theme.getWatermarkPosition());
-  }
-
   @Override
-  public void repopulate(final String indexName) {
-    final String destinationId = ThemeItem.THEME_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+  public void repopulate(final AbstractSearchIndex index) {
+    if (index.getIndexName() != adminUiIndex.getIndexName()) {
+      logger.info("Themes are currently not part of the {} index, no re-indexing necessary.");
+      return;
+    }
+
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
+      User systemUser = SecurityUtil.createSystemUser(cc, organization);
+      SecurityUtil.runAs(securityService, organization, systemUser, () -> {
         try {
           final List<Theme> themes = getThemes();
           int total = themes.size();
           int current = 1;
-          logIndexRebuildBegin(logger, indexName, total, "themes", organization);
+          logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
           for (Theme theme : themes) {
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    ThemeItem.update(toSerializableTheme(theme)));
-            logIndexRebuildProgress(logger, indexName, total, current);
+            updateThemeInIndex(theme, index, organization.getId(), systemUser);
+            logIndexRebuildProgress(logger, index.getIndexName(), total, current);
             current++;
           }
         } catch (ThemesServiceDatabaseException e) {
@@ -356,5 +342,86 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   @Override
   public IndexRebuildService.Service getService() {
     return IndexRebuildService.Service.Themes;
+  }
+
+  /**
+   * Remove the theme from the ElasticSearch index.
+   *
+   * @param themeId
+   *           the id of the theme to remove
+   * @param index
+   *           the index to remove the theme from
+   * @param orgId
+   *           the organization the theme belongs to
+   */
+  private void removeThemeFromIndex(long themeId, AbstractSearchIndex index, String orgId) {
+    logger.debug("Removing theme {} from the {} index.", themeId, index.getIndexName());
+
+    try {
+      index.delete(IndexTheme.DOCUMENT_TYPE, Long.toString(themeId), orgId);
+      logger.debug("Theme {} removed from the {} index", themeId, index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error deleting the theme {} from the {} index", themeId, index.getIndexName(), e);
+    }
+  }
+
+  /**
+   * Update the theme in the ElasticSearch index.
+   *  @param theme
+   *           the theme to update
+   * @param index
+   *           the index to update
+   * @param orgId
+   *           the organization the theme belongs to
+   * @param user
+   */
+  private void updateThemeInIndex(Theme theme, AbstractSearchIndex index, String orgId,
+          User user) {
+    logger.debug("Updating the theme with id '{}', name '{}', description '{}', organization '{}' in the {} index.",
+            theme.getId(), theme.getName(), theme.getDescription(),
+            orgId, index.getIndexName());
+    try {
+      if (theme.getId().isNone()) {
+        throw new IllegalArgumentException("Can't put theme in index without valid id!");
+      }
+      Long id = theme.getId().get();
+
+      // the function to do the actual updating
+      Function<Optional<IndexTheme>, Optional<IndexTheme>> updateFunction = (Optional<IndexTheme> indexThemeOpt) -> {
+        IndexTheme indexTheme;
+        if (indexThemeOpt.isPresent()) {
+          indexTheme = indexThemeOpt.get();
+        } else {
+          indexTheme = new IndexTheme(id, orgId);
+        }
+        String creator = StringUtils.isNotBlank(theme.getCreator().getName())
+                ? theme.getCreator().getName() : theme.getCreator().getUsername();
+
+        indexTheme.setCreationDate(theme.getCreationDate());
+        indexTheme.setDefault(theme.isDefault());
+        indexTheme.setName(theme.getName());
+        indexTheme.setDescription(theme.getDescription());
+        indexTheme.setCreator(creator);
+        indexTheme.setBumperActive(theme.isBumperActive());
+        indexTheme.setBumperFile(theme.getBumperFile());
+        indexTheme.setTrailerActive(theme.isTrailerActive());
+        indexTheme.setTrailerFile(theme.getTrailerFile());
+        indexTheme.setTitleSlideActive(theme.isTitleSlideActive());
+        indexTheme.setTitleSlideBackground(theme.getTitleSlideBackground());
+        indexTheme.setTitleSlideMetadata(theme.getTitleSlideMetadata());
+        indexTheme.setLicenseSlideActive(theme.isLicenseSlideActive());
+        indexTheme.setLicenseSlideBackground(theme.getLicenseSlideBackground());
+        indexTheme.setLicenseSlideDescription(theme.getLicenseSlideDescription());
+        indexTheme.setWatermarkActive(theme.isWatermarkActive());
+        indexTheme.setWatermarkFile(theme.getWatermarkFile());
+        indexTheme.setWatermarkPosition(theme.getWatermarkPosition());
+        return Optional.of(indexTheme);
+      };
+
+      index.addOrUpdateTheme(id, updateFunction, orgId, user);
+      logger.debug("Updated the theme {} in the {} index", theme.getId(), index.getIndexName());
+    } catch (SearchIndexException e) {
+      logger.error("Error updating the theme {} in the {} index", theme.getId(), index.getIndexName(), e);
+    }
   }
 }

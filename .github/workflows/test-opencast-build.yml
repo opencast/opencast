@@ -8,6 +8,7 @@ on:
       - 'docs/checkstyle/**'
       - 'docs/log4j/**'
       - 'assemblies/**'
+      - '.github/**'
   push:
     paths:
       - 'pom.xml'
@@ -15,14 +16,15 @@ on:
       - 'docs/checkstyle/**'
       - 'docs/log4j/**'
       - 'assemblies/**'
+      - '.github/**'
 
 jobs:
   build:
     strategy:
       matrix:
         java:
-          - 8
           - 11
+          - 13
     name: build (java ${{ matrix.java }})
     runs-on: ubuntu-20.04
     steps:
@@ -64,19 +66,57 @@ jobs:
 
       - name: build opencast
         run: |
-          mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-            clean install -Pnone
+          mvn clean install -Pnone \
+            --batch-mode \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            -Dhttp.keepAlive=false \
+            -Dmaven.wagon.http.pool=false \
+            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
       - name: build assemblies
+        if: matrix.java == 11
         working-directory: assemblies
-        if: >
-          github.event_name == 'push'
-          && matrix.java == 11
-          && github.repository == 'opencast/opencast'
-          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         run: |
-          mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-            clean install
+          mvn clean install -Pallinone  \
+            --batch-mode \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            -Dhttp.keepAlive=false \
+            -Dmaven.wagon.http.pool=false \
+            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+      - name: prepare allinone distribution
+        if: matrix.java == 11
+        working-directory: build
+        run: |
+          tar xf opencast-dist-allinone*.tar.gz
+
+      - name: prepare runtime dependencies
+        if: matrix.java == 11
+        working-directory: docs/scripts/devel-dependency-containers
+        run: |
+          docker-compose up -d
+
+      - name: get new curl
+        if: matrix.java == 11
+        run: |
+          curl -OL https://github.com/moparisthebest/static-curl/releases/download/v7.77.0/curl-amd64
+          chmod +x curl-amd64
+
+      - name: wait for elasticsearch to boot
+        if: matrix.java == 11
+        run: >
+          ./curl-amd64 -fisS --retry 60 --retry-delay 1 --retry-all-errors
+          http://localhost:9200/
+
+      - name: integration test
+        if: matrix.java == 11
+        run: |
+          ./build/opencast-dist-allinone/bin/start-opencast daemon &
+          ./curl-amd64 -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast http://localhost:8080/sysinfo/bundles/version
+
+      - name: show logs on failure
+        if: ${{ failure() }}
+        run: cat build/opencast-dist-allinone/data/log/opencast.log || true
 
       - name: save version
         working-directory: build

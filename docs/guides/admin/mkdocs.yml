@@ -7,6 +7,7 @@ markdown_extensions:
 
 plugins:
   - search:
+  - macros:
   - mermaid2:
       arguments:
         theme: neutral
@@ -69,6 +70,7 @@ nav:
    - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
+   - Elasticsearch: 'configuration/elasticsearch.md'
    - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
    - Inbox: 'configuration/inbox.md'
@@ -83,6 +85,7 @@ nav:
       - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
+      - JWT-based Authentication and Authorization (e.g. for OIDC): 'configuration/security.jwt.md'
       - Moodle User Provider: 'configuration/security.user.moodle.md'
       - Sakai User Provider: 'configuration/security.user.sakai.md'
       - Brightspace User Provider: 'configuration/security.user.brightspace.md'
@@ -169,6 +172,7 @@ nav:
    - Comment: 'workflowoperationhandlers/comment-woh.md'
    - Composite: 'workflowoperationhandlers/composite-woh.md'
    - Concat: 'workflowoperationhandlers/concat-woh.md'
+   - Conditional Config: 'workflowoperationhandlers/conditional-config-woh.md'
    - Configure-By-DCTerm: 'workflowoperationhandlers/configure-by-dcterm-woh.md'
    - Copy: 'workflowoperationhandlers/copy-woh.md'
    - Clone: 'workflowoperationhandlers/clone-woh.md'
@@ -199,6 +203,7 @@ nav:
    - Inspect: 'workflowoperationhandlers/inspect-woh.md'
    - Log: 'workflowoperationhandlers/log-woh.md'
    - Mattermost Notification Module: 'workflowoperationhandlers/notification.md'
+   - Metadata to ACL: 'workflowoperationhandlers/metadata-to-acl.md'
    - Move Storage: 'workflowoperationhandlers/move-storage-woh.md'
    - Multiencode: 'workflowoperationhandlers/multiencode-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'

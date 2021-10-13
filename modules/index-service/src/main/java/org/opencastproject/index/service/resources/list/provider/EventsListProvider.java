@@ -104,7 +104,7 @@ public class EventsListProvider implements ResourceListProvider {
       list.put("EVENTS.EVENTS.STATUS.PROCESSED", "EVENTS.EVENTS.STATUS.PROCESSED");
       list.put("EVENTS.EVENTS.STATUS.RECORDING_FAILURE", "EVENTS.EVENTS.STATUS.RECORDING_FAILURE");
       list.put("EVENTS.EVENTS.STATUS.PROCESSING_FAILURE", "EVENTS.EVENTS.STATUS.PROCESSING_FAILURE");
-      list.put("EVENTS.EVENTS.STATUS.PROCESSING_CANCELED", "EVENTS.EVENTS.STATUS.PROCESSING_CANCELED");
+      list.put("EVENTS.EVENTS.STATUS.PROCESSING_CANCELLED", "EVENTS.EVENTS.STATUS.PROCESSING_CANCELLED");
     } else if (COMMENTS.equals(listName)) {
       for (Comments comments : Comments.values())
         list.put(comments.toString(), "FILTERS.EVENTS.COMMENTS." + comments.toString());

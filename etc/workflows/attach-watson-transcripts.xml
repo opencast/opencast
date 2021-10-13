@@ -35,7 +35,7 @@
       <configurations>
         <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="strategy">merge</configuration>
-        <configuration key="check-availability">true</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 

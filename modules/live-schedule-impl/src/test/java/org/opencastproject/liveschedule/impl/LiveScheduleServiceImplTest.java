@@ -63,6 +63,8 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
@@ -126,6 +128,7 @@ public class LiveScheduleServiceImplTest {
   private AssetManager assetManager;
   private AuthorizationService authService;
   private OrganizationDirectoryService organizationService;
+  private SecurityService securityService;
 
   @Before
   public void setUp() throws Exception {
@@ -155,8 +158,13 @@ public class LiveScheduleServiceImplTest {
             defOrg.getAnonymousRole(), orgProps);
     EasyMock.expect(organizationService.getOrganization(ORG_ID)).andReturn(org).anyTimes();
 
+    securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.expect(securityService.getUser()).andReturn(null);
+
     // Live service configuration
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+    EasyMock.expect(bc.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER)).andReturn("system-user");
     Dictionary<String, Object> props = new Hashtable<String, Object>();
     props.put(LiveScheduleServiceImpl.LIVE_STREAMING_URL, STREAMING_SERVER_URL);
     props.put(LiveScheduleServiceImpl.LIVE_STREAM_MIME_TYPE, "video/x-flv");
@@ -180,13 +188,13 @@ public class LiveScheduleServiceImplTest {
     service.setAssetManager(assetManager);
     service.setAuthorizationService(authService);
     service.setOrganizationService(organizationService);
-
+    service.setSecurityService(securityService);
     service.activate(cc);
   }
 
   private void replayServices() {
     EasyMock.replay(searchService, seriesService, serviceRegistry, captureAgentService, downloadDistributionService,
-            workspace, dublinCoreService, assetManager, organizationService);
+            workspace, dublinCoreService, assetManager, organizationService, securityService);
   }
 
   private void assertExpectedLiveTracks(Track[] liveTracks, long duration, String caName, String suffix,
@@ -299,9 +307,11 @@ public class LiveScheduleServiceImplTest {
   public void testAddLiveTracksUsingCaptureAgentProperties() throws Exception {
     Properties props = new Properties();
     props.put(LiveScheduleServiceImpl.CA_PROPERTY_RESOLUTION_URL_PREFIX + "960x270", STREAMING_SERVER_URL
-            + "/c3d913f6-9af7-403a-91a9-33b73ee18193-another-capture-agent-presenter-delivery-stream-960x270_suffix_from_ca");
+        + "/c3d913f6-9af7-403a-91a9-33b73ee18193-another-capture-agent-presenter-"
+        + "delivery-stream-960x270_suffix_from_ca");
     props.put(LiveScheduleServiceImpl.CA_PROPERTY_RESOLUTION_URL_PREFIX + "1920x540", STREAMING_SERVER_URL
-            + "/c3d913f6-9af7-403a-91a9-33b73ee18193-another-capture-agent-presenter-delivery-stream-1920x540_suffix_from_ca");
+        + "/c3d913f6-9af7-403a-91a9-33b73ee18193-another-capture-agent-presenter-"
+        + "delivery-stream-1920x540_suffix_from_ca");
     EasyMock.expect(captureAgentService.getAgentCapabilities("another-capture-agent")).andReturn(props).anyTimes();
     replayServices();
 
@@ -320,17 +330,20 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(seriesService.getSeries(SERIES_ID)).andReturn(seriesDC).anyTimes();
 
     Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<catalog id=\"9ad6ebcb-b414-4b15-ab62-5e5ddede447e\" type=\"dublincore/episode\" xmlns=\"http://mediapackage.opencastproject.org\">"
-            + "<mimetype>text/xml</mimetype>"
-            + "<url>http://10.10.10.50/static/mh_default_org/engage-live/episode.xml</url></catalog>"
-            + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<catalog id=\"23113662-1a84-457a-85d5-0b3e32d2413a\" type=\"dublincore/series\" xmlns=\"http://mediapackage.opencastproject.org\">"
-            + "<mimetype>text/xml</mimetype>"
-            + "<url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url></catalog>"
-            + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" xmlns=\"http://mediapackage.opencastproject.org\">"
-            + "<mimetype>text/xml</mimetype>"
-            + "<url>http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml</url></attachment>");
+        + "<catalog id=\"9ad6ebcb-b414-4b15-ab62-5e5ddede447e\" type=\"dublincore/episode\" "
+        + "xmlns=\"http://mediapackage.opencastproject.org\">"
+        + "<mimetype>text/xml</mimetype>"
+        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/episode.xml</url></catalog>"
+        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+        + "<catalog id=\"23113662-1a84-457a-85d5-0b3e32d2413a\" type=\"dublincore/series\" "
+        + "xmlns=\"http://mediapackage.opencastproject.org\">"
+        + "<mimetype>text/xml</mimetype>"
+        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url></catalog>"
+        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+        + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" "
+        + "xmlns=\"http://mediapackage.opencastproject.org\">"
+        + "<mimetype>text/xml</mimetype>"
+        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml</url></attachment>");
     EasyMock.expect(downloadDistributionService.distribute(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
             EasyMock.anyObject(Set.class), EasyMock.anyBoolean())).andReturn(job).once();
     EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
@@ -378,8 +391,9 @@ public class LiveScheduleServiceImplTest {
             .loadFromXml(mpURI.toURL().openStream());
 
     Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" xmlns=\"http://mediapackage.opencastproject.org\">"
-            + "<mimetype>text/xml</mimetype><url>http://host/security-policy-episode.xml</url></attachment>");
+        + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" "
+        + "xmlns=\"http://mediapackage.opencastproject.org\">"
+        + "<mimetype>text/xml</mimetype><url>http://host/security-policy-episode.xml</url></attachment>");
     EasyMock.expect(downloadDistributionService.distribute(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
             EasyMock.anyObject(String.class), EasyMock.anyBoolean())).andReturn(job).once();
     EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
@@ -453,7 +467,7 @@ public class LiveScheduleServiceImplTest {
   public void testGetMediaPackageFromSearch() throws Exception {
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getByQuery((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
@@ -465,7 +479,7 @@ public class LiveScheduleServiceImplTest {
   public void testGetMediaPackageFromSearchNotFound() throws Exception {
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result-empty.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getByQuery((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
@@ -676,17 +690,20 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(seriesService.getSeries(SERIES_ID)).andReturn(seriesDC).anyTimes();
 
     Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<catalog id=\"9ad6ebcb-b414-4b15-ab62-5e5ddede447e\" type=\"dublincore/episode\" xmlns=\"http://mediapackage.opencastproject.org\">"
-            + "<mimetype>text/xml</mimetype>"
-            + "<url>http://10.10.10.50/static/mh_default_org/engage-live/episode.xml</url></catalog>"
-            + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<catalog id=\"23113662-1a84-457a-85d5-0b3e32d2413a\" type=\"dublincore/series\" xmlns=\"http://mediapackage.opencastproject.org\">"
-            + "<mimetype>text/xml</mimetype>"
-            + "<url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url></catalog>"
-            + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" xmlns=\"http://mediapackage.opencastproject.org\">"
-            + "<mimetype>text/xml</mimetype>"
-            + "<url>http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml</url></attachment>");
+        + "<catalog id=\"9ad6ebcb-b414-4b15-ab62-5e5ddede447e\" type=\"dublincore/episode\" "
+        + "xmlns=\"http://mediapackage.opencastproject.org\">"
+        + "<mimetype>text/xml</mimetype>"
+        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/episode.xml</url></catalog>"
+        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+        + "<catalog id=\"23113662-1a84-457a-85d5-0b3e32d2413a\" type=\"dublincore/series\" "
+        + "xmlns=\"http://mediapackage.opencastproject.org\">"
+        + "<mimetype>text/xml</mimetype>"
+        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url></catalog>"
+        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+        + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" "
+        + "xmlns=\"http://mediapackage.opencastproject.org\">"
+        + "<mimetype>text/xml</mimetype>"
+        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml</url></attachment>");
     EasyMock.expect(downloadDistributionService.distribute(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
             EasyMock.anyObject(Set.class), EasyMock.anyBoolean())).andReturn(job);
     EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
@@ -721,7 +738,8 @@ public class LiveScheduleServiceImplTest {
     Assert.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
     Assert.assertEquals(1, archivedMp.getPublications().length);
     Assert.assertEquals(LiveScheduleService.CHANNEL_ID, archivedMp.getPublications()[0].getChannel());
-    Assert.assertEquals(v, service.getSnapshotVersionCache().getIfPresent(MP_ID)); // Check that version got into local cache
+    // Check that version got into local cache
+    Assert.assertEquals(v, service.getSnapshotVersionCache().getIfPresent(MP_ID));
   }
 
   @Test
@@ -749,7 +767,7 @@ public class LiveScheduleServiceImplTest {
   public void testCreateOuUpdateLiveEventAlreadyPast() throws Exception {
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result-empty.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getByQuery((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
@@ -764,7 +782,7 @@ public class LiveScheduleServiceImplTest {
 
     URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/no-live-search-result.xml").toURI();
     SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
-    EasyMock.expect(searchService.getByQuery((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
+    EasyMock.expect(searchService.getForAdministrativeRead((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
     replayServices();
 
     Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
@@ -789,17 +807,20 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(seriesService.getSeries(SERIES_ID)).andReturn(seriesDC).anyTimes();
 
     Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<catalog id=\"9ad6ebcb-b414-4b15-ab62-5e5ddede447e\" type=\"dublincore/episode\" xmlns=\"http://mediapackage.opencastproject.org\">"
-            + "<mimetype>text/xml</mimetype>"
-            + "<url>http://10.10.10.50/static/mh_default_org/engage-live/episode_updated.xml</url></catalog>"
-            + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<catalog id=\"23113662-1a84-457a-85d5-0b3e32d2413a\" type=\"dublincore/series\" xmlns=\"http://mediapackage.opencastproject.org\">"
-            + "<mimetype>text/xml</mimetype>"
-            + "<url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url></catalog>"
-            + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" xmlns=\"http://mediapackage.opencastproject.org\">"
-            + "<mimetype>text/xml</mimetype>"
-            + "<url>http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml</url></attachment>");
+        + "<catalog id=\"9ad6ebcb-b414-4b15-ab62-5e5ddede447e\" type=\"dublincore/episode\" "
+        + "xmlns=\"http://mediapackage.opencastproject.org\">"
+        + "<mimetype>text/xml</mimetype>"
+        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/episode_updated.xml</url></catalog>"
+        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+        + "<catalog id=\"23113662-1a84-457a-85d5-0b3e32d2413a\" type=\"dublincore/series\" "
+        + "xmlns=\"http://mediapackage.opencastproject.org\">"
+        + "<mimetype>text/xml</mimetype>"
+        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url></catalog>"
+        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+        + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" "
+        + "xmlns=\"http://mediapackage.opencastproject.org\">"
+        + "<mimetype>text/xml</mimetype>"
+        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml</url></attachment>");
     EasyMock.expect(downloadDistributionService.distribute(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
             EasyMock.anyObject(Set.class), EasyMock.anyBoolean())).andReturn(job);
     EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();

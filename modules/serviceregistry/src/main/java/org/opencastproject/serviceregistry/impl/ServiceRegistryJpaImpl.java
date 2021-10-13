@@ -29,7 +29,6 @@ import static org.opencastproject.job.api.AbstractJobProducer.ACCEPT_JOB_LOADS_E
 import static org.opencastproject.job.api.AbstractJobProducer.DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING;
 import static org.opencastproject.job.api.Job.FailureReason.DATA;
 import static org.opencastproject.job.api.Job.Status.FAILED;
-import static org.opencastproject.job.jpa.JpaJob.fnToJob;
 import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
 import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
 import static org.opencastproject.serviceregistry.api.ServiceState.ERROR;
@@ -49,6 +48,7 @@ import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.HostStatistics;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.JaxbServiceStatistics;
@@ -950,7 +950,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
     logger.debug("Current host load: {}, job load cache size: {}", format("%.1f", localSystemLoad), jobCache.size());
 
-    if (jobCache.isEmpty() && Math.abs(localSystemLoad) > 0.01f) {
+    if (jobCache.isEmpty() && localSystemLoad != 0) {
       logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0",
               format("%.2f", localSystemLoad));
       localSystemLoad = 0;
@@ -973,15 +973,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       logger.warn("Can not set the job URI", e);
     }
     return job;
-  }
-
-  private Fn<JpaJob, JpaJob> fnSetJobUri() {
-    return new Fn<JpaJob, JpaJob>() {
-      @Override
-      public JpaJob apply(JpaJob job) {
-        return setJobUri(job);
-      }
-    };
   }
 
   /**
@@ -1438,7 +1429,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     cleanRunningJobs(serviceType, baseUrl);
   }
 
-  /** Find all undispatchable jobs that were orphaned when this host was last deactivated and set them to CANCELED. */
+  /** Find all undispatchable jobs that were orphaned when this host was last deactivated and set them to CANCELLED. */
   private void cleanUndispatchableJobs(String hostName) {
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -1468,7 +1459,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
         } else {
           logger.info("Cancelling the running undispatchable job {}, it was orphaned on this host ({})", job, hostName);
-          job.setStatus(Status.CANCELED);
+          job.setStatus(Status.CANCELLED);
           em.merge(job);
         }
       }
@@ -1485,7 +1476,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Find all running jobs on this service and set them to RESET or CANCELED.
+   * Find all running jobs on this service and set them to RESET or CANCELLED.
    *
    * @param serviceType
    *          the service type
@@ -1519,7 +1510,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         if (job.isDispatchable()) {
           em.refresh(job);
           // If this job has already been treated
-          if (Status.CANCELED.equals(job.getStatus()) || Status.RESTART.equals(job.getStatus()))
+          if (Status.CANCELLED.equals(job.getStatus()) || Status.RESTART.equals(job.getStatus()))
             continue;
           if (job.getRootJob() != null && Status.PAUSED.equals(job.getRootJob().getStatus())) {
             JpaJob rootJob = job.getRootJob();
@@ -1554,7 +1545,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Go through all the children recursively to set them in {@link Status#CANCELED} status
+   * Go through all the children recursively to set them in {@link Status#CANCELLED} status
    *
    * @param job
    *          the parent job
@@ -1564,10 +1555,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   private void cancelAllChildren(JpaJob job, EntityManager em) {
     for (JpaJob child : job.getChildJobs()) {
       em.refresh(child);
-      if (Status.CANCELED.equals(job.getStatus()))
+      if (Status.CANCELLED.equals(job.getStatus()))
         continue;
       cancelAllChildren(child, em);
-      child.setStatus(Status.CANCELED);
+      child.setStatus(Status.CANCELLED);
       em.merge(child);
     }
   }
@@ -1670,6 +1661,32 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
   }
 
+  @Override
+  public HostStatistics getHostStatistics() {
+    HostStatistics statistics = new HostStatistics();
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      List<Object[]> results = em.createNamedQuery("HostRegistration.jobStatistics", Object[].class)
+          .setParameter("status", Arrays.asList(Status.QUEUED.ordinal(), Status.RUNNING.ordinal()))
+          .getResultList();
+      for (Object[] row: results) {
+        final long host = ((Number) row[0]).longValue();
+        final int status = ((Number) row[1]).intValue();
+        final long count = ((Number) row[2]).longValue();
+        if (status == Status.RUNNING.ordinal()) {
+          statistics.addRunning(host, count);
+        } else {
+          statistics.addQueued(host, count);
+        }
+      }
+    } finally {
+      if (em != null)
+        em.close();
+    }
+    return statistics;
+  }
+
   /**
    * Gets all host registrations
    *
@@ -1714,16 +1731,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (jobs.size() == 0) {
         jobs = getChildren(em, id);
       }
-      return $(jobs).sort(new Comparator<JpaJob>() {
-        @Override
-        public int compare(JpaJob job1, JpaJob job2) {
-          if (job1.getDateCreated() == null || job2.getDateCreated() == null) {
-            return 0;
-          } else {
-            return job1.getDateCreated().compareTo(job2.getDateCreated());
-          }
-        }
-      }).map(fnSetJobUri()).map(fnToJob()).toList();
+      return jobs.stream()
+          .map(this::setJobUri)
+          .map(JpaJob::toJob)
+          .collect(Collectors.toList());
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
@@ -1774,7 +1785,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         setJobUri(job);
       }
 
-      return $(jobs).map(fnToJob()).toList();
+      return jobs.stream()
+          .map(JpaJob::toJob)
+          .collect(Collectors.toList());
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
@@ -3305,12 +3318,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                     logger.warn("Service {} is not working as expected: {}", service, response.getStatusLine());
                 }
               } else {
-                logger.warn("Service {} does not respond: {}", service.toString());
+                logger.warn("Service {} does not respond", service);
               }
             } catch (TrustedHttpClientException e) {
               if (!service.isOnline())
                 continue;
-              logger.warn("Unable to reach {} : {}", service, e);
+              logger.warn("Unable to reach {}", service, e);
             }
 
             // If we get here, the service did not respond as expected
@@ -3324,7 +3337,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                 logger.warn("Added {} to the watch list", service);
               }
             } catch (ServiceRegistryException e) {
-              logger.warn("Unable to unregister unreachable service: {} : {}", service, e);
+              logger.warn("Unable to unregister unreachable service: {}", service, e);
             }
           } finally {
             client.close(response);

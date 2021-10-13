@@ -98,7 +98,7 @@ Using a Profile
 Once defined, use your encoding profile in your workflow by setting the encoding-profile property to the profiles name:
 
     <operation
-        id="compose"
+        id="encode"
         fail-on-error="true"
         exception-handler-workflow="error"
         description="Encode presenter using my audio/video encoding profile">

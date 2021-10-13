@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -54,10 +54,6 @@
       <artifactId>httpclient-osgi</artifactId>
     </dependency>
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
     </dependency>
@@ -101,10 +97,6 @@
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
-    </dependency>
     <!-- Test -->
     <dependency>
       <groupId>junit</groupId>
@@ -132,11 +124,12 @@
       <artifactId>xml-matchers</artifactId>
       <version>1.0-RC1</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>org.eclipse.persistence.core</artifactId>
-      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>Saxon-HE</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -202,8 +195,6 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/oai-pmh-server.xml,
-              OSGI-INF/matterhorn-harvester.xml,
-              OSGI-INF/matterhorn-record-handler.xml,
               OSGI-INF/default-repository.xml
             </Service-Component>
             <Meta-Persistence>

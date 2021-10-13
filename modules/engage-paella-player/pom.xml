@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -23,20 +23,6 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <executions>
-              <execution>
-                <id>npm clean</id>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <phase>pre-clean</phase>
-                <configuration>
-                  <executable>npm</executable>
-                  <arguments>
-                    <argument>cache</argument>
-                    <argument>verify</argument>
-                  </arguments>
-                </configuration>
-              </execution>
               <execution>
                 <id>npm ci</id>
                 <goals>
@@ -103,17 +89,6 @@
                 </goals>
                 <configuration>
                   <nodeVersion>${node.version}</nodeVersion>
-                </configuration>
-              </execution>
-
-              <execution>
-                <phase>validate</phase>
-                <id>npm clean</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>cache verify</arguments>
                 </configuration>
               </execution>
 

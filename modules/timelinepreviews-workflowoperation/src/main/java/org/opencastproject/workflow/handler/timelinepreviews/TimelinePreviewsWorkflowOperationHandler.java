@@ -34,6 +34,7 @@ import org.opencastproject.timelinepreviews.api.TimelinePreviewsService;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
@@ -103,23 +104,16 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
     logger.info("Start timeline previews workflow operation for mediapackage {}",
         mediaPackage.getIdentifier().toString());
 
-    String sourceFlavorProperty = StringUtils.trimToNull(
-            workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
-    String sourceTagsProperty = StringUtils.trimToNull(
-            workflowInstance.getCurrentOperation().getConfiguration(SOURCE_TAGS_PROPERTY));
-    if (StringUtils.isEmpty(sourceFlavorProperty) && StringUtils.isEmpty(sourceTagsProperty)) {
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.many, Configuration.many, Configuration.many, Configuration.one);
+    List<MediaPackageElementFlavor> sourceFlavorProperty = tagsAndFlavors.getSrcFlavors();
+    List<String> sourceTagsProperty = tagsAndFlavors.getSrcTags();
+    if (sourceFlavorProperty.isEmpty() && sourceTagsProperty.isEmpty()) {
       throw new WorkflowOperationException(String.format("Required property %s or %s not set",
               SOURCE_FLAVOR_PROPERTY, SOURCE_TAGS_PROPERTY));
     }
-
-    String targetFlavorProperty = StringUtils.trimToNull(
-            workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
-    if (targetFlavorProperty == null) {
-      throw new WorkflowOperationException(String.format("Required property %s not set", TARGET_FLAVOR_PROPERTY));
-    }
-
-    String targetTagsProperty = StringUtils.trimToNull(
-            workflowInstance.getCurrentOperation().getConfiguration(TARGET_TAGS_PROPERTY));
+    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
+    List<String> targetTagsProperty = tagsAndFlavors.getTargetTags();
 
     String imageSizeArg = StringUtils.trimToNull(
             workflowInstance.getCurrentOperation().getConfiguration(IMAGE_SIZE_PROPERTY));
@@ -141,10 +135,10 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
             workflowInstance.getCurrentOperation().getConfiguration(PROCCESS_FIRST_MATCH)));
 
     TrackSelector trackSelector = new TrackSelector();
-    for (String flavor : asList(sourceFlavorProperty)) {
+    for (MediaPackageElementFlavor flavor : sourceFlavorProperty) {
       trackSelector.addFlavor(flavor);
     }
-    for (String tag : asList(sourceTagsProperty)) {
+    for (String tag : sourceTagsProperty) {
       trackSelector.addTag(tag);
     }
     Collection<Track> sourceTracks = trackSelector.select(mediaPackage, true);
@@ -228,7 +222,6 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
           }
 
           // set the timeline previews attachment flavor and add it to the mediapackage
-          MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorProperty);
           if ("*".equals(targetFlavor.getType())) {
             targetFlavor = new MediaPackageElementFlavor(
                 timelinePreviewsMpe.getFlavor().getType(), targetFlavor.getSubtype());
@@ -238,8 +231,8 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
                 targetFlavor.getType(), timelinePreviewsMpe.getFlavor().getSubtype());
           }
           timelinePreviewsMpe.setFlavor(targetFlavor);
-          if (!StringUtils.isEmpty(targetTagsProperty)) {
-            for (String tag : asList(targetTagsProperty)) {
+          if (!targetTagsProperty.isEmpty()) {
+            for (String tag : targetTagsProperty) {
               timelinePreviewsMpe.addTag(tag);
             }
           }

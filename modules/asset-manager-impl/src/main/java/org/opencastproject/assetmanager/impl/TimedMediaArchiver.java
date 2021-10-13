@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.impl;
 
 import static org.opencastproject.util.data.Option.some;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.kernel.scanner.AbstractScanner;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.Log;
@@ -56,7 +57,7 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
   public static final String TRIGGER_GROUP = "oc-asset-manager-timed-media-archiver-trigger-group";
   public static final String TRIGGER_NAME = "oc-asset-manager-timed-media-archiver-trigger";
 
-  private TieredStorageAssetManager assetManager;
+  private AssetManager assetManager;
   private WorkflowService workflowService;
   private String storeId;
   private long ageModifier;
@@ -149,8 +150,8 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
     try {
       // Hardcoded date of zero.  Assumption: there is nothing with a date older than 0 which needs to be auto moved.
       assetManager.moveSnapshotsByDate(new Date(0), maxAge, storeId);
-    } catch (NotFoundException e) {
-      throw new RuntimeException("Unable to offload asset manager data", e);
+    } catch (NotFoundException ignore) {
+      logger.debug("No snapshots found that need to be moved");
     }
   }
 
@@ -159,7 +160,7 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
     return SCANNER_NAME;
   }
 
-  public void setAssetManager(TieredStorageAssetManager am) {
+  public void setAssetManager(AssetManager am) {
     this.assetManager = am;
   }
 

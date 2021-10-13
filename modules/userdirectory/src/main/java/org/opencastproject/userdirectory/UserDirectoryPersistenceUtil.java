@@ -27,11 +27,14 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.requests.SortCriterion;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -39,6 +42,14 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 /**
  * Utility class for user directory persistence methods
@@ -84,8 +95,9 @@ public final class UserDirectoryPersistenceUtil {
       if (tx.isActive()) {
         tx.rollback();
       }
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -117,8 +129,9 @@ public final class UserDirectoryPersistenceUtil {
       if (tx.isActive()) {
         tx.rollback();
       }
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -151,8 +164,9 @@ public final class UserDirectoryPersistenceUtil {
       if (tx.isActive()) {
         tx.rollback();
       }
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -178,8 +192,170 @@ public final class UserDirectoryPersistenceUtil {
       query.setParameter("organization", organization);
       return query.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
+    }
+  }
+
+  /**
+   * Count how many groups there are in total fitting the filter criteria.
+   *
+   * @param orgId
+   *          the organization id
+   * @param nameFilter
+   *          filter by group name (optional)
+   * @param textFilter
+   *          fulltext filter (optional)
+   * @param emf
+   *          the entity manager factory
+   * @return the group list
+   * @throws IllegalArgumentException
+   */
+  public static long countTotalGroups(String orgId, Optional<String> nameFilter, Optional<String> textFilter,
+          EntityManagerFactory emf) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      CriteriaBuilder cb = em.getCriteriaBuilder();
+      final CriteriaQuery<Long> query = cb.createQuery(Long.class);
+      Root<JpaGroup> group = query.from(JpaGroup.class);
+      query.select(cb.count(group));
+
+      addWhereToQuery(query, cb, group, orgId, nameFilter, textFilter);
+
+      TypedQuery<Long> typedQuery = em.createQuery(query);
+      return typedQuery.getSingleResult();
+    } finally {
+      if (em != null) {
+        em.close();
+      }
+    }
+  }
+
+  /**
+   * Add where clauses to groups query.
+   *
+   * @param query
+   *         the query
+   * @param cb
+   *          the criteria builder
+   * @param group
+   *          the table
+   * @param orgId
+   *          the organization id
+   * @param nameFilter
+   *          filter by group name (optional)
+   * @param textFilter
+   *          fulltext filter (optional)
+   */
+  private static void addWhereToQuery(CriteriaQuery query, CriteriaBuilder cb, Root<JpaGroup> group,
+          String orgId, Optional<String> nameFilter, Optional<String> textFilter) {
+    List<Predicate> conditions = new ArrayList();
+    conditions.add(cb.equal(group.join("organization").get("id"), orgId));
+
+    // exact match, case sensitive
+    if (nameFilter.isPresent()) {
+      conditions.add(cb.equal(group.get("name"), nameFilter.get()));
+    }
+    // not exact match, case-insensitive, each token needs to match at least one field
+    if (textFilter.isPresent()) {
+      List<Predicate> fulltextConditions = new ArrayList();
+      String[] tokens = textFilter.get().split("\\s+");
+      for (String token: tokens) {
+        List<Predicate> fieldConditions = new ArrayList();
+        Expression<String> literal = cb.literal("%" + token + "%");
+
+        fieldConditions.add(cb.like(cb.lower(group.get("groupId")), cb.lower(literal)));
+        fieldConditions.add(cb.like(cb.lower(group.get("name")), cb.lower(literal)));
+        fieldConditions.add(cb.like(cb.lower(group.get("description")), cb.lower(literal)));
+        fieldConditions.add(cb.like(cb.lower(group.get("role")), cb.lower(literal)));
+        fieldConditions.add(cb.like(cb.lower(group.<JpaGroup, String>joinSet("members", JoinType.LEFT)),
+                cb.lower(literal)));
+        fieldConditions.add(cb.like(cb.lower(group.<JpaGroup, JpaRole>joinSet("roles", JoinType.LEFT).get("name")),
+                cb.lower(literal)));
+
+        // token needs to match at least one field
+        fulltextConditions.add(cb.or(fieldConditions.toArray(new Predicate[fieldConditions.size()])));
+      }
+      // all token have to match something
+      // (different to fulltext search for Elasticsearch, where only one token has to match!)
+      conditions.add(cb.and(fulltextConditions.toArray(new Predicate[fulltextConditions.size()])));
+    }
+    query.where(cb.and(conditions.toArray(new Predicate[conditions.size()])));
+  }
+
+  /**
+   * Get group list by criteria.
+   *
+   * @param orgId
+   *          the organization id
+   * @param limit
+   *          the limit (optional)
+   * @param offset
+   *          the offset (optional)
+   * @param nameFilter
+   *          filter by group name (optional)
+   * @param textFilter
+   *          fulltext filter (optional)
+   * @param sortCriteria
+   *          the sorting criteria (name, role or description)
+   * @param emf
+   *          the entity manager factory
+   * @return the group list
+   * @throws IllegalArgumentException
+   */
+  public static List<JpaGroup> findGroups(String orgId, Optional<Integer> limit, Optional<Integer> offset,
+          Optional<String> nameFilter, Optional<String> textFilter, Set<SortCriterion> sortCriteria,
+          EntityManagerFactory emf) throws IllegalArgumentException {
+
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      CriteriaBuilder cb = em.getCriteriaBuilder();
+      final CriteriaQuery<JpaGroup> query = cb.createQuery(JpaGroup.class);
+      Root<JpaGroup> group = query.from(JpaGroup.class);
+      query.select(group);
+      query.distinct(true);
+
+      // filter
+      addWhereToQuery(query, cb, group, orgId, nameFilter, textFilter);
+
+      // sort
+      List<Order> orders = new ArrayList<>();
+      for (SortCriterion criterion : sortCriteria) {
+        switch(criterion.getFieldName()) {
+          case "name":
+          case "description":
+          case "role":
+            Expression expression = group.get(criterion.getFieldName());
+            if (criterion.getOrder() == SortCriterion.Order.Ascending) {
+              orders.add(cb.asc(expression));
+            } else if (criterion.getOrder() == SortCriterion.Order.Descending) {
+              orders.add(cb.desc(expression));
+            }
+            break;
+          default:
+            throw new IllegalArgumentException("Sorting criterion " + criterion.getFieldName() + " is not supported "
+                    + "for groups.");
+        }
+      }
+      query.orderBy(orders);
+
+      TypedQuery<JpaGroup> typedQuery = em.createQuery(query);
+      if (limit.isPresent()) {
+        typedQuery.setMaxResults(limit.get());
+      }
+      if (offset.isPresent()) {
+        typedQuery.setFirstResult(offset.get());
+      }
+
+      return typedQuery.getResultList();
+
+    } finally {
+      if (em != null) {
+        em.close();
+      }
     }
   }
 
@@ -205,8 +381,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", organization);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -236,8 +413,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", orgId);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -262,8 +440,9 @@ public final class UserDirectoryPersistenceUtil {
       query.setParameter("organization", orgId);
       return query.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -286,8 +465,9 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -298,7 +478,11 @@ public final class UserDirectoryPersistenceUtil {
    * @param emf the entity manager factory
    * @return the list of users that was found
    */
-  public static List<JpaUser> findUsersByUserName(Collection<String> userNames, String organizationId, EntityManagerFactory emf) {
+  public static List<JpaUser> findUsersByUserName(
+      Collection<String> userNames,
+      String organizationId,
+      EntityManagerFactory emf
+  ) {
     if (userNames.isEmpty()) {
       return Collections.<JpaUser>emptyList();
     }
@@ -310,8 +494,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", organizationId);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -337,8 +522,9 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -364,8 +550,9 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -386,8 +573,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", organizationId);
       return ((Number) q.getSingleResult()).longValue();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -404,8 +592,9 @@ public final class UserDirectoryPersistenceUtil {
       Query q = em.createNamedQuery("User.countAll");
       return ((Number) q.getSingleResult()).longValue();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -435,8 +624,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", orgId);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -462,8 +652,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", orgId);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -489,8 +680,9 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -516,8 +708,9 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -543,14 +736,15 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
 
-  public static void removeGroup(String groupId, String orgId, EntityManagerFactory emf) throws NotFoundException,
-  Exception {
+  public static void removeGroup(String groupId, String orgId, EntityManagerFactory emf)
+          throws NotFoundException, Exception {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -588,7 +782,7 @@ public final class UserDirectoryPersistenceUtil {
    * @throws Exception
    */
   public static void deleteUser(String username, String orgId, EntityManagerFactory emf) throws NotFoundException,
-  Exception {
+          Exception {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {

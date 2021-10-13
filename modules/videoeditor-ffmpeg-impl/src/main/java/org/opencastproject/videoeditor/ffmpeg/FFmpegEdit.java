@@ -73,8 +73,7 @@ public class FFmpegEdit {
     }
   }
 
-  public FFmpegEdit()
-  {
+  public FFmpegEdit() {
     this.afade = Float.parseFloat(DEFAULT_AUDIO_FADE);
     this.vfade = Float.parseFloat(DEFAULT_VIDEO_FADE);
     this.ffmpegProperties = DEFAULT_FFMPEG_PROPERTIES;
@@ -83,8 +82,7 @@ public class FFmpegEdit {
   /*
    * Init with properties
    */
-  public FFmpegEdit(Properties properties)
-  {
+  public FFmpegEdit(Properties properties) {
     String fade = properties.getProperty(VideoEditorProperties.AUDIO_FADE, DEFAULT_AUDIO_FADE);
     try {
       this.afade = Float.parseFloat(fade);
@@ -133,8 +131,9 @@ public class FFmpegEdit {
       String line;
       int n = 5;
       while ((line = in.readLine()) != null) {
-        if (n-- > 0)
+        if (n-- > 0) {
           logger.info(line);
+        }
       }
 
       // wait until the task is finished

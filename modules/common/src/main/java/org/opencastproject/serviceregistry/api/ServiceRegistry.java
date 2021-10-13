@@ -523,6 +523,13 @@ public interface ServiceRegistry {
   List<HostRegistration> getHostRegistrations() throws ServiceRegistryException;
 
   /**
+   * Get statistics about jobs active on hosts.
+   *
+   * @return Host statistics
+   */
+  HostStatistics getHostStatistics();
+
+  /**
    * Finds host registration for the given hostname.
    *
    * @param hostname to lookup

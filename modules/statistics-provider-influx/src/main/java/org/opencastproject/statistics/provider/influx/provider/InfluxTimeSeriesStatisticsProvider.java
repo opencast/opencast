@@ -92,7 +92,9 @@ public class InfluxTimeSeriesStatisticsProvider extends InfluxStatisticsProvider
         }
       }
     }
-    final Double total = "SUM".equalsIgnoreCase(source.getAggregation()) ? values.stream().mapToDouble(v -> v).sum() : null;
+    final Double total = "SUM".equalsIgnoreCase(source.getAggregation())
+        ? values.stream().mapToDouble(v -> v).sum()
+        : null;
     return new TimeSeries(labels, values, total);
   }
 

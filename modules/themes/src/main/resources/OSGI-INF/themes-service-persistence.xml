@@ -9,10 +9,6 @@
     <provide interface="org.opencastproject.themes.ThemesServiceDatabase"/>
     <provide interface="org.opencastproject.index.rebuild.IndexProducer"/>
   </service>
-  <reference name="messageReceiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
-             cardinality="1..1" policy="static" bind="setMessageReceiver"/>
-  <reference name="messageSender" interface="org.opencastproject.message.broker.api.MessageSender"
-             cardinality="1..1" policy="static" bind="setMessageSender"/>
   <reference name="organization-directory-service"
              interface="org.opencastproject.security.api.OrganizationDirectoryService"
              cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
@@ -23,4 +19,6 @@
              cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
              cardinality="1..1" policy="static" bind="setSecurityService"/>
+  <reference name="admin-ui-index" interface="org.opencastproject.elasticsearch.index.AbstractSearchIndex"
+             bind="setAdminUiIndex" target="(index.name=adminui)"/>
 </scr:component>

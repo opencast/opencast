@@ -27,14 +27,12 @@ import static org.easymock.EasyMock.expect;
 import static org.opencastproject.capture.CaptureParameters.INGEST_WORKFLOW_DEFINITION;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 import static org.opencastproject.util.DateTimeSupport.fromUTC;
-import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.PropertiesUtil.toDictionary;
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.endpoint.AbstractEventEndpointTest.TestEnv;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
@@ -59,7 +57,6 @@ import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentImpl;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.IncidentTreeImpl;
-import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
@@ -75,9 +72,7 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.track.AbstractStreamImpl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
-import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
@@ -99,9 +94,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
-import org.opencastproject.series.impl.SeriesServiceDatabaseException;
-import org.opencastproject.series.impl.SeriesServiceImpl;
-import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -109,7 +101,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -252,8 +243,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     AclService aclService = EasyMock.createNiceMock(AclService.class);
     EasyMock.expect(aclService.getAcls()).andReturn(managedAcls).anyTimes();
-    EasyMock.expect(aclService.applyAclToEpisode(EasyMock.anyString(), EasyMock.anyObject(AccessControlList.class)))
-        .andReturn(true).anyTimes();
     EasyMock.replay(aclService);
 
     env.setAclService(aclService);
@@ -266,12 +255,12 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     job.setDateCreated(dateCreated);
     job.setDateCompleted(dateCompleted);
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
-    EasyMock.expect(serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
+    EasyMock.expect(serviceRegistry.createJob(EasyMock.anyObject(), EasyMock.anyObject(),
+            EasyMock.anyObject(), EasyMock.anyObject(), EasyMock.anyBoolean()))
             .andReturn(new JobImpl()).anyTimes();
-    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JobImpl()).anyTimes();
-    EasyMock.expect(serviceRegistry.getJobs((String) EasyMock.anyObject(), (Job.Status) EasyMock.anyObject()))
-            .andReturn(new ArrayList<Job>()).anyTimes();
+    EasyMock.expect(serviceRegistry.updateJob(EasyMock.anyObject())).andReturn(new JobImpl()).anyTimes();
+    EasyMock.expect(serviceRegistry.getJobs(EasyMock.anyObject(), EasyMock.anyObject()))
+            .andReturn(new ArrayList()).anyTimes();
     EasyMock.replay(serviceRegistry);
 
     // Org directory
@@ -361,35 +350,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.replay(workflowService);
     env.setWorkflowService(workflowService);
 
-    // series service
-    final SeriesServiceImpl seriesService = new SeriesServiceImpl();
-    final SeriesServiceSolrIndex seriesServiceSolrIndex = new SeriesServiceSolrIndex() {
-      private final Map<String, String> idMap = map(tuple("series-a", "/series-dublincore-a.xml"),
-              tuple("series-b", "/series-dublincore-b.xml"), tuple("series-c", "/series-dublincore-c.xml"),
-              tuple("foobar-series", "/series-dublincore.xml"));
-
-      @Override
-      public DublinCoreCatalog getDublinCore(String seriesId) throws SeriesServiceDatabaseException, NotFoundException {
-        String file = idMap.get(seriesId);
-        if (file != null) {
-          return withResource(getClass().getResourceAsStream(file), new Function<InputStream, DublinCoreCatalog>() {
-            @Override
-            public DublinCoreCatalog apply(InputStream is) {
-              return DublinCores.read(is);
-            }
-          });
-        }
-        throw new Error("Mock error");
-      }
-
-      @Override
-      public AccessControlList getAccessControl(String seriesID)
-              throws NotFoundException, SeriesServiceDatabaseException {
-        return acl;
-      }
-
-    };
-    seriesService.setIndex(seriesServiceSolrIndex);
+    SeriesEndpoint seriesEndpoint = EasyMock.createNiceMock(SeriesEndpoint.class);
+    EasyMock.expect(seriesEndpoint.getOnlySeriesWithWriteAccessEventsFilter()).andReturn(false).anyTimes();
+    EasyMock.expect(seriesEndpoint.getUserSeriesByAccess(EasyMock.anyBoolean())).andReturn(new HashMap<>()).anyTimes();
+    EasyMock.replay(seriesEndpoint);
+    env.setSeriesEndpoint(seriesEndpoint);
 
     StaticMetadataServiceDublinCoreImpl metadataSvcs = new StaticMetadataServiceDublinCoreImpl();
     metadataSvcs.setWorkspace(workspace);
@@ -577,6 +542,12 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       EasyMock.anyObject(AbstractSearchIndex.class))).andReturn(metaDataList).anyTimes();
     EasyMock.replay(indexService);
     env.setIndexService(indexService);
+
+    AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
+    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.some(new MediaPackageBuilderImpl()
+            .createNew())).anyTimes();
+    EasyMock.replay(assetManager);
+    env.setAssetManager(assetManager);
   }
 
   private Event createEvent(String id, String title, Source source) throws URISyntaxException {
@@ -705,6 +676,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
+  public AssetManager getAssetManager() {
+    return env.getAssetManager();
+  }
+
+  @Override
   public WorkflowService getWorkflowService() {
     return env.getWorkflowService();
   }
@@ -715,8 +691,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public SeriesEndpoint getSeriesService() {
-    return env.getSeriesService();
+  public SeriesEndpoint getSeriesEndpoint() {
+    return env.getSeriesEndpoint();
   }
 
   @Override

@@ -17,7 +17,7 @@ services:
       - ../activemq/activemq.xml:/activemq-opencast.tpl.xml:ro
   postgresql:
     container_name: opencast-postgresql
-    image: docker.io/library/postgres:12.3
+    image: docker.io/library/postgres:13.2
     ports:
       - 127.0.0.1:5432:5432
     environment:

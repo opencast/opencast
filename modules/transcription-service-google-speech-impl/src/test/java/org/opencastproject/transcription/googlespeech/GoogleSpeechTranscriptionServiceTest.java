@@ -286,14 +286,16 @@ public class GoogleSpeechTranscriptionServiceTest {
 
   @Test
   public void testTranscriptionDone() throws Exception {
-    InputStream stream = GoogleSpeechTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    InputStream stream
+        = GoogleSpeechTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
+        TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
 
     Capture<String> capturedCollection = Capture.newInstance();
     Capture<String> capturedFileName = Capture.newInstance();
     EasyMock.expect(workspace.putInCollection(EasyMock.capture(capturedCollection), EasyMock.capture(capturedFileName),
-            EasyMock.anyObject(InputStream.class))).andReturn(new URI("http://anything"));
+        EasyMock.anyObject(InputStream.class))).andReturn(new URI("http://anything"));
     EasyMock.replay(workspace);
 
     long before = System.currentTimeMillis();
@@ -312,8 +314,10 @@ public class GoogleSpeechTranscriptionServiceTest {
 
   @Test
   public void testTranscriptionError() throws Exception {
-    InputStream stream = GoogleSpeechTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    InputStream stream
+        = GoogleSpeechTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
+        TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
 
     service.transcriptionError(MP_ID, obj);
@@ -327,8 +331,10 @@ public class GoogleSpeechTranscriptionServiceTest {
 
   @Test
   public void testGetAndSaveJobResults() throws Exception {
-    InputStream stream = GoogleSpeechTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    InputStream stream
+        = GoogleSpeechTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
+        TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     Capture<String> capturedCollection = Capture.newInstance();
     Capture<String> capturedFileName = Capture.newInstance();
@@ -407,15 +413,19 @@ public class GoogleSpeechTranscriptionServiceTest {
 
   @Test
   public void testGetGeneratedTranscriptionNoJobId() throws Exception {
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
-    database.storeJobControl(MP_ID, "audioTrack2", "jobId2", TranscriptionJobControl.Status.InProgress.name(),
-            TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
+        TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl(MP_ID, "audioTrack2", "jobId2",
+        TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     database.updateJobControl(JOB_ID, TranscriptionJobControl.Status.TranscriptionComplete.name());
 
     URI uri = new URI("http://ADMIN_SERVER/collection/" + GoogleSpeechTranscriptionService.TRANSCRIPT_COLLECTION + "/"
             + JOB_ID + ".json");
-    EasyMock.expect(workspace.getCollectionURI(GoogleSpeechTranscriptionService.TRANSCRIPT_COLLECTION, JOB_ID + ".json"))
-            .andReturn(uri);
+    EasyMock
+        .expect(workspace.getCollectionURI(
+            GoogleSpeechTranscriptionService.TRANSCRIPT_COLLECTION, JOB_ID + ".json"
+        ))
+        .andReturn(uri);
     EasyMock.expect(workspace.get(uri)).andReturn(null); // Doesn't matter what is returned
     EasyMock.replay(workspace);
 
@@ -427,14 +437,19 @@ public class GoogleSpeechTranscriptionServiceTest {
 
   @Test
   public void testGetGeneratedTranscriptionNotInWorkspace() throws Exception {
-    InputStream stream = GoogleSpeechTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
+    InputStream stream
+        = GoogleSpeechTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
+        TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     URI uri = new URI("http://ADMIN_SERVER/collection/" + GoogleSpeechTranscriptionService.TRANSCRIPT_COLLECTION + "/"
             + JOB_ID + ".json");
-    EasyMock.expect(workspace.getCollectionURI(GoogleSpeechTranscriptionService.TRANSCRIPT_COLLECTION, JOB_ID + ".json"))
-            .andReturn(uri);
+    EasyMock
+        .expect(workspace.getCollectionURI(
+            GoogleSpeechTranscriptionService.TRANSCRIPT_COLLECTION, JOB_ID + ".json"
+        ))
+        .andReturn(uri);
     EasyMock.expect(workspace.get(uri)).andThrow(new NotFoundException());
     EasyMock.expect(workspace.putInCollection(EasyMock.anyObject(String.class), EasyMock.anyObject(String.class),
             EasyMock.anyObject(InputStream.class))).andReturn(uri);
@@ -463,9 +478,10 @@ public class GoogleSpeechTranscriptionServiceTest {
   public void testWorkflowDispatcherRunTranscriptionCompletedState() throws Exception {
     service.activate(cc);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
-    database.storeJobControl("mpId2", "audioTrack2", "jobId2", TranscriptionJobControl.Status.InProgress.name(),
-            TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
+        TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl("mpId2", "audioTrack2", "jobId2",
+        TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     database.updateJobControl(JOB_ID, TranscriptionJobControl.Status.TranscriptionComplete.name());
 
     Capture<Set<String>> capturedMpIds = mockAssetManagerAndWorkflow(GoogleSpeechTranscriptionService.DEFAULT_WF_DEF,
@@ -488,11 +504,13 @@ public class GoogleSpeechTranscriptionServiceTest {
   public void testWorkflowDispatcherRunProgressState() throws Exception {
     service.activate(cc);
 
-    InputStream stream = GoogleSpeechTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
+    InputStream stream
+        = GoogleSpeechTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, null, PROVIDER);
-    database.storeJobControl("mpId2", "audioTrack2", "jobId2", TranscriptionJobControl.Status.InProgress.name(),
-            TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
+        TranscriptionJobControl.Status.InProgress.name(), 0, null, PROVIDER);
+    database.storeJobControl("mpId2", "audioTrack2", "jobId2",
+        TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     EasyMock.expect(workspace.putInCollection(EasyMock.anyObject(String.class), EasyMock.anyObject(String.class),
             EasyMock.anyObject(InputStream.class))).andReturn(new URI("http://anything"));
@@ -512,8 +530,8 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response);
     EasyMock.replay(httpClient);
 
-    Capture<Set<String>> capturedMpIds = mockAssetManagerAndWorkflow(GoogleSpeechTranscriptionService.DEFAULT_WF_DEF,
-            true);
+    Capture<Set<String>> capturedMpIds
+        = mockAssetManagerAndWorkflow(GoogleSpeechTranscriptionService.DEFAULT_WF_DEF, true);
 
     WorkflowDispatcher dispatcher = service.new WorkflowDispatcher();
     dispatcher.run();

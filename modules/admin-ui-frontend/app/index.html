@@ -114,9 +114,20 @@
 
     <footer id="main-footer" ng-controller="NavCtrl">
       <div class="default-footer">
-        <div ng-if="version.version" class="meta">
+        <div ng-if="version.version"
+             class="meta"
+             title="{{ 'BUILD.VERSION' | translate }}">
           Opencast {{ version.version }}
-          <span with-role="ROLE_ADMIN"> - {{ version.buildNumber || 'undefined' }}</span>
+          <span ng-if="version.buildNumber"
+                with-role="ROLE_ADMIN"
+                title="{{ 'BUILD.COMMIT' | translate }}">
+            - {{ version.buildNumber || 'undefined' }}
+          </span>
+          <span ng-if="version['last-modified']"
+                with-role="ROLE_ADMIN"
+                title="{{ 'BUILD.DATE_DESC' | translate }}">
+            - {{ 'BUILD.BUILT_ON' | translate }} {{ version['last-modified'] }}
+          </span>
         </div>
         <div ng-if="feedbackUrl" class="feedback-btn" id="feedback-btn">
           <a href="javascript:;">Feedback</a>
@@ -298,6 +309,7 @@
     <script src="scripts/shared/directives/selectBoxDirective.js"></script>
     <script src="scripts/shared/directives/navDirective.js"></script>
     <script src="scripts/shared/directives/tableDirective.js"></script>
+    <script src="scripts/shared/directives/sanitizeXMLDirective.js"></script>
     <script src="scripts/shared/directives/statsDirective.js"></script>
     <script src="scripts/shared/directives/collapsibleBoxDirective.js"></script>
     <script src="scripts/shared/directives/confirmationModalDirective.js"></script>

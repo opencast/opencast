@@ -481,10 +481,12 @@ In case of a conflict (when updating `scheduling`):
 
 ### DELETE /api/events/{event_id}
 
-Deletes an event.
+Retracts possible publications and deletes an event. Since version 1.6.0 published events will be retracted by this
+endpoint, if you use a version previous to 1.6.0 don't call this endpoint before retracting published events.
 
 __Response__
 
+`202 (ACCEPTED)`: The retraction of publications has started.<br/>
 `204 (NO CONTENT)`: The event has been deleted.<br/>
 `404 (NOT FOUND)`: The specified event does not exist.
 
@@ -601,6 +603,258 @@ __Response__
 `204 (NO CONTENT)`: The permission has been revoked from the access control list of the specified event.<br/>
 `404 (NOT FOUND)`: The specified event does not exist.
 
+# Media
+
+### GET /api/events/{event_id}/media
+
+Returns the complete set of media tracks.
+
+__Response__
+
+`200 (OK)`: The list of media tracks is returned.<br/>
+`404 (NOT FOUND)`: The specified event does not exist.
+
+```
+[
+  {
+    "duration": 184669,
+    "flavor": "presenter\/source",
+    "identifier": "ea9a6cd8-85d2-4fb5-8571-29dc8b9c5940",
+    "mimetype": "video\/mp4",
+    "size": 65072115,
+    "streams": {
+      "video-1": {
+        "identifier": "video-1",
+        "framecount": 4430,
+        "framewidth": 2048,
+        "framerate": 24.0,
+        "format": "H.264 \/ AVC \/ MPEG-4 AVC \/ MPEG-4 part 10",
+        "bitrate": 2685332.0,
+        "frameheight": 858
+      },
+      "audio-1": {
+        "identifier": "audio-1",
+        "channels": 2,
+        "framecount": 7954,
+        "format": "AAC (Advanced Audio Coding)",
+        "bitrate": 128878.0,
+        "samplingrate": 44100
+      }
+    },
+    "checksum": "ac0e3138be69927c0fb6ff4ea7465df0 (md5)",
+    "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": false,
+    "is_live": false,
+    "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/ea9a6cd8-85d2-4fb5-8571-29dc8b9c5940\/5\/presenter.mp4",
+    "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/ea9a6cd8-85d2-4fb5-8571-29dc8b9c5940\/5\/presenter.mp4",
+    "tags": [
+      "archive"
+    ]
+  },
+  {
+    "duration": 184606,
+    "flavor": "presenter\/delivery",
+    "identifier": "28fba154-cdbd-4bd8-b6b7-829ad1ea6746",
+    "mimetype": "video\/mp4",
+    "size": 16513961,
+    "streams": {
+      "video-1": {
+        "identifier": "video-1",
+        "framecount": 4429,
+        "framewidth": 854,
+        "framerate": 24.0,
+        "format": "H.264 \/ AVC \/ MPEG-4 AVC \/ MPEG-4 part 10",
+        "bitrate": 582517.0,
+        "frameheight": 358
+      },
+      "audio-1": {
+        "identifier": "audio-1",
+        "channels": 2,
+        "format": "AAC (Advanced Audio Coding)",
+        "bitrate": 128965.0,
+        "samplingrate": 44100
+      }
+    },
+    "checksum": "e6a5fad8100fd5b09920e6a6dddc44dc (md5)",
+    "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": false,
+    "is_live": false,
+    "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/28fba154-cdbd-4bd8-b6b7-829ad1ea6746\/5\/84066_segment_0_480p.mp4",
+    "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/28fba154-cdbd-4bd8-b6b7-829ad1ea6746\/5\/84066_segment_0_480p.mp4",
+    "tags": [
+      "480p-quality",
+      "archive"
+    ]
+  },
+  {
+    "duration": 184606,
+    "flavor": "presenter\/delivery",
+    "identifier": "3f359b10-da82-4834-8e65-741bc62dcdaf",
+    "mimetype": "video\/mp4",
+    "size": 27365772,
+    "streams": {
+      "video-1": {
+        "identifier": "video-1",
+        "framecount": 4429,
+        "framewidth": 1280,
+        "framerate": 24.0,
+        "format": "H.264 \/ AVC \/ MPEG-4 AVC \/ MPEG-4 part 10",
+        "bitrate": 1052783.0,
+        "frameheight": 536
+      },
+      "audio-1": {
+        "identifier": "audio-1",
+        "channels": 2,
+        "format": "AAC (Advanced Audio Coding)",
+        "bitrate": 128965.0,
+        "samplingrate": 44100
+      }
+    },
+    "checksum": "6f547c80f9cc4166ccea52192ce82045 (md5)",
+    "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": false,
+    "is_live": false,
+    "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/3f359b10-da82-4834-8e65-741bc62dcdaf\/5\/84066_segment_1_720p.mp4",
+    "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/3f359b10-da82-4834-8e65-741bc62dcdaf\/5\/84066_segment_1_720p.mp4",
+    "tags": [
+      "720p-quality",
+      "archive"
+    ]
+  },
+  {
+    "duration": 185000,
+    "flavor": "presenter\/delivery",
+    "identifier": "db9e1496-5044-4451-9070-18399e20791a",
+    "mimetype": "application\/x-mpegURL",
+    "size": 462,
+    "streams": {
+      "video-1": {
+        "identifier": "video-1",
+        "framecount": 4440,
+        "framewidth": 854,
+        "framerate": 24.0,
+        "format": "H.264 \/ AVC \/ MPEG-4 AVC \/ MPEG-4 part 10",
+        "bitrate": 201482.0,
+        "frameheight": 358
+      },
+      "audio-1": {
+        "identifier": "audio-1",
+        "channels": 2,
+        "format": "AAC (Advanced Audio Coding)",
+        "bitrate": 130322.0,
+        "samplingrate": 44100
+      },
+      "video-2": {
+        "identifier": "video-2",
+        "framecount": 4440,
+        "framewidth": 1280,
+        "framerate": 24.0,
+        "format": "H.264 \/ AVC \/ MPEG-4 AVC \/ MPEG-4 part 10",
+        "bitrate": 386268.0,
+        "frameheight": 536
+      },
+      "audio-2": {
+        "identifier": "audio-2",
+        "channels": 2,
+        "format": "AAC (Advanced Audio Coding)",
+        "bitrate": 130322.0,
+        "samplingrate": 44100
+      }
+    },
+    "checksum": "053aaad6a0ada363e17c787e78a2b349 (md5)",
+    "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": true,
+    "is_live": false,
+    "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/db9e1496-5044-4451-9070-18399e20791a\/5\/presenter.m3u8",
+    "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/db9e1496-5044-4451-9070-18399e20791a\/5\/presenter.m3u8",
+    "tags": [
+      "archive"
+    ]
+  },
+  {
+    "duration": 185000,
+    "flavor": "presenter\/delivery",
+    "identifier": "dfd0a8a6-be37-46fa-993e-997b0aad064f",
+    "mimetype": "application\/x-mpegURL",
+    "size": 3991,
+    "streams": {
+      "video-1": {
+        "identifier": "video-1",
+        "framecount": 4440,
+        "framewidth": 854,
+        "framerate": 24.0,
+        "format": "H.264 \/ AVC \/ MPEG-4 AVC \/ MPEG-4 part 10",
+        "bitrate": 201482.0,
+        "frameheight": 358
+      },
+      "audio-1": {
+        "identifier": "audio-1",
+        "channels": 2,
+        "format": "AAC (Advanced Audio Coding)",
+        "bitrate": 130322.0,
+        "samplingrate": 44100
+      }
+    },
+    "checksum": "d7109c109cf955b2d6e9ebdf0ad07f6c (md5)",
+    "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": false,
+    "is_live": false,
+    "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/dfd0a8a6-be37-46fa-993e-997b0aad064f\/5\/84066_variant_0.m3u8",
+    "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/dfd0a8a6-be37-46fa-993e-997b0aad064f\/5\/84066_variant_0.m3u8",
+    "tags": [
+      "archive"
+    ]
+  },
+  {
+    "duration": 185000,
+    "flavor": "presenter\/delivery",
+    "identifier": "d94e2fbc-8f65-4b21-b7b9-cf2dcee43eeb",
+    "mimetype": "application\/x-mpegURL",
+    "size": 4009,
+    "streams": {
+      "video-1": {
+        "identifier": "video-1",
+        "framecount": 4440,
+        "framewidth": 1280,
+        "framerate": 24.0,
+        "format": "H.264 \/ AVC \/ MPEG-4 AVC \/ MPEG-4 part 10",
+        "bitrate": 386268.0,
+        "frameheight": 536
+      },
+      "audio-1": {
+        "identifier": "audio-1",
+        "channels": 2,
+        "format": "AAC (Advanced Audio Coding)",
+        "bitrate": 130322.0,
+        "samplingrate": 44100
+      }
+    },
+    "checksum": "720c93ec46bba9fa14cf1b5761b0458e (md5)",
+    "description": "",
+    "has_audio": true,
+    "has_video": true,
+    "is_master_playlist": false,
+    "is_live": false,
+    "element-description": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/d94e2fbc-8f65-4b21-b7b9-cf2dcee43eeb\/5\/84066_variant_1.m3u8",
+    "uri": "https:\/\/admin.opencast.org\/assets\/assets\/3627bd37-7681-4e4b-bff1-a7d299be38cd\/d94e2fbc-8f65-4b21-b7b9-cf2dcee43eeb\/5\/84066_variant_1.m3u8",
+    "tags": [
+      "archive"
+    ]
+  }
+]
+```
+
+
 # Metadata
 
 This section describes how to use the External API to work with metadata catalogs associated to events.
@@ -623,7 +877,7 @@ Returns the complete set of metadata.
 __Response__
 
 `200 (OK)`: The metadata collection is returned as [`catalogs`](types.md#catalogs).<br/>
-`404 (OK)`: The specified event does not exist.
+`404 (NOT FOUND)`: The specified event does not exist.
 
 ```
 [
@@ -828,6 +1082,8 @@ __Response__
       ],
       "has_audio":true,
       "has_video":true,
+      "is_master_playlist": false,
+      "is_live": false,
       "duration":3648,
       "description":"Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p, 640x360, 447 kb/s, 25 fps, 25"
     },
@@ -843,6 +1099,8 @@ __Response__
       ],
       "has_audio":true,
       "has_video":false,
+      "is_master_playlist": false,
+      "is_live": false,
       "duration":3648,
       "description":"aac (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 96 kb/s (default)"
     }

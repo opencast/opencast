@@ -688,7 +688,7 @@ public class AbstractEventEndpointTest {
     private WorkflowService workflowService;
     private AssetManager assetManager;
     private JobEndpoint jobService;
-    private SeriesEndpoint seriesService;
+    private SeriesEndpoint seriesEndpoint;
     private AclService aclService;
     private EventCommentService eventCommentService;
     private SecurityService securityService;
@@ -711,12 +711,12 @@ public class AbstractEventEndpointTest {
       return jobService;
     }
 
-    public void setSeriesService(SeriesEndpoint seriesService) {
-      this.seriesService = seriesService;
+    public void setSeriesEndpoint(SeriesEndpoint seriesEndpoint) {
+      this.seriesEndpoint = seriesEndpoint;
     }
 
-    public SeriesEndpoint getSeriesService() {
-      return seriesService;
+    public SeriesEndpoint getSeriesEndpoint() {
+      return this.seriesEndpoint;
     }
 
     public void setWorkflowService(WorkflowService workflowService) {

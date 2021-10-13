@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -69,7 +69,8 @@
             <Export-Package>
               org.opencastproject.assetmanager.api;version=${project.version},
               org.opencastproject.assetmanager.api.fn;version=${project.version},
-              org.opencastproject.assetmanager.api.query;version=${project.version}
+              org.opencastproject.assetmanager.api.query;version=${project.version},
+              org.opencastproject.assetmanager.api.storage;version=${project.version}
             </Export-Package>
             <Private-Package>
               javax.annotation*

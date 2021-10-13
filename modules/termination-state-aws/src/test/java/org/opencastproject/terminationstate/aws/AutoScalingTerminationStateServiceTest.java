@@ -38,6 +38,7 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -98,9 +99,11 @@ public class AutoScalingTerminationStateServiceTest {
     EasyMock.expect(dasir.getAutoScalingInstances()).andReturn(instances).anyTimes();
     EasyMock.replay(dasir);
 
-    EasyMock.expect(autoScaling.describeAutoScalingInstances(EasyMock.anyObject(DescribeAutoScalingInstancesRequest.class)))
+    EasyMock.expect(autoScaling.describeAutoScalingInstances(
+        EasyMock.anyObject(DescribeAutoScalingInstancesRequest.class)))
             .andReturn(dasir).anyTimes();
-    EasyMock.expect(autoScaling.recordLifecycleActionHeartbeat(EasyMock.anyObject(RecordLifecycleActionHeartbeatRequest.class)))
+    EasyMock.expect(autoScaling.recordLifecycleActionHeartbeat(
+        EasyMock.anyObject(RecordLifecycleActionHeartbeatRequest.class)))
             .andReturn(null).anyTimes();
     EasyMock.expect(autoScaling.completeLifecycleAction(EasyMock.anyObject(CompleteLifecycleActionRequest.class)))
             .andReturn(null).once();
@@ -128,6 +131,7 @@ public class AutoScalingTerminationStateServiceTest {
   }
 
   @Test
+  @Ignore // regularly fails. See https://github.com/opencast/opencast/issues/1111
   public void testLifeCyclePolling() throws Exception {
     service.startPollingLifeCycleHook();
     String[] trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);

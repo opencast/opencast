@@ -165,6 +165,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         }
 
         searchEntity.setDeletionDate(deletionDate);
+        searchEntity.setModificationDate(deletionDate);
         em.merge(searchEntity);
       }
       tx.commit();
@@ -202,7 +203,6 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       em.close();
     }
   }
-
 
   /**
    * {@inheritDoc}

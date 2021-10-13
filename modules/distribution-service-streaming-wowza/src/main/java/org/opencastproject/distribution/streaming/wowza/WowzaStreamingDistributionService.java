@@ -43,6 +43,7 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.XmlSafeParser;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -81,11 +82,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -233,7 +232,8 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
         try {
           Files.createDirectories(distributionDirectory.toPath());
         } catch (IOException e) {
-          throw new ComponentException("Distribution directory does not exist and can't be created", e);
+          throw new ComponentException("Distribution directory " + distributionDirectory
+              + " does not exist and can't be created", e);
         }
       }
 
@@ -591,8 +591,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
   private Document getSmilDocument(File smilFile) throws DistributionException {
     if (!smilFile.isFile()) {
       try {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+        DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
         Document doc = docBuilder.newDocument();
         Element smil = doc.createElement("smil");
         doc.appendChild(smil);
@@ -614,8 +613,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     }
 
     try {
-      DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+      DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
       Document doc = docBuilder.parse(smilFile);
 
       if (!"smil".equalsIgnoreCase(doc.getDocumentElement().getNodeName())) {
@@ -638,8 +636,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
   private void saveSmilFile(File smilFile, Document doc) throws DistributionException {
     try {
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      Transformer transformer = transformerFactory.newTransformer();
+      Transformer transformer = XmlSafeParser.newTransformerFactory().newTransformer();
       DOMSource source = new DOMSource(doc);
       StreamResult stream = new StreamResult(smilFile);
       transformer.transform(source, stream);
@@ -947,7 +944,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
     // Try to remove the parent folders, if possible
     File elementDir = elementFile.getParentFile();
-    if (elementDir != null && elementDir.exists()) {
+    if (elementDir != null && elementDir.exists() && elementDir.list() != null) {
       if (elementDir.list().length == 0) {
         if (!elementDir.delete()) {
           logger.warn("Could not properly delete element directory: {}", elementDir);

@@ -23,7 +23,6 @@ package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.nul;
-import static com.entwinemedia.fn.data.Opt.some;
 import static com.entwinemedia.fn.data.json.Jsons.BLANK;
 import static com.entwinemedia.fn.data.json.Jsons.NULL;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
@@ -63,16 +62,16 @@ import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.BulkUpdateUtil;
 import org.opencastproject.adminui.util.QueryPreprocessor;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
-import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.api.SortCriterion;
 import org.opencastproject.elasticsearch.index.event.Event;
 import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
@@ -87,7 +86,6 @@ import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
-import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.Attachment;
@@ -140,6 +138,7 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -244,13 +243,15 @@ public abstract class AbstractEventEndpoint {
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
 
+  public abstract AssetManager getAssetManager();
+
   public abstract WorkflowService getWorkflowService();
 
   public abstract AdminUISearchIndex getIndex();
 
   public abstract JobEndpoint getJobService();
 
-  public abstract SeriesEndpoint getSeriesService();
+  public abstract SeriesEndpoint getSeriesEndpoint();
 
   public abstract AclService getAclService();
 
@@ -401,7 +402,7 @@ public abstract class AbstractEventEndpoint {
     }
     final Runnable doOnNotFound = () -> {
       try {
-        getIndex().delete(Event.DOCUMENT_TYPE,id.concat(getSecurityService().getOrganization().getId()));
+        getIndex().delete(Event.DOCUMENT_TYPE,id,getSecurityService().getOrganization().getId());
       } catch (SearchIndexException e) {
         logger.error("error removing event {}: {}", id, e);
       }
@@ -461,7 +462,7 @@ public abstract class AbstractEventEndpoint {
       final String eventId = eventIdObject.toString();
       final Runnable doOnNotFound = () -> {
         try {
-          getIndex().delete(Event.DOCUMENT_TYPE,eventId.concat(getSecurityService().getOrganization().getId()));
+          getIndex().delete(Event.DOCUMENT_TYPE,eventId, getSecurityService().getOrganization().getId());
         } catch (SearchIndexException e) {
           logger.error("error removing event {}: {}", eventId, e);
         }
@@ -843,12 +844,37 @@ public abstract class AbstractEventEndpoint {
 
       Source eventSource = getIndexService().getEventSource(optEvent.get());
       if (eventSource == Source.ARCHIVE) {
-        if (getAclService().applyAclToEpisode(eventId, accessControlList)) {
+        Opt<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(eventId);
+        Option<AccessControlList> aclOpt = Option.option(accessControlList);
+        // the episode service is the source of authority for the retrieval of media packages
+        if (mediaPackage.isSome()) {
+          MediaPackage episodeSvcMp = mediaPackage.get();
+          aclOpt.fold(new Option.EMatch<AccessControlList>() {
+            // set the new episode ACL
+            @Override
+            public void esome(final AccessControlList acl) {
+              // update in episode service
+              try {
+                MediaPackage mp = getAuthorizationService().setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
+                getAssetManager().takeSnapshot(mp);
+              } catch (MediaPackageException e) {
+                logger.error("Error getting ACL from media package", e);
+              }
+            }
+
+            // if none EpisodeACLTransition#isDelete returns true so delete the episode ACL
+            @Override
+            public void enone() {
+              // update in episode service
+              MediaPackage mp = getAuthorizationService().removeAcl(episodeSvcMp, AclScope.Episode);
+              getAssetManager().takeSnapshot(mp);
+            }
+
+          });
           return ok();
-        } else {
-          logger.warn("Unable to find the event '{}'", eventId);
-          return notFound();
         }
+        logger.warn("Unable to find the event '{}'", eventId);
+        return notFound();
       } else if (eventSource == Source.WORKFLOW) {
         logger.warn("An ACL cannot be edited while an event is part of a current workflow because it might"
                 + " lead to inconsistent ACLs i.e. changed after distribution so that the old ACL is still "
@@ -860,12 +886,11 @@ public abstract class AbstractEventEndpoint {
         MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
         mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();
         // We could check agent access here if we want to forbid updating ACLs for users without access.
-        getSchedulerService().updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-                Opt.<Set<String>> none(), some(mediaPackage), Opt.<Map<String, String>> none(),
-                Opt.<Map<String, String>> none());
+        getSchedulerService().updateEvent(eventId, Opt.none(), Opt.none(), Opt.none(), Opt.none(),
+                Opt.some(mediaPackage), Opt.none(), Opt.none());
         return ok();
       }
-    } catch (AclServiceException | MediaPackageException e) {
+    } catch (MediaPackageException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         return forbidden();
       }
@@ -1140,12 +1165,12 @@ public abstract class AbstractEventEndpoint {
     for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
       metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
     }
-
     DublinCoreMetadataCollection metadataCollection = EventUtils.getEventMetadata(event, getIndexService().getCommonEventCatalogUIAdapter());
     if (getOnlySeriesWithWriteAccessEventModal()) {
       MetadataField seriesField = metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-      Map<String, String> seriesWithWriteAccess = getSeriesService().getUserSeriesByAccess(true);
-      seriesField.setCollection(seriesWithWriteAccess);
+      if (seriesField != null) {
+        seriesField.setCollection(getSeriesEndpoint().getUserSeriesByAccess(true));
+      }
     }
     metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), metadataCollection);
 
@@ -1197,7 +1222,7 @@ public abstract class AbstractEventEndpoint {
     //get once instead of for each event
     Map<String, String> seriesWithWriteAccess = null;
     if (getOnlySeriesWithWriteAccessEventModal()) {
-      seriesWithWriteAccess = getSeriesService().getUserSeriesByAccess(true);
+      seriesWithWriteAccess = getSeriesEndpoint().getUserSeriesByAccess(true);
     }
 
     // collect the metadata of all events
@@ -1724,7 +1749,7 @@ public abstract class AbstractEventEndpoint {
         return okJson(obj(f("workflowId", v(agentConfiguration.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION), Jsons.BLANK)),
                 f("configuration", obj(fields))));
       } else {
-        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withMediaPackage(id)));
+        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withCount(999999).withMediaPackage(id)));
       }
     } catch (NotFoundException e) {
       return notFound("Cannot find workflows for event %s", id);
@@ -2061,8 +2086,12 @@ public abstract class AbstractEventEndpoint {
         publisher.setValue(loggedInUser);
       }
 
-      collection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName())
-        .setCollection(getSeriesService().getUserSeriesByAccess(getOnlySeriesWithWriteAccessEventModal()));
+      if (getOnlySeriesWithWriteAccessEventModal()) {
+        MetadataField seriesField = collection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
+        if (seriesField != null) {
+          seriesField.setCollection(getSeriesEndpoint().getUserSeriesByAccess(true));
+        }
+      }
 
       metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
     }

@@ -2,16 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <!-- <Build-Number>${buildNumber}</Build-Number> not necessary since this is no OSGi bundle -->
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.opencastproject</groupId>
   <artifactId>opencast-theodul-plugin</artifactId>
-  <version>10-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
   <name>Opencast :: engage-theodul-plugin-archetype</name>
   <description>An archetype that generates a plugin for the Opencast Theodul Player</description>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>

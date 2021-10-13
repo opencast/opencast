@@ -5,6 +5,12 @@ export interface Attachment {
     readonly url: string;
 }
 
+export interface Track {
+    readonly type: string;
+    readonly url: string;
+    readonly resolution: { width: number, height: number} | undefined;
+}
+
 export interface JobResult {
     readonly title: string;
     readonly status: string;
@@ -13,6 +19,7 @@ export interface JobResult {
 export interface MediaPackage {
     readonly attachments: Attachment[];
     readonly creators: string[];
+    readonly tracks: Track[] | undefined;
 }
 
 export interface SearchEpisodeResult {
@@ -128,6 +135,55 @@ export async function copyEventToSeries(eventId: string, targetSeries: string): 
     return axios.post(hostAndPort() + "/lti-service-gui/" + eventId + "/copy?target_series=" + targetSeries);
 }
 
+/**
+ * Parse resolution from string to object if possible
+ * A resolution is expected to have the format {width}x{height}
+ * @param resolution resolution to be parsed
+ */
+const parseResolutionFromString = (resolution: any) => {
+  if (typeof resolution === "string" && /[0-9]+x[0-9]+/.test(resolution)) {
+    return {
+      width: parseInt(resolution.split('x')[0]),
+      height: parseInt(resolution.split('x')[1]),
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Track is not guaranteed to be an array or even exist at all, so we need to handle different cases
+ * @param result a result from the search query
+ */
+const parseTracksFromResult = (result: any) => {
+  if (Array.isArray(result.mediapackage.media.track)) {
+    return (
+      result.mediapackage.media.track.reduce((res: Track[], track: any) => {
+        // Avoid tracks that belong to an adaptive streaming publication
+        if(!('logicalname' in track) && 'video' in track && 'resolution' in track.video) {
+          res.push({
+            type: track.type,
+            url: track.url,
+            resolution: parseResolutionFromString(track.video.resolution)
+          })
+        }
+        return res;
+      }, [])
+    )
+  } else if (result.mediapackage.media.track !== null) {
+    // Avoid tracks that belong to an adaptive streaming publication
+    if ('logicalname' in result.mediapackage.media.track ||
+        !('video' in result.mediapackage.media.track && 'resolution' in result.mediapackage.media.track.video)) {
+      return undefined;
+    }
+    return {
+      type: result.mediapackage.media.track.type,
+      url: result.mediapackage.media.track.url,
+      resolution: parseResolutionFromString(result.mediapackage.media.track.video.resolution),
+    }
+  }
+  return undefined;
+}
+
 export async function searchEpisode(
     limit: number,
     offset: number,
@@ -141,7 +197,8 @@ export async function searchEpisode(
         urlSuffix += "&sname=" + seriesName;
     if (episodeId !== undefined)
         urlSuffix += "&id=" + episodeId;
-    const response = await axios.get(`${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`);
+    const url = `${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`;
+    const response = await axios.get<any>(url);
     const resultsRaw = response.data["search-results"]["result"];
     const results = Array.isArray(resultsRaw) ? resultsRaw : resultsRaw !== undefined ? [resultsRaw] : [];
     return {
@@ -153,11 +210,20 @@ export async function searchEpisode(
             languageShortCode: result.dcLanguage,
             licenseKey: result.dcLicense,
             mediapackage: {
-                creators: result.mediapackage.creators !== undefined ? result.mediapackage.creators.creator : [],
-                attachments: result.mediapackage.attachments.attachment.map((attachment: any) => ({
-                    type: attachment.type,
-                    url: attachment.url
-                }))
+                creators: result.mediapackage.creators !== undefined
+                    ? Array.isArray(result.mediapackage.creators.creator)
+                        ? result.mediapackage.creators.creator
+                        : [result.mediapackage.creators.creator]
+                    : [],
+                attachments: Array.from(
+                    Array.isArray(result.mediapackage.attachments.attachment)
+                        ? result.mediapackage.attachments.attachment
+                        : Array.of(result.mediapackage.attachments.attachment),
+                    (attachment: any) => ({
+                        type: attachment.type,
+                        url: attachment.url
+                    })),
+                tracks: parseTracksFromResult(result)
             }
         })),
         total: response.data["search-results"].total,
@@ -171,14 +237,14 @@ export async function deleteEvent(eventId: string): Promise<void> {
 }
 
 export async function getLti(): Promise<LtiData> {
-    const response = await axios.get(hostAndPort() + "/lti");
+    const response = await axios.get<any>(hostAndPort() + "/lti");
     return {
         roles: response.data.roles !== undefined ? response.data.roles.split(",") : [],
     }
 }
 
 export async function getJobs(seriesId: string): Promise<JobResult[]> {
-    const response = await axios.get(hostAndPort() + "/lti-service-gui/jobs?seriesId=" + seriesId);
+    const response = await axios.get<any>(hostAndPort() + "/lti-service-gui/jobs?seriesId=" + seriesId);
     return response.data.map((r: any) => ({ title: r.title, status: r.status }));
 }
 
@@ -187,15 +253,29 @@ export async function uploadFile(
     seriesId: string,
     eventId?: string,
     presenterFile?: Blob,
-    captionFile?: Blob): Promise<{}> {
+    captionFile?: Blob,
+    captionFormat?: string,
+    captionLanguage?: string,
+    setUploadPogress?: (progress: number) => void): Promise<{}> {
+    const percentage = 100;
     const data = new FormData();
     data.append("metadata", JSON.stringify([metadata]));
     if (eventId !== undefined)
         data.append("eventId", eventId);
     data.append("seriesId", seriesId);
+    if (captionFormat !== undefined)
+        data.append("captionFormat", captionFormat);
+    if (captionLanguage !== undefined)
+        data.append("captionLanguage", captionLanguage);
     if (captionFile !== undefined)
         data.append("captions", captionFile);
     if (presenterFile !== undefined)
         data.append("presenter", presenterFile);
-    return axios.post(hostAndPort() + "/lti-service-gui", data);
+    return axios.post(
+        hostAndPort() + "/lti-service-gui",
+        data,
+        setUploadPogress !== undefined ? {
+            onUploadProgress: progressEvent => setUploadPogress(Math.round(progressEvent.loaded * percentage / progressEvent.total))
+        } : {}
+    );
 }

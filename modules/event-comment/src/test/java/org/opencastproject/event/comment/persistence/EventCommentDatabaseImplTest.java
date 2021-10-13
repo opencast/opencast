@@ -28,9 +28,13 @@ import static org.opencastproject.event.comment.persistence.EventCommentDatabase
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbUser;
@@ -45,6 +49,8 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class EventCommentDatabaseImplTest {
 
@@ -52,28 +58,57 @@ public class EventCommentDatabaseImplTest {
   private static final User USER = new JaxbUser("wilfried.meyer", "matterhorn", new DefaultOrganization());
 
   private static final String EVENT_1_ID = "1";
-  private static final EventComment COMMENT_1 = EventComment.create(none(Long.class), EVENT_1_ID, ORGANIZATION.getId(), "test", USER);
+  private static final EventComment COMMENT_1
+      = EventComment.create(none(Long.class), EVENT_1_ID, ORGANIZATION.getId(), "test", USER);
 
   private EventCommentDatabaseServiceImpl persistence;
 
   @Before
   public void setUp() throws Exception {
+
     UserDirectoryService userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyObject(String.class))).andReturn(USER).anyTimes();
     EasyMock.replay(userDirectoryService);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    EasyMock.expect(securityService.getUser()).andReturn(USER).anyTimes();
     EasyMock.replay(securityService);
 
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(messageSender);
+    Event event = EasyMock.createNiceMock(Event.class);
+    EasyMock.expect(event.getIdentifier()).andReturn(EVENT_1_ID).anyTimes();
+    EasyMock.replay(event);
+
+    SearchResultItem resultItem = EasyMock.createMock(SearchResultItem.class);
+    EasyMock.expect(resultItem.getSource()).andReturn(event).anyTimes();
+    EasyMock.replay(resultItem);
+
+    SearchResult result = EasyMock.createMock(SearchResult.class);
+    EasyMock.expect(result.getDocumentCount()).andReturn(1L).anyTimes();
+    EasyMock.expect(result.getItems()).andReturn(new SearchResultItem[]{ resultItem }).anyTimes();
+    EasyMock.replay(result);
+
+    AbstractSearchIndex adminUiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(adminUiIndex.getIndexName()).andReturn("adminui").anyTimes();
+    EasyMock.expect(adminUiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
+    EasyMock.expect(adminUiIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
+            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.of(event)).atLeastOnce();
+    EasyMock.replay(adminUiIndex);
+
+    AbstractSearchIndex externalApiIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(externalApiIndex.getIndexName()).andReturn("externalapi").anyTimes();
+    EasyMock.expect(externalApiIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).
+            anyTimes();
+    EasyMock.expect(externalApiIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
+            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.of(event)).atLeastOnce();
+    EasyMock.replay(externalApiIndex);
 
     persistence = new EventCommentDatabaseServiceImpl();
     persistence.setEntityManagerFactory(newTestEntityManagerFactory(PERSISTENCE_UNIT));
     persistence.setUserDirectoryService(userDirectoryService);
-    persistence.setMessageSender(messageSender);
     persistence.setSecurityService(securityService);
+    persistence.setAdminUiIndex(adminUiIndex);
+    persistence.setExternalApiIndex(externalApiIndex);
     persistence.activate(null);
   }
 
