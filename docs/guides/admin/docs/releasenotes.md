@@ -42,6 +42,12 @@ API changes
 - Rename value for `sort` parameter in search API from `DATE_PUBLISHED` to `DATE_MODIFIED`.
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
+Additional Notes about 10.4
+---------------------------
+
+This release fixes bugs and a startup issue.  Some adopters were experiencing startup issues due to the JWT
+authentication module being installed by default.  This release removes that module for default configurations.
+
 Additional Notes about 10.3
 ---------------------------
 
