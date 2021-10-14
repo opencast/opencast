@@ -23,6 +23,7 @@
 package org.opencastproject.mediapackage;
 
 import org.opencastproject.mediapackage.identifier.Id;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -38,10 +39,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
@@ -111,20 +110,17 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
   public MediaPackage loadFromXml(InputStream is) throws MediaPackageException {
     if (serializer != null) {
       try {
-        // CHECKSTYLE:OFF
 
         //Convert InputStream to XML document to rewrite the URLs
-        Document xml = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+        Document xml = XmlSafeParser.parse(is);
         rewriteUrls(xml, serializer);
 
         // Reconverting back to inputStream
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Source xmlSource = new DOMSource(xml);
         Result outputTarget = new StreamResult(os);
-        //FIXME: Checkstyle Alerts for this line to use xmlSafeParser instead of this line
-        TransformerFactory.newInstance().newTransformer().transform(xmlSource, outputTarget);
+        XmlSafeParser.newTransformerFactory().newTransformer().transform(xmlSource, outputTarget);
         is = new ByteArrayInputStream(os.toByteArray());
-        // CHECKSTYLE:ON
 
       } catch (Exception e) {
         throw new MediaPackageException("Error deserializing paths in media package", e);
