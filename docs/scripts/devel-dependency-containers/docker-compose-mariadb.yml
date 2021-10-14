@@ -1,7 +1,7 @@
 version: '2'
 services:
   elasticsearch:
-    container_name: opencast-elasticsearch
+    container_name: $COMPOSE_PROJECT_NAME-elasticsearch
     image: docker.io/library/elasticsearch:7.9.2
     ports:
       - 127.0.0.1:9200:9200
@@ -9,14 +9,14 @@ services:
     environment:
       discovery.type: single-node
   activemq:
-    container_name: opencast-activemq
+    container_name: $COMPOSE_PROJECT_NAME-activemq
     image: quay.io/lkiesow/activemq
     ports:
       - 127.0.0.1:61616:61616
     volumes:
       - ../activemq/activemq.xml:/activemq-opencast.tpl.xml:ro
   mariadb:
-    container_name: opencast-mariadb
+    container_name: $COMPOSE_PROJECT_NAME-mariadb
     image: docker.io/library/mariadb:10.5.9
     ports:
       - 127.0.0.1:3306:3306

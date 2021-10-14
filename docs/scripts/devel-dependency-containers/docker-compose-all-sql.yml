@@ -1,7 +1,7 @@
 version: '2'
 services:
   elasticsearch:
-    container_name: opencast-elasticsearch
+    container_name: $COMPOSE_PROJECT_NAME-elasticsearch
     image: docker.io/library/elasticsearch:7.9.2
     ports:
       - 127.0.0.1:9200:9200
@@ -16,7 +16,7 @@ services:
     volumes:
       - ../activemq/activemq.xml:/activemq-opencast.tpl.xml:ro
   postgresql:
-    container_name: opencast-postgresql
+    container_name: $COMPOSE_PROJECT_NAME-postgresql
     image: docker.io/library/postgres:13.2
     ports:
       - 127.0.0.1:5432:5432
@@ -25,7 +25,7 @@ services:
       POSTGRES_PASSWORD: dbpassword
       POSTGRES_DB: opencast
   mariadb:
-    container_name: opencast-mariadb
+    container_name: $COMPOSE_PROJECT_NAME-mariadb
     image: docker.io/library/mariadb:10.5.9
     ports:
       - 127.0.0.1:3306:3306

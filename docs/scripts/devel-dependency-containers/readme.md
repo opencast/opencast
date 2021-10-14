@@ -52,6 +52,22 @@ before starting the containers anew. This stops and removes the containers, and 
 and named and anonymous volumes. Removing the anonymous volumes using the `--volumes` switch is optional
 but recommended, since otherwise these accumulate on your system over time.
 
+### Using multiple instances
+
+Sometimes you want to preserve the state of these containers, while also having the possibility to start up
+a fresh set. Think for example multiple parallel long-lived development branches.
+
+You can achieve this by setting the `COMPOSE_PROJECT_NAME` environment variable. For example:
+
+```sh
+COMPOSE_PROJECT_NAME=branch1 docker-compose up
+COMPOSE_PROJECT_NAME=branch2 docker-compose up
+```
+
+starts two parallel sets of containers (the names of which will be prefixed with `branch1` and `branch2`, respectively)
+which you can stop, clean, and otherwise manage independently of one another by using all the commands
+given above, each prefixed with the proper `COMPOSE_PROJECT_NAME=branch<n>`.
+
 SELinux
 -------
 
