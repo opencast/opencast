@@ -67,6 +67,5 @@ in:
 
 ```
 etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
-```
 
-If you are using external software, like Ilias for example, it is required that all of your media is accessable to every user. If that is not the case, the static files authorization must be disabled by setting the `authentication.required` option in the file above to `false`.
+The [ILIAS plugin](https://github.com/fluxapps/OpenCast), for example, does not authenticate users against Opencast. If you are using that plugin, this is why you probably want to disable this feature and make your media publically accessable.
