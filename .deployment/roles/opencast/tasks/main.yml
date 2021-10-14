@@ -79,6 +79,7 @@
     mode: '0644'
   loop:
     - etc/custom.properties
+    - etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
     - bin/setenv
 
 - name: start and enable opencast service
