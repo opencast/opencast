@@ -277,8 +277,22 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
             resultElements[i].setURI(uri);
 
             // Set new flavor
-            if (targetFlavor != null)
-              resultElements[i].setFlavor(targetFlavor);
+            if (targetFlavor != null) {
+              String targetFlavorType = targetFlavor.getType();
+              String targetFlavorSubtype = targetFlavor.getSubtype();
+
+              if (MediaPackageElementFlavor.WILDCARD.equals(targetFlavorType)) {
+                targetFlavorType = inputElements[i].getFlavor().getType();
+              }
+
+              if (MediaPackageElementFlavor.WILDCARD.equals(targetFlavorSubtype)) {
+                targetFlavorSubtype = inputElements[i].getFlavor().getSubtype();
+              }
+
+              String resolvedTargetFlavorStr =
+                  targetFlavorType + MediaPackageElementFlavor.SEPARATOR + targetFlavorSubtype;
+              resultElements[i].setFlavor(MediaPackageElementFlavor.parseFlavor(resolvedTargetFlavorStr));
+            }
           }
         }
 
