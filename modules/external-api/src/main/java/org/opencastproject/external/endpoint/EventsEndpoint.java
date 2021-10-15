@@ -65,7 +65,6 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
@@ -1603,39 +1602,33 @@ public class EventsEndpoint implements ManagedService {
   }
 
   public JObject getPublication(Publication publication, Boolean sign, ApiVersion requestedVersion) {
-    String url = publication.getURI() == null ? "" : publication.getURI().toString();
+    // signing publication URLs was introduced in 1.7.0
+    URI publicationUrl = publication.getURI();
+    if (!requestedVersion.isSmallerThan(VERSION_1_7_0)) {
+      publicationUrl = getSignedUrl(publicationUrl, sign);
+    }
+
     return obj(f("id", v(publication.getIdentifier())), f("channel", v(publication.getChannel())),
-            f("mediatype", v(publication.getMimeType(), BLANK)), f("url", v(url)),
+            f("mediatype", v(publication.getMimeType(), BLANK)),
+            f("url", v(publicationUrl, BLANK)),
             f("media", arr(getPublicationTracksJson(publication, sign, requestedVersion))),
             f("attachments", arr(getPublicationAttachmentsJson(publication, sign))),
             f("metadata", arr(getPublicationCatalogsJson(publication, sign))));
   }
 
-  private String getMediaPackageElementUri(MediaPackageElement element, Boolean sign) {
-    String elementUri;
-    if (sign) {
-      elementUri = getSignedUri(element.getURI());
-    } else {
-      elementUri = element.getURI() == null ? null : element.getURI().toString();
-    }
-    return elementUri;
-  }
-
-  private String getSignedUri(URI uri) {
-    if (uri == null) {
-      return null;
+  private URI getSignedUrl(URI url, boolean sign) {
+    if (url == null || !sign) {
+      return url;
     }
 
-    String location = uri.toString();
-    if (urlSigningService.accepts(location)) {
+    if (urlSigningService.accepts(url.toString())) {
       try {
-        location = urlSigningService.sign(location, expireSeconds, null, null);
+        return URI.create(urlSigningService.sign(url.toString(), expireSeconds, null, null));
       } catch (UrlSigningException e) {
-        logger.error("Unable to sign URI {}", uri, e);
-        return uri.toString();
+        logger.error("Unable to sign URI {}", url, e);
       }
     }
-    return location;
+    return url;
   }
 
   private List<JValue> getPublicationTracksJson(Publication publication, Boolean sign, ApiVersion requestedVersion) {
@@ -1666,7 +1659,7 @@ public class EventsEndpoint implements ManagedService {
       }
 
       tracks.add(obj(f("id", v(track.getIdentifier(), BLANK)), f("mediatype", v(track.getMimeType(), BLANK)),
-              f("url", v(getMediaPackageElementUri(track, sign), BLANK)), f("flavor", v(track.getFlavor(), BLANK)),
+              f("url", v(getSignedUrl(track.getURI(), sign), BLANK)), f("flavor", v(track.getFlavor(), BLANK)),
               f("size", v(track.getSize())), f("checksum", v(track.getChecksum(), BLANK)),
               f("tags", arr(track.getTags())), f("has_audio", v(track.hasAudio())),
               f("has_video", v(track.hasVideo())), f("duration", v(track.getDuration())),
@@ -1680,7 +1673,7 @@ public class EventsEndpoint implements ManagedService {
     for (Attachment attachment : publication.getAttachments()) {
       attachments.add(
               obj(f("id", v(attachment.getIdentifier(), BLANK)), f("mediatype", v(attachment.getMimeType(), BLANK)),
-                      f("url", v(getMediaPackageElementUri(attachment, sign), BLANK)),
+                      f("url", v(getSignedUrl(attachment.getURI(), sign), BLANK)),
                       f("flavor", v(attachment.getFlavor(), BLANK)), f("ref", v(attachment.getReference(), BLANK)),
                       f("size", v(attachment.getSize())), f("checksum", v(attachment.getChecksum(), BLANK)),
                       f("tags", arr(attachment.getTags()))));
@@ -1692,7 +1685,7 @@ public class EventsEndpoint implements ManagedService {
     List<JValue> catalogs = new ArrayList<>();
     for (Catalog catalog : publication.getCatalogs()) {
       catalogs.add(obj(f("id", v(catalog.getIdentifier(), BLANK)), f("mediatype", v(catalog.getMimeType(), BLANK)),
-              f("url", v(getMediaPackageElementUri(catalog, sign), BLANK)),
+              f("url", v(getSignedUrl(catalog.getURI(), sign), BLANK)),
               f("flavor", v(catalog.getFlavor(), BLANK)), f("size", v(catalog.getSize())),
               f("checksum", v(catalog.getChecksum(), BLANK)), f("tags", arr(catalog.getTags()))));
     }
