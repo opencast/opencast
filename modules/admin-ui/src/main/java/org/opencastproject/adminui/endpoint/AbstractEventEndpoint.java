@@ -382,7 +382,7 @@ public abstract class AbstractEventEndpoint {
   public Response getEventResponse(@PathParam("eventId") String id) throws Exception {
     for (final Event event : getIndexService().getEvent(id, getIndex())) {
       event.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
-      return okJson(eventToJSON(event));
+      return okJson(eventToJSON(event, Optional.empty()));
     }
     return notFound("Cannot find an event with id '%s'.", id);
   }
@@ -546,6 +546,49 @@ public abstract class AbstractEventEndpoint {
       pubJSON.add(json);
     }
     return pubJSON;
+  }
+
+  private List<JObject> eventCommentsToJson(List<EventComment> comments) {
+    List<JObject> commentArr = new ArrayList<>();
+    for (EventComment c : comments) {
+      JObject thing = obj(
+              f("reason", v(c.getReason())),
+              f("resolvedStatus", v(c.isResolvedStatus())),
+              f("modificationDate", v(c.getModificationDate().toInstant().toString())),
+              f("replies", arr(eventCommentRepliesToJson(c.getReplies()))),
+              f("author", obj(
+                      f("name", c.getAuthor().getName()),
+                      f("email", c.getAuthor().getEmail()),
+                      f("username", c.getAuthor().getUsername())
+              )),
+              f("id", v(c.getId().get())),
+              f("text", v(c.getText())),
+              f("creationDate", v(c.getCreationDate().toInstant().toString()))
+      );
+      commentArr.add(thing);
+    }
+
+    return commentArr;
+  }
+
+  private List<JObject> eventCommentRepliesToJson(List<EventCommentReply> replies) {
+    List<JObject> repliesArr = new ArrayList<>();
+    for (EventCommentReply r : replies) {
+      JObject thing = obj(
+              f("id", v(r.getId().get())),
+              f("text", v(r.getText())),
+              f("creationDate", v(r.getCreationDate().toInstant().toString())),
+              f("modificationDate", v(r.getModificationDate().toInstant().toString())),
+              f("author", obj(
+                      f("name", r.getAuthor().getName()),
+                      f("email", r.getAuthor().getEmail()),
+                      f("username", r.getAuthor().getUsername())
+              ))
+      );
+      repliesArr.add(thing);
+    }
+
+    return repliesArr;
   }
 
   @GET
@@ -2301,15 +2344,18 @@ public abstract class AbstractEventEndpoint {
           @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
           @RestParameter(name = "sort", description = "The order instructions used to sort the query result. Must be in the form '<field name>:(ASC|DESC)'", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of items to return per page.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The page number.", isRequired = false, type = RestParameter.Type.INTEGER) }, responses = {
+          @RestParameter(name = "offset", description = "The page number.", isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "getComments", description = "If comments should be fetched", isRequired = false, type = RestParameter.Type.BOOLEAN) }, responses = {
                   @RestResponse(description = "Returns all events as JSON", responseCode = HttpServletResponse.SC_OK) })
   public Response getEvents(@QueryParam("id") String id, @QueryParam("commentReason") String reasonFilter,
           @QueryParam("commentResolution") String resolutionFilter, @QueryParam("filter") String filter,
-          @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
+          @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit,
+          @QueryParam("getComments") Boolean getComments) {
 
     Option<Integer> optLimit = Option.option(limit);
     Option<Integer> optOffset = Option.option(offset);
     Option<String> optSort = Option.option(trimToNull(sort));
+    Option<Boolean> optGetComments = Option.option(getComments);
     ArrayList<JValue> eventsList = new ArrayList<>();
     final Organization organization = getSecurityService().getOrganization();
     final User user = getSecurityService().getUser();
@@ -2445,7 +2491,16 @@ public abstract class AbstractEventEndpoint {
     for (SearchResultItem<Event> item : results.getItems()) {
       Event source = item.getSource();
       source.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
-      eventsList.add(eventToJSON(source));
+      List<EventComment> comments = null;
+      if (optGetComments.isSome() && optGetComments.get()) {
+        try {
+          comments = getEventCommentService().getComments(source.getIdentifier());
+        } catch (EventCommentException e) {
+          logger.error("Unable to get comments from event {}", source.getIdentifier(), e);
+          throw new WebApplicationException(e);
+        }
+      }
+      eventsList.add(eventToJSON(source, Optional.ofNullable(comments)));
     }
 
     return okJsonList(eventsList, nul(offset).getOr(0), nul(limit).getOr(0), results.getHitCount());
@@ -2465,7 +2520,7 @@ public abstract class AbstractEventEndpoint {
     return UrlSupport.uri(serverUrl, eventId, "comment", Long.toString(commentId));
   }
 
-  private JValue eventToJSON(Event event) {
+  private JValue eventToJSON(Event event, Optional<List<EventComment>> comments) {
     List<Field> fields = new ArrayList<>();
 
     fields.add(f("id", v(event.getIdentifier())));
@@ -2495,6 +2550,9 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("technical_end", v(event.getTechnicalEndTime(), BLANK)));
     fields.add(f("technical_presenters", arr($(event.getTechnicalPresenters()).map(Functions.stringToJValue))));
     fields.add(f("publications", arr(eventPublicationsToJson(event))));
+    if (comments.isPresent()) {
+      fields.add(f("comments", arr(eventCommentsToJson(comments.get()))));
+    }
     return obj(fields);
   }
 

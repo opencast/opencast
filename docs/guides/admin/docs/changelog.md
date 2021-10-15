@@ -4,6 +4,36 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.4
+
+*Released on October 13th, 2021*
+
+- [[#3065](https://github.com/opencast/opencast/pull/3065)] -
+  Deactivate security-jwt by default
+- [[#3062](https://github.com/opencast/opencast/pull/3062)] -
+  Remove unused constants
+- [[#3060](https://github.com/opencast/opencast/pull/3060)] -
+  Opencast 10x docs show "compose" instead of "encode" #3059
+- [[#3040](https://github.com/opencast/opencast/pull/3040)] -
+  Deactivate Parallel Builds in CI
+- [[#3013](https://github.com/opencast/opencast/pull/3013)] -
+  Amberscript attach WOH improvements
+- [[#3006](https://github.com/opencast/opencast/pull/3006)] -
+  Fix a spacing issue in the series LTI tool
+- [[#3004](https://github.com/opencast/opencast/pull/3004)] -
+  Check if series catalog exists
+- [[#3003](https://github.com/opencast/opencast/pull/3003)] -
+  Set jobLoad to 0 when jobCache is empty for very small jobLoads
+- [[#2993](https://github.com/opencast/opencast/pull/2993)] -
+  Fix Theodul Multithread Builds
+- [[#2991](https://github.com/opencast/opencast/pull/2991)] -
+  Fix a `NullPointerException` in the new "Servers"-table code
+- [[#2956](https://github.com/opencast/opencast/pull/2956)] -
+  Show link to annotation tool in the series LTI tool
+- [[#2906](https://github.com/opencast/opencast/pull/2906)] -
+  Retry Documentation Deployment
+
+
 ### Opencast 10.3
 
 *Released on September 15th, 2021*
