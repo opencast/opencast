@@ -219,7 +219,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     expect(cc.getProperties()).andReturn(dictionary).anyTimes();
     replay(cc);
 
-    adminUIConfiguration.updated(cc);
+    adminUIConfiguration.modified(cc);
     env.setAdminUIConfiguration(adminUIConfiguration);
 
     // acl

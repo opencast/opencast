@@ -221,7 +221,7 @@ public class ToolsEndpointTest {
     expect(cc.getProperties()).andReturn(dictionary).anyTimes();
     replay(cc);
 
-    adminUIConfiguration.updated(cc);
+    adminUIConfiguration.modified(cc);
     endpoint.setAdminUIConfiguration(adminUIConfiguration);
   }
 

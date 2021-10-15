@@ -246,7 +246,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Modified
-  public void updated(ComponentContext cc) {
+  public void modified(ComponentContext cc) {
     Dictionary<String, Object> properties = cc.getProperties();
     if (properties == null) {
       logger.info("No configuration available, using defaults");

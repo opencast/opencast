@@ -268,7 +268,7 @@ public class AdminUIConfiguration {
   }
 
   @Modified
-  public void updated(ComponentContext cc) {
+  public void modified(ComponentContext cc) {
     Dictionary<String, Object> properties = cc.getProperties();
     if (properties == null) {
       return;
@@ -402,5 +402,6 @@ public class AdminUIConfiguration {
     retractWorkflowId = StringUtils.defaultString((String) properties.get(OPT_RETRACT_WORKFLOW_ID),
       DEFAULT_RETRACT_WORKFLOW_ID);
     logger.debug("Retract workflow ID set to {}", retractWorkflowId);
+    logger.info("Configuration updated");
   }
 }
