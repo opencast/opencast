@@ -55,7 +55,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.osgi.service.component.ComponentContext;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -217,11 +216,7 @@ public class ToolsEndpointTest {
     dictionary.put(AdminUIConfiguration.OPT_SMIL_CATALOG_FLAVOR, "smil/cutting");
     dictionary.put(AdminUIConfiguration.OPT_SMIL_SILENCE_FLAVOR, "*/silence");
 
-    ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
-    expect(cc.getProperties()).andReturn(dictionary).anyTimes();
-    replay(cc);
-
-    adminUIConfiguration.modified(cc);
+    adminUIConfiguration.modified(dictionary);
     endpoint.setAdminUIConfiguration(adminUIConfiguration);
   }
 

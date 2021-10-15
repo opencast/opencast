@@ -124,7 +124,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -245,23 +244,22 @@ public class SeriesEndpoint {
 
   /** OSGi callback if properties file is present */
   @Modified
-  public void modified(ComponentContext cc) {
-    Dictionary<String, Object> properties = cc.getProperties();
+  public void modified(Map<String, Object> properties) {
     if (properties == null) {
       logger.info("No configuration available, using defaults");
       return;
     }
 
-    Object dictionaryValue = properties.get(SERIES_HASEVENTS_DELETE_ALLOW_KEY);
-    if (dictionaryValue != null) {
-      deleteSeriesWithEventsAllowed = BooleanUtils.toBoolean(dictionaryValue.toString());
+    Object mapValue = properties.get(SERIES_HASEVENTS_DELETE_ALLOW_KEY);
+    if (mapValue != null) {
+      deleteSeriesWithEventsAllowed = BooleanUtils.toBoolean(mapValue.toString());
     }
 
-    dictionaryValue = properties.get(SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY);
-    onlySeriesWithWriteAccessSeriesTab = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
+    mapValue = properties.get(SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY);
+    onlySeriesWithWriteAccessSeriesTab = BooleanUtils.toBoolean(Objects.toString(mapValue, "true"));
 
-    dictionaryValue = properties.get(EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY);
-    onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
+    mapValue = properties.get(EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY);
+    onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(Objects.toString(mapValue, "true"));
 
     logger.info("Configuration updated");
   }

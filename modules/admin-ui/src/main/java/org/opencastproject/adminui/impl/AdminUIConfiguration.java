@@ -26,15 +26,14 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Component(
@@ -268,8 +267,7 @@ public class AdminUIConfiguration {
   }
 
   @Modified
-  public void modified(ComponentContext cc) {
-    Dictionary<String, Object> properties = cc.getProperties();
+  public void modified(Map<String, Object> properties) {
     if (properties == null) {
       return;
     }
