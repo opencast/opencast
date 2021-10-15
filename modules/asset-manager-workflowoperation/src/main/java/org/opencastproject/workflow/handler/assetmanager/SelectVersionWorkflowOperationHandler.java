@@ -34,13 +34,15 @@ import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
-import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +59,8 @@ import java.util.List;
  * This operation should be the first one in a workflow executed from the archive because it REPLACES the media package
  * used by the current workflow.
  */
+@Component(immediate = true, service = WorkflowOperationHandler.class, property = {
+        "service.description=Selects a mp version from the archive", "workflow.operation=select-version" })
 public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SelectVersionWorkflowOperationHandler.class);
@@ -121,7 +125,7 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
                 mp.getIdentifier(), noTagsOpt, sourceFlavorsOpt));
       }
     }
-    return createResult(resultMp, Action.CONTINUE);
+    return createResult(resultMp, WorkflowOperationResult.Action.CONTINUE);
   }
 
   private MediaPackage findVersion(String mpId, String version) throws WorkflowOperationException {
@@ -190,6 +194,7 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
     return flavors;
   }
 
+  @Reference
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }

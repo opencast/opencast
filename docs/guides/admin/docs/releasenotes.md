@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 Opencast 11: Release Notes
-=======
-Opencast 10: Release Notes
->>>>>>> 2074008a13 (Removed part of doc because it isn't reliable.)
-=========================
 
 
 Features
