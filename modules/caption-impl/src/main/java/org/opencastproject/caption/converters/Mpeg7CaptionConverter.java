@@ -42,6 +42,7 @@ import org.opencastproject.metadata.mpeg7.Mpeg7Catalog;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogImpl;
 import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.TextAnnotation;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -219,7 +219,7 @@ public class Mpeg7CaptionConverter implements CaptionConverter {
 
     Transformer tf = null;
     try {
-      tf = TransformerFactory.newInstance().newTransformer();
+      tf = XmlSafeParser.newTransformerFactory().newTransformer();
       DOMSource xmlSource = new DOMSource(mpeg7.toXml());
       tf.transform(xmlSource, new StreamResult(outputStream));
     } catch (TransformerConfigurationException e) {

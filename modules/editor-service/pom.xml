@@ -167,9 +167,8 @@
             <Export-Package>
               org.opencastproject.editor;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/editor_service.xml
-            </Service-Component>
+            <!-- Remove once editor-service use OSGi annotations and generates capabilities -->
+            <_dsannotations-options>norequirements</_dsannotations-options>
           </instructions>
         </configuration>
       </plugin>

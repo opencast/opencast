@@ -34,6 +34,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Functions;
@@ -210,7 +211,10 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
       try { // try to load job from filesystem
         synchronized (this) {
           File jobFile = getJobFile(id);
-          FileUploadJob job = (FileUploadJob) jobUnmarshaller.unmarshal(jobFile);
+          FileUploadJob job = null;
+          try (FileInputStream jobFileStream = new FileInputStream(jobFile)) {
+            job = (FileUploadJob) jobUnmarshaller.unmarshal(XmlSafeParser.parse(jobFileStream));
+          }
           job.setLastModified(jobFile.lastModified()); // get last modified time from job file
           return job;
         } // if loading from fs also fails
@@ -257,9 +261,9 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   private void storeJob(FileUploadJob job) throws FileUploadException {
     try {
       synchronized (this) {
-          logger.debug("Attempting to store job {}", job.getId());
-          File jobFile = ensureExists(getJobFile(job.getId()));
-          jobMarshaller.marshal(job, jobFile);
+        logger.debug("Attempting to store job {}", job.getId());
+        File jobFile = ensureExists(getJobFile(job.getId()));
+        jobMarshaller.marshal(job, jobFile);
       }
     } catch (Exception e) {
       throw fileUploadException(Severity.error, "Failed to write job file.", e);
@@ -285,12 +289,6 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.fileupload.api.FileUploadService#acceptChunk(org.opencastproject.fileupload.api.job.FileUploadJob
-   *      job, long chunk, InputStream content)
-   */
   @Override
   public void acceptChunk(FileUploadJob job, long chunkNumber, InputStream content) throws FileUploadException {
     // job already completed?
@@ -402,12 +400,6 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     removeFromCache(job);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.fileupload.api.FileUploadService#getPayload(org.opencastproject.fileupload.api.job.FileUploadJob
-   *      job)
-   */
   @Override
   public InputStream getPayload(FileUploadJob job) throws FileUploadException {
     // job not locked?

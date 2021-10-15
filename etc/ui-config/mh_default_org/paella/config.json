@@ -315,7 +315,8 @@
         "enabled": true
       },
       "es.upv.paella.playButtonOnScreenPlugin": {
-        "enabled": true
+        "enabled": true,
+        "showOnPause": false
       },
       "es.upv.paella.translecture.captionsPlugin": {
         "enabled": true

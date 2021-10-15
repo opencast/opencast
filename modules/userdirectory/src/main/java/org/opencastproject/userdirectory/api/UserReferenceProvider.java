@@ -35,7 +35,7 @@ public interface UserReferenceProvider {
      * @param mechanism
      *            the mechanism that adds the user reference
      */
-    void addUserReference(JpaUserReference user,
+  void addUserReference(JpaUserReference user,
             String mechanism);
 
     /**
@@ -44,7 +44,7 @@ public interface UserReferenceProvider {
      * @param user
      *            the user reference to be updated
      */
-    void updateUserReference(JpaUserReference user);
+  void updateUserReference(JpaUserReference user);
 
     /**
      * Returns the persisted user reference by the user name and organization id
@@ -55,13 +55,13 @@ public interface UserReferenceProvider {
      *            the organization id
      * @return the user reference or <code>null</code> if not found
      */
-    JpaUserReference findUserReference(String userName, String organizationId);
+  JpaUserReference findUserReference(String userName, String organizationId);
 
     /**
      * Set an optional roleProvider that takes care about resolving roles
      * @param roleProvider
      */
-    void setRoleProvider(RoleProvider roleProvider);
+  void setRoleProvider(RoleProvider roleProvider);
 
     /**
      * Load a user by userName
@@ -69,6 +69,6 @@ public interface UserReferenceProvider {
      * @param userName
      * @return the user or <code>null</code> if not found
      */
-    User loadUser(String userName);
+  User loadUser(String userName);
 
 }

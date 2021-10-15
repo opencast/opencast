@@ -7,13 +7,12 @@ This guide is based on an RPM software repository available for Red Hat-based Li
 University](https://uni-osnabrueck.de). This repository provides preconfigured Opencast installations and all necessary
 3rd-party-tools.
 
+<div class=warn>
+  <b>Opencast {{ opencast_major_version() }}</b> is not yet available.
+</div>
 
-Availability
-------------
-
-Note that it may take some time (usually about two weeks after a new release is out) before the RPMs are available.
-Watch for announcements on [the users list](https://docs.opencast.org/#mailing-lists) or just check which versions are
-available in the repository.
+> In addition to this guide, we have also recorded [a full installation done in 30 minutes](https://vt.uos.de/71hfc)
+> if you like to see how this works before you try it yourself.
 
 
 Currently Supported
@@ -31,7 +30,7 @@ Activate Repository
 First you have to install the necessary repositories:
 
 ```sh
-dnf install -y https://pkg.opencast.org/rpms/release/el/8/oc-09/noarch/opencast-repository-9-1.el8.noarch.rpm
+dnf install -y https://pkg.opencast.org/rpms/release/el/8/oc-{{ opencast_major_version() }}/noarch/opencast-repository-{{ opencast_major_version() }}-1.el8.noarch.rpm
 ```
 
 It might take some time after the release of a new Opencast version before the RPMs are moved to the stable repository.
@@ -158,7 +157,9 @@ Upgrading
 Packages will automatically upgrade to the latest minor version in a release series when running `dnf update`.
 They do not automatically upgrade the latest major version.
 This is intentional since additional migration steps might be required.
-For example, if you install Opencast 9.1, you get the latest 9.x release, but no 10 release.
+For example, if you install Opencast {{ opencast_major_version() }}.1,
+you get the latest {{ opencast_major_version() }}.x release,
+but no {{ opencast_major_version() | int + 1 }}.x release.
 
 These instructions will upgrade Opencast to a new version which may be incompatible with older versions.
 Thus, a rollback might not be possible.
@@ -170,17 +171,16 @@ For an RPM-based upgrade, first, stop Opencast:
 systemctl stop opencast.service
 ```
 
-Then, replace the repository
+Then, update the repository:
 
 ```sh
-rm -f /etc/yum.repos.d/opencast*.repo* || :
-dnf install -y https://pkg.opencast.org/rpms/release/el/8/oc-09/noarch/opencast-repository-9-1.el8.noarch.rpm
+dnf install -y https://pkg.opencast.org/rpms/release/el/8/oc-{{ opencast_major_version() }}/noarch/opencast-repository-{{ opencast_major_version() }}-1.el8.noarch.rpm
 ```
 
 Upgrade to the new Opencast package by running:
 
 ```sh
-dnf  install opencast-<distribution>
+dnf update
 ```
 
 At this point you must follow the relevant [upgrade instructions](../upgrade.md), prior to starting Opencast again.

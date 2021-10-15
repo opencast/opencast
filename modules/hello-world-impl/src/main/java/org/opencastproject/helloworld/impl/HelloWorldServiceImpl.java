@@ -23,9 +23,14 @@ package org.opencastproject.helloworld.impl;
 
 import org.opencastproject.helloworld.api.HelloWorldService;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * A simple tutorial class to learn about Opencast Services
@@ -42,9 +47,28 @@ public class HelloWorldServiceImpl implements HelloWorldService {
   /** The module specific logger */
   private static final Logger logger = LoggerFactory.getLogger(HelloWorldServiceImpl.class);
 
+  /** Message to print */
+  private String message = "Hello World";
+
+  /**
+   * This method is called when the bundle is activated (@Activate)
+   * or whenever the service's configuration file is modified (@Modified).
+   * The configuration file is determined by the class name:
+   *   etc/org.opencastproject.helloworld.impl.HelloWorldServiceImpl.cfg
+   */
+  @Activate
+  @Modified
+  void activate(Map<String, Object> properties) {
+    // Load service configuration
+    message = Objects.toString(properties.get("message"), "Hello World");
+
+    // Add some logging
+    logger.debug("Activated/Updated hello world service");
+  }
+
   public String helloWorld() {
-    logger.info("Hello World");
-    return "Hello World";
+    logger.info(message);
+    return message;
   }
 
   public String helloName(String name) {

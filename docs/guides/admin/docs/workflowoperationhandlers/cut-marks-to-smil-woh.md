@@ -12,16 +12,19 @@ It does this by attributing the given times to the specified tracks.
 Tracks are assumed to start at 0.
 Likewise, cut marks are assumed to be specified relative to the beginning of the tracks.
 
+The cut marks must be a media package attachment.
+For compatibility to early versions, the code falls back to looking for catalogs if no attachment was found.
+
 
 Parameter Table
 ---------------
 
 |Configuration Keys    |Example              |Description                                                    |
 |----------------------|---------------------|---------------------------------------------------------------|
-|source-media-flavors  |`presenter/prepared` |The flavors containing the video tracks.                       |
-|source-json-flavor    |`cut-marks/json`     |The flavor of the JSON. Must contain exactly one file.         |
+|source-media-flavors  |`presenter/prepared` |The flavors identifying the video tracks.                      |
+|source-json-flavor    |`cut-marks/json`     |The flavor of the JSON. Must identify exactly one element.     |
 |target-smil-flavor    |`smil/cutmarks`      |The flavor of the resulting SMIL.                              |
-|target-tags           |`archive`            |(Optional) Tags to add to the resulting SMIL. Default is `null`|
+|target-tags           |`archive`            |Tags to add to the resulting SMIL. (Default: `null`)           |
 
 
 JSON Format

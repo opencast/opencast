@@ -91,37 +91,46 @@ public class MoodleWebServiceImpl implements MoodleWebService {
     List<NameValuePair> params = new ArrayList<>();
     params.add(new BasicNameValuePair("field", filter.toString()));
 
-    for (int i = 0; i < values.size(); ++i)
+    for (int i = 0; i < values.size(); ++i) {
       params.add(new BasicNameValuePair("values[" + i + "]", values.get(i)));
+    }
 
     Object resp = executeMoodleRequest(MOODLE_FUNCTION_CORE_USER_GET_USERS_BY_FIELD, params);
 
     // Parse response
-    if (resp == null || !(resp instanceof JSONArray))
+    if (resp == null || !(resp instanceof JSONArray)) {
       throw new MoodleWebServiceException("Moodle responded in unexpected format");
+    }
 
     JSONArray respArray = (JSONArray) resp;
     List<MoodleUser> users = new ArrayList<>(respArray.size());
 
     for (Object userObj : respArray) {
-      if (!(userObj instanceof JSONObject))
+      if (!(userObj instanceof JSONObject)) {
         throw new MoodleWebServiceException("Moodle responded in unexpected format");
+      }
 
       JSONObject userJsonObj = (JSONObject) userObj;
       MoodleUser user = new MoodleUser();
 
-      if (userJsonObj.containsKey("id"))
+      if (userJsonObj.containsKey("id")) {
         user.setId(userJsonObj.get("id").toString());
-      if (userJsonObj.containsKey("username"))
+      }
+      if (userJsonObj.containsKey("username")) {
         user.setUsername(userJsonObj.get("username").toString());
-      if (userJsonObj.containsKey("fullname"))
+      }
+      if (userJsonObj.containsKey("fullname")) {
         user.setFullname(userJsonObj.get("fullname").toString());
-      if (userJsonObj.containsKey("idnumber"))
+      }
+      if (userJsonObj.containsKey("idnumber")) {
         user.setIdnumber(userJsonObj.get("idnumber").toString());
-      if (userJsonObj.containsKey("email"))
+      }
+      if (userJsonObj.containsKey("email")) {
         user.setEmail(userJsonObj.get("email").toString());
-      if (userJsonObj.containsKey("auth"))
+      }
+      if (userJsonObj.containsKey("auth")) {
         user.setAuth(userJsonObj.get("auth").toString());
+      }
 
       users.add(user);
     }
@@ -190,18 +199,21 @@ public class MoodleWebServiceImpl implements MoodleWebService {
    * @throws MoodleWebServiceException If the parsing failed because the response format was unexpected.
    */
   private List<String> parseIdList(Object resp) throws MoodleWebServiceException {
-    if (resp == null)
+    if (resp == null) {
       return new LinkedList<>();
+    }
 
-    if (!(resp instanceof JSONArray))
+    if (!(resp instanceof JSONArray)) {
       throw new MoodleWebServiceException("Moodle responded in unexpected format");
+    }
 
     JSONArray respArray = (JSONArray) resp;
     List<String> ids = new ArrayList<>(respArray.size());
 
     for (Object courseObj : respArray) {
-      if (!(courseObj instanceof JSONObject) || ((JSONObject) courseObj).get("id") == null)
+      if (!(courseObj instanceof JSONObject) || ((JSONObject) courseObj).get("id") == null) {
         throw new MoodleWebServiceException("Moodle responded in unexpected format");
+      }
 
       ids.add(((JSONObject) courseObj).get("id").toString());
     }
@@ -243,8 +255,9 @@ public class MoodleWebServiceImpl implements MoodleWebService {
         // Check for errors
         if (obj instanceof JSONObject) {
           JSONObject jObj = (JSONObject) obj;
-          if (jObj.containsKey("exception") || jObj.containsKey("errorcode"))
+          if (jObj.containsKey("exception") || jObj.containsKey("errorcode")) {
             throw new MoodleWebServiceException("Moodle returned an error: " + jObj.toJSONString());
+          }
         }
 
         return obj;

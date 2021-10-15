@@ -36,7 +36,7 @@ angular.module('adminNg.directives')
         if (angular.isDefined(attrs.taskStartable) &&
                     (attrs.taskStartable.toUpperCase().indexOf('PROCESSED') > -1
                     || attrs.taskStartable.toUpperCase().indexOf('PROCESSING_FAILURE') > -1
-                    || attrs.taskStartable.toUpperCase().indexOf('PROCESSING_CANCELED') > -1)) {
+                    || attrs.taskStartable.toUpperCase().indexOf('PROCESSING_CANCELLED') > -1)) {
           return true;
         }
         else {

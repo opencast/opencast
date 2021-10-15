@@ -29,20 +29,30 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.impl.AbstractAssetManager;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.AssetStoreException;
+import org.opencastproject.assetmanager.api.storage.DeletionSelector;
+import org.opencastproject.assetmanager.api.storage.Source;
+import org.opencastproject.assetmanager.api.storage.StoragePath;
+import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.persistence.Database;
-import org.opencastproject.assetmanager.impl.storage.AssetStore;
-import org.opencastproject.assetmanager.impl.storage.AssetStoreException;
-import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
-import org.opencastproject.assetmanager.impl.storage.Source;
-import org.opencastproject.assetmanager.impl.storage.StoragePath;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
@@ -70,7 +80,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Path;
@@ -127,12 +139,14 @@ public class TestTasksEndpoint extends TasksEndpoint {
     replay(workspace, workflowService);
 
     AssetManager assetManager = mkAssetManager(workspace);
+
     MediaPackage mp1 = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new IdImpl("id1"));
     AttachmentImpl attachment = new AttachmentImpl();
     attachment.setFlavor(MediaPackageElements.PROCESSING_PROPERTIES);
     mp1.add(attachment);
 
     MediaPackage mp2 = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new IdImpl("id2"));
+
     assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, mp1);
     assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, mp2);
 
@@ -142,40 +156,51 @@ public class TestTasksEndpoint extends TasksEndpoint {
   }
 
   AssetManager mkAssetManager(final Workspace workspace) throws Exception {
-    final PersistenceEnv penv = PersistenceEnvs.mk(mkEntityManagerFactory("org.opencastproject.assetmanager.impl"));
-    final Database db = new Database(null, penv);
-    return new AbstractAssetManager() {
+    final EntityManagerFactory emf = mkEntityManagerFactory("org.opencastproject.assetmanager.impl");
+    final PersistenceEnv penv = PersistenceEnvs.mk(emf);
+    final Database db = new Database(emf, penv);
+    HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
-      public HttpAssetProvider getHttpAssetProvider() {
-        // identity provider
-        return new HttpAssetProvider() {
-          @Override
-          public Snapshot prepareForDelivery(Snapshot snapshot) {
-            return snapshot;
-          }
-        };
-      }
-
-      @Override
-      public Database getDb() {
-        return db;
-      }
-
-      @Override
-      protected Workspace getWorkspace() {
-        return workspace;
-      }
-
-      @Override
-      public AssetStore getLocalAssetStore() {
-        return mkAssetStore(workspace);
-      }
-
-      @Override
-      protected String getCurrentOrgId() {
-        return DefaultOrganization.DEFAULT_ORGANIZATION_ID;
+      public Snapshot prepareForDelivery(Snapshot snapshot) {
+        return snapshot;
       }
     };
+
+    JaxbOrganization org = new DefaultOrganization();
+    JaxbUser user = new JaxbUser("user", null, org, new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN,
+            new DefaultOrganization()));
+
+    SecurityService securityService = createNiceMock(SecurityService.class);
+    expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.expect(securityService.getUser()).andAnswer(() -> user).anyTimes();
+    replay(securityService);
+
+    final AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
+    EasyMock.expect(authorizationService.getActiveAcl(EasyMock.<MediaPackage>anyObject()))
+            .andReturn(tuple(new AccessControlList(), AclScope.Episode))
+            .anyTimes();
+    EasyMock.replay(authorizationService);
+
+    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(ms);
+
+    AbstractSearchIndex esIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
+            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
+    EasyMock.replay(esIndex);
+
+    AssetManagerImpl am = new AssetManagerImpl();
+    am.setHttpAssetProvider(httpAssetProvider);
+    am.setDatabase(db);
+    am.setWorkspace(workspace);
+    am.setAssetStore(mkAssetStore(workspace));
+    am.setSecurityService(securityService);
+    am.setAuthorizationService(authorizationService);
+    am.setMessageSender(ms);
+    am.setAdminUiIndex(esIndex);
+    am.setExternalApiIndex(esIndex);
+
+    return am;
   }
 
   AssetStore mkAssetStore(final Workspace workspace) {

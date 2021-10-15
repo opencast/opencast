@@ -3,10 +3,10 @@ name: Test database upgrade
 on:
   pull_request:
     paths:
-      - 'docs/upgrade/**'
+      - 'docs/upgrade/*/mysql5.sql'
   push:
     paths:
-      - 'docs/upgrade/**'
+      - 'docs/upgrade/*/mysql5.sql'
 
 jobs:
   # Test database upgrade path.

@@ -1,5 +1,5 @@
-Opencast Administration Guide
-=============================
+Opencast {{ opencast_major_version() }} Administration Guide
+============================================================
 
 Welcome to the Opencast Universe! Opencast is an open-source enterprise level lecture recording system. The core of the
 system delivers functionality for scheduling, media encoding, editing and content delivery. For lecture capture,

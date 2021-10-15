@@ -22,6 +22,7 @@
 package org.opencastproject.metadata.dublincore;
 
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
@@ -49,7 +50,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
@@ -116,8 +116,7 @@ public class DublinCoreCatalogList {
    */
   public String getResultsAsXML() throws IOException {
     try {
-      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder builder = factory.newDocumentBuilder();
+      DocumentBuilder builder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
       DOMImplementation impl = builder.getDOMImplementation();
 
       Document doc = impl.createDocument(null, null, null);
@@ -129,7 +128,7 @@ public class DublinCoreCatalogList {
         root.appendChild(node);
       }
 
-      Transformer tf = TransformerFactory.newInstance().newTransformer();
+      Transformer tf = XmlSafeParser.newTransformerFactory().newTransformer();
       DOMSource xmlSource = new DOMSource(doc);
       StringWriter out = new StringWriter();
       tf.transform(xmlSource, new StreamResult(out));
@@ -166,7 +165,7 @@ public class DublinCoreCatalogList {
       // XML
       InputStream is = null;
       try {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory docBuilderFactory = XmlSafeParser.newDocumentBuilderFactory();
         docBuilderFactory.setNamespaceAware(true);
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         is = IOUtils.toInputStream(dcString, "UTF-8");
@@ -206,7 +205,7 @@ public class DublinCoreCatalogList {
   private static InputStream nodeToString(Node node) {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try {
-      Transformer t = TransformerFactory.newInstance().newTransformer();
+      Transformer t = XmlSafeParser.newTransformerFactory().newTransformer();
       t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
       t.setOutputProperty(OutputKeys.INDENT, "yes");
       t.transform(new DOMSource(node), new StreamResult(outputStream));

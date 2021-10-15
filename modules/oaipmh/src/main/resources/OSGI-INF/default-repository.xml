@@ -6,6 +6,7 @@
   <implementation class="org.opencastproject.oaipmh.server.DefaultRepository"/>
   <service>
     <provide interface="org.opencastproject.oaipmh.server.OaiPmhRepository"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
   </service>
   <property name="service.description" value="Opencast default OAI-PMH repository"/>
   <property name="service.pid" value="org.opencastproject.oaipmh.server.DefaultRepository"/>

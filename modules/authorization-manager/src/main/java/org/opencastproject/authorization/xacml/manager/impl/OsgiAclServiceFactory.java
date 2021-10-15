@@ -21,62 +21,50 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.series.api.SeriesService;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /** OSGi implementation of {@link org.opencastproject.authorization.xacml.manager.api.AclServiceFactory}. */
+@Component(
+        property = {
+                "service.description=Factory to create ACL services"
+        },
+        immediate = true,
+        service = { AclServiceFactory.class }
+)
 public class OsgiAclServiceFactory implements AclServiceFactory {
   private AclDb aclDb;
-  private SeriesService seriesService;
-  private AssetManager assetManager;
-  private AuthorizationService authorizationService;
   private SecurityService securityService;
   protected AbstractSearchIndex adminUiIndex;
   protected AbstractSearchIndex externalApiIndex;
 
   @Override
   public AclService serviceFor(Organization org) {
-    return new AclServiceImpl(org, aclDb, seriesService, assetManager,
-            authorizationService, adminUiIndex, externalApiIndex, securityService);
+    return new AclServiceImpl(org, aclDb, adminUiIndex, externalApiIndex, securityService);
   }
 
-  /** OSGi DI callback. */
+  @Reference
   public void setAclDb(AclDb aclDb) {
     this.aclDb = aclDb;
   }
 
-  /** OSGi DI callback. */
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
-  }
-
-  /** OSGi DI callback. */
-  public void setAssetManager(AssetManager assetManager) {
-    this.assetManager = assetManager;
-  }
-
-  /** OSGi DI callback. */
-  public void setAuthorizationService(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
-  }
-
-  /** OSGi DI callback. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  /** OSGi DI callback. */
+  @Reference(target = "(index.name=adminui)")
   public void setAdminUiIndex(AbstractSearchIndex index) {
     this.adminUiIndex = index;
   }
 
-  /** OSGi DI callback. */
+  @Reference(target = "(index.name=externalapi)")
   public void setExternalApiIndex(AbstractSearchIndex index) {
     this.externalApiIndex = index;
   }

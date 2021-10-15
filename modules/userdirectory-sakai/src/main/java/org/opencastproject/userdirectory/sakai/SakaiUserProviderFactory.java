@@ -86,7 +86,7 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
   private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.sakai.cache.expiration";
 
   /** A map of pid to sakai user provider instance */
-  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();;
+  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
 
   /** The OSGI bundle context */
   protected BundleContext bundleContext = null;
@@ -131,10 +131,14 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
     logger.debug("updated SakaiUserProviderFactory");
 
     String organization = (String) properties.get(ORGANIZATION_KEY);
-    if (StringUtils.isBlank(organization)) throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
+    if (StringUtils.isBlank(organization)) {
+      throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
+    }
 
     String url = (String) properties.get(SAKAI_URL_KEY);
-    if (StringUtils.isBlank(url)) throw new ConfigurationException(SAKAI_URL_KEY, "is not set");
+    if (StringUtils.isBlank(url)) {
+      throw new ConfigurationException(SAKAI_URL_KEY, "is not set");
+    }
 
     String userDn = (String) properties.get(SAKAI_SEARCH_USER);
     String password = (String) properties.get(SEARCH_PASSWORD);

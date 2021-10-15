@@ -25,6 +25,18 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>commons-io</groupId>

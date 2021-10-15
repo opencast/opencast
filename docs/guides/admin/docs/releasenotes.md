@@ -1,27 +1,26 @@
-Opencast 10: Release Notes
+Opencast 11: Release Notes
 =========================
 
-Important Changes
------------------
-
-- …
 
 Features
 --------
 
-- New *conditional-config* workflow operation handler, used to evaluate a list of conditions and set
-  a workflow configuration variable accordingly.
-- …
+- TBA
 
 Improvements
 ------------
 
-- …
+- TBA
+
+Behaviour changes
+-----------------
+
+- TBA
 
 API changes
 -----------
 
-- …
+- TBA
 
 
 Release Schedule
@@ -29,15 +28,14 @@ Release Schedule
 
 | Date                        | Phase                    |
 |-----------------------------|--------------------------|
-| May 18, 2021                | Feature freeze           |
-| May 24, 2021                | Translation week         |
-| May 31, 2021                | Public QA                |
-| June 15, 2021               | Release of Opencast 10.0 |
-
+| November 17, 2021           | Feature freeze           |
+| November 22, 2021           | Translation week         |
+| November 29, 2021           | Public QA phase          |
+| December 15, 2021           | Release of Opencast 11.0 |
 
 
 Release managers
 ----------------
 
-- Greg Logan
-- Per Pascal Seeland (University of Stuttgart)
+- Maximiliano Lira Del Canto (University of Cologne)
+- Jonathan Neugebauer (University of Münster)
