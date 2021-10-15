@@ -155,10 +155,7 @@ public class SolrRequester {
    * @throws SolrServerException
    *           if the solr server is not working as expected
    */
-  private SearchResult createSearchResult(final SolrQuery query, final SearchQuery sQuery) throws SolrServerException {
-
-    final boolean signed = sQuery.willSignURLs();
-    final long limit = sQuery.getLimit();
+  private SearchResult createSearchResult(final SolrQuery query, final boolean signed) throws SolrServerException {
 
     // Execute the query and try to get hold of a query response
     QueryResponse solrResponse = null;
@@ -172,7 +169,7 @@ public class SolrRequester {
     final SearchResultImpl result = new SearchResultImpl(query.getQuery());
     result.setSearchTime(solrResponse.getQTime());
     result.setOffset(solrResponse.getResults().getStart());
-    result.setLimit(limit);
+    result.setLimit(query.getRows());
     result.setTotal(solrResponse.getResults().getNumFound());
 
     // Walk through response and create new items with title, creator, etc:
@@ -823,7 +820,7 @@ public class SolrRequester {
    */
   public SearchResult getForAdministrativeRead(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, READ.toString(), false);
-    return createSearchResult(query, q);
+    return createSearchResult(query, q.willSignURLs());
   }
 
   /**
@@ -836,7 +833,7 @@ public class SolrRequester {
    */
   public SearchResult getForRead(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, READ.toString(), true);
-    return createSearchResult(query, q);
+    return createSearchResult(query, q.willSignURLs());
   }
 
   /**
@@ -849,7 +846,7 @@ public class SolrRequester {
    */
   public SearchResult getForWrite(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, WRITE.toString(), true);
-    return createSearchResult(query, q);
+    return createSearchResult(query, q.willSignURLs());
   }
 
   /**
