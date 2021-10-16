@@ -950,7 +950,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
     logger.debug("Current host load: {}, job load cache size: {}", format("%.1f", localSystemLoad), jobCache.size());
 
-    if (jobCache.isEmpty() && localSystemLoad != 0) {
+    if (jobCache.isEmpty() && Math.signum(localSystemLoad) != 0) {
       logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0",
               format("%.2f", localSystemLoad));
       localSystemLoad = 0;
