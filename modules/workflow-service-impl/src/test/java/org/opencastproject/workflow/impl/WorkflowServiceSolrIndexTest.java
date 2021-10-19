@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -95,9 +94,6 @@ public class WorkflowServiceSolrIndexTest {
     EasyMock.expect(serviceRegistry.getJobPayloads("START_WORKFLOW"))
             .andReturn(Collections.singletonList(jobPayload));
     EasyMock.replay(serviceRegistry);
-
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(messageSender);
 
     // Now create the dao
     dao = new WorkflowServiceSolrIndex();
