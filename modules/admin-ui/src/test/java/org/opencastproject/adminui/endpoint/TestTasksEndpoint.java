@@ -43,7 +43,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -181,9 +180,6 @@ public class TestTasksEndpoint extends TasksEndpoint {
             .anyTimes();
     EasyMock.replay(authorizationService);
 
-    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(ms);
-
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
@@ -196,7 +192,6 @@ public class TestTasksEndpoint extends TasksEndpoint {
     am.setAssetStore(mkAssetStore(workspace));
     am.setSecurityService(securityService);
     am.setAuthorizationService(authorizationService);
-    am.setMessageSender(ms);
     am.setIndex(esIndex);
 
     return am;

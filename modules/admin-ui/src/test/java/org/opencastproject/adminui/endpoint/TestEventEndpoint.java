@@ -69,8 +69,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.track.AbstractStreamImpl;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataList;
@@ -358,13 +356,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     StaticMetadataServiceDublinCoreImpl metadataSvcs = new StaticMetadataServiceDublinCoreImpl();
     metadataSvcs.setWorkspace(workspace);
-
-    // Org directory
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(messageSender);
-
-    MessageReceiver messageReceiver = EasyMock.createNiceMock(MessageReceiver.class);
-    EasyMock.replay(messageReceiver);
 
     final Date now = DateTime.parse("2014-06-05T09:15:56Z").toDate();
     EventComment comment = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 1",
