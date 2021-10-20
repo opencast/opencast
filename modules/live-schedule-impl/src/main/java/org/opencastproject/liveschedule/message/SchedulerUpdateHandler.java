@@ -21,9 +21,8 @@
 package org.opencastproject.liveschedule.message;
 
 import org.opencastproject.liveschedule.api.LiveScheduleService;
-import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
-import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
+import org.opencastproject.message.broker.api.update.ISchedulerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -43,22 +42,16 @@ import java.util.Map;
 
 @Component(
     immediate = true,
-    service = UpdateHandler.class,
+    service = { UpdateHandler.class, ISchedulerUpdateHandler.class },
     property = {
         "service.description=Scheduler Update Listener for Live Schedule Service"
     }
 )
-public class SchedulerUpdateHandler extends UpdateHandler {
+public class SchedulerUpdateHandler extends UpdateHandler implements ISchedulerUpdateHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerUpdateHandler.class);
 
-  private static final String DESTINATION_SCHEDULER = "SCHEDULER.Liveschedule";
-
   protected SchedulerService schedulerService;
-
-  public SchedulerUpdateHandler() {
-    super(DESTINATION_SCHEDULER);
-  }
 
   @Activate
   @Override
@@ -66,14 +59,7 @@ public class SchedulerUpdateHandler extends UpdateHandler {
     super.activate(cc);
   }
 
-  protected void execute(MessageItem messageItem) {
-    SchedulerItemList schedulerItemList = (SchedulerItemList) messageItem;
-    for (SchedulerItem item : schedulerItemList.getItems()) {
-      executeSingle(schedulerItemList.getId(), item);
-    }
-  }
-
-  private void executeSingle(final String mpId, final SchedulerItem schedulerItem) {
+  public void execute(final String mpId, final SchedulerItem schedulerItem) {
     try {
       logger.debug("Scheduler message handler START for mp {} event type {} in thread {}", mpId,
               schedulerItem.getType(), Thread.currentThread().getId());

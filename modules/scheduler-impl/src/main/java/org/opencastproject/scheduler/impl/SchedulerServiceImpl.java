@@ -63,9 +63,9 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
+import org.opencastproject.message.broker.api.update.ISchedulerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -136,7 +136,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
@@ -212,9 +211,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   protected Cache<String, String> lastModifiedCache = CacheBuilder.newBuilder()
           .expireAfterWrite(DEFAULT_CACHE_EXPIRE, TimeUnit.SECONDS).build();
 
-  /** The message broker sender service */
-  private MessageSender messageSender;
-
   /** Persistent storage for events */
   private SchedulerServiceDatabase persistence;
 
@@ -241,6 +237,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /** The list of registered event catalog UI adapters */
   private List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
+  private List<ISchedulerUpdateHandler> schedulerUpdateHandlers = new ArrayList<>();
 
   /** The system user name */
   private String systemUserName;
@@ -248,13 +245,21 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private ComponentContext componentContext;
 
   /**
-   * OSGi callback to set message sender.
+   * OSGi callback to add an update handler.
    *
-   * @param messageSender
+   * @param handler
    */
-  @Reference
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeSchedulerUpdateHandler"
+  )
+  public void addSchedulerUpdateHandler(ISchedulerUpdateHandler handler) {
+    this.schedulerUpdateHandlers.add(handler);
+  }
+
+  public void removeSchedulerUpdateHandler(ISchedulerUpdateHandler handler) {
+    this.schedulerUpdateHandlers.remove(handler);
   }
 
   /**
@@ -318,14 +323,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Send a message on the scheduler queue
+   * Update all of the handlers that an event has changed
    *
-   * This is just a little shorthand because we send a lot of messages.
-   *
-   * @param message message to send
+   * @param list The list of scheduler changes for a mediapackage
    */
-  private void sendSchedulerMessage(Serializable message) {
-    messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue, message);
+  private void sendSchedulerUpdate(SchedulerItemList list) {
+    for (SchedulerItem item : list.getItems()) {
+      String mpId = list.getId();
+      for (ISchedulerUpdateHandler handler : this.schedulerUpdateHandlers) {
+        handler.execute(mpId, item);
+      }
+    }
   }
 
   /**
@@ -880,7 +888,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         throw new NotFoundException();
 
       // Update live event
-      sendSchedulerMessage(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
+      sendSchedulerUpdate(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
 
       // Update API index
       removeSchedulingFromIndex(mediaPackageId, index);
@@ -1273,7 +1281,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         logger.debug("Setting Recording {} to state {}.", id, state);
 
         // Update live event
-        sendSchedulerMessage(new SchedulerItemList(r.getID(), Collections.singletonList(SchedulerItem
+        sendSchedulerUpdate(new SchedulerItemList(r.getID(), Collections.singletonList(SchedulerItem
                 .updateRecordingStatus(r.getState(), r.getLastCheckinTime()))));
 
         // Update API index
@@ -1334,7 +1342,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       persistence.resetRecordingState(id);
 
       // Update live event
-      sendSchedulerMessage(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
+      sendSchedulerUpdate(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
 
       // Update API index
       removeRecordingStatusFromIndex(id, index);
@@ -1538,7 +1546,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
 
     if (!items.isEmpty()) {
-      sendSchedulerMessage(new SchedulerItemList(mpId, items));
+      sendSchedulerUpdate(new SchedulerItemList(mpId, items));
     }
   }
 

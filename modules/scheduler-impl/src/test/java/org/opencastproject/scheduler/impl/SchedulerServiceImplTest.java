@@ -90,8 +90,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.message.broker.api.BaseMessage;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -235,10 +233,6 @@ public class SchedulerServiceImplTest {
 
     workspace = new UnitTestWorkspace();
 
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-
-    final BaseMessage baseMessageMock = EasyMock.createNiceMock(BaseMessage.class);
-
     AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     acl = new AccessControlList(new AccessControlEntry("ROLE_ADMIN", "write", true),
             new AccessControlEntry("ROLE_ADMIN", "read", true), new AccessControlEntry("ROLE_USER", "read", true));
@@ -273,14 +267,13 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
 
-    EasyMock.replay(messageSender, baseMessageMock, authorizationService, index, result,
+    EasyMock.replay(authorizationService, index, result,
             extendedAdapter, episodeAdapter, orgDirectoryService, componentContext, bundleContext);
 
     schedSvc = new SchedulerServiceImpl();
 
     schedSvc.setAuthorizationService(authorizationService);
     schedSvc.setWorkspace(workspace);
-    schedSvc.setMessageSender(messageSender);
     schedSvc.addCatalogUIAdapter(episodeAdapter);
     schedSvc.addCatalogUIAdapter(extendedAdapter);
     schedSvc.setOrgDirectoryService(orgDirectoryService);
@@ -1703,9 +1696,6 @@ public class SchedulerServiceImplTest {
             .anyTimes();
     EasyMock.replay(authorizationService);
 
-    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(ms);
-
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
@@ -1718,7 +1708,6 @@ public class SchedulerServiceImplTest {
     am.setAssetStore(mkAssetStore());
     am.setAuthorizationService(authorizationService);
     am.setSecurityService(securityService);
-    am.setMessageSender(ms);
     am.setIndex(esIndex);
     return am;
   }
