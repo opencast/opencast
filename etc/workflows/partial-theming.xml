@@ -43,21 +43,10 @@
     <operation
       id="tag"
       if="NOT(${theme_active})"
-      description="Tag presenter video as themed">
+      description="Tag elements as themed">
       <configurations>
-        <configuration key="source-flavors">presenter/trimmed</configuration>
-        <configuration key="target-flavor">presenter/themed</configuration>
-        <configuration key="copy">false</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="tag"
-      if="NOT(${theme_active})"
-      description="Tag presentation video as themed">
-      <configurations>
-        <configuration key="source-flavors">presentation/trimmed</configuration>
-        <configuration key="target-flavor">presentation/themed</configuration>
+        <configuration key="source-flavors">*/trimmed</configuration>
+        <configuration key="target-flavor">*/themed</configuration>
         <configuration key="copy">false</configuration>
       </configurations>
     </operation>
@@ -90,26 +79,6 @@
       </configurations>
     </operation>
 
-    <operation
-      id="tag"
-      if="NOT ${theme_watermark_active}"
-      description="Tagging presenter track as input for next operation">
-      <configurations>
-        <configuration key="source-flavors">presenter/trimmed</configuration>
-        <configuration key="target-flavor">presenter/branded</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="tag"
-      if="NOT ${theme_watermark_active}"
-      description="Tagging presentation track as input for next operation">
-      <configurations>
-        <configuration key="source-flavors">presentation/trimmed</configuration>
-        <configuration key="target-flavor">presentation/branded</configuration>
-      </configurations>
-    </operation>
-
     <!-- Add bumper and trailer part to the presenter track -->
 
     <operation
@@ -121,7 +90,7 @@
         <configuration key="source-flavor-part-0-mandatory">${theme_bumper_active}</configuration>
         <configuration key="source-flavor-part-1">branding/titleslide+video</configuration>
         <configuration key="source-flavor-part-1-mandatory">${theme_title_slide_active}</configuration>
-        <configuration key="source-flavor-part-2">presenter/branded</configuration>
+        <configuration key="source-flavor-part-2">presenter/trimmed</configuration>
         <configuration key="source-flavor-part-2-mandatory">true</configuration>
         <configuration key="source-flavor-part-3">branding/trailer</configuration>
         <configuration key="source-flavor-part-3-mandatory">${theme_trailer_active}</configuration>
@@ -143,7 +112,7 @@
         <configuration key="source-flavor-part-0-mandatory">${theme_bumper_active}</configuration>
         <configuration key="source-flavor-part-1">branding/titleslide+video</configuration>
         <configuration key="source-flavor-part-1-mandatory">${theme_title_slide_active}</configuration>
-        <configuration key="source-flavor-part-2">presentation/branded</configuration>
+        <configuration key="source-flavor-part-2">presentation/trimmed</configuration>
         <configuration key="source-flavor-part-2-mandatory">true</configuration>
         <configuration key="source-flavor-part-3">branding/trailer</configuration>
         <configuration key="source-flavor-part-3-mandatory">${theme_trailer_active}</configuration>

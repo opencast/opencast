@@ -3,9 +3,6 @@
 
   <id>studio-upload</id>
   <title>Studio Upload</title>
-  <tags>
-    <tag>upload</tag>
-  </tags>
   <displayOrder>1010</displayOrder>
   <description>
     A simple and fast workflow for publishing videos created by Opencast Studio.

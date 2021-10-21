@@ -9,9 +9,9 @@
   </tags>
   <displayOrder>1000</displayOrder>
   <description>
-    A default workflow for processing media.
+    The default workflow for processing media.
 
-    If straight to publishing is checked, then the uploaded media will be published to engage without cutting.
+    If straight to publishing is checked, then the uploaded media will be published without cutting.
   </description>
   <configuration_panel>
     <![CDATA[

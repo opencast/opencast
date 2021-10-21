@@ -9,11 +9,8 @@
   </tags>
   <displayOrder>100</displayOrder>
   <description>
-    A minimal testing workflow that transcodes the media into distribution formats, then
-    sends the resulting distribution files, along with their associated metadata,
-    to the distribution channels.
-
-    If straight to publishing is checked, then the uploaded media will be published to engage without cutting.
+    A minimal workflow that transcodes media into distribution formats,
+    then publishes the resulting distribution files, along with their associated metadata.
   </description>
   <configuration_panel>
     <![CDATA[
@@ -23,10 +20,6 @@
       </div>
     ]]>
   </configuration_panel>
-  <state-mappings>
-    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.PUBLISHING</state-mapping>
-    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.PUBLISHING</state-mapping>
-  </state-mappings>
   <operations>
 
     <operation
@@ -143,36 +136,6 @@
       </configurations>
     </operation>
 
-    <!-- Generate timeline preview images -->
-
-    <operation
-      id="timelinepreviews"
-      if="${straightToPublishing}"
-      fail-on-error="false"
-      exception-handler-workflow="partial-error"
-      description="Creating timeline preview images">
-      <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
-        <configuration key="target-flavor">*/timeline+preview</configuration>
-        <configuration key="target-tags">engage-download</configuration>
-        <configuration key="image-count">100</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Extract text form slide preview images -->
-
-    <operation
-      id="extract-text"
-      if="${straightToPublishing}"
-      fail-on-error="false"
-      exception-handler-workflow="partial-error"
-      description="Extracting text from presentation segments">
-      <configurations>
-        <configuration key="source-flavor">presentation/preview</configuration>
-        <configuration key="target-tags">engage-download</configuration>
-      </configurations>
-    </operation>
-
     <!-- Publish preview internal -->
 
     <operation
@@ -182,9 +145,7 @@
       <configurations>
         <configuration key="download-source-flavors">*/preview</configuration>
         <configuration key="channel-id">internal</configuration>
-        <configuration key="url-pattern">
-          ${org_org_opencastproject_admin_ui_url!'http://localhost:8080'}/admin-ng/index.html#/events/events/${event_id}/tools/editor
-        </configuration>
+        <configuration key="url-pattern">${org_org_opencastproject_admin_ui_url!'http://localhost:8080'}/admin-ng/index.html#/events/events/${event_id}/tools/editor</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
@@ -201,7 +162,6 @@
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download</configuration>
-        <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
