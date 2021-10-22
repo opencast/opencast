@@ -29,7 +29,6 @@ import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -119,9 +118,6 @@ public class SeriesServiceImplTest {
     index.setSecurityService(securityService);
     index.activate(null);
 
-    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    EasyMock.replay(messageSender);
-
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateSeries(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
@@ -131,7 +127,6 @@ public class SeriesServiceImplTest {
     seriesService.setPersistence(seriesDatabase);
     seriesService.setIndex(index);
     seriesService.setSecurityService(securityService);
-    seriesService.setMessageSender(messageSender);
     seriesService.setElasticsearchIndex(esIndex);
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);

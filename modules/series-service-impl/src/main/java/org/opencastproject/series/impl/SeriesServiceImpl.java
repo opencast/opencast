@@ -38,8 +38,8 @@ import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.EName;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.series.SeriesItem;
+import org.opencastproject.message.broker.api.update.ISeriesUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -70,6 +70,8 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -118,9 +120,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   /** The organization directory */
   protected OrganizationDirectoryService orgDirectory;
 
-  /** The message broker service sender */
-  protected MessageSender messageSender;
-
   /** The system user name */
   private String systemUserName;
 
@@ -128,6 +127,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   private ElasticsearchIndex elasticsearchIndex;
 
   private AclServiceFactory aclServiceFactory;
+
+  private ArrayList<ISeriesUpdateHandler> updateHandlers = new ArrayList<>();
 
   /** OSGi callback for setting index. */
   @Reference
@@ -153,10 +154,18 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     this.orgDirectory = orgDirectory;
   }
 
-  /** OSGi callback for setting the message sender. */
-  @Reference
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
+  /** OSGi callbacks for settings and removing handlers. */
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.MULTIPLE,
+      unbind = "removeMessageHandler"
+  )
+  public void addMessageHandler(ISeriesUpdateHandler handler) {
+    this.updateHandlers.add(handler);
+  }
+
+  public void removeMessageHandler(ISeriesUpdateHandler handler) {
+    this.updateHandlers.remove(handler);
   }
 
   /** OSGi callbacks for setting the API index. */
@@ -270,8 +279,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         // update API index
         updateSeriesMetadataInIndex(id, elasticsearchIndex, dublinCore);
         // still sent for other asynchronous updates
-        messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-                SeriesItem.updateCatalog(dublinCore));
+        triggerEventHandlers(SeriesItem.updateCatalog(dublinCore));
         return (updated == null) ? null : dublinCore;
       }
       return dc;
@@ -329,8 +337,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         //update API index
         updateSeriesAclInIndex(seriesId, elasticsearchIndex, accessControl);
         // still sent for other asynchronous updates
-        messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-                SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
+        triggerEventHandlers(SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
       } catch (SeriesServiceDatabaseException e) {
         logger.error("Could not update series {} with access control rules: {}", seriesId, e.getMessage());
         throw new SeriesException(e);
@@ -365,8 +372,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       // remove from API index
       removeSeriesFromIndex(seriesID, elasticsearchIndex);
       // still sent for other asynchronous updates
-      messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-              SeriesItem.delete(seriesID));
+      triggerEventHandlers(SeriesItem.delete(seriesID));
     } catch (SeriesServiceDatabaseException e1) {
       logger.error("Could not delete series with id {} from persistence storage", seriesID);
       throw new SeriesException(e1);
@@ -575,8 +581,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   public boolean updateSeriesElement(String seriesID, String type, byte[] data) throws SeriesException {
     try {
       if (persistence.existsSeriesElement(seriesID, type) && persistence.storeSeriesElement(seriesID, type, data)) {
-        messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-                SeriesItem.updateElement(seriesID, type, new String(data, StandardCharsets.UTF_8)));
+        triggerEventHandlers(SeriesItem.updateElement(seriesID, type, new String(data, StandardCharsets.UTF_8)));
         return true;
       } else {
         return false;
@@ -655,6 +660,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     } catch (Exception e) {
       logIndexRebuildError(logger, index.getIndexName(), e);
       throw new IndexRebuildException(index.getIndexName(), getService(), e);
+    }
+  }
+
+  private void triggerEventHandlers(SeriesItem item) {
+    for (ISeriesUpdateHandler handler : updateHandlers) {
+      handler.execute(item);
     }
   }
 
