@@ -22,10 +22,10 @@ package org.opencastproject.liveschedule.message;
 
 import org.opencastproject.liveschedule.api.LiveScheduleService;
 import org.opencastproject.mediapackage.Publication;
-import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteEpisode;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
+import org.opencastproject.message.broker.api.update.IAssetManagerUpdateHandler;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -36,20 +36,14 @@ import org.slf4j.LoggerFactory;
 
 @Component(
     immediate = true,
-    service = UpdateHandler.class,
+    service = { UpdateHandler.class, IAssetManagerUpdateHandler.class },
     property = {
         "service.description=Asset Manager Update Listener for Live Schedule Service"
     }
 )
-public class AssetManagerUpdateHandler extends UpdateHandler {
+public class AssetManagerUpdateHandler extends UpdateHandler implements IAssetManagerUpdateHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerUpdateHandler.class);
-
-  private static final String DESTINATION_ASSET_MANAGER = "ASSETMANAGER.Liveschedule";
-
-  public AssetManagerUpdateHandler() {
-    super(DESTINATION_ASSET_MANAGER);
-  }
 
   @Activate
   @Override
@@ -58,8 +52,7 @@ public class AssetManagerUpdateHandler extends UpdateHandler {
   }
 
   @Override
-  protected void execute(MessageItem messageItem) {
-    AssetManagerItem item = (AssetManagerItem) messageItem;
+  public void execute(AssetManagerItem item) {
     String mpId = item.getId();
 
     try {

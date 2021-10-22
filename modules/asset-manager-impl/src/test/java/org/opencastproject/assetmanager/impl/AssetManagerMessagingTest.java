@@ -23,12 +23,11 @@ package org.opencastproject.assetmanager.impl;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteEpisode;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteSnapshot;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
+import org.opencastproject.message.broker.api.update.IAssetManagerUpdateHandler;
 
 import com.entwinemedia.fn.Fx;
 import com.entwinemedia.fn.data.Opt;
@@ -40,17 +39,17 @@ import org.junit.Test;
 import java.io.Serializable;
 
 /**
- * Test message sending to ActiveMQ.
+ * Test message sending via the AM.
  */
 public class AssetManagerMessagingTest extends AssetManagerTestBase {
-  private MessageSender ms;
+  private IAssetManagerUpdateHandler handler;
 
   @Override
   public AssetManagerImpl makeAssetManager() throws Exception {
-    ms = EasyMock.createMock(MessageSender.class);
+    handler = EasyMock.createMock(IAssetManagerUpdateHandler.class);
 
     AssetManagerImpl am = super.makeAssetManager();
-    am.setMessageSender(ms);
+    am.addEventHandler(handler);
     return am;
   }
 
@@ -141,11 +140,11 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
     q = am.createQuery();
     assertThat(q, instanceOf(AQueryBuilderDecorator.class));
     // expect add messages
-    expectObjectMessage(ms, TakeSnapshot.class, mpCount * versionCount);
+    expectObjectMessage(handler, TakeSnapshot.class, mpCount * versionCount);
     // expect delete messages
-    expectObjectMessage(ms, DeleteSnapshot.class, deleteSnapshotMsgCount);
-    expectObjectMessage(ms, DeleteEpisode.class, deleteEpisodeMsgCount);
-    EasyMock.replay(ms);
+    expectObjectMessage(handler, DeleteSnapshot.class, deleteSnapshotMsgCount);
+    expectObjectMessage(handler, DeleteEpisode.class, deleteEpisodeMsgCount);
+    EasyMock.replay(handler);
     //
     String[] mp = createAndAddMediaPackagesSimple(mpCount, versionCount, versionCount, Opt.<String>none());
     for (String id : mp) {
@@ -155,21 +154,18 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
     // run deletion
     deleteQuery.apply(mp);
     // verify "delete" expectation
-    EasyMock.verify(ms);
+    EasyMock.verify(handler);
   }
 
   private void expectObjectMessage(
-          final MessageSender ms,
+          final IAssetManagerUpdateHandler handler,
           final Class<? extends Serializable> messageType,
           final int times) {
     if (times > 0) {
-      ms.sendObjectMessage(
-              EasyMock.eq(AssetManagerItem.ASSETMANAGER_QUEUE),
-              EasyMock.eq(DestinationType.Queue),
-              EasyMock.<Serializable>anyObject());
+      handler.execute(EasyMock.<AssetManagerItem>anyObject());
       EasyMock.expectLastCall().andAnswer(new IAnswer<Void>() {
         @Override public Void answer() throws Throwable {
-          assertThat(EasyMock.getCurrentArguments()[2], instanceOf(messageType));
+          assertThat(EasyMock.getCurrentArguments()[0], instanceOf(messageType));
           return null;
         }
       }).times(times);

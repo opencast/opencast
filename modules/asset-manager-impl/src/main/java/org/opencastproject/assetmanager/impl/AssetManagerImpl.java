@@ -78,8 +78,8 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
-import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
+import org.opencastproject.message.broker.api.update.IAssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -171,13 +171,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
+  private ArrayList<IAssetManagerUpdateHandler> handlers = new ArrayList<>();
+
   private SecurityService securityService;
   private AuthorizationService authorizationService;
   private OrganizationDirectoryService orgDir;
   private Workspace workspace;
   private AssetStore assetStore;
   private HttpAssetProvider httpAssetProvider;
-  private MessageSender messageSender;
   private String systemUserName;
   private Database db;
   private AclServiceFactory aclServiceFactory;
@@ -246,6 +247,19 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference(
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeEventHandler"
+  )
+  public void addEventHandler(IAssetManagerUpdateHandler handler) {
+    this.handlers.add(handler);
+  }
+
+  public void removeEventHandler(IAssetManagerUpdateHandler handler) {
+    this.handlers.remove(handler);
+  }
+
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
       unbind = "removeRemoteAssetStore"
   )
   public synchronized void addRemoteAssetStore(RemoteAssetStore assetStore) {
@@ -259,11 +273,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference
   public void setHttpAssetProvider(HttpAssetProvider httpAssetProvider) {
     this.httpAssetProvider = httpAssetProvider;
-  }
-
-  @Reference
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
   }
 
   @Reference
@@ -402,8 +411,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
       logger.info("Send update message for snapshot {}, {} to ActiveMQ",
               snapshot.getMediaPackage().getIdentifier().toString(), snapshot.getVersion());
-      messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-              mkTakeSnapshotMessage(snapshot));
+      fireEventHandlers(mkTakeSnapshotMessage(snapshot));
 
       updateEventInIndex(snapshot, index);
 
@@ -849,16 +857,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Override
   public void handleDeletedSnapshot(String mpId, VersionImpl version) {
-    logger.info("Send delete message for snapshot {}, {} to ActiveMQ", mpId, version);
-    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-            AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
+    logger.info("Firing event handlers for event {}, snapshot {}", mpId, version);
+    fireEventHandlers(AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
   }
 
   @Override
   public void handleDeletedEpisode(String mpId) {
-    logger.info("Send delete message for episode {} to ActiveMQ", mpId);
-    messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-            AssetManagerItem.deleteEpisode(mpId, new Date()));
+    logger.info("Firing event handlers for event {}", mpId);
+    fireEventHandlers(AssetManagerItem.deleteEpisode(mpId, new Date()));
 
     removeEventFromIndex(mpId, index);
   }
@@ -1447,11 +1453,16 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
             mpCopy);
   }
 
+  public void fireEventHandlers(AssetManagerItem item) {
+    for (IAssetManagerUpdateHandler handler : handlers) {
+      handler.execute(item);
+    }
+  }
+
   /**
    * Call {@link
    * org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(AbstractADeleteQuery.DeleteSnapshotHandler)}
-   * with a delete handler that sends messages to ActiveMQ. Also make sure to propagate the behaviour to subsequent
-   * instances.
+   * with a delete handler. Also make sure to propagate the behaviour to subsequent instances.
    */
   private final class ADeleteQueryWithMessaging extends ADeleteQueryDecorator {
     ADeleteQueryWithMessaging(ADeleteQuery delegate) {
