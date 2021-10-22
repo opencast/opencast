@@ -74,30 +74,30 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
 
       /*
         For backward compatibility, but i can not see how this could work.
-        According to the documentation "https://www.wowza.com/docs/how-to-protect-streaming-using-securetoken-in-wowza-streaming-engine" 
+        According to the documentation 
+        "https://www.wowza.com/docs/how-to-protect-streaming-using-securetoken-in-wowza-streaming-engine" 
         if you using token v1 we need a TEA implimentation.
       */
-      if ("rtmp".equals((uri.getScheme())))
-      {
-          return super.sign(policy);
+      if ("rtmp".equals((uri.getScheme()))) {
+        return super.sign(policy);
       }
 
-      // Get the key that matches this URI since there must be one that matches as the base url has been accepted.
+        // Get the key that matches this URI since there must be one that matches as the base url has been accepted.
       Key key = getKey(policy.getBaseUrl());
 
       policy.setResourceStrategy(getResourceStrategy());
 
       if (!key.getSecret().contains(":")) {
-          getLogger().error("Given key not valid. (prefix:secret)");
+        getLogger().error("Given key not valid. (prefix:secret)");
 
-          throw new Exception("Given key not valid. (prefix:secret)");
+        throw new Exception("Given key not valid. (prefix:secret)");
       }
       String[] wowzaKeyPair = key.getSecret().split(":");
       String wowzaPrefix = wowzaKeyPair[0];
       String wowzaSecret = wowzaKeyPair[1];
 
       String newUri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(),
-              addSignutureToRequest(policy, wowzaPrefix, wowzaSecret), null).toString();
+          addSignutureToRequest(policy, wowzaPrefix, wowzaSecret), null).toString();
       return newUri;
     } catch (Exception e) {
       getLogger().error("Unable to create signed URL because {}", ExceptionUtils.getStackTrace(e));
@@ -159,7 +159,8 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
       }
     }
 
-    queryStringParameters += "&" + encryptionKeyId + "hash=" + generateHash(baseUrl, resource, ip, encryptionKeyId, encryptionKey, startTime, endTime);
+    queryStringParameters += "&" + encryptionKeyId + "hash=" + generateHash(baseUrl,
+        resource, ip, encryptionKeyId, encryptionKey, startTime, endTime);
 
     return queryStringParameters;
   }
@@ -183,7 +184,8 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
    * @exception Exception
    *             if something goes bad
    */
-  private String generateHash(String baseUrl, String resource, String ip, String encryptionKeyId, String encryptionKey, String startTime, String endTime) throws Exception {
+  private String generateHash(String baseUrl, String resource, String ip,
+      String encryptionKeyId, String encryptionKey, String startTime, String endTime) throws Exception {
     String urlToHash = resource + "?";
 
     if (!"".equals(ip)) {
@@ -197,12 +199,12 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
     arguments.put(encryptionKeyId + "endtime", endTime);
 
     if (!"".equals(startTime)) {
-        arguments.put(encryptionKeyId + "starttime", startTime);
+      arguments.put(encryptionKeyId + "starttime", startTime);
     }
 
     String query = new URI(baseUrl).getQuery();
     if (null == query) {
-        query = "";
+      query = "";
     }
 
     String[] params = query.split("&");
@@ -214,9 +216,9 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
     }
 
     for (Map.Entry<String,String> entry : arguments.entrySet()) {
-        String value = entry.getValue();
-        String key = entry.getKey();
-        urlToHash += "&" + key + "=" + value;
+      String value = entry.getValue();
+      String key = entry.getKey();
+      urlToHash += "&" + key + "=" + value;
     }
 
     MessageDigest md = MessageDigest.getInstance("SHA-256");

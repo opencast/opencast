@@ -70,8 +70,10 @@ public class WowzaUrlSigningProviderTest {
 
   @Test
   public void testSign() throws UrlSigningException, ConfigurationException {
-    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX, KEY_ID, AbstractUrlSigningProvider.SECRET), SECRET_VALUE);
-    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX, KEY_ID, AbstractUrlSigningProvider.URL), URL_VALUE);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX,
+        KEY_ID, AbstractUrlSigningProvider.SECRET), SECRET_VALUE);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX,
+        KEY_ID, AbstractUrlSigningProvider.URL), URL_VALUE);
 
     signer.updated(properties);
 

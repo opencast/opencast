@@ -99,7 +99,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
     }
 
     public String getSecret() {
-        return secret;
+      return secret;
     }
 
     boolean supports(String organizationId) {
