@@ -378,7 +378,6 @@
             <M2_REPO>${settings.localRepository}</M2_REPO>
             <java.awt.headless>true</java.awt.headless>
             <eclipselink.logging.level>CONFIG</eclipselink.logging.level>
-            <java.util.logging.config.file>${basedir}/conf/services/java.util.logging.properties</java.util.logging.config.file>
             <logj4.configuration>${basedir}/docs/log4j/log4j.properties</logj4.configuration>
             <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
             <java.locale.providers>COMPAT</java.locale.providers> <!-- Date formats changed with java 9 -->
