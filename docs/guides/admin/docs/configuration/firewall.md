@@ -22,7 +22,6 @@ A visual representation of the communication within a three-node cluster will lo
 ```graphviz dot network.png
 digraph G {
   user[label = "User"];
-  activemq[label = "ActiveMQ"];
   oc1[label = "Opencast Admin"];
   oc2[label = "Opencast Worker"];
   oc3[label = "Opencast Presentation"];
@@ -40,7 +39,6 @@ digraph G {
   oc1 -> db [label = "3306²"];
   oc2 -> db [label = "3306²"];
   oc3 -> db [label = "3306²"];
-  oc1 -> activemq [label = "61616"];
   oc1 -> es[label = "9300"];
   oc1 -> storage;
   oc2 -> storage;

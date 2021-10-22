@@ -124,39 +124,12 @@ configure your firewall:
 
 
 
-Step 4: Set-Up ActiveMQ
------------------------
-
-Since version 2, Opencast requires an Apache ActiveMQ message broker as message relay for the administrative user
-interface. ActiveMQ can either be set up to run on its own machine or on one of the existing Opencast nodes (usually the
-admin node).
-
-ActiveMQ 5.10 or above should work. ActiveMQ 5.6 will not work. Versions in between are untested.
-
-
-### Installation
-
-* If you use the Opencast RPM repository, simply install the `activemq-dist` package.
-* If you are running RHEL, CentOS or Fedora you can use the [ActiveMQ-dist Copr RPM
-  repository](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
-* You can download binary distributions from the [Apache ActiveMQ website](http://activemq.apache.org/download.html)
-
-
-### Configuration
-
-What you basically need to do is to point all your Opencast nodes to your message broker. For more information about
-the configuration, have a look at the [Message Broker Set-Up Guide](../configuration/message-broker.md).
-
-Do not forget that ActiveMQ uses TCP port 61616 (default configuration) for communication which you might have to allow
-in your firewall.
-
-
-Step 5: Configure Opencast
+Step 4: Configure Opencast
 ----------------------------
 
-You did already set-up and configured your database and message broker in the last steps, but there is some more
-configuration you have to do. First of all you should follow the Basic Configuration guide which will tell you how to
-set the login credentials etc. After that continue with the following steps:
+You already configured your database, but there is some more configuration you have to do. First of all you should
+follow the Basic Configuration guide which will tell you how to set the login credentials etc. After that continue with
+the following steps:
 
 ### custom.properties
 

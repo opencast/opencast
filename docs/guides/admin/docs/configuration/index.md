@@ -17,7 +17,6 @@ General Configuration
 - [Load Configuration](load.md)
 - [Log Configuration](log.md)
 - [User Statistics and Privacy Configuration](user-statistics.and.privacy.md)
-- [Message Broker Configuration](message-broker.md)
 - [Metadata Configuration](metadata.md)
 - [Multi Tenancy Configuration](multi.tenancy.md)
 - [Trim Segments Configuration](trim-segments.md)

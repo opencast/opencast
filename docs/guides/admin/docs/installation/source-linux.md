@@ -79,7 +79,6 @@ website:
 
 * [Get FFmpeg](http://ffmpeg.org/download.html)
 * [Get Apache Maven](https://maven.apache.org/download.cgi)
-* [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
 * [Get Elasticsearch](https://elastic.co)
 
 Building Opencast
