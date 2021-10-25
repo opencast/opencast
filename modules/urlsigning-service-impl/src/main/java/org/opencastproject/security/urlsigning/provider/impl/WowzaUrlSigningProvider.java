@@ -92,7 +92,7 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
 
         throw new Exception("Given key not valid. (prefix@secret)");
       }
-      String[] wowzaKeyPair = key.getSecret().split(":");
+      String[] wowzaKeyPair = key.getSecret().split("@");
       String wowzaPrefix = wowzaKeyPair[0];
       String wowzaSecret = wowzaKeyPair[1];
 

@@ -72,7 +72,7 @@ public class WowzaResourceStrategyImpl implements ResourceStrategy {
     } catch (URISyntaxException e) {
       throw new IllegalStateException(e);
     }
-}
+  }
 
   /**
    * Transform a base URI into a proper stream location without the host and application name.

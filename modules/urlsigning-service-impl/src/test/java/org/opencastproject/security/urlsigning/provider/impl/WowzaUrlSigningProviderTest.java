@@ -41,7 +41,7 @@ import java.util.Hashtable;
 public class WowzaUrlSigningProviderTest {
   private static final String KEY_ID = "wowza";
   private static final String URL_VALUE = "http://192.168.1.1:1935";
-  private static final String SECRET_VALUE = "myTokenPrefix:mySharedSecret";
+  private static final String SECRET_VALUE = "myTokenPrefix@mySharedSecret";
   private static final String ORGANIZATION_ID = "mh_default_org";
 
   private static WowzaUrlSigningProvider signer;
