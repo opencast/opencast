@@ -1,0 +1,1 @@
+ActiveMQ is no longer required by Opencast.  It is safe to uninstall.
