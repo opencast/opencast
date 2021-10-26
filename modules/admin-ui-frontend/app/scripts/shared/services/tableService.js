@@ -319,6 +319,17 @@ angular.module('adminNg.services')
         query.limit = me.pagination.limit;
         query.offset = me.pagination.offset * me.pagination.limit;
 
+        // If the notes column is being displayed, fetch comments
+        if (me.columns) {
+          let commentsColumn = me.columns.find(obj => {
+          // Fixme: Can we avoid using a string literal here?
+            return obj.label === 'EVENTS.EVENTS.TABLE.ADMINUI_NOTES';
+          });
+          if (commentsColumn && !commentsColumn.deactivated) {
+            query.getComments = true;
+          }
+        }
+
         (function(resource){
 
           var startTime = new Date();

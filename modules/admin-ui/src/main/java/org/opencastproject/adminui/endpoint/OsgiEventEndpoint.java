@@ -34,11 +34,14 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
+import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.Dictionary;
 import java.util.Objects;
@@ -47,7 +50,23 @@ import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
 @Path("/")
-public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedService {
+@RestService(name = "eventservice", title = "Event Service",
+        abstractText = "Provides resources and operations related to the events",
+        notes = { "This service offers the event CRUD Operations for the admin UI.",
+                "<strong>Important:</strong> "
+                        + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                        + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                        + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+        immediate = true,
+        service = OsgiEventEndpoint.class,
+        property = {
+                "service.description=Admin UI - Event facade Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.OsgiEventEndpoint",
+                "opencast.service.path=/admin-ng/event",
+        }
+)
+public class OsgiEventEndpoint extends AbstractEventEndpoint {
 
   private AclServiceFactory aclServiceFactory;
   private AssetManager assetManager;
@@ -78,6 +97,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
     this.adminUIConfiguration = adminUIConfiguration;
   }
@@ -88,6 +108,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setJobService(JobEndpoint jobService) {
     this.jobService = jobService;
   }
@@ -98,6 +119,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setSeriesEndpoint(SeriesEndpoint seriesEndpoint) {
     this.seriesEndpoint = seriesEndpoint;
   }
@@ -108,6 +130,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
@@ -118,6 +141,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
@@ -128,6 +152,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }
@@ -138,6 +163,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -148,6 +174,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
@@ -158,6 +185,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -168,6 +196,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -178,6 +207,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
@@ -188,6 +218,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setCaptureAgentStateService(CaptureAgentStateService captureAgentStateService) {
     this.captureAgentStateService = captureAgentStateService;
   }
@@ -198,6 +229,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setIndex(AdminUISearchIndex index) {
     this.index = index;
   }
@@ -208,12 +240,14 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Modified
+  public void modified(ComponentContext cc) {
+    Dictionary<String, Object> properties = cc.getProperties();
     if (properties == null) {
       logger.info("No configuration available, using defaults");
       return;
@@ -228,6 +262,8 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
 
     dictionaryValue = properties.get(EVENTSTAB_ONLYEVENTSWITHWRITEACCESS_KEY);
     onlyEventsWithWriteAccessEventsTab = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
+
+    logger.info("Configuration updated");
   }
 
   @Override

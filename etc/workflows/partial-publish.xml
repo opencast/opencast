@@ -5,9 +5,7 @@
   <title>Publish the recording</title>
   <tags/>
   <description/>
-
   <configuration_panel/>
-
   <operations>
 
     <!-- Fall back to */source if */prepared does not exist -->
@@ -38,20 +36,21 @@
     <!-- Continue processing -->
 
     <operation
-        id="select-tracks"
-        exception-handler-workflow="partial-error"
-        description="Preparing presenter (camera) audio and video work versions">
+      id="select-tracks"
+      exception-handler-workflow="partial-error"
+      description="Selecting audio/video streams for processing">
       <configurations>
-        <configuration key="source-flavor">*/prepared</configuration>
+        <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/work</configuration>
         <configuration key="target-tags">-archive</configuration>
+        <configuration key="audio-muxing">duplicate</configuration>
       </configurations>
     </operation>
 
     <operation
-        id="analyze-tracks"
-        exception-handler-workflow="partial-error"
-        description="Analyze tracks in media package a set control variables">
+      id="analyze-tracks"
+      exception-handler-workflow="partial-error"
+      description="Analyzing tracks in media package and setting control variables">
       <configurations>
         <configuration key="source-flavor">*/work</configuration>
       </configurations>
@@ -64,35 +63,25 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <operation
-        id="clone"
-        exception-handler-workflow="partial-error">
+      id="clone"
+      exception-handler-workflow="partial-error"
+      description="Creating working copy of the cutting information">
       <configurations>
         <configuration key="source-flavor">smil/cutting</configuration>
         <configuration key="target-flavor">smil/tmp</configuration>
       </configurations>
     </operation>
 
-    <operation id="editor"
+    <operation
+      id="editor"
       exception-handler-workflow="partial-error"
-      description="Cut the recording according to the edit decision list">
+      description="Cutting the recording according to the edit decision list">
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
         <configuration key="smil-flavors">smil/tmp</configuration>
         <configuration key="target-smil-flavor">smil/tmp</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="interactive">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Tag any optionally uploaded assets -->
-    <operation
-      id="tag"
-      if="${downloadSourceflavorsExist}"
-      exception-handler-workflow="partial-error"
-      description="Tagging uploaded assets for distribution">
-      <configurations>
-        <configuration key="source-flavors">${download-source-flavors}</configuration>
-        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -107,69 +96,14 @@
 
     <operation
       id="image"
-      if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==0 AND ${presenter_work_video}"
       exception-handler-workflow="partial-error"
       description="Creating search result default thumbnails">
       <configurations>
-        <configuration key="source-flavor">presenter/work</configuration>
-        <configuration key="target-flavor">presenter/search+preview</configuration>
-        <configuration key="target-tags">engage-download</configuration>
-        <configuration key="encoding-profile">search-cover.http</configuration>
-        <configuration key="time">${thumbnailPosition}</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="image"
-      if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==0 AND (${presentation_work_video} AND NOT (${presenter_work_video}))"
-      exception-handler-workflow="partial-error"
-      description="Creating search result default thumbnails">
-      <configurations>
-        <configuration key="source-flavor">presentation/work</configuration>
-        <configuration key="target-flavor">presentation/search+preview</configuration>
-        <configuration key="target-tags">engage-download</configuration>
-        <configuration key="encoding-profile">search-cover.http</configuration>
-        <configuration key="time">${thumbnailPosition}</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="image"
-      if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==2"
-      exception-handler-workflow="partial-error"
-      description="Creating search result thumbnail from saved position">
-      <configurations>
-        <configuration key="source-flavor">${thumbnailTrack}/work</configuration>
+        <configuration key="source-flavor">*/trimmed</configuration>
         <configuration key="target-flavor">*/search+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">search-cover.http</configuration>
-        <configuration key="time">${thumbnailPosition}</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="image-convert"
-      if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==1 AND ${presenter_work_video}"
-      exception-handler-workflow="partial-error"
-      description="Convert uploaded thumbnail to search result thumbnail (presenter track)">
-      <configurations>
-        <configuration key="source-flavors">thumbnail/source</configuration>
-        <configuration key="target-tags">engage-download</configuration>
-        <configuration key="target-flavor">presenter/search+preview</configuration>
-        <configuration key="encoding-profiles">search-cover.http.downscale</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="image-convert"
-      if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==1 AND ${presentation_work_video}"
-      exception-handler-workflow="partial-error"
-      description="Convert uploaded thumbnail to search result thumbnail (presentation track)">
-      <configurations>
-        <configuration key="source-flavors">thumbnail/source</configuration>
-        <configuration key="target-tags">engage-download</configuration>
-        <configuration key="target-flavor">presentation/search+preview</configuration>
-        <configuration key="encoding-profiles">search-cover.http.downscale</configuration>
+        <configuration key="time">3</configuration>
       </configurations>
     </operation>
 
@@ -178,14 +112,13 @@
     <operation
       id="image"
       exception-handler-workflow="partial-error"
-      description="Creating player preview image">
+      description="Creating player preview image for presentation video">
       <configurations>
-        <configuration key="source-flavor">*/trimmed</configuration>
-        <configuration key="source-tags"></configuration>
-        <configuration key="target-flavor">*/player+preview</configuration>
+        <configuration key="source-flavor">presentation/trimmed</configuration>
+        <configuration key="target-flavor">presentation/player+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
-        <configuration key="time">1</configuration>
+        <configuration key="time">3</configuration>
       </configurations>
     </operation>
 
@@ -197,11 +130,10 @@
       description="Creating feed cover image">
       <configurations>
         <configuration key="source-flavor">*/trimmed</configuration>
-        <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">*/feed+preview</configuration>
         <configuration key="target-tags">atom,rss</configuration>
         <configuration key="encoding-profile">feed-cover.http</configuration>
-        <configuration key="time">1</configuration>
+        <configuration key="time">3</configuration>
       </configurations>
     </operation>
 
@@ -209,29 +141,20 @@
     <!-- Create a cover image with the default template -->
 
     <operation
-      id="tag"
-      description="Removing unneeded presenter-cover from download publication">
-      <configurations>
-        <configuration key="source-flavors">presenter/player+preview</configuration>
-        <configuration key="target-tags">-engage-download</configuration>
-      </configurations>
-    </operation>
-
-    <operation
       id="image"
       exception-handler-workflow="partial-error"
-      description="Creating player preview image">
+      description="Creating player preview image for presenter video">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
-        <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">presenter/coverbackground</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
-        <configuration key="time">1</configuration>
+        <configuration key="time">3</configuration>
       </configurations>
     </operation>
 
     <operation
       id="cover-image"
+      if="${presenter_work_media}"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="Create a cover image">
@@ -241,7 +164,7 @@
         <configuration key="height">1080</configuration>
         <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
         <configuration key="target-flavor">presenter/player+preview</configuration>
-        <configuration key="target-tags">archive, engage-download</configuration>
+        <configuration key="target-tags">engage-download</configuration>
      </configurations>
     </operation>
 
@@ -261,126 +184,16 @@
     </operation>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Apply the branding artifacts                                      -->
+    <!-- Apply theming                                                     -->
     <!--                                                                   -->
     <!-- Add trailer and bumper to the recording prior to publication.     -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    <!-- Apply the theme to the mediapackage -->
-
-    <operation
-      id="theme"
-      exception-handler-workflow="partial-error"
-      description="Apply the theme">
-      <configurations>
-        <configuration key="bumper-flavor">branding/bumper</configuration>
-        <configuration key="bumper-tags">archive</configuration>
-        <configuration key="trailer-flavor">branding/trailer</configuration>
-        <configuration key="trailer-tags">archive</configuration>
-        <configuration key="title-slide-flavor">branding/titleslide</configuration>
-        <configuration key="title-slide-tags">archive</configuration>
-        <configuration key="watermark-flavor">branding/watermark</configuration>
-        <configuration key="watermark-tags">archive</configuration>
-        <configuration key="watermark-layout">theme_watermark_layout</configuration>
-        <configuration key="watermark-layout-variable">theme_watermark_layout_variable</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Inspect the media from the theme -->
-
-    <operation
-      id="inspect"
-      exception-handler-workflow="partial-error"
-      description="Inspecting audio and video streams">
-      <configurations>
-        <configuration key="overwrite">false</configuration>
-        <configuration key="accept-no-media">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Create a title slide video if theme has active title slide -->
     <operation
       id="include"
-      description="Prepare title slide video"
-      if="${theme_title_slide_active}">
+      description="Including theming operations">
       <configurations>
-        <configuration key="workflow-id">partial-title-slide</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Render watermarks into video tracks -->
-    <operation
-      id="include"
-      description="Render watermarks into video tracks"
-      if="${theme_watermark_active}">
-      <configurations>
-        <configuration key="workflow-id">partial-watermark</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Tag the dublin core catalogs created during trim operation for archival and publication -->
-
-    <operation
-      id="tag"
-      description="Tagging presenter track as input for next operation"
-      if="NOT (${theme_watermark_active})">
-      <configurations>
-        <configuration key="source-flavors">presenter/trimmed</configuration>
-        <configuration key="target-flavor">presenter/branded</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="tag"
-      description="Tagging presentation track as input for next operation"
-      if="NOT (${theme_watermark_active})">
-      <configurations>
-        <configuration key="source-flavors">presentation/trimmed</configuration>
-        <configuration key="target-flavor">presentation/branded</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Add bumper and trailer part to the presenter track -->
-
-    <operation
-      id="concat"
-      exception-handler-workflow="partial-error"
-      description="Concatenate presenter track with intro, title slide and outro videos">
-      <configurations>
-        <configuration key="source-flavor-part-0">branding/bumper</configuration>
-        <configuration key="source-flavor-part-0-mandatory">${theme_bumper_active}</configuration>
-        <configuration key="source-flavor-part-1">branding/titleslide+video</configuration>
-        <configuration key="source-flavor-part-1-mandatory">${theme_title_slide_active}</configuration>
-        <configuration key="source-flavor-part-2">presenter/branded</configuration>
-        <configuration key="source-flavor-part-2-mandatory">true</configuration>
-        <configuration key="source-flavor-part-3">branding/trailer</configuration>
-        <configuration key="source-flavor-part-3-mandatory">${theme_trailer_active}</configuration>
-        <configuration key="target-flavor">presenter/themed</configuration>
-        <configuration key="encoding-profile">concat.work</configuration>
-        <configuration key="output-resolution">part-2</configuration>
-        <configuration key="output-framerate">part-2</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Add bumper and trailer part to the presentation track -->
-
-    <operation
-      id="concat"
-      exception-handler-workflow="partial-error"
-      description="Concatenate presentation track with intro, title slide and outro videos">
-      <configurations>
-        <configuration key="source-flavor-part-0">branding/bumper</configuration>
-        <configuration key="source-flavor-part-0-mandatory">${theme_bumper_active}</configuration>
-        <configuration key="source-flavor-part-1">branding/titleslide+video</configuration>
-        <configuration key="source-flavor-part-1-mandatory">${theme_title_slide_active}</configuration>
-        <configuration key="source-flavor-part-2">presentation/branded</configuration>
-        <configuration key="source-flavor-part-2-mandatory">true</configuration>
-        <configuration key="source-flavor-part-3">branding/trailer</configuration>
-        <configuration key="source-flavor-part-3-mandatory">${theme_trailer_active}</configuration>
-        <configuration key="target-flavor">presentation/themed</configuration>
-        <configuration key="encoding-profile">concat.work</configuration>
-        <configuration key="output-resolution">part-2</configuration>
-        <configuration key="output-framerate">part-2</configuration>
+        <configuration key="workflow-id">partial-theming</configuration>
       </configurations>
     </operation>
 
@@ -391,86 +204,18 @@
     <!-- are required by the Engage publication channel.                   -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    <!-- Encode presenter (camera) to Engage player format -->
+    <!-- Encode presenter (camera) and presentation (screen) -->
+    <!-- to Engage player format                             -->
+
     <operation
-      if="${flagQuality360p}"
       id="encode"
       exception-handler-workflow="partial-error"
-      description="Encoding 360p video to MP4 download">
+      description="Encoding videos to mp4 delivery format">
       <configurations>
         <configuration key="source-flavor">*/themed</configuration>
         <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming,360p-quality</configuration>
-        <configuration key="encoding-profile">adaptive-360p.http</configuration>
-      </configurations>
-    </operation>
-    <operation
-      if="${flagQuality480p}"
-      id="encode"
-      exception-handler-workflow="partial-error"
-      description="Encoding 480p video to MP4 download">
-      <configurations>
-        <configuration key="source-flavor">*/themed</configuration>
-        <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming,480p-quality</configuration>
-        <configuration key="encoding-profile">adaptive-480p.http</configuration>
-      </configurations>
-    </operation>
-    <operation
-      if="${flagQuality720p}"
-      id="encode"
-      exception-handler-workflow="partial-error"
-      description="Encoding 720p video to MP4 download">
-      <configurations>
-        <configuration key="source-flavor">*/themed</configuration>
-        <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming,720p-quality</configuration>
-        <configuration key="encoding-profile">adaptive-720p.http</configuration>
-      </configurations>
-    </operation>
-    <operation
-      if="${flagQuality1080p}"
-      id="encode"
-      exception-handler-workflow="partial-error"
-      description="Encoding 1080p video to MP4 download">
-      <configurations>
-        <configuration key="source-flavor">*/themed</configuration>
-        <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming,1080p-quality</configuration>
-        <configuration key="encoding-profile">adaptive-1080p.http</configuration>
-      </configurations>
-    </operation>
-    <operation
-      if="${flagQuality2160p}"
-      id="encode"
-      exception-handler-workflow="partial-error"
-      description="Encoding 2160p video to MP4 download">
-      <configurations>
-        <configuration key="source-flavor">*/themed</configuration>
-        <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming,2160p-quality</configuration>
-        <configuration key="encoding-profile">adaptive-2160p.http</configuration>
-      </configurations>
-    </operation>
-    <operation
-      id="composite"
-      description="Create YouTube compatible output"
-      if="${publishToYouTube}"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error">
-      <configurations>
-        <configuration key="source-flavor-lower">presentation/themed</configuration>
-        <configuration key="source-flavor-upper">presenter/themed</configuration>
-        <configuration key="encoding-profile">mp4-preview.dual.http</configuration>
-        <configuration key="target-flavor">composite/delivery</configuration>
-        <configuration key="target-tags">youtube</configuration>
-        <configuration key="output-resolution">1280x800</configuration>
-        <configuration key="output-background">0x000000FF</configuration>
-        <configuration key="layout">preview</configuration>
-        <configuration key="layout-preview">
-          {"horizontalCoverage":0.5,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"reference":{"left":1.0,"top":0.0},"offset":{"x":0,"y":0}}};
-          {"horizontalCoverage":0.5,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"reference":{"left":0.0,"top":0.0},"offset":{"x":0,"y":0}}};
-        </configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
+        <configuration key="encoding-profile">adaptive-parallel.http</configuration>
       </configurations>
     </operation>
 
@@ -532,61 +277,18 @@
 
     <operation
       id="publish-engage"
-      if="${publishToEngage}"
       max-attempts="2"
       exception-handler-workflow="partial-error"
       description="Publishing to Opencast Media Module">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
-        <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
+        <configuration key="download-source-tags">engage-download,atom,rss</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
-    <operation
-      id="publish-aws"
-      if="${publishToAws}"
-      max-attempts="2"
-      exception-handler-workflow="partial-error"
-      description="Publishing to Amazon Web Services">
-      <configurations>
-        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
-        <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
-        <configuration key="streaming-source-tags">engage-streaming</configuration>
-        <configuration key="strategy">merge</configuration>
-        <configuration key="check-availability">false</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="publish-configure"
-      if="${publishToApi}"
-      exception-handler-workflow="partial-error"
-      description="Publish to external api publication channel">
-      <configurations>
-        <configuration key="channel-id">api</configuration>
-        <configuration key="mimetype">application/json</configuration>
-        <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
-        <configuration key="url-pattern">http://localhost:8080/api/events/${event_id}</configuration>
-        <configuration key="with-published-elements">false</configuration>
-        <configuration key="check-availability">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Publish to YouTube -->
-
-    <operation
-      id="publish-youtube"
-      if="${publishToYouTube}"
-      max-attempts="2"
-      exception-handler-workflow="partial-error"
-      description="Publishing to YouTube">
-      <configurations>
-        <configuration key="source-tags">youtube</configuration>
-      </configurations>
-    </operation>
+    <!-- Here you can place operations to publish to your publication channels -->
 
   </operations>
-
 </definition>

@@ -88,7 +88,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.OpencastConstants;
-import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -114,15 +113,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -152,7 +153,16 @@ import javax.ws.rs.core.Response.Status;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
-public class SeriesEndpoint implements ManagedService {
+@Component(
+        immediate = true,
+        service = SeriesEndpoint.class,
+        property = {
+                "service.description=Admin UI - SeriesEndpoint Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.SeriesEndpoint",
+                "opencast.service.path=/admin-ng/series",
+        }
+)
+public class SeriesEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesEndpoint.class);
 
@@ -182,31 +192,37 @@ public class SeriesEndpoint implements ManagedService {
   private String serverUrl = "http://localhost:8080";
 
   /** OSGi callback for the series service. */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi callback for the search index. */
+  @Reference
   public void setIndex(AdminUISearchIndex index) {
     this.searchIndex = index;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi callback for the list provider service */
+  @Reference
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
 
   /** OSGi callback for the security service */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback for the acl service factory */
+  @Reference
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
@@ -215,6 +231,7 @@ public class SeriesEndpoint implements ManagedService {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
+  @Activate
   protected void activate(ComponentContext cc) {
     if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
@@ -226,23 +243,25 @@ public class SeriesEndpoint implements ManagedService {
   }
 
   /** OSGi callback if properties file is present */
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Modified
+  public void modified(Map<String, Object> properties) {
     if (properties == null) {
       logger.info("No configuration available, using defaults");
       return;
     }
 
-    Object dictionaryValue = properties.get(SERIES_HASEVENTS_DELETE_ALLOW_KEY);
-    if (dictionaryValue != null) {
-      deleteSeriesWithEventsAllowed = BooleanUtils.toBoolean(dictionaryValue.toString());
+    Object mapValue = properties.get(SERIES_HASEVENTS_DELETE_ALLOW_KEY);
+    if (mapValue != null) {
+      deleteSeriesWithEventsAllowed = BooleanUtils.toBoolean(mapValue.toString());
     }
 
-    dictionaryValue = properties.get(SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY);
-    onlySeriesWithWriteAccessSeriesTab = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
+    mapValue = properties.get(SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY);
+    onlySeriesWithWriteAccessSeriesTab = BooleanUtils.toBoolean(Objects.toString(mapValue, "true"));
 
-    dictionaryValue = properties.get(EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY);
-    onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
+    mapValue = properties.get(EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY);
+    onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(Objects.toString(mapValue, "true"));
+
+    logger.info("Configuration updated");
   }
 
   @GET
