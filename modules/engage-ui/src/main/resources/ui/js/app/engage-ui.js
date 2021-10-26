@@ -818,7 +818,7 @@ function($, bootbox, _, alertify, jsyaml) {
           var total = Array.isArray(result) ? result.length : 1;
 
           if (total == 0) {
-            $($main_container).append(msg_html_noseries);
+            $($main_container).html(msg_html_noseries);
             $($next).addClass('disabled');
             return;
           }
@@ -842,7 +842,7 @@ function($, bootbox, _, alertify, jsyaml) {
             createSeriesGrid(val);
           });
         } else {
-          $($main_container).append(msg_html_noseries);
+          $($main_container).html(msg_html_noseries);
         }
       }
     }).then(callback);
