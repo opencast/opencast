@@ -1,5 +1,5 @@
 -- Increase mime_type field size
-ALTER TABLE oc_assets_asset MODIFY COLUMN mime_type VARCHAR (255);
+ALTER TABLE oc_assets_asset ALTER COLUMN mime_type TYPE VARCHAR (255);
 
 -- Add modified and deletion date fields to series.
 --
@@ -20,4 +20,4 @@ UPDATE oc_series
 UPDATE oc_series
     SET modified_date = TIMESTAMP '1970-01-01 00:00:01'
     WHERE modified_date IS NULL;
-ALTER TABLE oc_series MODIFY modified_date TIMESTAMP NOT NULL;
+ALTER TABLE oc_series ALTER COLUMN modified_date SET NOT NULL;
