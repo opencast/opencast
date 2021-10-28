@@ -309,4 +309,21 @@ profile.encode.partial-import.mimetype = video/mp4
 profile.encode.partial-import.ffmpeg.command = -i #{in.video.path} \
   -filter:v crop=trunc(iw/2)*2:trunc(ih/2)*2,fps=25 -shortest -c:v libx264 -preset superfast -pix_fmt yuv420p -crf 18 -c:a aac -b:a 196k \
   #{out.dir}/#{out.name}#{out.suffix}
+
+# Preencode
+#   Used by partial import to make all videos have the same resolution,
+#   codec, framerate and samplerate to allow for usage of the concat
+#   demuxer.
+#   MUST specify the same framerate as image-movie.work
+profile.partial-import-preencode.name = partial-import-preencode
+profile.partial-import-preencode.input = audiovisual
+profile.partial-import-preencode.output = audiovisual
+profile.partial-import-preencode.suffix = -preencoded.mp4
+profile.partial-import-preencode.mimetype = video/mp4
+profile.partial-import-preencode.ffmpeg.command = -i #{in.video.path} \
+  -filter:v scale=1920:-2,fps=30 \
+  -shortest -c:v libx264 -pix_fmt yuv420p \
+  -c:a aac -b:a 196k \
+  -ar 48000 \
+  #{out.dir}/#{out.name}#{out.suffix}
 ```
