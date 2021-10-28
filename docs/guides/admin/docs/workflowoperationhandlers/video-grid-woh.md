@@ -60,7 +60,21 @@ Finally, the videos for each section are combined into one final, single video f
     <configuration key="source-flavor">presenter/source</configuration>
     <configuration key="source-smil-flavor">smil/source+partial</configuration>
     <configuration key="target-flavor">presenter/partial</configuration>
-    <configuration key="concat-encoding-profile">concat.work</configuration>
+    <configuration key="concat-encoding-profile">concat-samecodec.work</configuration>
   </configurations>
 </operation>
+```
+
+## Encoding Profiles
+
+Although not necessary, it is recommended to use a concat encoding profile that makes use of concat demuxing. This helps with reducing working memory usage.
+```
+# Concat - lossless concat
+# Source files must be of the same dimension and codecs and they will be used in the target
+# It uses ffmpeg concat demuxer
+profile.concat-samecodec.work.name = concat-samecodec
+profile.concat-samecodec.work.input = visual
+profile.concat-samecodec.work.output = visual
+profile.concat-samecodec.work.suffix = -concatenated.#{in.video.suffix}
+profile.concat-samecodec.work.ffmpeg.command = #{concatCommand} -c copy #{out.dir}/#{out.name}#{out.suffix}
 ```
