@@ -507,6 +507,174 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    *          the order
    * @return the enhanced search query
    */
+  public SeriesSearchQuery sortByIdentifer(Order order) {
+    withSortOrder(SeriesIndexSchema.UID, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the series created date.
+   *
+   * @return the sort order
+   */
+  public Order getSeriesIdentifierSortOrder() {
+    return getSortOrder(SeriesIndexSchema.UID);
+  }
+
+  /**
+   * Defines the sort order for the series by contributors.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
+  public SeriesSearchQuery sortBySubject(Order order) {
+    withSortOrder(SeriesIndexSchema.SUBJECT, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the series created date.
+   *
+   * @return the sort order
+   */
+  public Order getSeriesSubjectSortOrder() {
+    return getSortOrder(SeriesIndexSchema.SUBJECT);
+  }
+
+  /**
+   * Defines the sort order for the series by contributors.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
+  public SeriesSearchQuery sortByCreator(Order order) {
+    withSortOrder(SeriesIndexSchema.CREATOR, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the series created date.
+   *
+   * @return the sort order
+   */
+  public Order getSeriesCreatorSortOrder() {
+    return getSortOrder(SeriesIndexSchema.CREATOR);
+  }
+
+  /**
+   * Defines the sort order for the series by contributors.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
+  public SeriesSearchQuery sortByPublishers(Order order) {
+    withSortOrder(SeriesIndexSchema.PUBLISHERS, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the series created date.
+   *
+   * @return the sort order
+   */
+  public Order getSeriesPublishersSortOrder() {
+    return getSortOrder(SeriesIndexSchema.PUBLISHERS);
+  }
+
+  /**
+   * Defines the sort order for the series by contributors.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
+  public SeriesSearchQuery sortByDescription(Order order) {
+    withSortOrder(SeriesIndexSchema.DESCRIPTION, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the series created date.
+   *
+   * @return the sort order
+   */
+  public Order getSeriesDescriptionSortOrder() {
+    return getSortOrder(SeriesIndexSchema.DESCRIPTION);
+  }
+
+  /**
+   * Defines the sort order for the series by contributors.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
+  public SeriesSearchQuery sortByLanguage(Order order) {
+    withSortOrder(SeriesIndexSchema.LANGUAGE, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the series created date.
+   *
+   * @return the sort order
+   */
+  public Order getSeriesLanguageSortOrder() {
+    return getSortOrder(SeriesIndexSchema.LANGUAGE);
+  }
+
+  /**
+   * Defines the sort order for the series by contributors.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
+  public SeriesSearchQuery sortByRightsHolder(Order order) {
+    withSortOrder(SeriesIndexSchema.RIGHTS_HOLDER, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the series created date.
+   *
+   * @return the sort order
+   */
+  public Order getSeriesRightsHolderSortOrder() {
+    return getSortOrder(SeriesIndexSchema.RIGHTS_HOLDER);
+  }
+
+  /**
+   * Defines the sort order for the series by contributors.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
+  public SeriesSearchQuery sortByLicense(Order order) {
+    withSortOrder(SeriesIndexSchema.LICENSE, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the series created date.
+   *
+   * @return the sort order
+   */
+  public Order getSeriesLicenseSortOrder() {
+    return getSortOrder(SeriesIndexSchema.LICENSE);
+  }
+
+  /**
+   * Defines the sort order for the series by contributors.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
   public SeriesSearchQuery sortByContributors(Order order) {
     withSortOrder(SeriesIndexSchema.CONTRIBUTORS, order);
     return this;
