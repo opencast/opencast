@@ -308,6 +308,10 @@ public class IngestServiceImplTest {
     service.setServiceRegistry(serviceRegistry);
     service.defaultWorkflowDefinionId = "sample";
     serviceRegistry.registerService(service);
+    Dictionary<String, String> p = new Hashtable<>();
+    p.put(IngestServiceImpl.DOWNLOAD_SOURCE, "http://localhost.*|http://www.test.com/.*");
+    service.updated(p);
+    service.testMode = true;
   }
 
   @After
