@@ -491,6 +491,8 @@ public class IngestServiceImplTest {
     testAuthWhitelist("http://www.example.org/testfile", "http://localhost.*", true, false, true);
     //Matching regex
     testAuthWhitelist("http://www.example.org/testfile", "http://localhost.*|http://www.example.org/.*", false, true, true);
+    //Local filesystem should be actively rejected.  This file needs to *not* be in the resources directory (look in the impl for why), and needs to be readable by the user running the test
+    testAuthWhitelist(getClass().getResource("/../classes/org/opencastproject/ingest/impl/IngestServiceImpl.class").toString(), ".*", true, false, false);
   }
 
 
