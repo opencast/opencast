@@ -24,6 +24,7 @@ package org.opencastproject.search.impl.solr;
 
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Collections.filter;
 import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Option.option;
@@ -733,10 +734,10 @@ public class SolrRequester {
       sb.append("*:*");
     }
 
+    User user = securityService.getUser();
     if (applyPermissions) {
       sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":")
               .append(SolrUtils.clean(securityService.getOrganization().getId()));
-      User user = securityService.getUser();
       Set<Role> roles = user.getRoles();
       boolean userHasAnonymousRole = false;
       if (roles.size() > 0) {
@@ -787,10 +788,18 @@ public class SolrRequester {
 
     SolrQuery query = new SolrQuery(sb.toString());
 
-    if ((q.getLimit() > 0) && (q.getLimit() < QUERY_MAX_ROWS)) {
-      query.setRows(q.getLimit());
+    String orgAdminRole = user.getOrganization().getAdminRole();
+    boolean isAdmin = user.hasRole(GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
+    if (isAdmin) {
+      if (q.getLimit() > 0) {
+        query.setRows(q.getLimit());
+      }
     } else {
-      query.setRows(QUERY_MAX_ROWS);
+      if ((q.getLimit() > 0) && (q.getLimit() < QUERY_MAX_ROWS)) {
+        query.setRows(q.getLimit());
+      } else {
+        query.setRows(QUERY_MAX_ROWS);
+      }
     }
 
     if (q.getOffset() > 0) {
