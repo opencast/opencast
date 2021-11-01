@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -46,7 +47,11 @@ import javax.xml.bind.annotation.XmlType;
  * The search result represents a set of result items that has been compiled as a result for a search operation.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "search-results", namespace = "http://search.opencastproject.org", propOrder = { "query", "resultSet" })
+@XmlType(
+    name = "search-results",
+    namespace = "http://search.opencastproject.org",
+    propOrder = { "query", "resultSet", "limit" }
+)
 @XmlRootElement(name = "search-results", namespace = "http://search.opencastproject.org")
 public class SearchResultImpl implements SearchResult {
 
@@ -94,8 +99,8 @@ public class SearchResultImpl implements SearchResult {
   private long offset = 0;
 
   /** The pagination limit. Default is 10. */
-  @XmlAttribute
-  private long limit = 10;
+  @XmlElement
+  private Optional<Long> limit = Optional.of(10L);
 
   /** The number of hits total, regardless of the limit */
   @XmlAttribute
@@ -190,7 +195,7 @@ public class SearchResultImpl implements SearchResult {
    *
    * @see org.opencastproject.search.api.SearchResult#getLimit()
    */
-  public long getLimit() {
+  public Optional<Long> getLimit() {
     return limit;
   }
 
@@ -200,7 +205,7 @@ public class SearchResultImpl implements SearchResult {
    * @param limit
    *          The limit.
    */
-  public void setLimit(long limit) {
+  public void setLimit(Optional<Long> limit) {
     this.limit = limit;
   }
 
@@ -248,8 +253,8 @@ public class SearchResultImpl implements SearchResult {
    * @see org.opencastproject.search.api.SearchResult#getPage()
    */
   public long getPage() {
-    if (limit != 0) {
-      return offset / limit;
+    if (limit.isPresent() && limit.get() != 0) {
+      return offset / limit.get();
     }
     return 0;
   }

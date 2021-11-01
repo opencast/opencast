@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -224,7 +225,7 @@ public class SeriesFeedService extends AbstractFeedService implements FeedGenera
         SearchResultImpl artificialResult = new SearchResultImpl();
 
         // Response either finds the one series or nothing at all
-        artificialResult.setLimit(1);
+        artificialResult.setLimit(Optional.of(1L));
         artificialResult.setOffset(0);
         artificialResult.setTotal(1);
 

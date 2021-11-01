@@ -66,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -170,7 +171,7 @@ public class SolrRequester {
     final SearchResultImpl result = new SearchResultImpl(query.getQuery());
     result.setSearchTime(solrResponse.getQTime());
     result.setOffset(solrResponse.getResults().getStart());
-    result.setLimit(query.getRows());
+    result.setLimit(Optional.ofNullable(query.getRows()).map(i -> Long.valueOf(i)));
     result.setTotal(solrResponse.getResults().getNumFound());
 
     // Walk through response and create new items with title, creator, etc:
