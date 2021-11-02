@@ -289,7 +289,8 @@
               org.opencastproject.security.api;version=${project.version},
               org.opencastproject.storage;version=${project.version},
               org.opencastproject.systems;version=${project.version},
-              org.opencastproject.security.util;version=${project.version}
+              org.opencastproject.security.util;version=${project.version},
+              org.opencastproject.cleanup;version=${project.version}
             </Export-Package>
             <Provide-Capability>
               osgi.service;objectClass="org.opencastproject.util.ReadinessIndicator"
