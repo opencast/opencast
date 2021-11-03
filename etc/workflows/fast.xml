@@ -79,7 +79,7 @@
       exception-handler-workflow="partial-error"
       description="Creating Engage search result thumbnails">
       <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/search+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">search-cover.http</configuration>
@@ -96,7 +96,7 @@
       exception-handler-workflow="partial-error"
       description="Creating Engage player preview image">
       <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/player+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
@@ -113,7 +113,7 @@
       exception-handler-workflow="partial-error"
       description="Detecting slide transitions in presentation track">
       <configurations>
-        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-tags">engage-download</configuration>
       </configurations>
     </operation>
@@ -127,9 +127,8 @@
       exception-handler-workflow="partial-error"
       description="Creating presentation segments preview image">
       <configurations>
-        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-flavor">presentation/segment+preview</configuration>
-        <configuration key="reference-flavor">presentation/preview</configuration>
         <configuration key="reference-tags">engage-download</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-slides.http</configuration>
