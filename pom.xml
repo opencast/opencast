@@ -42,7 +42,6 @@
     <joda-time.version>2.10.10</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
     <karaf.version>4.2.9</karaf.version>
-    <mina.version>2.1.3</mina.version>
     <node.version>v14.17.0</node.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
@@ -806,26 +805,6 @@
         <groupId>org.apache.geronimo.specs</groupId>
         <artifactId>geronimo-jms_1.1_spec</artifactId>
         <version>1.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.mina</groupId>
-        <artifactId>mina-core</artifactId>
-        <version>${mina.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.mina</groupId>
-        <artifactId>mina-integration-beans</artifactId>
-        <version>${mina.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.mina</groupId>
-        <artifactId>mina-integration-jmx</artifactId>
-        <version>${mina.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.mina</groupId>
-        <artifactId>mina-integration-ognl</artifactId>
-        <version>${mina.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
