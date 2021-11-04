@@ -83,7 +83,7 @@ class OpencastToPaellaConverter {
           sourceType = 'rtmp';
           break;
         default:
-          paella.debug.log(`OpencastToPaellaConverter: MimeType (${track.mimetype}) not supported!`);
+          paella.log.debug(`OpencastToPaellaConverter: MimeType (${track.mimetype}) not supported!`);
           break;
         }
         break;
@@ -108,12 +108,12 @@ class OpencastToPaellaConverter {
           sourceType = 'audio';
           break;
         default:
-          paella.debug.log(`OpencastToPaellaConverter: MimeType (${track.mimetype}) not supported!`);
+          paella.log.debug(`OpencastToPaellaConverter: MimeType (${track.mimetype}) not supported!`);
           break;
         }
         break;
       default:
-        paella.debug.log(`OpencastToPaellaConverter: Protocol (${protocol[1]}) not supported!`);
+        paella.log.debug(`OpencastToPaellaConverter: Protocol (${protocol[1]}) not supported!`);
         break;
       }
     }
