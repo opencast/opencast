@@ -311,7 +311,8 @@ paella.addPlugin(function() {
     }
 
     setResultAvailable(searchValue) {
-      this.divSearch.innerText =  paella.utils.dictionary.translate('Results for \'{0}\'').replace(/\{0\}/g,searchValue);
+      this.divSearch.innerText =
+        paella.utils.dictionary.translate('Results for \'{0}\'').replace(/\{0\}/g,searchValue);
     }
 
     setNotSearch() {

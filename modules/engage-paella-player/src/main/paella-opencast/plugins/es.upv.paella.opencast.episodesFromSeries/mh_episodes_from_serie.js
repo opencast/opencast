@@ -60,7 +60,8 @@ paella.addPlugin(function() {
       episodesFromSeriesTitle.className = 'episodesFromSeriesTitle';
       if (serieId) {
         episodesFromSeriesTitle.innerHTML = '<span class=\'episodesFromSeriesTitle_Bold\'>'
-          + paella.utils.dictionary.translate('Videos in this series:') + '</span> ' + paella.AntiXSS.htmlEscape(serieTitle);
+          + paella.utils.dictionary.translate('Videos in this series:') + '</span> '
+          + paella.AntiXSS.htmlEscape(serieTitle);
       }
       else {
         episodesFromSeriesTitle.innerHTML = '<span class=\'episodesFromSeriesTitle_Bold\'>'
@@ -79,7 +80,7 @@ paella.addPlugin(function() {
       var params = {limit:5, page:0, sid:serieId};
       var mySearch = new SearchEpisode(paella.player.config, params);
       mySearch.doSearch(params, document.getElementById('episodesFromSeriesListing'));
-      
+
     }
   };
 });

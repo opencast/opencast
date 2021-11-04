@@ -98,10 +98,12 @@ paella.addPlugin(function() {
       var text = '';
 
       if (track.video) {
-        text = '<span class="downloadLinkText TypeFile Video">' + paella.utils.dictionary.translate('Video file') + '</span>';
+        text = '<span class="downloadLinkText TypeFile Video">'
+          + paella.utils.dictionary.translate('Video file') + '</span>';
       }
       else if (track.audio){
-        text = '<span class="downloadLinkText TypeFile Audio">' + paella.utils.dictionary.translate('Audio file') + '</span>';
+        text = '<span class="downloadLinkText TypeFile Audio">'
+          + paella.utils.dictionary.translate('Audio file') + '</span>';
       }
       // track
       var trackText = '<span class="downloadLinkText Track">' + track.type + '</span>';
