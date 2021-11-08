@@ -305,7 +305,7 @@ paella.addPlugin(function() {
 
 
     setNoActualResultAvailable(searchValue) {
-      this.divSearch.innerText = paella.dictionary
+      this.divSearch.innerText = paella.utils.dictionary
         .translate('Results for \'{0}\' (no actual results for \'{1}\' found)')
         .replace(/\{0\}/g,this.lastHit).replace(/\{1\}/g,searchValue);
     }

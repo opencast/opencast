@@ -57,7 +57,7 @@ function loadOpencastPaella(containerId) {
         window.location.href = oacl.getAuthenticationUrl();
       }
       else {
-        var errorMessage = paella.dictionary
+        var errorMessage = paella.utils.dictionary
           .translate('Error loading video {id}')
           .replace(/\{id\}/g, paella.utils.parameters.get('id') || '');
         paella.messageBox.showError(errorMessage);
