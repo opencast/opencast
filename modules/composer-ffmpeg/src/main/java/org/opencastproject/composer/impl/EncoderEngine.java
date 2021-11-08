@@ -84,7 +84,7 @@ public class EncoderEngine implements AutoCloseable {
 
   private final Pattern outputPattern = Pattern.compile("Output .* (\\S+) to '(.*)':");
   // ffmpeg4 generates HLS output files and may use a .tmp suffix while writing
-  private final Pattern outputPatternHLS = Pattern.compile("Opening \'([^\']+)\\.tmp\'|([^\']+)\' for writing");
+  private final Pattern outputPatternHLS = Pattern.compile("Opening '([^']+)\\.tmp'|([^']+)' for writing");
 
   // These are common video options that may be mapped in HLS streams. This will help catch some common mistakes
   private static List<String> mappableOptions = Stream.of("-bf", "-b_strategy", "-bitrate", "-bufsize", "-crf",
@@ -457,25 +457,26 @@ public class EncoderEngine implements AutoCloseable {
                 && !StringUtils.equals("/dev/null", outputPath)
                 && !StringUtils.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
-          logger.info("Identified output file {}", outputFile);
-          if (!type.startsWith("hls"))
+          if (!type.startsWith("hls")) {
+            logger.info("Identified output file {}", outputFile);
             output.add(outputFile);
+          }
         }
       }
     } else if (StringUtils.startsWith(message, "[hls @ ")) {
       logger.debug(message);
       Matcher matcher = outputPatternHLS.matcher(message);
       if (matcher.find()) {
-        int i = 1; // matched group, ".tmp" suffix may have to be removed
-        if (matcher.group(i) == null) i = 2;
-        String outputPath = matcher.group(i);
+        final String outputPath = Objects.toString(matcher.group(1), matcher.group(2));
         if (!StringUtils.equals("NUL", outputPath) && !StringUtils.equals("/dev/null", outputPath)
                 && !StringUtils.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
           // HLS generates the filenames based on a template with %v and %d replaced
           // HLS writes into the same manifest file to add each segment
-          if (!output.contains(outputFile))
+          if (!output.contains(outputFile)) {
+            logger.info("Identified HLS output file {}", outputFile);
             output.add(outputFile);
+          }
         }
       }
 
