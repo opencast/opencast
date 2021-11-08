@@ -91,7 +91,7 @@ paella.addPlugin(function() {
           onSuccess(true);
         })
         .catch(function(error) {
-          base.log.error('opencast downloads button plugin disabled: ' + error);
+          paella.log.error('opencast downloads button plugin disabled: ' + error);
           onSuccess(false);
         });
       }

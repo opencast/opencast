@@ -32,7 +32,7 @@ class OpencastToPaellaConverter {
     var streams = this._config.streams || [];
     streams.some(function(curretStream){
       return curretStream.filter.system.some(function(currentFilter) {
-        if ((currentFilter == '*') || base.userAgent.system[currentFilter] ) {
+        if ((currentFilter == '*') || paella.utils.userAgent.system[currentFilter] ) {
           filterStream = curretStream;
           return true;
         }
@@ -222,7 +222,7 @@ class OpencastToPaellaConverter {
         let smask = atc[0].split('/');
 
         if (((smask[0] == '*') || (smask[0] == sflavor[0])) && ((smask[1] == '*') || (smask[1] == sflavor[1]))) {
-          audioTag = (atc[1] == '*') ? base.dictionary.currentLanguage() : atc[1];
+          audioTag = (atc[1] == '*') ? paella.utils.dictionary.currentLanguage() : atc[1];
           return true;
         }
       });
@@ -414,7 +414,7 @@ class OpencastToPaellaConverter {
           }
 
           let captions_label = captions_lang || 'unknown language';
-          //base.dictionary.translate("CAPTIONS_" + captions_lang);
+          //paella.utils.dictionary.translate("CAPTIONS_" + captions_lang);
 
           captions.push({
             id: currentAttachment.id,
