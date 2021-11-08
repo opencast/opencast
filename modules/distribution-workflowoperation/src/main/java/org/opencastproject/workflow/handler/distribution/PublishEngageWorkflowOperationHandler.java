@@ -727,7 +727,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           }
         }
 
-        if (streamingDistributionService.publishToStreaming()) {
+        if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()) {
           for (MediaPackageElement element : distributedMediaPackage.getElements()) {
             Job retractStreamingJob
                 = streamingDistributionService.retract(CHANNEL_ID, distributedMediaPackage, element.getIdentifier());
