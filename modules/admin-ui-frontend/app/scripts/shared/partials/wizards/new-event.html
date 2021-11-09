@@ -110,7 +110,7 @@
         </header>
         <div class="obj-container">
           <ul>
-            <li  ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter:{type:'track'}| orderBy: 'displayOrder' track by asset.id">
+            <li ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter: {showAs: 'source'} | orderBy: 'displayOrder' track by asset.id">
               <div class="file-upload">
                 <input
                   id="{{asset.id}}"
