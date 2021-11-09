@@ -32,17 +32,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -108,26 +102,29 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
    * @see org.opencastproject.mediapackage.MediaPackageBuilder#loadFromXml(java.io.InputStream)
    */
   public MediaPackage loadFromXml(InputStream is) throws MediaPackageException {
+    try {
+      Document xml = XmlSafeParser.parse(is);
+      if (serializer != null) {
 
-    if (serializer != null) {
-      try {
 
-        //Convert InputStream to XML document to rewrite the URLs
-        Document xml = XmlSafeParser.parse(is);
+      //Convert InputStream to XML document to rewrite the URLs
+
         rewriteUrls(xml, serializer);
 
-        // Reconverting back to inputStream
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        Source xmlSource = new DOMSource(xml);
-        Result outputTarget = new StreamResult(os);
-        XmlSafeParser.newTransformerFactory().newTransformer().transform(xmlSource, outputTarget);
-        is = new ByteArrayInputStream(os.toByteArray());
+      // Reconverting back to inputStream
+//        ByteArrayOutputStream os = new ByteArrayOutputStream();
+//        Source xmlSource = new DOMSource(xml);
+//        Result outputTarget = new StreamResult(os);
+//        XmlSafeParser.newTransformerFactory().newTransformer().transform(xmlSource, outputTarget);
+//        is = new ByteArrayInputStream(os.toByteArray());
 
-      } catch (Exception e) {
-        throw new MediaPackageException("Error deserializing paths in media package", e);
-      }
+        }
+      return loadFromXml(xml);
+    } catch (Exception e) {
+      throw new MediaPackageException("Error deserializing paths in media package", e);
     }
-    return MediaPackageImpl.valueOf(is);
+//    return MediaPackageImpl.valueOf(is);
+
   }
 
   /**
