@@ -26,6 +26,7 @@ The following table contains the workflow operations that are available in an ou
 |add-catalog         |Add a catalog to the media package                             |[Documentation](add-catalog-woh.md)|
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
+|analyze-mediapackage |Analyze media package                                         |[Documentation](analyze-mediapackage-woh.md)|
 |animate             |Create animated video sequence                                 |[Documentation](animate-woh.md)|
 |amberscript-start-transcription|Start AmberScript Transcription                     |[Documentation](amberscript-start-transcription-woh.md)|
 |amberscript-attach-transcription|Attach AmberScript Transcription                   |[Documentation](amberscript-attach-transcription-woh.md)|
