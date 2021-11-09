@@ -68,4 +68,6 @@ in:
 ```
 etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
 
-The [ILIAS plugin](https://github.com/fluxapps/OpenCast), for example, does not authenticate users against Opencast. If you are using that plugin, this is why you probably want to disable this feature and make your media publically accessable.
+The [ILIAS plugin](https://github.com/fluxapps/OpenCast), for example, does not authenticate users against Opencast.     
+If you are using that plugin, this is why you probably want to disable this feature and make your media publically       
+accessable.
