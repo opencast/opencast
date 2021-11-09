@@ -1662,7 +1662,7 @@ public class EventsEndpoint implements ManagedService {
               f("url", v(getSignedUrl(track.getURI(), sign), BLANK)), f("flavor", v(track.getFlavor(), BLANK)),
               f("size", v(track.getSize())), f("checksum", v(track.getChecksum(), BLANK)),
               f("tags", arr(track.getTags())), f("has_audio", v(track.hasAudio())),
-              f("has_video", v(track.hasVideo())), f("duration", v(track.getDuration())),
+              f("has_video", v(track.hasVideo())), f("duration", v(track.getDuration(), BLANK)),
               f("description", v(track.getDescription(), BLANK))).merge(trackInfo));
     }
     return tracks;
