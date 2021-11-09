@@ -440,6 +440,11 @@
     <Extensions>webm</Extensions>
   </MimeType>
   <MimeType>
+    <Type>image/webp</Type>
+    <Description>WebP image</Description>
+    <Extensions>webp</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>video/x-dv</Type>
     <Description>DV Video</Description>
     <Extensions>dv</Extensions>
