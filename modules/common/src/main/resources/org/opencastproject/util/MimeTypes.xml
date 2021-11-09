@@ -509,4 +509,9 @@
     <Description>NUT</Description>
     <Extensions>nut</Extensions>
   </MimeType>
+  <MimeType>
+    <Type>text/x-ass</Type>
+    <Description>Advanced SubStation Alpha</Description>
+    <Extensions>ass,ssa</Extensions>
+  </MimeType>
 </MimeTypes>
