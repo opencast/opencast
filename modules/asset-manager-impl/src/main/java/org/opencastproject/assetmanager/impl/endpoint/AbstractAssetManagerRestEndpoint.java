@@ -244,7 +244,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
   }
 
   @GET
-  @Path("assets/{mediaPackageID}/{mediaPackageElementID}/{version}/{filenameIgnore}")
+  @Path("assets/{mediaPackageID}/{mediaPackageElementID}/{version}/{filename}")
   @RestQuery(name = "getAsset",
       description = "Get an asset",
       returnDescription = "The file",
@@ -265,8 +265,8 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               isRequired = true,
               type = STRING),
           @RestParameter(
-              name = "filenameIgnore",
-              description = "a descriptive filename which will be ignored though",
+              name = "filename",
+              description = "a descriptive filename used as the download filename",
               isRequired = false,
               type = STRING)},
       responses = {
@@ -288,6 +288,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
   public Response getAsset(@PathParam("mediaPackageID") final String mediaPackageID,
                            @PathParam("mediaPackageElementID") final String mediaPackageElementID,
                            @PathParam("version") final String version,
+                           @PathParam("filename") String fileName,
                            @HeaderParam("If-None-Match") String ifNoneMatch) {
 
     try {
@@ -310,11 +311,12 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
             }
           }
 
-          final String fileName = mediaPackageElementID
-                  .concat(".")
-                  .concat(asset.getMimeType().bind(suffix).getOr("unknown"));
+          if (StringUtils.isEmpty(fileName)) {
+            fileName = mediaPackageElementID
+                .concat(".")
+                .concat(asset.getMimeType().bind(suffix).getOr("unknown"));
+          }
 
-          asset.getMimeType().map(MimeTypeUtil.Fns.toString);
           // Write the file contents back
           Option<Long> length = asset.getSize() > 0 ? Option.some(asset.getSize()) : Option.none();
           return ok(asset.getInputStream(),
