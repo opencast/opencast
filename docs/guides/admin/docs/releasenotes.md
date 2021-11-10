@@ -42,6 +42,11 @@ API changes
 - Rename value for `sort` parameter in search API from `DATE_PUBLISHED` to `DATE_MODIFIED`.
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
+Additional Notes about 10.5
+---------------------------
+
+This release fixes several bugs.  Notably, this should drastically speed up audio normalization.
+
 Additional Notes about 10.4
 ---------------------------
 

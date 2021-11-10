@@ -4,6 +4,26 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.5
+
+*Released on November 10th, 2021*
+
+- [[#3107](https://github.com/opencast/opencast/pull/3107)] -
+  Force same sample rate for audio files in PartialImport WOH encoding profiles
+- [[#3105](https://github.com/opencast/opencast/pull/3105)] -
+  Composer Output File Recognition
+- [[#3084](https://github.com/opencast/opencast/pull/3084)] -
+  Speed up audio normalization
+- [[#3082](https://github.com/opencast/opencast/pull/3082)] -
+  Fix Job Load Warning
+- [[#3079](https://github.com/opencast/opencast/pull/3079)] -
+  Put max load config of server into right place
+- [[#3064](https://github.com/opencast/opencast/pull/3064)] -
+  Disabling Static Files Authorization for external software
+- [[#3063](https://github.com/opencast/opencast/pull/3063)] -
+  Handle wildcard target flavors in execute-many WOH
+
+
 ### Opencast 10.4
 
 *Released on October 13th, 2021*
