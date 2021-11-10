@@ -46,22 +46,22 @@ import org.opencastproject.util.NotFoundException;
 import com.google.common.util.concurrent.Striped;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.support.WriteRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentException;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
@@ -84,8 +84,26 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   /** The name of this index */
   private static final String INDEX_IDENTIFIER_PROPERTY = "index.identifier";
   private static final String DEFAULT_INDEX_IDENTIFIER = "opencast";
+
   private static final String INDEX_NAME_PROPERTY = "index.name";
   private static final String DEFAULT_INDEX_NAME = "Elasticsearch";
+
+  /** Retry configuration */
+  private int maxRetryAttemptsGet;
+  private static final String MAX_RETRY_ATTEMPTS_GET_PROPERTY = "max.retry.attempts.get";
+  private static final int DEFAULT_MAX_RETRY_ATTEMPTS_GET = 0;
+
+  private int maxRetryAttemptsUpdate;
+  private static final String MAX_RETRY_ATTEMPTS_UPDATE_PROPERTY = "max.retry.attempts.update";
+  private static final int DEFAULT_MAX_RETRY_ATTEMPTS_UPDATE = 0;
+
+  private int retryWaitingPeriodGet;
+  private static final String RETRY_WAITING_PERIOD_GET_PROPERTY = "retry.waiting.period.get";
+  private static final int DEFAULT_RETRY_WAITING_PERIOD_GET = 1000;
+
+  private int retryWaitingPeriodUpdate;
+  private static final String RETRY_WAITING_PERIOD_UPDATE_PROPERTY = "retry.waiting.period.update";
+  private static final int DEFAULT_RETRY_WAITING_PERIOD_UPDATE = 1000;
 
   /** The required index version */
   private static final int INDEX_VERSION = 101;
@@ -107,36 +125,62 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   /**
    * OSGi callback to activate this component instance.
    *
-   * @param ctx
-   *          the component context
+   * @param bundleContext
+   *          The bundle context
+   * @param properties
+   *          The configuration
    * @throws ComponentException
-   *           if the search index cannot be initialized
+   *          If the search index cannot be initialized
    */
   @Activate
-  public void activate(ComponentContext ctx) throws ComponentException {
-    super.activate(ctx);
+  public void activate(BundleContext bundleContext, Map<String, Object> properties) throws ComponentException {
+    super.activate(bundleContext);
 
-    String indexIdentifier = StringUtils.defaultIfBlank((String) ctx.getProperties()
+    String indexIdentifier = StringUtils.defaultIfBlank((String) properties
                     .get(INDEX_IDENTIFIER_PROPERTY), DEFAULT_INDEX_IDENTIFIER);
-    String indexName = StringUtils.defaultIfBlank((String) ctx.getProperties().get(INDEX_NAME_PROPERTY),
+    String indexName = StringUtils.defaultIfBlank((String) properties.get(INDEX_NAME_PROPERTY),
             DEFAULT_INDEX_NAME);
     try {
       init(indexIdentifier, indexName, INDEX_VERSION);
     } catch (Throwable t) {
       throw new ComponentException("Error initializing elastic search index", t);
     }
+
+    modified(properties);
   }
 
   /**
    * OSGi callback to deactivate this component.
    *
-   * @param ctx
-   *          the component context
    * @throws IOException
+   *          If closing the index fails
    */
   @Deactivate
-  public void deactivate(ComponentContext ctx) throws IOException {
+  public void deactivate() throws IOException {
     close();
+  }
+
+  /**
+   * OSGi callback for configuration changes.
+   *
+   * @param properties
+   *          The configuration
+   */
+  @Modified
+  public void modified(Map<String, Object> properties) {
+    maxRetryAttemptsGet = NumberUtils.toInt((String) properties.get(MAX_RETRY_ATTEMPTS_GET_PROPERTY),
+            DEFAULT_MAX_RETRY_ATTEMPTS_GET);
+    retryWaitingPeriodGet = NumberUtils.toInt((String) properties.get(RETRY_WAITING_PERIOD_GET_PROPERTY),
+            DEFAULT_RETRY_WAITING_PERIOD_GET);
+    logger.info("Max retry attempts for get requests set to {}, timeout set to {} ms.", maxRetryAttemptsGet,
+            retryWaitingPeriodGet);
+
+    maxRetryAttemptsUpdate = NumberUtils.toInt((String) properties.get(MAX_RETRY_ATTEMPTS_UPDATE_PROPERTY),
+            DEFAULT_MAX_RETRY_ATTEMPTS_UPDATE);
+    retryWaitingPeriodUpdate = NumberUtils.toInt((String) properties.get(RETRY_WAITING_PERIOD_UPDATE_PROPERTY),
+            DEFAULT_RETRY_WAITING_PERIOD_UPDATE);
+    logger.info("Max retry attempts for update requests set to {}, timeout set to {} ms.", maxRetryAttemptsUpdate,
+            retryWaitingPeriodUpdate);
   }
 
   /**
@@ -154,28 +198,54 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   /**
    * Loads the event from the search index if it exists.
    *
-   * @param mediapackageId
-   *          the mediapackage identifier
+   * @param mediaPackageId
+   *          The media package identifier
    * @param organization
-   *          the organization
+   *          The organization
    * @param user
-   *          the user
+   *          The user
    * @return the event (optional)
+   *
    * @throws SearchIndexException
-   *           if querying the search index fails
+   *          If querying the search index fails
    * @throws IllegalStateException
-   *           if multiple events with the same identifier are found
+   *          If multiple events with the same identifier are found
    */
-  public Optional<Event> getEvent(String mediapackageId, String organization, User user) throws SearchIndexException {
-    EventSearchQuery query = new EventSearchQuery(organization, user).withoutActions().withIdentifier(mediapackageId);
-    SearchResult<Event> searchResult = getByQuery(query);
+  public Optional<Event> getEvent(String mediaPackageId, String organization, User user) throws SearchIndexException {
+    return getEvent(mediaPackageId, organization, user, maxRetryAttemptsGet, retryWaitingPeriodGet);
+  }
+
+  /**
+   * Loads the event from the search index if it exists.
+   *
+   * @param mediaPackageId
+   *          The media package identifier
+   * @param organization
+   *          The organization
+   * @param user
+   *          The user
+   * @param maxRetryAttempts
+   *          How often to retry query in case of ElasticsearchStatusException
+   * @param retryWaitingPeriod
+   *          How long to wait (in ms) between retries
+   * @return the event (optional)
+   *
+   * @throws SearchIndexException
+   *           If querying the search index fails
+   * @throws IllegalStateException
+   *           If multiple events with the same identifier are found
+   */
+  private Optional<Event> getEvent(String mediaPackageId, String organization, User user, int maxRetryAttempts,
+          int retryWaitingPeriod) throws SearchIndexException {
+    EventSearchQuery query = new EventSearchQuery(organization, user).withoutActions().withIdentifier(mediaPackageId);
+    SearchResult<Event> searchResult = getByQuery(query, maxRetryAttempts, retryWaitingPeriod);
     if (searchResult.getDocumentCount() == 0) {
       return Optional.empty();
     } else if (searchResult.getDocumentCount() == 1) {
       return Optional.of(searchResult.getItems()[0].getSource());
     } else {
       throw new IllegalStateException(
-              "Multiple events with identifier " + mediapackageId + " found in search index");
+              "Multiple events with identifier " + mediaPackageId + " found in search index");
     }
   }
 
@@ -183,21 +253,47 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * Loads the series from the search index if it exists.
    *
    * @param seriesId
-   *          the series identifier
+   *          The series identifier
    * @param organization
-   *          the organization
+   *          The organization
    * @param user
-   *          the user
+   *          The user
    * @return the series (optional)
+   *
    * @throws SearchIndexException
-   *           if querying the search index fails
+   *          If querying the search index fails
    * @throws IllegalStateException
-   *           if multiple series with the same identifier are found
+   *          If multiple series with the same identifier are found
    */
   public Optional<Series> getSeries(String seriesId, String organization, User user)
           throws SearchIndexException {
+    return getSeries(seriesId, organization, user, maxRetryAttemptsGet, retryWaitingPeriodGet);
+  }
+
+  /**
+   * Loads the series from the search index if it exists.
+   *
+   * @param seriesId
+   *          The series identifier
+   * @param organization
+   *          The organization
+   * @param user
+   *          The user
+   * @param maxRetryAttempts
+   *          How often to retry query in case of ElasticsearchStatusException
+   * @param retryWaitingPeriod
+   *          How long to wait (in ms) between retries
+   * @return the series (optional)
+   *
+   * @throws SearchIndexException
+   *           If querying the search index fails
+   * @throws IllegalStateException
+   *           If multiple series with the same identifier are found
+   */
+  private Optional<Series> getSeries(String seriesId, String organization, User user, int maxRetryAttempts,
+          int retryWaitingPeriod) throws SearchIndexException {
     SeriesSearchQuery query = new SeriesSearchQuery(organization, user).withoutActions().withIdentifier(seriesId);
-    SearchResult<Series> searchResult = getByQuery(query);
+    SearchResult<Series> searchResult = getByQuery(query, maxRetryAttempts, retryWaitingPeriod);
     if (searchResult.getDocumentCount() == 0) {
       return Optional.empty();
     } else if (searchResult.getDocumentCount() == 1) {
@@ -211,21 +307,48 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * Loads the theme from the search index if it exists.
    *
    * @param themeId
-   *          the theme identifier
+   *          The theme identifier
    * @param organization
-   *          the organization
+   *          The organization
    * @param user
-   *          the user
+   *          The user
    * @return the theme wrapped in an optional
+   *
    * @throws SearchIndexException
-   *           if querying the search index fails
+   *          If querying the search index fails
    * @throws IllegalStateException
-   *           if multiple themes with the same identifier are found
+   *          If multiple themes with the same identifier are found
    */
-  protected Optional<IndexTheme> getTheme(long themeId, String organization, User user)
+  public Optional<IndexTheme> getTheme(long themeId, String organization, User user)
+          throws SearchIndexException {
+    return getTheme(themeId, organization, user, maxRetryAttemptsGet, retryWaitingPeriodGet);
+  }
+
+  /**
+   * Loads the theme from the search index if it exists.
+   *
+   * @param themeId
+   *          The theme identifier
+   * @param organization
+   *          The organization
+   * @param user
+   *          The user
+   * @param maxRetryAttempts
+   *          How often to retry query in case of ElasticsearchStatusException
+   * @param retryWaitingPeriod
+   *          How long to wait (in ms) between retries
+   * @return the theme wrapped in an optional
+   *
+   * @throws SearchIndexException
+   *          If querying the search index fails
+   * @throws IllegalStateException
+   *          If multiple themes with the same identifier are found
+   */
+  private Optional<IndexTheme> getTheme(long themeId, String organization, User user, int maxRetryAttempts,
+          int retryWaitingPeriod)
           throws SearchIndexException {
     ThemeSearchQuery query = new ThemeSearchQuery(organization, user).withIdentifier(themeId);
-    SearchResult<IndexTheme> searchResult = getByQuery(query);
+    SearchResult<IndexTheme> searchResult = getByQuery(query, maxRetryAttempts, retryWaitingPeriod);
     if (searchResult.getDocumentCount() == 0) {
       return Optional.empty();
     } else if (searchResult.getDocumentCount() == 1) {
@@ -247,11 +370,12 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @param updateFunction
    *          The function that does the actual updating
    * @param orgId
-   *           the organization the event belongs to
+   *          The organization the event belongs to
    * @param user
-   *           the user
+   *          The user
+   *
    * @throws SearchIndexException
-   *           Thrown if unable to update the event.
+   *          Thrown if unable to update the event.
    */
   public Optional<Event> addOrUpdateEvent(String id, Function<Optional<Event>, Optional<Event>> updateFunction,
           String orgId, User user) throws SearchIndexException {
@@ -260,7 +384,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     logger.debug("Locked event '{}'", id);
 
     try {
-      Optional<Event> eventOpt = getEvent(id, orgId, user);
+      Optional<Event> eventOpt = getEvent(id, orgId, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
       Optional<Event> updatedEventOpt = updateFunction.apply(eventOpt);
       if (updatedEventOpt.isPresent()) {
         update(updatedEventOpt.get());
@@ -276,9 +400,10 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * Adds the recording event to the search index or updates it accordingly if it is there.
    *
    * @param event
-   *          the recording event
+   *          The event to update
+   *
    * @throws SearchIndexException
-   *           if the event cannot be added or updated
+   *          If the event cannot be added or updated
    */
   private void update(Event event) throws SearchIndexException {
     logger.debug("Adding event {} to search index", event.getIdentifier());
@@ -288,10 +413,11 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
     ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
             inputDocument.getDocumentType(), resourceMetadata);
+
     try {
-      update(doc);
+      update(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, doc);
     } catch (Throwable t) {
-      throw new SearchIndexException("Cannot write resource " + event + " to index", t);
+      throw new SearchIndexException("Cannot write event " + event + " to index", t);
     }
   }
 
@@ -303,11 +429,12 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @param updateFunction
    *          The function that does the actual updating
    * @param orgId
-   *           the organization the series belongs to
+   *          The organization the series belongs to
    * @param user
-   *           the user
+   *          The user
+   *
    * @throws SearchIndexException
-   *           Thrown if unable to add or update the series.
+   *          Thrown if unable to add or update the series.
    */
   public Optional<Series> addOrUpdateSeries(String id, Function<Optional<Series>, Optional<Series>> updateFunction,
           String orgId, User user) throws SearchIndexException {
@@ -316,7 +443,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     logger.debug("Locked series '{}'", id);
 
     try {
-      Optional<Series> seriesOpt = getSeries(id, orgId, user);
+      Optional<Series> seriesOpt = getSeries(id, orgId, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
       Optional<Series> updatedSeriesOpt = updateFunction.apply(seriesOpt);
       if (updatedSeriesOpt.isPresent()) {
         update(updatedSeriesOpt.get());
@@ -332,7 +459,10 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * Add or update a series in the search index.
    *
    * @param series
+   *          The series to update
+   *
    * @throws SearchIndexException
+   *          If the series cannot be added or updated
    */
   private void update(Series series) throws SearchIndexException {
     logger.debug("Adding series {} to search index", series.getIdentifier());
@@ -342,10 +472,11 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
     ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
             inputDocument.getDocumentType(), resourceMetadata);
+
     try {
-      update(doc);
+      update(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, doc);
     } catch (Throwable t) {
-      throw new SearchIndexException("Cannot write resource " + series + " to index", t);
+      throw new SearchIndexException("Cannot write series " + series + " to index", t);
     }
   }
 
@@ -357,11 +488,12 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @param updateFunction
    *          The function that does the actual updating
    * @param orgId
-   *           the organization the theme belongs to
+   *          The organization the theme belongs to
    * @param user
-   *           the user
+   *          The user
+   *
    * @throws SearchIndexException
-   *           Thrown if unable to update the theme.
+   *          Thrown if unable to update the theme.
    */
   public Optional<IndexTheme> addOrUpdateTheme(long id, Function<Optional<IndexTheme>,
           Optional<IndexTheme>> updateFunction, String orgId, User user) throws SearchIndexException {
@@ -370,7 +502,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     logger.debug("Locked theme '{}'", id);
 
     try {
-      Optional<IndexTheme> themeOpt = getTheme(id, orgId, user);
+      Optional<IndexTheme> themeOpt = getTheme(id, orgId, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
       Optional<IndexTheme> updatedThemeOpt = updateFunction.apply(themeOpt);
       if (updatedThemeOpt.isPresent()) {
         update(updatedThemeOpt.get());
@@ -386,9 +518,10 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * Adds or updates the theme in the search index.
    *
    * @param theme
-   *          The theme to add
+   *          The theme to update
+   *
    * @throws SearchIndexException
-   *           Thrown if unable to add or update the theme.
+   *          Thrown if unable to add or update the theme.
    */
   private void update(IndexTheme theme) throws SearchIndexException {
     logger.debug("Adding theme {} to search index", theme.getIdentifier());
@@ -398,10 +531,11 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
     ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
             inputDocument.getDocumentType(), resourceMetadata);
+
     try {
-      update(doc);
+      update(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, doc);
     } catch (Throwable t) {
-      throw new SearchIndexException("Cannot write resource " + theme + " to index", t);
+      throw new SearchIndexException("Cannot write theme " + theme + " to index", t);
     }
   }
 
@@ -419,9 +553,10 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @param orgId
    *         The organization id
    * @return
-   *         true if it was deleted, false if it couldn't be found
+   *         True if it was deleted, false if it couldn't be found
    *
    * @throws SearchIndexException
+   *         If deleting from the index fails
    */
   public boolean delete(String type, String id, String orgId) throws SearchIndexException {
     final Lock lock = this.locks.get(id);
@@ -430,16 +565,14 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     try {
       String idWithOrgId = id.concat(orgId);
       logger.debug("Removing element with id '{}' from search index '{}'", idWithOrgId, getSubIndexIdentifier(type));
-      final DeleteRequest deleteRequest = new DeleteRequest(getSubIndexIdentifier(type), idWithOrgId)
-              .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
 
-      final DeleteResponse delete = getClient().delete(deleteRequest, RequestOptions.DEFAULT);
-      if (delete.getResult().equals(DocWriteResponse.Result.NOT_FOUND)) {
+      DeleteResponse deleteResponse = delete(type, idWithOrgId, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
+      if (deleteResponse.getResult().equals(DocWriteResponse.Result.NOT_FOUND)) {
         logger.trace("Document {} to delete was not found on index '{}'", idWithOrgId, getSubIndexIdentifier(type));
         return false;
       }
-    } catch (IOException e) {
-      throw new SearchIndexException(e);
+    } catch (Throwable e) {
+      throw new SearchIndexException("Cannot remove " + type + " " + id + " from index", e);
     } finally {
       lock.unlock();
       logger.debug("Released locked {} '{}'.", type, id);
@@ -468,13 +601,14 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    *          The user that is requesting to delete the event.
    * @param uid
    *          The identifier of the event.
+   *
    * @throws SearchIndexException
-   *           Thrown if there is an issue with deleting the event.
+   *          Thrown if there is an issue with deleting the event.
    * @throws NotFoundException
-   *           Thrown if the event cannot be found.
+   *          Thrown if the event cannot be found.
    */
   public void deleteAssets(String organization, User user, String uid) throws SearchIndexException, NotFoundException {
-    Optional<Event> eventOpt = getEvent(uid, organization, user);
+    Optional<Event> eventOpt = getEvent(uid, organization, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
     if (!eventOpt.isPresent()) {
       throw new NotFoundException("No event with id " + uid + " found.");
     }
@@ -497,14 +631,15 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    *          The user that is requesting to delete the event.
    * @param uid
    *          The identifier of the event.
+   *
    * @throws SearchIndexException
-   *           Thrown if there is an issue with deleting the event.
+   *          Thrown if there is an issue with deleting the event.
    * @throws NotFoundException
-   *           Thrown if the event cannot be found.
+   *          Thrown if the event cannot be found.
    */
   public void deleteScheduling(String organization, User user, String uid)
           throws SearchIndexException, NotFoundException {
-    Optional<Event> eventOpt = getEvent(uid, organization, user);
+    Optional<Event> eventOpt = getEvent(uid, organization, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
     if (!eventOpt.isPresent()) {
       throw new NotFoundException("No event with id " + uid + " found.");
     }
@@ -529,14 +664,15 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    *          The identifier of the event.
    * @param workflowId
    *          The identifier of the workflow.
+   *
    * @throws SearchIndexException
-   *           Thrown if there is an issue with deleting the event.
+   *          Thrown if there is an issue with deleting the event.
    * @throws NotFoundException
-   *           Thrown if the event cannot be found.
+   *          Thrown if the event cannot be found.
    */
   public void deleteWorkflow(String organization, User user, String uid, Long workflowId)
           throws SearchIndexException, NotFoundException {
-    Optional<Event> eventOpt = getEvent(uid, organization, user);
+    Optional<Event> eventOpt = getEvent(uid, organization, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
     if (!eventOpt.isPresent()) {
       throw new NotFoundException("No event with id " + uid + " found.");
     }
@@ -563,10 +699,28 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @param query
    *          The query to use to retrieve the events that match the query
    * @return {@link SearchResult} collection of {@link Event} from a query.
+   *
    * @throws SearchIndexException
-   *           Thrown if there is an error getting the results.
+   *          Thrown if there is an error getting the results.
    */
   public SearchResult<Event> getByQuery(EventSearchQuery query) throws SearchIndexException {
+    return getByQuery(query, maxRetryAttemptsGet, retryWaitingPeriodGet);
+  }
+
+  /**
+   * @param query
+   *          The query to use to retrieve the events that match the query
+   * @param maxRetryAttempts
+   *          How often to retry query in case of ElasticsearchStatusException
+   * @param retryWaitingPeriod
+   *          How long to wait (in ms) between retries
+   * @return {@link SearchResult} collection of {@link Event} from a query.
+   *
+   * @throws SearchIndexException
+   *          Thrown if there is an error getting the results.
+   */
+  private SearchResult<Event> getByQuery(EventSearchQuery query, int maxRetryAttempts, int retryWaitingPeriod)
+          throws SearchIndexException {
     logger.debug("Searching index using event query '{}'", query);
     // Create the request
     final SearchRequest searchRequest = getSearchRequest(query, new EventQueryBuilder(query));
@@ -579,20 +733,40 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
         } catch (IOException e) {
           return chuck(e);
         }
-      });
+      }, maxRetryAttempts, retryWaitingPeriod);
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying event index", t);
     }
   }
 
+
   /**
    * @param query
    *          The query to use to retrieve the series that match the query
    * @return {@link SearchResult} collection of {@link Series} from a query.
+   *
    * @throws SearchIndexException
-   *           Thrown if there is an error getting the results.
+   *          Thrown if there is an error getting the results.
    */
   public SearchResult<Series> getByQuery(SeriesSearchQuery query) throws SearchIndexException {
+    return getByQuery(query, maxRetryAttemptsGet, retryWaitingPeriodGet);
+  }
+
+  /**
+   * @param query
+   *          The query to use to retrieve the series that match the query
+   * @param maxRetryAttempts
+   *          How often to retry query in case of ElasticsearchStatusException
+   * @param retryWaitingPeriod
+   *          How long to wait (in ms) between retries
+   *
+   * @return {@link SearchResult} collection of {@link Series} from a query.
+   *
+   * @throws SearchIndexException
+   *          Thrown if there is an error getting the results.
+   */
+  private SearchResult<Series> getByQuery(SeriesSearchQuery query, int maxRetryAttempts, int retryWaitingPeriod)
+          throws SearchIndexException {
     logger.debug("Searching index using series query '{}'", query);
     // Create the request
     final SearchRequest searchRequest = getSearchRequest(query, new SeriesQueryBuilder(query));
@@ -604,7 +778,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
         } catch (IOException e) {
           return chuck(e);
         }
-      });
+      }, maxRetryAttempts, retryWaitingPeriod);
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying series index", t);
     }
@@ -614,10 +788,29 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @param query
    *          The query to use to retrieve the themes that match the query
    * @return {@link SearchResult} collection of {@link IndexTheme} from a query.
+   *
    * @throws SearchIndexException
-   *           Thrown if there is an error getting the results.
+   *          Thrown if there is an error getting the results.
    */
   public SearchResult<IndexTheme> getByQuery(ThemeSearchQuery query) throws SearchIndexException {
+    return getByQuery(query, maxRetryAttemptsGet, retryWaitingPeriodGet);
+  }
+
+  /**
+   * @param query
+   *          The query to use to retrieve the themes that match the query
+   * @param maxRetryAttempts
+   *          How often to retry query in case of ElasticsearchStatusException
+   * @param retryWaitingPeriod
+   *          How long to wait (in ms) between retries
+   *
+   * @return {@link SearchResult} collection of {@link IndexTheme} from a query.
+   *
+   * @throws SearchIndexException
+   *          Thrown if there is an error getting the results.
+   */
+  private SearchResult<IndexTheme> getByQuery(ThemeSearchQuery query, int maxRetryAttempts, int retryWaitingPeriod)
+          throws SearchIndexException {
     logger.debug("Searching index using theme query '{}'", query);
     // Create the request
     final SearchRequest searchRequest = getSearchRequest(query, new ThemeQueryBuilder(query));
@@ -629,7 +822,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
         } catch (IOException e) {
           return chuck(e);
         }
-      });
+      }, maxRetryAttempts, retryWaitingPeriod);
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying theme index", t);
     }
