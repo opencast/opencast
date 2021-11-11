@@ -311,7 +311,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
             }
           }
 
-          if (StringUtils.isEmpty(fileName)) {
+          if (StringUtils.isBlank(fileName)) {
             fileName = mediaPackageElementID
                 .concat(".")
                 .concat(asset.getMimeType().bind(suffix).getOr("unknown"));
