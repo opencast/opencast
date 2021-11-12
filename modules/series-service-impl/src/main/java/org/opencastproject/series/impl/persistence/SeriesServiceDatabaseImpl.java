@@ -21,9 +21,12 @@
 
 package org.opencastproject.series.impl.persistence;
 
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlParsingException;
@@ -34,6 +37,7 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.series.api.Series;
 import org.opencastproject.series.impl.SeriesServiceDatabase;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.util.NotFoundException;
@@ -52,15 +56,18 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 /**
  * Implements {@link SeriesServiceDatabase}. Defines permanent storage for series.
@@ -392,6 +399,62 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         tx.rollback();
       }
       throw new SeriesServiceDatabaseException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  @Override
+  public List<Series> getAllForAdministrativeRead(Date from, Optional<Date> to, int limit)
+          throws SeriesServiceDatabaseException {
+    // Validate parameters
+    if (limit <= 0) {
+      throw new IllegalArgumentException("limit has to be > 0");
+    }
+
+    // Make sure the user is actually an administrator of sorts
+    User user = securityService.getUser();
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
+      throw new SeriesServiceDatabaseException(
+          new UnauthorizedException(user, getClass().getName() + ".getModifiedInRangeForAdministrativeRead")
+      );
+    }
+
+    // Load series from DB.
+    EntityManager em = emf.createEntityManager();
+    try {
+      TypedQuery<SeriesEntity> q;
+      if (to.isPresent()) {
+        if (from.after(to.get())) {
+          throw new IllegalArgumentException("`from` is after `to`");
+        }
+
+        q = em.createNamedQuery("Series.getAllModifiedInRange", SeriesEntity.class)
+            .setParameter("from", from)
+            .setParameter("to", to.get())
+            .setMaxResults(limit);
+      } else {
+        q = em.createNamedQuery("Series.getAllModifiedSince", SeriesEntity.class)
+            .setParameter("since", from)
+            .setMaxResults(limit);
+      }
+
+      final List<Series> out = new ArrayList<>();
+      for (SeriesEntity entity : q.getResultList()) {
+        final Series series = new Series();
+        series.setId(entity.getSeriesId());
+        series.setOrganization(entity.getOrganization());
+        series.setDublinCore(DublinCoreXmlFormat.read(entity.getDublinCoreXML()));
+        series.setAccessControl(entity.getAccessControl());
+        series.setModifiedDate(entity.getModifiedDate());
+        series.setDeletionDate(entity.getDeletionDate());
+        out.add(series);
+      }
+
+      return out;
+    } catch (Exception e) {
+      String msg = String.format("Could not retrieve series modified between '%s' and '%s'", from, to);
+      throw new SeriesServiceDatabaseException(msg, e);
     } finally {
       em.close();
     }

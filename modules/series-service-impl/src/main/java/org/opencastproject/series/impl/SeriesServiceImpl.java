@@ -85,6 +85,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -401,6 +402,25 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       throw new SeriesException(e);
     }
   }
+
+  @Override
+  public List<org.opencastproject.series.api.Series> getAllForAdministrativeRead(
+      Date from,
+      Optional<Date> to,
+      int limit
+  ) throws SeriesException {
+    try {
+      return persistence.getAllForAdministrativeRead(from, to, limit);
+    } catch (SeriesServiceDatabaseException e) {
+      String msg = String.format(
+          "Exception while reading all series in range %s to %s from persistence storage",
+          from,
+          to
+      );
+      throw new SeriesException(msg, e);
+    }
+  }
+
 
   @Override
   public Map<String, String> getIdTitleMapOfAllSeries() throws SeriesException, UnauthorizedException {

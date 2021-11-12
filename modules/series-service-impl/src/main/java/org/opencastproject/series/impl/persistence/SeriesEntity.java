@@ -52,7 +52,8 @@ import javax.persistence.UniqueConstraint;
  * rules.
  *
  */
-@Entity(name = "SeriesEntity") @IdClass(SeriesEntityId.class)
+@Entity(name = "SeriesEntity")
+@IdClass(SeriesEntityId.class)
 @Access(AccessType.FIELD)
 @Table(name = "oc_series")
 @NamedQueries({
@@ -67,6 +68,18 @@ import javax.persistence.UniqueConstraint;
     @NamedQuery(
         name = "seriesById",
         query = "select s from SeriesEntity as s where s.seriesId=:seriesId and s.organization=:organization"
+    ),
+    @NamedQuery(
+        name = "Series.getAllModifiedSince",
+        query = "select s from SeriesEntity as s "
+            + "where s.modifiedDate >= :since "
+            + "order by s.modifiedDate asc"
+    ),
+    @NamedQuery(
+        name = "Series.getAllModifiedInRange",
+        query = "select s from SeriesEntity as s "
+            + "where s.modifiedDate >= :from and s.modifiedDate < :to "
+            + "order by s.modifiedDate asc"
     ),
 })
 public class SeriesEntity {
