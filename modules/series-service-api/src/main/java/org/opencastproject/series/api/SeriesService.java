@@ -29,7 +29,10 @@ import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.data.Opt;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Series service API for creating, removing and searching over series.
@@ -150,6 +153,16 @@ public interface SeriesService {
    *           if query could not be performed
    */
   DublinCoreCatalogList getSeries(SeriesQuery query) throws SeriesException, UnauthorizedException;
+
+
+  /**
+   * Returns all series (including deleted ones!) that have been modified in the
+   * given date range {@code from} (inclusive) -- {@code to} (exclusive). At
+   * most {@code limit} many series are returned. ACLs/permissions are NOT
+   * checked as this is only intended to be used in an administrative context.
+   */
+  List<Series> getAllForAdministrativeRead(Date from, Optional<Date> to, int limit)
+          throws SeriesException;
 
   /**
    * Returns a map of series Id to title of all series the user can access

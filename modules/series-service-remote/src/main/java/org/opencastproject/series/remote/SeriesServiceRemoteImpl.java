@@ -42,6 +42,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.api.Series;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
@@ -83,9 +84,11 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import javax.ws.rs.GET;
@@ -320,6 +323,13 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       closeConnection(response);
     }
     throw new SeriesException("Unable to get series from remote series index");
+  }
+
+  @Override
+  public List<Series> getAllForAdministrativeRead(Date from, Optional<Date> to, int limit)
+          throws SeriesException {
+    // TODO: decide what to do about this.
+    throw new SeriesException("NOT IMPLEMENTED");
   }
 
   @Override

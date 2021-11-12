@@ -24,14 +24,17 @@ package org.opencastproject.series.impl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.api.Series;
 import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
 import com.entwinemedia.fn.data.Opt;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * API that defines persistent storage of series.
@@ -104,6 +107,15 @@ public interface SeriesServiceDatabase {
    *           if exception occurs
    */
   List<SeriesEntity> getAllSeries() throws SeriesServiceDatabaseException;
+
+  /**
+   * Returns all series (including deleted ones!) that have been modified in the
+   * given date range {@code from} (inclusive) -- {@code to} (exclusive). At
+   * most {@code limit} many series are returned. ACLs/permissions are NOT
+   * checked as this is only intended to be used in an administrative context.
+   */
+  List<Series> getAllForAdministrativeRead(Date from, Optional<Date> to, int limit)
+          throws SeriesServiceDatabaseException;
 
   /**
    * Retrieves ACL for series with given ID.
