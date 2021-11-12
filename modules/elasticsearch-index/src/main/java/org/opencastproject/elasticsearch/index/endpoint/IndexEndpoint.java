@@ -55,13 +55,11 @@ import javax.ws.rs.core.Response;
     notes = {})
 @Component(
         immediate = true,
-        service = ApiIndexEndpoint.class,
         property = {
                 "service.description=Index Endpoint",
                 "opencast.service.type=org.opencastproject.elasticsearch.index.endpoint",
                 "opencast.service.path=/index"
         },
-        immediate = true,
         service = { IndexEndpoint.class }
 )
 public class IndexEndpoint {
