@@ -34,7 +34,7 @@ delete_indices() {
 		RESPONSE=$(curl -u "$USER:$PASSWORD" -X DELETE  "$SERVER/$DELETE_INDEX" -i -s)
 		echo -e "${RESPONSE}\n"
 
-	        # Check for errors
+	  # Check for errors
 		if [[ $RESPONSE != *"200"* ]]; then
 			echo -e "Index could not be deleted.\n"
 		else
@@ -51,9 +51,11 @@ curl -u "$USER:$PASSWORD" -X GET "$SERVER/_cat/indices?v" -w "\n"
 echo "Deleting all external api and admin ui indices."
 echo -e "Deleting the now unused group index might fail if you have already removed it or if you started with OC >= 10.\n"
 
+# Delete Admin UI sub indices
 SUB_INDICES=("${VERSION}" "${EVENT}" "${SERIES}" "${THEME}" "${GROUP}")
 delete_indices $ADMIN_UI_INDEX "${SUB_INDICES[@]}"
 
+# Delete External API sub indices
 SUB_INDICES=($VERSION $EVENT $SERIES $GROUP)
 delete_indices $EXTERNAL_API_INDEX "${SUB_INDICES[@]}"
 
