@@ -1,0 +1,8 @@
+Opencast 11 comes with minor changes to the service registry config at `ServiceRegistryJpaImpl.cfg`:
+
+1. The usage of `max.attempts` is modified in the sense that if you set -1, you can disable services going into error
+state completely. Before, this was equivalent to 0, which would have the service go into error state after one attempt,
+though this was undocumented. Check your configuration to be sure you didn't rely on this behavior.
+
+2. `no.error.state.service.types` was added. With this, you can define service types that should never go into error
+state.
