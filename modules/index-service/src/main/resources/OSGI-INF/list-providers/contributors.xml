@@ -15,8 +15,8 @@
              interface="org.opencastproject.security.api.UserDirectoryService"
              bind="setUserDirectoryService"/>
 
-  <reference name="AdminUISearchIndex"
-             interface="org.opencastproject.adminui.index.AdminUISearchIndex"
+  <reference name="ElasticsearchIndex"
+             interface="org.opencastproject.elasticsearch.index.ElasticsearchIndex"
              bind="setIndex"/>
 
 </scr:component>

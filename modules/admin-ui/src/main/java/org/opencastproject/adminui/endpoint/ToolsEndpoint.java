@@ -36,7 +36,6 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.ThumbnailImpl;
-import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
@@ -45,7 +44,8 @@ import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.exception.IndexServiceException;
@@ -217,7 +217,7 @@ public class ToolsEndpoint {
 
   // service references
   private AdminUIConfiguration adminUIConfiguration;
-  private AdminUISearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
   private AssetManager assetManager;
   private ComposerService composerService;
   private IndexService index;
@@ -242,8 +242,8 @@ public class ToolsEndpoint {
   }
 
   @Reference
-  public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
-    this.searchIndex = adminUISearchIndex;
+  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.searchIndex = elasticsearchIndex;
   }
 
   @Reference

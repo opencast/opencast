@@ -176,11 +176,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-admin-ui-index</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-list-providers-service</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -349,12 +344,6 @@
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-index-rebuild</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -388,7 +377,6 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               net.fortuna.ical4j.*,
-              org.opencastproject.adminui.index,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               *
