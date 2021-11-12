@@ -150,6 +150,30 @@ public class IndexRebuildService implements BundleActivator {
   }
 
   /**
+   * Start Index Rebuild from the specified service and then do all that follow. Can be used to resume a complete index
+   * rebuild that was interrupted.
+   *
+   * @param index
+   *           The index to rebuild.
+   * @param serviceName
+   *           The name of the {@link Service} to start with.
+   *
+   * @throws IllegalArgumentException
+   *           Thrown if the service doesn't exist.
+   * @throws IndexRebuildException
+   *           Thrown if the index rebuild failed.
+   */
+  public synchronized void resumeIndexRebuild(ElasticsearchIndex index, String serviceName)
+          throws IllegalArgumentException, IndexRebuildException {
+    IndexRebuildService.Service startingService = IndexRebuildService.Service.valueOf(serviceName);
+    logger.info("Resuming rebuild of {} index with service '{}'.", index.getIndexName(), startingService);
+    Service[] services = IndexRebuildService.Service.values();
+    for (int i = startingService.ordinal(); i < services.length; i++) {
+      rebuildIndex(index, services[i]);
+    }
+  }
+
+  /**
    * Trigger repopulation of the index with data from a specific service.
    *
    * @param index
