@@ -77,13 +77,13 @@ import javax.persistence.UniqueConstraint;
     @NamedQuery(
         name = "Series.getAllModifiedSince",
         query = "select s from SeriesEntity as s "
-            + "where s.modifiedDate >= :since "
+            + "where s.modifiedDate >= :since and s.organization=:organization "
             + "order by s.modifiedDate asc"
     ),
     @NamedQuery(
         name = "Series.getAllModifiedInRange",
         query = "select s from SeriesEntity as s "
-            + "where s.modifiedDate >= :from and s.modifiedDate < :to "
+            + "where s.modifiedDate >= :from and s.modifiedDate < :to and s.organization=:organization "
             + "order by s.modifiedDate asc"
     ),
 })

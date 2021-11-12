@@ -430,10 +430,12 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         q = em.createNamedQuery("Series.getAllModifiedInRange", SeriesEntity.class)
             .setParameter("from", from)
             .setParameter("to", to.get())
+            .setParameter("organization", user.getOrganization().getId())
             .setMaxResults(limit);
       } else {
         q = em.createNamedQuery("Series.getAllModifiedSince", SeriesEntity.class)
             .setParameter("since", from)
+            .setParameter("organization", user.getOrganization().getId())
             .setMaxResults(limit);
       }
 
