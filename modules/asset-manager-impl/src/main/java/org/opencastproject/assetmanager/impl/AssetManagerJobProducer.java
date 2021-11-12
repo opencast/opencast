@@ -355,8 +355,8 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    * @param targetStorage
    *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
-   *  The String containing the number of successful and failed moves
-   *  [<> OK ][<> FAILED ]
+   *  The JSON String containing the number of successful and failed moves
+   *  {"OK":<>,"FAIL":<>}
    */
   protected String internalMoveByIdAndDate(
       final String mpId,
