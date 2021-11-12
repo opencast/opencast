@@ -1059,11 +1059,6 @@
         <version>3.3.3</version>
       </dependency>
       <dependency>
-        <groupId>net.sourceforge.nekohtml</groupId>
-        <artifactId>com.springsource.org.cyberneko.html</artifactId>
-        <version>1.9.13</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
         <version>3.1_7</version>
