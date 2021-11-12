@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -169,7 +170,11 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
           throw new UnauthorizedException(currentUser + " is not authorized to update series " + seriesId);
         }
       }
-      em.remove(entity);
+
+      Date now = new Date();
+      entity.setModifiedDate(now);
+      entity.setDeletionDate(now);
+      em.merge(entity);
       tx.commit();
     } catch (NotFoundException e) {
       throw e;
@@ -214,6 +219,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
       properties.remove(propertyName);
       entity.setProperties(properties);
+      entity.setModifiedDate(new Date());
       em.merge(entity);
       tx.commit();
     } catch (NotFoundException e) {
@@ -303,13 +309,20 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     DublinCoreCatalog newSeries = null;
     try {
       tx.begin();
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null) {
+      SeriesEntity entity = getPotentiallyDeletedSeriesEntity(seriesId, em);
+      if (entity == null || entity.isDeleted()) {
+        // If the series existed but is marked deleted, we completely delete it
+        // here to make sure no remains of the old series linger.
+        if (entity != null) {
+          this.deleteSeries(seriesId);
+        }
+
         // no series stored, create new entity
         entity = new SeriesEntity();
         entity.setOrganization(securityService.getOrganization().getId());
         entity.setSeriesId(seriesId);
         entity.setSeries(seriesXML);
+        entity.setModifiedDate(new Date());
         em.persist(entity);
         newSeries = dc;
       } else {
@@ -324,6 +337,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
           }
         }
         entity.setSeries(seriesXML);
+        entity.setModifiedDate(new Date());
         em.merge(entity);
       }
       tx.commit();
@@ -373,7 +387,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not retrieve series", e);
+      logger.error("Could not retrieve series with ID '{}'", seriesId, e);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -534,6 +548,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         updated = true;
       }
       entity.setAccessControl(serializedAC);
+      entity.setModifiedDate(new Date());
       em.merge(entity);
       tx.commit();
       return updated;
@@ -587,6 +602,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       Map<String, String> properties = entity.getProperties();
       properties.put(propertyName, propertyValue);
       entity.setProperties(properties);
+      entity.setModifiedDate(new Date());
       em.merge(entity);
       tx.commit();
     } catch (NotFoundException e) {
@@ -611,9 +627,23 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    *          the series identifier
    * @param em
    *          an open entity manager
-   * @return the series entity, or null if not found
+   * @return the series entity, or null if not found or if the series is deleted.
    */
   protected SeriesEntity getSeriesEntity(String id, EntityManager em) {
+    SeriesEntity entity = getPotentiallyDeletedSeriesEntity(id, em);
+    return entity == null || entity.isDeleted() ? null : entity;
+  }
+
+  /**
+   * Gets a potentially deleted series by its ID, using the current organizational context.
+   *
+   * @param id
+   *          the series identifier
+   * @param em
+   *          an open entity manager
+   * @return the series entity, or null if not found
+   */
+  protected SeriesEntity getPotentiallyDeletedSeriesEntity(String id, EntityManager em) {
     String orgId = securityService.getOrganization().getId();
     Query q = em.createNamedQuery("seriesById").setParameter("seriesId", id).setParameter("organization", orgId);
     try {
@@ -637,6 +667,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         success = false;
       } else {
         series.addElement(type, data);
+        series.setModifiedDate(new Date());
         em.merge(series);
         tx.commit();
         success = true;
@@ -669,6 +700,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       } else {
         if (series.getElements().containsKey(type)) {
           series.removeElement(type);
+          series.setModifiedDate(new Date());
           em.merge(series);
           tx.commit();
           success = true;
