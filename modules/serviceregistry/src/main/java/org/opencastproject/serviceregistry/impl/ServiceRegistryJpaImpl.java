@@ -222,8 +222,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** The configuration key for setting {@link #maxAttemptsBeforeErrorState} */
   static final String MAX_ATTEMPTS_CONFIG_KEY = "max.attempts";
 
-  /** The configuration key for setting {@link #noErrorStateServices} */
-  static final String NO_ERROR_STATE_SERVICES_CONFIG_KEY = "no.error.state.services";
+  /** The configuration key for setting {@link #noErrorStateServiceTypes} */
+  static final String NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY = "no.error.state.service.types";
 
   /** Default value for {@link #maxAttemptsBeforeErrorState} */
   private static final int DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE = 10;
@@ -236,7 +236,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   private boolean errorStatesEnabled = DEFAULT_ERROR_STATES_ENABLED;
 
   /** Services for which error state is disabled */
-  private List<String> noErrorStateServices = new ArrayList();
+  private List<String> noErrorStateServiceTypes = new ArrayList();
 
   /** Default delay between checking if hosts are still alive in seconds * */
   static final long DEFAULT_HEART_BEAT = 60;
@@ -760,12 +760,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
-    noErrorStateServices = new ArrayList();
-    String noErrorStateServicesStr = StringUtils.trimToNull((String) properties.get(NO_ERROR_STATE_SERVICES_CONFIG_KEY));
-    if (noErrorStateServicesStr != null) {
-      noErrorStateServices = Arrays.asList(noErrorStateServicesStr.split("\\s*,\\s*"));
-      if (!noErrorStateServices.isEmpty()) {
-        logger.info("Set services without error state to {}", String.join(", ", noErrorStateServices));
+    noErrorStateServiceTypes = new ArrayList();
+    String noErrorStateServiceTypesStr = StringUtils.trimToNull((String) properties.get(
+            NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY));
+    if (noErrorStateServiceTypesStr != null) {
+      noErrorStateServiceTypes = Arrays.asList(noErrorStateServiceTypesStr.split("\\s*,\\s*"));
+      if (!noErrorStateServiceTypes.isEmpty()) {
+        logger.info("Set service types without error state to {}", String.join(", ", noErrorStateServiceTypes));
       }
     }
 
@@ -2567,7 +2568,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
 
         // The current service already is in WARNING state and max attempts is reached
-        else if (errorStatesEnabled && !noErrorStateServices.contains(currentService.getServiceType())
+        else if (errorStatesEnabled && !noErrorStateServiceTypes.contains(currentService.getServiceType())
                 && getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
           logger.info("State set to ERROR for current service {} on host {}", currentService.getServiceType(),
                   currentService.getHost());

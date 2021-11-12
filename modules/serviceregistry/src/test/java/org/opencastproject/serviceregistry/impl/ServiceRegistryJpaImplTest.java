@@ -548,7 +548,7 @@ public class ServiceRegistryJpaImplTest {
     // disable error states for one service
     Dictionary<String, String> properties = new Hashtable<>();
     properties.put(ServiceRegistryJpaImpl.MAX_ATTEMPTS_CONFIG_KEY, "1");
-    properties.put(ServiceRegistryJpaImpl.NO_ERROR_STATE_SERVICES_CONFIG_KEY, TEST_SERVICE_2 + ", " + TEST_SERVICE_3);
+    properties.put(ServiceRegistryJpaImpl.NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY, TEST_SERVICE_2 + ", " + TEST_SERVICE_3);
     serviceRegistryJpaImpl.updated(properties);
 
     serviceRegistryJpaImpl.sanitize(TEST_SERVICE, TEST_HOST);

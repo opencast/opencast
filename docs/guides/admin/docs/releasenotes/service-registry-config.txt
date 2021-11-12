@@ -4,4 +4,5 @@ Opencast 11 comes with minor changes to the service registry config at `ServiceR
 state completely. Before, this was equivalent to 0, which would have the service go into error state after one attempt,
 though this was undocumented. Check your configuration to be sure you didn't rely on this behavior.
 
-2. `no.error.state.services` was added. With this, you can define service types that should never go into error state.
+2. `no.error.state.service.types` was added. With this, you can define service types that should never go into error
+state.
