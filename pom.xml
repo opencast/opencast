@@ -43,8 +43,8 @@
     <json-simple.version>1.1.1</json-simple.version>
     <karaf.version>4.2.9</karaf.version>
     <node.version>v14.17.0</node.version>
-    <osgi.compendium.version>5.0.0</osgi.compendium.version>
-    <osgi.core.version>5.0.0</osgi.core.version>
+    <osgi.compendium.version>6.0.0</osgi.compendium.version>
+    <osgi.core.version>6.0.0</osgi.core.version>
     <querydsl.version>3.7.4</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
@@ -848,7 +848,7 @@
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.compendium</artifactId>
+        <artifactId>osgi.cmpn</artifactId>
         <version>${osgi.compendium.version}</version>
         <scope>provided</scope>
       </dependency>
