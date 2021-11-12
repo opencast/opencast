@@ -31,11 +31,7 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
@@ -683,42 +679,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
     // update series
     Function<Optional<Series>, Optional<Series>> updateFunction = getMetadataUpdateFunction(seriesId, dc, orgId);
-    Optional<Series> updatedSeriesOpt = updateSeriesInIndex(seriesId, index, orgId, updateFunction);
-
-    // update series title for events?
-    if (updatedSeriesOpt.isPresent() && updatedSeriesOpt.get().isSeriesTitleUpdated()) {
-      Series updatedSeries = updatedSeriesOpt.get();
-      User user = securityService.getUser();
-      SearchResult<Event> events;
-      try {
-        events = index.getByQuery(
-                new EventSearchQuery(orgId, user).withoutActions().withSeriesId(updatedSeries.getIdentifier()));
-      } catch (SearchIndexException e) {
-        logger.error("Error requesting the events of the series {} from the {} index.", seriesId, index.getIndexName(),
-                e);
-        return;
-      }
-
-      for (SearchResultItem<Event> searchResultItem : events.getItems()) {
-        String eventId = searchResultItem.getSource().getIdentifier();
-
-        Function<Optional<Event>, Optional<Event>> eventUpdateFunction = (Optional<Event> eventOpt) -> {
-          if (eventOpt.isPresent() && eventOpt.get().getSeriesId().equals(updatedSeries.getIdentifier())) {
-            Event event = eventOpt.get();
-            event.setSeriesName(updatedSeries.getTitle());
-            return Optional.of(event);
-          }
-          return Optional.empty();
-        };
-
-        try {
-          index.addOrUpdateEvent(eventId, eventUpdateFunction, orgId, user);
-          logger.debug("Series title of series {} updated for event {} in the index.", seriesId, eventId);
-        } catch (SearchIndexException e) {
-          logger.error("Error updating the series title for event {} of series {} to the index.", eventId, seriesId, e);
-        }
-      }
-    }
+    updateSeriesInIndex(seriesId, index, orgId, updateFunction);
   }
 
   /**

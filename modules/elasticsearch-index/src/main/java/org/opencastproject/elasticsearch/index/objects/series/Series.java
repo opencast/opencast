@@ -140,8 +140,6 @@ public class Series implements IndexObject {
   @XmlElement(name = "theme")
   private Long theme = null;
 
-  private boolean seriesTitleUpdated = false;
-
   /** Context for serializing and deserializing */
   private static JAXBContext context = null;
 
@@ -202,7 +200,6 @@ public class Series implements IndexObject {
     }
 
     this.title = title;
-    seriesTitleUpdated = true;
   }
 
   /**
@@ -507,10 +504,6 @@ public class Series implements IndexObject {
    */
   public Long getTheme() {
     return theme;
-  }
-
-  public boolean isSeriesTitleUpdated() {
-    return seriesTitleUpdated;
   }
 
   /**
