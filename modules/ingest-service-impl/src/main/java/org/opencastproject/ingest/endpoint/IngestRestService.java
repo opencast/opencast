@@ -1108,7 +1108,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   }
 
   @POST
-  @Produces(MediaType.TEXT_HTML)
+  @Produces(MediaType.TEXT_XML)
   @Path("ingest/{wdID}")
   @RestQuery(name = "ingest",
              description = "<p>Ingest the completed media package into the system and start a specified workflow.</p>"
@@ -1130,7 +1130,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   }
 
   @POST
-  @Produces(MediaType.TEXT_HTML)
+  @Produces(MediaType.TEXT_XML)
   @Path("ingest")
   @RestQuery(name = "ingest",
              description = "<p>Ingest the completed media package into the system</p>"
