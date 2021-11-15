@@ -105,26 +105,13 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
     try {
       Document xml = XmlSafeParser.parse(is);
       if (serializer != null) {
-
-
-      //Convert InputStream to XML document to rewrite the URLs
-
+        //Convert InputStream to XML document to rewrite the URLs
         rewriteUrls(xml, serializer);
-
-      // Reconverting back to inputStream
-//        ByteArrayOutputStream os = new ByteArrayOutputStream();
-//        Source xmlSource = new DOMSource(xml);
-//        Result outputTarget = new StreamResult(os);
-//        XmlSafeParser.newTransformerFactory().newTransformer().transform(xmlSource, outputTarget);
-//        is = new ByteArrayInputStream(os.toByteArray());
-
-        }
+      }
       return loadFromXml(xml);
     } catch (Exception e) {
       throw new MediaPackageException("Error deserializing paths in media package", e);
     }
-//    return MediaPackageImpl.valueOf(is);
-
   }
 
   /**
