@@ -35,6 +35,7 @@ import org.opencastproject.util.data.Function2;
 
 import com.entwinemedia.fn.Fns;
 import com.entwinemedia.fn.data.ImmutableSetWrapper;
+import com.google.gson.annotations.JsonAdapter;
 
 import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.CollectionUtils;
@@ -64,6 +65,7 @@ import javax.xml.transform.TransformerException;
  * Attention: Encoding schemes are not preserved! See http://opencast.jira.com/browse/MH-8759
  */
 @ParametersAreNonnullByDefault
+@JsonAdapter(DublinCoreGsonAdapter.class)
 public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, MetadataCatalog, Cloneable {
   private static final long serialVersionUID = -4568663918115847488L;
 
