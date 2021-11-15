@@ -21,6 +21,10 @@ Workflow Instance Variables
 Parameter Table
 ---------------
 
+If no configuration keys are specified, workflow instance variables will be set for every mediapackage element.
+
+If no mediapackage element matches a configuration key, no workflow instance variables will be set for that key. For example, the operation will never generate `presentation_work_exists=false`.
+
 |Configuration Key|Example            |Description                                       |
 |-----------------|-------------------|--------------------------------------------------|
 |source-flavors   |`*/work`           |The comma separated list of flavors of the elements we are interested in. |
