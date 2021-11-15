@@ -27,11 +27,11 @@ import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -59,15 +59,13 @@ public final class AclServiceImpl implements AclService {
   private final SecurityService securityService;
 
   /** The Elasticsearch indices */
-  protected AbstractSearchIndex adminUiIndex;
-  protected AbstractSearchIndex externalApiIndex;
+  protected ElasticsearchIndex index;
 
-  public AclServiceImpl(Organization organization, AclDb aclDb, AbstractSearchIndex adminUiIndex,
-          AbstractSearchIndex externalApiIndex, SecurityService securityService) {
+  public AclServiceImpl(Organization organization, AclDb aclDb, ElasticsearchIndex index,
+          SecurityService securityService) {
     this.organization = organization;
     this.aclDb = aclDb;
-    this.adminUiIndex = adminUiIndex;
-    this.externalApiIndex = externalApiIndex;
+    this.index = index;
     this.securityService = securityService;
   }
 
@@ -88,8 +86,7 @@ public final class AclServiceImpl implements AclService {
     if (updateAcl) {
       if (oldName.isSome() && !(oldName.get().getName().equals(acl.getName()))) {
         User user = securityService.getUser();
-        updateAclInIndex(oldName.get().getName(), acl.getName(), adminUiIndex, organization.getId(), user);
-        updateAclInIndex(oldName.get().getName(), acl.getName(), externalApiIndex, organization.getId(), user);
+        updateAclInIndex(oldName.get().getName(), acl.getName(), index, organization.getId(), user);
       }
     }
     return updateAcl;
@@ -107,8 +104,7 @@ public final class AclServiceImpl implements AclService {
     if (aclDb.deleteAcl(organization, id)) {
       if (deletedAcl.isSome()) {
         User user = securityService.getUser();
-        removeAclFromIndex(deletedAcl.get().getName(), adminUiIndex, organization.getId(), user);
-        removeAclFromIndex(deletedAcl.get().getName(), externalApiIndex, organization.getId(), user);
+        removeAclFromIndex(deletedAcl.get().getName(), index, organization.getId(), user);
       }
       return true;
     }
@@ -116,7 +112,7 @@ public final class AclServiceImpl implements AclService {
   }
 
   /**
-   * Update the Managed ACL in the events and series in the Elasticsearch index.
+   * Update the Managed ACL in the events and series in the API index.
    *
    * @param currentAclName
    *         the current name of the managed acl
@@ -129,7 +125,7 @@ public final class AclServiceImpl implements AclService {
    * @param user
    *         the current user
    */
-  private void updateAclInIndex(String currentAclName, String newAclName, AbstractSearchIndex index, String orgId,
+  private void updateAclInIndex(String currentAclName, String newAclName, ElasticsearchIndex index, String orgId,
           User user) {
     logger.debug("Update the events to change the managed acl name from '{}' to '{}'.", currentAclName, newAclName);
     updateManagedAclForEvents(currentAclName, Optional.of(newAclName), index, orgId, user);
@@ -139,7 +135,7 @@ public final class AclServiceImpl implements AclService {
   }
 
   /**
-   * Remove the Managed ACL from the events and series in the Elasticsearch index.
+   * Remove the Managed ACL from the events and series in the API index.
    *
    * @param currentAclName
    *         the current name of the managed acl
@@ -150,7 +146,7 @@ public final class AclServiceImpl implements AclService {
    * @param user
    *         the current user
    */
-  private void removeAclFromIndex(String currentAclName, AbstractSearchIndex index, String orgId,
+  private void removeAclFromIndex(String currentAclName, ElasticsearchIndex index, String orgId,
           User user) {
     logger.debug("Update the events to remove the managed acl name '{}'.", currentAclName);
     updateManagedAclForEvents(currentAclName, Optional.empty(), index, orgId, user);
@@ -160,7 +156,7 @@ public final class AclServiceImpl implements AclService {
   }
 
   /**
-   * Update or remove the Managed Acl for the series in the Elasticsearch index.
+   * Update or remove the Managed Acl for the series in the API index.
    *
    * @param currentAclName
    *         the current name of the managed acl
@@ -173,7 +169,7 @@ public final class AclServiceImpl implements AclService {
    *         the current user
    */
   private void updateManagedAclForSeries(String currentAclName, Optional<String> newAclNameOpt,
-          AbstractSearchIndex index, String orgId, User user) {
+          ElasticsearchIndex index, String orgId, User user) {
     SearchResult<Series> result;
     try {
       result = index.getByQuery(new SeriesSearchQuery(orgId, user).withoutActions()
@@ -210,7 +206,7 @@ public final class AclServiceImpl implements AclService {
   }
 
   /**
-   * Update or remove the Managed Acl for the events in the Elasticsearch index.
+   * Update or remove the Managed Acl for the events in the API index.
    *
    * @param currentAclName
    *         the current name of the managed acl
@@ -223,7 +219,7 @@ public final class AclServiceImpl implements AclService {
    *         the current user
    */
   private void updateManagedAclForEvents(String currentAclName, Optional<String> newAclNameOpt,
-          AbstractSearchIndex index, String orgId, User user) {
+          ElasticsearchIndex index, String orgId, User user) {
     SearchResult<Event> result;
     try {
       result = index.getByQuery(new EventSearchQuery(orgId, user).withoutActions()

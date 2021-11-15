@@ -23,6 +23,7 @@
 package org.opencastproject.search.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.AccessControlList;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,6 +63,9 @@ public class SearchResultItemImpl implements SearchResultItem {
   /** The media package */
   @XmlElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")
   private MediaPackage mediaPackage = null;
+
+  @XmlElement(name = "acl")
+  private AccessControlList acl = null;
 
   /** Dublin core field 'dc:extent' */
   @XmlElement
@@ -595,6 +599,14 @@ public class SearchResultItemImpl implements SearchResultItem {
     return mediaPackage;
   }
 
+  public void setAccessControlList(AccessControlList acl) {
+    this.acl = acl;
+  }
+
+  public AccessControlList getAccessControlList() {
+    return acl;
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -708,6 +720,7 @@ public class SearchResultItemImpl implements SearchResultItem {
     item.setId(from.getId());
     item.setOrganization(from.getOrganization());
     item.setMediaPackage(from.getMediaPackage());
+    item.setAccessControlList(from.getAccessControlList());
     item.setDcExtent(from.getDcExtent());
     item.setDcTitle(from.getDcTitle());
     item.setDcSubject(from.getDcSubject());

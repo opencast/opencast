@@ -77,8 +77,8 @@ import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -172,6 +172,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -198,6 +199,7 @@ import javax.ws.rs.core.Response;
 public class SchedulerServiceImplTest {
 
   public static final File baseDir = new File(new File(IoSupport.getSystemTmpDir()), "schedulerservicetest");
+  public static final File archiveDir = new File(baseDir, "archive");
 
   private SeriesService seriesService;
   private static UnitTestWorkspace workspace;
@@ -210,7 +212,7 @@ public class SchedulerServiceImplTest {
   private Organization currentOrg = new DefaultOrganization();
 
   private static SchedulerServiceImpl schedSvc;
-  private static AbstractSearchIndex index;
+  private static ElasticsearchIndex index;
 
   // persistent properties
   private static SchedulerServiceDatabaseImpl schedulerDatabase;
@@ -265,7 +267,7 @@ public class SchedulerServiceImplTest {
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
 
-    index = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    index = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
 
@@ -280,8 +282,7 @@ public class SchedulerServiceImplTest {
     schedSvc.addCatalogUIAdapter(episodeAdapter);
     schedSvc.addCatalogUIAdapter(extendedAdapter);
     schedSvc.setOrgDirectoryService(orgDirectoryService);
-    schedSvc.setAdminUiIndex(index);
-    schedSvc.setExternalApiIndex(index);
+    schedSvc.setIndex(index);
 
     schedSvc.activate(componentContext);
   }
@@ -1708,8 +1709,9 @@ public class SchedulerServiceImplTest {
             String baseName = AssetManagerImpl.getFileNameFromUrn(mpe).getOr(mpe.getElementType().toString());
 
             // the returned uri must match the path of the {@link #getAsset} method
-            return uri(baseDir.toURI(),
+            return uri(archiveDir.toURI(),
                     mpe.getMediaPackage().getIdentifier().toString(),
+                    snapshot.getVersion().toString(),
                     mpe.getIdentifier(),
                     baseName);
           }
@@ -1735,7 +1737,7 @@ public class SchedulerServiceImplTest {
     MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
     EasyMock.replay(ms);
 
-    AbstractSearchIndex esIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
             EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);
@@ -1748,8 +1750,7 @@ public class SchedulerServiceImplTest {
     am.setAuthorizationService(authorizationService);
     am.setSecurityService(securityService);
     am.setMessageSender(ms);
-    am.setAdminUiIndex(esIndex);
-    am.setExternalApiIndex(esIndex);
+    am.setIndex(esIndex);
     return am;
   }
 
@@ -1771,10 +1772,21 @@ public class SchedulerServiceImplTest {
         return Option.none();
       }
 
+      /**
+       * For this test we don't store assets with media package element id as filename so it matches the workspace
+       * paths. But we can assume that in each folder is only one media package element.
+       * @param path
+       *          Path to directory
+       * @return  First file in that directory
+       */
+      private File getFirstFile(File path) {
+        return path.listFiles()[0];
+      }
+
       @Override
       public void put(StoragePath path, Source source) throws AssetStoreException {
-        File destFile = new File(baseDir, UrlSupport.concat(path.getMediaPackageId(), path.getMediaPackageElementId(),
-                path.getVersion().toString()));
+        File destFile = new File(archiveDir, UrlSupport.concat(path.getMediaPackageId(), path.getVersion().toString(),
+                path.getMediaPackageElementId(), Paths.get(source.getUri()).getFileName().toString()));
         try {
           FileUtils.copyFile(workspace.get(source.getUri()), destFile);
         } catch (IOException e) {
@@ -1786,8 +1798,8 @@ public class SchedulerServiceImplTest {
 
       @Override
       public Opt<InputStream> get(StoragePath path) throws AssetStoreException {
-        File file = new File(baseDir, UrlSupport.concat(path.getMediaPackageId(), path.getMediaPackageElementId(),
-                path.getVersion().toString()));
+        File file = getFirstFile(new File(archiveDir, UrlSupport.concat(path.getMediaPackageId(),
+                path.getVersion().toString(), path.getMediaPackageElementId())));
         InputStream inputStream;
         try {
           inputStream = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
@@ -1804,10 +1816,10 @@ public class SchedulerServiceImplTest {
 
       @Override
       public boolean copy(StoragePath from, StoragePath to) throws AssetStoreException {
-        File file = new File(baseDir, UrlSupport.concat(from.getMediaPackageId(), from.getMediaPackageElementId(),
-                from.getVersion().toString()));
-        File destFile = new File(baseDir,
-                UrlSupport.concat(to.getMediaPackageId(), to.getMediaPackageElementId(), to.getVersion().toString()));
+        File file = getFirstFile(new File(archiveDir, UrlSupport.concat(from.getMediaPackageId(),
+                from.getVersion().toString(), from.getMediaPackageElementId())));
+        File destFile = getFirstFile(new File(archiveDir,
+                UrlSupport.concat(to.getMediaPackageId(), to.getVersion().toString(), to.getMediaPackageElementId())));
         try {
           FileUtils.copyFile(file, destFile);
           return true;

@@ -440,6 +440,11 @@
     <Extensions>webm</Extensions>
   </MimeType>
   <MimeType>
+    <Type>image/webp</Type>
+    <Description>WebP image</Description>
+    <Extensions>webp</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>video/x-dv</Type>
     <Description>DV Video</Description>
     <Extensions>dv</Extensions>
@@ -503,5 +508,10 @@
     <Type>video/x-nut</Type>
     <Description>NUT</Description>
     <Extensions>nut</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>text/x-ass</Type>
+    <Description>Advanced SubStation Alpha</Description>
+    <Extensions>ass,ssa</Extensions>
   </MimeType>
 </MimeTypes>

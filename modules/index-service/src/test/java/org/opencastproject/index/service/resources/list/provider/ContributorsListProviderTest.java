@@ -21,7 +21,7 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.security.api.SecurityService;
@@ -29,7 +29,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaUser;
-import org.opencastproject.util.data.Option;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -46,7 +45,7 @@ import java.util.Map;
 public class ContributorsListProviderTest {
 
   private static final String ORG_ID = "org-id";
-  private AbstractSearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
   private UserDirectoryService userDirectoryService;
   private ContributorsListProvider contributorsListProvider;
   private SecurityService securityService;
@@ -119,8 +118,8 @@ public class ContributorsListProviderTest {
     contributors.add("User 1");
     contributors.add("User 5");
 
-    searchIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
-    EasyMock.expect(searchIndex.getTermsForField(EasyMock.anyString(), EasyMock.anyObject(Option.class)))
+    searchIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    EasyMock.expect(searchIndex.getTermsForField(EasyMock.anyString(), EasyMock.anyObject(String.class)))
             .andReturn(contributors).anyTimes();
 
     contributorsListProvider = new ContributorsListProvider();

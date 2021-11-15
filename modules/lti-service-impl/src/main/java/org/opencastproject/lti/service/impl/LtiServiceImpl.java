@@ -29,9 +29,9 @@ import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -114,7 +114,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private WorkflowService workflowService;
   private AssetManager assetManager;
   private Workspace workspace;
-  private AbstractSearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
   private AuthorizationService authorizationService;
   private SeriesService seriesService;
   private String workflow;
@@ -149,7 +149,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   }
 
   /** OSGi DI */
-  public void setSearchIndex(AbstractSearchIndex searchIndex) {
+  public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 

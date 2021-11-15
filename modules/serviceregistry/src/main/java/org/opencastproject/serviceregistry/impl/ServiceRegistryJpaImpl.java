@@ -204,7 +204,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   static final long MIN_DISPATCH_INTERVAL = 1;
 
   /** Default delay between job dispatching attempts, in seconds */
-  static final long DEFAULT_DISPATCH_INTERVAL = 5;
+  static final long DEFAULT_DISPATCH_INTERVAL = 2;
 
   /** Default delay before starting job dispatching, in seconds */
   static final long DEFAULT_DISPATCH_START_DELAY = 60;
@@ -219,14 +219,24 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Default setting on service statistics retrieval */
   static final int DEFAULT_SERVICE_STATISTICS_MAX_JOB_AGE = 14;
 
-  /** Default value for {@link #maxAttemptsBeforeErrorState} */
-  private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 10;
-
   /** The configuration key for setting {@link #maxAttemptsBeforeErrorState} */
-  private static final String MAX_ATTEMPTS_CONFIG_KEY = "max.attempts";
+  static final String MAX_ATTEMPTS_CONFIG_KEY = "max.attempts";
 
-  /** Number of failed jobs on a service before to set it in error state */
-  protected int maxAttemptsBeforeErrorState = MAX_FAILURE_BEFORE_ERROR_STATE;
+  /** The configuration key for setting {@link #noErrorStateServiceTypes} */
+  static final String NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY = "no.error.state.service.types";
+
+  /** Default value for {@link #maxAttemptsBeforeErrorState} */
+  private static final int DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE = 10;
+
+  /** Default value for {@link #errorStatesEnabled} */
+  private static final boolean DEFAULT_ERROR_STATES_ENABLED = true;
+
+  /** Number of failed jobs on a service before to set it in error state. -1 will disable error states completely. */
+  protected int maxAttemptsBeforeErrorState = DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE;
+  private boolean errorStatesEnabled = DEFAULT_ERROR_STATES_ENABLED;
+
+  /** Services for which error state is disabled */
+  private List<String> noErrorStateServiceTypes = new ArrayList();
 
   /** Default delay between checking if hosts are still alive in seconds * */
   static final long DEFAULT_HEART_BEAT = 60;
@@ -731,14 +741,32 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     logger.info("Updating service registry properties");
 
+    maxAttemptsBeforeErrorState = DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE;
+    errorStatesEnabled = DEFAULT_ERROR_STATES_ENABLED;
     String maxAttempts = StringUtils.trimToNull((String) properties.get(MAX_ATTEMPTS_CONFIG_KEY));
     if (maxAttempts != null) {
       try {
         maxAttemptsBeforeErrorState = Integer.parseInt(maxAttempts);
-        logger.info("Set max attempts before error state to {}", maxAttempts);
+        if (maxAttemptsBeforeErrorState < 0) {
+          errorStatesEnabled = false;
+          logger.info("Error states of services disabled");
+        } else {
+          errorStatesEnabled = true;
+          logger.info("Set max attempts before error state to {}", maxAttempts);
+        }
       } catch (NumberFormatException e) {
         logger.warn("Can not set max attempts before error state to {}. {} must be an integer", maxAttempts,
                 MAX_ATTEMPTS_CONFIG_KEY);
+      }
+    }
+
+    noErrorStateServiceTypes = new ArrayList();
+    String noErrorStateServiceTypesStr = StringUtils.trimToNull((String) properties.get(
+            NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY));
+    if (noErrorStateServiceTypesStr != null) {
+      noErrorStateServiceTypes = Arrays.asList(noErrorStateServiceTypesStr.split("\\s*,\\s*"));
+      if (!noErrorStateServiceTypes.isEmpty()) {
+        logger.info("Set service types without error state to {}", String.join(", ", noErrorStateServiceTypes));
       }
     }
 
@@ -950,10 +978,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
     logger.debug("Current host load: {}, job load cache size: {}", format("%.1f", localSystemLoad), jobCache.size());
 
-    if (jobCache.isEmpty() && localSystemLoad != 0) {
-      logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0",
-              format("%.2f", localSystemLoad));
-      localSystemLoad = 0;
+    if (jobCache.isEmpty()) {
+      if (Math.abs(localSystemLoad) > 0.0000001F) {
+        logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0", localSystemLoad);
+      }
+      localSystemLoad = 0.0F;
     }
   }
 
@@ -2539,7 +2568,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
 
         // The current service already is in WARNING state and max attempts is reached
-        else if (getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
+        else if (errorStatesEnabled && !noErrorStateServiceTypes.contains(currentService.getServiceType())
+                && getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
           logger.info("State set to ERROR for current service {} on host {}", currentService.getServiceType(),
                   currentService.getHost());
           currentService.setServiceState(ERROR, job.toJob().getSignature());

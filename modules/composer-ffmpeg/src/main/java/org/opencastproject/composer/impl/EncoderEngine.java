@@ -28,8 +28,6 @@ import org.opencastproject.composer.api.VideoClip;
 import org.opencastproject.mediapackage.AdaptivePlaylist;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -45,6 +43,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -84,7 +83,7 @@ public class EncoderEngine implements AutoCloseable {
 
   private final Pattern outputPattern = Pattern.compile("Output .* (\\S+) to '(.*)':");
   // ffmpeg4 generates HLS output files and may use a .tmp suffix while writing
-  private final Pattern outputPatternHLS = Pattern.compile("Opening \'([^\']+)\\.tmp\'|([^\']+)\' for writing");
+  private final Pattern outputPatternHLS = Pattern.compile("Opening '([^']+)\\.tmp'|([^']+)' for writing");
 
   // These are common video options that may be mapped in HLS streams. This will help catch some common mistakes
   private static List<String> mappableOptions = Stream.of("-bf", "-b_strategy", "-bitrate", "-bufsize", "-crf",
@@ -107,7 +106,7 @@ public class EncoderEngine implements AutoCloseable {
    */
   File encode(File mediaSource, EncodingProfile format, Map<String, String> properties)
           throws EncoderException {
-    List<File> output = process(Collections.map(Tuple.tuple("video", mediaSource)), format, properties);
+    List<File> output = process(Collections.singletonMap("video", mediaSource), format, properties);
     if (output.size() != 1) {
       throw new EncoderException(String.format("Encode expects one output file (%s found)", output.size()));
     }
@@ -457,25 +456,26 @@ public class EncoderEngine implements AutoCloseable {
                 && !StringUtils.equals("/dev/null", outputPath)
                 && !StringUtils.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
-          logger.info("Identified output file {}", outputFile);
-          if (!type.startsWith("hls"))
+          if (!type.startsWith("hls")) {
+            logger.info("Identified output file {}", outputFile);
             output.add(outputFile);
+          }
         }
       }
     } else if (StringUtils.startsWith(message, "[hls @ ")) {
       logger.debug(message);
       Matcher matcher = outputPatternHLS.matcher(message);
       if (matcher.find()) {
-        int i = 1; // matched group, ".tmp" suffix may have to be removed
-        if (matcher.group(i) == null) i = 2;
-        String outputPath = matcher.group(i);
+        final String outputPath = Objects.toString(matcher.group(1), matcher.group(2));
         if (!StringUtils.equals("NUL", outputPath) && !StringUtils.equals("/dev/null", outputPath)
                 && !StringUtils.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
           // HLS generates the filenames based on a template with %v and %d replaced
           // HLS writes into the same manifest file to add each segment
-          if (!output.contains(outputFile))
+          if (!output.contains(outputFile)) {
+            logger.info("Identified HLS output file {}", outputFile);
             output.add(outputFile);
+          }
         }
       }
 
@@ -589,17 +589,17 @@ public class EncoderEngine implements AutoCloseable {
       if (vInputPad == null && aInputPad == null)
         throw new EncoderException("At least one of video or audio input must be specified");
       // Init
-      vfilter = new ArrayList<>(java.util.Collections.nCopies(size, null));
-      afilter = new ArrayList<>(java.util.Collections.nCopies(size, null));
+      vfilter = new ArrayList<>(Collections.nCopies(size, null));
+      afilter = new ArrayList<>(Collections.nCopies(size, null));
       // name of output pads to map to files
-      apads = new ArrayList<>(java.util.Collections.nCopies(size, null));
-      vpads = new ArrayList<>(java.util.Collections.nCopies(size, null));
+      apads = new ArrayList<>(Collections.nCopies(size, null));
+      vpads = new ArrayList<>(Collections.nCopies(size, null));
 
-      vbitrate = new ArrayList<>(java.util.Collections.nCopies(size, null));
-      abitrate = new ArrayList<>(java.util.Collections.nCopies(size, null));
+      vbitrate = new ArrayList<>(Collections.nCopies(size, null));
+      abitrate = new ArrayList<>(Collections.nCopies(size, null));
 
-      vstream = new ArrayList<>(java.util.Collections.nCopies(size, null));
-      astream = new ArrayList<>(java.util.Collections.nCopies(size, null));
+      vstream = new ArrayList<>(Collections.nCopies(size, null));
+      astream = new ArrayList<>(Collections.nCopies(size, null));
 
       vsplit = (size > 1) ? (vInputPad + "split=" + size) : null; // number of splits
       asplit = (size > 1) ? (aInputPad + "asplit=" + size) : null;
@@ -1190,7 +1190,7 @@ public class EncoderEngine implements AutoCloseable {
         return edits;
       }
     }
-    java.util.Collections.sort(edits); // Sort clips if all clips are from the same src
+    Collections.sort(edits); // Sort clips if all clips are from the same src
     List<VideoClip> clips = new ArrayList<VideoClip>();
     it = edits.iterator();
     while (it.hasNext()) { // Check for legal durations

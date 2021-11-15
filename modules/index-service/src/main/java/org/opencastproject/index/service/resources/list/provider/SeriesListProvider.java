@@ -24,10 +24,10 @@ package org.opencastproject.index.service.resources.list.provider;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesIndexSchema;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListFilter;
@@ -35,7 +35,6 @@ import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.requests.SortCriterion;
 
@@ -71,7 +70,7 @@ public class SeriesListProvider implements ResourceListProvider {
   private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, ORGANIZERS, TITLE_EXTENDED };
 
   /** The search index. */
-  private AbstractSearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
   /** The security service. */
   private SecurityService securityService;
@@ -81,7 +80,7 @@ public class SeriesListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for series services. */
-  public void setSearchIndex(AbstractSearchIndex searchIndex) {
+  public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
@@ -102,20 +101,17 @@ public class SeriesListProvider implements ResourceListProvider {
     Map<String, String> result = new HashMap<>();
     if (TITLE.equals(listName)) {
       seriesQuery.sortByTitle(SortCriterion.Order.Ascending);
-      for (String title : searchIndex.getTermsForField(SeriesIndexSchema.TITLE,
-          Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
+      for (String title : searchIndex.getTermsForField(SeriesIndexSchema.TITLE, Series.DOCUMENT_TYPE)) {
         result.put(title, title);
       }
     } else if (CONTRIBUTORS.equals(listName)) {
       seriesQuery.sortByContributors(SortCriterion.Order.Ascending);
-      for (String contributor : searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS,
-          Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
+      for (String contributor : searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS, Series.DOCUMENT_TYPE)) {
         result.put(contributor, contributor);
       }
     } else if (ORGANIZERS.equals(listName)) {
       seriesQuery.sortByOrganizers(SortCriterion.Order.Ascending);
-      for (String organizer : searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS,
-          Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
+      for (String organizer : searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS, Series.DOCUMENT_TYPE)) {
         result.put(organizer, organizer);
       }
     } else {
