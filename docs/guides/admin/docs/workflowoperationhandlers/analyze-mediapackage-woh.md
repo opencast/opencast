@@ -23,7 +23,6 @@ Parameter Table
 
 |Configuration Key|Example            |Description                                       |
 |-----------------|-------------------|--------------------------------------------------|
-|source-flavor    |`presentation/work`|The flavor of the element we are interested in.   |
 |source-flavors   |`*/work`           |The comma separated list of flavors of the elements we are interested in. |
 |source-tags      |`delivery, 1080p`  |The comma separated list of tags of the elements we are interested in.|
 
