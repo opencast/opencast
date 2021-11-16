@@ -302,22 +302,13 @@ angular.module('adminNg.controllers')
           });
 
           //<===============================
-          // Enable asset upload (catalogs and attachments) to existing events
+          // Enable asset upload (catalogs, attachments and tracks) to existing events
 
           // Retrieve option configuration for asset upload
           UploadAssetOptions.getOptionsPromise().then(function(data){
             if (data) {
               $scope.assetUploadWorkflowDefId = data.workflow;
-              $scope.uploadAssetOptions = [];
-              // Filter out asset options of type "track".
-              // Not allowing tracks to be added to existing mediapackages
-              // for this iteration of the upload option feature.
-              // TODO: consider enabling track uploads to existing mps.
-              angular.forEach(data.options, function(option) {
-                if (option.type !== 'track') {
-                  $scope.uploadAssetOptions.push(option);
-                }
-              });
+              $scope.uploadAssetOptions = data.options;
               // if no asset options, undefine the option variable
               $scope.uploadAssetOptions = $scope.uploadAssetOptions.length > 0 ? $scope.uploadAssetOptions : undefined;
               $scope.newAssets = {};
