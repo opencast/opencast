@@ -62,21 +62,105 @@ import javax.xml.bind.annotation.XmlType;
     @Index(name = "IX_oc_annotation_type", columnList = "type")
 })
 @NamedQueries({
-    @NamedQuery(name = "findAnnotations", query = "SELECT a FROM Annotation a WHERE (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findAnnotationsByMediapackageId", query = "SELECT a FROM Annotation a WHERE a.mediapackageId = :mediapackageId AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findAnnotationsByType", query = "SELECT a FROM Annotation a WHERE a.type = :type AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findAnnotationsByTypeAndMediapackageId", query = "SELECT a FROM Annotation a WHERE a.mediapackageId = :mediapackageId AND a.type = :type AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findAnnotationsByTypeAndMediapackageIdOrderByOutpointDESC", query = "SELECT a FROM Annotation a WHERE a.mediapackageId = :mediapackageId AND a.type = :type AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE)) ORDER BY a.outpoint DESC"),
-    @NamedQuery(name = "findAnnotationsByIntervall", query = "SELECT a FROM Annotation a WHERE :begin <= a.created AND a.created <= :end AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findAnnotationsByTypeAndIntervall", query = "SELECT a FROM Annotation a WHERE :begin <= a.created AND a.created <= :end AND a.type = :type AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findTotal", query = "SELECT COUNT(a) FROM Annotation a WHERE (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findTotalByMediapackageId", query = "SELECT COUNT(a) FROM Annotation a WHERE a.mediapackageId = :mediapackageId AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findTotalByType", query = "SELECT COUNT(a) FROM Annotation a WHERE a.type = :type AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findTotalByTypeAndMediapackageId", query = "SELECT COUNT(a) FROM Annotation a WHERE a.mediapackageId = :mediapackageId AND a.type = :type AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findTotalByIntervall", query = "SELECT COUNT(a) FROM Annotation a WHERE :begin <= a.created AND a.created <= :end AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findDistinctEpisodeIdTotalByIntervall", query = "SELECT COUNT(distinct a.mediapackageId) FROM Annotation a WHERE :begin <= a.created AND a.created <= :end AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "findTotalByTypeAndIntervall", query = "SELECT COUNT(a) FROM Annotation a WHERE :begin <= a.created AND a.created <= :end AND a.type = :type AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),
-    @NamedQuery(name = "updateAnnotation", query = "UPDATE Annotation a SET a.value = :value WHERE a.annotationId = :annotationId") })
+    @NamedQuery(
+        name = "findAnnotations",
+        query = "SELECT a FROM Annotation a "
+            + "WHERE (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findAnnotationsByMediapackageId",
+        query = "SELECT a FROM Annotation a "
+            + "WHERE a.mediapackageId = :mediapackageId "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findAnnotationsByType",
+        query = "SELECT a FROM Annotation a "
+            + "WHERE a.type = :type "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findAnnotationsByTypeAndMediapackageId",
+        query = "SELECT a FROM Annotation a "
+            + "WHERE a.mediapackageId = :mediapackageId "
+            + "AND a.type = :type "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findAnnotationsByTypeAndMediapackageIdOrderByOutpointDESC",
+        query = "SELECT a FROM Annotation a "
+            + "WHERE a.mediapackageId = :mediapackageId "
+            + "AND a.type = :type "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE)) "
+            + "ORDER BY a.outpoint DESC"
+    ),
+    @NamedQuery(
+        name = "findAnnotationsByIntervall",
+        query = "SELECT a FROM Annotation a "
+            + "WHERE :begin <= a.created "
+            + "AND a.created <= :end "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findAnnotationsByTypeAndIntervall",
+        query = "SELECT a FROM Annotation a "
+            + "WHERE :begin <= a.created "
+            + "AND a.created <= :end "
+            + "AND a.type = :type "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findTotal",
+        query = "SELECT COUNT(a) FROM Annotation a "
+            + "WHERE (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findTotalByMediapackageId",
+        query = "SELECT COUNT(a) FROM Annotation a "
+            + "WHERE a.mediapackageId = :mediapackageId "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findTotalByType",
+        query = "SELECT COUNT(a) FROM Annotation a "
+            + "WHERE a.type = :type "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findTotalByTypeAndMediapackageId",
+        query = "SELECT COUNT(a) FROM Annotation a "
+            + "WHERE a.mediapackageId = :mediapackageId "
+            + "AND a.type = :type "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findTotalByIntervall",
+        query = "SELECT COUNT(a) FROM Annotation a "
+            + "WHERE :begin <= a.created "
+            + "AND a.created <= :end "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findDistinctEpisodeIdTotalByIntervall",
+        query = "SELECT COUNT(distinct a.mediapackageId) FROM Annotation a "
+            + "WHERE :begin <= a.created "
+            + "AND a.created <= :end "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "findTotalByTypeAndIntervall",
+        query = "SELECT COUNT(a) FROM Annotation a "
+            + "WHERE :begin <= a.created "
+            + "AND a.created <= :end "
+            + "AND a.type = :type "
+            + "AND (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"
+    ),
+    @NamedQuery(
+        name = "updateAnnotation",
+        query = "UPDATE Annotation a SET a.value = :value "
+            + "WHERE a.annotationId = :annotationId"
+    ),
+})
 @XmlType(name = "annotation", namespace = "http://annotation.opencastproject.org")
 @XmlRootElement(name = "annotation", namespace = "http://annotation.opencastproject.org")
 @XmlAccessorType(XmlAccessType.FIELD)

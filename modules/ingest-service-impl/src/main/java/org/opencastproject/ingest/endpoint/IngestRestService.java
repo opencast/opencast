@@ -91,6 +91,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -640,10 +641,11 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
           @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
           @RestParameter(description = "Access control list in XACML or JSON form", isRequired = false, name = "acl", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Tag of the next media file", isRequired = false, name = "tag", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) },
       bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
       responses = {
-          @RestResponse(description = "Ingest successfull. Returns workflow instance as xml", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Ingest successful. Returns workflow instance as xml", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Ingest failed due to invalid requests.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the log files",
               responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
@@ -719,6 +721,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
           @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
           @RestParameter(description = "Access control list in XACML or JSON form", isRequired = false, name = "acl", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Tag of the next media file", isRequired = false, name = "tag", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) },
       bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
       responses = {
@@ -729,7 +732,11 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       returnDescription = "")
   public Response addMediaPackage(@Context HttpServletRequest request, @PathParam("wdID") String wdID) {
     logger.trace("add mediapackage as multipart-form-data with workflow definition id: {}", wdID);
+    // For compatibility, we will support re-use of flavors for now but will print a warning.
+    // If there are no major complaints, we will remove this with Opencast 11 or 12
+    boolean flavorAlreadyUsed = false;
     MediaPackageElementFlavor flavor = null;
+    List<String> tags = new ArrayList<>();
     try {
       MediaPackage mp = ingestService.createMediaPackage();
       DublinCoreCatalog dcc = null;
@@ -753,9 +760,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             if ("flavor".equals(fieldName)) {
               try {
                 flavor = MediaPackageElementFlavor.parseFlavor(value);
+                flavorAlreadyUsed = false;
               } catch (IllegalArgumentException e) {
                 return badRequest(String.format("Could not parse flavor '%s'", value), e);
               }
+              /* “Remember” the tags for the next media. */
+            } else if ("tag".equals(fieldName)) {
+              tags.add(value);
               /* Fields for DC catalog */
             } else if (dcterms.contains(fieldName)) {
               if ("identifier".equals(fieldName)) {
@@ -838,7 +849,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               } catch (java.net.URISyntaxException e) {
                 return badRequest(String.format("Invalid URI %s for media", value), e);
               }
-              ingestService.addTrack(mediaUrl, flavor, mp);
+              warnIfFlavorAlreadyUsed(flavorAlreadyUsed);
+              ingestService.addTrack(mediaUrl, flavor, tags.toArray(new String[0]), mp);
+              flavorAlreadyUsed = true;
+              tags.clear();
               hasMedia = true;
 
             } else {
@@ -852,7 +866,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               /* A flavor has to be specified in the request prior the video file */
               return badRequest("A flavor has to be specified in the request prior to the content BODY", null);
             }
-            ingestService.addTrack(item.openStream(), item.getName(), flavor, mp);
+            warnIfFlavorAlreadyUsed(flavorAlreadyUsed);
+            ingestService.addTrack(item.openStream(), item.getName(), flavor, tags.toArray(new String[0]), mp);
+            flavorAlreadyUsed = true;
+            tags.clear();
             hasMedia = true;
           }
         }
@@ -890,6 +907,21 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     } catch (Exception e) {
       logger.warn("Unable to add mediapackage", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @Deprecated
+  private void warnIfFlavorAlreadyUsed(final boolean used) {
+    if (used) {
+      logger.warn("\n"
+          + "********************************************\n"
+          + "* Warning: Re-use of flavors during ingest *\n"
+          + "*          is deprecated and will be       *\n"
+          + "*          removed soon! Declare a flavor  *\n"
+          + "*          for each media file or create   *\n"
+          + "*          an issue if you need this.      *\n"
+          + "********************************************"
+      );
     }
   }
 
@@ -1166,7 +1198,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     final String workflowDefinition = wfConfig.get(WORKFLOW_DEFINITION_ID_PARAM);
 
     // Adding ingest start time to workflow configuration
-    wfConfig.put(IngestService.START_DATE_KEY, DATE_FORMAT.format(startCache.asMap().get(mp.getIdentifier().toString())));
+    final Date ingestDate = startCache.getIfPresent(mp.getIdentifier().toString());
+    wfConfig.put(IngestService.START_DATE_KEY, DATE_FORMAT.format(ingestDate != null ? ingestDate : new Date()));
 
     final X<WorkflowInstance> ingest = new X<WorkflowInstance>() {
       @Override
@@ -1195,6 +1228,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       startCache.asMap().remove(mp.getIdentifier().toString());
       return Response.ok(WorkflowParser.toXml(workflow)).build();
     } catch (Exception e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof NotFoundException) {
+        return badRequest("Could not retrieve all media package elements", e);
+      }
       logger.warn("Unable to ingest mediapackage", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }

@@ -665,18 +665,21 @@ public class SeriesRestService {
     } else {
       return Response.status(BAD_REQUEST).entity("Required series metadata not provided").build();
     }
-    try {
-      AccessControlList acl = null;
-      if (StringUtils.isNotBlank(accessControl)) {
-        try {
-          acl = AccessControlParser.parseAcl(accessControl);
-        } catch (Exception e) {
-          logger.debug("Could not parse ACL", e);
-          return Response.status(BAD_REQUEST).entity("Could not parse ACL").build();
-        }
+    AccessControlList acl = null;
+    if (StringUtils.isNotBlank(accessControl)) {
+      try {
+        acl = AccessControlParser.parseAcl(accessControl);
+      } catch (Exception e) {
+        logger.debug("Could not parse ACL", e);
+        return Response.status(BAD_REQUEST).entity("Could not parse ACL").build();
       }
+    }
+
+    try {
       DublinCoreCatalog newSeries = seriesService.updateSeries(dc);
-      seriesService.updateAccessControl(dc.getFirst(PROPERTY_IDENTIFIER), acl, override);
+      if (acl != null) {
+        seriesService.updateAccessControl(dc.getFirst(PROPERTY_IDENTIFIER), acl, override);
+      }
       if (newSeries == null) {
         logger.debug("Updated series {} ", dc.getFirst(PROPERTY_IDENTIFIER));
         return Response.status(NO_CONTENT).build();

@@ -936,8 +936,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       final boolean isJSON;
       try (InputStream inputStream = workingFileRepository.get(mediaPackageId, elementId)) {
         try (BufferedReader reader  = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-          // Exception for current BBB integration which is ingesting a JSON array as catalog
-          isJSON = reader.read() == '[';
+          // Exception for current BBB integration and Extron SMP351 which is ingesting a JSON array/object as catalog
+          int firstChar = reader.read();
+          isJSON = firstChar == '[' || firstChar == '{';
         }
       }
 

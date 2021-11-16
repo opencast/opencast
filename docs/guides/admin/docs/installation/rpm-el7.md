@@ -7,10 +7,6 @@ This guide is based on an RPM software repository available for Red Hat-based Li
 University](https://uni-osnabrueck.de). This repository provides preconfigured Opencast installations and all necessary
 3rd-party-tools.
 
-<div class=warn>
-<b>Opencast 10</b> is currently available from the testing repository only.
-</div>
-
 
 Currently Supported
 -------------------

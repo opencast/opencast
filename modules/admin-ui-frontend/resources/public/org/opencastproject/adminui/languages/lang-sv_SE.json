@@ -619,6 +619,7 @@
             "NOCONTENT": "Inga data tillgängliga",
             "PUBLISHED": "Publicerad",
             "WEEKDAY": "Veckodag",
+            "ADMINUI_NOTES": "Notes",
             "TOOLTIP": {
                "ASSETS": "Öppna resurserdetaljs",
                "START": "Filter för detta startdatum",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "Metadata behöver korrigeras",
                   "WRONG_SERIES_PUBLICATION": "Fel serie eller publikationskanal",
                   "WRONG_WORKFLOW": "Fel workflow",
-                  "PROCESSING_FAILURE": "Bearbetning misslyckades"
+                  "PROCESSING_FAILURE": "Bearbetning misslyckades",
+                  "ADMINUI_NOTES": "Notes in Admin UI"
                }
             },
             "STATISTICS": {

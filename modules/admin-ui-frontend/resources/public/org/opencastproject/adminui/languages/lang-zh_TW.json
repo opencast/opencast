@@ -619,6 +619,7 @@
             "NOCONTENT": "無可用數據",
             "PUBLISHED": "已發佈",
             "WEEKDAY": "Weekday",
+            "ADMINUI_NOTES": "Notes",
             "TOOLTIP": {
                "ASSETS": "Open asset details",
                "START": "篩選此開始日期",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "後設資料需要校正",
                   "WRONG_SERIES_PUBLICATION": "錯誤的系列或發行頻道",
                   "WRONG_WORKFLOW": "錯誤的工作流程",
-                  "PROCESSING_FAILURE": "處理程序失敗"
+                  "PROCESSING_FAILURE": "處理程序失敗",
+                  "ADMINUI_NOTES": "Notes in Admin UI"
                }
             },
             "STATISTICS": {

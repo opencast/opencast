@@ -619,6 +619,7 @@
             "NOCONTENT": "אין נתונים זמינים",
             "PUBLISHED": "פורסם",
             "WEEKDAY": "יום חול",
+            "ADMINUI_NOTES": "Notes",
             "TOOLTIP": {
                "ASSETS": "Open asset details",
                "START": "מסנן עבור תאריך ההתחלה הזה",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "מטה-נתונים צריכים תיקון",
                   "WRONG_SERIES_PUBLICATION": "סדרה או ערוץ פרסום שגוי",
                   "WRONG_WORKFLOW": "תהליך עבודה שגוי",
-                  "PROCESSING_FAILURE": "עיבוד נכשל"
+                  "PROCESSING_FAILURE": "עיבוד נכשל",
+                  "ADMINUI_NOTES": "Notes in Admin UI"
                }
             },
             "STATISTICS": {
@@ -1624,7 +1626,7 @@
             "RUNNING": "משימות רצות",
             "QUEUED": "משימות בתור",
             "MEAN_RUN_TIME": "זמן ריצה ממוצע",
-            "MEAN_QUEUE_TIME": "זמן ממוצע בתור",
+            "MEAN_QUEUE_TIME": "זמן תור ממוצע",
             "MAINTENANCE": "תחזוקה",
             "MAINTENANCE_OFF": "הפעל מצב תחזוקה",
             "MAINTENANCE_ON": "צא ממצב תחזוקה"

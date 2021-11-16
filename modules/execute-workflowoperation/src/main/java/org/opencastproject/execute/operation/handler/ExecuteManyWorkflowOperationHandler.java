@@ -51,8 +51,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -256,8 +257,8 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
             // The job payload is a file with set of properties for the workflow
             final Properties properties = new Properties();
             File propertiesFile = workspace.get(resultElements[i].getURI());
-            try (InputStream is = new FileInputStream(propertiesFile)) {
-              properties.load(is);
+            try (InputStreamReader reader = new InputStreamReader(new FileInputStream(propertiesFile), StandardCharsets.UTF_8)) {
+              properties.load(reader);
             }
             logger.debug("Loaded {} properties from {}", properties.size(), propertiesFile);
             workspace.deleteFromCollection(ExecuteService.COLLECTION, propertiesFile.getName());
@@ -276,8 +277,22 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
             resultElements[i].setURI(uri);
 
             // Set new flavor
-            if (targetFlavor != null)
-              resultElements[i].setFlavor(targetFlavor);
+            if (targetFlavor != null) {
+              String targetFlavorType = targetFlavor.getType();
+              String targetFlavorSubtype = targetFlavor.getSubtype();
+
+              if (MediaPackageElementFlavor.WILDCARD.equals(targetFlavorType)) {
+                targetFlavorType = inputElements[i].getFlavor().getType();
+              }
+
+              if (MediaPackageElementFlavor.WILDCARD.equals(targetFlavorSubtype)) {
+                targetFlavorSubtype = inputElements[i].getFlavor().getSubtype();
+              }
+
+              String resolvedTargetFlavorStr =
+                  targetFlavorType + MediaPackageElementFlavor.SEPARATOR + targetFlavorSubtype;
+              resultElements[i].setFlavor(MediaPackageElementFlavor.parseFlavor(resolvedTargetFlavorStr));
+            }
           }
         }
 

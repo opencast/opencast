@@ -619,6 +619,7 @@
             "NOCONTENT": "Geen gegevens beschikbaar",
             "PUBLISHED": "Gepubliceerd",
             "WEEKDAY": "Weekdag",
+            "ADMINUI_NOTES": "Notities",
             "TOOLTIP": {
                "ASSETS": "Open asset details",
                "START": "Filter voor deze begindatum",
@@ -907,7 +908,8 @@
                   "WRONG_METADATA": "Metadata moeten aangepast worden",
                   "WRONG_SERIES_PUBLICATION": "Verkeerde series of publicatiekanaal",
                   "WRONG_WORKFLOW": "Verkeerde workflow",
-                  "PROCESSING_FAILURE": "Verwerking mislukt"
+                  "PROCESSING_FAILURE": "Verwerking mislukt",
+                  "ADMINUI_NOTES": "Notities in de Admin UI"
                }
             },
             "STATISTICS": {

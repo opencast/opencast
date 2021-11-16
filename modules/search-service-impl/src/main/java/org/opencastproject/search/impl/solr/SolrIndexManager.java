@@ -27,7 +27,6 @@ import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Collections.flatMap;
 import static org.opencastproject.util.data.Collections.head;
-import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Option.option;
 
 import org.opencastproject.mediapackage.Attachment;
@@ -39,6 +38,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.metadata.api.MetadataValue;
+import org.opencastproject.metadata.api.MetadataValues;
 import org.opencastproject.metadata.api.StaticMetadata;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.api.util.Interval;
@@ -104,6 +104,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Utility class used to manage the search index.
@@ -638,21 +639,15 @@ public class SolrIndexManager {
   }
 
   static List<DField<String>> fromMValue(List<MetadataValue<String>> as) {
-    return map(as, new ArrayList<DField<String>>(), new Function<MetadataValue<String>, DField<String>>() {
-      @Override
-      public DField<String> apply(MetadataValue<String> v) {
-        return new DField<String>(v.getValue(), v.getLanguage());
-      }
-    });
+    return as.stream()
+        .map(v -> new DField<>(v.getValue(), MetadataValues.LANGUAGE_UNDEFINED))
+        .collect(Collectors.toList());
   }
 
   static List<DField<String>> fromDCValue(List<DublinCoreValue> as) {
-    return map(as, new ArrayList<DField<String>>(), new Function<DublinCoreValue, DField<String>>() {
-      @Override
-      public DField<String> apply(DublinCoreValue v) {
-        return new DField<String>(v.getValue(), v.getLanguage());
-      }
-    });
+    return as.stream()
+        .map(v -> new DField<>(v.getValue(), DublinCore.LANGUAGE_UNDEFINED))
+        .collect(Collectors.toList());
   }
 
   /**
@@ -690,7 +685,7 @@ public class SolrIndexManager {
        * MH-8353 a series could have a permission defined we don't know how to handle -DH
        */
       if (actionPermissions == null) {
-        logger.warn("Search service doesn't know how to handle action: " + entry.getAction());
+        logger.debug("Search service doesn't know how to handle action: {}", entry.getAction());
         continue;
       }
       if (acl == null) {

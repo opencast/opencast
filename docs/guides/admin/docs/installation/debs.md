@@ -21,7 +21,7 @@ Currently Supported
 -------------------
 
 * Debian 9 and newer amd64
-* Ubuntu 18.04 amd64
+* Ubuntu 18.04 and newer amd64
 
 
 Supported JDKs

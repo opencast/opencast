@@ -28,7 +28,7 @@ Or replace the old Java version like this:
 
 ```
 % dnf shell
-> remove java-1.8.0-openjdk.x86_64
+> remove 'java-1.8.0*'
 > install java-11-openjdk.x86_64
 > run
 ```
@@ -67,4 +67,7 @@ in:
 
 ```
 etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
-```
+
+The [ILIAS plugin](https://github.com/fluxapps/OpenCast), for example, does not authenticate users against Opencast.     
+If you are using that plugin, this is why you probably want to disable this feature and make your media publically       
+accessable.

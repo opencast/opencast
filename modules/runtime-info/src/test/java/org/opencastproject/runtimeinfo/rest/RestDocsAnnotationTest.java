@@ -61,16 +61,18 @@ public class RestDocsAnnotationTest {
     assertEquals("ingestservice", restServiceAnnotation.name());
     assertEquals("Ingest Service", restServiceAnnotation.title());
     assertEquals(
-            "This service creates and augments Opencast media packages that include media tracks, metadata catalogs and attachments.",
-            restServiceAnnotation.abstractText());
+        "This service creates and augments Opencast media packages that include media tracks, "
+            + "metadata catalogs and attachments.",
+        restServiceAnnotation.abstractText());
 
     // notes
     assertEquals(2, restServiceAnnotation.notes().length);
     assertEquals("All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-            restServiceAnnotation.notes()[0]);
+        restServiceAnnotation.notes()[0]);
     assertEquals(
-            "If the service is down or not working it will return a status 503, this means the the underlying service is not working and is either restarting or has failed",
-            restServiceAnnotation.notes()[1]);
+        "If the service is down or not working it will return a status 503, this means the the "
+            + "underlying service is not working and is either restarting or has failed",
+        restServiceAnnotation.notes()[1]);
 
   }
 
@@ -290,21 +292,65 @@ public class RestDocsAnnotationTest {
   /**
    * This sample class simulates a annotated REST service class.
    */
-  @RestService(name = "ingestservice", title = "Ingest Service", notes = {
+  @RestService(
+      name = "ingestservice",
+      title = "Ingest Service",
+      notes = {
           "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-          "If the service is down or not working it will return a status 503, this means the the underlying service is not working and is either restarting or has failed" }, abstractText = "This service creates and augments Opencast media packages that include media tracks, metadata catalogs and attachments.")
+          "If the service is down or not working it will return a status 503, this means the "
+              + "the underlying service is not working and is either restarting or has failed",
+      },
+      abstractText = "This service creates and augments Opencast media packages that include "
+          + "media tracks, metadata catalogs and attachments."
+  )
   public class TestServletSample {
 
     @POST
     @Produces(MediaType.TEXT_XML)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("addTrack")
-    @RestQuery(name = "addTrackInputStream", description = "Add a media track to a given media package using an input stream", pathParameters = { @RestParameter(defaultValue = "", description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = {
-            @RestParameter(defaultValue = "Default", description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-            @RestParameter(defaultValue = "", description = "The media package as XML", isRequired = false, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(defaultValue = "", description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
+    @RestQuery(
+        name = "addTrackInputStream",
+        description = "Add a media track to a given media package using an input stream",
+        pathParameters = {
+            @RestParameter(
+                defaultValue = "",
+                description = "Workflow definition id",
+                isRequired = true,
+                name = "wdID",
+                type = RestParameter.Type.STRING
+            ),
+        },
+        restParameters = {
+            @RestParameter(
+                defaultValue = "Default",
+                description = "The kind of media track",
+                isRequired = true,
+                name = "flavor",
+                type = RestParameter.Type.STRING
+            ),
+            @RestParameter(
+                defaultValue = "",
+                description = "The media package as XML",
+                isRequired = false,
+                name = "mediaPackage",
+                type = RestParameter.Type.TEXT
+            ),
+        },
+        bodyParameter = @RestParameter(
+            defaultValue = "",
+            description = "The media track file",
+            isRequired = true,
+            name = "BODY",
+            type = RestParameter.Type.FILE
+        ),
+        responses = {
             @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
             @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-            @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "augmented media package")
+            @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+        },
+        returnDescription = "augmented media package"
+    )
     public int methodA() {
       return 0;
     }
@@ -313,12 +359,48 @@ public class RestDocsAnnotationTest {
     @Produces(MediaType.TEXT_XML)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("addTrack")
-    @RestQuery(name = "addTrackInputStream", description = "Add a media track to a given media package using an input stream", pathParameters = { @RestParameter(defaultValue = "", description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = {
-            @RestParameter(defaultValue = "Default", description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-            @RestParameter(defaultValue = "ADCD ${this.schema} XUHZSUFH ${somethingElse} UGGUH ${anotherthing} AIHID", description = "The media package as XML", isRequired = false, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(defaultValue = "", description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
+    @RestQuery(
+        name = "addTrackInputStream",
+        description = "Add a media track to a given media package using an input stream",
+        pathParameters = {
+            @RestParameter(
+                defaultValue = "",
+                description = "Workflow definition id",
+                isRequired = true,
+                name = "wdID",
+                type = RestParameter.Type.STRING
+            ),
+        },
+        restParameters = {
+            @RestParameter(
+                defaultValue = "Default",
+                description = "The kind of media track",
+                isRequired = true,
+                name = "flavor",
+                type = RestParameter.Type.STRING
+            ),
+            @RestParameter(
+                defaultValue = "ADCD ${this.schema} XUHZSUFH ${somethingElse} UGGUH ${anotherthing} AIHID",
+                description = "The media package as XML",
+                isRequired = false,
+                name = "mediaPackage",
+                type = RestParameter.Type.TEXT
+            ),
+        },
+        bodyParameter = @RestParameter(
+            defaultValue = "",
+            description = "The media track file",
+            isRequired = true,
+            name = "BODY",
+            type = RestParameter.Type.FILE
+        ),
+        responses = {
             @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
             @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-            @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "augmented media package")
+            @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+        },
+        returnDescription = "augmented media package"
+    )
     public int methodB() {
       return 0;
     }

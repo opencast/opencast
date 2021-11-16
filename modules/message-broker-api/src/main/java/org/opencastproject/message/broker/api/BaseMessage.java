@@ -47,8 +47,9 @@ public class BaseMessage implements Serializable {
   }
 
   public Opt<String> getId() {
-    if (object instanceof MessageItem)
+    if (object instanceof MessageItem) {
       return Opt.some(((MessageItem) object).getId());
+    }
 
     return Opt.none();
   }

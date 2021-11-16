@@ -23,20 +23,23 @@ package org.opencastproject.assetmanager.impl;
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.fns.Booleans.eq;
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.PropertySchema;
+import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.AssetStoreException;
+import org.opencastproject.assetmanager.api.storage.DeletionSelector;
+import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
+import org.opencastproject.assetmanager.api.storage.Source;
+import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
-import org.opencastproject.assetmanager.impl.storage.AssetStore;
-import org.opencastproject.assetmanager.impl.storage.AssetStoreException;
-import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
-import org.opencastproject.assetmanager.impl.storage.Source;
-import org.opencastproject.assetmanager.impl.storage.StoragePath;
+import org.opencastproject.assetmanager.impl.util.TestUser;
+import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -44,14 +47,19 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
+import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import org.opencastproject.util.persistencefn.PersistenceUtil;
-import org.opencastproject.util.persistencefn.Queries;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
@@ -60,10 +68,10 @@ import com.entwinemedia.fn.P1;
 import com.entwinemedia.fn.P1Lazy;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.jpa.impl.JPAQuery;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
@@ -74,56 +82,110 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
-
-import javax.persistence.EntityManager;
+import java.util.function.Function;
 
 /**
- * Base class for {@link AssetManager} tests.
+ * Base class for {@link org.opencastproject.assetmanager.api.AssetManager} tests.
  * <p>
  * See {@link org.opencastproject.util.persistencefn.PersistenceUtil
  * #mkTestEntityManagerFactoryFromSystemProperties(String)} for command line
  * configuration options.
  * <p>
- * Implementations of this class need to call {@link #setUp(AssetManager)} to setup the necessary variables prior to
- * running a test. You may implement a {@link org.junit.Before} annotated method like this:
- * <pre>
- *   |@Before
- *   |public void setUp() throws Exception {
- *   |  setUp(mkAbstractAssetManager());
- *   |}
- * </pre>
  */
 // CHECKSTYLE:OFF
-public abstract class AssetManagerTestBase<A extends AssetManager> {
+public abstract class AssetManagerTestBase {
   protected static final Logger logger = LoggerFactory.getLogger(AssetManagerTestBase.class);
   public static final String PERSISTENCE_UNIT = "org.opencastproject.assetmanager.impl";
 
   protected static final String OWNER = "test";
 
+  public static final String LOCAL_STORE_ID = "local-test";
+  public static final String REMOTE_STORE_1_ID = "remote-1-test";
+  public static final String REMOTE_STORE_2_ID = "remote-2-test";
+
   @Rule
   public TemporaryFolder tempFolder = new TemporaryFolder();
 
   /** The asset manager under test. */
-  protected A am;
+  protected AssetManagerImpl am;
   protected AQueryBuilder q;
   protected Props p;
   protected Props p2;
-  protected PersistenceEnv penv;
 
-  /**
-   * Return the underlying instance of {@link AbstractAssetManager}.
-   * If the asset manager under test is of type AbstractAssetManager just return that instance.
-   */
-  public abstract AbstractAssetManager getAbstractAssetManager();
-
-  public abstract String getCurrentOrgId();
-
-  public final void setUp(A assetManager) {
-    am = assetManager;
+  @Before
+  public void setUp() throws Exception {
+    this.am = makeAssetManager();
     q = am.createQuery();
     p = new Props(q, "org.opencastproject.service");
     p2 = new Props(q, "org.opencastproject.service.sub");
+  }
+
+  /**
+   * Create a new test asset manager.
+   */
+  protected AssetManagerImpl makeAssetManager() throws Exception {
+    final Database db = new Database(
+            PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT));
+
+    final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
+            .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
+            .andAnswer(() -> getClass().getResourceAsStream("/dublincore-a.xml")).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
+      File tmp = tempFolder.newFile();
+      FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
+      return tmp;
+    }).anyTimes();
+    EasyMock.replay(workspace);
+
+    AssetStore localAssetStore = mkAssetStore(LOCAL_STORE_ID);
+    RemoteAssetStore remoteAssetStore1 = mkRemoteAssetStore(REMOTE_STORE_1_ID);
+    RemoteAssetStore remoteAssetStore2 = mkRemoteAssetStore(REMOTE_STORE_2_ID);
+
+    HttpAssetProvider httpAssetProvider =  new HttpAssetProvider() {
+      @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
+        return snapshot;
+      }
+    };
+
+    Organization org = new DefaultOrganization();
+    User currentUser = TestUser.mk(org, org.getAdminRole());
+
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.expect(securityService.getUser()).andAnswer(() -> currentUser).anyTimes();
+    EasyMock.replay(securityService);
+
+    final AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
+    EasyMock.expect(authorizationService.getActiveAcl(EasyMock.<MediaPackage>anyObject()))
+            .andReturn(tuple(new AccessControlList(), AclScope.Episode))
+            .anyTimes();
+    EasyMock.replay(authorizationService);
+
+    MessageSender ms = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(ms);
+
+    AbstractSearchIndex esIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
+            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
+    EasyMock.replay(esIndex);
+
+    AssetManagerImpl am = new AssetManagerImpl();
+    am.setAssetStore(localAssetStore);
+    am.addRemoteAssetStore(remoteAssetStore1);
+    am.addRemoteAssetStore(remoteAssetStore2);
+    am.setHttpAssetProvider(httpAssetProvider);
+    am.setWorkspace(workspace);
+    am.setSecurityService(securityService);
+    am.setDatabase(db);
+    am.setAuthorizationService(authorizationService);
+    am.setMessageSender(ms);
+    am.setAdminUiIndex(esIndex);
+    am.setExternalApiIndex(esIndex);
+    return am;
   }
 
   public static MediaPackage mkMediaPackage(MediaPackageElement... elements) throws Exception {
@@ -238,7 +300,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
           @Override public Snapshot apply(Integer versionCount) {
             if (!continuousVersions) {
               // insert a gap into the version claim
-              getAbstractAssetManager().getDb().claimVersion(mp.getIdentifier().toString());
+              am.getDatabase().claimVersion(mp.getIdentifier().toString());
             }
             logger.debug("Taking snapshot {} of media package {}", versionCount + 1, mpId);
             return am.takeSnapshot(OWNER, mp);
@@ -278,65 +340,6 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
 
     public final PropertyField<Version> versionId = versionProp("version");
     // CHECKSTYLE:ON
-  }
-
-  /**
-   * Create a new test asset manager.
-   */
-  protected AbstractAssetManager mkAbstractAssetManager() throws Exception {
-    penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT);
-    // empty database
-    penv.tx(new Fn<EntityManager, Object>() {
-      @Override public Object apply(EntityManager entityManager) {
-        Queries.sql.update(entityManager, "delete from oc_assets_asset");
-        Queries.sql.update(entityManager, "delete from oc_assets_properties");
-        Queries.sql.update(entityManager, "delete from oc_assets_snapshot");
-        Queries.sql.update(entityManager, "delete from oc_assets_version_claim");
-        return null;
-      }
-    });
-    final Database db = new Database(
-            PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
-            penv);
-    //
-    final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
-            .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
-      File tmp = tempFolder.newFile();
-      FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
-      return tmp;
-    }).anyTimes();
-    EasyMock.replay(workspace);
-    //
-    final AssetStore assetStore = mkAssetStore("test-store-type");
-    //
-    return new AbstractAssetManager() {
-      @Override public Database getDb() {
-        return db;
-      }
-
-      @Override public AssetStore getLocalAssetStore() {
-        return assetStore;
-      }
-
-      @Override public HttpAssetProvider getHttpAssetProvider() {
-        // identity provider
-        return new HttpAssetProvider() {
-          @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
-            return snapshot;
-          }
-        };
-      }
-
-      @Override protected Workspace getWorkspace() {
-        return workspace;
-      }
-
-      @Override protected String getCurrentOrgId() {
-        return AssetManagerTestBase.this.getCurrentOrgId();
-      }
-    };
   }
 
   /**
@@ -409,16 +412,78 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
     };
   }
 
-  long runCount(final JPAQuery q) {
-    return penv.tx(new Fn<EntityManager, Long>() {
-      @Override public Long apply(EntityManager em) {
-        return q.clone(em, Database.TEMPLATES).count();
+  /**
+   * Create a test asset store.
+   */
+  protected RemoteAssetStore mkRemoteAssetStore(String storeType) {
+    return new RemoteAssetStore() {
+      private Set<StoragePath> store = new HashSet<>();
+
+      private void logSize() {
+        logger.debug("Store contains {} asset/s", store.size());
       }
-    });
+
+      @Override public void put(StoragePath path, Source source) throws AssetStoreException {
+        store.add(path);
+        logSize();
+      }
+
+      @Override public boolean copy(StoragePath from, StoragePath to) throws AssetStoreException {
+        if (store.contains(from)) {
+          store.add(to);
+          logSize();
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      @Override public Opt<InputStream> get(StoragePath path) throws AssetStoreException {
+        return IoSupport.openClassPathResource("/dublincore-a.xml").toOpt();
+      }
+
+      @Override public boolean contains(StoragePath path) throws AssetStoreException {
+        return store.contains(path);
+      }
+
+      @Override public boolean delete(DeletionSelector sel) throws AssetStoreException {
+        logger.info("Delete from asset store " + sel);
+        final Set<StoragePath> newStore = new HashSet<>();
+        boolean deleted = false;
+        for (StoragePath s : store) {
+          if (!(sel.getOrganizationId().equals(s.getOrganizationId())
+                  && sel.getMediaPackageId().equals(s.getMediaPackageId())
+                  && sel.getVersion().map(eq(s.getVersion())).getOr(true))) {
+            newStore.add(s);
+          } else {
+            deleted = true;
+          }
+        }
+        store = newStore;
+        logSize();
+        return deleted;
+      }
+
+      @Override public Option<Long> getTotalSpace() {
+        return Option.none();
+      }
+
+      @Override public Option<Long> getUsableSpace() {
+        return Option.none();
+      }
+
+      @Override public Option<Long> getUsedSpace() {
+        return Option.some((long) store.size());
+      }
+
+      @Override public String getStoreType() {
+        return storeType;
+      }
+    };
   }
 
   void assertStoreSize(long size) {
-    assertEquals("Assets in store", size, (long) getAbstractAssetManager().getLocalAssetStore().getUsedSpace().get());
+    assertEquals("Assets in store", size, (long) am.getLocalAssetStore().getUsedSpace().get());
   }
 
   String getStoreType() {

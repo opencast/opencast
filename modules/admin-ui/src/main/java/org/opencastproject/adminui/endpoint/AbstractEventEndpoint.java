@@ -23,7 +23,6 @@ package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.nul;
-import static com.entwinemedia.fn.data.Opt.some;
 import static com.entwinemedia.fn.data.json.Jsons.BLANK;
 import static com.entwinemedia.fn.data.json.Jsons.NULL;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
@@ -63,9 +62,10 @@ import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.BulkUpdateUtil;
 import org.opencastproject.adminui.util.QueryPreprocessor;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
-import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -86,7 +86,6 @@ import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
-import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.Attachment;
@@ -244,6 +243,8 @@ public abstract class AbstractEventEndpoint {
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
 
+  public abstract AssetManager getAssetManager();
+
   public abstract WorkflowService getWorkflowService();
 
   public abstract AdminUISearchIndex getIndex();
@@ -381,7 +382,7 @@ public abstract class AbstractEventEndpoint {
   public Response getEventResponse(@PathParam("eventId") String id) throws Exception {
     for (final Event event : getIndexService().getEvent(id, getIndex())) {
       event.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
-      return okJson(eventToJSON(event));
+      return okJson(eventToJSON(event, Optional.empty()));
     }
     return notFound("Cannot find an event with id '%s'.", id);
   }
@@ -545,6 +546,49 @@ public abstract class AbstractEventEndpoint {
       pubJSON.add(json);
     }
     return pubJSON;
+  }
+
+  private List<JObject> eventCommentsToJson(List<EventComment> comments) {
+    List<JObject> commentArr = new ArrayList<>();
+    for (EventComment c : comments) {
+      JObject thing = obj(
+              f("reason", v(c.getReason())),
+              f("resolvedStatus", v(c.isResolvedStatus())),
+              f("modificationDate", v(c.getModificationDate().toInstant().toString())),
+              f("replies", arr(eventCommentRepliesToJson(c.getReplies()))),
+              f("author", obj(
+                      f("name", c.getAuthor().getName()),
+                      f("email", c.getAuthor().getEmail()),
+                      f("username", c.getAuthor().getUsername())
+              )),
+              f("id", v(c.getId().get())),
+              f("text", v(c.getText())),
+              f("creationDate", v(c.getCreationDate().toInstant().toString()))
+      );
+      commentArr.add(thing);
+    }
+
+    return commentArr;
+  }
+
+  private List<JObject> eventCommentRepliesToJson(List<EventCommentReply> replies) {
+    List<JObject> repliesArr = new ArrayList<>();
+    for (EventCommentReply r : replies) {
+      JObject thing = obj(
+              f("id", v(r.getId().get())),
+              f("text", v(r.getText())),
+              f("creationDate", v(r.getCreationDate().toInstant().toString())),
+              f("modificationDate", v(r.getModificationDate().toInstant().toString())),
+              f("author", obj(
+                      f("name", r.getAuthor().getName()),
+                      f("email", r.getAuthor().getEmail()),
+                      f("username", r.getAuthor().getUsername())
+              ))
+      );
+      repliesArr.add(thing);
+    }
+
+    return repliesArr;
   }
 
   @GET
@@ -843,12 +887,37 @@ public abstract class AbstractEventEndpoint {
 
       Source eventSource = getIndexService().getEventSource(optEvent.get());
       if (eventSource == Source.ARCHIVE) {
-        if (getAclService().applyAclToEpisode(eventId, accessControlList)) {
+        Opt<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(eventId);
+        Option<AccessControlList> aclOpt = Option.option(accessControlList);
+        // the episode service is the source of authority for the retrieval of media packages
+        if (mediaPackage.isSome()) {
+          MediaPackage episodeSvcMp = mediaPackage.get();
+          aclOpt.fold(new Option.EMatch<AccessControlList>() {
+            // set the new episode ACL
+            @Override
+            public void esome(final AccessControlList acl) {
+              // update in episode service
+              try {
+                MediaPackage mp = getAuthorizationService().setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
+                getAssetManager().takeSnapshot(mp);
+              } catch (MediaPackageException e) {
+                logger.error("Error getting ACL from media package", e);
+              }
+            }
+
+            // if none EpisodeACLTransition#isDelete returns true so delete the episode ACL
+            @Override
+            public void enone() {
+              // update in episode service
+              MediaPackage mp = getAuthorizationService().removeAcl(episodeSvcMp, AclScope.Episode);
+              getAssetManager().takeSnapshot(mp);
+            }
+
+          });
           return ok();
-        } else {
-          logger.warn("Unable to find the event '{}'", eventId);
-          return notFound();
         }
+        logger.warn("Unable to find the event '{}'", eventId);
+        return notFound();
       } else if (eventSource == Source.WORKFLOW) {
         logger.warn("An ACL cannot be edited while an event is part of a current workflow because it might"
                 + " lead to inconsistent ACLs i.e. changed after distribution so that the old ACL is still "
@@ -860,12 +929,11 @@ public abstract class AbstractEventEndpoint {
         MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
         mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();
         // We could check agent access here if we want to forbid updating ACLs for users without access.
-        getSchedulerService().updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-                Opt.<Set<String>> none(), some(mediaPackage), Opt.<Map<String, String>> none(),
-                Opt.<Map<String, String>> none());
+        getSchedulerService().updateEvent(eventId, Opt.none(), Opt.none(), Opt.none(), Opt.none(),
+                Opt.some(mediaPackage), Opt.none(), Opt.none());
         return ok();
       }
-    } catch (AclServiceException | MediaPackageException e) {
+    } catch (MediaPackageException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         return forbidden();
       }
@@ -1724,7 +1792,7 @@ public abstract class AbstractEventEndpoint {
         return okJson(obj(f("workflowId", v(agentConfiguration.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION), Jsons.BLANK)),
                 f("configuration", obj(fields))));
       } else {
-        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withMediaPackage(id)));
+        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withCount(999999).withMediaPackage(id)));
       }
     } catch (NotFoundException e) {
       return notFound("Cannot find workflows for event %s", id);
@@ -2276,15 +2344,18 @@ public abstract class AbstractEventEndpoint {
           @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
           @RestParameter(name = "sort", description = "The order instructions used to sort the query result. Must be in the form '<field name>:(ASC|DESC)'", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of items to return per page.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The page number.", isRequired = false, type = RestParameter.Type.INTEGER) }, responses = {
+          @RestParameter(name = "offset", description = "The page number.", isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "getComments", description = "If comments should be fetched", isRequired = false, type = RestParameter.Type.BOOLEAN) }, responses = {
                   @RestResponse(description = "Returns all events as JSON", responseCode = HttpServletResponse.SC_OK) })
   public Response getEvents(@QueryParam("id") String id, @QueryParam("commentReason") String reasonFilter,
           @QueryParam("commentResolution") String resolutionFilter, @QueryParam("filter") String filter,
-          @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
+          @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit,
+          @QueryParam("getComments") Boolean getComments) {
 
     Option<Integer> optLimit = Option.option(limit);
     Option<Integer> optOffset = Option.option(offset);
     Option<String> optSort = Option.option(trimToNull(sort));
+    Option<Boolean> optGetComments = Option.option(getComments);
     ArrayList<JValue> eventsList = new ArrayList<>();
     final Organization organization = getSecurityService().getOrganization();
     final User user = getSecurityService().getUser();
@@ -2420,7 +2491,16 @@ public abstract class AbstractEventEndpoint {
     for (SearchResultItem<Event> item : results.getItems()) {
       Event source = item.getSource();
       source.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
-      eventsList.add(eventToJSON(source));
+      List<EventComment> comments = null;
+      if (optGetComments.isSome() && optGetComments.get()) {
+        try {
+          comments = getEventCommentService().getComments(source.getIdentifier());
+        } catch (EventCommentException e) {
+          logger.error("Unable to get comments from event {}", source.getIdentifier(), e);
+          throw new WebApplicationException(e);
+        }
+      }
+      eventsList.add(eventToJSON(source, Optional.ofNullable(comments)));
     }
 
     return okJsonList(eventsList, nul(offset).getOr(0), nul(limit).getOr(0), results.getHitCount());
@@ -2440,7 +2520,7 @@ public abstract class AbstractEventEndpoint {
     return UrlSupport.uri(serverUrl, eventId, "comment", Long.toString(commentId));
   }
 
-  private JValue eventToJSON(Event event) {
+  private JValue eventToJSON(Event event, Optional<List<EventComment>> comments) {
     List<Field> fields = new ArrayList<>();
 
     fields.add(f("id", v(event.getIdentifier())));
@@ -2470,6 +2550,9 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("technical_end", v(event.getTechnicalEndTime(), BLANK)));
     fields.add(f("technical_presenters", arr($(event.getTechnicalPresenters()).map(Functions.stringToJValue))));
     fields.add(f("publications", arr(eventPublicationsToJson(event))));
+    if (comments.isPresent()) {
+      fields.add(f("comments", arr(eventCommentsToJson(comments.get()))));
+    }
     return obj(fields);
   }
 

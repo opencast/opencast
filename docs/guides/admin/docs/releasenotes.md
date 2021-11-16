@@ -42,6 +42,54 @@ API changes
 - Rename value for `sort` parameter in search API from `DATE_PUBLISHED` to `DATE_MODIFIED`.
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
+Additional Notes about 10.5
+---------------------------
+
+This release fixes several bugs.  Notably, this should drastically speed up audio normalization.
+
+Additional Notes about 10.4
+---------------------------
+
+This release fixes bugs and a startup issue.  Some adopters were experiencing startup issues due to the JWT
+authentication module being installed by default.  This release removes that module for default configurations.
+
+Additional Notes about 10.3
+---------------------------
+
+This release fixes a number of bugs.  This release also includes [a fix](https://github.com/opencast/opencast/pull/2964)
+which prevents ActiveMQ from eventually blocking operations.  This fix must be manually deployed.  Please follow the
+existing the [message broker](configuration/message-broker.md) configuration instructions with the updated file.
+
+Additional Notes about 10.2
+---------------------------
+
+This release fixes a number of bugs including two very important fixes related Extron SMP capture agent compatibility
+and problems during publication.
+
+__Manual action required if upgrading from Opencast 10.1__:
+Opencast 10.1 contains a bug which can cause problems with republishing events.
+If you never ran 10.1 in production, e.g. upgraded from 9.7 to 10.2, no manual action is required.
+
+If you have, to fix the problem, you will need to re-write the search service's Solr entries set in Opencast 10.1
+by re-indexing those events. To re-index, stop your presentation/allinone node,
+remove `<karaf-data>/solr-indexes/search` (often `/var/lib/opencast/solr-indexes/search`)
+and restart Opencast. The re-index progress will be logged. Once Opencast is up again, everything should be fine.
+All other indexes are not effected.
+
+More details can be found at [pull request #2923](https://github.com/opencast/opencast/pull/2923).
+
+Additional Notes about 10.1
+---------------------------
+
+This release contains many bugfixes.  In particular, the email libraries are now working properly! You might also
+encounter issues with updating the Elasticsearch indices with 10.0, especially when deleting elements, that are fixed
+with this minor release.
+
+From this release onwards there's also no longer the need to run the Elasticsearch index rebuild separately for each
+service to avoid concurrency issues. Instead, you can simply use the /admin-ng/index/recreateIndex or /api/recreateIndex
+endpoints to trigger the complete rebuild and be sure that everything will happen in order, since there is no longer any
+asynchronicity involved.
+
 
 Release Schedule
 ----------------
