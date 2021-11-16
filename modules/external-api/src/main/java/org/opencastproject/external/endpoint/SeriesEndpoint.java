@@ -1416,7 +1416,7 @@ public class SeriesEndpoint {
     }
 
     try {
-      return externalIndex.getByQuery(q);
+      return elasticsearchIndex.getByQuery(q);
     } catch (SearchIndexException e) {
       logger.error("Failed to execute search query: {}", e.getMessage());
       throw new SeriesException(e);
