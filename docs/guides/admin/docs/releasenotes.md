@@ -1,11 +1,11 @@
 Opencast 11: Release Notes
-=========================
 
 
 Features
 --------
 
-- TBA
+- New *select-version* workflow operation handler, used to replace the media package in the currently
+  running workflow with an older version from the asset manager.
 
 Improvements
 ------------

@@ -40,6 +40,10 @@
       <artifactId>json-simple</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
@@ -73,7 +77,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
   </dependencies>
   <build>

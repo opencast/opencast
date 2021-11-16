@@ -65,13 +65,13 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
-import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexProducer;
-import org.opencastproject.index.rebuild.IndexRebuildException;
-import org.opencastproject.index.rebuild.IndexRebuildService;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
+import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -181,8 +181,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private String systemUserName;
   private Database db;
   private AclServiceFactory aclServiceFactory;
-  private AbstractSearchIndex adminUiIndex;
-  private AbstractSearchIndex externalApiIndex;
+  private ElasticsearchIndex index;
 
   // Settings for role filter
   private boolean includeAPIRoles;
@@ -273,14 +272,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     this.aclServiceFactory = aclServiceFactory;
   }
 
-  @Reference(name = "adminUiIndex", target = "(index.name=adminui)")
-  public void setAdminUiIndex(AbstractSearchIndex index) {
-    this.adminUiIndex = index;
-  }
-
-  @Reference(name = "externalApiIndex", target = "(index.name=externalapi)")
-  public void setExternalApiIndex(AbstractSearchIndex index) {
-    this.externalApiIndex = index;
+  @Reference(name = "index")
+  public void setIndex(ElasticsearchIndex index) {
+    this.index = index;
   }
 
   /**
@@ -407,24 +401,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 mkPropertyName(ace.getRole(), ace.getAction())), Value.mk(ace.isAllow())));
       }
 
-      // We pass the original media package here, instead of using
-      // snapshot.getMediaPackage(), for security reasons. The original media
-      // package has elements with URLs of type http://.../files/... in it. These
-      // URLs will be pulled from the Workspace cache without a HTTP call.
-      //
-      // Were we to use snapshot.getMediaPackage(), we'd have a HTTP call on our
-      // hands that's secured via the asset manager security model. But the
-      // snapshot taken here doesn't have the necessary security properties
-      // installed (yet). This happens in AssetManagerWithSecurity, some layers
-      // higher up. So there's a weird loop in here.
       logger.info("Send update message for snapshot {}, {} to ActiveMQ",
               snapshot.getMediaPackage().getIdentifier().toString(), snapshot.getVersion());
       messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
-              mkTakeSnapshotMessage(snapshot, mp));
+              mkTakeSnapshotMessage(snapshot));
 
-      // update ES indices
-      updateEventInIndex(snapshot, adminUiIndex);
-      updateEventInIndex(snapshot, externalApiIndex);
+      updateEventInIndex(snapshot, index);
 
       return snapshot;
     }
@@ -464,13 +446,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * <p>
    * Do not call outside of a security context.
    */
-  private AssetManagerItem.TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot, MediaPackage mp) {
-    final MediaPackage chosenMp;
-    if (mp != null) {
-      chosenMp = mp;
-    } else {
-      chosenMp = snapshot.getMediaPackage();
-    }
+  private AssetManagerItem.TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot) {
+    final MediaPackage mp = snapshot.getMediaPackage();
 
     long version;
     try {
@@ -483,19 +460,19 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       throw new RuntimeException("The current implementation of the index requires versions being of type 'long'.");
     }
 
-    return AssetManagerItem.add(workspace, chosenMp, authorizationService.getActiveAcl(chosenMp).getA(),
+    return AssetManagerItem.add(workspace, mp, authorizationService.getActiveAcl(mp).getA(),
             version, snapshot.getArchivalDate());
   }
 
   /**
-   * Update the event in the Elasticsearch index.
+   * Update the event in the API index.
    *
    * @param snapshot
    *         The newest snapshot of the event to update
    * @param index
-   *         The Elasticsearch index to update
+   *         The API index to update
    */
-  private void updateEventInIndex(Snapshot snapshot, AbstractSearchIndex index) {
+  private void updateEventInIndex(Snapshot snapshot, ElasticsearchIndex index) {
     final MediaPackage mp = snapshot.getMediaPackage();
     String eventId = mp.getIdentifier().toString();
     final String organization = securityService.getOrganization().getId();
@@ -546,14 +523,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
-   * Remove the event from the Elasticsearch index
+   * Remove the event from the API index
    *
    * @param eventId
    *         The id of the event to remove
    * @param index
-   *         The Elasticsearch index to update
+   *         The API index to update
    */
-  private void removeEventFromIndex(String eventId, AbstractSearchIndex index) {
+  private void removeEventFromIndex(String eventId, ElasticsearchIndex index) {
     final String organization = securityService.getOrganization().getId();
     final User user = securityService.getUser();
     logger.debug("Received AssetManager delete episode message {}", eventId);
@@ -847,9 +824,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
             AssetManagerItem.deleteEpisode(mpId, new Date()));
 
-    // update ES indices
-    removeEventFromIndex(mpId, adminUiIndex);
-    removeEventFromIndex(mpId, externalApiIndex);
+    removeEventFromIndex(mpId, index);
   }
 
   /**
@@ -862,7 +837,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
+  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
     final Organization org = securityService.getOrganization();
     final User user = (org != null ? securityService.getUser() : null);
     try {

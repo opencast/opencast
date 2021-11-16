@@ -11,7 +11,7 @@
     <provide interface="org.opencastproject.list.api.ResourceListProvider"/>
   </service>
 
-  <reference name="AdminUISearchIndex"
-             interface="org.opencastproject.adminui.index.AdminUISearchIndex"
+  <reference name="ElasticsearchIndex"
+             interface="org.opencastproject.elasticsearch.index.ElasticsearchIndex"
              bind="setIndex"/>
 </scr:component>

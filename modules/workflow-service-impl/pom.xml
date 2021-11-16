@@ -72,11 +72,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-index-rebuild</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-elasticsearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -116,7 +111,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
@@ -128,7 +123,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.apache.felix</groupId>
-          <artifactId>org.osgi.compendium</artifactId>
+          <artifactId>osgi.cmpn</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

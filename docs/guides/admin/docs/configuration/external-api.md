@@ -115,12 +115,6 @@ directly in the Opencast administrative user interface.
 |-----------------------------|-------|-------------------------------|
 |ROLE_API_CAPTURE_AGENTS_VIEW |GET    |/api/agents</br>/api/agents/\* |
 
-**Administrative API**
-
-|ROLE       |METHOD | URL               |
-|-----------|-------|-------------------|
-|ROLE_ADMIN |POST   |/api/recreateIndex |
-
 **Workflow API**
 
 |ROLE                                |METHOD | URL                                                      |

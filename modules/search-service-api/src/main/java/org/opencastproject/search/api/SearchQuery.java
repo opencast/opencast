@@ -92,6 +92,11 @@ public class SearchQuery {
     return this;
   }
 
+  /**
+   * Sets a limit on the maximum number of returned items. If the query
+   * execution is not performed by an administrator, this is capped at some
+   * absolute limit (e.g. 2000)!
+   */
   public SearchQuery withLimit(int limit) {
     this.limit = limit;
     return this;

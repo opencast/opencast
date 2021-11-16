@@ -20,7 +20,6 @@
  */
 package org.opencastproject.assetmanager.impl.endpoint;
 
-import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.opencastproject.util.MimeTypeUtil.Fns.suffix;
 import static org.opencastproject.util.OsgiUtil.getComponentContextProperty;
 import static org.opencastproject.util.OsgiUtil.getContextProperty;
@@ -107,7 +106,13 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   }
 
   private URI createUriFor(MediaPackageElement mpe, Snapshot snapshot) {
-    String baseName = getBaseName(AssetManagerImpl.getFileNameFromUrn(mpe).getOr(mpe.getElementType().toString()));
+    Opt<String> fileNameOpt = AssetManagerImpl.getFileNameFromUrn(mpe);
+    String fileName;
+    if (fileNameOpt.isSome()) {
+      fileName = fileNameOpt.get();
+    } else {
+      fileName = mpe.getElementType().toString() + "." + mimeTypeToSuffix(Opt.nul(mpe.getMimeType()));
+    }
 
     // the returned uri must match the path of the {@link #getAsset} method
     return uri(calcServerUrl(snapshot.getOrganizationId().toString()),
@@ -116,7 +121,7 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
                mpe.getMediaPackage().getIdentifier().toString(),
                mpe.getIdentifier(),
                snapshot.getVersion().toString(),
-               baseName + "." + mimeTypeToSuffix(Opt.nul(mpe.getMimeType())));
+               fileName);
   }
 
   /** Get a file name suffix for the given MIME type. */

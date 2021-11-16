@@ -26,6 +26,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -42,6 +43,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.api.Series;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
@@ -56,6 +58,8 @@ import org.opencastproject.util.doc.rest.RestService;
 
 
 import com.entwinemedia.fn.data.Opt;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -79,13 +83,19 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringWriter;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import javax.ws.rs.GET;
@@ -117,10 +127,10 @@ import javax.ws.rs.core.Response;
 )
 @Component(
     property = {
-    "service.description=Series Remote Service Proxy",
-    "opencast.service.type=org.opencastproject.series",
-    "opencast.service.path=/series",
-    "opencast.service.publish=false"
+        "service.description=Series Remote Service Proxy",
+        "opencast.service.type=org.opencastproject.series",
+        "opencast.service.path=/series",
+        "opencast.service.publish=false"
     },
     immediate = true,
     service = { SeriesService.class, SeriesServiceRemoteImpl.class }
@@ -128,6 +138,10 @@ import javax.ws.rs.core.Response;
 public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesServiceRemoteImpl.class);
+
+
+  private static final Gson gson = new Gson();
+  private static final Type seriesListType = new TypeToken<ArrayList<Series>>() { }.getType();
 
   public SeriesServiceRemoteImpl() {
     super(JOB_TYPE);
@@ -320,6 +334,45 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       closeConnection(response);
     }
     throw new SeriesException("Unable to get series from remote series index");
+  }
+
+  @Override
+  public List<Series> getAllForAdministrativeRead(Date from, Optional<Date> to, int limit)
+          throws SeriesException, UnauthorizedException {
+    // Assemble URL
+    StringBuilder url = new StringBuilder();
+    url.append("/allInRangeAdministrative.json?");
+
+    List<NameValuePair> queryParams = new ArrayList<>();
+    queryParams.add(new BasicNameValuePair("from", Long.toString(from.getTime())));
+    queryParams.add(new BasicNameValuePair("limit", Integer.toString(limit)));
+    if (to.isPresent()) {
+      queryParams.add(new BasicNameValuePair("to", Long.toString(to.get().getTime())));
+    }
+    url.append(URLEncodedUtils.format(queryParams, StandardCharsets.UTF_8));
+    HttpGet get = new HttpGet(url.toString());
+
+    // Send HTTP request
+    HttpResponse response = getResponse(get, SC_OK, SC_BAD_REQUEST, SC_UNAUTHORIZED);
+    try {
+      if (response == null) {
+        throw new SeriesException("Unable to get series from remote series index");
+      }
+
+      if (response.getStatusLine().getStatusCode() == SC_BAD_REQUEST) {
+        throw new SeriesException("internal server error when fetching /allInRangeAdministrative.json");
+      } else if (response.getStatusLine().getStatusCode() == SC_UNAUTHORIZED) {
+        throw new UnauthorizedException("got UNAUTHORIZED when fetching /allInRangeAdministrative.json");
+      } else {
+        // Retrieve and deserialize data
+        Reader reader = new InputStreamReader(response.getEntity().getContent(), "UTF-8");
+        return gson.fromJson(reader, seriesListType);
+      }
+    } catch (IOException e) {
+      throw new SeriesException("failed to reader response body of /allInRangeAdministrative.json", e);
+    } finally {
+      closeConnection(response);
+    }
   }
 
   @Override

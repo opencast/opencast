@@ -26,8 +26,8 @@ import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
@@ -229,13 +229,12 @@ public class WorkflowStatisticsTest {
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
 
-    final AbstractSearchIndex index = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
     EasyMock.replay(result, index);
 
-    service.setAdminUiIndex(index);
-    service.setExternalApiIndex(index);
+    service.setIndex(index);
 
     // Register the workflow service with the service registry
     serviceRegistry.registerService(service);

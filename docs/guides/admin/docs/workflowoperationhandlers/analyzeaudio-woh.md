@@ -78,5 +78,5 @@ profile.sox-audio-only.work.name = sox audio only
 profile.sox-audio-only.work.input = visual
 profile.sox-audio-only.work.output = audio
 profile.sox-audio-only.work.suffix = -work.flac
-profile.sox-audio-only.work.ffmpeg.command = -i #{in.video.path} -c:a flac #{out.dir}/#{out.name}#{out.suffix}
+profile.sox-audio-only.work.ffmpeg.command = -i #{in.video.path} -vn -c:a flac #{out.dir}/#{out.name}#{out.suffix}
 ```
