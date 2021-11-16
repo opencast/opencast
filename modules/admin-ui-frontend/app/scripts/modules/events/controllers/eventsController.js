@@ -160,7 +160,7 @@ angular.module('adminNg.controllers')
       });
     };
     $scope.embedCode = '';
-    //TODO Error Handling
+
     $scope.getEmbedCode = function (size, id) {
       $scope.selectedBox = size;
       var engageUrl = '<SERVER_URL>';
