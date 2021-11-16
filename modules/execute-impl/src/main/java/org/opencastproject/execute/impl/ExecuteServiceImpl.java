@@ -52,16 +52,16 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -451,6 +451,11 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
       pb.redirectErrorStream(true);
 
       p = pb.start();
+      BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      String line;
+      while ((line = stdout.readLine()) != null) {
+        logger.debug(line);
+      }
       result = p.waitFor();
 
       logger.debug("Command {} finished with result {}", command.get(0), result);
@@ -473,19 +478,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         }
         return "";
       } else {
-        // 'Scanner' reads tokens delimited by an specific character (set).
-        // By telling a Scanner to use the 'beginning of the input boundary' character as delimiter, which of course
-        // will never find, yields the whole String as the next token.
-        String line;
-        try (Scanner scanner = new Scanner(p.getInputStream())) {
-          scanner.useDelimiter("\\A");
-          line = scanner.next();
-        } catch (NoSuchElementException e) {
-          line = "";
-        }
-
-        throw new ExecuteException(String.format("Process %s returned error code %d with this output:\n%s",
-                command.get(0), result, line.trim()));
+        throw new ExecuteException(String.format("Process %s returned error code %d", command.get(0), result));
       }
     } catch (InterruptedException e) {
       throw new ExecuteException("The executor thread has been unexpectedly interrupted", e);
