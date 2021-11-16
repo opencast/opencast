@@ -210,9 +210,10 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     // Preview subtype
     AdminUIConfiguration adminUIConfiguration = new AdminUIConfiguration();
-    Hashtable<String, String> dictionary = new Hashtable<>();
+    Hashtable<String, Object> dictionary = new Hashtable<>();
     dictionary.put(AdminUIConfiguration.OPT_PREVIEW_SUBTYPE, PREVIEW_SUBTYPE);
-    adminUIConfiguration.updated(dictionary);
+
+    adminUIConfiguration.modified(dictionary);
     env.setAdminUIConfiguration(adminUIConfiguration);
 
     // acl

@@ -62,15 +62,15 @@ the response:
 
 Query String Parameter     |Type                         | Description
 :--------------------------|:----------------------------|:-----------
-`sign`                     | [`boolean`](types.md#basic) | Whether public distribution urls should be signed
-`withacl`                  | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response
-`withmetadata`             | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response
-`withpublications`         | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response
+`sign`                     | [`boolean`](types.md#basic) | Whether publication urls (version 1.7.0 or higher) and distribution urls should be pre-signed.
+`withacl`                  | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response.
+`withmetadata`             | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response.
+`withpublications`         | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response.
 `withscheduling`           | [`boolean`](types.md#basic) | Whether the scheduling information should be included in the response (version 1.1.0 and higher).
 
 By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if URL signing is turned
-on in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching
-this response.
+on in Opencast. Starting with version 1.7.0, publication urls will also be signed if configured. Remember to consider
+the [maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
 
 __Sample request__
 
@@ -343,12 +343,12 @@ In case of a conflict (409):
 Returns a single event.
 
 By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on
-in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this
-response.
+in Opencast. Starting with version 1.7.0, publication urls will also be signed if configured. Remember to consider the
+[maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
 
 Query String Parameter | Type                        | Description
 :----------------------|:----------------------------|:-----------
-`sign`                 | [`boolean`](types.md#basic) | Whether public distribution urls should be signed.
+`sign`                 | [`boolean`](types.md#basic) | Whether publication urls (version 1.7.0 or higher) and distribution urls should be pre-signed.
 `withacl`              | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response.
 `withmetadata`         | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response.
 `withpublications`     | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response.
@@ -1025,7 +1025,11 @@ Returns an event's list of publications.
 
 Query String Parameter     |Type                         | Description
 :--------------------------|:----------------------------|:-----------
-`sign`                     | [`boolean`](types.md#basic) | Whether public distribution urls should be signed
+`sign`                     | [`boolean`](types.md#basic) | Whether publication urls (version 1.7.0 or higher) and distribution urls should be pre-signed.
+
+By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if URL signing is turned
+on in Opencast. Starting with version 1.7.0, publication urls will also be signed if configured. Remember to consider
+the [maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
 
 __Response__
 
@@ -1055,7 +1059,11 @@ Returns a single publication.
 
 Query String Parameter     |Type                         | Description
 :--------------------------|:----------------------------|:-----------
-`sign`                     | [`boolean`](types.md#basic) | Whether public distribution urls should be signed
+`sign`                     | [`boolean`](types.md#basic) | Whether publication urls (version 1.7.0 or higher) and distribution urls should be pre-signed.
+
+By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if URL signing is turned
+on in Opencast. Starting with version 1.7.0, publication urls will also be signed if configured. Remember to consider
+the [maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
 
 __Response__
 

@@ -52,6 +52,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +78,15 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+        immediate = true,
+        service = ListProvidersEndpoint.class,
+        property = {
+                "service.description=Admin UI - Resource List Provider Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.ListProvidersEndpoint",
+                "opencast.service.path=/admin-ng/resources",
+        }
+)
 public class ListProvidersEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersEndpoint.class);
@@ -102,16 +113,19 @@ public class ListProvidersEndpoint {
   }
 
   /** OSGi callback for series services. */
+  @Reference
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
 
   /** OSGi callback for sercurity service. */
+  @Reference
   public void setSecurityService(SecurityService securitySerivce) {
     this.securityService = securitySerivce;
   }
 
   /** OSGi callback for series end point. */
+  @Reference
   public void setSeriesEndpoint(SeriesEndpoint seriesEndpoint) {
     this.seriesEndpoint = seriesEndpoint;
   }

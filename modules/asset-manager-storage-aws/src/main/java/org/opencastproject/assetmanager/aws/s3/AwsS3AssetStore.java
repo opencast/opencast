@@ -296,11 +296,6 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     s3.deleteObject(bucketName, map.getObjectKey());
   }
 
-  // Used by restore service
-  public String getBucketName() {
-    return this.bucketName;
-  }
-
   // For running tests
   void setS3(AmazonS3 s3) {
     this.s3 = s3;

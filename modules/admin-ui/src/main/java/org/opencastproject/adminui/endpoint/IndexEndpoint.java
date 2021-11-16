@@ -32,6 +32,9 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +58,15 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+        immediate = true,
+        service = IndexEndpoint.class,
+        property = {
+                "service.description=Admin UI - Index Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.IndexEndpoint",
+                "opencast.service.path=/admin-ng/index",
+        }
+)
 public class IndexEndpoint {
 
   /** The logging facility */
@@ -74,10 +86,12 @@ public class IndexEndpoint {
   /**
    * OSGI DI
    */
+  @Reference
   public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
     this.adminUISearchIndex = adminUISearchIndex;
   }
 
+  @Reference
   public void setIndexRebuildService(IndexRebuildService indexRebuildService) {
     this.indexRebuildService = indexRebuildService;
   }
@@ -85,10 +99,12 @@ public class IndexEndpoint {
   /**
    * OSGI DI
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activate IndexEndpoint");
   }

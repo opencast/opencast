@@ -632,7 +632,7 @@ public class ProcessSmilTest {
             + "<video src='video.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='5000ms' clipBegin='1000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
             + "<video src='video.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='5000ms' clipBegin='1000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/></par></body></smil>";
 
-    List<String> encodingProfiles = Arrays.asList("player-preview.http", "av.work"); // Should throw exception
+    List<String> encodingProfiles = Arrays.asList("player-preview.http", "av.copy"); // Should throw exception
     // Encoding profile must support visual or audiovisual
     String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814";
     String paramGroupId2 = "pg-54d11c80-f8d1-4911-8e91-fffeb02e727a";

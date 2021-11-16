@@ -15,11 +15,15 @@ their relations. Its primary use is to post-process audio and video files ingest
 Prerequisite
 ------------
 
-When using the PartialImportWorkflowOperation, it is recommended to perform a media inspection beforehand using the
-InspectWorkflowOperation with the option `accurate-frame-count` set to `true`. This ensures that
-the PartialImportWorkflowOperation works correctly in case of media files with incorrect frame count in their header.
+When using the partial-import operation, make sure to perform a media inspection beforehand using the
+[inspect operation](inspect-woh.md) with the option `accurate-frame-count` set to `true`. This ensures that
+the partial-import operation works correctly in case of media files with incorrect frame count in their header.
 Note that the use of `accurate-frame-count` will force the InspectWorkflowOperation to decode the complete video
 stream which makes the operation more expensive in terms of load.
+
+Not all encoding profiles required for the PartialImportWorkflowOperation are available in
+Opencast per default, so you will have to add them yourself.
+Examples can be found [further down](encoding-profiles).
 
 
 Parameter Table
@@ -32,13 +36,12 @@ Parameter Table
 |**source-smil-flavor**\*| MediaPackageElementFlavor |The flavor of the SMIL file describing how to build the targets.</br>When using /ingest/addPartialTrack, the ingest service will create the SMIL file and add it to the media package as flavor *smil/source+partial*||
 |**target-presenter-flavor**\*| MediaPackageElementFlavor |The flavor to be used for the target presentation track.</br>Both the type and subtype must not be *\**||
 |**target-presentation-flavor**\*| MediaPackageElementFlavor |The flavor to be used for the target presentation track.</br>Both the type nor subtype must not be *\**||
+|**preencode-encoding-profile**\*|String|Encoding profile to for pre-processing videos. Must ensure same resolution, codec, framerate and samplerate. Must use the same framerate as the image-movie.work profile||
 |**concat-encoding-profile**\*|String|Encoding profile used for concatenating audio or video files||
 |concat-output-framerate|Float|The optional output framerate for concatenated video files||
 |**trim-encoding-profile**\*|String|Encoding profile using for trimming tracks|
 |force-encoding|Boolean|If set to *true*, all generated target files will be encoded using the encoding profile *force-encoding-profile*|false|
 |**force-encoding-profile**\*|String|Encoding profile to be used when *force-encoding* is set to *true* or a given target track has a file extension not included in *required-extensions*||
-|preencode-encoding|Boolean|If set to *true*, all source target files will be encoded using the encoding profile *preencode-encoding-profile* before they're processed further|false|
-|preencode-encoding-profile|String|Encoding profile to be used when *preencode-encoding* is set to *true* ||
 |required-extensions|String , { "," , String }|Comma-separated list of file extension names (case insensitive). All generated target files whose file extensions are not in this list will be encoded using the encoding profile *force-encoding-profile*|"mp4"|
 |enforce-divisible-by-two|Boolean|If set, all video targets will have widths and heights divisible by two. This might be necessary depending since some encoder fail when encountering uneven widths or heights.|false|
 
@@ -121,9 +124,10 @@ in the SMIL file:
     <configuration key="source-smil-flavor">smil/source+partial</configuration>
     <configuration key="target-presenter-flavor">presenter/standard</configuration>
     <configuration key="target-presentation-flavor">presentation/standard</configuration>
+    <configuration key="preencode-encoding-profile">partial-import-preencode</configuration>
     <configuration key="concat-encoding-profile">concat.work</configuration>
     <configuration key="trim-encoding-profile">trim.work</configuration>
-    <configuration key="force-encoding-profile">editor.work</configuration>
+    <configuration key="force-encoding-profile">encode.partial-import</configuration>
   </configurations>
 </operation>
 ```
@@ -203,12 +207,12 @@ combinations result in a defined behavior:
 
 ### Supported Combinations of Video and Audio Elements
 
-|video|audio|resulting track|
-|-----|-----|---------------|
-|audio/video track|n/a|audio/video track|
-|video-only track|n/a|video-only track|
-|video-only track|audio-only track|audio/video track|
-|n/a|audio-only track|audio-only track
+|video               |audio           |resulting track  |
+|--------------------|----------------|-----------------|
+|audio/video track   |n/a             |audio/video track|
+|video-only track    |n/a             |video-only track |
+|video-only track    |audio-only track|audio/video track|
+|n/a                 |audio-only track|audio-only track |
 
 All other combinations of *video* and *audio* elements result in unspecified behavior of the
 PartialImportWorkflowOperation.
@@ -241,19 +245,68 @@ supposed to be changed by the user.
 
 ### Hard-coded Encoding Profiles
 
-|encoding profile|description|
-|----------------|-----------|
-|import.preview  |Extract the first frame of a given partial track|
+|Encoding Profile  |Description|
+|------------------|-----------|
+|import.preview    |Extract the first frame of a given partial track|
 |import.image-frame|Extract the last frame of a given partial track. Note that this profile is used to extract the *exactly* last frame of a partial track - not just a frame close to the last one. To make this work for video files with headers that don't contain the exact frame count, set *accurate\_frame\_count* to *true* in  etc/org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg|
-|image-movie.work|Generate video partial tracks based on extracted images used to fill video gaps|
-|import.silent|Generate silent audio tracks used to fill audio gaps|
+|image-movie.work  |Generate video partial tracks based on extracted images used to fill video gaps|
+|import.silent     |Generate silent audio tracks used to fill audio gaps|
 
 
 ### Configurable Encoding Profiles
 
-|configuration key|description|
-|-----------------|-----------|
-|concat-encoding-profile|Used to concatenate partial tracks into tracks|
-|trim-encoding-profile|Used to trim the resulting concatenated single tracks if necessary|
-|force-encoding-profile|Used to re-encode target tracks in case the file extension of a given target track is not included in *required-extensions* or the configuration key *force-encoding* is set to *true* |
-|preencode-encoding-profile|Only used if *preencode-encoding* is set to true. Can be used to encode all source tracks before any processing happens, to avoid errors with non-uniform input. Should be used instead of [Encode](encode-woh.md), as the latter will break source-smil. |
+|Configuration Key         |Description |
+|--------------------------|------------|
+|concat-encoding-profile   |Used to concatenate partial tracks into tracks|
+|trim-encoding-profile     |Used to trim the resulting concatenated single tracks if necessary|
+|preencode-encoding-profile|Used to encode all source video tracks before any processing happens, to avoid errors with non-uniform input and prepare them for lossless concatenation. Must ensure same resolution, codec, framerate and samplerate. Must use the same framerate as the image-movie.work profile. |
+|force-encoding-profile    |Used to re-encode target tracks in case the file extension of a given target track is not included in *required-extensions* or the configuration key *force-encoding* is set to *true* |
+
+### Missing Encoding Profiles
+
+Some of the encoding profiles necessary for this operation are not included in Opencast per default,
+but the operation will not work without them (or with similar ones configured).
+If you want to use this operation. we recommend using the following encoding profiles by copy and pasting them in
+a `.properties` file in the `etc/encoding` folder of your installation.
+
+```
+# Generate silent audio tracks for filling gaps for partial import operation
+profile.import.silent.name = Generate silent audio tracks for filling gaps
+profile.import.silent.input = nothing
+profile.import.silent.output = audio
+profile.import.silent.suffix = -silent-audio.mp4
+profile.import.silent.ffmpeg.command = -strict -2 -filter_complex aevalsrc=0:d=#{time} -c:a aac -b:a 8k #{out.dir}/#{out.name}#{out.suffix}
+
+# Extract last image for partial import operation
+profile.import.image-frame.name = Extract last image
+profile.import.image-frame.input = visual
+profile.import.image-frame.output = image
+profile.import.image-frame.suffix = -image.jpg
+profile.import.image-frame.ffmpeg.command = -sseof -3 -i #{in.video.path} -update 1 -q:v 1 #{out.dir}/#{out.name}#{out.suffix}
+
+# Extract image for partial import operation
+profile.import.preview.name = Extract an image
+profile.import.preview.input = visual
+profile.import.preview.output = image
+profile.import.preview.suffix = -image.jpg
+profile.import.preview.ffmpeg.command = -ss #{time} -i #{in.video.path} -r 1 -frames:v 1 #{out.dir}/#{out.name}#{out.suffix}
+
+# Trim a stream
+#   This command will trim and input stream. Trimming will be fast, as no
+#   re-encoding takes place. It will, however, not be frame accurate.
+profile.trim.work.name = trim track
+profile.trim.work.input = stream
+profile.trim.work.output = visual
+profile.trim.work.suffix = -trimmed.#{in.video.suffix}
+profile.trim.work.ffmpeg.command = -ss #{trim.start} -i #{in.video.path} -t #{trim.duration} -c copy #{out.dir}/#{out.name}#{out.suffix}
+
+# Used by Partial Import operation to encode tracks into equal formats
+profile.encode.partial-import.name = editor
+profile.encode.partial-import.input = audiovisual
+profile.encode.partial-import.output = audiovisual
+profile.encode.partial-import.suffix = -editor.mp4
+profile.encode.partial-import.mimetype = video/mp4
+profile.encode.partial-import.ffmpeg.command = -i #{in.video.path} \
+  -filter:v crop=trunc(iw/2)*2:trunc(ih/2)*2,fps=25 -shortest -c:v libx264 -preset superfast -pix_fmt yuv420p -crf 18 -c:a aac -b:a 196k \
+  #{out.dir}/#{out.name}#{out.suffix}
+```

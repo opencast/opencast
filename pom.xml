@@ -378,7 +378,6 @@
             <M2_REPO>${settings.localRepository}</M2_REPO>
             <java.awt.headless>true</java.awt.headless>
             <eclipselink.logging.level>CONFIG</eclipselink.logging.level>
-            <java.util.logging.config.file>${basedir}/conf/services/java.util.logging.properties</java.util.logging.config.file>
             <logj4.configuration>${basedir}/docs/log4j/log4j.properties</logj4.configuration>
             <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
             <java.locale.providers>COMPAT</java.locale.providers> <!-- Date formats changed with java 9 -->
@@ -505,21 +504,6 @@
                   </pluginExecutionFilter>
                   <action>
                     <execute/>
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>de.empulse.eclipselink</groupId>
-                    <artifactId>staticweave-maven-plugin</artifactId>
-                    <versionRange>[1.0.0,)</versionRange>
-                    <goals>
-                      <goal>weave</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <execute>
-                      <runOnIncremental>true</runOnIncremental>
-                    </execute>
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -663,30 +647,6 @@
               </goals>
             </execution>
           </executions>
-        </plugin>
-        <plugin>
-          <groupId>de.empulse.eclipselink</groupId>
-          <artifactId>staticweave-maven-plugin</artifactId>
-          <version>1.0.0</version>
-          <executions>
-            <execution>
-              <phase>process-classes</phase>
-              <goals>
-                <goal>weave</goal>
-              </goals>
-              <configuration>
-                <persistenceXMLLocation>META-INF/persistence.xml</persistenceXMLLocation>
-                <logLevel>FINE</logLevel>
-              </configuration>
-            </execution>
-          </executions>
-          <dependencies>
-            <dependency>
-              <groupId>org.eclipse.persistence</groupId>
-              <artifactId>org.eclipse.persistence.jpa</artifactId>
-              <version>${eclipselink.version}</version>
-            </dependency>
-          </dependencies>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>

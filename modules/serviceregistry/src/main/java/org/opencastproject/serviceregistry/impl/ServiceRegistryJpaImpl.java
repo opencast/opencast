@@ -204,7 +204,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   static final long MIN_DISPATCH_INTERVAL = 1;
 
   /** Default delay between job dispatching attempts, in seconds */
-  static final long DEFAULT_DISPATCH_INTERVAL = 5;
+  static final long DEFAULT_DISPATCH_INTERVAL = 2;
 
   /** Default delay before starting job dispatching, in seconds */
   static final long DEFAULT_DISPATCH_START_DELAY = 60;
@@ -950,10 +950,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
     logger.debug("Current host load: {}, job load cache size: {}", format("%.1f", localSystemLoad), jobCache.size());
 
-    if (jobCache.isEmpty() && localSystemLoad != 0) {
-      logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0",
-              format("%.2f", localSystemLoad));
-      localSystemLoad = 0;
+    if (jobCache.isEmpty()) {
+      if (Math.abs(localSystemLoad) > 0.0000001F) {
+        logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0", localSystemLoad);
+      }
+      localSystemLoad = 0.0F;
     }
   }
 

@@ -129,8 +129,6 @@ angular.module('adminNg.controllers')
           ConfirmationModal.show('embedding-code',Table.fullScreenUrl,row);
         };
 
-        row.comments = CommentResource.query({ resource: 'event', resourceId: row.id, type: 'comments' });
-
         row.editorUrl = $scope.editorUrl.replace('$id', row.id);
       }
     });
@@ -202,8 +200,6 @@ angular.module('adminNg.controllers')
       $scope.confirmMsgVisibility = {'visibility': 'visible'};
     };
 
-    // Text for events without notes
-    $scope.noCommentTextArea = '';
     // Type of comments in the notes column
     $scope.table.notesCommentReason = 'EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ADMINUI_NOTES';
 

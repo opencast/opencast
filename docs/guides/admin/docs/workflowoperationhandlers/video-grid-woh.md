@@ -25,7 +25,7 @@ a single output file.
 |-------------------        |-----------------------------|---------------------------------------------------------------------|
 |**source-flavors**\*       | presenter/source            | Flavors containing all the video tracks to be combined.             |
 |**source-smil-flavor**\*   | smil/source+partial         | Flavor containing the SMIL specifying when each video track is active. The example shows the flavor used by partial ingest. |                          |
-|**concat-encoding-profile**\* | concat-samecodec.work  | Encoding profile used for the final concatenation.                  |
+|**concat-encoding-profile**\* | concat.work              | Encoding profile used for the final concatenation.                  |
 |resolution                 | 1280x720                    | Resolution of the output. Example value is the default.  |
 |background-color           | 0xFFFFFF                    | The color used to fill space not occupied by input videos in the output. Example value is the default.
 |**target-flavor**\*        | presenter/partial           | Flavor containing the output video tracks.                              |
@@ -60,7 +60,7 @@ Finally, the videos for each section are combined into one final, single video f
     <configuration key="source-flavor">presenter/source</configuration>
     <configuration key="source-smil-flavor">smil/source+partial</configuration>
     <configuration key="target-flavor">presenter/partial</configuration>
-    <configuration key="concat-encoding-profile">concat-samecodec.work</configuration>
+    <configuration key="concat-encoding-profile">concat.work</configuration>
   </configurations>
 </operation>
 ```

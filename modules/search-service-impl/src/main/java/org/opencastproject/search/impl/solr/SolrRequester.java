@@ -169,7 +169,7 @@ public class SolrRequester {
     final SearchResultImpl result = new SearchResultImpl(query.getQuery());
     result.setSearchTime(solrResponse.getQTime());
     result.setOffset(solrResponse.getResults().getStart());
-    result.setLimit(solrResponse.getResults().size());
+    result.setLimit(query.getRows());
     result.setTotal(solrResponse.getResults().getNumFound());
 
     // Walk through response and create new items with title, creator, etc:

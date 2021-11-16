@@ -81,6 +81,9 @@ import com.entwinemedia.fn.data.json.Jsons;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +117,15 @@ import javax.ws.rs.core.Response.Status;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+        immediate = true,
+        service = ThemesEndpoint.class,
+        property = {
+                "service.description=Admin UI - Themes Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.ThemesEndpoint",
+                "opencast.service.path=/admin-ng/themes",
+        }
+)
 public class ThemesEndpoint {
 
   /** The logging facility */
@@ -138,35 +150,42 @@ public class ThemesEndpoint {
   private StaticFileRestService staticFileRestService;
 
   /** OSGi callback for the themes service database. */
+  @Reference
   public void setThemesServiceDatabase(ThemesServiceDatabase themesServiceDatabase) {
     this.themesServiceDatabase = themesServiceDatabase;
   }
 
   /** OSGi callback for the security service. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setIndex(AdminUISearchIndex index) {
     this.searchIndex = index;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setStaticFileService(StaticFileService staticFileService) {
     this.staticFileService = staticFileService;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setStaticFileRestService(StaticFileRestService staticFileRestService) {
     this.staticFileRestService = staticFileRestService;
   }
 
+  @Activate
   public void activate(BundleContext bundleContext) {
     logger.info("Activate themes endpoint");
   }
