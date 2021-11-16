@@ -41,7 +41,7 @@ angular.module('adminNg.services').service('UploadAssetOptions',[ 'ResourcesList
   var _WorkflowPrefix = 'EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID';
 
   service.getOptionsPromise = function(){
-    // don't retrieve again if alreay retrieved for this session
+    // don't retrieve again if already retrieved for this session
     if (!_uploadOptions) {
       var deferred = $q.defer();
       ResourcesListResource.get({resource: 'eventUploadAssetOptions'},
@@ -50,11 +50,18 @@ angular.module('adminNg.services').service('UploadAssetOptions',[ 'ResourcesList
           _uploadOptions = [];
           angular.forEach(data, function (assetOption, assetKey) {
             if (assetKey.charAt(0) !== '$') {
-              if ((assetKey.indexOf(_OptionPrefixAsset) >= 0) || (assetKey.indexOf(_OptionPrefixSource) >= 0)) {
+              var showAsSource = (assetKey.indexOf(_OptionPrefixSource) >= 0);
+              var showAsUploadAsset = (assetKey.indexOf(_OptionPrefixAsset) >= 0);
+              if (showAsSource || showAsUploadAsset) {
                 // parse upload asset options
                 var options = JSON.parse(assetOption);
                 if (!options['title']) {
                   options['title'] = assetKey;
+                }
+                if (showAsSource) {
+                  options['showAs'] = 'source';
+                } else if (showAsUploadAsset) {
+                  options['showAs'] = 'uploadAsset';
                 }
                 _uploadOptions.push(options);
               } else if (assetKey.indexOf(_WorkflowPrefix) >= 0) {

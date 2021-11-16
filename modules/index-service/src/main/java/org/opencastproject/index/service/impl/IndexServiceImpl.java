@@ -544,7 +544,7 @@ public class IndexServiceImpl implements IndexService {
               assetList.add(item.getFieldName());
               mp = ingestService.addTrack(item.openStream(), item.getName(),
                       new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
-              } else {
+            } else {
               logger.warn("Unknown field name found {}", item.getFieldName());
             }
           }
@@ -626,11 +626,15 @@ public class IndexServiceImpl implements IndexService {
             mp =  ingestService.addAttachment(item.openStream(), item.getName(),
                     new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
           } else if (item.getFieldName().toLowerCase().matches(catalogRegex)) {
-
             assetList.add(item.getFieldName());
             // Add catalog with field name as temporary flavor
-            mp =  ingestService.addCatalog(item.openStream(), item.getName(),
-                    new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
+            mp = ingestService.addCatalog(item.openStream(), item.getName(),
+                new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
+          } else if (item.getFieldName().toLowerCase().matches(trackRegex)) {
+            // Cannot get flavor at this point, so saving with temporary flavor
+            assetList.add(item.getFieldName());
+            mp = ingestService.addTrack(item.openStream(), item.getName(),
+                new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
           } else {
             logger.warn("Unknown field name found {}", item.getFieldName());
           }
@@ -1161,8 +1165,14 @@ public class IndexServiceImpl implements IndexService {
             catArray[0].setFlavor(newElemflavor);
             logger.info("Update asset {} {}", type, newElemflavor);
           } else if (patternTrack.matcher(type).matches()) {
-            // Overwriting of existing tracks of same flavor is currently not allowed.
-            // TODO: allow overwriting of existing tracks of same flavor
+            if (overwriteExisting) {
+              // remove existing catalogs of the new flavor
+              Track[] existing = mp.getTracks(newElemflavor);
+              for (int i = 0; i < existing.length; i++) {
+                mp.remove(existing[i]);
+                logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+              }
+            }
             Track[]  trackArray = mp.getTracks(new MediaPackageElementFlavor(assetOrig, "*"));
             if (trackArray.length > 1) {
               throw new IllegalArgumentException("More than one " + asset + " found, only one expected.");
