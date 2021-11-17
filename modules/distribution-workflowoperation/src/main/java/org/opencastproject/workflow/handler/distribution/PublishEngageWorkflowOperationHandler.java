@@ -327,20 +327,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         throw new WorkflowOperationException("One of the distribution jobs did not complete successfully");
       }
 
-      // Prepare published elements to be added
-      Set<MediaPackageElement> mediaPackageElements = new HashSet<>();
-
-      for (Job job : jobs) {
-        try {
-          mediaPackageElements.addAll(MediaPackageElementParser.getArrayFromXml(job.getPayload()));
-        } catch (MediaPackageException e) {
-          throw new WorkflowOperationException(String.format(
-                  "Job '%s' returned payload (%s) that could not be parsed to media package elements", job,
-                  job.getPayload()), e);
-        }
-      }
-
-
       logger.debug("Distribute of mediapackage {} completed", mediaPackage);
 
       String engageUrlString = null;
@@ -371,6 +357,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         if (!mediaPackageForSearch.hasTracks()) {
           throw new WorkflowOperationException("Media package does not meet publication criteria: No tracks selected");
         }
+
+        // Prepare published elements to be added
+        MediaPackageElement[] mediaPackageElements = mediaPackageForSearch.getElements();
 
         logger.info("Publishing media package {} to search index", mediaPackageForSearch);
 
