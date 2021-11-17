@@ -53,6 +53,7 @@
   <modules>
     <module>modules/admin-ui</module>
     <module>modules/admin-ui-frontend</module>
+    <module>modules/analyze-mediapackage-workflowoperation</module>
     <module>modules/animate-api</module>
     <module>modules/animate-impl</module>
     <module>modules/animate-remote</module>

@@ -20,7 +20,10 @@
  */
 package org.opencastproject.metadata.dublincore;
 
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+
+import java.util.Map;
 
 /**
  * A {@link CatalogUIAdapter} converts between a concrete {@link org.opencastproject.metadata.api.MetadataCatalog}
@@ -55,5 +58,15 @@ public interface CatalogUIAdapter {
    * @return The fields with raw data
    */
   DublinCoreMetadataCollection getRawFields();
+
+  /**
+   * Returns all fields of this catalog in a raw data format. Allows to hand over custom queries to fill the collection
+   * of a metadata field (defined by its output id) from a list provider.
+   *
+   * @param collectionQueryOverrides
+   *          A map of custom list provider queries mapped to metadata fields by the output id. Can be empty.
+   * @return The fields with raw data
+   */
+  DublinCoreMetadataCollection getRawFields(Map<String, ResourceListQuery> collectionQueryOverrides);
 
 }
