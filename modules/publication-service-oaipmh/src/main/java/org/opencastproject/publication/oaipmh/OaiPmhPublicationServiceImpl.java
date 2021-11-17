@@ -751,10 +751,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     }
     MediaPackage publishedMp = merge(filteredMp, removeMatchingNonExistantElements(filteredMp,
             (MediaPackage) result.getItems().get(0).getMediaPackage().clone(), parsedFlavors, tags));
-    // Does the media package have a title and track?
-    if (!MediaPackageSupport.isPublishable(publishedMp)) {
-      throw new PublicationException("Media package does not meet criteria for publication");
-    }
     // Publish the media package to OAI-PMH
     try {
       logger.debug("Updating metadata of media package {} in {}",
