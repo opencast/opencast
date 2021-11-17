@@ -31,8 +31,5 @@
   "moduleName": "adminNg",
   "resolutions": {
     "angular": "1.8.2"
-  },
-"resolutions": {
-  "angular-translate": "2.18.3"
-}
+  }
 }
