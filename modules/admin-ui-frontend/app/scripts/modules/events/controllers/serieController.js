@@ -324,7 +324,7 @@ angular.module('adminNg.controllers')
 
     $scope.close = function() {
       if (($scope.unsavedChanges([$scope.commonMetadataCatalog]) === false
-           && $scope.unsavedChanges($scope.extendedMetadataCatalogs))
+           && $scope.unsavedChanges($scope.extendedMetadataCatalogs) === false)
           || confirmUnsaved()) {
         Modal.$scope.close();
       }
@@ -333,9 +333,12 @@ angular.module('adminNg.controllers')
     $scope.unsavedChanges = function(catalogs) {
       if (angular.isDefined(catalogs)) {
         return catalogs.some(function(catalog) {
-          return catalog.fields.some(function(field) {
-            return field.dirty === true;
-          });
+          if (angular.isDefined(catalog)) {
+            return catalog.fields.some(function(field) {
+              return field.dirty === true;
+            });
+          }
+          return false;
         });
       }
       return false;
