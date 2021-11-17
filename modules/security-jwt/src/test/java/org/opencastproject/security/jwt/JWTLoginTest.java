@@ -306,4 +306,23 @@ public class JWTLoginTest {
     assertNull(username);
   }
 
+  @Test
+  public void testNonExpiringLoginWithCache() {
+    Object username;
+    String jwt = generator.generateValidNonExpiringSymmetricJWT();
+
+    username = authFilter.getPreAuthenticatedPrincipal(
+        mockRequest(jwt)
+    );
+    assertEquals(username, generator.getUsername());
+
+    // Make sure that the cache is used and no calls to the mocked user reference provider are made
+    reset(userReferenceProvider);
+
+    username = authFilter.getPreAuthenticatedPrincipal(
+        mockRequest(jwt)
+    );
+    assertEquals(username, generator.getUsername());
+  }
+
 }
