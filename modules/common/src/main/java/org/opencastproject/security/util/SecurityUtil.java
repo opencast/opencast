@@ -164,7 +164,11 @@ public final class SecurityUtil {
 
   /** Extract hostname and port number from a URL. */
   public static Tuple<String, Integer> hostAndPort(URL url) {
-    return tuple(StringUtils.strip(url.getHost(), "/"), url.getPort());
+    int port = url.getPort();
+    if (port < 0) {
+      port = url.getDefaultPort();
+    }
+    return tuple(StringUtils.strip(url.getHost(), "/"), port);
   }
 
   /**
