@@ -69,6 +69,7 @@ import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.resources.list.provider.SeriesListProvider;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.ListProviderException;
@@ -716,15 +717,6 @@ public class SeriesEndpoint {
    *         depending on the parameter
    */
   public Map<String, String> getUserSeriesByAccess(boolean writeAccess) {
-    String listProviderName = null;
-    MetadataField seriesMetadataField = indexService.getCommonEventCatalogUIAdapter().getRawFields().getOutputFields()
-        .get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-    if (seriesMetadataField != null && StringUtils.isNotEmpty(seriesMetadataField.getListprovider())) {
-      listProviderName = seriesMetadataField.getListprovider();
-    }
-    if (StringUtils.isEmpty(listProviderName)) {
-      listProviderName = "SERIES";
-    }
     SeriesListQuery query = new SeriesListQuery();
     if (writeAccess) {
       query.withoutPermissions();
@@ -732,7 +724,7 @@ public class SeriesEndpoint {
       query.withWritePermission(true);
     }
     try {
-      return listProvidersService.getList(listProviderName, query, true);
+      return listProvidersService.getList(SeriesListProvider.PROVIDER_PREFIX, query, true);
     } catch (ListProviderException e) {
       logger.warn("Could not perform search query.", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

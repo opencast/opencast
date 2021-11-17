@@ -53,8 +53,6 @@ public class UsersListQuery extends ResourceListQueryImpl {
 
   public UsersListQuery() {
     super();
-    this.availableFilters.add(createNameFilter(Option.<String> none()));
-    this.availableFilters.add(createRoleFilter(Option.<String> none()));
     this.availableFilters.add(createProviderFilter(Option.<String> none()));
   }
 

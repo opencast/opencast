@@ -223,7 +223,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.addCatalogUIAdapter(dublinCoreAdapter);
-    indexServiceImpl.setCommonSeriesCatalogUIAdapter(dublinCoreAdapter);
     indexServiceImpl.setSecurityService(securityService);
     indexServiceImpl.setSeriesService(seriesService);
 
