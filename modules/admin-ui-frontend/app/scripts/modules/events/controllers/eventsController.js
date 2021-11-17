@@ -24,9 +24,9 @@
 angular.module('adminNg.controllers')
 .controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource',
   'ResourcesListResource', 'Notifications', 'ConfirmationModal', 'RelativeDatesService', 'AuthService',
-  'CommentResource','$http',
+  'CommentResource','IdentityResource',
   function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications,
-    ConfirmationModal, RelativeDatesService, AuthService, CommentResource, $http) {
+    ConfirmationModal, RelativeDatesService, AuthService, CommentResource, IdentityResource) {
 
     $scope.stats = Stats;
 
@@ -162,18 +162,24 @@ angular.module('adminNg.controllers')
     $scope.embedCode = '';
 
     $scope.getEmbedCode = function (size, id) {
-      $scope.selectedBox = size;
-      var engageUrl = '<SERVER_URL>';
-      var embedID = id;
-      $http.get('/api/info/organization/properties/engageuiurl')
-      .then(function(response) {
-        engageUrl = response.data['org.opencastproject.engage.ui.url'];
-        var url = engageUrl + '/play/' + embedID;
-        var sizeArray = size.split('x');
+      const identity = IdentityResource.get();
+      identity.$promise.then(function (info) {
+
+        // check if the engage URL is configured
+        let engageUrl = window.location.origin;
+        if (info && info.org && info.org.properties && info.org.properties) {
+          engageUrl = info.org.properties['org.opencastproject.engage.ui.url'] || engageUrl;
+        }
+
+        const url = engageUrl + '/play/' + id;
+        const sizeArray = size.split('x'),
+              width = sizeArray[0],
+              height = sizeArray[1];
+        $scope.selectedBox = size;
         $scope.embedCode = '<iframe allowfullscreen src="' + url +
-        '" style="border:0px #FFFFFF none;" name="Player" scrolling="no"' +
-         ' frameborder="0" marginheight="0px" marginwidth="0px" width="' +
-        sizeArray[0] + '" height="' + sizeArray[1] + '"></iframe>';
+          '" style="border: none;" name="Player" scrolling="no"' +
+          ' frameborder="0" marginheight="0px" marginwidth="0px" width="' +
+          width + '" height="' + height + '"></iframe>';
       });
     };
 
