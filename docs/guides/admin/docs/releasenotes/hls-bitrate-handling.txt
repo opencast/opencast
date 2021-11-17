@@ -1,0 +1,3 @@
+Opencast 11 removes support for automatically setting up an HLS encoding ladder via the `{video,audio}.bitrates.mink`
+and `{video,audio}.bitrates.maxk` encoding profile options. Instead, users should now explicitly specify the bit rate
+and bit rate control mechanism in the `ffmpeg.command`.
