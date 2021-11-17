@@ -253,11 +253,11 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     // Use TransferManager to take advantage of multipart upload.
     // TransferManager processes all transfers asynchronously, so this call will return immediately.
     logger.info("Uploading {} to archive bucket {}...", objectName, bucketName);
-    Upload upload = s3TransferManager.upload(bucketName, objectName, origin);
-    long start = System.currentTimeMillis();
 
     S3Object obj = null;
     try {
+      Upload upload = s3TransferManager.upload(bucketName, objectName, origin);
+      long start = System.currentTimeMillis();
       // Block and wait for the upload to finish
       upload.waitForCompletion();
       logger.info("Upload of {} to archive bucket {} completed in {} seconds",
@@ -272,9 +272,13 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       return new AwsUploadOperationResult(objectName, versionId);
     } catch (InterruptedException e) {
       throw new AssetStoreException("Operation interrupted", e);
+    } catch (Exception e) {
+      throw new AssetStoreException("Upload failed", e);
     } finally {
       try {
-        obj.close();
+        if (obj != null) {
+          obj.close();
+        }
       } catch (IOException e) {
         //Swallow and ignore
       }
