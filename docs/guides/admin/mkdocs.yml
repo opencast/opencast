@@ -161,6 +161,7 @@ nav:
    - Retry Strategies: 'workflowoperationhandlers/retry-strategies.md'
    - Add Catalog: 'workflowoperationhandlers/add-catalog-woh.md'
    - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
+   - Analyze Mediapackage: 'workflowoperationhandlers/analyze-mediapackage-woh.md'
    - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'
    - Animate: 'workflowoperationhandlers/animate-woh.md'
    - AmberScript Start Transcription: 'workflowoperationhandlers/amberscript-start-transcription-woh.md'
