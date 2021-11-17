@@ -22,7 +22,6 @@
 package org.opencastproject.series.api;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
@@ -142,20 +141,6 @@ public interface SeriesService {
   AccessControlList getSeriesAccessControl(String seriesID) throws NotFoundException, SeriesException;
 
   /**
-   * Search over series
-   *
-   * @param query
-   *          {@link SeriesQuery} representing query
-   * @return List of all matching series
-   * @throws UnauthorizedException
-   *           if the current user is not authorized to perform this action
-   * @throws SeriesException
-   *           if query could not be performed
-   */
-  DublinCoreCatalogList getSeries(SeriesQuery query) throws SeriesException, UnauthorizedException;
-
-
-  /**
    * Returns all series (including deleted ones!) that have been modified in the
    * given date range {@code from} (inclusive) -- {@code to} (exclusive). At
    * most {@code limit} many series are returned. ACLs/permissions are NOT
@@ -163,17 +148,6 @@ public interface SeriesService {
    */
   List<Series> getAllForAdministrativeRead(Date from, Optional<Date> to, int limit)
           throws SeriesException, UnauthorizedException;
-
-  /**
-   * Returns a map of series Id to title of all series the user can access
-   *
-   * @return a map of series Id to title of all series the user can access
-   * @throws UnauthorizedException
-   *           if the current user is not authorized to perform this action
-   * @throws SeriesException
-   *           if query could not be performed
-   */
-  Map<String, String> getIdTitleMapOfAllSeries() throws SeriesException, UnauthorizedException;
 
   /**
    * Returns all the elements of a series in a map. The key of the map marks the element type. If
