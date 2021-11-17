@@ -247,4 +247,28 @@ public class WorkingFileRepositoryTest {
     Assert.assertFalse(result);
   }
 
+  @Test
+  public void testCleanupOldFilesFromMediapackageNothingToDelete() throws Exception {
+    // Cleanup files older than 1 day, nothing should be deleted
+    boolean result = repo.cleanupOldFilesFromMediapackage(1);
+    Assert.assertTrue(result);
+    File file = null;
+    file = repo.getFile(mediaPackageID, mediaPackageElementID);
+    Assert.assertNotNull(file);
+  }
+
+  @Test
+  public void testCleanupOldFilesFromMediapackageSomethingToDelete() throws Exception {
+    // Cleanup files older than 1 day, nothing should be deleted
+    boolean result = repo.cleanupOldFilesFromMediapackage(0);
+    Assert.assertTrue(result);
+    File file = null;
+    try {
+      file = repo.getFile(mediaPackageID, mediaPackageElementID);
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNull(file);
+    }
+  }
+
 }
