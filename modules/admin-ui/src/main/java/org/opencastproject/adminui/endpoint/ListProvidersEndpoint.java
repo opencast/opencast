@@ -205,7 +205,7 @@ public class ListProvidersEndpoint {
   public Response getFilters(@PathParam("page") final String page, @Context HttpHeaders headers)
           throws ListProviderException {
 
-    ResourceListQuery query = new ResourceListQueryImpl();
+    ResourceListQuery query;
 
     if ("series".equals(page)) {
       query = new SeriesListQuery();
@@ -236,7 +236,7 @@ public class ListProvidersEndpoint {
       if ("events".equals(page) && seriesEndpoint.getOnlySeriesWithWriteAccessEventsFilter()) {
         Map<String, String> seriesWriteAccess = seriesEndpoint.getUserSeriesByAccess(true);
         return RestUtils.okJson(JSONUtils.filtersToJSONSeriesWriteAccess(query, listProvidersService,
-                securityService.getOrganization(), seriesWriteAccess));
+                seriesWriteAccess));
       } else {
         return RestUtils.okJson(JSONUtils.filtersToJSON(query, listProvidersService, securityService.getOrganization()));
       }

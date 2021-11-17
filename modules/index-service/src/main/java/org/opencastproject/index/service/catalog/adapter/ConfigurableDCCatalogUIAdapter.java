@@ -27,6 +27,7 @@ import static org.opencastproject.util.OsgiUtil.getCfg;
 
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.CatalogUIAdapter;
@@ -37,16 +38,17 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter {
@@ -109,17 +111,19 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
 
   @Override
   public DublinCoreMetadataCollection getRawFields() {
+    return getRawFields(Collections.emptyMap());
+  }
 
+  @Override
+  public DublinCoreMetadataCollection getRawFields(Map<String, ResourceListQuery> collectionQueryOverrides) {
     DublinCoreMetadataCollection rawFields = new DublinCoreMetadataCollection();
     for (MetadataField metadataField : dublinCoreProperties.values()) {
       try {
-        String defaultKey = getCollectionDefault(metadataField, listProvidersService); // check for default
+        String defaultKey = getCollectionDefault(metadataField, listProvidersService);
+        ResourceListQuery collectionQueryOverride = collectionQueryOverrides.get(metadataField.getOutputID());
 
-        if (StringUtils.isNotBlank(defaultKey)) {
-          rawFields.addField(new MetadataField(metadataField), defaultKey, listProvidersService);
-        } else {
-          rawFields.addEmptyField(new MetadataField(metadataField), listProvidersService);
-        }
+        rawFields.addField(new MetadataField(metadataField), Optional.ofNullable(defaultKey),
+                Optional.ofNullable(collectionQueryOverride), listProvidersService);
       } catch (IllegalArgumentException e) {
         logger.error("Skipping metadata field '{}' because of error", metadataField, e);
       }

@@ -122,8 +122,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 import com.google.common.net.MediaType;
 
@@ -170,6 +168,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -198,9 +197,6 @@ public class IndexServiceImpl implements IndexService {
   private Pattern patternCatalog = Pattern.compile(catalogRegex);
   private Pattern patternTrack = Pattern.compile(trackRegex);
   private Pattern patternNumberedAsset = Pattern.compile(numberedAssetRegex);
-
-  private EventCatalogUIAdapter eventCatalogUIAdapter;
-  private SeriesCatalogUIAdapter seriesCatalogUIAdapter;
 
   private AclServiceFactory aclServiceFactory;
   private AuthorizationService authorizationService;
@@ -259,26 +255,6 @@ public class IndexServiceImpl implements IndexService {
    */
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
-  }
-
-  /**
-   * OSGi callback to add the event dublincore {@link EventCatalogUIAdapter} instance.
-   *
-   * @param eventCatalogUIAdapter
-   *          the adapter to set
-   */
-  public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
-    this.eventCatalogUIAdapter = eventCatalogUIAdapter;
-  }
-
-  /**
-   * OSGi callback to add the series dublincore {@link SeriesCatalogUIAdapter} instance.
-   *
-   * @param seriesCatalogUIAdapter
-   *          the adapter to set
-   */
-  public void setCommonSeriesCatalogUIAdapter(CommonSeriesCatalogUIAdapter seriesCatalogUIAdapter) {
-    this.seriesCatalogUIAdapter = seriesCatalogUIAdapter;
   }
 
   /**
@@ -419,22 +395,9 @@ public class IndexServiceImpl implements IndexService {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
-  private static final Fn2<EventCatalogUIAdapter, String, Boolean> eventOrganizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean apply(EventCatalogUIAdapter catalogUIAdapter, String organization) {
-      return organization.equals(catalogUIAdapter.getOrganization());
-    }
-  };
-
-  private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> seriesOrganizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean apply(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
-      return catalogUIAdapter.getOrganization().equals(organization);
-    }
-  };
-
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
-    return Stream.$(eventCatalogUIAdapters).filter(eventOrganizationFilter._2(organization)).toList();
+    return eventCatalogUIAdapters.stream().filter(a -> organization.equals(a.getOrganization()))
+            .collect(Collectors.toList());
   }
 
   /**
@@ -443,12 +406,30 @@ public class IndexServiceImpl implements IndexService {
    * @return A {@link List} of {@link SeriesCatalogUIAdapter} that provide the metadata to the front end.
    */
   public List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters(String organization) {
-    return Stream.$(seriesCatalogUIAdapters).filter(seriesOrganizationFilter._2(organization)).toList();
+    return seriesCatalogUIAdapters.stream().filter(a -> organization.equals(a.getOrganization()))
+            .collect(Collectors.toList());
+  }
+
+  public EventCatalogUIAdapter getCommonEventCatalogUIAdapter(String organization) {
+    return eventCatalogUIAdapters.stream().filter(a -> a instanceof CommonEventCatalogUIAdapter)
+            .filter(a -> organization.equals(a.getOrganization())).collect(Collectors.toList()).get(0);
+  }
+
+  public SeriesCatalogUIAdapter getCommonSeriesCatalogUIAdapter(String organization) {
+    return seriesCatalogUIAdapters.stream().filter(a -> a instanceof CommonSeriesCatalogUIAdapter)
+            .filter(a -> organization.equals(a.getOrganization())).collect(Collectors.toList()).get(0);
   }
 
   @Override
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters() {
     return new ArrayList<>(getEventCatalogUIAdapters(securityService.getOrganization().getId()));
+  }
+
+  @Override
+  public List<EventCatalogUIAdapter> getExtendedEventCatalogUIAdapters() {
+    String organization = securityService.getOrganization().getId();
+    return eventCatalogUIAdapters.stream().filter(a -> !(a instanceof CommonEventCatalogUIAdapter))
+            .filter(a -> organization.equals(a.getOrganization())).collect(Collectors.toList());
   }
 
   @Override
@@ -458,12 +439,12 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public EventCatalogUIAdapter getCommonEventCatalogUIAdapter() {
-    return eventCatalogUIAdapter;
+    return getCommonEventCatalogUIAdapter(securityService.getOrganization().getId());
   }
 
   @Override
   public SeriesCatalogUIAdapter getCommonSeriesCatalogUIAdapter() {
-    return seriesCatalogUIAdapter;
+    return getCommonSeriesCatalogUIAdapter(securityService.getOrganization().getId());
   }
 
   public void activate(ComponentContext cc) {
@@ -852,7 +833,7 @@ public class IndexServiceImpl implements IndexService {
     SourceType type = getSourceType(eventHttpServletRequest.getSource().get());
 
     DublinCoreMetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
-            .getMetadataByAdapter(eventCatalogUIAdapter);
+            .getMetadataByAdapter(getCommonEventCatalogUIAdapter());
 
     Date currentStartDate = null;
     JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
@@ -905,7 +886,7 @@ public class IndexServiceImpl implements IndexService {
       presenterUsernames = technicalPresenters.get();
     }
 
-    eventHttpServletRequest.getMetadataList().get().add(eventCatalogUIAdapter, eventMetadata);
+    eventHttpServletRequest.getMetadataList().get().add(getCommonEventCatalogUIAdapter(), eventMetadata);
     updateMediaPackageMetadata(eventHttpServletRequest.getMediaPackage().get(),
             eventHttpServletRequest.getMetadataList().get());
 
@@ -2019,17 +2000,6 @@ public class IndexServiceImpl implements IndexService {
   }
 
   /**
-   * @return A {@link MetadataList} with only the common SeriesCatalogUIAdapter's empty {@link DublinCoreMetadataCollection}
-   *         available
-   */
-  private MetadataList getMetadataListWithCommonSeriesCatalogUIAdapters() {
-    MetadataList metadataList = new MetadataList();
-    metadataList.add(seriesCatalogUIAdapter.getFlavor().toString(), seriesCatalogUIAdapter.getUITitle(),
-            seriesCatalogUIAdapter.getRawFields());
-    return metadataList;
-  }
-
-  /**
    * @return A {@link MetadataList} with all of the available CatalogUIAdapters empty {@link DublinCoreMetadataCollection}
    *         available
    */
@@ -2039,12 +2009,6 @@ public class IndexServiceImpl implements IndexService {
     for (SeriesCatalogUIAdapter adapter : getSeriesCatalogUIAdapters()) {
       metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), adapter.getRawFields());
     }
-    return metadataList;
-  }
-
-  private MetadataList getMetadataListWithCommonEventCatalogUIAdapter() {
-    MetadataList metadataList = new MetadataList();
-    metadataList.add(eventCatalogUIAdapter, eventCatalogUIAdapter.getRawFields());
     return metadataList;
   }
 

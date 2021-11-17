@@ -86,8 +86,10 @@ import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
+import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
@@ -1189,39 +1191,58 @@ public abstract class AbstractEventEndpoint {
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
     Event event = optEvent.get();
-
     MetadataList metadataList = new MetadataList();
-    List<EventCatalogUIAdapter> catalogUIAdapters = getIndexService().getEventCatalogUIAdapters();
-    catalogUIAdapters.remove(getIndexService().getCommonEventCatalogUIAdapter());
-    MediaPackage mediaPackage;
-    try {
-      mediaPackage = getIndexService().getEventMediapackage(event);
-    } catch (IndexServiceException e) {
-      if (e.getCause() instanceof NotFoundException) {
-        return notFound("Cannot find data for event %s", eventId);
-      } else if (e.getCause() instanceof UnauthorizedException) {
-        return Response.status(Status.FORBIDDEN).entity("Not authorized to access " + eventId).build();
-      }
-      logger.error("Internal error when trying to access metadata for " + eventId, e);
-      return serverError();
-    }
-    for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
-      metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
-    }
-    DublinCoreMetadataCollection metadataCollection = EventUtils.getEventMetadata(event, getIndexService().getCommonEventCatalogUIAdapter());
-    if (getOnlySeriesWithWriteAccessEventModal()) {
-      MetadataField seriesField = metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-      if (seriesField != null) {
-        seriesField.setCollection(getSeriesEndpoint().getUserSeriesByAccess(true));
-      }
-    }
+
+    // Load common metadata
+    EventCatalogUIAdapter eventCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
+    DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
+    EventUtils.setEventMetadataValues(event, metadataCollection);
     metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), metadataCollection);
 
+    // Load extended metadata
+    List<EventCatalogUIAdapter> extendedCatalogUIAdapters = getIndexService().getExtendedEventCatalogUIAdapters();
+    if (!extendedCatalogUIAdapters.isEmpty()) {
+      MediaPackage mediaPackage;
+      try {
+        mediaPackage = getIndexService().getEventMediapackage(event);
+      } catch (IndexServiceException e) {
+        if (e.getCause() instanceof NotFoundException) {
+          return notFound("Cannot find data for event %s", eventId);
+        } else if (e.getCause() instanceof UnauthorizedException) {
+          return Response.status(Status.FORBIDDEN).entity("Not authorized to access " + eventId).build();
+        }
+        logger.error("Internal error when trying to access metadata for " + eventId, e);
+        return serverError();
+      }
+
+      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedCatalogUIAdapters) {
+        metadataList.add(extendedCatalogUIAdapter, extendedCatalogUIAdapter.getFields(mediaPackage));
+      }
+    }
+
+    // lock metadata?
     final String wfState = event.getWorkflowState();
     if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState)))
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
     return okJson(MetadataJson.listToJson(metadataList, true));
+  }
+
+  /**
+   * If we only want to show series with write access, create a special query to fill the collection of the series
+   * metadata field
+   *
+   * @return a map with resource list queries belonging to metadata fields
+   */
+  private Map getCollectionQueryOverrides() {
+    HashMap<String, ResourceListQuery> collectionQueryOverrides = new HashMap();
+    if (getOnlySeriesWithWriteAccessEventModal()) {
+      SeriesListQuery seriesListQuery = new SeriesListQuery();
+      seriesListQuery.withReadPermission(true);
+      seriesListQuery.withWritePermission(true);
+      collectionQueryOverrides.put(DublinCore.PROPERTY_IS_PART_OF.getLocalName(), seriesListQuery);
+    }
+    return collectionQueryOverrides;
   }
 
   @POST  // use POST instead of GET because of a possibly long list of ids
@@ -1241,7 +1262,6 @@ public abstract class AbstractEventEndpoint {
                              responseCode = HttpServletResponse.SC_NOT_FOUND)
              })
   public Response getEventsMetadata(@FormParam("eventIds") String eventIds) throws Exception {
-
     if (StringUtils.isBlank(eventIds)) {
       return badRequest("Event ids can't be empty");
     }
@@ -1261,12 +1281,6 @@ public abstract class AbstractEventEndpoint {
     Set<String> eventsNotFound = new HashSet();
     Set<String> eventsWithRunningWorkflow = new HashSet();
     Set<String> eventsMerged = new HashSet();
-
-    //get once instead of for each event
-    Map<String, String> seriesWithWriteAccess = null;
-    if (getOnlySeriesWithWriteAccessEventModal()) {
-      seriesWithWriteAccess = getSeriesEndpoint().getUserSeriesByAccess(true);
-    }
 
     // collect the metadata of all events
     List<DublinCoreMetadataCollection> collectedMetadata = new ArrayList();
@@ -1288,16 +1302,11 @@ public abstract class AbstractEventEndpoint {
       }
 
       // collect metadata
-      DublinCoreMetadataCollection metadataCollection =
-        EventUtils.getEventMetadata(event, getIndexService().getCommonEventCatalogUIAdapter());
+      EventCatalogUIAdapter eventCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
+      DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(
+              getCollectionQueryOverrides());
+      EventUtils.setEventMetadataValues(event, metadataCollection);
       collectedMetadata.add(metadataCollection);
-
-      // in case we want only series with write access
-      if (getOnlySeriesWithWriteAccessEventModal()) {
-        MetadataField seriesField =
-          metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-        seriesField.setCollection(seriesWithWriteAccess);
-      }
 
       eventsMerged.add(eventId);
     }
@@ -2097,47 +2106,49 @@ public abstract class AbstractEventEndpoint {
   @RestQuery(name = "getNewMetadata", description = "Returns all the data related to the metadata tab in the new event modal as JSON", returnDescription = "All the data related to the event metadata tab as JSON", responses = {
           @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the event metadata tab as JSON") })
   public Response getNewMetadata() {
-    MetadataList metadataList = getIndexService().getMetadataListWithAllEventCatalogUIAdapters();
-    DublinCoreMetadataCollection collection = metadataList
-            .getMetadataByAdapter(getIndexService().getCommonEventCatalogUIAdapter());
-    if (collection != null) {
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
-        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
-      if (collection.getOutputFields().containsKey("duration"))
-        collection.removeField(collection.getOutputFields().get("duration"));
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName()))
-        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName()));
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName()))
-        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName()));
-      if (collection.getOutputFields().containsKey("startDate"))
-        collection.removeField(collection.getOutputFields().get("startDate"));
-      if (collection.getOutputFields().containsKey("startTime"))
-        collection.removeField(collection.getOutputFields().get("startTime"));
-      if (collection.getOutputFields().containsKey("location"))
-        collection.removeField(collection.getOutputFields().get("location"));
+    MetadataList metadataList = new MetadataList();
 
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
-        MetadataField publisher = collection.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
-        Map<String, String> users = new HashMap<String, String>();
-        if (publisher.getCollection() != null) {
-          users = publisher.getCollection();
-        }
-        String loggedInUser = getSecurityService().getUser().getName();
-        if (!users.containsKey(loggedInUser)) {
-          users.put(loggedInUser, loggedInUser);
-        }
-        publisher.setValue(loggedInUser);
+    // Common metadata
+    EventCatalogUIAdapter commonCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
+    DublinCoreMetadataCollection commonMetadata = commonCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
+
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
+    if (commonMetadata.getOutputFields().containsKey("duration"))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get("duration"));
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName()))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName()));
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName()))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName()));
+    if (commonMetadata.getOutputFields().containsKey("startDate"))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get("startDate"));
+    if (commonMetadata.getOutputFields().containsKey("startTime"))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get("startTime"));
+    if (commonMetadata.getOutputFields().containsKey("location"))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get("location"));
+
+    // Set publisher to user
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
+      MetadataField publisher = commonMetadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
+      Map<String, String> users = new HashMap<>();
+      if (publisher.getCollection() != null) {
+        users = publisher.getCollection();
       }
-
-      if (getOnlySeriesWithWriteAccessEventModal()) {
-        MetadataField seriesField = collection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-        if (seriesField != null) {
-          seriesField.setCollection(getSeriesEndpoint().getUserSeriesByAccess(true));
-        }
+      String loggedInUser = getSecurityService().getUser().getName();
+      if (!users.containsKey(loggedInUser)) {
+        users.put(loggedInUser, loggedInUser);
       }
-
-      metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
+      publisher.setValue(loggedInUser);
     }
+
+    metadataList.add(commonCatalogUiAdapter, commonMetadata);
+
+    // Extended metadata
+    List<EventCatalogUIAdapter> extendedCatalogUIAdapters = getIndexService().getExtendedEventCatalogUIAdapters();
+    for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedCatalogUIAdapters) {
+      metadataList.add(extendedCatalogUIAdapter, extendedCatalogUIAdapter.getRawFields());
+    }
+
     return okJson(MetadataJson.listToJson(metadataList, true));
   }
 

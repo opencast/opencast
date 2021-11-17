@@ -35,6 +35,7 @@ import com.entwinemedia.fn.Fn;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,13 +63,28 @@ public final class EventUtils {
    * @param event
    *          the source {@link Event}
    * @return a {@link DublinCoreMetadataCollection} instance with all the event metadata
+   *
+   * @throws ParseException
    */
   public static DublinCoreMetadataCollection getEventMetadata(Event event, EventCatalogUIAdapter eventCatalogUIAdapter)
-          throws Exception {
-    //copy metadata collection to avoid side effects
+          throws ParseException {
     DublinCoreMetadataCollection eventMetadata = new DublinCoreMetadataCollection(eventCatalogUIAdapter.getRawFields());
+    setEventMetadataValues(event, eventMetadata);
+    return eventMetadata;
+  }
 
-    //match event get methods to correct output fields
+  /**
+   * Set values of metadata fields from event.
+   *
+   * @param event
+   *          the {@link Event} from the index
+   * @param eventMetadata
+   *          a {@link DublinCoreMetadataCollection} to be modified
+   *
+   * @throws ParseException
+   */
+  public static void setEventMetadataValues(Event event, DublinCoreMetadataCollection eventMetadata)
+          throws ParseException {
     for (MetadataField field: eventMetadata.getOutputFields().values()) {
       if (field.getOutputID().equals(DublinCore.PROPERTY_TITLE.getLocalName())) {
         field.setValue(event.getTitle());
@@ -132,8 +148,6 @@ public final class EventUtils {
         }
       }
     }
-
-    return eventMetadata;
   }
 
   /**
