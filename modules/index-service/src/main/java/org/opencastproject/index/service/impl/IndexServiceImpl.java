@@ -43,7 +43,6 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentParser;
@@ -162,6 +161,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -1864,19 +1864,6 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Opt<Series> getSeries(String seriesId, ElasticsearchIndex searchIndex) throws SearchIndexException {
-    SearchResult<Series> result = searchIndex
-            .getByQuery(new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
-                    .withIdentifier(seriesId));
-    // If the results list if empty, we return already a response.
-    if (result.getPageSize() == 0) {
-      logger.debug("Didn't find series with id {}", seriesId);
-      return Opt.none();
-    }
-    return Opt.some(result.getItems()[0].getSource());
-  }
-
-  @Override
   public void removeSeries(String id) throws NotFoundException, SeriesException, UnauthorizedException {
     seriesService.deleteSeries(id);
   }
@@ -1991,8 +1978,8 @@ public class IndexServiceImpl implements IndexService {
   private void checkSeriesExists(String seriesID, ElasticsearchIndex index)
           throws NotFoundException, IndexServiceException {
     try {
-      Opt<Series> optSeries = getSeries(seriesID, index);
-      if (optSeries.isNone())
+      Optional<Series> optSeries = index.getSeries(seriesID, securityService.getOrganization().getId(), securityService.getUser());
+      if (optSeries.isEmpty())
         throw new NotFoundException("Cannot find a series with id " + seriesID);
     } catch (SearchIndexException e) {
       logger.error("Unable to get a series with id {} because:", seriesID, e);

@@ -294,19 +294,6 @@ public interface IndexService {
   EventCatalogUIAdapter getCommonEventCatalogUIAdapter();
 
   /**
-   * Get a single series
-   *
-   * @param seriesId
-   *          the series id
-   * @param searchIndex
-   *          the abstract search index
-   * @return a series or none if not found wrapped in an option
-   * @throws SearchIndexException
-   *           Thrown if there is an error when using the search index.
-   */
-  Opt<Series> getSeries(String seriesId, ElasticsearchIndex searchIndex) throws SearchIndexException;
-
-  /**
    * Create a new series.
    *
    * @param metadata
