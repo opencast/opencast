@@ -366,8 +366,8 @@ public class StatisticsEndpoint {
   }
 
   private void checkSeriesAccess(final String seriesId) throws UnauthorizedException, SearchIndexException {
-    final Opt<Series> series = indexService.getSeries(seriesId, elasticsearchIndex);
-    if (series.isNone()) {
+    final Optional<Series> series = elasticsearchIndex.getSeries(seriesId, securityService.getOrganization().getId(), securityService.getUser());
+    if (series.isEmpty()) {
       // IndexService checks permissions and returns None if user is unauthorized
       throw new UnauthorizedException(securityService.getUser(), "read");
     }
