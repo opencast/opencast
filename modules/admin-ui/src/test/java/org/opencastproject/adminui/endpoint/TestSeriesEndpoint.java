@@ -21,6 +21,8 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.anyString;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 
 import org.opencastproject.authorization.xacml.manager.api.AclService;
@@ -56,6 +58,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -85,6 +88,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.ws.rs.Path;
@@ -181,7 +185,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     EasyMock.expect(seriesService.updateSeries(EasyMock.anyObject(DublinCoreCatalog.class))).andReturn(dc).anyTimes();
     EasyMock.expect(seriesService.getSeriesCount()).andReturn(3).anyTimes();
-    EasyMock.expect(seriesService.getSeriesAccessControl(EasyMock.anyString())).andReturn(acl).anyTimes();
+    EasyMock.expect(seriesService.getSeriesAccessControl(anyString())).andReturn(acl).anyTimes();
     seriesService.deleteSeries(Long.toString(1L));
     EasyMock.expectLastCall();
     seriesService.deleteSeries(Long.toString(2L));
@@ -210,7 +214,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     EasyMock.expect(aclServiceFactory.serviceFor(defaultOrganization)).andReturn(aclService).anyTimes();
     EasyMock.replay(aclServiceFactory);
 
-    setupIndex();
+    setupIndex(defaultOrganization, userWithoutPermissions);
 
     CommonSeriesCatalogUIAdapter dublinCoreAdapter = new CommonSeriesCatalogUIAdapter();
     Properties seriesCatalogProperties = getCatalogProperties(getClass(), "/series-catalog.properties");
@@ -265,7 +269,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
   }
 
   @SuppressWarnings({ "unchecked" })
-  private void setupIndex() throws SearchIndexException, IOException, IllegalStateException, ParseException {
+  private void setupIndex(Organization defaultOrganization, User user) throws SearchIndexException, IOException, IllegalStateException, ParseException {
     long time = DateTimeSupport.fromUTC("2014-04-27T14:35:50Z");
     Series series1 = createSeries("1", "title 1", "contributor 1", "organizer 1", time, 1L);
 
@@ -343,6 +347,11 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     elasticsearchIndex = EasyMock.createMock(ElasticsearchIndex.class);
 
+    EasyMock.expect(elasticsearchIndex.getSeries("1", defaultOrganization.getId(), user)).andReturn(Optional.of(series1));
+    EasyMock.expect(elasticsearchIndex.getSeries("2", defaultOrganization.getId(), user)).andReturn(Optional.of(series2));
+    EasyMock.expect(elasticsearchIndex.getSeries("3", defaultOrganization.getId(), user)).andReturn(Optional.of(series3));
+    EasyMock.expect(elasticsearchIndex.getSeries(anyString(), anyString(), anyObject())).andReturn(Optional.empty());
+
     final Capture<SeriesSearchQuery> captureSeriesSearchQuery = EasyMock.newCapture();
     final Capture<EventSearchQuery> captureEventSearchQuery = EasyMock.newCapture();
     final Capture<ThemeSearchQuery> captureThemeSearchQuery = EasyMock.newCapture();
@@ -384,6 +393,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
                   return ascSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
                         && captureSeriesSearchQuery.getValue().getSeriesTitleSortOrder() == Order.Descending) {
+
                   return descSeriesSearchResult;
                 } else {
                   return ascSeriesSearchResult;

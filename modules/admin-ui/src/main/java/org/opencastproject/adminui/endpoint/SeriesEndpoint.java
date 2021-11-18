@@ -127,6 +127,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -314,8 +315,8 @@ public class SeriesEndpoint {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response getSeriesMetadata(@PathParam("seriesId") String series) throws UnauthorizedException,
           NotFoundException, SearchIndexException {
-    Opt<Series> optSeries = indexService.getSeries(series, searchIndex);
-    if (optSeries.isNone())
+    Optional<Series> optSeries = searchIndex.getSeries(series, securityService.getOrganization().getId(), securityService.getUser());
+    if (optSeries.isEmpty())
       return notFound("Cannot find a series with id '%s'.", series);
 
     MetadataList metadataList = new MetadataList();
@@ -885,8 +886,8 @@ public class SeriesEndpoint {
   public Response getSeriesTheme(@PathParam("seriesId") String seriesId) {
     Long themeId;
     try {
-      Opt<Series> series = indexService.getSeries(seriesId, searchIndex);
-      if (series.isNone())
+      Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(), securityService.getUser());
+      if (series.isEmpty())
         return notFound("Cannot find a series with id {}", seriesId);
 
       themeId = series.get().getTheme();
@@ -973,8 +974,8 @@ public class SeriesEndpoint {
       return badRequest();
     }
 
-    Opt<Series> series = indexService.getSeries(seriesId, searchIndex);
-    if (series.isNone())
+    Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(), securityService.getUser());
+    if (series.isEmpty())
       return notFound("Cannot find a series with id {}", seriesId);
 
     if (hasProcessingEvents(seriesId)) {
