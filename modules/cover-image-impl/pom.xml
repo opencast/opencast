@@ -13,7 +13,7 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <batik.version>1.7</batik.version>
+    <batik.version>1.14</batik.version>
   </properties>
   <dependencies>
     <dependency>
@@ -66,6 +66,11 @@
     </dependency>
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>xmlgraphics-commons</artifactId>
+      <version>2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-anim</artifactId>
       <version>${batik.version}</version>
     </dependency>
@@ -82,6 +87,11 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-codec</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-constants</artifactId>
       <version>${batik.version}</version>
     </dependency>
     <dependency>
@@ -106,17 +116,17 @@
     </dependency>
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
-      <artifactId>batik-js</artifactId>
-      <version>${batik.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-parser</artifactId>
       <version>${batik.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-rasterizer</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-svgrasterizer</artifactId>
       <version>${batik.version}</version>
     </dependency>
     <dependency>
@@ -158,6 +168,11 @@
       <artifactId>xml-apis-ext</artifactId>
       <version>1.3.04</version>
     </dependency>
+    <dependency>
+      <groupId>org.mozilla</groupId>
+      <artifactId>rhino</artifactId>
+      <version>1.7.13</version>
+    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -184,8 +199,11 @@
             <ignoredUnusedDeclaredDependency>javax.servlet:javax.servlet-api</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.core</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-anim</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-awt-util</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-bridge</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-css</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-codec</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-constants</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-dom</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-ext</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-gvt</ignoredUnusedDeclaredDependency>
@@ -196,7 +214,12 @@
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-svg-dom</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-transcoder</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-xml</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-svgrasterizer</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-rasterizer</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-util</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:xmlgraphics-commons</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>xml-apis:xml-apis-ext</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.mozilla:rhino</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -209,6 +232,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
+              !org.python.*,
               !org.apache.fop.*,
               com.sun.image.codec.jpeg,
               org.w3c.dom,
@@ -228,20 +252,23 @@
               batik-awt-util;inline=true,
               batik-bridge;inline=true,
               batik-codec;inline=true,
+              batik-constants;inline=true,
               batik-css;inline=true,
               batik-dom;inline=true,
               batik-ext;inline=true,
               batik-gvt;inline=true,
-              batik-js;inline=true,
               batik-parser;inline=true,
               batik-rasterizer;inline=true,
+              batik-svgrasterizer;inline=true,
               batik-script;inline=true,
               batik-svggen;inline=true,
               batik-svg-dom;inline=true,
               batik-transcoder;inline=true,
               batik-util;inline=true,
               batik-xml;inline=true,
-              xml-apis-ext;inline=true
+              xml-apis-ext;inline=true,
+              xmlgraphics-commons;inline=true,
+              rhino;inline=true
             </Embed-Dependency>
           </instructions>
         </configuration>
