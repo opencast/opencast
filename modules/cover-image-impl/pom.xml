@@ -158,10 +158,6 @@
       <artifactId>xml-apis-ext</artifactId>
       <version>1.3.04</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.xalan</artifactId>
-    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -201,7 +197,6 @@
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-transcoder</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-xml</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>xml-apis:xml-apis-ext</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.servicemix.bundles:org.apache.servicemix.bundles.xalan</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

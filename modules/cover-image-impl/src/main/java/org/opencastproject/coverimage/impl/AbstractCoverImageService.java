@@ -233,32 +233,32 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
       throw new IllegalArgumentException("Neither svg nor xmlSource nor xslDoc must be null");
     }
 
-    Transformer transformer;
-    try {
-      // CHECKSTYLE:OFF
-      // Xalan Transformer can't be configured safely
-      // xslDoc is an already parsed Document
-      transformer = TransformerFactory.newInstance()
-              .newTransformer(new DOMSource(xslDoc));
-      // CHECKSTYLE:ON
-    } catch (TransformerConfigurationException e) {
-      // this should never happen...
-      throw new CoverImageException("The XSL transformer factory has serious configuration errors", e);
-    }
-    transformer.setParameter("width", width);
-    transformer.setParameter("height", height);
-    if (isNotBlank(posterImage)) {
-      transformer.setParameter("posterimage", posterImage);
-    }
-
     Thread thread = Thread.currentThread();
     ClassLoader loader = thread.getContextClassLoader();
     thread.setContextClassLoader(AbstractCoverImageService.class.getClassLoader());
     try {
+      Transformer transformer;
+      // CHECKSTYLE:OFF
+      // Xalan Transformer can't be configured safely
+      // xslDoc is an already parsed Document
+      transformer = TransformerFactory
+          .newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null)
+          .newTransformer(new DOMSource(xslDoc));
+      // CHECKSTYLE:ON
+
+      transformer.setParameter("width", width);
+      transformer.setParameter("height", height);
+      if (isNotBlank(posterImage)) {
+        transformer.setParameter("posterimage", posterImage);
+      }
+
       log.debug("Transform XML source to SVG");
       // Xalan Transformer can't be configured safely
       // Preparsing the XML with a safe parser
       transformer.transform(new DOMSource(XmlSafeParser.parse(xmlSource)), svg);
+    } catch (TransformerConfigurationException e) {
+      // this should never happen...
+      throw new CoverImageException("The XSL transformer factory has serious configuration errors", e);
     } catch (TransformerException | IOException | SAXException e) {
       log.warn("Error while transforming SVG to image: {}", e.getMessage());
       throw new CoverImageException("Error while transforming SVG to image", e);
