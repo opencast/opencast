@@ -129,9 +129,13 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
   /** The index identifier */
   private String indexIdentifier = null;
+  private static final String INDEX_IDENTIFIER_PROPERTY = "index.identifier";
+  private static final String DEFAULT_INDEX_IDENTIFIER = "opencast";
 
   /** The index name */
   private String indexName = null;
+  private static final String INDEX_NAME_PROPERTY = "index.name";
+  private static final String DEFAULT_INDEX_NAME = "Elasticsearch";
 
   /** The high level client */
   private RestHighLevelClient client = null;
@@ -168,12 +172,18 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /**
    * OSGi callback to activate this component instance.
    *
+   * @param properties
+   *          The configuration
    * @param bundleContext
    *          the bundle context
    * @throws ComponentException
    *           if the search index cannot be initialized
    */
-  public void activate(BundleContext bundleContext) throws ComponentException {
+  public void activate(Map<String, Object> properties, BundleContext bundleContext) throws ComponentException {
+    indexIdentifier = StringUtils.defaultIfBlank((String) properties
+            .get(INDEX_IDENTIFIER_PROPERTY), DEFAULT_INDEX_IDENTIFIER);
+    logger.info("Index identifier set to {}.", indexIdentifier);
+
     indexSettingsPath = StringUtils.trimToNull(bundleContext.getProperty("karaf.etc"));
     if (indexSettingsPath == null) {
       throw new ComponentException("Could not determine Karaf configuration path");
@@ -189,6 +199,18 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
                     ELASTICSEARCH_SERVER_PORT_DEFAULT + ""));
     username = StringUtils.trimToNull(bundleContext.getProperty(ELASTICSEARCH_USERNAME_KEY));
     password = StringUtils.trimToNull(bundleContext.getProperty(ELASTICSEARCH_PASSWORD_KEY));
+  }
+
+  /**
+   * OSGi callback for configuration changes.
+   *
+   * @param properties
+   *          The configuration
+   */
+  public void modified(Map<String, Object> properties) {
+    indexName = StringUtils.defaultIfBlank((String) properties.get(INDEX_NAME_PROPERTY),
+            DEFAULT_INDEX_NAME);
+    logger.info("Index name set to {}.", indexName);
   }
 
   @Override
@@ -309,10 +331,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /**
    * Initializes an Elasticsearch node for the given index.
    *
-   * @param indexIdentifier
-   *          the index name used by Elasticsearch
-   * @param indexName
-   *          the index name used for logging
    * @param version
    *          the index version
    * @throws SearchIndexException
@@ -322,14 +340,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * @throws IllegalArgumentException
    *           if the index identifier is blank.
    */
-  protected void init(String indexIdentifier, String indexName, int version)
+  protected void init(int version)
           throws IOException, IllegalArgumentException, SearchIndexException {
-    if (StringUtils.isBlank(indexIdentifier)) {
-      throw new IllegalArgumentException("Search index identifier must be set");
-    }
-
-    this.indexIdentifier = indexIdentifier;
-    this.indexName = indexName;
     this.indexVersion = version;
 
     if (client == null) {
@@ -372,6 +384,10 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *           if loading of the type definitions fails
    */
   private void createIndex() throws SearchIndexException, IOException {
+    if (StringUtils.isBlank(this.indexIdentifier)) {
+      throw new IllegalArgumentException("Search index identifier must be set");
+    }
+
     for (String type : getDocumentTypes()) {
       createSubIndex(type, getSubIndexIdentifier(type));
     }

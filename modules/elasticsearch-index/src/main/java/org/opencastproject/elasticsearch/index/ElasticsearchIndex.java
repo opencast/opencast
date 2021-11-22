@@ -45,7 +45,6 @@ import org.opencastproject.util.NotFoundException;
 
 import com.google.common.util.concurrent.Striped;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -80,13 +79,6 @@ import javax.xml.bind.Unmarshaller;
         service = { ElasticsearchIndex.class }
 )
 public class ElasticsearchIndex extends AbstractElasticsearchIndex {
-
-  /** The name of this index */
-  private static final String INDEX_IDENTIFIER_PROPERTY = "index.identifier";
-  private static final String DEFAULT_INDEX_IDENTIFIER = "opencast";
-
-  private static final String INDEX_NAME_PROPERTY = "index.name";
-  private static final String DEFAULT_INDEX_NAME = "Elasticsearch";
 
   /** Retry configuration */
   private int maxRetryAttemptsGet;
@@ -134,19 +126,14 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    */
   @Activate
   public void activate(BundleContext bundleContext, Map<String, Object> properties) throws ComponentException {
-    super.activate(bundleContext);
+    super.activate(properties, bundleContext);
+    modified(properties);
 
-    String indexIdentifier = StringUtils.defaultIfBlank((String) properties
-                    .get(INDEX_IDENTIFIER_PROPERTY), DEFAULT_INDEX_IDENTIFIER);
-    String indexName = StringUtils.defaultIfBlank((String) properties.get(INDEX_NAME_PROPERTY),
-            DEFAULT_INDEX_NAME);
     try {
-      init(indexIdentifier, indexName, INDEX_VERSION);
+      init(INDEX_VERSION);
     } catch (Throwable t) {
       throw new ComponentException("Error initializing elastic search index", t);
     }
-
-    modified(properties);
   }
 
   /**
@@ -168,6 +155,8 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    */
   @Modified
   public void modified(Map<String, Object> properties) {
+    super.modified(properties);
+
     maxRetryAttemptsGet = NumberUtils.toInt((String) properties.get(MAX_RETRY_ATTEMPTS_GET_PROPERTY),
             DEFAULT_MAX_RETRY_ATTEMPTS_GET);
     retryWaitingPeriodGet = NumberUtils.toInt((String) properties.get(RETRY_WAITING_PERIOD_GET_PROPERTY),
