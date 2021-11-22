@@ -128,7 +128,8 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Ta zbirka vsebuje posnetke. Z izbrisom zbirke, posnetki ne bodo izbrisani.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone.",
+         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Ta zbirka ne more biti izbrisana, ker vsebuje posnetke."
@@ -205,6 +206,7 @@
       "INVALID_ACL_RULES": "Pravila morajo vsebovati veljavo vlogo ter pravice do branja in/ali zapisovanja.",
       "MISSING_ACL_RULES": "Potrebna je vsaj ena vloga z dovoljenji za branje in pisanje.",
       "SAVED_ACL_RULES": "Pravila za dostop so shranjena.",
+      "SAVED_METADATA": "The metadata has been saved.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Obstoječe dogodke v tej seriji bo treba znova obdelati",
       "SERIES_ACL_LOCKED": "Urejanje pravilnikov o dostopu ni dovoljeno, ko se v dogodku, ki je del serije, izvajajo postopki",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Pravilnik o dostopu zahteva vsaj eno vlogo z dovoljenji za branje in pisanje.",
