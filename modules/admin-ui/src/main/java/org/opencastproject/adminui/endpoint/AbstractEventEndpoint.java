@@ -560,7 +560,8 @@ public abstract class AbstractEventEndpoint {
               f("replies", arr(eventCommentRepliesToJson(c.getReplies()))),
               f("author", obj(
                       f("name", c.getAuthor().getName()),
-                      f("email", c.getAuthor().getEmail()),
+                      // email field of the digest user is always null
+                      f("email", v(c.getAuthor().getEmail(), NULL)),
                       f("username", c.getAuthor().getUsername())
               )),
               f("id", v(c.getId().get())),
@@ -583,7 +584,8 @@ public abstract class AbstractEventEndpoint {
               f("modificationDate", v(r.getModificationDate().toInstant().toString())),
               f("author", obj(
                       f("name", r.getAuthor().getName()),
-                      f("email", r.getAuthor().getEmail()),
+                      // email field of the digest user is always null
+                      f("email", v(r.getAuthor().getEmail(), NULL)),
                       f("username", r.getAuthor().getUsername())
               ))
       );
