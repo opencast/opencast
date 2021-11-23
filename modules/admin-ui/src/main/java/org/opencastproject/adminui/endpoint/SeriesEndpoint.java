@@ -124,11 +124,15 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -239,6 +243,12 @@ public class SeriesEndpoint {
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl != null)
         this.serverUrl = ccServerUrl;
+
+      Dictionary dict = cc.getProperties();
+      List<String> keys = Collections.list(dict.keys());
+      Map<String, Object> dictCopy = keys.stream()
+              .collect(Collectors.toMap(Function.identity(), dict::get));
+      modified(dictCopy);
     }
     logger.info("Activate series endpoint");
   }
