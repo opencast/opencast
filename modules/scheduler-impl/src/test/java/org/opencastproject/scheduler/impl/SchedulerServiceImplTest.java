@@ -94,6 +94,7 @@ import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
@@ -120,6 +121,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.IoSupport;
@@ -304,6 +306,8 @@ public class SchedulerServiceImplTest {
 
     seriesService = EasyMock.createMock(SeriesService.class);
     EasyMock.expect(seriesService.getSeries(EasyMock.anyString())).andReturn(seriesCatalog).anyTimes();
+    EasyMock.expect(seriesService.getSeries(EasyMock.anyObject(SeriesQuery.class)))
+            .andReturn(new DublinCoreCatalogList(seriesCatalogs, 1)).anyTimes();
     EasyMock.replay(seriesService);
     schedSvc.setSeriesService(seriesService);
 
