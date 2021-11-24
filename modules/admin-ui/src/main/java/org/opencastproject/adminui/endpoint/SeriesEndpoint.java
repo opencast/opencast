@@ -233,12 +233,14 @@ public class SeriesEndpoint {
   }
 
   @Activate
-  protected void activate(ComponentContext cc) {
+  protected void activate(ComponentContext cc, Map<String, Object> properties) {
     if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl != null)
         this.serverUrl = ccServerUrl;
+
+      modified(properties);
     }
     logger.info("Activate series endpoint");
   }

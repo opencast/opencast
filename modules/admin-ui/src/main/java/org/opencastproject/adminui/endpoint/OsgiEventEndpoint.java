@@ -39,6 +39,7 @@ import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
@@ -245,6 +246,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
     this.urlSigningService = urlSigningService;
   }
 
+  @Activate
   @Modified
   public void modified(ComponentContext cc) {
     Dictionary<String, Object> properties = cc.getProperties();
