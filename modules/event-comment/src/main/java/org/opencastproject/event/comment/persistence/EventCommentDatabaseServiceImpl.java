@@ -151,10 +151,10 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   /**
-   * OSgi callback for the API index.
+   * OSgi callback for the Elasticsearch index.
    *
    * @param index
-   *          the API index.
+   *          the Elasticsearch index.
    */
   @Reference
   public void setIndex(ElasticsearchIndex index) {

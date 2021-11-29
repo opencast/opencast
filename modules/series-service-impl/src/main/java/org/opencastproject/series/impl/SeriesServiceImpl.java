@@ -116,7 +116,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   /** The system user name */
   private String systemUserName;
 
-  /** The API index */
+  /** The Elasticsearch index */
   private ElasticsearchIndex index;
 
   private AclServiceFactory aclServiceFactory;
@@ -155,7 +155,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     this.updateHandlers.remove(handler);
   }
 
-  /** OSGi callbacks for setting the API index. */
+  /** OSGi callbacks for setting the Elasticsearch index. */
   @Reference
   public void setElasticsearchIndex(ElasticsearchIndex index) {
     this.index = index;
@@ -252,7 +252,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       try {
         updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
-        //update API index
+        //update Elasticsearch index
         updateSeriesAclInIndex(seriesId, accessControl);
         // still sent for other asynchronous updates
         triggerEventHandlers(SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
@@ -287,7 +287,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   public void deleteSeries(final String seriesID) throws SeriesException, NotFoundException {
     try {
       persistence.deleteSeries(seriesID);
-      // remove from API index
+      // remove from Elasticsearch index
       removeSeriesFromIndex(seriesID);
       // still sent for other asynchronous updates
       triggerEventHandlers(SeriesItem.delete(seriesID));
@@ -373,7 +373,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       persistence.updateSeriesProperty(seriesID, propertyName, propertyValue);
 
-      // update API index
+      // update Elasticsearch index
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
         updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue));
       }
@@ -394,7 +394,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       persistence.deleteSeriesProperty(seriesID, propertyName);
 
-      // update API index
+      // update Elasticsearch index
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
         updateThemePropertyInIndex(seriesID, Optional.empty());
       }
@@ -576,12 +576,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Remove series from API index.
+   * Remove series from Elasticsearch index.
    *
    * @param seriesId
    *          The series id
    * @param index
-   *          The API index to update
+   *          The Elasticsearch index to update
    */
   private void removeSeriesFromIndex(String seriesId) {
     String orgId = securityService.getOrganization().getId();
@@ -596,12 +596,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series metadata in API index. Also update events if series title has changed (optional).
+   * Update series metadata in Elasticsearch index. Also update events if series title has changed (optional).
    *
    * @param seriesId
    *          The series id
    * @param index
-   *          The API index to update
+   *          The Elasticsearch index to update
    * @param dc
    *          The dublin core catalog
    */
@@ -615,7 +615,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Get the function to update the metadata for a series in an API index.
+   * Get the function to update the metadata for a series in an Elasticsearch index.
    *
    * @param seriesId
    *          The series id
@@ -653,12 +653,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series acl in API index.
+   * Update series acl in Elasticsearch index.
    *
    * @param seriesId
    *          The series id
    * @param index
-   *          The API index to update
+   *          The Elasticsearch index to update
    * @param acl
    *          The acl to update
    */
@@ -670,7 +670,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Get the function to update the acl for a series in an API index.
+   * Get the function to update the acl for a series in an Elasticsearch index.
    *
    * @param seriesId
    *          The series id
@@ -697,14 +697,14 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series theme property in an API index.
+   * Update series theme property in an Elasticsearch index.
    *
    * @param seriesId
    *          The series id
    * @param propertyValueOpt
    *          The value of the property (optional)
    * @param index
-   *          The API index to update
+   *          The Elasticsearch index to update
    */
   private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt) {
     String orgId = securityService.getOrganization().getId();
@@ -715,7 +715,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Get the function to update the theme property for a series in an API index.
+   * Get the function to update the theme property for a series in an Elasticsearch index.
    *
    * @param seriesId
    *          The series id
@@ -739,7 +739,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update a series in an API index.
+   * Update a series in an Elasticsearch index.
    *
    * @param seriesId
    *          The series id

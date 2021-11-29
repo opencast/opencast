@@ -473,12 +473,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
-   * Update the event in the API index.
+   * Update the event in the Elasticsearch index.
    *
    * @param snapshot
    *         The newest snapshot of the event to update
    * @param index
-   *         The API index to update
+   *         The Elasticsearch index to update
    */
   private void updateEventInIndex(Snapshot snapshot) {
     final MediaPackage mp = snapshot.getMediaPackage();
@@ -531,12 +531,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
-   * Remove the event from the API index
+   * Remove the event from the Elasticsearch index
    *
    * @param eventId
    *         The id of the event to remove
    * @param index
-   *         The API index to update
+   *         The Elasticsearch index to update
    */
   private void removeArchivedVersionFromIndex(String eventId) {
     final String orgId = securityService.getOrganization().getId();
