@@ -231,7 +231,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     this.setSecurityService(securityService);
     this.setAclServiceFactory(aclServiceFactory);
     this.setIndexService(indexServiceImpl);
-    this.activate(null);
+    this.activate(null, null);
   }
 
   private Series createSeries(String id, String title, String contributor, String organizer, long time, Long themeId) {

@@ -22,9 +22,9 @@ paella.addPlugin(function() {
   return class DownloadsPlugin extends paella.TabBarPlugin {
     getSubclass() { return 'downloadsTabBar'; }
     getName() { return 'es.upv.paella.opencast.downloadsPlugin'; }
-    getTabName() { return paella.dictionary.translate('Downloads'); }
+    getTabName() { return paella.utils.dictionary.translate('Downloads'); }
     getIndex() { return 30; }
-    getDefaultToolTip() { return paella.dictionary.translate('Downloads'); }
+    getDefaultToolTip() { return paella.utils.dictionary.translate('Downloads'); }
 
 
     get domElement() { return this._domElement; }
@@ -73,7 +73,7 @@ paella.addPlugin(function() {
           }
         }
         if (download) {
-          paella.debug.log(track.type);
+          paella.log.debug(track.type);
           container.appendChild(this.createLink(track, i));
         }
       }
@@ -98,10 +98,12 @@ paella.addPlugin(function() {
       var text = '';
 
       if (track.video) {
-        text = '<span class="downloadLinkText TypeFile Video">' + paella.dictionary.translate('Video file') + '</span>';
+        text = '<span class="downloadLinkText TypeFile Video">'
+          + paella.utils.dictionary.translate('Video file') + '</span>';
       }
       else if (track.audio){
-        text = '<span class="downloadLinkText TypeFile Audio">' + paella.dictionary.translate('Audio file') + '</span>';
+        text = '<span class="downloadLinkText TypeFile Audio">'
+          + paella.utils.dictionary.translate('Audio file') + '</span>';
       }
       // track
       var trackText = '<span class="downloadLinkText Track">' + track.type + '</span>';
@@ -124,7 +126,7 @@ paella.addPlugin(function() {
       }
 
       if (mimetype)
-        text += ' <span class="downloadLinkText MIMEType">[' + paella.dictionary.translate(mimetype) + ']</span>';
+        text += ' <span class="downloadLinkText MIMEType">[' + paella.utils.dictionary.translate(mimetype) + ']</span>';
       text += ': ' + trackText;
       if (resolution)
         text += ' <span class="downloadLinkText Resolution">(' + resolution + ')</span>';
