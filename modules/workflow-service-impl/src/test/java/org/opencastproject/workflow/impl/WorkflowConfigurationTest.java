@@ -23,7 +23,7 @@ package org.opencastproject.workflow.impl;
 
 import org.opencastproject.workflow.api.WorkflowConfiguration;
 import org.opencastproject.workflow.api.WorkflowConfigurationImpl;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
@@ -45,7 +45,7 @@ public class WorkflowConfigurationTest {
     Set<WorkflowConfiguration> config = new HashSet<WorkflowConfiguration>();
     config.add(new WorkflowConfigurationImpl("this", "that"));
     op.setConfiguration(config);
-    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
     ops.add(op);
     instance.setOperations(ops);

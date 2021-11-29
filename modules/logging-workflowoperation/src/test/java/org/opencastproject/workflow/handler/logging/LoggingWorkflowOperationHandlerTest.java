@@ -24,7 +24,7 @@ package org.opencastproject.workflow.handler.logging;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 
@@ -42,7 +42,7 @@ import java.io.File;
 public class LoggingWorkflowOperationHandlerTest {
 
   private LoggingWorkflowOperationHandler operation = new LoggingWorkflowOperationHandler();
-  private WorkflowInstanceImpl workflow;
+  private WorkflowInstance workflow;
   private WorkflowOperationInstance instance;
 
   @Rule
@@ -56,7 +56,7 @@ public class LoggingWorkflowOperationHandlerTest {
     instance = EasyMock.createNiceMock(WorkflowOperationInstanceImpl.class);
     EasyMock.expect(instance.getId()).andReturn(2L).anyTimes();
 
-    workflow = EasyMock.createNiceMock(WorkflowInstanceImpl.class);
+    workflow = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflow.getMediaPackage()).andReturn(mediaPackage).anyTimes();
     EasyMock.expect(workflow.getId()).andReturn(1L).anyTimes();
     EasyMock.expect(workflow.getCurrentOperation()).andReturn(instance).anyTimes();

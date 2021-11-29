@@ -24,7 +24,7 @@ package org.opencastproject.workflow.handler.workflow;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
@@ -51,7 +51,7 @@ import java.util.List;
 public class AddCatalogWorkflowOperationHandlerTest {
 
   private AddCatalogWorkflowOperationHandler operationHandler;
-  private WorkflowInstanceImpl instance;
+  private WorkflowInstance instance;
   private WorkflowOperationInstanceImpl operation;
 
   @Rule
@@ -64,7 +64,7 @@ public class AddCatalogWorkflowOperationHandlerTest {
   public void setUp() throws Exception {
     operationHandler = new AddCatalogWorkflowOperationHandler();
 
-    instance = new WorkflowInstanceImpl();
+    instance = new WorkflowInstance();
 
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
     operation = new WorkflowOperationInstanceImpl("test", OperationState.RUNNING);

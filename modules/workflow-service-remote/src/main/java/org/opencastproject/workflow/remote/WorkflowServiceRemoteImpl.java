@@ -277,6 +277,45 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     return getWorkflowInstances(q);
   }
 
+  @Override
+  public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
+          throws WorkflowDatabaseException {
+    List<NameValuePair> queryStringParams = new ArrayList<>();
+
+    queryStringParams.add(new BasicNameValuePair("mediaPackageId", mediaPackageId));
+
+    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/instances.xml");
+    HttpResponse response = getResponse(get);
+    try {
+      if (response != null)
+        return WorkflowParser.parseWorkflowSet(response.getEntity().getContent()).getItems();
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
+  }
+
+  @Override
+  public boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException {
+    List<NameValuePair> queryStringParams = new ArrayList<>();
+
+    queryStringParams.add(new BasicNameValuePair("mediaPackageId", mediaPackageId));
+
+    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/hasActiveWorkflows");
+    HttpResponse response = getResponse(get);
+    try {
+      if (response != null)
+        return Boolean.valueOf(response.getEntity().getContent().toString());
+    } catch (Exception e) {
+      throw new WorkflowDatabaseException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new WorkflowDatabaseException("Workflow instances can not be loaded from a remote workflow service");
+  }
+
   /**
    * {@inheritDoc}
    *

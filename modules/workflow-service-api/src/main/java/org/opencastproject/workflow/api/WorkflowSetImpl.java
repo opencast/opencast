@@ -65,15 +65,19 @@ public class WorkflowSetImpl implements WorkflowSet {
   public WorkflowSetImpl() {
   }
 
+  public WorkflowSetImpl(List<WorkflowInstance> workflows) {
+    this.resultSet = workflows;
+  }
+
+
   /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.workflow.api.WorkflowSet#getItems()
    */
   @Override
-  public WorkflowInstance[] getItems() {
-    return resultSet == null || resultSet.size() == 0 ? new WorkflowInstance[0] : resultSet
-            .toArray(new WorkflowInstance[resultSet.size()]);
+  public List<WorkflowInstance> getItems() {
+    return resultSet == null || resultSet.size() == 0 ? new ArrayList<>() : resultSet;
   }
 
   /**
@@ -87,7 +91,7 @@ public class WorkflowSetImpl implements WorkflowSet {
       throw new IllegalArgumentException("Parameter item cannot be null");
     if (resultSet == null)
       resultSet = new ArrayList<WorkflowInstance>();
-    resultSet.add((WorkflowInstanceImpl) item);
+    resultSet.add((WorkflowInstance) item);
   }
 
   /**

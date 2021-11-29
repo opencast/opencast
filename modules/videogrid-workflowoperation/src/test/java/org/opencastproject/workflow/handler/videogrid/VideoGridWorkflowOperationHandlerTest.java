@@ -43,7 +43,7 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.videogrid.api.VideoGridService;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
@@ -63,7 +63,7 @@ import java.util.Arrays;
 public class VideoGridWorkflowOperationHandlerTest {
 
   private VideoGridWorkflowOperationHandler handler;
-  private WorkflowInstanceImpl workflow;
+  private WorkflowInstance workflow;
   private WorkflowOperationInstance instance;
 
   private TrackImpl track;
@@ -130,7 +130,7 @@ public class VideoGridWorkflowOperationHandlerTest {
     // To avoid NullPointerEx when grabbing Absolute Track Path
     EasyMock.expect(workspace.get(trackURI)).andReturn(new File(trackURI)).anyTimes();
 
-    workflow = EasyMock.createNiceMock(WorkflowInstanceImpl.class);
+    workflow = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflow.getMediaPackage()).andReturn(mediaPackage).anyTimes();
     EasyMock.expect(workflow.getCurrentOperation()).andReturn(instance).anyTimes();
 

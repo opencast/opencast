@@ -379,7 +379,7 @@ public class WorkflowServiceImplTest {
 
     WorkflowSet workflowsInDb = service.getWorkflowInstances(new WorkflowQuery().withMediaPackage(mediapackage1
             .getIdentifier().toString()));
-    Assert.assertEquals(1, workflowsInDb.getItems().length);
+    Assert.assertEquals(1, workflowsInDb.getItems().size());
   }
 
   @Test
@@ -403,7 +403,7 @@ public class WorkflowServiceImplTest {
 
     Assert.assertEquals(1, service.getWorkflowInstances(queryForManfred).getTotalCount());
     Assert.assertEquals(instance1.getMediaPackage().getIdentifier().toString(),
-            service.getWorkflowInstances(queryForManfred).getItems()[0].getMediaPackage().getIdentifier().toString());
+            service.getWorkflowInstances(queryForManfred).getItems().get(0).getMediaPackage().getIdentifier().toString());
   }
 
   @Test
@@ -433,7 +433,7 @@ public class WorkflowServiceImplTest {
     startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
 
     WorkflowSet workflowsInDb = service.getWorkflowInstances(new WorkflowQuery().withMediaPackage(mediaPackageId));
-    Assert.assertEquals(1, workflowsInDb.getItems().length);
+    Assert.assertEquals(1, workflowsInDb.getItems().size());
   }
 
   @Test
@@ -445,7 +445,7 @@ public class WorkflowServiceImplTest {
     startAndWait(pausingWorkflowDefinition, mediapackage1, WorkflowState.PAUSED);
 
     WorkflowSet workflowsInDb = service.getWorkflowInstances(new WorkflowQuery().withCurrentOperation("opPause"));
-    Assert.assertEquals(1, workflowsInDb.getItems().length);
+    Assert.assertEquals(1, workflowsInDb.getItems().size());
   }
 
   @Test
@@ -460,7 +460,7 @@ public class WorkflowServiceImplTest {
 
     WorkflowSet workflowsInDb = service.getWorkflowInstances(new WorkflowQuery().withText("Climate").withCount(100)
             .withStartPage(0));
-    Assert.assertEquals(1, workflowsInDb.getItems().length);
+    Assert.assertEquals(1, workflowsInDb.getItems().size());
     Assert.assertEquals(1, service.getWorkflowInstances(new WorkflowQuery().withText("limate")).size());
     Assert.assertEquals(1, service.getWorkflowInstances(new WorkflowQuery().withText("mate")).size());
     Assert.assertEquals(1, service.getWorkflowInstances(new WorkflowQuery().withText("lima")).size());
@@ -535,15 +535,15 @@ public class WorkflowServiceImplTest {
 
     WorkflowSet succeededWorkflows = service.getWorkflowInstances(new WorkflowQuery()
             .withState(WorkflowState.SUCCEEDED));
-    Assert.assertEquals(2, succeededWorkflows.getItems().length);
+    Assert.assertEquals(2, succeededWorkflows.getItems().size());
 
     WorkflowSet failedWorkflows = service.getWorkflowInstances(new WorkflowQuery().withState(WorkflowState.FAILED));
-    Assert.assertEquals(1, failedWorkflows.getItems().length);
+    Assert.assertEquals(1, failedWorkflows.getItems().size());
 
     // Ensure that the "without" queries works
     WorkflowSet notFailedWorkflows = service.getWorkflowInstances(new WorkflowQuery()
             .withoutState(WorkflowState.FAILED));
-    Assert.assertEquals(2, notFailedWorkflows.getItems().length);
+    Assert.assertEquals(2, notFailedWorkflows.getItems().size());
   }
 
   protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPackage mp, WorkflowState stateToWaitFor)
@@ -601,31 +601,31 @@ public class WorkflowServiceImplTest {
     instances.add(startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED));
 
     Assert.assertEquals(5, service.countWorkflowInstances());
-    Assert.assertEquals(5, service.getWorkflowInstances(new WorkflowQuery()).getItems().length);
+    Assert.assertEquals(5, service.getWorkflowInstances(new WorkflowQuery()).getItems().size());
 
     // We should get the first two workflows
     WorkflowSet firstTwoWorkflows = service.getWorkflowInstances(new WorkflowQuery().withText("Climate").withCount(2)
             .withStartPage(0));
-    Assert.assertEquals(2, firstTwoWorkflows.getItems().length);
+    Assert.assertEquals(2, firstTwoWorkflows.getItems().size());
     Assert.assertEquals(3, firstTwoWorkflows.getTotalCount()); // The total, non-paged number of results should be three
 
     // We should get the last workflow
     WorkflowSet lastWorkflow = service.getWorkflowInstances(new WorkflowQuery().withText("Climate").withCount(1)
             .withStartPage(2));
-    Assert.assertEquals(1, lastWorkflow.getItems().length);
+    Assert.assertEquals(1, lastWorkflow.getItems().size());
     Assert.assertEquals(3, lastWorkflow.getTotalCount()); // The total, non-paged number of results should be three
 
     // We should get the first linguistics (mediapackage2) workflow
     WorkflowSet firstLinguisticsWorkflow = service.getWorkflowInstances(new WorkflowQuery().withText("Linguistics")
             .withCount(1).withStartPage(0));
-    Assert.assertEquals(1, firstLinguisticsWorkflow.getItems().length);
+    Assert.assertEquals(1, firstLinguisticsWorkflow.getItems().size());
     Assert.assertEquals(2, firstLinguisticsWorkflow.getTotalCount()); // The total, non-paged number of results should
                                                                       // be two
 
     // We should get the second linguistics (mediapackage2) workflow
     WorkflowSet secondLinguisticsWorkflow = service.getWorkflowInstances(new WorkflowQuery().withText("Linguistics")
             .withCount(1).withStartPage(1));
-    Assert.assertEquals(1, secondLinguisticsWorkflow.getItems().length);
+    Assert.assertEquals(1, secondLinguisticsWorkflow.getItems().size());
     Assert.assertEquals(2, secondLinguisticsWorkflow.getTotalCount()); // The total, non-paged number of results should
                                                                        // be two
   }
@@ -639,7 +639,7 @@ public class WorkflowServiceImplTest {
     startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);
 
     WorkflowSet workflowsInDb = service.getWorkflowInstances(new WorkflowQuery());
-    Assert.assertEquals(2, workflowsInDb.getItems().length);
+    Assert.assertEquals(2, workflowsInDb.getItems().size());
   }
 
   @Test

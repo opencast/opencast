@@ -27,7 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -51,10 +51,10 @@ public class MediaPackagePostOperationHandlerTest {
   /** Represents a tuple of handler and instance, useful for return types */
   private static final class InstanceAndHandler {
 
-    private WorkflowInstanceImpl workflowInstance;
+    private WorkflowInstance workflowInstance;
     private WorkflowOperationHandler workflowHandler;
 
-    private InstanceAndHandler(WorkflowInstanceImpl i,
+    private InstanceAndHandler(WorkflowInstance i,
         WorkflowOperationHandler h) {
       this.workflowInstance = i;
       this.workflowHandler = h;
@@ -68,7 +68,7 @@ public class MediaPackagePostOperationHandlerTest {
   private InstanceAndHandler createWorkflow(String url, String format) {
     WorkflowOperationHandler handler = new MediaPackagePostOperationHandler();
 
-    WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
+    WorkflowInstance workflowInstance = new WorkflowInstance();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     WorkflowOperationInstanceImpl operation

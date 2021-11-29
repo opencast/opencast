@@ -73,7 +73,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.osgi.framework.ServiceException;
@@ -154,6 +153,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /** The key in solr documents representing the workflow as xml */
   private static final String XML_KEY = "xml";
+
+  /** The key in solr documents representing the workflow definition id */
+  protected static final String WORKFLOW_INSTANCE_KEY = "instance";
 
   /** The key in solr documents representing the workflow's contributors */
   private static final String CONTRIBUTOR_KEY = "contributor";
@@ -446,8 +448,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     doc.addField(ID_KEY, instance.getId());
     doc.addField(WORKFLOW_DEFINITION_KEY, instance.getTemplate());
     doc.addField(STATE_KEY, instance.getState().toString());
-    String xml = WorkflowParser.toXml(instance);
-    doc.addField(XML_KEY, xml);
+//    String xml = WorkflowParser.toXml(instance);
+//    doc.addField(WORKFLOW_INSTANCE_KEY, instance);
 
     // index the current operation if there is one. If the workflow is finished, there is no current operation, so use a
     // constant
@@ -1044,14 +1046,14 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       set.setSearchTime(searchTime);
 
       // Iterate through the results
-      for (SolrDocument doc : items) {
-        String xml = (String) doc.get(XML_KEY);
-        try {
-          set.addItem(WorkflowParser.parseWorkflowInstance(xml));
-        } catch (Exception e) {
-          throw new IllegalStateException("can not parse workflow xml", e);
-        }
-      }
+//      for (SolrDocument doc : items) {
+//        WorkflowInstance instance = (WorkflowInstance) doc.get(WORKFLOW_INSTANCE_KEY);
+//        try {
+//          set.addItem(instance);
+//        } catch (Exception e) {
+//          throw new IllegalStateException("can not parse workflow xml", e);
+//        }
+//      }
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     }

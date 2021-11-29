@@ -22,56 +22,30 @@
 
 package org.opencastproject.workflow.api;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * A single result of searching.
  */
-@XmlJavaTypeAdapter(WorkflowSetImpl.Adapter.class)
-public interface WorkflowSet {
+@XmlJavaTypeAdapter(WorkflowConfigurationSetImpl.Adapter.class)
+public interface WorkflowConfigurationSet {
 
   /**
-   * The search item list
+   * Get set of workflow configurations
    *
-   * @return Item list.
+   * @return
+   *         Set of workflow configurations
    */
-  List<WorkflowInstance> getItems();
+  Set<WorkflowConfiguration> get();
 
   /**
-   * Get the total number of items returned
+   * Set set of workflow configurations
    *
-   * @return The number.
+   * @param configurations
+   *        Set of workflow configurations
    */
-  long size();
-
-  /**
-   * Get the start page.
-   *
-   * @return The start page.
-   */
-  long getStartPage();
-
-  /**
-   * Get the count limit.
-   *
-   * @return The count limit.
-   */
-  long getPageSize();
-
-  /**
-   * Get the search time.
-   *
-   * @return The time in ms.
-   */
-  long getSearchTime();
-
-  /**
-   * The total number of items without paging.
-   *
-   * @return The total number of items
-   */
-  long getTotalCount();
+  void set(Set<WorkflowConfiguration> configurations);
 
 }

@@ -129,10 +129,10 @@ public final class WorkflowParser {
    * @throws WorkflowParsingException
    *           if creating the workflow instance fails
    */
-  public static WorkflowInstanceImpl parseWorkflowInstance(InputStream in) throws WorkflowParsingException {
+  public static WorkflowInstance parseWorkflowInstance(InputStream in) throws WorkflowParsingException {
     try {
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      WorkflowInstanceImpl workflow = unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowInstanceImpl.class)
+      WorkflowInstance workflow = unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowInstance.class)
               .getValue();
       workflow.init();
       return workflow;
@@ -152,7 +152,7 @@ public final class WorkflowParser {
    * @throws WorkflowParsingException
    *           if creating the workflow instance fails
    */
-  public static WorkflowInstanceImpl parseWorkflowInstance(String in) throws WorkflowParsingException {
+  public static WorkflowInstance parseWorkflowInstance(String in) throws WorkflowParsingException {
     try {
       return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
     } catch (IOException e) {
@@ -223,4 +223,102 @@ public final class WorkflowParser {
     }
   }
 
+  /**
+   * Loads a set of workflow instances from the given input stream.
+   *
+   * @param in
+   *          the input stream
+   * @return the set of workflow instances
+   * @throws WorkflowParsingException
+   *           if creating the workflow instance set fails
+   */
+  public static WorkflowConfigurationSet parseWorkflowConfigurationSet(InputStream in) throws WorkflowParsingException {
+    try {
+      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowConfigurationSetImpl.class).getValue();
+    } catch (Exception e) {
+      throw new WorkflowParsingException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
+    }
+  }
+
+  /**
+   * Loads a set of workflow instances from the xml string.
+   *
+   * @param in
+   *          xml string of the workflow instance set
+   * @return the workflow set
+   * @throws WorkflowParsingException
+   *           if creating the workflow instance set fails
+   */
+  public static WorkflowConfigurationSet parseWorkflowConfigurationSet(String in) throws WorkflowParsingException {
+    try {
+      return parseWorkflowConfigurationSet(IOUtils.toInputStream(in, "UTF8"));
+    } catch (IOException e) {
+      throw new WorkflowParsingException(e);
+    }
+  }
+
+
+  /**
+   * Loads a list of workflow operation instances from the given input stream.
+   *
+   * @param in
+   *          the input stream
+   * @return the list of workflow operation instances
+   * @throws WorkflowParsingException
+   *           if creating the workflow operation instance list fails
+   */
+  public static WorkflowOperationInstancesList parseWorkflowOperationInstancesList(InputStream in) throws WorkflowParsingException {
+    try {
+      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowOperationInstancesListImpl.class).getValue();
+    } catch (Exception e) {
+      throw new WorkflowParsingException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
+    }
+  }
+
+  /**
+   * Loads a list of workflow operation instances from the xml string.
+   *
+   * @param in
+   *          xml string of the workflow operation instance list
+   * @return the list of workflow operation instances
+   * @throws WorkflowParsingException
+   *           if creating the workflow operation instance list fails
+   */
+  public static WorkflowOperationInstancesList parseWorkflowOperationInstancesList(String in) throws WorkflowParsingException {
+    try {
+      return parseWorkflowOperationInstancesList(IOUtils.toInputStream(in, "UTF8"));
+    } catch (IOException e) {
+      throw new WorkflowParsingException(e);
+    }
+  }
+
+  public static String workflowOperationInstancesToXml(WorkflowOperationInstancesList list)
+          throws WorkflowParsingException {
+    try {
+      Marshaller marshaller = jaxbContext.createMarshaller();
+      Writer writer = new StringWriter();
+      marshaller.marshal(list, writer);
+      return writer.toString();
+    } catch (Exception e) {
+      throw new WorkflowParsingException(e);
+    }
+  }
+
+  public static String workflowConfigurationToXml(WorkflowConfigurationSet set)
+          throws WorkflowParsingException {
+    try {
+      Marshaller marshaller = jaxbContext.createMarshaller();
+      Writer writer = new StringWriter();
+      marshaller.marshal(set, writer);
+      return writer.toString();
+    } catch (Exception e) {
+      throw new WorkflowParsingException(e);
+    }
+  }
 }

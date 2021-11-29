@@ -105,7 +105,6 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -312,28 +311,28 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     Track mp1Track = mp1.getTrack("publish-track-1");
     ((AbstractStreamImpl) mp1Track.getStreams()[0]).setIdentifier("fortesting");
 
-    final WorkflowInstanceImpl workflowInstanceImpl1 = new WorkflowInstanceImpl(wfD, mp1, 2L, null, null,
+    final WorkflowInstance WorkflowInstance1 = new WorkflowInstance(wfD, mp1, 2L, null, null,
             new HashMap<String, String>());
-    final WorkflowInstanceImpl workflowInstanceImpl2 = new WorkflowInstanceImpl(wfD,
+    final WorkflowInstance WorkflowInstance2 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage2"), 2L, null, null, new HashMap<String, String>());
-    final WorkflowInstanceImpl workflowInstanceImpl3 = new WorkflowInstanceImpl(wfD,
+    final WorkflowInstance WorkflowInstance3 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage3"), 2L, null, null, new HashMap<String, String>());
 
-    workflowInstanceImpl1.setId(1);
-    workflowInstanceImpl2.setId(2);
-    workflowInstanceImpl3.setId(3);
-    workflowInstanceImpl1.getOperations().get(0).setId(4L);
-    workflowInstanceImpl1.getOperations().get(1).setId(5L);
+    WorkflowInstance1.setId(1);
+    WorkflowInstance2.setId(2);
+    WorkflowInstance3.setId(3);
+    WorkflowInstance1.getOperations().get(0).setId(4L);
+    WorkflowInstance1.getOperations().get(1).setId(5L);
 
-    workflowSet.addItem(workflowInstanceImpl1);
-    workflowSet.addItem(workflowInstanceImpl2);
-    workflowSet.addItem(workflowInstanceImpl3);
+    workflowSet.addItem(WorkflowInstance1);
+    workflowSet.addItem(WorkflowInstance2);
+    workflowSet.addItem(WorkflowInstance3);
 
     workflowSet.setTotalCount(3);
 
     WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.getWorkflowDefinitionById(EasyMock.anyString())).andReturn(wfD).anyTimes();
-    EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(workflowInstanceImpl1).anyTimes();
+    EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(WorkflowInstance1).anyTimes();
     EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
             .andAnswer(new IAnswer<WorkflowSet>() {
               @Override

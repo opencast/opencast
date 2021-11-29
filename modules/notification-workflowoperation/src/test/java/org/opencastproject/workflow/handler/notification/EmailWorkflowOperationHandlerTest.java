@@ -28,7 +28,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
@@ -49,7 +49,7 @@ import java.util.List;
 public class EmailWorkflowOperationHandlerTest {
   private WorkflowOperationInstance operation;
   private EmailWorkflowOperationHandler operationHandler;
-  private final WorkflowInstanceImpl workflowInstance = new WorkflowInstanceImpl();
+  private final WorkflowInstance workflowInstance = new WorkflowInstance();
   private MediaPackage mp;
   private URI uriMP;
   // private MimeMessage message;

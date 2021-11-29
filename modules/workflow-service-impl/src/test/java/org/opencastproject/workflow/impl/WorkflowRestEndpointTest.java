@@ -25,7 +25,6 @@ package org.opencastproject.workflow.impl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.endpoint.WorkflowRestService;
 
@@ -40,12 +39,12 @@ import junit.framework.Assert;
 public class WorkflowRestEndpointTest {
 
   private WorkflowRestService restService;
-  private WorkflowInstanceImpl workflow;
+  private WorkflowInstance workflow;
 
   @Before
   public void setUp() throws Exception {
     // Create a workflow for the service to return
-    workflow = new WorkflowInstanceImpl();
+    workflow = new WorkflowInstance();
     workflow.setTitle("a workflow instance");
     workflow.setId(1);
 

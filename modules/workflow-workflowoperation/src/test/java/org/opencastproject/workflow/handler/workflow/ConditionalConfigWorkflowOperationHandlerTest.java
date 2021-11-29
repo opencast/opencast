@@ -24,7 +24,6 @@ package org.opencastproject.workflow.handler.workflow;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
@@ -55,7 +54,7 @@ public class ConditionalConfigWorkflowOperationHandlerTest {
     // Operation handler to be tested
     operationHandler = new ConditionalConfigWorkflowOperationHandler();
 
-    workflowInstance = new WorkflowInstanceImpl();
+    workflowInstance = new WorkflowInstance();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     // Media package does not matter for this test

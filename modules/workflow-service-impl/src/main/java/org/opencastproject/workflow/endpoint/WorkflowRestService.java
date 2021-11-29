@@ -59,7 +59,6 @@ import org.opencastproject.workflow.api.WorkflowDefinitionSet;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
@@ -68,6 +67,7 @@ import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
+import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl;
@@ -289,6 +289,42 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
   }
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("mediaPackage/{id}/hasActiveWorkflows")
+  @RestQuery(name = "hasactiveworkflows", description = "Returns if a media package has active workflows",
+          returnDescription = "Returns wether the media package has active workflows as a boolean.",
+          pathParameters = {
+                  @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
+          responses = {
+                  @RestResponse(responseCode = SC_OK, description = "Whether the media package has active workflows.")})
+  public Response mediaPackageHasActiveWorkflows(@PathParam("id") String mediaPackageId) {
+    try {
+      return Response.ok(Boolean.toString(service.mediaPackageHasActiveWorkflows(mediaPackageId))).build();
+
+    } catch (WorkflowDatabaseException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("mediaPackage/{id}/instances.xml")
+  @RestQuery(name = "workflowsofmediapackage", description = "Returns the workflows media package has active workflows",
+          returnDescription = "Returns wether the media package has active workflows as a boolean.",
+          pathParameters = {
+                  @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
+          responses = {
+                  @RestResponse(responseCode = SC_OK, description = "Whether the media package has active workflows.")})
+  public Response getWorkflowsOfMediaPackage(@PathParam("id") String mediaPackageId) {
+    try {
+      return Response.ok(new WorkflowSetImpl(service.getWorkflowInstancesByMediaPackage(mediaPackageId))).build();
+
+    } catch (WorkflowDatabaseException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 
   @GET
   @Produces(MediaType.TEXT_XML)
@@ -520,7 +556,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the parent workflow does not exist") })
-  public WorkflowInstanceImpl start(@FormParam("definition") String workflowDefinitionXmlOrId,
+  public WorkflowInstance start(@FormParam("definition") String workflowDefinitionXmlOrId,
           @FormParam("mediapackage") MediaPackageImpl mp, @FormParam("parent") String parentWorkflowId,
           @FormParam("properties") LocalHashMap localMap) {
     if (mp == null || StringUtils.isBlank(workflowDefinitionXmlOrId))
@@ -541,7 +577,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     return startWorkflow(workflowDefinition, mp, parentWorkflowId, localMap);
   }
 
-  private WorkflowInstanceImpl startWorkflow(WorkflowDefinition workflowDefinition, MediaPackageImpl mp,
+  private WorkflowInstance startWorkflow(WorkflowDefinition workflowDefinition, MediaPackageImpl mp,
           String parentWorkflowId, LocalHashMap localMap) {
     Map<String, String> properties = new HashMap<String, String>();
     if (localMap != null)
@@ -557,7 +593,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     }
 
     try {
-      return (WorkflowInstanceImpl) service.start(workflowDefinition, mp, parentIdAsLong, properties);
+      return (WorkflowInstance) service.start(workflowDefinition, mp, parentIdAsLong, properties);
     } catch (WorkflowException e) {
       throw new WebApplicationException(e);
     } catch (NotFoundException e) {

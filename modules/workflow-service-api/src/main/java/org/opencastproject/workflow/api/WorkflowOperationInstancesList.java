@@ -29,49 +29,23 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 /**
  * A single result of searching.
  */
-@XmlJavaTypeAdapter(WorkflowSetImpl.Adapter.class)
-public interface WorkflowSet {
+@XmlJavaTypeAdapter(WorkflowOperationInstancesListImpl.Adapter.class)
+public interface WorkflowOperationInstancesList {
 
   /**
-   * The search item list
+   * Get a list of workflow operation instances
    *
-   * @return Item list.
+   * @return
+   *         List of workflow operation instances
    */
-  List<WorkflowInstance> getItems();
+  List<WorkflowOperationInstance> get();
 
   /**
-   * Get the total number of items returned
+   * Set a list of workflow operation instances
    *
-   * @return The number.
+   * @param workflowOperationInstances
+   *        List of workflow operation instances
    */
-  long size();
-
-  /**
-   * Get the start page.
-   *
-   * @return The start page.
-   */
-  long getStartPage();
-
-  /**
-   * Get the count limit.
-   *
-   * @return The count limit.
-   */
-  long getPageSize();
-
-  /**
-   * Get the search time.
-   *
-   * @return The time in ms.
-   */
-  long getSearchTime();
-
-  /**
-   * The total number of items without paging.
-   *
-   * @return The total number of items
-   */
-  long getTotalCount();
+  void set(List<WorkflowOperationInstance> workflowOperationInstances);
 
 }

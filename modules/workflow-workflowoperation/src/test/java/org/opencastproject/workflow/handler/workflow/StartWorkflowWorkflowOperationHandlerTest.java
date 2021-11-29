@@ -41,8 +41,8 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
@@ -64,7 +64,7 @@ public class StartWorkflowWorkflowOperationHandlerTest {
   private AssetManager assetManager;
   private WorkflowService workflowService;
   private WorkflowOperationInstanceImpl operation;
-  private WorkflowInstanceImpl workflowInstance;
+  private WorkflowInstance workflowInstance;
   private static final String MP_ID = "c3066908-39e3-44b1-842a-9ae93ef8d314";
   private static final String WD_ID = "test-workflow";
 
@@ -89,7 +89,7 @@ public class StartWorkflowWorkflowOperationHandlerTest {
     operation.setConfiguration("workflowConfigurations", "true");
     operation.setConfiguration("key", "value");
 
-    workflowInstance = new WorkflowInstanceImpl();
+    workflowInstance = new WorkflowInstance();
     workflowInstance.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setOperations(Lists.newArrayList(operation));

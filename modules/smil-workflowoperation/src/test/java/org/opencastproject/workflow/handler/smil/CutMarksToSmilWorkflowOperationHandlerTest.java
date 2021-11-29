@@ -33,7 +33,7 @@ import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
@@ -66,7 +66,7 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
   private CutMarksToSmilWorkflowOperationHandler handler;
 
   private Workspace workspace;
-  private WorkflowInstanceImpl workflow;
+  private WorkflowInstance workflow;
   private WorkflowOperationInstance instance;
 
   @Before
@@ -79,7 +79,7 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
 
     workspace = EasyMock.createNiceMock(Workspace.class);
 
-    workflow = EasyMock.createNiceMock(WorkflowInstanceImpl.class);
+    workflow = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflow.getCurrentOperation()).andReturn(instance).anyTimes();
 
     handler.setWorkspace(workspace);

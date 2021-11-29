@@ -342,4 +342,8 @@ public interface WorkflowService {
    * @return All configured workflow state mappings
    */
   Map<String, Map<String, String>> getWorkflowStateMappings();
+
+  boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException;
+
+  List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId) throws WorkflowDatabaseException;
 }

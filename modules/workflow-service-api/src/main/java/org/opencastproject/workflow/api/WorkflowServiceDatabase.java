@@ -19,59 +19,23 @@
  *
  */
 
-
 package org.opencastproject.workflow.api;
+
+import org.opencastproject.util.NotFoundException;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+public interface WorkflowServiceDatabase {
 
-/**
- * A single result of searching.
- */
-@XmlJavaTypeAdapter(WorkflowSetImpl.Adapter.class)
-public interface WorkflowSet {
+  WorkflowInstance getWorkflow(long workflowId) throws NotFoundException, WorkflowServiceDatabaseException;
 
-  /**
-   * The search item list
-   *
-   * @return Item list.
-   */
-  List<WorkflowInstance> getItems();
+  boolean mediaPackageHasActiveWorkflows(String mediaPackageId);
 
-  /**
-   * Get the total number of items returned
-   *
-   * @return The number.
-   */
-  long size();
+  void removeFromDatabase(WorkflowInstance instance);
 
-  /**
-   * Get the start page.
-   *
-   * @return The start page.
-   */
-  long getStartPage();
+  List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId);
 
-  /**
-   * Get the count limit.
-   *
-   * @return The count limit.
-   */
-  long getPageSize();
+  List<WorkflowInstance> getRunningWorkflowInstancesByMediaPackage(String mediaPackageId);
 
-  /**
-   * Get the search time.
-   *
-   * @return The time in ms.
-   */
-  long getSearchTime();
-
-  /**
-   * The total number of items without paging.
-   *
-   * @return The total number of items
-   */
-  long getTotalCount();
-
+  void updateInDatabase(WorkflowInstance instance);
 }

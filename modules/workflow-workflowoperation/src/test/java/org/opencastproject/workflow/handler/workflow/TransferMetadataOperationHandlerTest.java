@@ -29,7 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
@@ -49,7 +49,7 @@ import java.nio.charset.StandardCharsets;
 public class TransferMetadataOperationHandlerTest {
 
   private TransferMetadataWorkflowOperationHandler handler;
-  private WorkflowInstanceImpl instance;
+  private WorkflowInstance instance;
   private WorkflowOperationInstanceImpl operation;
   private DublinCoreCatalog resultCatalog = null;
 
@@ -75,7 +75,7 @@ public class TransferMetadataOperationHandlerTest {
     Catalog catalog = CatalogImpl.fromURI(new URI("http://example.com"));
     catalog.setFlavor(MediaPackageElementFlavor.parseFlavor("dublincore/episode"));
     mediaPackage.add(catalog);
-    instance = EasyMock.createMock(WorkflowInstanceImpl.class);
+    instance = EasyMock.createMock(WorkflowInstance.class);
     EasyMock.expect(instance.getCurrentOperation()).andReturn(operation).anyTimes();
     EasyMock.expect(instance.getMediaPackage()).andReturn(mediaPackage).anyTimes();
     EasyMock.replay(instance);

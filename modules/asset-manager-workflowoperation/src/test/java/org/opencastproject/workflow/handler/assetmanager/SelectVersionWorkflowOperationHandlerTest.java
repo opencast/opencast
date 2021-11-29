@@ -39,7 +39,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
@@ -72,7 +72,7 @@ public class SelectVersionWorkflowOperationHandlerTest {
   public void setUp() throws Exception {
     builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
-    wfInstance = new WorkflowInstanceImpl();
+    wfInstance = new WorkflowInstance();
     wfInstance.setId(1);
     wfInstance.setState(WorkflowState.RUNNING);
 

@@ -19,59 +19,39 @@
  *
  */
 
-
 package org.opencastproject.workflow.api;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 /**
- * A single result of searching.
+ * Presents exception that occurs while storing/retrieving series from permanent storage or from index.
+ *
  */
-@XmlJavaTypeAdapter(WorkflowSetImpl.Adapter.class)
-public interface WorkflowSet {
+public class WorkflowServiceDatabaseException extends Exception {
 
   /**
-   * The search item list
+   * Create exception with a message.
    *
-   * @return Item list.
+   * @param message
    */
-  List<WorkflowInstance> getItems();
+  public WorkflowServiceDatabaseException(String message) {
+    super(message);
+  }
 
   /**
-   * Get the total number of items returned
+   * Create exception with a cause.
    *
-   * @return The number.
+   * @param cause
    */
-  long size();
+  public WorkflowServiceDatabaseException(Throwable cause) {
+    super(cause);
+  }
 
   /**
-   * Get the start page.
+   * Create exception with a message and a cause.
    *
-   * @return The start page.
+   * @param message
+   * @param cause
    */
-  long getStartPage();
-
-  /**
-   * Get the count limit.
-   *
-   * @return The count limit.
-   */
-  long getPageSize();
-
-  /**
-   * Get the search time.
-   *
-   * @return The time in ms.
-   */
-  long getSearchTime();
-
-  /**
-   * The total number of items without paging.
-   *
-   * @return The total number of items
-   */
-  long getTotalCount();
-
+  public WorkflowServiceDatabaseException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

@@ -32,7 +32,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
@@ -69,20 +69,20 @@ public class TestJobEndpoint extends JobEndpoint {
 
     WorkflowSetImpl workflowSet = new WorkflowSetImpl();
 
-    WorkflowInstanceImpl workflowInstanceImpl1 = new WorkflowInstanceImpl(wfD,
+    WorkflowInstance WorkflowInstance1 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage1"), 2L, null, null, new HashMap<String, String>());
-    WorkflowInstanceImpl workflowInstanceImpl2 = new WorkflowInstanceImpl(wfD,
+    WorkflowInstance WorkflowInstance2 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage2"), 2L, null, null, new HashMap<String, String>());
-    WorkflowInstanceImpl workflowInstanceImpl3 = new WorkflowInstanceImpl(wfD,
+    WorkflowInstance WorkflowInstance3 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage3"), 2L, null, null, new HashMap<String, String>());
 
-    workflowInstanceImpl1.setId(1);
-    workflowInstanceImpl2.setId(2);
-    workflowInstanceImpl3.setId(3);
+    WorkflowInstance1.setId(1);
+    WorkflowInstance2.setId(2);
+    WorkflowInstance3.setId(3);
 
-    workflowSet.addItem(workflowInstanceImpl1);
-    workflowSet.addItem(workflowInstanceImpl2);
-    workflowSet.addItem(workflowInstanceImpl3);
+    workflowSet.addItem(WorkflowInstance1);
+    workflowSet.addItem(WorkflowInstance2);
+    workflowSet.addItem(WorkflowInstance3);
 
     workflowSet.setTotalCount(3);
 

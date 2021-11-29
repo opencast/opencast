@@ -29,7 +29,7 @@ import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
@@ -53,7 +53,7 @@ import java.util.Map;
 public class EmailTemplateServiceImplTest {
 
   private EmailTemplateServiceImpl service;
-  private WorkflowInstanceImpl workflowInstance;
+  private WorkflowInstance workflowInstance;
   private MediaPackage mp;
   private URI uriMP;
 
@@ -145,7 +145,7 @@ public class EmailTemplateServiceImplTest {
 
     service.setIncidentService(is);
 
-    workflowInstance = new WorkflowInstanceImpl(def, null, null, null, null, props);
+    workflowInstance = new WorkflowInstance(def, null, null, null, null, props);
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);

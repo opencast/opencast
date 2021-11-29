@@ -21,21 +21,127 @@
 
 package org.opencastproject.workflow.api;
 
+import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.FAILED;
+import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.INSTANTIATED;
+import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.RETRY;
+import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.SKIPPED;
+import static org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState.SUCCEEDED;
+
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- * An single instance of a running, paused, or stopped workflow. WorkflowInstance objects are snapshots in time for a
- * particular workflow. They are not thread-safe, and will not be updated by other threads.
+ * Enitity object for storing workflows in persistence storage. Workflow ID is stored as primary key, DUBLIN_CORE field is
+ * used to store serialized Dublin core and ACCESS_CONTROL field is used to store information about access control
+ * rules.
+ *
  */
-@XmlJavaTypeAdapter(WorkflowInstanceImpl.Adapter.class)
-public interface WorkflowInstance extends Configurable {
+@Entity(name = "WorkflowInstance")
+@Access(AccessType.FIELD)
+@Table(name = "oc_workflow", indexes = {
+        @Index(name = "IX_oc_workflow_mediaPackageId", columnList = ("mediaPackageId")),
+        @Index(name = "IX_oc_workflow_seriesId", columnList = ("seriesId")), })
+@NamedQueries({
+        @NamedQuery(name = "Workflow.findAll", query = "select w from WorkflowInstance w"),
+        @NamedQuery(
+                name = "Workflow.workflowById",
+                query = "SELECT w FROM WorkflowInstance as w where w.workflowId=:workflowId and w.organizationId=:organizationId"
+        ),
 
-  enum WorkflowState {
+        // for media packages
+        // TODO: Add back "order by w.dateCreated"?
+        @NamedQuery(name = "Workflow.byMediaPackage", query = "SELECT w FROM WorkflowInstance w where "
+                + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId"),
+        @NamedQuery(name = "Workflow.countActiveByMediaPackage", query = "SELECT COUNT(w) FROM WorkflowInstance w where "
+                + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
+                + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning)"),
+        @NamedQuery(name = "Workflow.byMediaPackageAndOneOfThreeStates", query = "SELECT w FROM WorkflowInstance w where "
+                + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
+                + "(w.state = :stateOne or w.state = :stateTwo or w.state = :stateThree)"),
+})
+public class WorkflowInstance {
+
+  /** Workflow ID, primary key */
+  /** The workflow id is the same as the related job id */
+  /** It is set by the workflow service when creating the instance */
+  /** TODO: Figure out reasonable lengths */
+  @Id
+  @Column(name = "id")
+  private long workflowId;
+
+  @Column(name = "state", length = 128)
+  private WorkflowState state;
+
+  @Column(name = "template")
+  private String template;
+
+  @Column(name = "title")
+  private String title;
+
+  @Column(name = "description")
+  private String description;
+
+  @Column(name = "parent", nullable = true)
+  private Long parentId;
+
+  @Column(name = "creatorId")
+  private String creatorName;
+
+  @Column(name = "organizationId")
+  private String organizationId;
+
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  @Column(name = "mediaPackage", length = 16777215)
+  private String mediaPackage;
+
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  @Column(name = "operations", length = 16777215)
+  protected String operations;
+
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  @Column(name = "configurations", length = 16777215)
+  protected String configurations;
+
+  @Column(name = "mediaPackageId", length = 128)
+  protected String mediaPackageId;
+
+  @Column(name = "seriesId", length = 128)
+  protected String seriesId;
+
+  @Column(name = "initialized")
+  protected boolean initialized = false;
+
+  public enum WorkflowState {
     INSTANTIATED, RUNNING, STOPPED, PAUSED, SUCCEEDED, FAILED, FAILING;
 
     public boolean isTerminated() {
@@ -63,135 +169,406 @@ public interface WorkflowInstance extends Configurable {
     }
   }
 
-  /**
-   * The unique ID of this {@link WorkflowInstance}.
-   */
-  long getId();
+  /** Logging utilities */
+  private static final Logger logger = LoggerFactory.getLogger(WorkflowInstance.class);
 
   /**
-   * Sets the workflow identifier.
+   * Default constructor without any import.
+   */
+  public WorkflowInstance() {
+
+  }
+
+  /**
+   * Constructs a new workflow instance from the given definition, mediapackage, and optional parent workflow ID and
+   * properties.
+   */
+  public WorkflowInstance(WorkflowDefinition def, MediaPackage mediaPackage, Long parentWorkflowId, User creator,
+          Organization organization, Map<String, String> properties) {
+    this.workflowId = -1; // this should be set by the workflow service once the workflow is persisted
+    this.title = def.getTitle();
+    this.template = def.getId();
+    this.description = def.getDescription();
+    this.parentId = parentWorkflowId;
+    this.creatorName = creator != null ? creator.getUsername() : null;
+    if (organization != null)
+      this.organizationId = organization.getId();
+    this.state = WorkflowState.INSTANTIATED;
+    this.mediaPackage = MediaPackageParser.getAsXml(mediaPackage);
+    this.mediaPackageId = mediaPackage.getIdentifier().toString();
+    this.seriesId = mediaPackage.getSeries();
+
+//    this.operations = new ArrayList<WorkflowOperationInstance>();
+    try {
+      extend(def);
+    } catch (WorkflowParsingException e) {
+      logger.error("Error: ", e);
+    }
+
+    Set<WorkflowConfiguration> configurations = new TreeSet<WorkflowConfiguration>();
+    if (properties != null) {
+      for (Map.Entry<String, String> entry : properties.entrySet()) {
+        configurations.add(new WorkflowConfigurationImpl(entry.getKey(), entry.getValue()));
+      }
+    }
+
+    try {
+      this.configurations = WorkflowParser.workflowConfigurationToXml(new WorkflowConfigurationSetImpl(configurations));
+    } catch (WorkflowParsingException e) {
+      logger.error("Error: ", e);
+    }
+  }
+
+  public long getId() {
+    return workflowId;
+  }
+
+  public void setId(long workflowId) {
+    this.workflowId = workflowId;
+  }
+
+  public WorkflowState getState() {
+    return state;
+  }
+
+  public void setState(WorkflowState state) {
+    this.state = state;
+  }
+
+  public String getTemplate() {
+    return template;
+  }
+
+  public void setTemplate(String template) {
+    this.template = template;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public Long getParentId() {
+    return parentId;
+  }
+
+  public void setParentId(Long parentId) {
+    this.parentId = parentId;
+  }
+
+  public String getCreatorName() {
+    return creatorName;
+  }
+
+  public void setCreatorName(String creatorName) {
+    this.creatorName = creatorName;
+  }
+
+  public String getOrganizationId() {
+    return organizationId;
+  }
+
+  public void setOrganizationId(String organizationId) {
+    this.organizationId = organizationId;
+  }
+
+  public MediaPackage getMediaPackage()  {
+    try {
+      return MediaPackageParser.getFromXml(mediaPackage);
+    } catch (MediaPackageException e) {
+      logger.error("Error: ", e);
+    }
+    return null;
+  }
+
+  public void setMediaPackage(MediaPackage mediaPackage) {
+    this.mediaPackage = MediaPackageParser.getAsXml(mediaPackage);
+    this.mediaPackageId = mediaPackage.getIdentifier().toString();
+    this.seriesId = mediaPackage.getSeries();
+  }
+
+  public boolean isActive() {
+    return !getState().isTerminated();
+  }
+
+  /**
+   * {@inheritDoc}
    *
-   * @param id
-   *          the identifier
+   * @see org.opencastproject.workflow.api.WorkflowInstance#getOperations()
    */
-  void setId(long id);
+  public List<WorkflowOperationInstance> getOperations() {
+//    if (operations == null)
+//      operations = new ArrayList<WorkflowOperationInstance>();
+    if (!initialized)
+      init();
+
+    return unmarshalOperations();
+//    return new ArrayList<WorkflowOperationInstance>(operations);
+  }
 
   /**
-   * The short title of the workflow definition used to create this workflow instance.
-   */
-  String getTitle();
-
-  /**
-   * The identifier of the workflow definition used to create this workflow instance.
-   */
-  String getTemplate();
-
-  /**
-   * The longer description of the workflow definition used to create this workflow instance.
-   */
-  String getDescription();
-
-  /**
-   * The parent workflow instance ID, if any.
-   */
-  Long getParentId();
-
-  /**
-   * Returns the username of the user that created this workflow.
+   * Sets the workflow operations on this workflow instance
    *
-   * @return username of the workflow's creator
+   * @param workflowOperationInstanceList
    */
-  String getCreatorName();
+  public final void setOperations(List<WorkflowOperationInstance> workflowOperationInstanceList) {
+    marshalOperations(workflowOperationInstanceList);
+    init();
+  }
+
+  protected void init() {
+    if (operations == null || operations.isEmpty())
+      return;
+
+//    // Jaxb will lose the workflow operation's position, so we fix it here
+//    for (int i = 0; i < operations.size(); i++) {
+//      ((WorkflowOperationInstanceImpl) operations.get(i)).setPosition(i);
+//    }
+
+    initialized = true;
+  }
 
   /**
-   * Returns the organization that this workflow belongs to.
+   * {@inheritDoc}
    *
-   * @return the organization
+   * @see org.opencastproject.workflow.api.WorkflowInstance#getCurrentOperation()
    */
-  String getOrganizationId();
+  public WorkflowOperationInstance getCurrentOperation() throws IllegalStateException {
+    if (!initialized)
+      init();
+
+    List<WorkflowOperationInstance> operations = unmarshalOperations();
+
+    if (operations == null || operations.isEmpty())
+      throw new IllegalStateException("Workflow " + workflowId + " has no operations");
+
+    WorkflowOperationInstance currentOperation = null;
+
+    // Handle newly instantiated workflows
+    if (INSTANTIATED.equals(operations.get(0).getState()) || RETRY.equals(operations.get(0).getState())) {
+      currentOperation = operations.get(0);
+    } else {
+      WorkflowOperationInstance.OperationState previousState = null;
+
+      int position = 0;
+      while (currentOperation == null && position < operations.size()) {
+
+        WorkflowOperationInstance operation = operations.get(position);
+
+        switch (operation.getState()) {
+          case FAILED:
+            break;
+          case RETRY:
+          case INSTANTIATED:
+            if (SUCCEEDED.equals(previousState) || SKIPPED.equals(previousState) || FAILED.equals(previousState))
+              currentOperation = operation;
+            break;
+          case PAUSED:
+            currentOperation = operation;
+            break;
+          case RUNNING:
+            currentOperation = operation;
+            break;
+          case SKIPPED:
+            break;
+          case SUCCEEDED:
+            break;
+          default:
+            throw new IllegalStateException("Found operation in unknown state '" + operation.getState() + "'");
+        }
+
+        previousState = operation.getState();
+        position++;
+      }
+
+      // If we are at the last operation and there is no more work to do, we're done
+      if (operations.get(operations.size() - 1) == currentOperation) {
+        switch (currentOperation.getState()) {
+          case FAILED:
+          case SKIPPED:
+          case SUCCEEDED:
+            currentOperation = null;
+            break;
+          case INSTANTIATED:
+          case PAUSED:
+          case RUNNING:
+          case RETRY:
+            break;
+          default:
+            throw new IllegalStateException("Found operation in unknown state '" + currentOperation.getState() + "'");
+        }
+      }
+
+    }
+
+    return currentOperation;
+  }
 
   /**
-   * Returns a copy of the {@link WorkflowOperationInstance}s that make up this workflow. In order to modify the
-   * operations, call setOperations.
+   * {@inheritDoc}
    *
-   * @return the workflow operations
+   * @see org.opencastproject.workflow.api.Configurable#getConfiguration(java.lang.String)
    */
-  List<WorkflowOperationInstance> getOperations();
+  public String getConfiguration(String key) {
+    if (key == null || configurations == null)
+      return null;
+    for (WorkflowConfiguration config : unmarshalConfiguration()) {
+      if (config.getKey().equals(key))
+        return config.getValue();
+    }
+    return null;
+  }
 
   /**
-   * Sets the list of workflow operations.
+   * {@inheritDoc}
    *
-   * @param operations
-   *          the new list of operations
+   * @see org.opencastproject.workflow.api.Configurable#getConfigurationKeys()
    */
-  void setOperations(List<WorkflowOperationInstance> operations);
+  public Set<String> getConfigurationKeys() {
+    Set<String> keys = new TreeSet<String>();
+    Set<WorkflowConfiguration> configurations = unmarshalConfiguration();
+    if (configurations != null && !configurations.isEmpty()) {
+      for (WorkflowConfiguration config : configurations) {
+        keys.add(config.getKey());
+      }
+    }
+    return keys;
+  }
 
   /**
-   * Returns the {@link WorkflowOperationInstance} that is currently either in {@link WorkflowState#RUNNING} or
-   * {@link WorkflowState#PAUSED}.
+   * {@inheritDoc}
    *
-   * @return the current operation
-   * @throws IllegalStateException
-   *           if the workflow instance has no operations
+   * @see org.opencastproject.workflow.api.Configurable#removeConfiguration(java.lang.String)
    */
-  WorkflowOperationInstance getCurrentOperation() throws IllegalStateException;
+  public void removeConfiguration(String key) {
+    if (key == null || configurations == null)
+      return;
+    Set<WorkflowConfiguration> configurations = unmarshalConfiguration();
+    for (Iterator<WorkflowConfiguration> configIter = configurations.iterator(); configIter.hasNext();) {
+      WorkflowConfiguration config = configIter.next();
+      if (config.getKey().equals(key)) {
+        configIter.remove();
+        marshalConfiguration(configurations);
+        return;
+      }
+    }
+  }
 
   /**
-   * The current {@link WorkflowState} of this {@link WorkflowInstance}.
-   */
-  WorkflowState getState();
-
-  /**
-   * Set the state of the workflow.
+   * {@inheritDoc}
    *
-   * @param state
-   *          the new workflow state
+   * @see org.opencastproject.workflow.api.Configurable#setConfiguration(java.lang.String, java.lang.String)
    */
-  void setState(WorkflowState state);
+  public void setConfiguration(String key, String value) {
+    if (key == null)
+      return;
+//    if (configurations == null)
+//      configurations = new HashSet<WorkflowConfiguration>();
 
-  /**
-   * @return True if the workflow has not finished, been stopped or failed.
-   */
-  boolean isActive();
+    // Adjust already existing values
+    Set<WorkflowConfiguration> configurations = unmarshalConfiguration();
+    for (WorkflowConfiguration config : configurations) {
+      if (config.getKey().equals(key)) {
+        ((WorkflowConfigurationImpl) config).setValue(value);
+        marshalConfiguration(configurations);
+        return;
+      }
+    }
 
-  /**
-   * The {@link MediaPackage} being worked on by this workflow instance.
-   */
-  MediaPackage getMediaPackage();
+    // No configurations were found, so add a new one
+    configurations.add(new WorkflowConfigurationImpl(key, value));
+    marshalConfiguration(configurations);
+  }
 
-  /**
-   * Returns the next operation, and marks it as current. If there is no next operation, this method will return null.
-   */
-  WorkflowOperationInstance next();
+  @Override
+  public int hashCode() {
+    return Long.valueOf(workflowId).hashCode();
+  }
 
-  /**
-   * Return whether there is another operation after the current operation. If there is no next operation, this will
-   * return null.
-   */
-  boolean hasNext();
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof WorkflowInstance) {
+      WorkflowInstance other = (WorkflowInstance) obj;
+      return workflowId == other.getId();
+    }
+    return false;
+  }
 
-  /**
-   * Set the media package this workflow instance is processing.
-   */
-  void setMediaPackage(MediaPackage mp);
+  public void extend(WorkflowDefinition workflowDefinition) throws WorkflowParsingException {
+    List<WorkflowOperationInstance> operations = unmarshalOperations();
+    if (!workflowDefinition.getOperations().isEmpty()) {
+      for (WorkflowOperationDefinition entry : workflowDefinition.getOperations()) {
+        operations.add(new WorkflowOperationInstanceImpl(entry, -1));
+      }
+      setOperations(operations);
 
-  /**
-   * Appends the operations found in the workflow definition to the end of this workflow instance.
-   *
-   * @param workflowDefinition
-   *          the workflow definition
-   */
-  void extend(WorkflowDefinition workflowDefinition);
+      setTemplate(workflowDefinition.getId());
+    }
+  }
 
-  /**
-   * Insert the operations found in the workflow definition after the operation <code>after</code>.
-   * This allows to include a different workflow at any point. This method is a generalization
-   * of {@link #extend(org.opencastproject.workflow.api.WorkflowDefinition)}.
-   *
-   * @param workflowDefinition
-   *          the workflow to insert
-   * @param after
-   *          insert the given workflow after this operation
-   */
-  void insert(WorkflowDefinition workflowDefinition, WorkflowOperationInstance after);
+  public void insert(WorkflowDefinition workflowDefinition, WorkflowOperationInstance after) {
+    List<WorkflowOperationInstance> operations = unmarshalOperations();
+    if (!workflowDefinition.getOperations().isEmpty() && after.getPosition() >= 0) {
+      int offset = 0;
+      for (WorkflowOperationDefinition entry : workflowDefinition.getOperations()) {
+        operations.add(after.getPosition() + offset, new WorkflowOperationInstanceImpl(entry, -1));
+      }
+      setOperations(operations);
+    }
+  }
+
+  private List<WorkflowOperationInstance> unmarshalOperations() {
+    try {
+      if (this.operations != null) {
+        return WorkflowParser.parseWorkflowOperationInstancesList(this.operations).get();
+      } else {
+        return new ArrayList<WorkflowOperationInstance>();
+      }
+    } catch (WorkflowParsingException e) {
+      logger.error("Error: ", e);
+    }
+    return null;
+  }
+
+  private void marshalOperations(List<WorkflowOperationInstance> operations) {
+    try {
+      this.operations = WorkflowParser.workflowOperationInstancesToXml(new WorkflowOperationInstancesListImpl(operations));
+    } catch (WorkflowParsingException e) {
+      logger.error("Error: ", e);
+    }
+  }
+
+  private Set<WorkflowConfiguration> unmarshalConfiguration() {
+    try {
+      if (this.configurations != null) {
+        return WorkflowParser.parseWorkflowConfigurationSet(this.configurations).get();
+      } else {
+        return new TreeSet<WorkflowConfiguration>();
+      }
+    } catch (WorkflowParsingException e) {
+      logger.error("Error: ", e);
+    }
+    return null;
+  }
+
+  private void marshalConfiguration(Set<WorkflowConfiguration> configurations) {
+    try {
+      this.configurations = WorkflowParser.workflowConfigurationToXml(new WorkflowConfigurationSetImpl(configurations));
+    } catch (WorkflowParsingException e) {
+      logger.error("Error: ", e);
+    }
+  }
 }
+
+
