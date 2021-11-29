@@ -61,9 +61,14 @@ angular.module('adminNg.directives')
         };
 
 
-        var optionsObj = {};
-        optionsObj.timeInput = true;
-        optionsObj.showButtonPanel = true;
+        var optionsObj = {
+          controlType: 'select',
+          showMillisec: false,
+          showMicrosec: false,
+          showTimezone: false,
+          oneLine: true,
+          timeFormat: 'HH:mm'
+        };
         optionsObj.onClose = function () {
           var newDate = element.datetimepicker('getDate');
           setTimeout(function(){
