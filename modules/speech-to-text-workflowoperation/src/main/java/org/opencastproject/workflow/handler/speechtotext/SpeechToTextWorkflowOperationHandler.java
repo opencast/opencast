@@ -178,42 +178,43 @@ public class SpeechToTextWorkflowOperationHandler extends AbstractWorkflowOperat
     // subtitles file is generated now, put it into the media package
     try {
       URI output = new URI(job.getPayload());
-      String id = UUID.randomUUID().toString();
-      InputStream in = workspace.read(output);
-      URI uri = workspace.put(parentMediaPackage.getIdentifier().toString(), id,
-              FilenameUtils.getName(output.getPath()), in);
+      String mediaPackageIdentifier = UUID.randomUUID().toString();
 
-      MediaPackageElement subtitleMediaPackage;
+      MediaPackageElement subtitleMediaPackageElement;
       switch (appendSubtitleAs) {
         case track:
-          subtitleMediaPackage = new TrackImpl();
+          subtitleMediaPackageElement = new TrackImpl();
           break;
         case attachment:
         default:
-          subtitleMediaPackage = new AttachmentImpl();
+          subtitleMediaPackageElement = new AttachmentImpl();
       }
 
-      subtitleMediaPackage.setIdentifier(id);
-      subtitleMediaPackage.setURI(uri);
+      subtitleMediaPackageElement.setIdentifier(mediaPackageIdentifier);
+      try (InputStream in = workspace.read(output)) {
+        URI uri = workspace.put(parentMediaPackage.getIdentifier().toString(), mediaPackageIdentifier,
+                FilenameUtils.getName(output.getPath()), in);
+        subtitleMediaPackageElement.setURI(uri);
+      }
       MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor().applyTo(track.getFlavor());
-      subtitleMediaPackage.setFlavor(targetFlavor);
+      subtitleMediaPackageElement.setFlavor(targetFlavor);
 
       List<String> targetTags = tagsAndFlavors.getTargetTags();
 
       // this is used to set some values automatically, like the correct mimetype
-      Job inspection = mediaInspectionService.enrich(subtitleMediaPackage, true);
+      Job inspection = mediaInspectionService.enrich(subtitleMediaPackageElement, true);
       if (!waitForStatus(inspection).isSuccess()) {
         throw new SpeechToTextServiceException(String.format(
                 "Transcription for '%s' failed at enriching process", trackURI));
       }
 
-      subtitleMediaPackage = MediaPackageElementParser.getFromXml(inspection.getPayload());
+      subtitleMediaPackageElement = MediaPackageElementParser.getFromXml(inspection.getPayload());
 
       for (String tag : targetTags) {
-        subtitleMediaPackage.addTag(tag);
+        subtitleMediaPackageElement.addTag(tag);
       }
 
-      parentMediaPackage.add(subtitleMediaPackage);
+      parentMediaPackage.add(subtitleMediaPackageElement);
 
       workspace.delete(output);
     } catch (Exception e) {

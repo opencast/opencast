@@ -46,14 +46,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SpeechToTextServiceImplTest {
@@ -101,7 +102,7 @@ public class SpeechToTextServiceImplTest {
     EasyMock.expect(workspace.get(EasyMock.anyObject()))
             .andReturn(new File(getClass().getResource("/speech_to_text_test.mp4").toURI())).anyTimes();
 
-    Field field = speechToTextService.getClass().getDeclaredField("selectedEngine");
+    Field field = speechToTextService.getClass().getDeclaredField("speechToTextEngine");
     field.setAccessible(true);
     field.set(speechToTextService, voskEngine);
 
@@ -150,14 +151,11 @@ public class SpeechToTextServiceImplTest {
     URI videoUri = getClass().getResource("/speech_to_text_test.mp4").toURI();
     Job job = speechToTextService.transcribe(videoUri, "eng");
     File output = new File(new URI(job.getPayload()));
-    StringBuilder textFromSpeech = new StringBuilder();
-    try (Stream<String> stream = Files.lines(Paths.get(output.getPath()), StandardCharsets.UTF_8)) {
-      stream.forEach(s -> textFromSpeech.append(s).append("\n"));
-    } catch (IOException e) {
-      Assert.fail("IOException occurred " + e.getMessage());
-    }
+    String textFromSpeech = Files.lines(Paths.get(output.getPath()), StandardCharsets.UTF_8)
+            .collect(Collectors.joining("\n"));
     Assert.assertTrue(output.isFile());
-    Assert.assertTrue(textFromSpeech.indexOf("look celia we have to follow our passions") > 0);
+    Stream<String> testWordsStream = Arrays.stream("look celia we have to follow our passions".split(" "));
+    Assert.assertTrue(testWordsStream.allMatch(textFromSpeech::contains));
   }
 
 }

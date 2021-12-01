@@ -23,11 +23,9 @@ package org.opencastproject.speechtotext.impl.engine;
 
 import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
-import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.IoSupport;
 
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -37,26 +35,23 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Dictionary;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /** Vosk implementation of the Speech-to-text engine interface. */
 @Component(
     immediate = true,
     service = {
-        SpeechToTextEngine.class,
-        ManagedService.class
+        SpeechToTextEngine.class
     },
     property = {
         "service.description=Vosk implementation of the SpeechToTextEngine interface",
         "service.pid=org.opencastproject.speechtotext.impl.engine.VoskEngine"
     }
 )
-public class VoskEngine implements SpeechToTextEngine, ManagedService {
+public class VoskEngine implements SpeechToTextEngine {
 
-  private static final Logger log = LoggerFactory.getLogger(VoskEngine.class);
+  private static final Logger logger = LoggerFactory.getLogger(VoskEngine.class);
 
   /** Name of the engine. */
   private static final String engineName = "Vosk";
@@ -77,31 +72,13 @@ public class VoskEngine implements SpeechToTextEngine, ManagedService {
   }
 
   @Activate
-  public void activate(ComponentContext cc) {
-    log.debug("Activating Vosk as viable speech-to-text engine...");
-  }
-
-  /**
-   * OSGI callback when the configuration is updated. This method is only here to prevent the
-   * configuration admin service from calling the service deactivate and activate methods
-   * for a config update. It does not have to do anything as the updates are handled by updated().
-   */
   @Modified
-  public void modified(Map<String, Object> config) throws ConfigurationException {
-    log.debug("Modified vosk engine service");
-  }
-
-  @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
-    if (properties == null) {
-      return;
-    }
-    log.debug("Start updating Vosk configuration.");
+  public void activate(ComponentContext cc) {
+    logger.debug("Activated/Modified Vosk engine service class");
     voskExecutable = StringUtils.defaultIfBlank(
-            (String) properties.get(VOSK_EXECUTABLE_PATH_CONFIG_KEY), VOSK_EXECUTABLE_DEFAULT_PATH);
-    log.debug("Set vosk path to {}", voskExecutable);
-
-    log.debug("Finished updating Vosk configuration");
+            (String) cc.getProperties().get(VOSK_EXECUTABLE_PATH_CONFIG_KEY), VOSK_EXECUTABLE_DEFAULT_PATH);
+    logger.debug("Set vosk path to {}", voskExecutable);
+    logger.debug("Finished activating/updating speech-to-text service");
   }
 
   /**
@@ -113,15 +90,12 @@ public class VoskEngine implements SpeechToTextEngine, ManagedService {
   public File generateSubtitlesFile(URI mediaFile, File preparedOutputFile, String language)
           throws SpeechToTextEngineException {
 
-    final List<String> command = new ArrayList<>();
-    command.add(voskExecutable);
-    command.add("-i");
-    command.add(mediaFile.toString());
-    command.add("-o");
-    command.add(preparedOutputFile.getAbsolutePath());
-    command.add("-l");
-    command.add(language);
-    log.info("Executing Vosk's transcription command: {}", command);
+    final List<String> command = Arrays.asList(
+            voskExecutable,
+            "-i", mediaFile.toString(),
+            "-o", preparedOutputFile.getAbsolutePath(),
+            "-l", language);
+    logger.info("Executing Vosk's transcription command: {}", command);
 
     Process process = null;
     try {
@@ -138,9 +112,9 @@ public class VoskEngine implements SpeechToTextEngine, ManagedService {
       if (!preparedOutputFile.isFile()) {
         throw new SpeechToTextEngineException("Vosk produced no output");
       }
-      log.info("Subtitles file generated successfully: {}", preparedOutputFile);
+      logger.info("Subtitles file generated successfully: {}", preparedOutputFile);
     } catch (Exception e) {
-      log.debug("Transcription failed closing Vosk transcription process for: {}", mediaFile);
+      logger.debug("Transcription failed closing Vosk transcription process for: {}", mediaFile);
       throw new SpeechToTextEngineException(e);
     } finally {
       IoSupport.closeQuietly(process);
