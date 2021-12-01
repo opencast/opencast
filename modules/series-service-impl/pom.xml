@@ -32,6 +32,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-solr</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -144,6 +149,7 @@
               *
             </Import-Package>
             <Export-Package>
+              org.opencastproject.series.impl.solr;version=${project.version},
               org.opencastproject.series.impl.persistence;version=${project.version},
               org.opencastproject.series.impl;version=${project.version},
               org.opencastproject.series.endpoint;version=${project.version}
