@@ -20,6 +20,7 @@ function App() {
   return (
           <HashRouter>
               <Switch>
+                  {/*Todo: When user is logged in then redirect to Events*/}
                   <Route exact path={"/"}>
                       <Login />
                       {/*<Events />*/}
