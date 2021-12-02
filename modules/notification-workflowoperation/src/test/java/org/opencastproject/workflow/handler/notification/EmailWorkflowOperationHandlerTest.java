@@ -32,7 +32,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
@@ -117,13 +116,13 @@ public class EmailWorkflowOperationHandlerTest {
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setTemplate("DCE-workflow");
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl failedOperation1 = new WorkflowOperationInstanceImpl("operation1",
+    WorkflowOperationInstance failedOperation1 = new WorkflowOperationInstance("operation1",
             OperationState.FAILED);
     failedOperation1.setFailWorkflowOnException(true);
-    WorkflowOperationInstanceImpl failedOperation2 = new WorkflowOperationInstanceImpl("operation2",
+    WorkflowOperationInstance failedOperation2 = new WorkflowOperationInstance("operation2",
             OperationState.FAILED);
     failedOperation2.setFailWorkflowOnException(false);
-    operation = new WorkflowOperationInstanceImpl("email", OperationState.RUNNING);
+    operation = new WorkflowOperationInstance("email", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();
     operationList.add(failedOperation1);
     operationList.add(failedOperation2);

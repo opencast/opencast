@@ -44,7 +44,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
@@ -374,7 +373,7 @@ public class CompositeWorkflowOperationHandlerTest {
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("op", OperationState.RUNNING);
     operation.setTemplate("composite");
     operation.setState(OperationState.RUNNING);
     for (String key : configurations.keySet()) {

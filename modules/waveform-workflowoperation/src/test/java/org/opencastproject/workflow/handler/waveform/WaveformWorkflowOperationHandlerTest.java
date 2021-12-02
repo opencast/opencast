@@ -37,7 +37,6 @@ import org.opencastproject.waveform.api.WaveformService;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
@@ -77,7 +76,7 @@ public class WaveformWorkflowOperationHandlerTest {
     mediaPackage.setIdentifier(new IdImpl("123-456"));
     mediaPackage.add(track);
 
-    instance = EasyMock.createNiceMock(WorkflowOperationInstanceImpl.class);
+    instance = EasyMock.createNiceMock(WorkflowOperationInstance.class);
     EasyMock.expect(instance.getConfiguration("target-flavor")).andReturn("*/*").anyTimes();
     EasyMock.expect(instance.getConfiguration("target-tags")).andReturn("a,b,c").anyTimes();
 

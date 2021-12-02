@@ -32,7 +32,6 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
@@ -150,17 +149,17 @@ public class EmailTemplateServiceImplTest {
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
 
-    WorkflowOperationInstanceImpl failedOperation1 = new WorkflowOperationInstanceImpl("operation1",
+    WorkflowOperationInstance failedOperation1 = new WorkflowOperationInstance("operation1",
             OperationState.FAILED);
     failedOperation1.setFailWorkflowOnException(true);
     failedOperation1.setId(1L);
     EasyMock.expect(is.getIncidentsOfJob(1L, true)).andReturn(subtree).anyTimes();
-    WorkflowOperationInstanceImpl failedOperation2 = new WorkflowOperationInstanceImpl("operation2",
+    WorkflowOperationInstance failedOperation2 = new WorkflowOperationInstance("operation2",
             OperationState.FAILED);
     failedOperation2.setFailWorkflowOnException(false);
     failedOperation1.setId(2L);
     EasyMock.expect(is.getIncidentsOfJob(2L, true)).andReturn(job1Tree).anyTimes();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("email", OperationState.RUNNING);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("email", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();
     operationList.add(failedOperation1);
     operationList.add(failedOperation2);

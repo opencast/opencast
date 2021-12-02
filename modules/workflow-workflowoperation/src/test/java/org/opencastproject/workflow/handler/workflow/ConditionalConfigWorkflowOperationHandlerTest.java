@@ -26,7 +26,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowParser;
@@ -46,7 +45,7 @@ import java.util.function.Function;
 public class ConditionalConfigWorkflowOperationHandlerTest {
   private WorkflowInstance workflowInstance;
   private ConditionalConfigWorkflowOperationHandler operationHandler;
-  private WorkflowOperationInstanceImpl operation;
+  private WorkflowOperationInstance operation;
   private static final String CONFIGURATION_VAR = "config";
 
   @Before
@@ -60,7 +59,7 @@ public class ConditionalConfigWorkflowOperationHandlerTest {
     // Media package does not matter for this test
     workflowInstance.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
 
-    operation = new WorkflowOperationInstanceImpl("conditional-config", OperationState.RUNNING);
+    operation = new WorkflowOperationInstance("conditional-config", OperationState.RUNNING);
     operation.setConfiguration(ConditionalConfigWorkflowOperationHandler.CONFIGURATION_NAME, CONFIGURATION_VAR);
     operation.setConfiguration(ConditionalConfigWorkflowOperationHandler.CONDITION_PREFIX + "-1", "${step} == 1");
     operation.setConfiguration(ConditionalConfigWorkflowOperationHandler.VALUE_PREFIX + "-1", "value 1");

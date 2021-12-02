@@ -21,30 +21,42 @@
 
 package org.opencastproject.workflow.api;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
- * JAXB annotated implementation of {@link WorkflowConfiguration}
+ * A configuration value for workflow operations.
  */
-@XmlType(name = "configuration", namespace = "http://workflow.opencastproject.org")
-@XmlRootElement(name = "configuration", namespace = "http://workflow.opencastproject.org")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class WorkflowConfigurationImpl implements WorkflowConfiguration, Comparable<WorkflowConfiguration> {
-  @XmlAttribute
+@Entity(name = "WorkflowConfigurationForOperationInstance")
+@Access(AccessType.FIELD)
+@Table(name = "oc_workflow_operation_instance_configuration")
+public class WorkflowConfigurationForOperationInstance implements WorkflowConfiguration, Comparable<WorkflowConfiguration> {
+
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
+
+  @Column
   protected String key;
-  @XmlValue
+
+  @Column
   protected String value;
 
-  public WorkflowConfigurationImpl() {
+  @ManyToOne(fetch = FetchType.LAZY)
+  private WorkflowOperationInstance operationInstance;
+
+  public WorkflowConfigurationForOperationInstance() {
   }
 
-  public WorkflowConfigurationImpl(String key, String value) {
+  public WorkflowConfigurationForOperationInstance(String key, String value) {
     this.key = key;
     this.value = value;
   }
@@ -53,16 +65,16 @@ public class WorkflowConfigurationImpl implements WorkflowConfiguration, Compara
     return key;
   }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
-
   public String getValue() {
     return value;
   }
 
   public void setValue(String value) {
     this.value = value;
+  }
+
+  public void setWorkflowOperationInstance(WorkflowOperationInstance operationInstance) {
+    this.operationInstance = operationInstance;
   }
 
   /**
@@ -91,7 +103,7 @@ public class WorkflowConfigurationImpl implements WorkflowConfiguration, Compara
       return false;
     if (getClass() != obj.getClass())
       return false;
-    WorkflowConfigurationImpl other = (WorkflowConfigurationImpl) obj;
+    WorkflowConfigurationForOperationInstance other = (WorkflowConfigurationForOperationInstance) obj;
     if (key == null) {
       if (other.key != null)
         return false;
@@ -118,18 +130,5 @@ public class WorkflowConfigurationImpl implements WorkflowConfiguration, Compara
   @Override
   public int compareTo(WorkflowConfiguration o) {
     return this.key.compareTo(o.getKey());
-  }
-
-  /**
-   * Allows JAXB handling of {@link WorkflowConfiguration} interfaces.
-   */
-  static class Adapter extends XmlAdapter<WorkflowConfigurationImpl, WorkflowConfiguration> {
-    public WorkflowConfigurationImpl marshal(WorkflowConfiguration config) throws Exception {
-      return (WorkflowConfigurationImpl) config;
-    }
-
-    public WorkflowConfiguration unmarshal(WorkflowConfigurationImpl config) throws Exception {
-      return config;
-    }
   }
 }

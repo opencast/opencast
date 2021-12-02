@@ -21,14 +21,20 @@
 
 package org.opencastproject.workflow.api;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 /**
  * A configuration value for workflow operations.
  */
-@XmlJavaTypeAdapter(WorkflowConfigurationImpl.Adapter.class)
 public interface WorkflowConfiguration {
+
   String getKey();
 
   String getValue();
+
+  void setValue(String value);
+
+  int hashCode();
+  boolean equals(Object obj);
+  String toString();
+
+  int compareTo(WorkflowConfiguration o);
 }

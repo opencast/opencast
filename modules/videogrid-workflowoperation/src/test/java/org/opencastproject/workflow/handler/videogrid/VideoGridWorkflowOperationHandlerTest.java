@@ -45,7 +45,6 @@ import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.videogrid.api.VideoGridService;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -121,7 +120,7 @@ public class VideoGridWorkflowOperationHandlerTest {
         MediaPackageElementFlavor.parseFlavor(SOURCE_SMIL_FLAVOR_KEY));
 
     /** Create Mocks **/
-    instance = EasyMock.createNiceMock(WorkflowOperationInstanceImpl.class);
+    instance = EasyMock.createNiceMock(WorkflowOperationInstance.class);
     EasyMock.expect(instance.getConfiguration("target-flavor")).andReturn(TARGET_FLAVOR_RETURN).anyTimes();
 
     workspace = EasyMock.createNiceMock(Workspace.class);

@@ -54,8 +54,6 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.QueryTerm;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
-import org.opencastproject.workflow.api.WorkflowSet;
-import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport.OperationReport;
@@ -1009,7 +1007,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    *      String, boolean)
    */
   @Override
-  public WorkflowSet getWorkflowInstances(WorkflowQuery query, String action, boolean applyPermissions)
+  public List<WorkflowInstance> getWorkflowInstances(WorkflowQuery query, String action, boolean applyPermissions)
           throws WorkflowDatabaseException {
     int count = query.getCount() > 0 ? (int) query.getCount() : 20; // default to 20 items if not specified
     int startIndex = query.getStartPage() > 0 ? (int) query.getStartPage() * count : (int) query.getStartIndex();
@@ -1032,18 +1030,18 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     long totalHits;
     long time = System.currentTimeMillis();
-    WorkflowSetImpl set = null;
+    List<WorkflowInstance> set = null;
     try {
       QueryResponse response = solrServer.query(solrQuery);
       SolrDocumentList items = response.getResults();
       long searchTime = System.currentTimeMillis() - time;
       totalHits = items.getNumFound();
 
-      set = new WorkflowSetImpl();
-      set.setPageSize(count);
-      set.setTotalCount(totalHits);
-      set.setStartPage(query.getStartPage());
-      set.setSearchTime(searchTime);
+      set = new ArrayList<>();
+//      set.setPageSize(count);
+//      set.setTotalCount(totalHits);
+//      set.setStartPage(query.getStartPage());
+//      set.setSearchTime(searchTime);
 
       // Iterate through the results
 //      for (SolrDocument doc : items) {

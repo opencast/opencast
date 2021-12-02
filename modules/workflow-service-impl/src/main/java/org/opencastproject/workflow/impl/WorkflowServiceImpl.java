@@ -94,7 +94,6 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowOperationResultImpl;
@@ -104,7 +103,6 @@ import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowServiceDatabase;
 import org.opencastproject.workflow.api.WorkflowServiceDatabaseException;
-import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.WorkflowStatistics;
@@ -1400,7 +1398,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
-  public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
+  public List<WorkflowInstance> getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
     return index.getWorkflowInstances(query, Permissions.Action.READ.toString(), true);
   }
 
@@ -1410,7 +1408,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
-  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery query) throws WorkflowDatabaseException,
+  public List<WorkflowInstance> getWorkflowInstancesForAdministrativeRead(WorkflowQuery query) throws WorkflowDatabaseException,
           UnauthorizedException {
     User user = securityService.getUser();
     if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole()))
@@ -1441,7 +1439,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @return the workflow instance
    */
   protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationInstance operation) {
-    WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) operation;
+    WorkflowOperationInstance currentOperation = (WorkflowOperationInstance) operation;
     int failedAttempt = currentOperation.getFailedAttempts() + 1;
     currentOperation.setFailedAttempts(failedAttempt);
     currentOperation.addToExecutionHistory(currentOperation.getId());
@@ -1452,7 +1450,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       int position = currentOperation.getPosition();
       // Advance to operation that actually failed
       if (workflow.getOperations().size() > position + 1) { // This should always be true...
-        currentOperation = (WorkflowOperationInstanceImpl) workflow.getOperations().get(position + 1);
+        currentOperation = (WorkflowOperationInstance) workflow.getOperations().get(position + 1);
         // It's currently in RETRY state, change to FAILED
         currentOperation.setState(OperationState.FAILED);
       }
@@ -1472,7 +1470,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           List<WorkflowOperationInstance> operations = workflow.getOperations();
           WorkflowOperationDefinitionImpl errorResolutionDefinition = new WorkflowOperationDefinitionImpl(
                   ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", false);
-          WorkflowOperationInstanceImpl errorResolutionInstance = new WorkflowOperationInstanceImpl(
+          WorkflowOperationInstance errorResolutionInstance = new WorkflowOperationInstance(
                   errorResolutionDefinition, currentOperation.getPosition());
           errorResolutionInstance.setExceptionHandlingWorkflow(currentOperation.getExceptionHandlingWorkflow());
           operations.add(currentOperation.getPosition(), errorResolutionInstance);
@@ -1547,7 +1545,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throws WorkflowDatabaseException {
 
     // Get the operation and its handler
-    WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) workflow.getCurrentOperation();
+    WorkflowOperationInstance currentOperation = (WorkflowOperationInstance) workflow.getCurrentOperation();
     WorkflowOperationHandler handler = getWorkflowOperationHandler(currentOperation.getTemplate());
 
     // Create an operation result for the lazy or else update the workflow's media package
@@ -1569,7 +1567,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     // been serialized and deserialized in the meantime.
     int currentOperationPosition = currentOperation.getPosition();
     workflow = updateConfiguration(workflow, result.getProperties());
-    currentOperation = (WorkflowOperationInstanceImpl) workflow.getOperations().get(currentOperationPosition);
+    currentOperation = (WorkflowOperationInstance) workflow.getOperations().get(currentOperationPosition);
 
     // Adjust workflow statistics
     currentOperation.setTimeInQueue(result.getTimeInQueue());
@@ -1947,8 +1945,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         securityService.setOrganization(org);
         WorkflowQuery workflowQuery = new WorkflowQuery().withState(WorkflowInstance.WorkflowState.PAUSED).withCount(
                 Integer.MAX_VALUE);
-        WorkflowSet workflowSet = getWorkflowInstances(workflowQuery);
-        workflows.addAll(workflowSet.getItems());
+        List<WorkflowInstance> workflowSet = getWorkflowInstances(workflowQuery);
+        workflows.addAll(workflowSet);
       }
     } finally {
       securityService.setOrganization(organization);
@@ -2281,7 +2279,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
     WorkflowQuery query = new WorkflowQuery().withState(state).withDateBefore(DateUtils.addDays(new Date(), -buffer))
             .withCount(Integer.MAX_VALUE);
-    for (WorkflowInstance workflowInstance : getWorkflowInstances(query).getItems()) {
+    for (WorkflowInstance workflowInstance : getWorkflowInstances(query)) {
       try {
         remove(workflowInstance.getId());
         instancesCleaned++;

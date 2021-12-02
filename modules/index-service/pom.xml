@@ -277,7 +277,6 @@
               OSGI-INF/list-providers/services.xml,
               OSGI-INF/list-providers/themes.xml,
               OSGI-INF/list-providers/users.xml,
-              OSGI-INF/list-providers/workflows.xml
             </Service-Component>
             <JPA-PersistenceUnits>
               org.opencastproject.index.service

@@ -35,7 +35,6 @@ import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSetImpl;
 
 import org.easymock.EasyMock;
 import org.junit.Ignore;
@@ -67,7 +66,7 @@ public class TestJobEndpoint extends JobEndpoint {
     wfD.setTitle("Full");
     wfD.setId("full");
 
-    WorkflowSetImpl workflowSet = new WorkflowSetImpl();
+    List<WorkflowInstance> workflowSet = new ArrayList<>();
 
     WorkflowInstance WorkflowInstance1 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage1"), 2L, null, null, new HashMap<String, String>());
@@ -80,11 +79,9 @@ public class TestJobEndpoint extends JobEndpoint {
     WorkflowInstance2.setId(2);
     WorkflowInstance3.setId(3);
 
-    workflowSet.addItem(WorkflowInstance1);
-    workflowSet.addItem(WorkflowInstance2);
-    workflowSet.addItem(WorkflowInstance3);
-
-    workflowSet.setTotalCount(3);
+    workflowSet.add(WorkflowInstance1);
+    workflowSet.add(WorkflowInstance2);
+    workflowSet.add(WorkflowInstance3);
 
     List<HostRegistration> hosts = new ArrayList<>();
     hosts.add(new JaxbHostRegistration("host1", "1.1.1.1", "node1", 100000, 8, 8, true, false));
@@ -107,7 +104,7 @@ public class TestJobEndpoint extends JobEndpoint {
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
     EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
             .andReturn(workflowSet).anyTimes();
-    EasyMock.expect(workflowService.countWorkflowInstances()).andReturn(workflowSet.size()).anyTimes();
+    EasyMock.expect(workflowService.countWorkflowInstances()).andReturn((long) workflowSet.size()).anyTimes();
     EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(hosts).anyTimes();
     EasyMock.expect(serviceRegistry.getActiveJobs()).andReturn(jobs).anyTimes();
 

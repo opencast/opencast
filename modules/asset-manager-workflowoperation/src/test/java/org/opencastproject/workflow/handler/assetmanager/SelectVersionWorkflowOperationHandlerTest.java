@@ -39,11 +39,9 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import com.entwinemedia.fn.Stream;
@@ -63,7 +61,7 @@ public class SelectVersionWorkflowOperationHandlerTest {
   private static final String NO_TAGS = "hls-full-res-presenter-mp4,hls-full-res-presentation-mp4";
 
   private SelectVersionWorkflowOperationHandler operationHandler;
-  private WorkflowOperationInstanceImpl operation;
+  private WorkflowOperationInstance operation;
   private WorkflowInstance wfInstance;
   private MediaPackageBuilder builder;
   private AssetManager assetManager;
@@ -76,7 +74,7 @@ public class SelectVersionWorkflowOperationHandlerTest {
     wfInstance.setId(1);
     wfInstance.setState(WorkflowState.RUNNING);
 
-    operation = new WorkflowOperationInstanceImpl("select-version", OperationState.RUNNING);
+    operation = new WorkflowOperationInstance("select-version", OperationState.RUNNING);
 
     List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();
     operationsList.add(operation);

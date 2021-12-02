@@ -51,7 +51,9 @@ import com.google.common.collect.Sets;
 import org.junit.Ignore;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
@@ -151,8 +153,8 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
     expect(startedStoppedWorkflow.getConfiguration("abc")).andReturn("123");
     replay(startedStoppedWorkflow);
 
-    WorkflowSet workflows = createNiceMock(WorkflowSet.class);
-    expect(workflows.getItems()).andReturn(new WorkflowInstance[] { runningWorkflow, stoppedWorkflow });
+    List<WorkflowInstance> workflows = createNiceMock(WorkflowSet.class);
+    expect(workflows).andReturn(Arrays.asList(runningWorkflow, stoppedWorkflow ));
     replay(workflows);
 
     // WorkflowService

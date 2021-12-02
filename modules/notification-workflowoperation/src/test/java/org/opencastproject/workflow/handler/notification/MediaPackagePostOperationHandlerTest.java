@@ -32,7 +32,6 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,8 +70,8 @@ public class MediaPackagePostOperationHandlerTest {
     WorkflowInstance workflowInstance = new WorkflowInstance();
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowState.RUNNING);
-    WorkflowOperationInstanceImpl operation
-        = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
+    WorkflowOperationInstance operation
+        = new WorkflowOperationInstance("op", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationsList
         = new ArrayList<WorkflowOperationInstance>();
     operationsList.add(operation);

@@ -32,7 +32,6 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -50,14 +49,14 @@ public class TransferMetadataOperationHandlerTest {
 
   private TransferMetadataWorkflowOperationHandler handler;
   private WorkflowInstance instance;
-  private WorkflowOperationInstanceImpl operation;
+  private WorkflowOperationInstance operation;
   private DublinCoreCatalog resultCatalog = null;
 
   @Before
   public void setUp() throws Exception {
     handler = new TransferMetadataWorkflowOperationHandler();
 
-    operation = new WorkflowOperationInstanceImpl("test", WorkflowOperationInstance.OperationState.RUNNING);
+    operation = new WorkflowOperationInstance("test", WorkflowOperationInstance.OperationState.RUNNING);
 
     String dc = IOUtils.toString(getClass().getResourceAsStream("/dublincore.xml"), StandardCharsets.UTF_8);
     Workspace workspace = EasyMock.createMock(Workspace.class);

@@ -42,7 +42,6 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
@@ -91,7 +90,7 @@ public class AnimateWorkflowOperationHandlerTest {
     //catalog.setURI(getClass().getResource("/dc-episode.xml").toURI());
     mediaPackage.add(catalog);
 
-    instance = EasyMock.createNiceMock(WorkflowOperationInstanceImpl.class);
+    instance = EasyMock.createNiceMock(WorkflowOperationInstance.class);
     EasyMock.expect(instance.getConfiguration("target-flavor")).andReturn("a/b").anyTimes();
     EasyMock.expect(instance.getConfiguration("target-tags")).andReturn("a,b,c").anyTimes();
 

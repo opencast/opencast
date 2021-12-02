@@ -274,4 +274,41 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     }
   }
 
+//  // TODO: Get this replaced
+//  List<WorkflowInstance> getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
+//
+//
+//    EntityManager em = null;
+//    try {
+//      em = emf.createEntityManager();
+//      String queryString = "SELECT w FROM Workflow w where w.organizationId = :organizationId";
+//
+//      //TODO build query from WorkflowQuery dynamically
+//
+//      Query databaseQuery = em.createQuery(queryString);
+//
+//      String orgId = securityService.getOrganization().getId();
+//      databaseQuery.setParameter("organizationId", orgId);
+//
+//      return getWorkflowInstancesForQuery(databaseQuery);
+//
+//    } finally {
+//      if (em != null)
+//        em.close();
+//    }
+//  }
+//
+//  private List<WorkflowInstance> getWorkflowInstancesForQuery(Query query) throws WorkflowDatabaseException {
+//    List<JpaWorkflow> results = query.getResultList();
+//    List<WorkflowInstance> workflows = new ArrayList<>(results.size());
+//    for (JpaWorkflow jpaWorkflow: results) {
+//      try {
+//        workflows.add(jpaWorkflow.toWorkflow());
+//      } catch (MediaPackageException | WorkflowParsingException e) {
+//        throw new WorkflowDatabaseException(e);
+//      }
+//    }
+//    return workflows;
+//  }
+
 }

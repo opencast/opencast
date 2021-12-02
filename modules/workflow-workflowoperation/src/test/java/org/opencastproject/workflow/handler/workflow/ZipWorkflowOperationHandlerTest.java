@@ -28,7 +28,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -84,7 +83,7 @@ public class ZipWorkflowOperationHandlerTest {
   public void testInvalidWorkflow() throws Exception {
     WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
 
@@ -109,7 +108,7 @@ public class ZipWorkflowOperationHandlerTest {
   public void testInvalidMediaPackage() throws Exception {
     WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(null);
@@ -134,7 +133,7 @@ public class ZipWorkflowOperationHandlerTest {
   public void testConfigKeyTargetFlavorDefaultValue() {
     WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     ops.add(operation);
     instance.setOperations(ops);
     instance.setMediaPackage(mp);

@@ -34,7 +34,6 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
@@ -304,7 +303,7 @@ public class DefaultsWorkflowOperationHandlerTest {
       workflowInstance.setConfiguration(entry.getKey(), entry.getValue());
     }
 
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl();
+    WorkflowOperationInstance operation = new WorkflowOperationInstance();
     operation.setTemplate("defaults");
     operation.setState(OperationState.RUNNING);
 

@@ -108,8 +108,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
-import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
@@ -286,7 +284,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.replay(workspace);
 
     // workflow service
-    final WorkflowSetImpl workflowSet = new WorkflowSetImpl();
+    final List<WorkflowInstance> workflowSet = new ArrayList<>();
 
     WorkflowDefinition wfD = new WorkflowDefinitionImpl();
     wfD.setTitle("Full");
@@ -324,22 +322,20 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     WorkflowInstance1.getOperations().get(0).setId(4L);
     WorkflowInstance1.getOperations().get(1).setId(5L);
 
-    workflowSet.addItem(WorkflowInstance1);
-    workflowSet.addItem(WorkflowInstance2);
-    workflowSet.addItem(WorkflowInstance3);
-
-    workflowSet.setTotalCount(3);
+    workflowSet.add(WorkflowInstance1);
+    workflowSet.add(WorkflowInstance2);
+    workflowSet.add(WorkflowInstance3);
 
     WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.getWorkflowDefinitionById(EasyMock.anyString())).andReturn(wfD).anyTimes();
     EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(WorkflowInstance1).anyTimes();
     EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
-            .andAnswer(new IAnswer<WorkflowSet>() {
+            .andAnswer(new IAnswer<List<WorkflowInstance>>() {
               @Override
-              public WorkflowSet answer() throws Throwable {
+              public List<WorkflowInstance> answer() throws Throwable {
                 WorkflowQuery query = (WorkflowQuery) EasyMock.getCurrentArguments()[0];
                 if (query.getId() != null && Long.parseLong(query.getId()) == 9999L) {
-                  return new WorkflowSetImpl();
+                  return new ArrayList<>();
                 } else {
                   return workflowSet;
                 }

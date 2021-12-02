@@ -45,7 +45,6 @@ import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.QueryTerm;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 
 import org.apache.commons.io.IOUtils;
@@ -178,7 +177,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    *      #getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
-  public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
+  public List<WorkflowInstance> getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
     List<NameValuePair> queryStringParams = new ArrayList<>();
 
     if (query.getText() != null)
@@ -257,7 +256,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpResponse response = getResponse(get);
     try {
       if (response != null)
-        return WorkflowParser.parseWorkflowSet(response.getEntity().getContent());
+        return WorkflowParser.parseWorkflowSet(response.getEntity().getContent()).getItems();
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     } finally {
@@ -272,7 +271,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
-  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
+  public List<WorkflowInstance> getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
           UnauthorizedException {
     return getWorkflowInstances(q);
   }

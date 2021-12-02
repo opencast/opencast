@@ -32,10 +32,8 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -104,9 +102,9 @@ public class EmailDataTest {
     workflowInstance.setState(WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
 
-    failedOperation = new WorkflowOperationInstanceImpl("operation1", OperationState.FAILED);
+    failedOperation = new WorkflowOperationInstance("operation1", OperationState.FAILED);
 
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("email", OperationState.RUNNING);
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("email", OperationState.RUNNING);
     List<WorkflowOperationInstance> operationList = new ArrayList<WorkflowOperationInstance>();
     operationList.add(failedOperation);
     operationList.add(operation);

@@ -28,7 +28,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -52,7 +51,7 @@ public class AddCatalogWorkflowOperationHandlerTest {
 
   private AddCatalogWorkflowOperationHandler operationHandler;
   private WorkflowInstance instance;
-  private WorkflowOperationInstanceImpl operation;
+  private WorkflowOperationInstance operation;
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -67,7 +66,7 @@ public class AddCatalogWorkflowOperationHandlerTest {
     instance = new WorkflowInstance();
 
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
-    operation = new WorkflowOperationInstanceImpl("test", OperationState.RUNNING);
+    operation = new WorkflowOperationInstance("test", OperationState.RUNNING);
     ops.add(operation);
     instance.setOperations(ops);
     String catalogName = "test-catalog";

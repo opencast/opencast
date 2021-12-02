@@ -62,7 +62,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
@@ -445,7 +444,7 @@ public class JobEndpoint {
    */
   public JObject getTasksAsJSON(WorkflowQuery query) throws JobEndpointException, NotFoundException {
     // Get results
-    WorkflowSet workflowInstances = null;
+    List<WorkflowInstance> workflowInstances = null;
     long totalWithoutFilters = 0;
     List<JValue> jsonList = new ArrayList<>();
 
@@ -457,7 +456,7 @@ public class JobEndpoint {
               e.getCause());
     }
 
-    WorkflowInstance[] items = workflowInstances.getItems();
+    List<WorkflowInstance> items = workflowInstances;
 
     for (WorkflowInstance instance : items) {
       long instanceId = instance.getId();
@@ -478,7 +477,7 @@ public class JobEndpoint {
               f("submitter", v(creatorName, Jsons.BLANK))));
     }
 
-    return obj(f("results", arr(jsonList)), f("count", v(workflowInstances.getTotalCount())),
+    return obj(f("results", arr(jsonList)), f("count", v(workflowInstances.size())),
             f("offset", v(query.getStartPage())), f("limit", v(jsonList.size())), f("total", v(totalWithoutFilters)));
   }
 
@@ -674,12 +673,12 @@ public class JobEndpoint {
    */
   private WorkflowInstance getWorkflowById(long id) throws NotFoundException, JobEndpointException {
     try {
-      WorkflowSet workflowInstances = workflowService
+      List<WorkflowInstance> workflowInstances = workflowService
               .getWorkflowInstances(new WorkflowQuery().withId(Long.toString(id)));
-      if (workflowInstances.getItems().length == 0)
+      if (workflowInstances.size() == 0)
         throw new NotFoundException();
 
-      return workflowInstances.getItems()[0];
+      return workflowInstances.get(0);
     } catch (WorkflowDatabaseException e) {
       throw new JobEndpointException(String.format("Not able to get the list of job from the database: %s", e),
               e.getCause());

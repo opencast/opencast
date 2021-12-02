@@ -91,24 +91,24 @@ public interface WorkflowService {
    *
    * @param query
    *          The query parameters
-   * @return The {@link WorkflowSet} containing the workflow instances matching the query parameters
+   * @return The {@link List<WorkflowInstance>} containing the workflow instances matching the query parameters
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instances from persistence
    */
-  WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException;
+  List<WorkflowInstance> getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException;
 
   /**
    * Finds workflow instances based on the specified query for administrative access.
    *
    * @param q
    *          The query parameters
-   * @return The {@link WorkflowSet} containing the workflow instances matching the query parameters
+   * @return The {@link List<WorkflowInstance>} containing the workflow instances matching the query parameters
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instances from persistence
    * @throws UnauthorizedException
    *           if the user does not own an administrative role
    */
-  WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
+  List<WorkflowInstance> getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
           UnauthorizedException;
 
   /**

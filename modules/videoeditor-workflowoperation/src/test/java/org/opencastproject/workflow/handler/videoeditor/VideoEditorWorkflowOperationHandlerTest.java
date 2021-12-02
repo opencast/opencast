@@ -41,10 +41,8 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -121,7 +119,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
     workflowInstance.setId(1);
     workflowInstance.setState(WorkflowInstance.WorkflowState.RUNNING);
     workflowInstance.setMediaPackage(mp);
-    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("op",
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("op",
             WorkflowOperationInstance.OperationState.RUNNING);
     operation.setTemplate("editor");
     operation.setState(WorkflowOperationInstance.OperationState.RUNNING);

@@ -26,7 +26,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -46,7 +45,7 @@ public class ConfigureByDublinCoreTermWOHTest {
 
   private ConfigureByDublinCoreTermWOH operationHandler;
   private WorkflowInstance instance;
-  private WorkflowOperationInstanceImpl operation;
+  private WorkflowOperationInstance operation;
   private MediaPackage mp;
   private Workspace workspace;
 
@@ -61,7 +60,7 @@ public class ConfigureByDublinCoreTermWOHTest {
 
     // Initialize the workflow
     instance = new WorkflowInstance();
-    operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
     ops.add(operation);
     instance.setOperations(ops);

@@ -26,7 +26,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -53,7 +52,7 @@ public class LoggingWorkflowOperationHandlerTest {
     MediaPackageBuilder builder = new MediaPackageBuilderImpl();
     MediaPackage mediaPackage = builder.createNew();
 
-    instance = EasyMock.createNiceMock(WorkflowOperationInstanceImpl.class);
+    instance = EasyMock.createNiceMock(WorkflowOperationInstance.class);
     EasyMock.expect(instance.getId()).andReturn(2L).anyTimes();
 
     workflow = EasyMock.createNiceMock(WorkflowInstance.class);

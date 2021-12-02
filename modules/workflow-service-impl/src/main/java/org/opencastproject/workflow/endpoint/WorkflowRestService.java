@@ -66,7 +66,6 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStatistics;
@@ -449,11 +448,11 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       }
     }
 
-    WorkflowSet set = service.getWorkflowInstances(q);
+    List<WorkflowInstance> set = service.getWorkflowInstances(q);
 
     // Marshalling of a full workflow takes a long time. Therefore, we strip everything that's not needed.
     if (compact) {
-      for (WorkflowInstance instance : set.getItems()) {
+      for (WorkflowInstance instance : set) {
 
         // Remove all operations but the current one
         WorkflowOperationInstance currentOperation = instance.getCurrentOperation();

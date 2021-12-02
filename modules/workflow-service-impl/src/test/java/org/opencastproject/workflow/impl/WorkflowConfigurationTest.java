@@ -21,30 +21,25 @@
 
 package org.opencastproject.workflow.impl;
 
-import org.opencastproject.workflow.api.WorkflowConfiguration;
-import org.opencastproject.workflow.api.WorkflowConfigurationImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowParser;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class WorkflowConfigurationTest {
 
   @Test
   public void testConfigurationSerialization() throws Exception {
-    WorkflowOperationInstanceImpl op = new WorkflowOperationInstanceImpl("op", OperationState.RUNNING);
-    Set<WorkflowConfiguration> config = new HashSet<WorkflowConfiguration>();
-    config.add(new WorkflowConfigurationImpl("this", "that"));
-    op.setConfiguration(config);
+    WorkflowOperationInstance op = new WorkflowOperationInstance("op", OperationState.RUNNING);
+//    Set<WorkflowConfigurationForOperationInstance> config = new HashSet<WorkflowConfigurationForOperationInstance>();
+//    config.add(new WorkflowConfigurationForOperationInstance("this", "that"));
+    op.setConfiguration("this", "that");
     WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
     ops.add(op);

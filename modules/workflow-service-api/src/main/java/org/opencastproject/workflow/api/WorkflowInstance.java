@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ import java.util.TreeSet;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -54,6 +56,7 @@ import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -122,15 +125,31 @@ public class WorkflowInstance {
   @Column(name = "mediaPackage", length = 16777215)
   private String mediaPackage;
 
-  @Lob
-  @Basic(fetch = FetchType.LAZY)
-  @Column(name = "operations", length = 16777215)
-  protected String operations;
+//  @Lob
+//  @Basic(fetch = FetchType.LAZY)
+//  @Column(name = "operations", length = 16777215)
+//  protected String operations;
 
-  @Lob
-  @Basic(fetch = FetchType.LAZY)
-  @Column(name = "configurations", length = 16777215)
-  protected String configurations;
+  @OneToMany(
+          mappedBy = "instance",
+          cascade = CascadeType.ALL,
+          orphanRemoval = true,
+          fetch = FetchType.LAZY
+  )
+  protected List<WorkflowOperationInstance> operations;
+
+//  @Lob
+//  @Basic(fetch = FetchType.LAZY)
+//  @Column(name = "configurations", length = 16777215)
+//  protected String configurations;
+
+  @OneToMany(
+          mappedBy = "instance",
+          cascade = CascadeType.ALL,
+          orphanRemoval = true,
+          fetch = FetchType.LAZY
+  )
+  protected Set<WorkflowConfigurationForWorkflowInstance> configurations;
 
   @Column(name = "mediaPackageId", length = 128)
   protected String mediaPackageId;
@@ -198,7 +217,7 @@ public class WorkflowInstance {
     this.mediaPackageId = mediaPackage.getIdentifier().toString();
     this.seriesId = mediaPackage.getSeries();
 
-//    this.operations = new ArrayList<WorkflowOperationInstance>();
+    this.operations = new ArrayList<WorkflowOperationInstance>();
     try {
       extend(def);
     } catch (WorkflowParsingException e) {
@@ -208,14 +227,10 @@ public class WorkflowInstance {
     Set<WorkflowConfiguration> configurations = new TreeSet<WorkflowConfiguration>();
     if (properties != null) {
       for (Map.Entry<String, String> entry : properties.entrySet()) {
-        configurations.add(new WorkflowConfigurationImpl(entry.getKey(), entry.getValue()));
+        WorkflowConfigurationForWorkflowInstance newConfig = new WorkflowConfigurationForWorkflowInstance(entry.getKey(), entry.getValue());
+        newConfig.setWorkflowInstance(this);
+        configurations.add(newConfig);
       }
-    }
-
-    try {
-      this.configurations = WorkflowParser.workflowConfigurationToXml(new WorkflowConfigurationSetImpl(configurations));
-    } catch (WorkflowParsingException e) {
-      logger.error("Error: ", e);
     }
   }
 
@@ -308,13 +323,12 @@ public class WorkflowInstance {
    * @see org.opencastproject.workflow.api.WorkflowInstance#getOperations()
    */
   public List<WorkflowOperationInstance> getOperations() {
-//    if (operations == null)
-//      operations = new ArrayList<WorkflowOperationInstance>();
+    if (operations == null)
+      operations = new ArrayList<WorkflowOperationInstance>();
     if (!initialized)
       init();
 
-    return unmarshalOperations();
-//    return new ArrayList<WorkflowOperationInstance>(operations);
+    return new ArrayList<WorkflowOperationInstance>(operations);
   }
 
   /**
@@ -323,7 +337,10 @@ public class WorkflowInstance {
    * @param workflowOperationInstanceList
    */
   public final void setOperations(List<WorkflowOperationInstance> workflowOperationInstanceList) {
-    marshalOperations(workflowOperationInstanceList);
+    for (int i = 0; i < workflowOperationInstanceList.size(); i++) {
+      workflowOperationInstanceList.get(i).setWorkflowInstance(this);
+    }
+    this.operations = workflowOperationInstanceList;
     init();
   }
 
@@ -333,7 +350,7 @@ public class WorkflowInstance {
 
 //    // Jaxb will lose the workflow operation's position, so we fix it here
 //    for (int i = 0; i < operations.size(); i++) {
-//      ((WorkflowOperationInstanceImpl) operations.get(i)).setPosition(i);
+//      ((WorkflowOperationInstance) operations.get(i)).setPosition(i);
 //    }
 
     initialized = true;
@@ -347,8 +364,6 @@ public class WorkflowInstance {
   public WorkflowOperationInstance getCurrentOperation() throws IllegalStateException {
     if (!initialized)
       init();
-
-    List<WorkflowOperationInstance> operations = unmarshalOperations();
 
     if (operations == null || operations.isEmpty())
       throw new IllegalStateException("Workflow " + workflowId + " has no operations");
@@ -423,7 +438,7 @@ public class WorkflowInstance {
   public String getConfiguration(String key) {
     if (key == null || configurations == null)
       return null;
-    for (WorkflowConfiguration config : unmarshalConfiguration()) {
+    for (WorkflowConfiguration config : configurations) {
       if (config.getKey().equals(key))
         return config.getValue();
     }
@@ -437,7 +452,6 @@ public class WorkflowInstance {
    */
   public Set<String> getConfigurationKeys() {
     Set<String> keys = new TreeSet<String>();
-    Set<WorkflowConfiguration> configurations = unmarshalConfiguration();
     if (configurations != null && !configurations.isEmpty()) {
       for (WorkflowConfiguration config : configurations) {
         keys.add(config.getKey());
@@ -454,12 +468,11 @@ public class WorkflowInstance {
   public void removeConfiguration(String key) {
     if (key == null || configurations == null)
       return;
-    Set<WorkflowConfiguration> configurations = unmarshalConfiguration();
-    for (Iterator<WorkflowConfiguration> configIter = configurations.iterator(); configIter.hasNext();) {
-      WorkflowConfiguration config = configIter.next();
+    for (Iterator<WorkflowConfigurationForWorkflowInstance> configIter = configurations.iterator(); configIter.hasNext();) {
+      WorkflowConfigurationForWorkflowInstance config = configIter.next();
       if (config.getKey().equals(key)) {
+        config.setWorkflowInstance(null);
         configIter.remove();
-        marshalConfiguration(configurations);
         return;
       }
     }
@@ -473,22 +486,21 @@ public class WorkflowInstance {
   public void setConfiguration(String key, String value) {
     if (key == null)
       return;
-//    if (configurations == null)
-//      configurations = new HashSet<WorkflowConfiguration>();
+    if (configurations == null)
+      configurations = new HashSet<WorkflowConfigurationForWorkflowInstance>();
 
     // Adjust already existing values
-    Set<WorkflowConfiguration> configurations = unmarshalConfiguration();
     for (WorkflowConfiguration config : configurations) {
       if (config.getKey().equals(key)) {
-        ((WorkflowConfigurationImpl) config).setValue(value);
-        marshalConfiguration(configurations);
+        ((WorkflowConfiguration) config).setValue(value);
         return;
       }
     }
 
     // No configurations were found, so add a new one
-    configurations.add(new WorkflowConfigurationImpl(key, value));
-    marshalConfiguration(configurations);
+    WorkflowConfigurationForWorkflowInstance newConfig = new WorkflowConfigurationForWorkflowInstance(key, value);
+    newConfig.setWorkflowInstance(this);
+    configurations.add(newConfig);
   }
 
   @Override
@@ -506,10 +518,9 @@ public class WorkflowInstance {
   }
 
   public void extend(WorkflowDefinition workflowDefinition) throws WorkflowParsingException {
-    List<WorkflowOperationInstance> operations = unmarshalOperations();
     if (!workflowDefinition.getOperations().isEmpty()) {
       for (WorkflowOperationDefinition entry : workflowDefinition.getOperations()) {
-        operations.add(new WorkflowOperationInstanceImpl(entry, -1));
+        operations.add(new WorkflowOperationInstance(entry, -1));
       }
       setOperations(operations);
 
@@ -518,55 +529,12 @@ public class WorkflowInstance {
   }
 
   public void insert(WorkflowDefinition workflowDefinition, WorkflowOperationInstance after) {
-    List<WorkflowOperationInstance> operations = unmarshalOperations();
     if (!workflowDefinition.getOperations().isEmpty() && after.getPosition() >= 0) {
       int offset = 0;
       for (WorkflowOperationDefinition entry : workflowDefinition.getOperations()) {
-        operations.add(after.getPosition() + offset, new WorkflowOperationInstanceImpl(entry, -1));
+        operations.add(after.getPosition() + offset, new WorkflowOperationInstance(entry, -1));
       }
       setOperations(operations);
-    }
-  }
-
-  private List<WorkflowOperationInstance> unmarshalOperations() {
-    try {
-      if (this.operations != null) {
-        return WorkflowParser.parseWorkflowOperationInstancesList(this.operations).get();
-      } else {
-        return new ArrayList<WorkflowOperationInstance>();
-      }
-    } catch (WorkflowParsingException e) {
-      logger.error("Error: ", e);
-    }
-    return null;
-  }
-
-  private void marshalOperations(List<WorkflowOperationInstance> operations) {
-    try {
-      this.operations = WorkflowParser.workflowOperationInstancesToXml(new WorkflowOperationInstancesListImpl(operations));
-    } catch (WorkflowParsingException e) {
-      logger.error("Error: ", e);
-    }
-  }
-
-  private Set<WorkflowConfiguration> unmarshalConfiguration() {
-    try {
-      if (this.configurations != null) {
-        return WorkflowParser.parseWorkflowConfigurationSet(this.configurations).get();
-      } else {
-        return new TreeSet<WorkflowConfiguration>();
-      }
-    } catch (WorkflowParsingException e) {
-      logger.error("Error: ", e);
-    }
-    return null;
-  }
-
-  private void marshalConfiguration(Set<WorkflowConfiguration> configurations) {
-    try {
-      this.configurations = WorkflowParser.workflowConfigurationToXml(new WorkflowConfigurationSetImpl(configurations));
-    } catch (WorkflowParsingException e) {
-      logger.error("Error: ", e);
     }
   }
 }
