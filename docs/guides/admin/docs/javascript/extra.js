@@ -50,12 +50,30 @@ function addTitleToCodeTag() {
     SPAN.classList.add("etc-span");
     SPAN.title = '"etc" represents the configuration directory of Opencast.\nThis directory is often located at "/etc/opencast".';
 
+    let branch = 'develop';
+    if (window.location.host == 'docs.opencast.org') {
+        branch = window.location.pathname.substring(1).replace(/\/admin.*/, '');
+    }
+    const repobase = `https://github.com/opencast/opencast/blob/${branch}/`;
+
     var codeElementList = document.getElementsByTagName("CODE");
     for (var i = 0; i < codeElementList.length; i++) {
         var CODE = codeElementList[i];
+
         if (typeof CODE.innerText !== 'undefined') {
             if (CODE.innerText.startsWith('etc/')) {
                 CODE.innerHTML = CODE.innerHTML.replace(/^etc/, SPAN.outerHTML);
+
+                // Link repository
+                let a = document.createElement('a');
+                a.innerText = '⇲';
+                a.title = 'Find configuration file in repository';
+                a.style.transform = 'rotate(-90deg)';
+                a.style.display = 'inline-block';
+                a.style.verticalAlign = 'super';
+                a.style.fontSize = '.83em';
+                a.href = repobase + CODE.innerText + '#repo-content-pjax-container';
+                CODE.parentNode.insertBefore(a, CODE.nextSibling);
             }
         }
     }
