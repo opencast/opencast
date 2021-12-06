@@ -1355,7 +1355,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       // Update live event
       sendSchedulerUpdate(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
-      
+
       // Update Elasticsearch index
       removeRecordingStatusFromIndex(id);
     } catch (NotFoundException e) {

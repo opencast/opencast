@@ -50,6 +50,13 @@
                "match_mapping_type" : "string",
                "mapping" : { "type" : "keyword" }
               }
+           },
+           {
+             "extended_metadata_template" : {
+               "match" : "extended_metadata_*",
+               "match_mapping_type" : "string",
+               "mapping" : { "type" : "keyword" }
+             }
            }
        ]
 }

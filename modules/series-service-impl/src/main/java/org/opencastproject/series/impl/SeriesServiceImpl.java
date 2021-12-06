@@ -41,6 +41,7 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreByteFormat;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
@@ -63,6 +64,7 @@ import org.opencastproject.util.data.Option;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -78,9 +80,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -460,37 +464,42 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public boolean addSeriesElement(String seriesID, String type, byte[] data) throws SeriesException {
+  public boolean updateExtendedMetadata(String seriesId, String type, DublinCoreCatalog dc) throws SeriesException {
     try {
-      if (persistence.existsSeriesElement(seriesID, type)) {
-        return false;
-      } else {
-        return persistence.storeSeriesElement(seriesID, type, data);
+      final byte[] data = dc.toXmlString().getBytes("UTF-8");
+      boolean successful = updateSeriesElement(seriesId, type, data);
+      if (successful) {
+        updateSeriesExtendedMetadataInIndex(seriesId, dc, type);
       }
+      return successful;
+    } catch (IOException e) {
+      throw new SeriesException(e);
+    }
+  }
+
+  @Override
+  public boolean updateSeriesElement(String seriesId, String type, byte[] data) throws SeriesException {
+    try {
+      boolean elementExisted = persistence.existsSeriesElement(seriesId, type);
+      boolean elementChanged = persistence.storeSeriesElement(seriesId, type, data);
+      if (elementExisted && elementChanged) {
+        triggerEventHandlers(SeriesItem.updateElement(seriesId, type, new String(data, StandardCharsets.UTF_8)));
+      }
+      return elementChanged;
     } catch (SeriesServiceDatabaseException e) {
       throw new SeriesException(e);
     }
   }
 
   @Override
-  public boolean updateSeriesElement(String seriesID, String type, byte[] data) throws SeriesException {
+  public boolean deleteSeriesElement(String seriesId, String type) throws SeriesException {
     try {
-      if (persistence.existsSeriesElement(seriesID, type) && persistence.storeSeriesElement(seriesID, type, data)) {
-        triggerEventHandlers(SeriesItem.updateElement(seriesID, type, new String(data, StandardCharsets.UTF_8)));
-        return true;
-      } else {
-        return false;
-      }
-    } catch (SeriesServiceDatabaseException e) {
-      throw new SeriesException(e);
-    }
-  }
-
-  @Override
-  public boolean deleteSeriesElement(String seriesID, String type) throws SeriesException {
-    try {
-      if (persistence.existsSeriesElement(seriesID, type)) {
-        return persistence.deleteSeriesElement(seriesID, type);
+      if (persistence.existsSeriesElement(seriesId, type)) {
+        boolean successful = persistence.deleteSeriesElement(seriesId, type);
+        if (successful) {
+          removeSeriesExtendedMetadataFromIndex(seriesId, type);
+        }
+        return  successful;
       } else {
         return false;
       }
@@ -517,13 +526,25 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                           series.getOrganization(), index.getIndexName());
                   List<Function<Optional<Series>, Optional<Series>>> updateFunctions = new ArrayList<>();
 
-                  DublinCoreCatalog catalog;
                   try {
-                    catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
+                    DublinCoreCatalog catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
                     updateFunctions.add(getMetadataUpdateFunction(seriesId, catalog, organization.getId()));
                   } catch (IOException | ParserConfigurationException | SAXException e) {
-                    logger.error("Could not read dublincore XML of series {}.", seriesId, e);
+                    logger.error("Could not read dublin core XML of series {}.", seriesId, e);
                     return;
+                  }
+
+                  // remove all extended metadata catalogs first so we get rid of old data
+                  updateFunctions.add(getResetExtendedMetadataFunction());
+                  for (Map.Entry<String, byte[]> entry: series.getElements().entrySet()) {
+                    try {
+                      DublinCoreCatalog dc = DublinCoreByteFormat.read(entry.getValue());
+                      updateFunctions.add(getExtendedMetadataUpdateFunction(seriesId, dc, entry.getKey(),
+                              organization.getId()));
+                    } catch (IOException | ParseException | ParserConfigurationException | SAXException e) {
+                      logger.error("Could not parse series element {} of series {} as a dublin core catalog, skipping.",
+                              entry.getKey(), seriesId, e);
+                    }
                   }
 
                   String aclStr = series.getAccessControl();
@@ -580,8 +601,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *
    * @param seriesId
    *          The series id
-   * @param index
-   *          The Elasticsearch index to update
    */
   private void removeSeriesFromIndex(String seriesId) {
     String orgId = securityService.getOrganization().getId();
@@ -596,12 +615,101 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series metadata in Elasticsearch index. Also update events if series title has changed (optional).
+   * Remove series extended metadata from Elasticsearch index.
    *
    * @param seriesId
    *          The series id
-   * @param index
-   *          The Elasticsearch index to update
+   * @param type
+   *          The type of extended metadata to remove
+   */
+  private void removeSeriesExtendedMetadataFromIndex(String seriesId, String type) {
+    String orgId = securityService.getOrganization().getId();
+    logger.debug("Removing extended metadata of series {} from the {} index.", seriesId, index.getIndexName());
+
+    // update series
+    Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
+      if (seriesOpt.isPresent()) {
+        Series series = seriesOpt.get();
+        series.removeExtendedMetadata(type);
+        return Optional.of(series);
+      }
+      return Optional.empty();
+    };
+    updateSeriesInIndex(seriesId, orgId, updateFunction);
+  }
+
+  /**
+   * Update series extended metadata in Elasticsearch index.
+   *
+   * @param seriesId
+   *          The series id
+   * @param dc
+   *          The dublin core catalog
+   * @param type
+   *          The type of dublin core catalog
+   */
+  private void updateSeriesExtendedMetadataInIndex(String seriesId, DublinCoreCatalog dc,
+          String type) {
+    String orgId = securityService.getOrganization().getId();
+    logger.debug("Updating extended metadata of series {} in the {} index.", seriesId, index.getIndexName());
+
+    // update series
+    Function<Optional<Series>, Optional<Series>> updateFunction =
+            getExtendedMetadataUpdateFunction(seriesId, dc, type, orgId);
+    updateSeriesInIndex(seriesId, orgId, updateFunction);
+  }
+
+  /**
+   * Get the function to reset the extended metadata for a series in an Elasticsearch index.
+   *
+   * @return the function to do the update
+   */
+  private Function<Optional<Series>, Optional<Series>> getResetExtendedMetadataFunction() {
+    return (Optional<Series> seriesOpt) -> {
+      if (seriesOpt.isPresent()) {
+        Series series = seriesOpt.get();
+        series.resetExtendedMetadata();
+        return Optional.of(series);
+      }
+      return Optional.empty();
+    };
+  }
+
+  /**
+   * Get the function to update the extended metadata for a series in an Elasticsearch index.
+   *
+   * @param seriesId
+   *          The series id
+   * @param dc
+   *          The dublin core catalog
+   * @param type
+   *          The type of dublin core catalog
+   * @param orgId
+   *          The id of the current organization
+   * @return the function to do the update
+   */
+  private Function<Optional<Series>, Optional<Series>> getExtendedMetadataUpdateFunction(String seriesId,
+          DublinCoreCatalog dc, String type, String orgId) {
+    return (Optional<Series> seriesOpt) -> {
+      Series series = seriesOpt.orElse(new Series(seriesId, orgId));
+
+      Map<String, List<String>> map = new HashMap();
+      Set<EName> eNames = dc.getProperties();
+      for (EName eName: eNames) {
+        String name = eName.getLocalName();
+        List<String> values = dc.get(eName, DublinCore.LANGUAGE_ANY);
+        map.put(name, values);
+      }
+      series.setExtendedMetadata(type, map);
+      return Optional.of(series);
+    };
+  }
+
+  /**
+   * Update series metadata in Elasticsearch index.
+   *
+   * @param seriesId
+   *          The series id
    * @param dc
    *          The dublin core catalog
    */
@@ -657,8 +765,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *
    * @param seriesId
    *          The series id
-   * @param index
-   *          The Elasticsearch index to update
    * @param acl
    *          The acl to update
    */
@@ -703,8 +809,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The series id
    * @param propertyValueOpt
    *          The value of the property (optional)
-   * @param index
-   *          The Elasticsearch index to update
    */
   private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt) {
     String orgId = securityService.getOrganization().getId();
