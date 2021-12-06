@@ -84,19 +84,19 @@ public class WorkflowOperationInstance implements Configurable {
   @Column(name = "holdurl")
   protected String holdStateUserInterfaceUrl;
 
-  @Column(name = "hold-action-title")
+  @Column(name = "holdActionTitle")
   protected String holdActionTitle;
 
-  @Column(name = "fail-on-error")
+  @Column(name = "failOnError")
   protected boolean failWorkflowOnException;
 
-  @Column(name = "if")
+  @Column(name = "if_condition")
   protected String executeCondition;
 
-  @Column(name = "unless")
+  @Column(name = "unless_condition")
   protected String skipCondition;
 
-  @Column(name = "exception-handler-workflow")
+  @Column(name = "exceptionHandlerWorkflow")
   protected String exceptionHandlingWorkflow;
 
   @Column(name = "abortable")
@@ -105,34 +105,34 @@ public class WorkflowOperationInstance implements Configurable {
   @Column(name = "continuable")
   protected Boolean continuable;
 
-  @Column(name = "started", nullable = false)
+  @Column(name = "started")
   @Temporal(TemporalType.TIMESTAMP)
   protected Date dateStarted;
 
-  @Column(name = "completed", nullable = false)
+  @Column(name = "completed")
   @Temporal(TemporalType.TIMESTAMP)
   protected Date dateCompleted;
 
-  @Column(name = "time-in-queue")
+  @Column(name = "timeInQueue")
   protected Long timeInQueue;
 
-  @Column(name = "max-attempts")
+  @Column(name = "maxAttempts")
   protected int maxAttempts;
 
-  @Column(name = "failed-attempts")
+  @Column(name = "failedAttempts")
   protected int failedAttempts;
 
-  @Column(name = "execution-host")
+  @Column(name = "executionHost")
   protected String executionHost;
 
   @ElementCollection
   @CollectionTable(
-          name = "execution-history",
+          name = "executionHistory",
           joinColumns = @JoinColumn(name = "operationId"))
-  @Column(name = "execution-history-entry")
+  @Column(name = "executionHistoryEntry")
   protected List<Long> executionHistory = new ArrayList<Long>();
 
-  @Column(name = "retry-strategy", length = 128)
+  @Column(name = "retryStrategy", length = 128)
   protected RetryStrategy retryStrategy;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -173,7 +173,7 @@ public class WorkflowOperationInstance implements Configurable {
     this.configurations = new TreeSet<WorkflowConfigurationForOperationInstance>();
     if (defConfigs != null) {
       for (String key : defConfigs) {
-        WorkflowConfigurationForOperationInstance newConfig = new WorkflowConfigurationForOperationInstance(key, getConfiguration(key));
+        WorkflowConfigurationForOperationInstance newConfig = new WorkflowConfigurationForOperationInstance(key, def.getConfiguration(key));
         newConfig.setWorkflowOperationInstance(this);
         configurations.add(newConfig);
 //        configurations.add(new WorkflowConfigurationForOperationInstance(key, def.getConfiguration(key)));
@@ -453,6 +453,16 @@ public class WorkflowOperationInstance implements Configurable {
   /** The position of this workflow operation in the workflow instance */
   public int getPosition() {
     return position;
+  }
+
+  /**
+   * Sets the workflow operation's position within the workflow.
+   *
+   * @param position
+   *          the position
+   */
+  public void setPosition(int position) {
+    this.position = position;
   }
 
   /**

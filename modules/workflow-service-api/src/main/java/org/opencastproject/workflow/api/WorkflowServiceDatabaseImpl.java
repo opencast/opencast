@@ -189,6 +189,10 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       tx = em.getTransaction();
       tx.begin();
 
+//      if (em.contains(instance)) {
+//        instance = em.merge(instance);
+//      }
+
       em.remove(instance);
       tx.commit();
       logger.debug("Workflow with id {} was deleted.", instance.getId());

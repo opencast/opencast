@@ -44,10 +44,10 @@ public class WorkflowConfigurationForWorkflowInstance implements WorkflowConfigu
   @Column(name = "id")
   private Long id;
 
-  @Column
+  @Column(name = "key_part")
   protected String key;
 
-  @Column
+  @Column(name = "value_part")
   protected String value;
 
   @ManyToOne(fetch = FetchType.LAZY)
