@@ -94,6 +94,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -242,6 +243,8 @@ public class IngestServiceImplTest {
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject())).andReturn(organization)
             .anyTimes();
+    EasyMock.expect(organizationDirectoryService.getOrganization((URL) EasyMock.anyObject())).andReturn(organization)
+            .anyTimes();
     EasyMock.replay(organizationDirectoryService);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -326,6 +329,7 @@ public class IngestServiceImplTest {
       };
     }
     service.setHttpClient(httpClient);
+    service.setOrganizationDirectoryService(organizationDirectoryService);
     service.setWorkingFileRepository(wfr);
     service.setWorkflowService(workflowService);
     service.setSecurityService(securityService);
@@ -478,6 +482,9 @@ public class IngestServiceImplTest {
 
   @Test
   public void testAuthWhitelist() throws Exception {
+    //Test fetching something from something known to be inside the cluster.  This should use the default service-wide trusted client
+    testAuthWhitelist("http://localhost/testfile", "", false, true, false);
+
     //Clear the whitelist, this should *never* send digest auth when fetching files
     testAuthWhitelist("http://www.example.org/testfile", "", false, false, true);
     //Non-matching regex

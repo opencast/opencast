@@ -60,7 +60,6 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.smil.api.util.SmilUtil;
@@ -1569,9 +1568,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         HttpGet get = new HttpGet(uri);
         List<String> clusterUrls = new LinkedList<>();
         try {
-          clusterUrls = serviceRegistry.getHostRegistrations().stream().map(
-            (java.util.function.Function<HostRegistration, String>) r -> r.getBaseUrl()).collect(Collectors.toUnmodifiableList());
-        } catch (ServiceRegistryException e) {
+          // Note that we are not checking ports here.
+          clusterUrls = organizationDirectoryService.getOrganization(uri.toURL()).getServers()
+                          .keySet()
+                          .stream()
+                          .collect(Collectors.toUnmodifiableList());
+        } catch (NotFoundException e) {
           logger.warn("Unable to determine cluster members, will not be able to authenticate any downloads from them", e);
         }
 
@@ -1579,7 +1581,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           //NB: We're creating a new client here with *different* auth than the system auth creds
           externalHttpClient = getAuthedHttpClient();
           response = externalHttpClient.execute(get);
-        } else if (clusterUrls.contains(uri.getHost())) {
+        } else if (clusterUrls.contains(uri.getScheme() + "://" + uri.getHost())) {
           // Only using the system-level httpclient and digest credentials against our own servers
           response = httpClient.execute(get);
         } else {
