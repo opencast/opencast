@@ -1603,7 +1603,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         in = response.getEntity().getContent();
         // This weird path whitelists files which exist *inside this bundle during build*, but likely won't cause issues
         // at runtime.  This will need to be changed if this module ever gets renamed though.
-      } else if (!uri.toString().startsWith("file") || uri.toString().contains("ingest-service-impl/target/test-classes")) {
+      } else if (!uri.toString().startsWith("file") || (uri.toString().contains("ingest-service-impl/target/test-classes") && !uri.toString().contains(".."))) {
         in = uri.toURL().openStream();
       } else {
         throw new IOException("Refusing to fetch files from the local filesystem");
