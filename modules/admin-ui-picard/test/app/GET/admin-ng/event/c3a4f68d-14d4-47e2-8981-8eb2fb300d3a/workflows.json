@@ -10,7 +10,7 @@
       "series": "",
       "id": 1676,
       "title": "Mock Event Processing",
-      "status": "RUNNING"
+      "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.RUNNING"
     },
     {
       "submitted": "2018-08-10T11:35:32Z",
@@ -18,7 +18,15 @@
       "series": "",
       "id": 1677,
       "title": "Mock Event Processing Complete",
-      "status": "SUCCEEDED"
+      "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
+    },
+    {
+      "submitted": "2018-08-10T11:39:32Z",
+      "workflow": "Process upon upload and schedule",
+      "series": "",
+      "id": 1678,
+      "title": "Mock Event Processing Complete (Copy)",
+      "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
     }
   ]
 }

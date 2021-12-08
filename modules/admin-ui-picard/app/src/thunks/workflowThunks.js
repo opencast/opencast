@@ -22,6 +22,11 @@ export const fetchWorkflowDef = (type) => async (dispatch) => {
                 };
                 break;
             }
+            case 'event-details':
+                urlParams = {
+                    tags: 'schedule'
+                };
+                break;
             default: {
                 urlParams = {
                     tags: 'upload,schedule'
@@ -33,9 +38,11 @@ export const fetchWorkflowDef = (type) => async (dispatch) => {
 
         const response = await  data.data;
 
+        const workflows = response.workflows;
+
         const workflowDef = {
             defaultWorkflowId: response.default_workflow_id,
-            workflows: response.workflows
+            workflows: workflows
         }
         dispatch(loadWorkflowDefSuccess(workflowDef));
     } catch (e) {

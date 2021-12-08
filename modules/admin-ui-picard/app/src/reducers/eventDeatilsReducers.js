@@ -9,10 +9,26 @@ import {
     SAVE_COMMENT_DONE,
     SAVE_COMMENT_REPLY_IN_PROGRESS,
     SAVE_COMMENT_REPLY_DONE,
+    LOAD_EVENT_WORKFLOWS_IN_PROGRESS,
+    LOAD_EVENT_WORKFLOWS_SUCCESS,
+    LOAD_EVENT_WORKFLOWS_FAILURE,
+    SET_EVENT_WORKFLOW_DEFINITIONS,
+    SET_EVENT_WORKFLOW,
+    SET_EVENT_WORKFLOW_CONFIGURATION,
+    DO_EVENT_WORKFLOW_ACTION_IN_PROGRESS,
+    DO_EVENT_WORKFLOW_ACTION_SUCCESS,
+    DO_EVENT_WORKFLOW_ACTION_FAILURE,
+    DELETE_EVENT_WORKFLOW_IN_PROGRESS,
+    DELETE_EVENT_WORKFLOW_SUCCESS,
+    DELETE_EVENT_WORKFLOW_FAILURE,
+    LOAD_EVENT_PUBLICATIONS_SUCCESS,
+    LOAD_EVENT_PUBLICATIONS_IN_PROGRESS,
+    LOAD_EVENT_PUBLICATIONS_FAILURE,
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
 const initialState = {
+    eventId: "",
     policies: [],
     fetchingPoliciesInProgress: false,
     savingCommentReplyInProgress: false,
@@ -20,7 +36,25 @@ const initialState = {
     fetchingCommentsInProgress: false,
     comments: [],
     commentReasons: [],
-    eventId: ""
+    fetchingWorkflowsInProgress: false,
+    workflows: {
+        scheduling: false,
+        entries: [],
+        workflow: {
+            workflowId: "",
+            description: ""
+        }
+    },
+    workflowConfiguration: {
+        workflowId: "",
+        description: ""
+    },
+    workflowDefinitions: [],
+    baseWorkflow: {},
+    workflowActionInProgress: false,
+    deleteWorkflowInProgress: false,
+    loadingPublications: false,
+    publications: []
 }
 
 // Reducer for event details
@@ -68,6 +102,26 @@ const eventDetails = (state=initialState, action) => {
                 fetchingCommentsInProgress: false
             };
         }
+        case LOAD_EVENT_PUBLICATIONS_SUCCESS: {
+            const { publications } = payload;
+            return {
+                ...state,
+                loadingPublications: false,
+                publications: publications
+            }
+        }
+        case LOAD_EVENT_PUBLICATIONS_IN_PROGRESS: {
+            return {
+                ...state,
+                loadingPublications: true
+            }
+        }
+        case LOAD_EVENT_PUBLICATIONS_FAILURE: {
+            return {
+                ...state,
+                loadingPublications: false
+            }
+        }
         case SAVE_COMMENT_IN_PROGRESS: {
             return {
                 ...state,
@@ -91,6 +145,93 @@ const eventDetails = (state=initialState, action) => {
                 ...state,
                 savingCommentReplyInProgress: false
             };
+        }
+        case LOAD_EVENT_WORKFLOWS_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingWorkflowsInProgress: true
+            };
+        }
+        case LOAD_EVENT_WORKFLOWS_SUCCESS: {
+            const { workflows } = payload;
+            return {
+                ...state,
+                workflows: workflows,
+                fetchingWorkflowsInProgress: false
+            }
+        }
+        case LOAD_EVENT_WORKFLOWS_FAILURE: {
+            return {
+                ...state,
+                fetchingWorkflowsInProgress: false
+            };
+        }
+        case SET_EVENT_WORKFLOW_DEFINITIONS: {
+            const { workflows, workflowDefinitions } = payload;
+            return {
+                ...state,
+                baseWorkflow: {...workflows.workflow},
+                workflows: workflows,
+                workflowDefinitions: workflowDefinitions
+            };
+        }
+        case SET_EVENT_WORKFLOW: {
+            const { workflow } = payload;
+            return {
+                ...state,
+                workflows: {
+                    ...state.workflows,
+                    workflow: workflow
+                }
+            }
+        }
+        case SET_EVENT_WORKFLOW_CONFIGURATION: {
+            const { workflow_configuration } = payload;
+            return {
+                ...state,
+                workflowConfiguration: workflow_configuration
+            }
+        }
+        case DO_EVENT_WORKFLOW_ACTION_IN_PROGRESS: {
+            return {
+                ...state,
+                workflowActionInProgress: true
+            }
+        }
+        case DO_EVENT_WORKFLOW_ACTION_SUCCESS: {
+            return {
+                ...state,
+                workflowActionInProgress: false
+            }
+        }
+        case DO_EVENT_WORKFLOW_ACTION_FAILURE: {
+            return {
+                ...state,
+                workflowActionInProgress: false
+            }
+        }
+        case DELETE_EVENT_WORKFLOW_IN_PROGRESS: {
+            return {
+                ...state,
+                deleteWorkflowInProgress: true
+            }
+        }
+        case DELETE_EVENT_WORKFLOW_SUCCESS: {
+            const { workflowsEntries } = payload;
+            return {
+                ...state,
+                workflows: {
+                    ...state.workflows,
+                    entries: workflowsEntries
+                },
+                deleteWorkflowInProgress: false
+            }
+        }
+        case DELETE_EVENT_WORKFLOW_FAILURE: {
+            return {
+                ...state,
+                deleteWorkflowInProgress: false
+            }
         }
         default:
             return state;
