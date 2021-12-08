@@ -80,6 +80,8 @@
   loop:
     - etc/custom.properties
     - etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
+    - etc/org.apache.karaf.features.cfg
+    - etc/security/mh_default_org.xml
     - bin/setenv
 
 - name: start and enable opencast service
