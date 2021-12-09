@@ -41,7 +41,6 @@ import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.objects.theme.ThemeQueryBuilder;
 import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.NotFoundException;
 
 import com.google.common.util.concurrent.Striped;
 
@@ -381,6 +380,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     try {
       Optional<Event> eventOpt = getEvent(id, orgId, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
       Optional<Event> updatedEventOpt = updateFunction.apply(eventOpt);
+
       if (updatedEventOpt.isPresent()) {
         update(updatedEventOpt.get());
       }
@@ -539,6 +539,54 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    */
 
   /**
+   * Delete event from index.
+   *
+   * @param eventId
+   *         The event identifier
+   * @param orgId
+   *         The organization id
+   * @return
+   *         true if it was deleted, false if it couldn't be found
+   * @throws SearchIndexException
+   *         If there was an error during deletion
+   */
+  public boolean deleteEvent(String eventId, String orgId) throws SearchIndexException {
+    return delete(Event.DOCUMENT_TYPE, eventId, orgId);
+  }
+
+  /**
+   * Delete series from index.
+   *
+   * @param seriesId
+   *         The series identifier
+   * @param orgId
+   *         The organization id
+   * @return
+   *         true if it was deleted, false if it couldn't be found
+   * @throws SearchIndexException
+   *         If there was an error during deletion
+   */
+  public boolean deleteSeries(String seriesId, String orgId) throws SearchIndexException {
+    return delete(Series.DOCUMENT_TYPE, seriesId, orgId);
+  }
+
+  /**
+   * Delete theme from index.
+   *
+   * @param themeId
+   *         The theme identifier
+   * @param orgId
+   *         The organization id
+   * @return
+   *         true if it was deleted, false if it couldn't be found
+   * @throws SearchIndexException
+   *         If there was an error during deletion
+   */
+  public boolean deleteTheme(String themeId, String orgId) throws SearchIndexException {
+    return delete(IndexTheme.DOCUMENT_TYPE, themeId, orgId);
+  }
+
+  /**
    * Delete object from this index.
    *
    * @param type
@@ -553,7 +601,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *         If deleting from the index fails
    */
-  public boolean delete(String type, String id, String orgId) throws SearchIndexException {
+  private boolean delete(String type, String id, String orgId) throws SearchIndexException {
     final Lock lock = this.locks.get(id);
     lock.lock();
     logger.debug("Locked {} '{}'.", type, id);
@@ -573,117 +621,6 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
       logger.debug("Released locked {} '{}'.", type, id);
     }
     return true;
-  }
-
-  /**
-   * @param event
-   *          The event to check if it
-   * @return If an event has a record of being a schedule, workflow or archive event.
-   */
-  private boolean toDelete(Event event) {
-    boolean hasScheduling = event.isScheduledEvent();
-    boolean hasWorkflow = event.getWorkflowId() != null;
-    boolean hasArchive = event.getArchiveVersion() != null;
-    return !hasScheduling && !hasWorkflow && !hasArchive;
-  }
-
-  /**
-   * Delete an event from the asset manager.
-   *
-   * @param organization
-   *          The organization the event is a part of.
-   * @param user
-   *          The user that is requesting to delete the event.
-   * @param uid
-   *          The identifier of the event.
-   *
-   * @throws SearchIndexException
-   *          Thrown if there is an issue with deleting the event.
-   * @throws NotFoundException
-   *          Thrown if the event cannot be found.
-   */
-  public void deleteAssets(String organization, User user, String uid) throws SearchIndexException, NotFoundException {
-    Optional<Event> eventOpt = getEvent(uid, organization, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
-    if (!eventOpt.isPresent()) {
-      throw new NotFoundException("No event with id " + uid + " found.");
-    }
-    Event event = eventOpt.get();
-    event.setArchiveVersion(null);
-
-    if (toDelete(event)) {
-      delete(Event.DOCUMENT_TYPE, uid, organization);
-    } else {
-      update(event);
-    }
-  }
-
-  /**
-   * Delete an event from the scheduling service
-   *
-   * @param organization
-   *          The organization the event is a part of.
-   * @param user
-   *          The user that is requesting to delete the event.
-   * @param uid
-   *          The identifier of the event.
-   *
-   * @throws SearchIndexException
-   *          Thrown if there is an issue with deleting the event.
-   * @throws NotFoundException
-   *          Thrown if the event cannot be found.
-   */
-  public void deleteScheduling(String organization, User user, String uid)
-          throws SearchIndexException, NotFoundException {
-    Optional<Event> eventOpt = getEvent(uid, organization, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
-    if (!eventOpt.isPresent()) {
-      throw new NotFoundException("No event with id " + uid + " found.");
-    }
-    Event event = eventOpt.get();
-    event.setAgentId(null);
-
-    if (toDelete(event)) {
-      delete(Event.DOCUMENT_TYPE, uid, organization);
-    } else {
-      update(event);
-    }
-  }
-
-  /**
-   * Delete an event from the workflow service
-   *
-   * @param organization
-   *          The organization the event is a part of.
-   * @param user
-   *          The user that is requesting to delete the event.
-   * @param uid
-   *          The identifier of the event.
-   * @param workflowId
-   *          The identifier of the workflow.
-   *
-   * @throws SearchIndexException
-   *          Thrown if there is an issue with deleting the event.
-   * @throws NotFoundException
-   *          Thrown if the event cannot be found.
-   */
-  public void deleteWorkflow(String organization, User user, String uid, Long workflowId)
-          throws SearchIndexException, NotFoundException {
-    Optional<Event> eventOpt = getEvent(uid, organization, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
-    if (!eventOpt.isPresent()) {
-      throw new NotFoundException("No event with id " + uid + " found.");
-    }
-    Event event = eventOpt.get();
-    if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowId)) {
-      logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", uid, workflowId);
-      event.setWorkflowId(null);
-      event.setWorkflowDefinitionId(null);
-      event.setWorkflowState(null);
-    }
-
-    if (toDelete(event)) {
-      delete(Event.DOCUMENT_TYPE, uid, organization);
-    } else {
-      update(event);
-    }
   }
 
   /*

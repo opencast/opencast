@@ -1490,13 +1490,23 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param index
    */
   private void removeSchedulingFromIndex(String mediaPackageId, ElasticsearchIndex index) {
-    String organization = getSecurityService().getOrganization().getId();
+    String orgId = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
+
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      if (!eventOpt.isPresent()) {
+        logger.warn("Scheduled recording {} not found for deletion from the {} index.", mediaPackageId,
+                index.getIndexName());
+        return Optional.empty();
+      }
+      Event event = eventOpt.get();
+      event.setAgentId(null);
+      return Optional.of(event);
+    };
+
     try {
-      index.deleteScheduling(organization, user, mediaPackageId);
-      logger.debug("Scheduling information of event {} removed from the {} index.", mediaPackageId, index.getIndexName());
-    } catch (NotFoundException e) {
-      logger.warn("Scheduled recording {} not found for deletion from the {} index.", mediaPackageId,
+      index.addOrUpdateEvent(mediaPackageId, updateFunction, orgId, user);
+      logger.debug("Scheduling information of event {} removed from the {} index.", mediaPackageId,
               index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Failed to delete the scheduling information of event {} from the {} index.", mediaPackageId,

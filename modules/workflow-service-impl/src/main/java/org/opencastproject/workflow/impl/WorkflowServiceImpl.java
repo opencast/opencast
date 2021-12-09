@@ -2433,18 +2433,33 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     final long workflowInstanceId = workflowInstance.getId();
     final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
 
-    final String organization = securityService.getOrganization().getId();
+    final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
 
+    logger.debug("Removing workflow instance {} of event {} from the {} index.", workflowInstanceId, eventId,
+            index.getIndexName());
+
+    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+      if (!eventOpt.isPresent()) {
+        logger.warn("Workflow instance {} of event {} not found for removal from the {} index.", workflowInstanceId,
+                eventId, index.getIndexName());
+        return Optional.empty();
+      }
+      Event event = eventOpt.get();
+      if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowInstanceId)) {
+        logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", eventId,
+                workflowInstanceId);
+        event.setWorkflowId(null);
+        event.setWorkflowDefinitionId(null);
+        event.setWorkflowState(null);
+      }
+      return Optional.of(event);
+    };
+
     try {
-      logger.debug("Removing workflow instance {} of event {} from the {} index.", workflowInstanceId, eventId,
-              index.getIndexName());
-      index.deleteWorkflow(organization, user, eventId, workflowInstanceId);
+      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
       logger.debug("Workflow instance {} of event {} removed from the {} index.", workflowInstanceId, eventId,
               index.getIndexName());
-    } catch (NotFoundException e) {
-      logger.warn("Workflow instance {} of event {} not found for removal from the {} index.", workflowInstanceId,
-              eventId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
               eventId, index.getIndexName(), e);
@@ -2467,13 +2482,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           DublinCoreCatalog episodeDublincoreCatalog, ElasticsearchIndex index) {
     final long workflowInstanceId = workflowInstance.getId();
     final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
-    final String organization = securityService.getOrganization().getId();
+    final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
 
     logger.debug("Updating workflow instance {} of event {} in the {} index.", workflowInstanceId, eventId,
             index.getIndexName());
     Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      Event event = eventOpt.orElse(new Event(eventId, organization));
+      Event event = eventOpt.orElse(new Event(eventId, orgId));
       event.setCreator(user.getName());
       event.setWorkflowId(workflowInstanceId);
       event.setWorkflowDefinitionId(workflowInstance.getTemplate());
@@ -2491,7 +2506,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     };
 
     try {
-      index.addOrUpdateEvent(eventId, updateFunction, organization, user);
+      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
       logger.debug("Workflow instance {} of event {} updated in the {} index.", workflowInstanceId, eventId,
               index.getIndexName());
     } catch (SearchIndexException e) {

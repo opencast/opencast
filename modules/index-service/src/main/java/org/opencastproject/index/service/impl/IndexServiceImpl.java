@@ -226,6 +226,7 @@ public class IndexServiceImpl implements IndexService {
   private UserDirectoryService userDirectoryService;
   private WorkflowService workflowService;
   private Workspace workspace;
+  private ElasticsearchIndex elasticsearchIndex;
 
   /** The single thread executor service */
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -241,6 +242,11 @@ public class IndexServiceImpl implements IndexService {
   @Reference
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
+  }
+
+  @Reference
+  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /**
@@ -1464,14 +1470,14 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public EventRemovalResult removeEvent(Event event, Runnable doOnNotFound, String retractWorkflowId)
+  public EventRemovalResult removeEvent(Event event, String retractWorkflowId)
       throws UnauthorizedException, WorkflowDatabaseException, NotFoundException {
     final boolean hasOnlyEngageLive = event.getPublications().size() == 1
         && EventUtils.ENGAGE_LIVE_CHANNEL_ID.equals(event.getPublications().get(0).getChannel());
     final boolean retract = event.hasPreview()
         || (!event.getPublications().isEmpty()  && !hasOnlyEngageLive && this.hasSnapshots(event.getIdentifier()));
     if (retract) {
-      retractAndRemoveEvent(event.getIdentifier(), doOnNotFound, retractWorkflowId);
+      retractAndRemoveEvent(event.getIdentifier(), retractWorkflowId);
       return EventRemovalResult.RETRACTING;
     } else {
       try {
@@ -1483,7 +1489,7 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
-  private void retractAndRemoveEvent(String id, Runnable doOnNotFound, String retractWorkflowId)
+  private void retractAndRemoveEvent(String id, String retractWorkflowId)
       throws WorkflowDatabaseException, NotFoundException {
     final WorkflowDefinition wfd = workflowService.getWorkflowDefinitionById(retractWorkflowId);
     final Workflows workflows = new Workflows(assetManager, workflowService);
@@ -1494,7 +1500,7 @@ public class IndexServiceImpl implements IndexService {
     }
     this.retractions.put(
         result.get(0).getId(),
-        new Retraction(securityService.getUser(), securityService.getOrganization(), doOnNotFound)
+        new Retraction(securityService.getUser(), securityService.getOrganization())
     );
   }
 
@@ -1502,59 +1508,69 @@ public class IndexServiceImpl implements IndexService {
   public boolean removeEvent(String id) throws NotFoundException, UnauthorizedException {
     boolean unauthorizedScheduler = false;
     boolean notFoundScheduler = false;
-    boolean removedScheduler = true;
+    boolean removedScheduler = false;
     try {
       schedulerService.removeEvent(id);
+      removedScheduler = true;
     } catch (NotFoundException e) {
       notFoundScheduler = true;
     } catch (UnauthorizedException e) {
       unauthorizedScheduler = true;
     } catch (SchedulerException e) {
-      removedScheduler = false;
       logger.error("Unable to remove the event '{}' from scheduler service:", id, e);
     }
 
     boolean unauthorizedWorkflow = false;
     boolean notFoundWorkflow = false;
-    boolean removedWorkflow = true;
+    boolean removedWorkflow = false;
     try {
       WorkflowQuery workflowQuery = new WorkflowQuery().withMediaPackage(id);
       WorkflowSet workflowSet = workflowService.getWorkflowInstances(workflowQuery);
-      if (workflowSet.size() == 0)
+      if (workflowSet.size() == 0) {
         notFoundWorkflow = true;
+      }
       for (WorkflowInstance instance : workflowSet.getItems()) {
         workflowService.stop(instance.getId());
         workflowService.remove(instance.getId());
       }
+      removedWorkflow = true;
     } catch (NotFoundException e) {
       notFoundWorkflow = true;
     } catch (UnauthorizedException e) {
       unauthorizedWorkflow = true;
-    } catch (WorkflowDatabaseException e) {
-      removedWorkflow = false;
-      logger.error("Unable to remove the event '{}' because removing workflow failed:", id, e);
     } catch (WorkflowException e) {
-      removedWorkflow = false;
       logger.error("Unable to remove the event '{}' because removing workflow failed:", id, e);
     }
 
     boolean unauthorizedArchive = false;
     boolean notFoundArchive = false;
-    boolean removedArchive = true;
+    boolean removedArchive = false;
     try {
       final AQueryBuilder q = assetManager.createQuery();
       final Predicate p = q.organizationId().eq(securityService.getOrganization().getId()).and(q.mediaPackageId(id));
       final AResult r = q.select(q.nothing()).where(p).run();
-      if (r.getSize() > 0)
+      if (r.getSize() > 0) {
         q.delete(DEFAULT_OWNER, q.snapshot()).where(p).run();
+      }
+      removedArchive = true;
     } catch (AssetManagerException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         unauthorizedArchive = true;
       } else if (e.getCause() instanceof NotFoundException) {
         notFoundArchive = true;
       } else {
-        removedArchive = false;
         logger.error("Unable to remove the event '{}' from the archive:", id, e);
+      }
+    }
+
+    // if all three services either removed the event successfully or couldn't find it, make sure it's also removed
+    // from the index
+    if ((removedScheduler || notFoundScheduler) && (removedWorkflow || notFoundWorkflow)
+            && (removedArchive || notFoundArchive)) {
+      try {
+        elasticsearchIndex.deleteEvent(id, securityService.getOrganization().getId());
+      } catch (SearchIndexException e) {
+        logger.error("Removing event {} from the {} index failed", id, elasticsearchIndex.getIndexName(), e);
       }
     }
 
@@ -1938,14 +1954,14 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public MetadataList updateAllSeriesMetadata(String id, String metadataJSON, ElasticsearchIndex index)
-          throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
+          throws IllegalArgumentException, IndexServiceException, NotFoundException {
     MetadataList metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
     return updateSeriesMetadata(id, metadataJSON, index, metadataList);
   }
 
   @Override
   public MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, ElasticsearchIndex index)
-          throws IndexServiceException, NotFoundException, UnauthorizedException {
+          throws IndexServiceException, NotFoundException {
     checkSeriesExists(id, index);
     updateSeriesMetadata(id, metadataList);
     return metadataList;

@@ -375,7 +375,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     logger.debug("Removing theme {} from the {} index.", themeId, index.getIndexName());
 
     try {
-      index.delete(IndexTheme.DOCUMENT_TYPE, Long.toString(themeId), orgId);
+      index.deleteTheme(Long.toString(themeId), orgId);
       logger.debug("Theme {} removed from the {} index", themeId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error deleting the theme {} from the {} index", themeId, index.getIndexName(), e);
