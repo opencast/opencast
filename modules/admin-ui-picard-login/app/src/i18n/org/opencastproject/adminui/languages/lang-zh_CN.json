@@ -1,0 +1,10 @@
+{
+  "LOGIN": {
+    "WELCOME": "欢迎来到Opencast",
+    "REMEMBER": "在这台电脑上记住我",
+    "USERNAME": "用户名...",
+    "PASSWORD": "密码...",
+    "LOGIN": "登录",
+    "ERROR": "用户名或密码错误"
+  }
+}

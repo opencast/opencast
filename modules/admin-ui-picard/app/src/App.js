@@ -1,5 +1,5 @@
 import React from 'react';
-import {HashRouter, Route, Switch} from "react-router-dom";
+import {BrowserRouter, HashRouter, Route, Switch} from "react-router-dom";
 import './App.scss';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -18,12 +18,14 @@ import Acls from "./components/users/Acls";
 
 function App() {
   return (
-          <HashRouter>
+          <BrowserRouter>
               <Switch>
                   {/*Todo: When user is logged in then redirect to Events*/}
-                  <Route exact path={"/"}>
+                  <Route exact path={"/login"}>
                       <Login />
-                      {/*<Events />*/}
+                  </Route>
+                  <Route exact path={"/"}>
+                      <Events />
                   </Route>
                   <Route exact path={"/events/events"}>
                       <Events />
@@ -59,7 +61,7 @@ function App() {
                       <Statistics />
                   </Route>
               </Switch>
-          </HashRouter>
+          </BrowserRouter>
   );
 }
 

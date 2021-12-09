@@ -1,0 +1,10 @@
+{
+  "LOGIN": {
+    "WELCOME": "歡迎來到Opencast",
+    "REMEMBER": "記住我",
+    "USERNAME": "使用者名稱...",
+    "PASSWORD": "密碼...",
+    "LOGIN": "登入",
+    "ERROR": "不正確的使用者名稱 和/或 密碼"
+  }
+}

@@ -1,0 +1,56 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+// Fonts
+// ----------------------------------------
+// url('#{$font-path}#{$file}.woff2') format('woff2')
+
+@mixin font-face($font-family, $file, $font-weight, $font-style) {
+  @font-face {
+    font-family: $font-family;
+      src: url('#{$font-path}#{$file}.eot');
+      src: url('#{$font-path}#{$file}.eot?#iefix') format('embedded-opentype'),
+           url('#{$font-path}#{$file}.woff') format('woff'),
+           url('#{$font-path}#{$file}.ttf') format('truetype');
+    font-weight: $font-weight;
+    font-style: $font-style;
+  }
+}
+
+// Include Fonts
+@include font-face('Open Sans', 'OpenSans-Light-webfont', 300, normal);
+@include font-face('Open Sans', 'OpenSans-LightItalic-webfont', 300, italic);
+
+@include font-face('Open Sans', 'OpenSans-Regular-webfont', 400, normal);
+@include font-face('Open Sans', 'OpenSans-Italic-webfont', 400, italic);
+
+@include font-face('Open Sans', 'OpenSans-Semibold-webfont', 600, normal);
+@include font-face('Open Sans', 'OpenSans-SemiboldItalic-webfont', 600, italic);
+
+@include font-face('Open Sans', 'OpenSans-Bold-webfont', 700, normal);
+@include font-face('Open Sans', 'OpenSans-BoldItalic-webfont', 700, italic);
+
+@include font-face('Open Sans', 'OpenSans-ExtraBold-webfont', 800, normal);
+@include font-face('Open Sans', 'OpenSans-ExtraBoldItalic-webfont', 800, italic);
+
+@include font-face('FontAwesome', 'fontawesome-webfont', normal, normal);
+
+@import "fontawesome/fontawesome-config";

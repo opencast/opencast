@@ -1,0 +1,10 @@
+{
+  "LOGIN": {
+    "WELCOME": "Pozdravljeni v Opencastu",
+    "REMEMBER": "Zapomni si me v tem računalniku",
+    "USERNAME": "Uporabniško ime ...",
+    "PASSWORD": "Geslo ...",
+    "LOGIN": "Prijava",
+    "ERROR": "Napačno uporabniško ime in/ali geslo"
+  }
+}
