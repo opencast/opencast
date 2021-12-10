@@ -30,6 +30,8 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -48,7 +50,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -56,6 +63,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.regex.Pattern;
 
 /** Used by the {@link InboxScannerService} to do the actual ingest. */
 public class Ingestor implements Runnable {
@@ -71,7 +79,7 @@ public class Ingestor implements Runnable {
 
   private final String workflowDefinition;
 
-  private Map<String, String> workflowConfig;
+  private final Map<String, String> workflowConfig;
 
   private final MediaPackageElementFlavor mediaFlavor;
 
@@ -84,6 +92,9 @@ public class Ingestor implements Runnable {
   private final int secondsBetweenTries;
 
   private RateLimiter throttle = RateLimiter.create(1.0);
+
+  private final Optional<Pattern> metadataPattern;
+  private final DateTimeFormatter dateFormatter;
 
   /**
    * Thread pool to run the ingest worker.
@@ -141,11 +152,41 @@ public class Ingestor implements Runnable {
             } else {
               /* Create MediaPackage and add Track */
               MediaPackage mp = ingestService.createMediaPackage();
-              logger.info("Start ingest track from file {} to mediapackage {}",
+              logger.info("Start ingest track from file {} to media package {}",
                       artifact.getName(), mp.getIdentifier().toString());
 
               DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
-              dcc.add(DublinCore.PROPERTY_TITLE, artifact.getName());
+              String title = null;
+              if (metadataPattern.isPresent()) {
+                var matcher = metadataPattern.get().matcher(artifact.getName());
+                if (matcher.find()) {
+                  try {
+                    title = matcher.group("title");
+                  } catch (IllegalArgumentException e) {
+                    logger.debug("{} matches no title in {}", metadataPattern.get(), artifact.getName(), e);
+                  }
+                  try {
+                    dcc.add(DublinCore.PROPERTY_SPATIAL, matcher.group("spatial"));
+                  } catch (IllegalArgumentException e) {
+                    logger.debug("{} matches no spatial in {}", metadataPattern.get(), artifact.getName(), e);
+                  }
+                  try {
+                    var value = matcher.group("created");
+                    logger.debug("Trying to parse matched date '{}' with formatter {}", value, dateFormatter);
+                    var date = Timestamp.valueOf(LocalDateTime.parse(value, dateFormatter));
+                    var created = EncodingSchemeUtils.encodeDate(date, Precision.Second);
+                    dcc.add(DublinCore.PROPERTY_CREATED, created);
+                  } catch (DateTimeParseException e) {
+                    logger.warn("Matched date does not match configured date-time format", e);
+                  } catch (IllegalArgumentException e) {
+                    logger.debug("{} matches no spatial in {}", metadataPattern, artifact.getName(), e);
+                  }
+                } else {
+                  logger.debug("Regular expression {} does not match {}", metadataPattern.get(), artifact.getName());
+                }
+              }
+              // fall back to filename for title if matcher did not catch any
+              dcc.add(DublinCore.PROPERTY_TITLE, StringUtils.isNotBlank(title) ? title : artifact.getName());
 
               /* Check if we have a subdir and if its name matches an existing series */
               File dir = artifact.getParentFile();
@@ -157,10 +198,6 @@ public class Ingestor implements Runnable {
                   logger.info("Ingest from inbox into series with id {}", seriesID);
                   dcc.add(DublinCore.PROPERTY_IS_PART_OF, seriesID);
                 }
-              }
-
-              if (logger.isDebugEnabled()) {
-                logger.debug("episode dublincore for the inbox file {}: {}", artifact.getName(), dcc.toXml());
               }
 
               try (ByteArrayOutputStream dcout = new ByteArrayOutputStream()) {
@@ -228,11 +265,16 @@ public class Ingestor implements Runnable {
    * @param mediaFlavor           media flavor to use by default
    * @param inbox                 inbox directory to watch
    * @param maxThreads            maximum worker threads doing the actual ingest
+   * @param seriesService         reference to the active series service
    * @param maxTries              maximum tries for a ingest job
+   * @param secondsBetweenTries   time between retires in seconds
+   * @param metadataPattern       regular expression pattern for matching metadata in file names
+   * @param dateFormatter         date formatter pattern for parsing temporal metadata
    */
   public Ingestor(IngestService ingestService, SecurityContext secCtx,
           String workflowDefinition, Map<String, String> workflowConfig, String mediaFlavor, File inbox, int maxThreads,
-          SeriesService seriesService, int maxTries, int secondsBetweenTries) {
+          SeriesService seriesService, int maxTries, int secondsBetweenTries, Optional<Pattern> metadataPattern,
+          DateTimeFormatter dateFormatter) {
     this.ingestService = ingestService;
     this.secCtx = secCtx;
     this.workflowDefinition = workflowDefinition;
@@ -244,6 +286,8 @@ public class Ingestor implements Runnable {
     this.seriesService = seriesService;
     this.maxTries = maxTries;
     this.secondsBetweenTries = secondsBetweenTries;
+    this.metadataPattern = metadataPattern;
+    this.dateFormatter = dateFormatter;
   }
 
   /**
