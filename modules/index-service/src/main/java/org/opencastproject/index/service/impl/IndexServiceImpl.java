@@ -1563,6 +1563,9 @@ public class IndexServiceImpl implements IndexService {
       }
     }
 
+    if (unauthorizedScheduler || unauthorizedWorkflow || unauthorizedArchive)
+      throw new UnauthorizedException("Not authorized to remove event id " + id);
+
     // if all three services either removed the event successfully or couldn't find it, make sure it's also removed
     // from the index
     if ((removedScheduler || notFoundScheduler) && (removedWorkflow || notFoundWorkflow)
@@ -1574,19 +1577,17 @@ public class IndexServiceImpl implements IndexService {
       }
     }
 
-    if (notFoundScheduler && notFoundWorkflow && notFoundArchive)
-      throw new NotFoundException("Event id " + id + " not found.");
-
-    if (unauthorizedScheduler || unauthorizedWorkflow || unauthorizedArchive)
-      throw new UnauthorizedException("Not authorized to remove event id " + id);
-
     try {
       eventCommentService.deleteComments(id);
     } catch (EventCommentException e) {
       logger.error("Unable to remove comments for event '{}':", id, e);
     }
 
-    return removedScheduler && removedWorkflow && removedArchive;
+    if (notFoundScheduler && notFoundWorkflow && notFoundArchive)
+      throw new NotFoundException("Event id " + id + " not found.");
+
+    return ((removedScheduler || notFoundScheduler) && (removedWorkflow || notFoundWorkflow)
+            && (removedArchive || notFoundArchive));
   }
 
   private void updateWorkflowInstance(WorkflowInstance workflowInstance)
