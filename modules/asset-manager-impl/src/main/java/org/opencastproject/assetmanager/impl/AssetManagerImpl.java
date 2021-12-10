@@ -576,6 +576,19 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
+  public RichAResult getSnapshotsByIdOrderedByVersion(String mpId, boolean asc) {
+    RequireUtil.requireNotBlank(mpId, "mpId");
+    AQueryBuilder q = createQuery();
+    ASelectQuery query = baseQuery(q, mpId);
+    if (asc) {
+      query = query.orderBy(q.version().asc());
+    } else {
+      query = query.orderBy(q.version().desc());
+    }
+    return Enrichments.enrich(query.run());
+  }
+
+  @Override
   public RichAResult getSnapshotsByIdAndVersion(final String mpId, final Version version) {
     RequireUtil.requireNotBlank(mpId, "mpId");
     RequireUtil.notNull(version, "version");
@@ -594,12 +607,36 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
+  public RichAResult getSnapshotsByDateOrderedById(Date start, Date end) {
+    RequireUtil.notNull(start, "start");
+    RequireUtil.notNull(end, "end");
+    AQueryBuilder q = createQuery();
+    ASelectQuery query = baseQuery(q).where(q.archived().ge(start)).where(q.archived().le(end));
+    return Enrichments.enrich(query.orderBy(q.mediapackageId().asc()).run());
+  }
+
+  @Override
   public RichAResult getSnapshotsByIdAndDate(final String mpId, final Date start, final Date end) {
     RequireUtil.requireNotBlank(mpId, "mpId");
     RequireUtil.notNull(start, "start");
     RequireUtil.notNull(end, "end");
     AQueryBuilder q = createQuery();
     ASelectQuery query = baseQuery(q, mpId).where(q.archived().ge(start)).where(q.archived().le(end));
+    return Enrichments.enrich(query.run());
+  }
+
+  @Override
+  public RichAResult getSnapshotsByIdAndDateOrderedByVersion(String mpId, Date start, Date end, boolean asc) {
+    RequireUtil.requireNotBlank(mpId, "mpId");
+    RequireUtil.notNull(start, "start");
+    RequireUtil.notNull(end, "end");
+    AQueryBuilder q = createQuery();
+    ASelectQuery query = baseQuery(q, mpId).where(q.archived().ge(start)).where(q.archived().le(end));
+    if (asc) {
+      query = query.orderBy(q.version().asc());
+    } else {
+      query = query.orderBy(q.version().desc());
+    }
     return Enrichments.enrich(query.run());
   }
 

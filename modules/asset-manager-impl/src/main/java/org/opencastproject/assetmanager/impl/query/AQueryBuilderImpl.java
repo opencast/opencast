@@ -154,6 +154,10 @@ public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
     };
   }
 
+  @Override public Field<String> mediapackageId() {
+    return new SimpleSnapshotField<>(Q_SNAPSHOT.mediaPackageId);
+  }
+
   /**
    * A predicate that is based on a simple snapshot field expression.
    */
