@@ -34,9 +34,12 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SU
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
@@ -993,71 +996,76 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     final Lock lock = this.lock.get(workflowInstanceId);
     lock.lock();
     try {
+      // get workflow instance from index
       WorkflowQuery query = new WorkflowQuery();
       query.withId(Long.toString(workflowInstanceId));
       WorkflowSet workflows = index.getWorkflowInstances(query, Permissions.Action.READ.toString(), false);
-      if (workflows.size() == 1) {
-        WorkflowInstance instance = workflows.getItems()[0];
-
-        WorkflowInstance.WorkflowState state = instance.getState();
-        if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED
-            && state != WorkflowState.STOPPED) {
-          if (!force) {
-            throw new WorkflowStateException("Workflow instance with state '" + state + "' cannot be removed. " + "Only states SUCCEEDED, FAILED & STOPPED are allowed");
-          }
-          logger.info("Using force, removing workflow " + workflowInstanceId + " despite being in state " + state);
-        }
-
-        assertPermission(instance, Permissions.Action.WRITE.toString(), instance.getOrganizationId());
-
-        // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
-        removeTempFiles(instance);
-
-        // Second, remove jobs related to a operation which belongs to the workflow instance
-        List<WorkflowOperationInstance> operations = instance.getOperations();
-        List<Long> jobsToDelete = new ArrayList<>();
-        for (WorkflowOperationInstance op : operations) {
-          if (op.getId() != null) {
-            long workflowOpId = op.getId();
-            if (workflowOpId != workflowInstanceId) {
-              jobsToDelete.add(workflowOpId);
-            }
-          }
-        }
-        try {
-          serviceRegistry.removeJobs(jobsToDelete);
-        } catch (ServiceRegistryException e) {
-          logger.warn("Problems while removing jobs related to workflow operations '%s': %s", jobsToDelete,
-                  e.getMessage());
-        } catch (NotFoundException e) {
-          logger.debug("No jobs related to one of the workflow operations '%s' found in the service registry",
-                  jobsToDelete);
-        }
-
-        // Third, remove workflow instance job itself
-        try {
-          serviceRegistry.removeJobs(Collections.singletonList(workflowInstanceId));
-          removeWorkflowInstanceFromIndex(instance, elasticsearchIndex);
-        } catch (ServiceRegistryException e) {
-          logger.warn("Problems while removing workflow instance job '%d'", workflowInstanceId, e);
-        } catch (NotFoundException e) {
-          logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
-        }
-
-        // At last, remove workflow instance from the index
-        try {
-          index.remove(workflowInstanceId);
-        } catch (NotFoundException e) {
-          // This should never happen, because we got workflow instance by querying the index...
-          logger.warn("Workflow instance could not be removed from index", e);
-        }
-      } else if (workflows.size() == 0) {
-        throw new NotFoundException("Workflow instance with id '" + Long.toString(workflowInstanceId)
-                                              + "' could not be found");
-      } else {
-        throw new WorkflowDatabaseException("More than one workflow found with id: "
-                                                    + Long.toString(workflowInstanceId));
+      if (workflows.size() == 0) {
+        removeWorkflowInstanceFromIndex(workflowInstanceId, elasticsearchIndex);
+        throw new NotFoundException("Workflow instance with id '" + workflowInstanceId + "' could not be found");
       }
+      if (workflows.size() > 1) {
+        throw new WorkflowDatabaseException("More than one workflow found with id: " + workflowInstanceId);
+      }
+
+      WorkflowInstance instance = workflows.getItems()[0];
+
+      // check workflow state
+      WorkflowInstance.WorkflowState state = instance.getState();
+      if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED && state != WorkflowState.STOPPED) {
+        if (!force) {
+          throw new WorkflowStateException("Workflow instance with state '" + state + "' cannot be removed. "
+                  + "Only states SUCCEEDED, FAILED & STOPPED are allowed");
+        }
+        logger.info("Using force, removing workflow " + workflowInstanceId + " despite being in state " + state);
+      }
+
+      // are we allowed to do this?
+      assertPermission(instance, Permissions.Action.WRITE.toString(), instance.getOrganizationId());
+
+      // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
+      removeTempFiles(instance);
+
+      // Second, remove jobs related to a operation which belongs to the workflow instance
+      List<WorkflowOperationInstance> operations = instance.getOperations();
+      List<Long> jobsToDelete = new ArrayList<>();
+      for (WorkflowOperationInstance op : operations) {
+        if (op.getId() != null) {
+          long workflowOpId = op.getId();
+          if (workflowOpId != workflowInstanceId) {
+            jobsToDelete.add(workflowOpId);
+          }
+        }
+      }
+      try {
+        serviceRegistry.removeJobs(jobsToDelete);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Problems while removing jobs related to workflow operations '%s': %s", jobsToDelete,
+                e.getMessage());
+      } catch (NotFoundException e) {
+        logger.debug("No jobs related to one of the workflow operations '%s' found in the service registry",
+                jobsToDelete);
+      }
+
+      // Third, remove workflow instance job itself
+      try {
+        serviceRegistry.removeJobs(Collections.singletonList(workflowInstanceId));
+      } catch (ServiceRegistryException e) {
+        logger.warn("Problems while removing workflow instance job '%d'", workflowInstanceId, e);
+      } catch (NotFoundException e) {
+        logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
+      }
+
+      // Finally, remove workflow instance from the workflow index
+      try {
+        index.remove(workflowInstanceId);
+      } catch (NotFoundException e) {
+        // This should never happen, because we got workflow instance by querying the index...
+        logger.warn("Workflow instance could not be removed from index", e);
+      }
+
+      // Also remove workflow instance from the Elasticsearch index
+      removeWorkflowInstanceFromIndex(workflowInstanceId, elasticsearchIndex);
     } finally {
       lock.unlock();
     }
@@ -2424,45 +2432,63 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /**
    * Remove a workflow instance from the API index.
    *
-   * @param workflowInstance
-   *         the workflowInstance to remove
+   * @param workflowInstanceId
+   *         the identifier of the workflow instance to remove
    * @param index
    *         the index to update
    */
-  private void removeWorkflowInstanceFromIndex(WorkflowInstance workflowInstance, ElasticsearchIndex index) {
-    final long workflowInstanceId = workflowInstance.getId();
-    final String eventId = workflowInstance.getMediaPackage().getIdentifier().toString();
-
+  private void removeWorkflowInstanceFromIndex(long workflowInstanceId, ElasticsearchIndex index) {
     final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
 
-    logger.debug("Removing workflow instance {} of event {} from the {} index.", workflowInstanceId, eventId,
-            index.getIndexName());
-
-    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      if (!eventOpt.isPresent()) {
-        logger.warn("Workflow instance {} of event {} not found for removal from the {} index.", workflowInstanceId,
-                eventId, index.getIndexName());
-        return Optional.empty();
-      }
-      Event event = eventOpt.get();
-      if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowInstanceId)) {
-        logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", eventId,
-                workflowInstanceId);
-        event.setWorkflowId(null);
-        event.setWorkflowDefinitionId(null);
-        event.setWorkflowState(null);
-      }
-      return Optional.of(event);
-    };
-
+    // find events
+    SearchResult<Event> results;
     try {
-      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
-      logger.debug("Workflow instance {} of event {} removed from the {} index.", workflowInstanceId, eventId,
-              index.getIndexName());
+      results = index.getByQuery(new EventSearchQuery(orgId, user).withWorkflowId(workflowInstanceId));
     } catch (SearchIndexException e) {
-      logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
-              eventId, index.getIndexName(), e);
+      logger.error("Error retrieving the events for workflow instance {} from the {} index.", workflowInstanceId,
+              index.getIndexName(), e);
+      return;
+    }
+
+    if (results.getItems().length == 0) {
+      logger.warn("No events for workflow instance {} found in the {} index.", workflowInstanceId,
+              index.getIndexName());
+      return;
+    }
+
+    // should be only one event, but better safe than sorry
+    for (SearchResultItem<Event> item: results.getItems()) {
+      String eventId = item.getSource().getIdentifier();
+      logger.debug("Removing workflow instance {} of event {} from the {} index.", workflowInstanceId, eventId,
+              index.getIndexName());
+
+      Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
+        if (!eventOpt.isPresent()) {
+          logger.warn("Event {} of workflow instance {} not found in the {} index.", workflowInstanceId,
+                  eventId, index.getIndexName());
+          return Optional.empty();
+        }
+        Event event = eventOpt.get();
+        if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowInstanceId)) {
+          logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", eventId,
+                  workflowInstanceId);
+          event.setWorkflowId(null);
+          event.setWorkflowDefinitionId(null);
+          event.setWorkflowState(null);
+          return Optional.of(event);
+        }
+        return Optional.empty();
+      };
+
+      try {
+        index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
+        logger.debug("Workflow instance {} of event {} removed from the {} index.", workflowInstanceId, eventId,
+                index.getIndexName());
+      } catch (SearchIndexException e) {
+        logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
+                eventId, index.getIndexName(), e);
+      }
     }
   }
 

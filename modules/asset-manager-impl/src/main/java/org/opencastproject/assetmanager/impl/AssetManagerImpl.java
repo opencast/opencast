@@ -529,7 +529,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @param index
    *         The API index to update
    */
-  private void removeEventFromIndex(String eventId, ElasticsearchIndex index) {
+  private void removeArchivedVersionFromIndex(String eventId, ElasticsearchIndex index) {
     final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
     logger.debug("Received AssetManager delete episode message {}", eventId);
@@ -869,7 +869,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, MessageSender.DestinationType.Queue,
             AssetManagerItem.deleteEpisode(mpId, new Date()));
 
-    removeEventFromIndex(mpId, index);
+    removeArchivedVersionFromIndex(mpId, index);
   }
 
   /**

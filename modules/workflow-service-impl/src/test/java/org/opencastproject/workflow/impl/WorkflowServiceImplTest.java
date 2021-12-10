@@ -39,6 +39,7 @@ import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.job.api.JobContext;
@@ -317,6 +318,7 @@ public class WorkflowServiceImplTest {
     dao.setAssetManager(assetManager);
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
+    EasyMock.expect(result.getItems()).andReturn(new SearchResultItem[0]).anyTimes();
 
     final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
