@@ -240,6 +240,14 @@ button {
     display: inline-block;
 }
 
+// Exception for datetimepicker
+.ui-datepicker-buttonpane {
+  button {
+    height: initial;
+    min-width: initial;
+  }
+}
+
 // Buttons
 .add-btn {
     @include btn(green);
