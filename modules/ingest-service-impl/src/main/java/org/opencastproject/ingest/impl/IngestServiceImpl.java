@@ -129,6 +129,7 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -136,6 +137,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
 
@@ -1564,18 +1566,34 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
+        List<String> clusterUrls = new LinkedList<>();
+        try {
+          // Note that we are not checking ports here.
+          clusterUrls = organizationDirectoryService.getOrganization(uri.toURL()).getServers()
+                          .keySet()
+                          .stream()
+                          .collect(Collectors.toUnmodifiableList());
+        } catch (NotFoundException e) {
+          logger.warn("Unable to determine cluster members, will not be able to authenticate any downloads from them", e);
+        }
 
-        if (uri.getHost().matches(downloadSource)) {
-          CredentialsProvider provider = new BasicCredentialsProvider();
-          provider.setCredentials(
-              new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
-              new UsernamePasswordCredentials(downloadUser, downloadPassword));
-           externalHttpClient = HttpClientBuilder.create()
-              .setDefaultCredentialsProvider(provider)
-              .build();
+        if (uri.toString().matches(downloadSource)) {
+          //NB: We're creating a new client here with *different* auth than the system auth creds
+          externalHttpClient = getAuthedHttpClient();
           response = externalHttpClient.execute(get);
-        } else {
+        } else if (clusterUrls.contains(uri.getScheme() + "://" + uri.getHost())) {
+          // Only using the system-level httpclient and digest credentials against our own servers
           response = httpClient.execute(get);
+        } else {
+          //NB: No auth here at all
+          externalHttpClient = getNoAuthHttpClient();
+          response = externalHttpClient.execute(get);
+        }
+
+        if (null == response) {
+          // If you get here then chances are you're using a mock httpClient which does not have appropriate
+          // mocking to respond to the URL you are feeding it.  Try adding that URL to the mock and see if that works.
+          throw new IOException("Null response object from the http client, refer to code for explanation");
         }
 
         int httpStatusCode = response.getStatusLine().getStatusCode();
@@ -1758,6 +1776,20 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
+  }
+
+  //Used in testing
+  protected CloseableHttpClient getNoAuthHttpClient() {
+    return HttpClientBuilder.create().build();
+  }
+
+  protected CloseableHttpClient getAuthedHttpClient() {
+    HttpClientBuilder cb = HttpClientBuilder.create();
+    CredentialsProvider provider = new BasicCredentialsProvider();
+    provider.setCredentials(
+      new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
+      new UsernamePasswordCredentials(downloadUser, downloadPassword));
+    return cb.build();
   }
 
   private MediaPackage createSmil(MediaPackage mediaPackage) throws IOException, IngestException {
