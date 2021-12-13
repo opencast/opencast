@@ -344,6 +344,7 @@ public class IngestServiceImplTest {
     Dictionary<String, String> p = new Hashtable<>();
     p.put(IngestServiceImpl.DOWNLOAD_SOURCE, "http://localhost.*|http://www.test.com/.*");
     service.updated(p);
+    service.testMode = true;
   }
 
   @After
@@ -491,6 +492,13 @@ public class IngestServiceImplTest {
     testAuthWhitelist("http://www.example.org/testfile", "http://localhost.*", true, false, true);
     //Matching regex
     testAuthWhitelist("http://www.example.org/testfile", "http://localhost.*|http://www.example.org/.*", false, true, true);
+
+    //Local filesystem should be actively rejected.  This file needs to *not* be in the resources directory (look in the impl for why), and needs to be readable by the user running the test
+    //NB: This is a horrible, horrible hack, but it's the only way I can think of to get *out* of test-classes.  If you try and ../ your way up above that getResource NPEs, as expected.
+    testAuthWhitelist(getClass().getResource("./../../../../").toURI().resolve("../../pom.xml").toString(), ".*", true, false, false);
+    //Test to ensure we can't use '..' to get around filters.  Removing the ".." works as expected, see below
+    testAuthWhitelist(getClass().getResource("./../impl/IngestServiceImplTest.class").toURI().toString(), ".*", true, false, false);
+    testAuthWhitelist(getClass().getResource("./IngestServiceImplTest.class").toURI().toString(), ".*", false, false, false);
   }
 
 
