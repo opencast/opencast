@@ -4,6 +4,18 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.10
+
+*Released on December 13th, 2021*
+
+- [[GHSA-mf4f-j588-5xm8](https://github.com/opencast/opencast/security/advisories/GHSA-mf4f-j588-5xm8)] -
+  Apache Log4j Remote Code Execution
+- [[GHSA-j4mm-7pj3-jf7v](https://github.com/opencast/opencast/security/advisories/GHSA-j4mm-7pj3-jf7v)} -
+  HTTP Method Spoofing
+- [[#3080](https://github.com/opencast/opencast/pull/3080)] -
+  Backport fixes: chrome tests and Safari fix
+
+
 ### Opencast 9.9
 
 *Released on October 12th, 2021*
