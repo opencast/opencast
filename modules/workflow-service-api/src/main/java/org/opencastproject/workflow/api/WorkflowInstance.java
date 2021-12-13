@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +56,7 @@ import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -136,6 +136,7 @@ public class WorkflowInstance {
           orphanRemoval = true,
           fetch = FetchType.LAZY
   )
+  @OrderColumn
   protected List<WorkflowOperationInstance> operations;
 
 //  @Lob
@@ -224,12 +225,10 @@ public class WorkflowInstance {
       logger.error("Error: ", e);
     }
 
-    Set<WorkflowConfiguration> configurations = new TreeSet<WorkflowConfiguration>();
+    this.configurations = new TreeSet<WorkflowConfigurationForWorkflowInstance>();
     if (properties != null) {
       for (Map.Entry<String, String> entry : properties.entrySet()) {
-        WorkflowConfigurationForWorkflowInstance newConfig = new WorkflowConfigurationForWorkflowInstance(entry.getKey(), entry.getValue());
-        newConfig.setWorkflowInstance(this);
-        configurations.add(newConfig);
+        addConfiguration(entry.getKey() , entry.getValue());
       }
     }
   }
@@ -488,17 +487,21 @@ public class WorkflowInstance {
     if (key == null)
       return;
     if (configurations == null)
-      configurations = new HashSet<WorkflowConfigurationForWorkflowInstance>();
+      configurations = new TreeSet<>();
 
     // Adjust already existing values
-    for (WorkflowConfiguration config : configurations) {
+    for (WorkflowConfigurationForWorkflowInstance config : configurations) {
       if (config.getKey().equals(key)) {
-        ((WorkflowConfiguration) config).setValue(value);
+        ((WorkflowConfigurationForWorkflowInstance) config).setValue(value);
         return;
       }
     }
 
     // No configurations were found, so add a new one
+    addConfiguration(key , value);
+  }
+
+  private void addConfiguration(String key, String value) {
     WorkflowConfigurationForWorkflowInstance newConfig = new WorkflowConfigurationForWorkflowInstance(key, value);
     newConfig.setWorkflowInstance(this);
     configurations.add(newConfig);
@@ -533,6 +536,7 @@ public class WorkflowInstance {
     if (!workflowDefinition.getOperations().isEmpty() && after.getPosition() >= 0) {
       int offset = 0;
       for (WorkflowOperationDefinition entry : workflowDefinition.getOperations()) {
+        offset++;
         operations.add(after.getPosition() + offset, new WorkflowOperationInstance(entry, -1));
       }
       setOperations(operations);

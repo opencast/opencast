@@ -68,20 +68,20 @@ public class TestJobEndpoint extends JobEndpoint {
 
     List<WorkflowInstance> workflowSet = new ArrayList<>();
 
-    WorkflowInstance WorkflowInstance1 = new WorkflowInstance(wfD,
+    WorkflowInstance workflowInstance1 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage1"), 2L, null, null, new HashMap<String, String>());
-    WorkflowInstance WorkflowInstance2 = new WorkflowInstance(wfD,
+    WorkflowInstance workflowInstance2 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage2"), 2L, null, null, new HashMap<String, String>());
-    WorkflowInstance WorkflowInstance3 = new WorkflowInstance(wfD,
+    WorkflowInstance workflowInstance3 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage3"), 2L, null, null, new HashMap<String, String>());
 
-    WorkflowInstance1.setId(1);
-    WorkflowInstance2.setId(2);
-    WorkflowInstance3.setId(3);
+    workflowInstance1.setId(1);
+    workflowInstance2.setId(2);
+    workflowInstance3.setId(3);
 
-    workflowSet.add(WorkflowInstance1);
-    workflowSet.add(WorkflowInstance2);
-    workflowSet.add(WorkflowInstance3);
+    workflowSet.add(workflowInstance1);
+    workflowSet.add(workflowInstance2);
+    workflowSet.add(workflowInstance3);
 
     List<HostRegistration> hosts = new ArrayList<>();
     hosts.add(new JaxbHostRegistration("host1", "1.1.1.1", "node1", 100000, 8, 8, true, false));

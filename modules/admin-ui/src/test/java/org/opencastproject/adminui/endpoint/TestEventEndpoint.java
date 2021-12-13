@@ -309,26 +309,26 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     Track mp1Track = mp1.getTrack("publish-track-1");
     ((AbstractStreamImpl) mp1Track.getStreams()[0]).setIdentifier("fortesting");
 
-    final WorkflowInstance WorkflowInstance1 = new WorkflowInstance(wfD, mp1, 2L, null, null,
+    final WorkflowInstance workflowInstance1 = new WorkflowInstance(wfD, mp1, 2L, null, null,
             new HashMap<String, String>());
-    final WorkflowInstance WorkflowInstance2 = new WorkflowInstance(wfD,
+    final WorkflowInstance workflowInstance2 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage2"), 2L, null, null, new HashMap<String, String>());
-    final WorkflowInstance WorkflowInstance3 = new WorkflowInstance(wfD,
+    final WorkflowInstance workflowInstance3 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage3"), 2L, null, null, new HashMap<String, String>());
 
-    WorkflowInstance1.setId(1);
-    WorkflowInstance2.setId(2);
-    WorkflowInstance3.setId(3);
-    WorkflowInstance1.getOperations().get(0).setId(4L);
-    WorkflowInstance1.getOperations().get(1).setId(5L);
+    workflowInstance1.setId(1);
+    workflowInstance2.setId(2);
+    workflowInstance3.setId(3);
+    workflowInstance1.getOperations().get(0).setId(4L);
+    workflowInstance1.getOperations().get(1).setId(5L);
 
-    workflowSet.add(WorkflowInstance1);
-    workflowSet.add(WorkflowInstance2);
-    workflowSet.add(WorkflowInstance3);
+    workflowSet.add(workflowInstance1);
+    workflowSet.add(workflowInstance2);
+    workflowSet.add(workflowInstance3);
 
     WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.getWorkflowDefinitionById(EasyMock.anyString())).andReturn(wfD).anyTimes();
-    EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(WorkflowInstance1).anyTimes();
+    EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(workflowInstance1).anyTimes();
     EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
             .andAnswer(new IAnswer<List<WorkflowInstance>>() {
               @Override

@@ -126,6 +126,9 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
+    logger.info("LOL");
+    logger.info(workflowInstance.toString());
+    logger.info(workflowInstance.getMediaPackage().toString());
     MediaPackage mediaPackage = (MediaPackage) workflowInstance.getMediaPackage().clone();
     // Inspect the tracks
     long totalTimeInQueue = 0;

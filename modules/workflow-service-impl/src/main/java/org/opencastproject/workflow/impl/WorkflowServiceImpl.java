@@ -106,6 +106,7 @@ import org.opencastproject.workflow.api.WorkflowServiceDatabaseException;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.WorkflowStatistics;
+import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -644,20 +645,23 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
       }
 
-//      Map<String, String> wfProperties = new HashMap<>();
-//      for (String key : instance.getConfigurationKeys()) {
-//        wfProperties.put(key, instance.getConfiguration(key));
-//      }
-//      final Function<String, String> systemVariableGetter = key -> componentContext == null
-//              ? null
-//              : componentContext.getBundleContext().getProperty(key);
-//      if (instance.getOperations().stream().anyMatch(op -> op.getExecutionCondition() != null)) {
-////        instance = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(instance));
-//        instance.getOperations().stream().filter(op -> op.getExecutionCondition() != null).forEach(
-//                op -> op.setExecutionCondition(WorkflowConditionInterpreter.replaceVariables(op.getExecutionCondition(),
-//                        systemVariableGetter,
-//                        properties, true)));
-//      }
+      Map<String, String> wfProperties = new HashMap<>();
+      for (String key : instance.getConfigurationKeys()) {
+        wfProperties.put(key, instance.getConfiguration(key));
+      }
+      final Function<String, String> systemVariableGetter = key -> componentContext == null
+              ? null
+              : componentContext.getBundleContext().getProperty(key);
+      if (instance.getOperations().stream().anyMatch(op -> op.getExecutionCondition() != null)) {
+//        instance = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(instance));
+        instance.getOperations().stream().filter(op -> op.getExecutionCondition() != null).forEach(
+                op -> op.setExecutionCondition(WorkflowConditionInterpreter.replaceVariables(op.getExecutionCondition(),
+                        systemVariableGetter,
+                        properties, true)));
+      }
+
+
+      // TODO: Get this working again? Needed to parse "$()" strings EVERYWHERE in the instance
 //      String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(instance),
 //              systemVariableGetter, wfProperties, false);
 //      return WorkflowParser.parseWorkflowInstance(xml);

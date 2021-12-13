@@ -173,9 +173,7 @@ public class WorkflowOperationInstance implements Configurable {
     this.configurations = new TreeSet<WorkflowConfigurationForOperationInstance>();
     if (defConfigs != null) {
       for (String key : defConfigs) {
-        WorkflowConfigurationForOperationInstance newConfig = new WorkflowConfigurationForOperationInstance(key, def.getConfiguration(key));
-        newConfig.setWorkflowOperationInstance(this);
-        configurations.add(newConfig);
+        addConfiguration(key, def.getConfiguration(key));
 //        configurations.add(new WorkflowConfigurationForOperationInstance(key, def.getConfiguration(key)));
       }
     }
@@ -351,16 +349,14 @@ public class WorkflowOperationInstance implements Configurable {
     if (configurations == null)
       configurations = new TreeSet<WorkflowConfigurationForOperationInstance>();
 
-    for (WorkflowConfiguration config : configurations) {
+    for (WorkflowConfigurationForOperationInstance config : configurations) {
       if (config.getKey().equals(key)) {
-        ((WorkflowConfiguration) config).setValue(value);
+        ((WorkflowConfigurationForOperationInstance) config).setValue(value);
         return;
       }
     }
     // No configurations were found, so add a new one
-    WorkflowConfigurationForOperationInstance newConfig = new WorkflowConfigurationForOperationInstance(key, value);
-    newConfig.setWorkflowOperationInstance(this);
-    configurations.add(newConfig);
+    addConfiguration(key, value);
   }
 
   /**
@@ -372,11 +368,17 @@ public class WorkflowOperationInstance implements Configurable {
   public Set<String> getConfigurationKeys() {
     Set<String> keys = new TreeSet<String>();
     if (configurations != null && !configurations.isEmpty()) {
-      for (WorkflowConfiguration config : configurations) {
+      for (WorkflowConfigurationForOperationInstance config : configurations) {
         keys.add(config.getKey());
       }
     }
     return keys;
+  }
+
+  private void addConfiguration(String key, String value) {
+    WorkflowConfigurationForOperationInstance newConfig = new WorkflowConfigurationForOperationInstance(key, value);
+    newConfig.setWorkflowOperationInstance(this);
+    configurations.add(newConfig);
   }
 
   /**
@@ -481,7 +483,7 @@ public class WorkflowOperationInstance implements Configurable {
     return executeCondition;
   }
 
-  private void setExecutionCondition(String condition) {
+  public void setExecutionCondition(String condition) {
     this.executeCondition = condition;
   }
 
