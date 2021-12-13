@@ -95,7 +95,14 @@ yum install elasticsearch-oss
 
 Opencast automatically configures the search index once it is connected.
 The default configuration will work for a local Elasticsearch with no modifications.
-Just make sure to start and enable the service:
+The only exception for this is to add a configuration to mitigate Log4Shell.
+For this, add a file `/etc/elasticsearch/jvm.options.d/log4shell` with the content:
+
+```
+-Dlog4j2.formatMsgNoLookups=true
+```
+
+Finally, make sure to start and enable the service:
 
 ```sh
 systemctl start elasticsearch
