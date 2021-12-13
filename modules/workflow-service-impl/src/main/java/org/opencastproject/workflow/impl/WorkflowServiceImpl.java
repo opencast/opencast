@@ -662,6 +662,19 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
 
       // TODO: Get this working again? Needed to parse "$()" strings EVERYWHERE in the instance
+      // Band-aid code, should probably be replaced
+      for (String configKey : instance.getConfigurationKeys()) {
+              String configValue = WorkflowConditionInterpreter.replaceVariables(instance.getConfiguration(configKey),
+                      systemVariableGetter, wfProperties, false);
+              instance.setConfiguration(configKey, configValue);
+      }
+      for (WorkflowOperationInstance operationInstance : instance.getOperations()) {
+        for (String configKey : operationInstance.getConfigurationKeys()) {
+          String configValue = WorkflowConditionInterpreter.replaceVariables(
+                  operationInstance.getConfiguration(configKey), systemVariableGetter, wfProperties, false);
+          operationInstance.setConfiguration(configKey, configValue);
+        }
+      }
 //      String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(instance),
 //              systemVariableGetter, wfProperties, false);
 //      return WorkflowParser.parseWorkflowInstance(xml);
