@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
@@ -81,7 +84,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
         // for media packages
         // TODO: Add back "order by w.dateCreated"?
         @NamedQuery(name = "Workflow.byMediaPackage", query = "SELECT w FROM WorkflowInstance w where "
-                + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId"),
+                + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId order by w.dateCreated"),
         @NamedQuery(name = "Workflow.countActiveByMediaPackage", query = "SELECT COUNT(w) FROM WorkflowInstance w where "
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
                 + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning)"),
@@ -119,6 +122,14 @@ public class WorkflowInstance {
 
   @Column(name = "organizationId")
   private String organizationId;
+
+  @Column(name = "dateCreated")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date dateCreated = null;
+
+  @Column(name = "dateCompleted")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date dateCompleted = null;
 
   @Lob
   @Basic(fetch = FetchType.LAZY)
@@ -214,6 +225,7 @@ public class WorkflowInstance {
     if (organization != null)
       this.organizationId = organization.getId();
     this.state = WorkflowState.INSTANTIATED;
+    this.dateCreated = new Date();
     this.mediaPackage = MediaPackageParser.getAsXml(mediaPackage);
     this.mediaPackageId = mediaPackage.getIdentifier().toString();
     this.seriesId = mediaPackage.getSeries();
@@ -246,6 +258,10 @@ public class WorkflowInstance {
   }
 
   public void setState(WorkflowState state) {
+    if (dateCompleted == null && state.isTerminated()) {
+      dateCompleted = new Date();
+    }
+
     this.state = state;
   }
 
@@ -295,6 +311,22 @@ public class WorkflowInstance {
 
   public void setOrganizationId(String organizationId) {
     this.organizationId = organizationId;
+  }
+
+  public Date getDateCreated() {
+    return dateCreated;
+  }
+
+  public void setDateCreated(Date dateCreated) {
+    this.dateCreated = dateCreated;
+  }
+
+  public Date getDateCompleted() {
+    return dateCompleted;
+  }
+
+  public void setDateCompleted(Date dateCompleted) {
+    this.dateCompleted = dateCompleted;
   }
 
   public MediaPackage getMediaPackage()  {

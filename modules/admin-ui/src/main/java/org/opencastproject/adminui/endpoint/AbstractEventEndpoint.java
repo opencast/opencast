@@ -142,7 +142,7 @@ import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowQuery;
+import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowUtil;
@@ -230,6 +230,8 @@ public abstract class AbstractEventEndpoint {
   /** The configuration key that defines the default workflow definition */
   //TODO Move to a constants file instead of declaring it at the top of multiple files?
   protected static final String WORKFLOW_DEFINITION_DEFAULT = "org.opencastproject.workflow.default.definition";
+
+  private static final String WORKFLOW_STATUS_TRANSLATION_PREFIX = "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.";
 
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
@@ -1783,13 +1785,31 @@ public abstract class AbstractEventEndpoint {
         return okJson(obj(f("workflowId", v(agentConfiguration.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION), Jsons.BLANK)),
                 f("configuration", obj(fields))));
       } else {
-        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withCount(999999).withMediaPackage(id)));
+        List<WorkflowInstance> workflowInstances = getWorkflowService().getWorkflowInstancesByMediaPackage(id);
+        List<JValue> jsonList = new ArrayList<>();
+
+        for (WorkflowInstance instance : workflowInstances) {
+          long instanceId = instance.getId();
+          Date created = instance.getDateCreated();
+          String creatorName = instance.getCreatorName();
+
+          jsonList.add(obj(f("id", v(instanceId)), f("title", v(instance.getTitle(), Jsons.BLANK)),
+                  f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
+                  f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : "", Jsons.BLANK)),
+                  f("submitter", v(creatorName, Jsons.BLANK))));
+        }
+
+        JObject json = obj(f("results", arr(jsonList)));
+        return okJson(json);
       }
     } catch (NotFoundException e) {
       return notFound("Cannot find workflows for event %s", id);
     } catch (SchedulerException e) {
       logger.error("Unable to get workflow data for event with id {}", id);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+    } catch (WorkflowDatabaseException e) {
+      throw new JobEndpointException(String.format("Not able to get the list of job from the database: %s", e),
+              e.getCause());
     }
   }
 
@@ -1876,9 +1896,46 @@ public abstract class AbstractEventEndpoint {
     }
 
     try {
-      return okJson(getJobService().getTasksAsJSON(workflowInstanceId));
+      WorkflowInstance instance = getWorkflowService().getWorkflowById(workflowInstanceId);
+      // Gather user information
+//      User user = instance.getCreator();
+//      List<Field> userInformation = new ArrayList<>();
+//      if (user != null) {
+//        userInformation.add(f("username", v(user.getUsername())));
+//        userInformation.add(f("name", v(user.getName(), Jsons.BLANK)));
+//        userInformation.add(f("email", v(user.getEmail(), Jsons.BLANK)));
+//      }
+      // Retrieve submission date with the workflow instance main job
+      Date created = instance.getDateCreated();
+      long executionTime;
+
+      Date completed = instance.getDateCompleted();
+      if (completed == null)
+        completed = new Date();
+
+      executionTime = (completed.getTime() - created.getTime());
+
+      List<Field> fields = new ArrayList<>();
+      for (String key : instance.getConfigurationKeys()) {
+        fields.add(f(key, v(instance.getConfiguration(key), Jsons.BLANK)));
+      }
+
+      JValue list = obj(f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState(), Jsons.BLANK)),
+              f("description", v(instance.getDescription(), Jsons.BLANK)), f("executionTime", v(executionTime, Jsons.BLANK)),
+              f("wiid", v(instance.getId(), Jsons.BLANK)), f("title", v(instance.getTitle(), Jsons.BLANK)),
+              f("wdid", v(instance.getTemplate(), Jsons.BLANK)), f("configuration", obj(fields)),
+              f("submittedAt", v(created != null ? toUTC(created.getTime()) : "", Jsons.BLANK)),
+//              f("creator", obj(userInformation)));
+              f("creator", v(instance.getCreatorName(), Jsons.BLANK)));
+
+      return okJson(list);
     } catch (NotFoundException e) {
       return notFound("Cannot find workflow  %s", workflowId);
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Unable to get workflow %s of event %s", workflowId, eventId, e);
+      return serverError();
+    } catch (UnauthorizedException e) {
+      return forbidden();
     }
   }
 
@@ -1892,7 +1949,7 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventOperations(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId)
-          throws JobEndpointException, SearchIndexException {
+          throws SearchIndexException {
     Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
@@ -1906,9 +1963,28 @@ public abstract class AbstractEventEndpoint {
     }
 
     try {
-      return okJson(getJobService().getOperationsAsJSON(workflowInstanceId));
+      WorkflowInstance instance = getWorkflowService().getWorkflowById(workflowInstanceId);
+
+      List<WorkflowOperationInstance> operations = instance.getOperations();
+      List<JValue> operationsJSON = new ArrayList<>();
+
+      for (WorkflowOperationInstance wflOp : operations) {
+        List<Field> fields = new ArrayList<>();
+        for (String key : wflOp.getConfigurationKeys()) {
+          fields.add(f(key, v(wflOp.getConfiguration(key), Jsons.BLANK)));
+        }
+        operationsJSON.add(obj(f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + wflOp.getState(), Jsons.BLANK)), f("title", v(wflOp.getTemplate(), Jsons.BLANK)),
+                f("description", v(wflOp.getDescription(), Jsons.BLANK)), f("id", v(wflOp.getId(), Jsons.BLANK)), f("configuration", obj(fields))));
+      }
+
+      return okJson(arr(operationsJSON));
     } catch (NotFoundException e) {
       return notFound("Cannot find workflow %s", workflowId);
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Unable to get workflow operations of event %s and workflow %s", eventId, workflowId, e);
+      return serverError();
+    } catch (UnauthorizedException e) {
+      return forbidden();
     }
   }
 
@@ -1923,7 +1999,7 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Unable to parse workflowId or operationPosition", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "No operation with these identifiers was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventOperation(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId,
-          @PathParam("operationPosition") Integer operationPosition) throws JobEndpointException, SearchIndexException {
+          @PathParam("operationPosition") Integer operationPosition) throws SearchIndexException {
     Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
@@ -1936,11 +2012,38 @@ public abstract class AbstractEventEndpoint {
       return RestUtil.R.badRequest();
     }
 
+    WorkflowInstance instance;
     try {
-      return okJson(getJobService().getOperationAsJSON(workflowInstanceId, operationPosition));
-    } catch (NotFoundException e) {
+      instance = getWorkflowService().getWorkflowById(workflowInstanceId);    } catch (NotFoundException e) {
       return notFound("Cannot find workflow %s", workflowId);
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Unable to get workflow operation of event %s and workflow %s at position %s", eventId, workflowId,
+              operationPosition, e);
+      return serverError();
+    } catch (UnauthorizedException e) {
+      return forbidden();
     }
+
+    List<WorkflowOperationInstance> operations = instance.getOperations();
+
+    if (operations.size() > operationPosition) {
+      WorkflowOperationInstance wflOp = operations.get(operationPosition);
+      return okJson(obj(f("retry_strategy", v(wflOp.getRetryStrategy(), Jsons.BLANK)),
+              f("execution_host", v(wflOp.getExecutionHost(), Jsons.BLANK)),
+              f("failed_attempts", v(wflOp.getFailedAttempts())),
+              f("max_attempts", v(wflOp.getMaxAttempts())),
+              f("exception_handler_workflow", v(wflOp.getExceptionHandlingWorkflow(), Jsons.BLANK)),
+              f("fail_on_error", v(wflOp.isFailWorkflowOnException())),
+              f("description", v(wflOp.getDescription(), Jsons.BLANK)),
+              f("state", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + wflOp.getState(), Jsons.BLANK)),
+              f("job", v(wflOp.getId(), Jsons.BLANK)),
+              f("name", v(wflOp.getTemplate(), Jsons.BLANK)),
+              f("time_in_queue", v(wflOp.getTimeInQueue(), v(0))),
+              f("started", wflOp.getDateStarted() != null ? v(toUTC(wflOp.getDateStarted().getTime())) : Jsons.BLANK),
+              f("completed", wflOp.getDateCompleted() != null ? v(toUTC(wflOp.getDateCompleted().getTime())) : Jsons.BLANK))
+      );
+    }
+    return notFound("Cannot find workflow operation of workflow %s at position %s", workflowId, operationPosition);
   }
 
   @GET
