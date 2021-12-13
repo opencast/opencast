@@ -4,6 +4,54 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.6
+
+*Released on December 13th, 2021*
+
+- [[GHSA-hcxx-mp6g-6gr9](https://github.com/opencast/opencast/security/advisories/GHSA-hcxx-mp6g-6gr9)] -
+  Opencast publishes global system account credentials
+- [[GHSA-59g4-hpg3-3gcp](https://github.com/opencast/opencast/security/advisories/GHSA-59g4-hpg3-3gcp)] -
+  Files Accessible to External Parties
+- [[#3252](https://github.com/opencast/opencast/pull/3252)] -
+  Update Stand-alone Editor to 2021-12-10
+- [[#3241](https://github.com/opencast/opencast/pull/3241)] -
+  Fix Ingest Download Configuration
+- [[#3222](https://github.com/opencast/opencast/pull/3222)] -
+  Improve Inbox Documentation
+- [[#3205](https://github.com/opencast/opencast/pull/3205)] -
+  Fix Date Time Picker
+- [[#3202](https://github.com/opencast/opencast/pull/3202)] -
+  asset-manager move to S3 duplicates identical files #3164
+- [[#3200](https://github.com/opencast/opencast/pull/3200)] -
+  Handle multiple creators in Theodul
+- [[#3199](https://github.com/opencast/opencast/pull/3199)] -
+  Allow null value for (event) comment author email field
+- [[#3186](https://github.com/opencast/opencast/pull/3186)] -
+  Use comma as separator for WFR cleanup config
+- [[#3183](https://github.com/opencast/opencast/pull/3183)] -
+  fix editor remote endpoint 403 error
+- [[#3182](https://github.com/opencast/opencast/pull/3182)] -
+  handle null or empty workflow state
+- [[#3181](https://github.com/opencast/opencast/pull/3181)] -
+  Assure that S3 upload runtime exceptions are logged
+- [[#3178](https://github.com/opencast/opencast/pull/3178)] -
+  More context for graph about supported version
+- [[#3174](https://github.com/opencast/opencast/pull/3174)] -
+  Fix NullPointerException in `CachedJWT` if `exp` claim does not exist
+- [[#3173](https://github.com/opencast/opencast/pull/3173)] -
+  Ensure JWT Feature is Installed
+- [[#3172](https://github.com/opencast/opencast/pull/3172)] -
+  Improve Admin UI Performance
+- [[#3160](https://github.com/opencast/opencast/pull/3160)] -
+  Analyze mediapackage WOH
+- [[#3147](https://github.com/opencast/opencast/pull/3147)] -
+  Drop existing video chaptermarks on cutting
+- [[#3142](https://github.com/opencast/opencast/pull/3142)] -
+  Update paella player to paella 6.5.5
+- [[#3058](https://github.com/opencast/opencast/pull/3058)] -
+  Stream Security Fix
+
+
 ### Opencast 10.5
 
 *Released on November 10th, 2021*
@@ -745,6 +793,18 @@ Opencast 10
 
 Opencast 9
 ----------
+
+### Opencast 9.10
+
+*Released on December 13th, 2021*
+
+- [[GHSA-mf4f-j588-5xm8](https://github.com/opencast/opencast/security/advisories/GHSA-mf4f-j588-5xm8)] -
+  Apache Log4j Remote Code Execution
+- [[GHSA-j4mm-7pj3-jf7v](https://github.com/opencast/opencast/security/advisories/GHSA-j4mm-7pj3-jf7v)} -
+  HTTP Method Spoofing
+- [[#3080](https://github.com/opencast/opencast/pull/3080)] -
+  Backport fixes: chrome tests and Safari fix
+
 
 ### Opencast 9.9
 
