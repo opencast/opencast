@@ -109,7 +109,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   private OrganizationDatabase persistence = null;
 
   /** The list of directory listeners */
-  private final List<OrganizationDirectoryListener> listeners = new ArrayList<OrganizationDirectoryListener>();
+  private final List<OrganizationDirectoryListener> listeners = new ArrayList<>();
 
   private OrgCache cache;
 
@@ -188,7 +188,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     final String anonRole = (String) properties.get(ORG_ANONYMOUS_ROLE_KEY);
 
     // Build the properties map
-    final Map<String, String> orgProperties = new HashMap<String, String>();
+    final Map<String, String> orgProperties = new HashMap<>();
     HashMap<String, Integer> servers = new HashMap<>();
 
     for (Enumeration<?> e = properties.keys(); e.hasMoreElements();) {
@@ -280,13 +280,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    *          the organization
    */
   private void fireOrganizationRegistered(final Organization organization) {
-    executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        for (OrganizationDirectoryListener listener : listeners) {
-          logger.debug("Notifying {} about newly registered organization '{}'", listener, organization);
-          listener.organizationRegistered(organization);
-        }
+    executor.submit(() -> {
+      for (OrganizationDirectoryListener listener : listeners) {
+        logger.debug("Notifying {} about newly registered organization '{}'", listener, organization);
+        listener.organizationRegistered(organization);
       }
     });
   }
@@ -298,13 +295,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    *          the organization
    */
   private void fireOrganizationUnregistered(final Organization organization) {
-    executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        for (OrganizationDirectoryListener listener : listeners) {
-          logger.debug("Notifying {} about unregistered organization '{}'", listener, organization);
-          listener.organizationUnregistered(organization);
-        }
+    executor.submit(() -> {
+      for (OrganizationDirectoryListener listener : listeners) {
+        logger.debug("Notifying {} about unregistered organization '{}'", listener, organization);
+        listener.organizationUnregistered(organization);
       }
     });
   }
@@ -316,13 +310,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    *          the organization
    */
   private void fireOrganizationUpdated(final Organization organization) {
-    executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        for (OrganizationDirectoryListener listener : listeners) {
-          logger.debug("Notifying {} about updated organization '{}'", listener, organization);
-          listener.organizationUpdated(organization);
-        }
+    executor.submit(() -> {
+      for (OrganizationDirectoryListener listener : listeners) {
+        logger.debug("Notifying {} about updated organization '{}'", listener, organization);
+        listener.organizationUpdated(organization);
       }
     });
   }
