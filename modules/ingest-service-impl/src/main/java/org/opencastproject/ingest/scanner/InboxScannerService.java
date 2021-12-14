@@ -29,17 +29,14 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.ingest.api.IngestService;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -179,21 +176,17 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     final int maxThreads = NumberUtils.toInt(Objects.toString(properties.get(INBOX_THREADS), "1"));
     final int maxTries = NumberUtils.toInt(Objects.toString(properties.get(INBOX_TRIES), "3"));
     final int secondsBetweenTries = NumberUtils.toInt(Objects.toString(properties.get(INBOX_TRIES_BETWEEN_SEC), "300"));
-    final Option<SecurityContext> secCtx = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
-            .bind(new Function<Tuple<User, Organization>, Option<SecurityContext>>() {
-              @Override
-              public Option<SecurityContext> apply(Tuple<User, Organization> a) {
-                return some(new SecurityContext(securityService, a.getB(), a.getA()));
-              }
-            });
-    // Only setup new inbox if security context could be aquired
-    if (secCtx.isSome()) {
+
+    var securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
+            .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
+    // Only setup new inbox if security context could be acquired
+    if (securityContext.isPresent()) {
       // remove old file install configuration
       fileInstallCfg.foreach(removeFileInstallCfg);
       // set up new file install config
       fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
       // create new scanner
-      Ingestor ingestor = new Ingestor(ingestService, secCtx.get(), workflowDefinition,
+      Ingestor ingestor = new Ingestor(ingestService, securityContext.get(), workflowDefinition,
               workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries);
       this.ingestor = some(ingestor);
       new Thread(ingestor).start();
