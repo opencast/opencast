@@ -1,8 +1,6 @@
 import React from 'react';
-import {BrowserRouter, HashRouter, Route, Switch} from "react-router-dom";
+import {HashRouter, Route, Switch} from "react-router-dom";
 import './App.scss';
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import Events from "./components/events/Events";
 import Recordings from "./components/recordings/Recordings";
 import Jobs from "./components/systems/Jobs";
@@ -18,7 +16,7 @@ import Acls from "./components/users/Acls";
 
 function App() {
   return (
-          <BrowserRouter>
+          <HashRouter>
               <Switch>
                   {/*Todo: When user is logged in then redirect to Events*/}
                   <Route exact path={"/login"}>
@@ -61,7 +59,7 @@ function App() {
                       <Statistics />
                   </Route>
               </Switch>
-          </BrowserRouter>
+          </HashRouter>
   );
 }
 
