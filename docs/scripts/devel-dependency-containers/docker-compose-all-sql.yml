@@ -8,6 +8,7 @@ services:
       - 127.0.0.1:9300:9300
     environment:
       discovery.type: single-node
+      ES_JAVA_OPTS: '-Dlog4j2.formatMsgNoLookups=true'
   activemq:
     container_name: opencast-activemq
     image: quay.io/lkiesow/activemq
