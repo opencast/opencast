@@ -93,6 +93,17 @@ If you wish to use the upstream Elasticsearch repository directly be aware that 
 versions with the same major and minor version values.  That is, if our 9.x repository has Elasticsearch 7.9.2 then
 Opencast only formally supports Elasticsearch versions starting with 7.9.
 
+The default Elasticsearch configuration should work for Opencast out of the box, however there is one change you should make.
+[Log4Shell](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) affects Elasticsearch, and you should mitigate this by adding a
+file at `/etc/elasticsearch/jvm.options.d/log4shell.options` with the content:
+
+```
+-Dlog4j2.formatMsgNoLookups=true
+```
+
+This applies a mitigation for the security issue.  Once applied, you should restart Elasticsearch.
+
+
 
 Install Opencast
 ------------------
