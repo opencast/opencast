@@ -132,8 +132,9 @@ public final class WorkflowParser {
   public static WorkflowInstance parseWorkflowInstance(InputStream in) throws WorkflowParsingException {
     try {
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      WorkflowInstance workflow = unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowInstance.class)
+      JaxbWorkflowInstance jaxbWorkflow = unmarshaller.unmarshal(XmlSafeParser.parse(in), JaxbWorkflowInstance.class)
               .getValue();
+      WorkflowInstance workflow = jaxbWorkflow.toWorkflowInstance();
       workflow.init();
       return workflow;
     } catch (Exception e) {
@@ -242,6 +243,18 @@ public final class WorkflowParser {
   }
 
   public static String toXml(WorkflowInstance workflowInstance) throws WorkflowParsingException {
+    try {
+      Marshaller marshaller = jaxbContext.createMarshaller();
+      Writer writer = new StringWriter();
+      marshaller.marshal(workflowInstance, writer);
+      return writer.toString();
+    } catch (Exception e) {
+      throw new WorkflowParsingException(e);
+    }
+
+  }
+
+  public static String toXml(JaxbWorkflowInstance workflowInstance) throws WorkflowParsingException {
     try {
       Marshaller marshaller = jaxbContext.createMarshaller();
       Writer writer = new StringWriter();

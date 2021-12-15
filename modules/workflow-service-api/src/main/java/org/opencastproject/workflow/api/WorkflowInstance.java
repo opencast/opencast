@@ -169,7 +169,6 @@ public class WorkflowInstance {
   @Column(name = "seriesId", length = 128)
   protected String seriesId;
 
-  @Column(name = "initialized")
   protected boolean initialized = false;
 
   public enum WorkflowState {
@@ -243,6 +242,39 @@ public class WorkflowInstance {
         addConfiguration(entry.getKey() , entry.getValue());
       }
     }
+  }
+
+  public WorkflowInstance(
+          long id,
+          WorkflowState state,
+          String template,
+          String title,
+          String description,
+          Long parentId,
+          String creatorName,
+          String organizationId,
+          Date dateCreated,
+          Date dateCompleted,
+          MediaPackage mediaPackage,
+          List<WorkflowOperationInstance> operations,
+          Set<WorkflowConfigurationForWorkflowInstance> configurations,
+          String mediaPackageId,
+          String seriesId) {
+    this.workflowId = id;
+    this.state = state;
+    this.template = template;
+    this.title = title;
+    this.description = description;
+    this.parentId = parentId;
+    this.creatorName = creatorName;
+    this.organizationId = organizationId;
+    this.dateCreated = dateCreated;
+    this.dateCompleted = dateCompleted;
+    this.mediaPackage = MediaPackageParser.getAsXml(mediaPackage);
+    this.operations = operations;
+    this.configurations = configurations;
+    this.mediaPackageId = mediaPackageId;
+    this.seriesId = seriesId;
   }
 
   public long getId() {

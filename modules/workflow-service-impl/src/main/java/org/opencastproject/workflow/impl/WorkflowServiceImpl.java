@@ -103,6 +103,7 @@ import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowServiceDatabase;
 import org.opencastproject.workflow.api.WorkflowServiceDatabaseException;
+import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.WorkflowStatistics;
@@ -1329,7 +1330,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           updateWorkflowInstanceInIndex(workflowInstance, accessControlList, episodeDublinCoreCatalog,
                   elasticsearchIndex);
         }
-//        index(workflowInstance);
+        index(workflowInstance);
 
         //Update the database
         persistence.updateInDatabase(workflowInstance);
@@ -1415,7 +1416,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
-  public List<WorkflowInstance> getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
+  public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
     return index.getWorkflowInstances(query, Permissions.Action.READ.toString(), true);
   }
 
@@ -1425,7 +1426,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
    */
   @Override
-  public List<WorkflowInstance> getWorkflowInstancesForAdministrativeRead(WorkflowQuery query) throws WorkflowDatabaseException,
+  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery query) throws WorkflowDatabaseException,
           UnauthorizedException {
     User user = securityService.getUser();
     if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole()))
@@ -1962,8 +1963,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         securityService.setOrganization(org);
         WorkflowQuery workflowQuery = new WorkflowQuery().withState(WorkflowInstance.WorkflowState.PAUSED).withCount(
                 Integer.MAX_VALUE);
-        List<WorkflowInstance> workflowSet = getWorkflowInstances(workflowQuery);
-        workflows.addAll(workflowSet);
+        WorkflowSet workflowSet = getWorkflowInstances(workflowQuery);
+        workflows.addAll(workflowSet.getItems());
       }
     } finally {
       securityService.setOrganization(organization);
@@ -2296,7 +2297,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
     WorkflowQuery query = new WorkflowQuery().withState(state).withDateBefore(DateUtils.addDays(new Date(), -buffer))
             .withCount(Integer.MAX_VALUE);
-    for (WorkflowInstance workflowInstance : getWorkflowInstances(query)) {
+    for (WorkflowInstance workflowInstance : getWorkflowInstances(query).getItems()) {
       try {
         remove(workflowInstance.getId());
         instancesCleaned++;

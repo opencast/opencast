@@ -45,6 +45,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
+import org.opencastproject.workflow.api.JaxbWorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -54,6 +55,7 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.QueryTerm;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
+import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport.OperationReport;
@@ -71,6 +73,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.osgi.framework.ServiceException;
@@ -447,7 +450,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     doc.addField(WORKFLOW_DEFINITION_KEY, instance.getTemplate());
     doc.addField(STATE_KEY, instance.getState().toString());
 //    String xml = WorkflowParser.toXml(instance);
-//    doc.addField(WORKFLOW_INSTANCE_KEY, instance);
+    doc.addField(XML_KEY, WorkflowParser.toXml(new JaxbWorkflowInstance(instance)));
 
     // index the current operation if there is one. If the workflow is finished, there is no current operation, so use a
     // constant
@@ -1007,7 +1010,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    *      String, boolean)
    */
   @Override
-  public List<WorkflowInstance> getWorkflowInstances(WorkflowQuery query, String action, boolean applyPermissions)
+  public WorkflowSetImpl getWorkflowInstances(WorkflowQuery query, String action, boolean applyPermissions)
           throws WorkflowDatabaseException {
     int count = query.getCount() > 0 ? (int) query.getCount() : 20; // default to 20 items if not specified
     int startIndex = query.getStartPage() > 0 ? (int) query.getStartPage() * count : (int) query.getStartIndex();
@@ -1030,28 +1033,28 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     long totalHits;
     long time = System.currentTimeMillis();
-    List<WorkflowInstance> set = null;
+    WorkflowSetImpl set = null;
     try {
       QueryResponse response = solrServer.query(solrQuery);
       SolrDocumentList items = response.getResults();
       long searchTime = System.currentTimeMillis() - time;
       totalHits = items.getNumFound();
 
-      set = new ArrayList<>();
-//      set.setPageSize(count);
-//      set.setTotalCount(totalHits);
-//      set.setStartPage(query.getStartPage());
-//      set.setSearchTime(searchTime);
+      set = new WorkflowSetImpl();
+      set.setPageSize(count);
+      set.setTotalCount(totalHits);
+      set.setStartPage(query.getStartPage());
+      set.setSearchTime(searchTime);
 
-      // Iterate through the results
-//      for (SolrDocument doc : items) {
-//        WorkflowInstance instance = (WorkflowInstance) doc.get(WORKFLOW_INSTANCE_KEY);
-//        try {
-//          set.addItem(instance);
-//        } catch (Exception e) {
-//          throw new IllegalStateException("can not parse workflow xml", e);
-//        }
-//      }
+//       Iterate through the results
+      for (SolrDocument doc : items) {
+        String xml = (String) doc.get(XML_KEY);
+        try {
+          set.addItem(WorkflowParser.parseWorkflowInstance(xml));
+        } catch (Exception e) {
+          throw new IllegalStateException("can not parse workflow xml", e);
+        }
+      }
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     }

@@ -24,6 +24,7 @@ package org.opencastproject.workflow.api;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -41,7 +42,7 @@ public class WorkflowSetImpl implements WorkflowSet {
 
   /** A list of search items. */
   @XmlElement(name = "workflow")
-  private List<WorkflowInstance> resultSet = null;
+  private List<JaxbWorkflowInstance> resultSet = null;
 
   /** The pagination offset. */
   @XmlAttribute(name = "startPage")
@@ -66,7 +67,7 @@ public class WorkflowSetImpl implements WorkflowSet {
   }
 
   public WorkflowSetImpl(List<WorkflowInstance> workflows) {
-    this.resultSet = workflows;
+    this.resultSet = workflows.stream().map(workflow -> new JaxbWorkflowInstance(workflow)).collect(Collectors.toList());
   }
 
 
@@ -77,7 +78,7 @@ public class WorkflowSetImpl implements WorkflowSet {
    */
   @Override
   public List<WorkflowInstance> getItems() {
-    return resultSet == null || resultSet.size() == 0 ? new ArrayList<>() : resultSet;
+    return resultSet == null || resultSet.size() == 0 ? new ArrayList<>() : resultSet.stream().map(workflow -> workflow.toWorkflowInstance()).collect(Collectors.toList());
   }
 
   /**
@@ -90,8 +91,8 @@ public class WorkflowSetImpl implements WorkflowSet {
     if (item == null)
       throw new IllegalArgumentException("Parameter item cannot be null");
     if (resultSet == null)
-      resultSet = new ArrayList<WorkflowInstance>();
-    resultSet.add((WorkflowInstance) item);
+      resultSet = new ArrayList<JaxbWorkflowInstance>();
+    resultSet.add(new JaxbWorkflowInstance(item));
   }
 
   /**

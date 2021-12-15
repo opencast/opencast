@@ -95,7 +95,7 @@ public interface WorkflowService {
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instances from persistence
    */
-  List<WorkflowInstance> getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException;
+  WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException;
 
   /**
    * Finds workflow instances based on the specified query for administrative access.
@@ -108,7 +108,7 @@ public interface WorkflowService {
    * @throws UnauthorizedException
    *           if the user does not own an administrative role
    */
-  List<WorkflowInstance> getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
+  WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
           UnauthorizedException;
 
   /**

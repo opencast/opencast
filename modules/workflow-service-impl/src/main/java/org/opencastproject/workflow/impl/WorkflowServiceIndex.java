@@ -26,9 +26,8 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowQuery;
+import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStatistics;
-
-import java.util.List;
 
 /**
  * Provides persistence services to the workflow service implementation.
@@ -84,7 +83,7 @@ public interface WorkflowServiceIndex {
    * @throws WorkflowDatabaseException
    *           if there is a problem retrieving the workflow instances from persistence
    */
-  List<WorkflowInstance> getWorkflowInstances(WorkflowQuery query, String action, boolean applyPermissions) throws WorkflowDatabaseException;
+  WorkflowSetImpl getWorkflowInstances(WorkflowQuery query, String action, boolean applyPermissions) throws WorkflowDatabaseException;
 
   /**
    * Returns the workflow statistics.

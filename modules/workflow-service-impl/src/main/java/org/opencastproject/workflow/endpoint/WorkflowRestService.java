@@ -52,6 +52,7 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workflow.api.JaxbWorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -66,6 +67,7 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStatistics;
@@ -448,11 +450,11 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       }
     }
 
-    List<WorkflowInstance> set = service.getWorkflowInstances(q);
+    WorkflowSet set = service.getWorkflowInstances(q);
 
     // Marshalling of a full workflow takes a long time. Therefore, we strip everything that's not needed.
     if (compact) {
-      for (WorkflowInstance instance : set) {
+      for (WorkflowInstance instance : set.getItems()) {
 
         // Remove all operations but the current one
         WorkflowOperationInstance currentOperation = instance.getCurrentOperation();
@@ -475,6 +477,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
         mediaPackage.setDuration(duration);
       }
     }
+
+//    List<JaxbWorkflowInstance> xmlSet = set.stream()
+//            .map(instance -> new JaxbWorkflowInstance(instance))
+//            .collect(Collectors.toList());
 
     return Response.ok(set).build();
   }
@@ -529,9 +535,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "workflowasxml", description = "Get a specific workflow instance.", returnDescription = "An XML representation of a workflow instance", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow instance."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
-  public WorkflowInstance getWorkflowAsXml(@PathParam("id") long id) throws WorkflowDatabaseException,
+  public JaxbWorkflowInstance getWorkflowAsXml(@PathParam("id") long id) throws WorkflowDatabaseException,
           NotFoundException, UnauthorizedException {
-    return service.getWorkflowById(id);
+//    return Response.ok().entity(new JaxbWorkflowInstance(service.getWorkflowById(id))).build();
+    return new JaxbWorkflowInstance(service.getWorkflowById(id));
   }
 
   @GET
@@ -540,7 +547,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "workflowasjson", description = "Get a specific workflow instance.", returnDescription = "A JSON representation of a workflow instance", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow instance."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
-  public WorkflowInstance getWorkflowAsJson(@PathParam("id") long id) throws WorkflowDatabaseException,
+  public JaxbWorkflowInstance getWorkflowAsJson(@PathParam("id") long id) throws WorkflowDatabaseException,
           NotFoundException, UnauthorizedException {
     return getWorkflowAsXml(id);
   }

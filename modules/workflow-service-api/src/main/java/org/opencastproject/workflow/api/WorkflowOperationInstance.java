@@ -208,6 +208,53 @@ public class WorkflowOperationInstance implements Configurable {
     setState(state);
   }
 
+  public WorkflowOperationInstance(
+          long id,
+          String template,
+          Long jobId,
+          OperationState state,
+          String description,
+          Set<WorkflowConfigurationForOperationInstance> configurations,
+          String holdStateUserInterfaceUrl,
+          String holdActionTitle,
+          boolean failWorkflowOnException,
+          String executeCondition,
+          String skipCondition,
+          String exceptionHandlingWorkflow,
+          Boolean abortable,
+          Boolean continuable,
+          Date dateStarted,
+          Date dateCompleted,
+          Long timeInQueue,
+          int maxAttempts,
+          int failedAttempts,
+          String executionHost,
+          List<Long> executionHistory,
+          RetryStrategy retryStrategy) {
+    this.id = id;
+    this.template = template;
+    this.jobId = jobId;
+    this.state = state;
+    this.description = description;
+    this.configurations = configurations;
+    this.holdStateUserInterfaceUrl = holdStateUserInterfaceUrl;
+    this.holdActionTitle = holdActionTitle;
+    this.failWorkflowOnException = failWorkflowOnException;
+    this.executeCondition = executeCondition;
+    this.skipCondition = skipCondition;
+    this.exceptionHandlingWorkflow = exceptionHandlingWorkflow;
+    this.abortable = abortable;
+    this.continuable = continuable;
+    this.dateStarted = dateStarted;
+    this.dateCompleted = dateCompleted;
+    this.timeInQueue = timeInQueue;
+    this.maxAttempts = maxAttempts;
+    this.failedAttempts = failedAttempts;
+    this.executionHost = executionHost;
+    this.executionHistory = executionHistory;
+    this.retryStrategy = retryStrategy;
+  }
+
   /**
    * Sets the template
    *

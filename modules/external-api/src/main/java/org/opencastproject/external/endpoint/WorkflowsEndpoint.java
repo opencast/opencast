@@ -302,7 +302,7 @@ public class WorkflowsEndpoint {
     // Get results
     List<WorkflowInstance> workflowInstances;
     try {
-      workflowInstances = workflowService.getWorkflowInstances(query);
+      workflowInstances = workflowService.getWorkflowInstances(query).getItems();
     } catch (Exception e) {
       logger.error("The workflow service was not able to get the workflow instances", e);
       return ApiResponses.serverError("Could not retrieve workflow instances, reason: '%s'", e.getMessage());

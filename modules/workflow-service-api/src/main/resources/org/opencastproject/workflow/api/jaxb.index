@@ -1,3 +1,7 @@
+JaxbTest
+JaxbWorkflowConfiguration
+JaxbWorkflowInstance
+JaxbWorkflowOperationInstance
 WorkflowDefinitionImpl
 WorkflowDefinitionSet
 WorkflowOperationDefinitionImpl

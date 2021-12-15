@@ -1,0 +1,228 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+package org.opencastproject.workflow.api;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+/**
+ * A JAXB-annotated implementation of {@link WorkflowOperationInstance}
+ */
+@XmlType(name = "operation-instance", namespace = "http://workflow.opencastproject.org")
+@XmlRootElement(name = "operation-instance", namespace = "http://workflow.opencastproject.org")
+@XmlAccessorType(XmlAccessType.NONE)
+public class JaxbWorkflowOperationInstance {
+
+  static class DateAdapter extends XmlAdapter<Long, Date> {
+    /**
+     * {@inheritDoc}
+     *
+     * @see javax.xml.bind.annotation.adapters.XmlAdapter#marshal(java.lang.Object)
+     */
+    @Override
+    public Long marshal(Date v) throws Exception {
+      return v == null ? null : v.getTime();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see javax.xml.bind.annotation.adapters.XmlAdapter#unmarshal(java.lang.Object)
+     */
+    @Override
+    public Date unmarshal(Long v) throws Exception {
+      return v == null ? null : new Date(v);
+    }
+  }
+
+  @XmlAttribute(name = "id")
+  private Long id;
+
+  @XmlAttribute(name = "template")
+  protected String template;
+
+  @XmlAttribute(name = "job")
+  protected Long jobId;
+
+  @XmlAttribute(name = "state")
+  protected WorkflowOperationInstance.OperationState state;
+
+  @XmlAttribute(name = "description")
+  protected String description;
+
+  @XmlElement(name = "configuration")
+  @XmlElementWrapper(name = "configurations")
+  protected Set<JaxbWorkflowConfiguration> configurations;
+
+  @XmlElement(name = "holdurl")
+  protected String holdStateUserInterfaceUrl;
+
+  @XmlElement(name = "hold-action-title")
+  protected String holdActionTitle;
+
+  @XmlAttribute(name = "fail-on-error")
+  protected boolean failWorkflowOnException;
+
+  @XmlAttribute(name = "if")
+  protected String executeCondition;
+
+  @XmlAttribute(name = "unless")
+  protected String skipCondition;
+
+  @XmlAttribute(name = "exception-handler-workflow")
+  protected String exceptionHandlingWorkflow;
+
+  @XmlAttribute(name = "abortable")
+  protected Boolean abortable;
+
+  @XmlAttribute(name = "continuable")
+  protected Boolean continuable;
+
+  @XmlJavaTypeAdapter(JaxbWorkflowOperationInstance.DateAdapter.class)
+  @XmlElement(name = "started")
+  protected Date dateStarted;
+
+  @XmlJavaTypeAdapter(JaxbWorkflowOperationInstance.DateAdapter.class)
+  @XmlElement(name = "completed")
+  protected Date dateCompleted;
+
+  @XmlElement(name = "time-in-queue")
+  protected Long timeInQueue;
+
+  @XmlAttribute(name = "max-attempts")
+  protected int maxAttempts;
+
+  @XmlAttribute(name = "failed-attempts")
+  protected int failedAttempts;
+
+  @XmlAttribute(name = "execution-host")
+  protected String executionHost;
+
+  @XmlElementWrapper(name = "execution-history")
+  @XmlElement(name = "execution-history-entry")
+  protected List<Long> executionHistory = new ArrayList<Long>();
+
+  @XmlJavaTypeAdapter(RetryStrategy.Adapter.class)
+  @XmlAttribute(name = "retry-strategy")
+  protected RetryStrategy retryStrategy;
+
+  /**
+   * No-arg constructor needed for JAXB serialization
+   */
+  public JaxbWorkflowOperationInstance() {
+    this.maxAttempts = 1;
+    this.retryStrategy = RetryStrategy.NONE;
+  }
+
+  /**
+   * Builds a new workflow operation instance based on another workflow operation.
+   *
+   */
+  public JaxbWorkflowOperationInstance(WorkflowOperationInstance operation) {
+    this();
+    this.id = operation.getId();
+    this.template = operation.getTemplate();
+    this.jobId = operation.getId();
+    this.state = operation.getState();
+    this.description = operation.getDescription();
+    this.configurations = operation.getConfigurationKeys().stream()
+            .map(key -> new JaxbWorkflowConfiguration(key, operation.getConfiguration(key)))
+            .collect(Collectors.toSet());
+    this.holdStateUserInterfaceUrl = operation.getHoldStateUserInterfaceUrl();
+    this.holdActionTitle = operation.getHoldActionTitle();
+    this.failWorkflowOnException = operation.isFailWorkflowOnException();
+    this.executeCondition = operation.getExecutionCondition();
+    this.skipCondition = operation.getSkipCondition();
+    this.exceptionHandlingWorkflow = operation.getExceptionHandlingWorkflow();
+    this.abortable = operation.isAbortable();
+    this.continuable = operation.isContinuable();
+    this.dateStarted = operation.getDateStarted();
+    this.dateCompleted = operation.getDateCompleted();
+    this.timeInQueue = operation.getTimeInQueue();
+    this.maxAttempts = operation.getMaxAttempts();
+    this.failedAttempts = operation.getFailedAttempts();
+    this.executionHost = operation.getExecutionHost();
+    this.executionHistory = operation.getExecutionHistory();
+    this.retryStrategy = operation.getRetryStrategy();
+  }
+
+  public WorkflowOperationInstance toWorkflowOperationInstance() {
+    return new WorkflowOperationInstance(id, template, jobId, state, description,
+            configurations.stream().map(config -> new WorkflowConfigurationForOperationInstance(config.getKey(), config.getValue())).collect(Collectors.toSet()),
+            holdStateUserInterfaceUrl, holdActionTitle, failWorkflowOnException, executeCondition,
+            skipCondition, exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
+            executionHost, executionHistory, retryStrategy);
+  }
+
+  public static JaxbWorkflowOperationInstance fromWorkflowOperationInstance(WorkflowOperationInstance operation) {
+    return new JaxbWorkflowOperationInstance(operation);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+
+    if (o == null || getClass() != o.getClass())
+      return false;
+
+    JaxbWorkflowOperationInstance jaxbWorkflowOperationInstance = (JaxbWorkflowOperationInstance) o;
+
+    return new EqualsBuilder().append(template, jaxbWorkflowOperationInstance.template).append(jobId, jaxbWorkflowOperationInstance.jobId)
+            .append(state, jaxbWorkflowOperationInstance.state).append(description, jaxbWorkflowOperationInstance.description)
+            .append(configurations, jaxbWorkflowOperationInstance.configurations).append(holdStateUserInterfaceUrl, jaxbWorkflowOperationInstance.holdStateUserInterfaceUrl)
+            .append(holdActionTitle, jaxbWorkflowOperationInstance.holdActionTitle).append(failWorkflowOnException, jaxbWorkflowOperationInstance.failWorkflowOnException)
+            .append(executeCondition, jaxbWorkflowOperationInstance.executeCondition).append(skipCondition, jaxbWorkflowOperationInstance.skipCondition)
+            .append(exceptionHandlingWorkflow, jaxbWorkflowOperationInstance.exceptionHandlingWorkflow).append(abortable, jaxbWorkflowOperationInstance.abortable)
+            .append(continuable, jaxbWorkflowOperationInstance.continuable).append(dateStarted, jaxbWorkflowOperationInstance.dateStarted)
+            .append(dateCompleted, jaxbWorkflowOperationInstance.dateCompleted).append(timeInQueue, jaxbWorkflowOperationInstance.timeInQueue)
+            .append(maxAttempts, jaxbWorkflowOperationInstance.maxAttempts).append(failedAttempts, jaxbWorkflowOperationInstance.failedAttempts)
+            .append(executionHost, jaxbWorkflowOperationInstance.executionHost).append(executionHistory, jaxbWorkflowOperationInstance.executionHistory)
+            .append(retryStrategy, jaxbWorkflowOperationInstance.retryStrategy)
+            .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).append(template).append(jobId).append(state).append(description).append(configurations)
+            .append(holdStateUserInterfaceUrl).append(holdActionTitle).append(failWorkflowOnException).append(executeCondition).append(skipCondition).append(exceptionHandlingWorkflow)
+            .append(abortable).append(continuable).append(dateStarted).append(dateCompleted).append(timeInQueue).append(maxAttempts).append(failedAttempts).append(executionHost)
+            .append(executionHistory).append(retryStrategy)
+            .toHashCode();
+  }
+}
