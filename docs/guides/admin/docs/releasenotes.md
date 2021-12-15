@@ -4,7 +4,7 @@
 Features
 --------
 
-- New ElasticSearch architecture, now there is one elastic search for the admin ui and the external api. This  
+- New ElasticSearch architecture, now there is one elastic search for the admin ui and the external api. This
   simplifies the maintenance and double the speed of index rebuild.
 - New *select-version* workflow operation handler, used to replace the media package in the currently
   running workflow with an older version from the asset manager.
@@ -38,7 +38,7 @@ Behavior changes
   workflows. The new ones just remove a lot of redundancies, making the whole process more efficient.
 
   Some of the new workflows (e.g. `fast`) now use slightly different workflow configurations. This could potentially
-  cause problems if you scheduled recordings using the old workflows but have the events processed using the new 
+  cause problems if you scheduled recordings using the old workflows but have the events processed using the new
   workflows. Please make sure the workflow you use work fine, or do not have anything scheduled via the upgrade.
 - Changes to the service registry config at `ServiceRegistryJpaImpl.cfg`:
     - The usage of `max.attempts` is modified in the sense that if you set -1, you can disable services going into error
