@@ -8,6 +8,8 @@ Opencast 11
 
 *Released on December 15th, 2021*
 
+- [[#3263](https://github.com/opencast/opencast/pull/3263)] -
+  Remove chinese traditional
 - [[#3264](https://github.com/opencast/opencast/pull/3264)] -
   Update Logging Documentation
 - [[#3231](https://github.com/opencast/opencast/pull/3231)] -
