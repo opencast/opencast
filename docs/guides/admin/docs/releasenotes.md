@@ -36,7 +36,6 @@ Behavior changes
 - There is a completely new set of workflows. Please make sure to check your local configuration and adapt
   it accordingly if you made changes to your workflows before. Opencast will also continue to work with the old set of
   workflows. The new ones just remove a lot of redundancies, making the whole process more efficient.
-
   Some of the new workflows (e.g. `fast`) now use slightly different workflow configurations. This could potentially
   cause problems if you scheduled recordings using the old workflows but have the events processed using the new
   workflows. Please make sure the workflow you use work fine, or do not have anything scheduled via the upgrade.
@@ -44,35 +43,30 @@ Behavior changes
     - The usage of `max.attempts` is modified in the sense that if you set -1, you can disable services going into error
       state completely. Before, this was equivalent to 0, which would have the service go into error state after one
       attempt, though this was undocumented. Check your configuration to be sure you didn't rely on this behavior.
-
     - `no.error.state.service.types` was added. With this, you can define service types that should never go into error
       state.
 - The default location of the user interface configuration service configuration is now
-  `etc/org.opencastproject.uiconfig.UIConfigRest.cfg`. For more details, take a look at
+  `etc/org.opencastproject.uiconfig.UIConfigRest.cfg `. For more details, take a look at
   [pull request #2860](https://github.com/opencast/opencast/pull/2860).
 - There are changes to how hosts are mapped to tenants. If you use a multi-tenant system you therefore need to update
   your `org.opencastproject.organization-*.cfg` configuration files:
-
   Before Opencast 11 the domain names were mapped to tenants and a common port number was assumed for all domains. Now
   you need to configure a URL per instance you want to map to a tenant.
+```
+# Before:
+port=8080
+prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org 
+prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
 
-  Before:
-  ```
-  port=8080
-  prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org
-  prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
-  ```
-
-  Now:
-  ```
-  prop.org.opencastproject.host.admin.example.org=https://tenant1-admin.example.org
-  prop.org.opencastproject.host.presentation.example.org=https://tenant1-presentation.example.org:8443
-  ```
+# Now:
+prop.org.opencastproject.host.admin.example.org=https://tenant1-admin.example.org
+prop.org.opencastproject.host.presentation.example.org=https://tenant1-presentation.example.org:8443
+```
 - Support for automatically setting up an HLS encoding ladder via the `{video,audio}.bitrates.mink`
   and `{video,audio}.bitrates.maxk` encoding profile options was removed. Instead, users should now explicitly specify
   the bit rate and bit rate control mechanism in the `ffmpeg.command`.
 - Some S3 distribution workflow operation handlers have been renamed: *publish-aws* to *publish-engage-aws* and
-  *retract-aws* to *retract-engage-aws*
+  *retract-aws* to *retract-engage-aws*.
 - If an URL does not exist, it returns to the welcome page.
 - The amount of job statistics for servers displayed in the admin interface was reduced to running and queued jobs to
   avoid performance problems and remove incorrect and/or misleading data.
