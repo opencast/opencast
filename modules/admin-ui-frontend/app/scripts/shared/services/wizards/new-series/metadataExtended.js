@@ -106,7 +106,10 @@ angular.module('adminNg.services')
           me.updateRequiredMetadata(field.id, field.value);
         }
 
-        me.ud[target].fields[field.tabindex - 1] = field;
+        var i = me.ud[target].fields.findIndex(function (f) {
+          return f.id === field.id;
+        });
+        me.ud[target].fields[i] = field;
       };
 
       this.getFiledCatalogs = function () {
