@@ -39,12 +39,13 @@ adjusting the `job.load.execute` parameter above.
 The command arguments may contain placeholders, which are substituted by their corresponding values before
 the command runs. The complete list of available placeholders is detailed in the table below.
 
-|Placeholder            |Used in     |Meaning                                            |
-|-----------------------|------------|---------------------------------------------------|
-|#{id}                  |Execute Once|The Mediapackage ID                                |
-|#{flavor(some/flavor)} |Execute Once|The absolute path of the element matching the specified flavor. If several elements have the same flavor, the first element returned by MediaPackage#getElementsByFlavor is used.
-|#{in}                  |Execute Many|The absolute path of the input element             |
-|#{out}                 |Execute Once, Execute Many|The absolute path of the output element, formed from the output-filename parameter
+|Placeholder              |Used in     |Meaning                                            |
+|-------------------------|------------|---------------------------------------------------|
+|`#{id}`                  |Execute Once, Execute Many|The mediapackage ID|
+|`#{org_id}`              |Execute Once, Execute Many|The organization ID|
+|`#{flavor(some/flavor)}` |Execute Once|The absolute path of the element matching the specified flavor. If several elements have the same flavor, the first element returned by MediaPackage#getElementsByFlavor is used.|
+|`#{in}`                  |Execute Many|The absolute path of the input element.|
+|`#{out}`                 |Execute Once, Execute Many|The absolute path of the output element, formed from the output-filename parameter.|
 
 ## Using custom properties in the argument list
 
@@ -88,4 +89,3 @@ For more information on how to execute a command in a workflow, see:
 
 * [Execute Once Workflow Operation](../workflowoperationhandlers/execute-once-woh.md)
 * [Execute Many Workflow Operation](../workflowoperationhandlers/execute-many-woh.md)
-
