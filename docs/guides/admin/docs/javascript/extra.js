@@ -66,12 +66,8 @@ function addTitleToCodeTag() {
 
                 // Link repository
                 let a = document.createElement('a');
-                a.innerText = '⇲';
-                a.title = 'Find configuration file in repository';
-                a.style.transform = 'rotate(-90deg)';
-                a.style.display = 'inline-block';
-                a.style.verticalAlign = 'super';
-                a.style.fontSize = '.83em';
+                a.innerHTML = '<i style="color: black; vertical-align: super; margin: -5px 0 0 2px" class="fa fa-github"></i>'
+                a.title = 'Find configuration file in GitHub repository';
                 a.href = repobase + CODE.innerText + '#repo-content-pjax-container';
                 CODE.parentNode.insertBefore(a, CODE.nextSibling);
             }
