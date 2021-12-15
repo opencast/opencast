@@ -76,7 +76,7 @@ nav:
    - Inbox: 'configuration/inbox.md'
    - List Providers: 'configuration/listproviders.md'
    - Load: 'configuration/load.md'
-   - Log: 'configuration/log.md'
+   - Logging: 'configuration/log.md'
    - User Statistics and Privacy Configuration: 'configuration/user-statistics.and.privacy.md'
    - Multi Tenancy: 'configuration/multi.tenancy.md'
    - Authentication, Authorization and User Management:
