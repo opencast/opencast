@@ -1,4 +1,0 @@
-Opencast 11 changes the default location of the user interface configuration service configuration
-which can now be found at `etc/org.opencastproject.uiconfig.UIConfigRest.cfg`.
-
-For more details, take a look at [pull request #2860](https://github.com/opencast/opencast/pull/2860).

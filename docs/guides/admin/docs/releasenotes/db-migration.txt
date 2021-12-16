@@ -1,3 +1,0 @@
-Upgrading to Opencast 11 requires a DB migration, as some tables have changed slightly.
-Migration scripts can be found in `doc/upgrade/10_to_11/`.
-There are separate scripts for MariaDB/MySQL (`mysql5.sql`) and PostgreSQL (`postgresql.sql`).
