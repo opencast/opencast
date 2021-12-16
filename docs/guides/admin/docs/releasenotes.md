@@ -4,7 +4,7 @@
 Features
 --------
 
-- New ElasticSearch architecture, now there is one elastic search for the admin ui and the external api. This
+- New Elasticsearch architecture, now there is one elastic search for the admin ui and the external api. This
   simplifies the maintenance and double the speed of index rebuild.
 - New *select-version* workflow operation handler, used to replace the media package in the currently
   running workflow with an older version from the asset manager.
@@ -32,7 +32,7 @@ Behavior changes
   to the old Admin UI index, thus migration is possible, alternatively the index has to be rebuilt or the old Admin UI
   index can be configured (see upgrade guide).
   With this change the index rebuild should now be twice as fast as before. The index endpoints to clear and rebuild
-  the index were moved to /index.
+  the index were moved to `/index`.
 - There is a completely new set of workflows. Please make sure to check your local configuration and adapt
   it accordingly if you made changes to your workflows before. Opencast will also continue to work with the old set of
   workflows. The new ones just remove a lot of redundancies, making the whole process more efficient.
@@ -52,16 +52,16 @@ Behavior changes
   your `org.opencastproject.organization-*.cfg` configuration files:
   Before Opencast 11 the domain names were mapped to tenants and a common port number was assumed for all domains. Now
   you need to configure a URL per instance you want to map to a tenant.
-```
-# Before:
-port=8080
-prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org 
-prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
+  ```
+  # Before:
+  port=8080
+  prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org 
+  prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
 
-# Now:
-prop.org.opencastproject.host.admin.example.org=https://tenant1-admin.example.org
-prop.org.opencastproject.host.presentation.example.org=https://tenant1-presentation.example.org:8443
-```
+  # Now:
+  prop.org.opencastproject.host.admin.example.org=https://tenant1-admin.example.org
+  prop.org.opencastproject.host.presentation.example.org=https://tenant1-presentation.example.org:8443
+  ```
 - Support for automatically setting up an HLS encoding ladder via the `{video,audio}.bitrates.mink`
   and `{video,audio}.bitrates.maxk` encoding profile options was removed. Instead, users should now explicitly specify
   the bit rate and bit rate control mechanism in the `ffmpeg.command`.
