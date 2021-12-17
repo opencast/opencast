@@ -113,6 +113,16 @@ API changes
   different types of events in one request
 - The Series API can now return ACLs within its response, if you tell it to
 
+
+Additional Notes about 9.11
+---------------------------
+
+This release contains two security fixes:
+
+- Further mitigation for Log4Shell (CVE-2021-45046)
+- Files Accessible to External Parties (CVE-2021-43821; Backport from 10.x)
+
+
 Additional Notes about 9.10
 ---------------------------
 
