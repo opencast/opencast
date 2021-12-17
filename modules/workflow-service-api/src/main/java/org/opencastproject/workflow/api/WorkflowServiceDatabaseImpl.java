@@ -165,10 +165,8 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
 
       // TODO: We don't get the organization here, it will be null. Should we even be trying to get organization here?
       if (orga == null) {
-        logger.info("NO ORGA");
         query = em.createNamedQuery("Workflow.findAllTwo");
       } else {
-        logger.info("YES ORGA");
         query = em.createNamedQuery("Workflow.findAll");
         String orgId = securityService.getOrganization().getId();
         query.setParameter("organizationId", orgId);
@@ -182,6 +180,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   }
 
   public List<WorkflowInstance> getAllWorkflowInstances(int limit, int offset) {
+
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
@@ -201,8 +200,6 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   }
 
   public boolean mediaPackageHasActiveWorkflows(String mediaPackageId)  {
-
-    //TODO check authorization
 
     EntityManager em = null;
     try {
@@ -252,11 +249,6 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
 
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId) {
 
-    //TODO check authorization
-    //either user is local or global admin
-    //or user has read right on mp
-    //get mp from assetmanager, current workflow (or scheduler?) to check acl
-
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
@@ -267,7 +259,6 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       query.setParameter("mediaPackageId", mediaPackageId);
 
       List<WorkflowInstance> workflowInstances = query.getResultList();
-//      List<WorkflowInstance> workflowInstances = getWorkflowInstancesForQuery(query);
       return workflowInstances;
 
     } finally {
@@ -325,42 +316,4 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
         em.close();
     }
   }
-
-//  // TODO: Get this replaced
-//  List<WorkflowInstance> getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
-//
-//
-//    EntityManager em = null;
-//    try {
-//      em = emf.createEntityManager();
-//      String queryString = "SELECT w FROM Workflow w where w.organizationId = :organizationId";
-//
-//      //TODO build query from WorkflowQuery dynamically
-//
-//      Query databaseQuery = em.createQuery(queryString);
-//
-//      String orgId = securityService.getOrganization().getId();
-//      databaseQuery.setParameter("organizationId", orgId);
-//
-//      return getWorkflowInstancesForQuery(databaseQuery);
-//
-//    } finally {
-//      if (em != null)
-//        em.close();
-//    }
-//  }
-//
-//  private List<WorkflowInstance> getWorkflowInstancesForQuery(Query query) throws WorkflowDatabaseException {
-//    List<JpaWorkflow> results = query.getResultList();
-//    List<WorkflowInstance> workflows = new ArrayList<>(results.size());
-//    for (JpaWorkflow jpaWorkflow: results) {
-//      try {
-//        workflows.add(jpaWorkflow.toWorkflow());
-//      } catch (MediaPackageException | WorkflowParsingException e) {
-//        throw new WorkflowDatabaseException(e);
-//      }
-//    }
-//    return workflows;
-//  }
-
 }

@@ -43,6 +43,7 @@ import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
@@ -52,7 +53,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 
 /** Responds to series events by re-distributing metadata and security policy files to workflows. */
 public class WorkflowPermissionsUpdatedEventHandler {
@@ -152,11 +152,11 @@ public class WorkflowPermissionsUpdatedEventHandler {
 
       // Note: getWorkflowInstances will only return a given number of results (default 20)
       WorkflowQuery q = new WorkflowQuery().withSeriesId(seriesId);
-      List<WorkflowInstance> result = workflowService.getWorkflowInstancesForAdministrativeRead(q);
+      WorkflowSet result = workflowService.getWorkflowInstancesForAdministrativeRead(q);
       Integer offset = 0;
 
       while (result.size() > 0) {
-        for (WorkflowInstance instance : result) {
+        for (WorkflowInstance instance : result.getItems()) {
           if (!instance.isActive()) {
             continue;
           }

@@ -1881,7 +1881,7 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventWorkflow(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId)
-          throws JobEndpointException, SearchIndexException {
+          throws SearchIndexException {
     Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
@@ -1897,14 +1897,7 @@ public abstract class AbstractEventEndpoint {
 
     try {
       WorkflowInstance instance = getWorkflowService().getWorkflowById(workflowInstanceId);
-      // Gather user information
-//      User user = instance.getCreator();
-//      List<Field> userInformation = new ArrayList<>();
-//      if (user != null) {
-//        userInformation.add(f("username", v(user.getUsername())));
-//        userInformation.add(f("name", v(user.getName(), Jsons.BLANK)));
-//        userInformation.add(f("email", v(user.getEmail(), Jsons.BLANK)));
-//      }
+
       // Retrieve submission date with the workflow instance main job
       Date created = instance.getDateCreated();
       long executionTime;
@@ -1925,7 +1918,6 @@ public abstract class AbstractEventEndpoint {
               f("wiid", v(instance.getId(), Jsons.BLANK)), f("title", v(instance.getTitle(), Jsons.BLANK)),
               f("wdid", v(instance.getTemplate(), Jsons.BLANK)), f("configuration", obj(fields)),
               f("submittedAt", v(created != null ? toUTC(created.getTime()) : "", Jsons.BLANK)),
-//              f("creator", obj(userInformation)));
               f("creator", v(instance.getCreatorName(), Jsons.BLANK)));
 
       return okJson(list);
@@ -1973,8 +1965,14 @@ public abstract class AbstractEventEndpoint {
         for (String key : wflOp.getConfigurationKeys()) {
           fields.add(f(key, v(wflOp.getConfiguration(key), Jsons.BLANK)));
         }
-        operationsJSON.add(obj(f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + wflOp.getState(), Jsons.BLANK)), f("title", v(wflOp.getTemplate(), Jsons.BLANK)),
-                f("description", v(wflOp.getDescription(), Jsons.BLANK)), f("id", v(wflOp.getId(), Jsons.BLANK)), f("configuration", obj(fields))));
+        operationsJSON.add(obj(
+                f("status",
+                v(WORKFLOW_STATUS_TRANSLATION_PREFIX + wflOp.getState(), Jsons.BLANK)),
+                f("title", v(wflOp.getTemplate(), Jsons.BLANK)),
+                f("description", v(wflOp.getDescription(), Jsons.BLANK)),
+                f("id", v(wflOp.getId(), Jsons.BLANK)),
+                f("configuration", obj(fields))
+        ));
       }
 
       return okJson(arr(operationsJSON));

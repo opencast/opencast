@@ -48,7 +48,7 @@ public class WorkflowConfigurationForWorkflowInstance implements WorkflowConfigu
 
   @Column(name = "key_part")
   protected String key;
-  
+
   @Lob
   @Basic(fetch = FetchType.LAZY)
   @Column(name = "value_part")

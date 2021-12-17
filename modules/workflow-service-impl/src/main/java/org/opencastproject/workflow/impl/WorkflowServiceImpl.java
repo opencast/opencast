@@ -285,7 +285,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Activate
   public void activate(ComponentContext componentContext) {
-    logger.info("ARNEARNE");
     this.componentContext = componentContext;
     executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
     try {
@@ -570,8 +569,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throw new IllegalArgumentException("Parent workflow " + parentWorkflowId + " not visible to this user");
         }
       } else {
-//        WorkflowQuery wfq = new WorkflowQuery().withMediaPackage(mediaPackageId).isActive();
-//        WorkflowSet mpWorkflowInstances = getWorkflowInstances(wfq);
         if (persistence.mediaPackageHasActiveWorkflows(mediaPackageId)) {
           throw new IllegalStateException(String.format(
                   "Can't start workflow '%s' for media package '%s' because another workflow is currently active.",
@@ -598,7 +595,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       try {
         // Create a new job for this workflow instance
         String workflowDefinitionXml = WorkflowParser.toXml(workflowDefinition);
-//        String workflowInstanceXml = WorkflowParser.toXml(workflowInstance);
         String mediaPackageXml = MediaPackageParser.getAsXml(sourceMediaPackage);
 
         List<String> arguments = new ArrayList<>();
@@ -654,7 +650,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               ? null
               : componentContext.getBundleContext().getProperty(key);
       if (instance.getOperations().stream().anyMatch(op -> op.getExecutionCondition() != null)) {
-//        instance = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(instance));
         instance.getOperations().stream().filter(op -> op.getExecutionCondition() != null).forEach(
                 op -> op.setExecutionCondition(WorkflowConditionInterpreter.replaceVariables(op.getExecutionCondition(),
                         systemVariableGetter,
@@ -994,7 +989,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public void remove(long workflowInstanceId, boolean force) throws WorkflowDatabaseException, NotFoundException,
-          UnauthorizedException, WorkflowParsingException, WorkflowStateException {
+          UnauthorizedException, WorkflowStateException {
     final Lock lock = this.lock.get(workflowInstanceId);
     lock.lock();
     try {
@@ -1274,13 +1269,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
       // Synchronize the job status with the workflow
       WorkflowState workflowState = workflowInstance.getState();
-//      String xml;
-//      try {
-//        xml = WorkflowParser.toXml(workflowInstance);
-//      } catch (Exception e) {
-//        // Can't happen, since we are converting from an in-memory object
-//        throw new IllegalStateException("In-memory workflow instance could not be serialized", e);
-//      }
 
       Job job;
       try {
@@ -1362,8 +1350,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
 
       try {
-//        WorkflowInstance clone = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(workflowInstance));
-//        fireListeners(originalWorkflowInstance, clone);
         fireListeners(originalWorkflowInstance, workflowInstance);
       } catch (Exception e) {
         // Can't happen, since we are converting from an in-memory object
@@ -2371,17 +2357,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
         for (WorkflowInstance instance : workflows) {
           current += 1;
-//          if (StringUtils.isEmpty(workflow)) {
-//            logger.warn("Skipping restore of workflow #{}: Payload is empty", current);
-//            continue;
-//          }
-//          WorkflowInstance instance;
-//          try {
-//            instance = WorkflowParser.parseWorkflowInstance(workflow);
-//          } catch (WorkflowParsingException e) {
-//            logger.warn("Skipping restore of workflow. Error parsing: {}", workflow, e);
-//            continue;
-//          }
           Organization organization = null;
           try {
             organization = organizationDirectoryService.getOrganization(instance.getOrganizationId());

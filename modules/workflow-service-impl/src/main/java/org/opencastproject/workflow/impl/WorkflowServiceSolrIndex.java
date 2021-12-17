@@ -216,13 +216,6 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   /** The thread pool to use in asynchronous indexing */
   protected ExecutorService indexingExecutor;
 
-//  public static final Fn<Job, Boolean> operationIsStartWorkflow = new Fn<Job, Boolean>() {
-//    @Override
-//    public Boolean apply(Job job) {
-//      return WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation());
-//    }
-//  };
-
   /**
    * Callback from the OSGi environment on component registration. The indexing behavior can be set using component
    * context properties. <code>synchronousIndexing=true|false</code> determines whether threads performing workflow
@@ -439,7 +432,6 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     doc.addField(ID_KEY, instance.getId());
     doc.addField(WORKFLOW_DEFINITION_KEY, instance.getTemplate());
     doc.addField(STATE_KEY, instance.getState().toString());
-//    String xml = WorkflowParser.toXml(instance);
     doc.addField(XML_KEY, WorkflowParser.toXml(new JaxbWorkflowInstance(instance)));
 
     // index the current operation if there is one. If the workflow is finished, there is no current operation, so use a

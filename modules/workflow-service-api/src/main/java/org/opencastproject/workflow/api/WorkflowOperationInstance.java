@@ -331,24 +331,6 @@ public class WorkflowOperationInstance implements Configurable {
     this.state = state;
   }
 
-//  public Set<WorkflowConfiguration> getConfigurations() {
-//    return configurations;
-//  }
-//
-//  public void setConfiguration(Set<WorkflowConfiguration> configurations) {
-//    this.configurations = configurations;
-//  }
-//
-//  public void addConfiguration(WorkflowConfiguration config) {
-//    configurations.add(config);
-//    config.setWorkflowOperationInstance(this);
-//  }
-//
-//  public void removeConfiguration(WorkflowConfiguration config) {
-//    config.setWorkflowOperationInstance(null);
-//    configurations.remove(config);
-//  }
-
   /**
    * {@inheritDoc}
    *

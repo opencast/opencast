@@ -478,10 +478,6 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       }
     }
 
-//    List<JaxbWorkflowInstance> xmlSet = set.stream()
-//            .map(instance -> new JaxbWorkflowInstance(instance))
-//            .collect(Collectors.toList());
-
     return Response.ok(set).build();
   }
 
@@ -537,7 +533,6 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
   public JaxbWorkflowInstance getWorkflowAsXml(@PathParam("id") long id) throws WorkflowDatabaseException,
           NotFoundException, UnauthorizedException {
-//    return Response.ok().entity(new JaxbWorkflowInstance(service.getWorkflowById(id))).build();
     return new JaxbWorkflowInstance(service.getWorkflowById(id));
   }
 
