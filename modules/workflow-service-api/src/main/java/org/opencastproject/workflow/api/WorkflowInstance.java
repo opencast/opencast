@@ -75,7 +75,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
         @Index(name = "IX_oc_workflow_mediaPackageId", columnList = ("mediaPackageId")),
         @Index(name = "IX_oc_workflow_seriesId", columnList = ("seriesId")), })
 @NamedQueries({
-        @NamedQuery(name = "Workflow.findAll", query = "select w from WorkflowInstance w"),
+        @NamedQuery(name = "Workflow.findAll", query = "select w from WorkflowInstance w where w.organizationId=:organizationId"),
+        @NamedQuery(name = "Workflow.findAllTwo", query = "select w from WorkflowInstance w"),
         @NamedQuery(
                 name = "Workflow.workflowById",
                 query = "SELECT w FROM WorkflowInstance as w where w.workflowId=:workflowId and w.organizationId=:organizationId"
@@ -584,6 +585,12 @@ public class WorkflowInstance {
     }
     return false;
   }
+
+  @Override
+  public String toString() {
+    return "Workflow {" + workflowId + "}";
+  }
+
 
   public void extend(WorkflowDefinition workflowDefinition) throws WorkflowParsingException {
     if (!workflowDefinition.getOperations().isEmpty()) {

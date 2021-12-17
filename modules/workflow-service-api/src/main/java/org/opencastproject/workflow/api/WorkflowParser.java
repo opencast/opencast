@@ -162,47 +162,6 @@ public final class WorkflowParser {
   }
 
   /**
-   * Loads a workflow instance from the xml stream.
-   *
-   * @param in
-   *          xml stream of the workflow instance
-   * @return the workflow instance
-   * @throws WorkflowParsingException
-   *           if creating the workflow instance fails
-   */
-  public static List<WorkflowOperationInstance> parseWorkflowOperationInstances(String in) throws WorkflowParsingException {
-    try {
-      return parseWorkflowOperationInstances(IOUtils.toInputStream(in, "UTF8"));
-    } catch (IOException e) {
-      throw new WorkflowParsingException(e);
-    }
-  }
-
-  /**
-   * Loads workflow definitions from the given input stream.
-   *
-   * @param in
-   * @return the list of workflow definitions
-   */
-  public static List<WorkflowOperationInstance> parseWorkflowOperationInstances(InputStream in) throws WorkflowParsingException {
-    try {
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      WorkflowOperationInstance[] impls = unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowOperationInstance[].class)
-              .getValue();
-      List<WorkflowOperationInstance> list = new ArrayList<>();
-      for (WorkflowOperationInstance impl : impls) {
-        list.add(impl);
-      }
-      return list;
-    } catch (Exception e) {
-      throw new WorkflowParsingException(e);
-    } finally {
-      IoSupport.closeQuietly(in);
-    }
-  }
-
-
-  /**
    * Loads workflow statistics from the given input stream.
    *
    * @param in
@@ -243,15 +202,7 @@ public final class WorkflowParser {
   }
 
   public static String toXml(WorkflowInstance workflowInstance) throws WorkflowParsingException {
-    try {
-      Marshaller marshaller = jaxbContext.createMarshaller();
-      Writer writer = new StringWriter();
-      marshaller.marshal(workflowInstance, writer);
-      return writer.toString();
-    } catch (Exception e) {
-      throw new WorkflowParsingException(e);
-    }
-
+    return toXml(new JaxbWorkflowInstance(workflowInstance));
   }
 
   public static String toXml(JaxbWorkflowInstance workflowInstance) throws WorkflowParsingException {

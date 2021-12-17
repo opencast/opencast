@@ -1040,6 +1040,14 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
         }
 
+        // At last, remove workflow instance from the index
+        try {
+          index.remove(workflowInstanceId);
+        } catch (NotFoundException e) {
+          // This should never happen, because we got workflow instance by querying the index...
+          logger.warn("Workflow instance could not be removed from index", e);
+        }
+
         //Remove workflow from database
         persistence.removeFromDatabase(instance);
     } finally {
@@ -2349,30 +2357,31 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       logIndexRebuildBegin(logger.getSlf4jLogger(), index.getIndexName(), total, "workflows");
       int current = 0;
       int offset = 0;
-      List<String> workflows;
+      List<WorkflowInstance> workflows;
       do {
         try {
-          workflows = serviceRegistry.getJobPayloads(startWorkflow, limit, offset);
-        } catch (ServiceRegistryException e) {
+          workflows = persistence.getAllWorkflowInstances(limit, offset);
+//          workflows = serviceRegistry.getJobPayloads(startWorkflow, limit, offset);
+        } catch (Exception e) {
           logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), total, current, e);
           throw new IndexRebuildException(index.getIndexName(), getService(), e);
         }
         logger.debug("Got {} workflows for re-indexing", workflows.size());
         offset += limit;
 
-        for (final String workflow : workflows) {
+        for (WorkflowInstance instance : workflows) {
           current += 1;
-          if (StringUtils.isEmpty(workflow)) {
-            logger.warn("Skipping restore of workflow #{}: Payload is empty", current);
-            continue;
-          }
-          WorkflowInstance instance;
-          try {
-            instance = WorkflowParser.parseWorkflowInstance(workflow);
-          } catch (WorkflowParsingException e) {
-            logger.warn("Skipping restore of workflow. Error parsing: {}", workflow, e);
-            continue;
-          }
+//          if (StringUtils.isEmpty(workflow)) {
+//            logger.warn("Skipping restore of workflow #{}: Payload is empty", current);
+//            continue;
+//          }
+//          WorkflowInstance instance;
+//          try {
+//            instance = WorkflowParser.parseWorkflowInstance(workflow);
+//          } catch (WorkflowParsingException e) {
+//            logger.warn("Skipping restore of workflow. Error parsing: {}", workflow, e);
+//            continue;
+//          }
           Organization organization = null;
           try {
             organization = organizationDirectoryService.getOrganization(instance.getOrganizationId());

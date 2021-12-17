@@ -35,6 +35,7 @@ import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workflow.api.WorkflowSetImpl;
 
 import org.easymock.EasyMock;
 import org.junit.Ignore;
@@ -66,7 +67,7 @@ public class TestJobEndpoint extends JobEndpoint {
     wfD.setTitle("Full");
     wfD.setId("full");
 
-    List<WorkflowInstance> workflowSet = new ArrayList<>();
+    final WorkflowSetImpl workflowSet = new WorkflowSetImpl();
 
     WorkflowInstance workflowInstance1 = new WorkflowInstance(wfD,
             loadMpFromResource("jobs_mediapackage1"), 2L, null, null, new HashMap<String, String>());
@@ -79,9 +80,9 @@ public class TestJobEndpoint extends JobEndpoint {
     workflowInstance2.setId(2);
     workflowInstance3.setId(3);
 
-    workflowSet.add(workflowInstance1);
-    workflowSet.add(workflowInstance2);
-    workflowSet.add(workflowInstance3);
+    workflowSet.addItem(workflowInstance1);
+    workflowSet.addItem(workflowInstance2);
+    workflowSet.addItem(workflowInstance3);
 
     List<HostRegistration> hosts = new ArrayList<>();
     hosts.add(new JaxbHostRegistration("host1", "1.1.1.1", "node1", 100000, 8, 8, true, false));

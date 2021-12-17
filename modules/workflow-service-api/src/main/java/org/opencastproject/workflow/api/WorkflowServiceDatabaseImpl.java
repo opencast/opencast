@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.api;
 
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
@@ -153,6 +154,52 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     }
   }
 
+  public List<WorkflowInstance> getAllWorkflowInstances() {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+
+      Organization orga = securityService.getOrganization();
+
+      Query query;
+
+      // TODO: We don't get the organization here, it will be null. Should we even be trying to get organization here?
+      if (orga == null) {
+        logger.info("NO ORGA");
+        query = em.createNamedQuery("Workflow.findAllTwo");
+      } else {
+        logger.info("YES ORGA");
+        query = em.createNamedQuery("Workflow.findAll");
+        String orgId = securityService.getOrganization().getId();
+        query.setParameter("organizationId", orgId);
+      }
+      List<WorkflowInstance> workflowInstances = query.getResultList();
+      return workflowInstances;
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  public List<WorkflowInstance> getAllWorkflowInstances(int limit, int offset) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+
+      Query query = em.createNamedQuery("Workflow.findAll", String.class);
+
+      String orgId = securityService.getOrganization().getId();
+      query.setParameter("organizationId", orgId);
+      query.setMaxResults(limit);
+      query.setFirstResult(offset);
+      logger.debug("Requesting workflows using query: {}", query);
+      return query.getResultList();
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
   public boolean mediaPackageHasActiveWorkflows(String mediaPackageId)  {
 
     //TODO check authorization
@@ -188,12 +235,13 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-
-//      if (em.contains(instance)) {
-//        instance = em.merge(instance);
-//      }
-
-      em.remove(instance);
+      WorkflowInstance fromDb = em.find(WorkflowInstance.class, instance.getId());
+      if (fromDb == null) {
+        // Already removed
+      } else {
+        instance = em.merge(instance);
+        em.remove(instance);
+      }
       tx.commit();
       logger.debug("Workflow with id {} was deleted.", instance.getId());
     } finally {

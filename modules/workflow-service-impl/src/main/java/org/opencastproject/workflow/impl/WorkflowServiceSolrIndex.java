@@ -28,7 +28,6 @@ import static org.opencastproject.util.data.Option.option;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -41,7 +40,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
@@ -51,16 +49,14 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
-import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.QueryTerm;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
+import org.opencastproject.workflow.api.WorkflowServiceDatabase;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport.OperationReport;
-
-import com.entwinemedia.fn.Fn;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -76,7 +72,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -200,6 +195,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   /** The service registry, managing jobs */
   private ServiceRegistry serviceRegistry = null;
 
+  /** Persistent storage */
+  protected WorkflowServiceDatabase persistence;
+
   /** The authorization service */
   private AuthorizationService authorizationService = null;
 
@@ -218,12 +216,12 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   /** The thread pool to use in asynchronous indexing */
   protected ExecutorService indexingExecutor;
 
-  public static final Fn<Job, Boolean> operationIsStartWorkflow = new Fn<Job, Boolean>() {
-    @Override
-    public Boolean apply(Job job) {
-      return WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation());
-    }
-  };
+//  public static final Fn<Job, Boolean> operationIsStartWorkflow = new Fn<Job, Boolean>() {
+//    @Override
+//    public Boolean apply(Job job) {
+//      return WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation());
+//    }
+//  };
 
   /**
    * Callback from the OSGi environment on component registration. The indexing behavior can be set using component
@@ -296,16 +294,10 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     if (instancesInSolr == 0) {
       logger.info("The workflow index is empty, looking for workflows to index");
       // this may be a new index, so get all of the existing workflows and index them
-      List<String> workflowPayloads;
+      List<WorkflowInstance> workflowInstances;
+      workflowInstances = persistence.getAllWorkflowInstances();
 
-      try {
-        workflowPayloads =  serviceRegistry.getJobPayloads(WorkflowServiceImpl.Operation.START_WORKFLOW.toString());
-      } catch (ServiceRegistryException e) {
-        logger.error("Unable to load the workflows jobs: {}", e.getMessage());
-        throw new ServiceException(e.getMessage());
-      }
-
-      final int total = workflowPayloads.size();
+      final int total = workflowInstances.size();
       if (total == 0) {
         logger.info("No workflows found. Repopulating index finished.");
         return;
@@ -314,17 +306,15 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       logger.info("Populating the workflow index with {} workflows", total);
 
       int current = 0;
-      for (String payload : workflowPayloads) {
+      for (WorkflowInstance instance : workflowInstances) {
         current++;
-        WorkflowInstance instance = null;
         try {
-          instance = WorkflowParser.parseWorkflowInstance(payload);
           Organization organization = orgDirectory.getOrganization(instance.getOrganizationId());
           securityService.setOrganization(organization);
           securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
           index(instance);
-        } catch (WorkflowParsingException | WorkflowDatabaseException | NotFoundException e) {
-          logger.warn("Skipping restoring of workflow {}", payload, e);
+        } catch (WorkflowDatabaseException | NotFoundException e) {
+          logger.warn("Skipping restoring of workflow {}", instance, e);
         }
         if (current % 100 == 0) {
           logger.info("Indexing workflow {}/{} ({} percent done)", current, total, current * 100 / total);
@@ -1113,6 +1103,12 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   @Reference(name = "serviceregistry")
   protected void setServiceRegistry(ServiceRegistry registry) {
     this.serviceRegistry = registry;
+  }
+
+  /** OSGi callback for setting persistance. */
+  @Reference(name = "workflow-persistence")
+  public void setPersistence(WorkflowServiceDatabase persistence) {
+    this.persistence = persistence;
   }
 
   /**

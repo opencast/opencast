@@ -38,4 +38,7 @@ public interface WorkflowServiceDatabase {
   List<WorkflowInstance> getRunningWorkflowInstancesByMediaPackage(String mediaPackageId);
 
   void updateInDatabase(WorkflowInstance instance);
+
+  List<WorkflowInstance> getAllWorkflowInstances();
+  List<WorkflowInstance> getAllWorkflowInstances(int limit, int offset);
 }

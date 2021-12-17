@@ -108,6 +108,8 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workflow.api.WorkflowSet;
+import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
@@ -284,7 +286,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.replay(workspace);
 
     // workflow service
-    final List<WorkflowInstance> workflowSet = new ArrayList<>();
+    final WorkflowSetImpl workflowSet = new WorkflowSetImpl();
 
     WorkflowDefinition wfD = new WorkflowDefinitionImpl();
     wfD.setTitle("Full");
@@ -322,20 +324,20 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     workflowInstance1.getOperations().get(0).setId(4L);
     workflowInstance1.getOperations().get(1).setId(5L);
 
-    workflowSet.add(workflowInstance1);
-    workflowSet.add(workflowInstance2);
-    workflowSet.add(workflowInstance3);
+    workflowSet.addItem(workflowInstance1);
+    workflowSet.addItem(workflowInstance2);
+    workflowSet.addItem(workflowInstance3);
 
     WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.getWorkflowDefinitionById(EasyMock.anyString())).andReturn(wfD).anyTimes();
     EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(workflowInstance1).anyTimes();
     EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
-            .andAnswer(new IAnswer<List<WorkflowInstance>>() {
+            .andAnswer(new IAnswer<WorkflowSet>() {
               @Override
-              public List<WorkflowInstance> answer() throws Throwable {
+              public WorkflowSet answer() throws Throwable {
                 WorkflowQuery query = (WorkflowQuery) EasyMock.getCurrentArguments()[0];
                 if (query.getId() != null && Long.parseLong(query.getId()) == 9999L) {
-                  return new ArrayList<>();
+                  return new WorkflowSetImpl();
                 } else {
                   return workflowSet;
                 }
