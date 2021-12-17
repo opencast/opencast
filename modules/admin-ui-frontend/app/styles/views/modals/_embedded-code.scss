@@ -21,19 +21,20 @@
 
 .embedSizeButton {
     display: inline-block;
-    background-color: #466DC3;
-    border: 1px solid silver;
+    background-color: #E2E1E1;
+    border: 1px solid #CCC;
     border-radius: 10px;
     cursor: pointer;
     margin-right: 5px;
     vertical-align: middle;
     font-size: 14px;
     text-align: center;
-    color: white;
+    color: black;
 }
 
 .embedSizeButtonSelected {
-    border: 5px solid #FFE04F;
+    //border: 5px solid #FFE04F;
+    border: 3px solid #24425c;
 }
 
 .copyConfirm {
