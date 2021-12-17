@@ -4,6 +4,30 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.1
+
+*Released on December 17th, 2021*
+
+- [[#3270](https://github.com/opencast/opencast/pull/3270)] -
+  Remove old release notes snippets
+- [[#3268](https://github.com/opencast/opencast/pull/3268)] -
+  Fix Typos and Syntax in Opencast 11 Release Notes
+- [[#3266](https://github.com/opencast/opencast/pull/3266)] -
+  Fix formatting of OC 11 release notes
+- [[#3265](https://github.com/opencast/opencast/pull/3265)] -
+  Prepare docs for OC 11 release
+- [[#3264](https://github.com/opencast/opencast/pull/3264)] -
+  Update Logging Documentation
+- [[#3263](https://github.com/opencast/opencast/pull/3263)] -
+  Remove chinese traditional
+- [[#3221](https://github.com/opencast/opencast/pull/3221)] -
+  Link Configuration Files in GitHub
+- [[#3220](https://github.com/opencast/opencast/pull/3220)] -
+  Improve GitHub Actions Concurrency Configuration
+- [[#3128](https://github.com/opencast/opencast/pull/3128)] -
+  Let Encode Handle HLS
+
+
 ### Opencast 11.0
 
 *Released on December 15th, 2021*

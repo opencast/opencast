@@ -80,6 +80,16 @@ API changes
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
+Additional Notes about 11.1
+---------------------------
+
+This release contains an updated version of Pax Logging, which provides Opencast's Log4j functionality.  Earlier
+versions are affected by the Log4Shell vulnerability, which was partially mitigated in 11.0 by
+[GHSA-mf4f-j588-5xm8](https://github.com/opencast/opencast/security/advisories/GHSA-mf4f-j588-5xm8).  Further
+vulnerability discoveries by security researchers have rendered the previous mitigations ineffective.  Normally
+we would wait for our underlying runtime (Apache Karaf) to update, however in light of the severity of these issues
+we have issued an out-of-order patch to address, and resolve, these concerns immediately.
+
 
 Release Schedule
 ----------------
