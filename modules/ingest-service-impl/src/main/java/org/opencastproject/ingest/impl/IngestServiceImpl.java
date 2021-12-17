@@ -313,6 +313,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private boolean skipCatalogs = DEFAULT_SKIP;
   private boolean skipAttachments = DEFAULT_SKIP;
 
+  protected boolean testMode = false;
+
   /**
    * Creates a new ingest service instance.
    */
@@ -1583,8 +1585,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           throw new IOException(uri + " returns http " + httpStatusCode);
         }
         in = response.getEntity().getContent();
-      } else {
+        //If it does not start with file, or we're in test mode (ie, to allow arbitrary file:// access)
+      } else if (!uri.toString().startsWith("file") || testMode) {
         in = uri.toURL().openStream();
+      } else {
+        throw new IOException("Refusing to fetch files from the local filesystem");
       }
       String fileName = FilenameUtils.getName(uri.getPath());
       if (isBlank(FilenameUtils.getExtension(fileName)))
