@@ -23,11 +23,13 @@ package org.opencastproject.workflow.api;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -46,7 +48,9 @@ public class WorkflowConfigurationForWorkflowInstance implements WorkflowConfigu
 
   @Column(name = "key_part")
   protected String key;
-
+  
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
   @Column(name = "value_part")
   protected String value;
 
