@@ -44,6 +44,9 @@ public interface EventIndexSchema extends IndexSchema {
   /** The event series name */
   String SERIES_NAME = "series_name";
 
+  /** The key in the input documents representing the prefix to extended metadata */
+  String EXTENDED_METADATA_PREFIX = "extended_metadata_";
+
   /** The access policy */
   String ACCESS_POLICY = "access_policy";
 

@@ -27,14 +27,18 @@ import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.impl.SearchMetadataCollection;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -203,6 +207,10 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.CONTRIBUTOR, contributors.toArray(new String[contributors.size()]), true);
     }
 
+    if (!event.getExtendedMetadata().isEmpty()) {
+      addExtendedMetadata(metadata, event.getExtendedMetadata());
+    }
+
     if (StringUtils.isNotBlank(event.getAccessPolicy())) {
       metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), true);
       addAuthorization(metadata, event.getAccessPolicy());
@@ -303,6 +311,26 @@ public final class EventIndexUtils {
   }
 
   /**
+   * Adds extended metadata fields to the input document
+   *
+   * @param doc
+   *          the input document
+   * @param extendedMetadata
+   *          the extended metadata map
+   */
+  private static void addExtendedMetadata(SearchMetadataCollection doc, Map<String, Map<String,
+          List<String>>> extendedMetadata) {
+    for (String type: extendedMetadata.keySet()) {
+      Map<String, List<String>> extendedMetadataByType = extendedMetadata.get(type);
+      for (String name: extendedMetadataByType.keySet()) {
+        List<String> values = extendedMetadataByType.get(name);
+        String fieldName = SeriesIndexSchema.EXTENDED_METADATA_PREFIX.concat(type + "_" + name);
+        doc.addField(fieldName, values, true);
+      }
+    }
+  }
+
+  /**
    * Adds authorization fields to the input document.
    *
    * @param doc
@@ -311,11 +339,11 @@ public final class EventIndexUtils {
    *          the access control list string
    */
   private static void addAuthorization(SearchMetadataCollection doc, String aclString) {
-    Map<String, List<String>> permissions = new HashMap<String, List<String>>();
+    Map<String, List<String>> permissions = new HashMap<>();
 
     // Define containers for common permissions
     for (Action action : Permissions.Action.values()) {
-      permissions.put(action.toString(), new ArrayList<String>());
+      permissions.put(action.toString(), new ArrayList<>());
     }
 
     AccessControlList acl = AccessControlParser.parseAclSilent(aclString);
@@ -326,7 +354,7 @@ public final class EventIndexUtils {
       }
       List<String> actionPermissions = permissions.get(entry.getAction());
       if (actionPermissions == null) {
-        actionPermissions = new ArrayList<String>();
+        actionPermissions = new ArrayList<>();
         permissions.put(entry.getAction(), actionPermissions);
       }
       actionPermissions.add(entry.getRole());
@@ -337,6 +365,30 @@ public final class EventIndexUtils {
       String fieldName = EventIndexSchema.ACL_PERMISSION_PREFIX.concat(entry.getKey());
       doc.addField(fieldName, entry.getValue(), false);
     }
+  }
+
+  /**
+   * Update extended metadata for event from dublin core catalog.
+   *
+   * @param event
+   *         The event
+   * @param dc
+   *         The dublin core catalog with extended metadata
+   * @param flavor
+   *         The flavor of the extended metadata
+   * @return
+   *         The updated event
+   */
+  public static Event updateEventExtendedMetadata(Event event, DublinCoreCatalog dc, MediaPackageElementFlavor flavor) {
+    Map<String, List<String>> map = new HashMap();
+    Set<EName> eNames = dc.getProperties();
+    for (EName eName: eNames) {
+      String name = eName.getLocalName();
+      List<String> values = dc.get(eName, DublinCore.LANGUAGE_ANY);
+      map.put(name, values);
+    }
+    event.setExtendedMetadata(flavor.toString(), map);
+    return event;
   }
 
   /**

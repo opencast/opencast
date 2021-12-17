@@ -81,6 +81,7 @@ import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -184,6 +185,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private Database db;
   private AclServiceFactory aclServiceFactory;
   private ElasticsearchIndex index;
+  private Map<String, List<EventCatalogUIAdapter>> extendedEventCatalogUIAdapters = new HashMap<>();
 
   // Settings for role filter
   private boolean includeAPIRoles;
@@ -284,6 +286,20 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
+  }
+
+  @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC,
+          target = "(common-metadata=false)")
+  public synchronized void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
+    List<EventCatalogUIAdapter> list = extendedEventCatalogUIAdapters.computeIfAbsent(
+            catalogUIAdapter.getOrganization(), k -> new ArrayList());
+    list.add(catalogUIAdapter);
+  }
+
+  public synchronized void removeCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
+    if (extendedEventCatalogUIAdapters.containsKey(catalogUIAdapter.getOrganization())) {
+      extendedEventCatalogUIAdapters.get(catalogUIAdapter.getOrganization()).remove(catalogUIAdapter);
+    }
   }
 
   /**
@@ -502,12 +518,27 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       EventIndexUtils.updateEvent(event, mp);
 
+      // common metadata
       for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
         try (InputStream in = workspace.read(catalog.getURI())) {
           EventIndexUtils.updateEvent(event, DublinCores.read(in));
         } catch (IOException | NotFoundException e) {
-          throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
+          throw new IllegalStateException(String.format("Unable to load common dublin core catalog for event '%s'",
                   mp.getIdentifier()), e);
+        }
+      }
+
+      // extended metadata
+      event.resetExtendedMetadata();  // getting rid of old data
+      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedEventCatalogUIAdapters.get(organization)) {
+        for (Catalog catalog: mp.getCatalogs(extendedCatalogUIAdapter.getFlavor())) {
+          try (InputStream in = workspace.read(catalog.getURI())) {
+            EventIndexUtils.updateEventExtendedMetadata(event, DublinCores.read(in),
+                    extendedCatalogUIAdapter.getFlavor());
+          } catch (IOException | NotFoundException e) {
+            throw new IllegalStateException(String.format("Unable to load extended dublin core catalog '%s' for event "
+                            + "'%s'", catalog.getFlavor(), mp.getIdentifier()), e);
+          }
         }
       }
 
