@@ -4,6 +4,15 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.11
+
+*Released on December 17th, 2021*
+
+- [[#3277](https://github.com/opencast/opencast/pull/3277)]
+  Security: Fix Files Accessible to External Parties
+- [[#3276](https://github.com/opencast/opencast/pulls?q=is%3Apr+is%3Aclosed)]
+  Security: Update to Pax Logging 1.11.11 (9.x)
+
 ### Opencast 9.10
 
 *Released on December 13th, 2021*
