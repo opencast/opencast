@@ -4,6 +4,19 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.7
+
+*Released on December 17th, 2021*
+
+- [[#3275](https://github.com/opencast/opencast/pull/3275)] -
+  Update to Pax Logging 1.11.11
+- [[#3261](https://github.com/opencast/opencast/pull/3261)] -
+  Update Elasticsearch container image to 7.10.2
+- [[#3248](https://github.com/opencast/opencast/pull/3248)] -
+  Switch to Java Optional
+- [[#3223](https://github.com/opencast/opencast/pull/3223)] -
+  Fix multiple extended metadata catalogs for series
+
 ### Opencast 10.6
 
 *Released on December 13th, 2021*

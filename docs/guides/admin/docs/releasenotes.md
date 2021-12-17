@@ -42,13 +42,23 @@ API changes
 - Rename value for `sort` parameter in search API from `DATE_PUBLISHED` to `DATE_MODIFIED`.
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
+Additional Notes about 10.7
+---------------------------
+
+This release contains an updated version of Pax Logging, which provides Opencast's Log4j functionality.  Earlier
+versions are affected by the Log4Shell vulnerability, which was partially mitigated in 10.6 by
+[GHSA-mf4f-j588-5xm8](https://github.com/opencast/opencast/security/advisories/GHSA-mf4f-j588-5xm8).  Further
+vulnerability discoveries by security researchers have rendered the previous mitigations ineffective.  Normally
+we would wait for our underlying runtime (Apache Karaf) to update, however in light of the severity of these issues
+we have issued an out-of-order patch to address, and resolve, these concerns immediately.
+
 Additional Notes about 10.6
 ---------------------------
 
 This release fixes several bugs.  This release also contains fixes for three security issues.  The simplest of these
 was fixed in 9.10 and merged forward to this release.  This fix is:
 
-- [GHSA-mf4f-j588-5xm8](https://github.com/opencast/opencast/security/advisories/GHSA-mf4f-j588-5xm8]):
+- [GHSA-mf4f-j588-5xm8](https://github.com/opencast/opencast/security/advisories/GHSA-mf4f-j588-5xm8):
   Apache Log4j Remote Code Execution
 
 The other two security related issues are:
@@ -58,7 +68,8 @@ The other two security related issues are:
 - [GHSA-59g4-hpg3-3gcp](https://github.com/opencast/opencast/security/advisories/GHSA-59g4-hpg3-3gcp):
   Files Accessible to External Parties
 
-Notably, these last two issues could completely expose all secrets in your production system.  You should consider changing them.
+Notably, these last two issues could completely expose all secrets in your production system.  You should consider
+changing them.
 
 Additional Notes about 10.5
 ---------------------------
