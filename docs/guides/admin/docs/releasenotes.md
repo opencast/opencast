@@ -121,6 +121,11 @@ This release contains a security fix:
 
 - Further mitigation for Log4Shell (CVE-2021-45105)
 
+Like the previous release this is an out-of-order patch to address and resolve a further vulnerability discovered
+by security researchers. Unlike the previous release it not only provides an updated version of Pax Logging, but
+also entirely removes the replaced bundles from Opencast's assemblies to avoid confusion if people do find the old,
+vulnerable version of Log4J somewhere on the filesystem.
+
 
 Additional Notes about 9.11
 ---------------------------
