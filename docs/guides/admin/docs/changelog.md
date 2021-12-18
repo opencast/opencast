@@ -5,9 +5,9 @@ Opencast 9
 ----------
 
 
-### Opencast 9.11
+### Opencast 9.12
 
-*Released on December 20th, 2021*
+*Released on December 18th, 2021*
 
 - [[#3280](https://github.com/opencast/opencast/pull/3280)]
   Security: Update to Pax Logging 1.11.12 (9.x)
