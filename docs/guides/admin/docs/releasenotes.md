@@ -114,6 +114,14 @@ API changes
 - The Series API can now return ACLs within its response, if you tell it to
 
 
+Additional Notes about 9.12
+---------------------------
+
+This release contains a security fix:
+
+- Further mitigation for Log4Shell (CVE-2021-45105)
+
+
 Additional Notes about 9.11
 ---------------------------
 
