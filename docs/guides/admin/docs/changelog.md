@@ -656,6 +656,15 @@ Opencast 11
 Opencast 10
 ----------
 
+
+### Opencast 10.8
+
+*Released on December 20th, 2021*
+
+- [[#3282](https://github.com/opencast/opencast/pull/3282)]
+  Security: Update to Pax Logging 1.11.12
+
+
 ### Opencast 10.7
 
 *Released on December 17th, 2021*
@@ -1458,6 +1467,25 @@ Opencast 10
 
 Opencast 9
 ----------
+
+
+### Opencast 9.12
+
+*Released on December 18th, 2021*
+
+- [[#3280](https://github.com/opencast/opencast/pull/3280)]
+  Security: Update to Pax Logging 1.11.12 (9.x)
+
+
+### Opencast 9.11
+
+*Released on December 17th, 2021*
+
+- [[#3277](https://github.com/opencast/opencast/pull/3277)]
+  Security: Fix Files Accessible to External Parties
+- [[#3276](https://github.com/opencast/opencast/pull/3276)]
+  Security: Update to Pax Logging 1.11.11 (9.x)
+
 
 ### Opencast 9.10
 
