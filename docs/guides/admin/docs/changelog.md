@@ -4,6 +4,30 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.1
+
+*Released on December 17th, 2021*
+
+- [[#3270](https://github.com/opencast/opencast/pull/3270)] -
+  Remove old release notes snippets
+- [[#3268](https://github.com/opencast/opencast/pull/3268)] -
+  Fix Typos and Syntax in Opencast 11 Release Notes
+- [[#3266](https://github.com/opencast/opencast/pull/3266)] -
+  Fix formatting of OC 11 release notes
+- [[#3265](https://github.com/opencast/opencast/pull/3265)] -
+  Prepare docs for OC 11 release
+- [[#3264](https://github.com/opencast/opencast/pull/3264)] -
+  Update Logging Documentation
+- [[#3263](https://github.com/opencast/opencast/pull/3263)] -
+  Remove chinese traditional
+- [[#3221](https://github.com/opencast/opencast/pull/3221)] -
+  Link Configuration Files in GitHub
+- [[#3220](https://github.com/opencast/opencast/pull/3220)] -
+  Improve GitHub Actions Concurrency Configuration
+- [[#3128](https://github.com/opencast/opencast/pull/3128)] -
+  Let Encode Handle HLS
+
+
 ### Opencast 11.0
 
 *Released on December 15th, 2021*
@@ -631,6 +655,28 @@ Opencast 11
 
 Opencast 10
 ----------
+
+
+### Opencast 10.8
+
+*Released on December 20th, 2021*
+
+- [[#3282](https://github.com/opencast/opencast/pull/3282)]
+  Security: Update to Pax Logging 1.11.12
+
+
+### Opencast 10.7
+
+*Released on December 17th, 2021*
+
+- [[#3275](https://github.com/opencast/opencast/pull/3275)] -
+  Update to Pax Logging 1.11.11
+- [[#3261](https://github.com/opencast/opencast/pull/3261)] -
+  Update Elasticsearch container image to 7.10.2
+- [[#3248](https://github.com/opencast/opencast/pull/3248)] -
+  Switch to Java Optional
+- [[#3223](https://github.com/opencast/opencast/pull/3223)] -
+  Fix multiple extended metadata catalogs for series
 
 ### Opencast 10.6
 
@@ -1421,6 +1467,25 @@ Opencast 10
 
 Opencast 9
 ----------
+
+
+### Opencast 9.12
+
+*Released on December 18th, 2021*
+
+- [[#3280](https://github.com/opencast/opencast/pull/3280)]
+  Security: Update to Pax Logging 1.11.12 (9.x)
+
+
+### Opencast 9.11
+
+*Released on December 17th, 2021*
+
+- [[#3277](https://github.com/opencast/opencast/pull/3277)]
+  Security: Fix Files Accessible to External Parties
+- [[#3276](https://github.com/opencast/opencast/pull/3276)]
+  Security: Update to Pax Logging 1.11.11 (9.x)
+
 
 ### Opencast 9.10
 
