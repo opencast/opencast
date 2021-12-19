@@ -4,6 +4,15 @@ Changelog
 Opencast 10
 ----------
 
+
+### Opencast 10.8
+
+*Released on December 20th, 2021*
+
+- [[#3282](https://github.com/opencast/opencast/pull/3282)]
+  Security: Update to Pax Logging 1.11.12
+
+
 ### Opencast 10.7
 
 *Released on December 17th, 2021*

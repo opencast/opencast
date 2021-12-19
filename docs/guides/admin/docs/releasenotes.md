@@ -42,6 +42,19 @@ API changes
 - Rename value for `sort` parameter in search API from `DATE_PUBLISHED` to `DATE_MODIFIED`.
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
+
+Additional Notes about 10.8
+---------------------------
+
+This release contains a security fix:
+
+- Further mitigation for Log4Shell (CVE-2021-45105)
+
+Like the previous release this is an out-of-order patch to address and resolve a further vulnerability discovered
+by security researchers. Unlike the previous release it not only provides an updated version of Pax Logging, but
+also entirely removes the replaced bundles from Opencast's assemblies to avoid confusion if people do find the old,
+vulnerable version of Log4J somewhere on the filesystem, even though it is not used.
+
 Additional Notes about 10.7
 ---------------------------
 
