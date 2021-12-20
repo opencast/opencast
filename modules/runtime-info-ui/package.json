@@ -11,7 +11,7 @@
     "jquery": "^3.6.0"
   },
   "devDependencies": {
-    "eslint": "^8.4.1",
+    "eslint": "^8.5.0",
     "eslint-plugin-header": "^3.1.1",
     "html-linter": "^1.1.1"
   }
