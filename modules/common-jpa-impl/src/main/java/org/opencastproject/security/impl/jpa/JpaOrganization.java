@@ -99,7 +99,7 @@ public class JpaOrganization implements Organization {
   @Lob
   @ElementCollection
   @MapKeyColumn(name = "name", nullable = false)
-  @Column(name = "value", length = 65535)
+  @Column(name = "\"value\"", length = 65535)
   @CollectionTable(
       name = "oc_organization_property",
       joinColumns = @JoinColumn(name = "organization", nullable = false)
