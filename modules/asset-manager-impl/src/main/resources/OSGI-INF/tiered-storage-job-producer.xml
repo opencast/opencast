@@ -13,7 +13,8 @@
   <reference name="assetManager"
              interface="org.opencastproject.assetmanager.api.AssetManager"
              policy="dynamic"
-             bind="setAssetManager"/>
+             bind="setAssetManager"
+             unbind="unsetAssetManager"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
              cardinality="1..1" policy="static" bind="setSecurityService"/>
   <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
@@ -21,5 +22,5 @@
   <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
              cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
   <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-             cardinality="1..1" policy="dynamic" bind="setServiceRegistry"/>
+             cardinality="1..1" policy="dynamic" bind="setServiceRegistry" unbind="unsetServiceRegistry"/>
 </scr:component>

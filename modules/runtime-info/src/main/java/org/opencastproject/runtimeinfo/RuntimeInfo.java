@@ -117,6 +117,12 @@ public class RuntimeInfo {
     this.userIdRoleProvider = userIdRoleProvider;
   }
 
+  protected void unsetUserIdRoleProvider(UserIdRoleProvider userIdRoleProvider) {
+    if (this.userIdRoleProvider == userIdRoleProvider) {
+      this.userIdRoleProvider = null;
+    }
+  }
+
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

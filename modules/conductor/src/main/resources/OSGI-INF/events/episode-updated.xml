@@ -13,7 +13,7 @@
                cardinality="1..1" policy="static" bind="setMessageReceiver"/>
     <reference name="oaiPmhUpdatedEventHandler"
                interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
-               cardinality="1..1" policy="dynamic" bind="setOaiPmhUpdatedEventHandler"/>
+               cardinality="1..1" policy="dynamic" bind="setOaiPmhUpdatedEventHandler" unbind="unsetOaiPmhUpdatedEventHandler"/>
   </scr:component>
   <scr:component name="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
                  immediate="true" activate="activate">

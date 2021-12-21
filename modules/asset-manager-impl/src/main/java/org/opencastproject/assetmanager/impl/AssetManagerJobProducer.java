@@ -442,6 +442,12 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     this.serviceRegistry = serviceRegistry;
   }
 
+  protected void unsetServiceRegistry(ServiceRegistry serviceRegistry) {
+    if (this.serviceRegistry == serviceRegistry) {
+      this.serviceRegistry = null;
+    }
+  }
+
   @Override
   protected ServiceRegistry getServiceRegistry() {
     return this.serviceRegistry;
@@ -449,6 +455,12 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
 
   protected void setAssetManager(AssetManager assetManager) {
     this.tsam = assetManager;
+  }
+
+  protected void unsetAssetManager(AssetManager assetManager) {
+    if (this.tsam == assetManager) {
+      this.tsam = null;
+    }
   }
 
   protected void setSecurityService(SecurityService securityService) {

@@ -124,6 +124,12 @@ public class ConductingEpisodeUpdatedEventHandler {
     this.oaiPmhUpdatedEventHandler = h;
   }
 
+  public void unsetOaiPmhUpdatedEventHandler(OaiPmhUpdatedEventHandler h) {
+    if (this.oaiPmhUpdatedEventHandler == h) {
+      this.oaiPmhUpdatedEventHandler = null;
+    }
+  }
+
   /**
    * OSGi DI callback.
    */

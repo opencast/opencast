@@ -172,6 +172,12 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
     this.assetManager = assetManager;
   }
 
+  public void unsetAssetManager(AssetManager assetManager) {
+    if (this.assetManager == assetManager) {
+      this.assetManager = null;
+    }
+  }
+
   @Override
   public SchedulerService getSchedulerService() {
     return schedulerService;
