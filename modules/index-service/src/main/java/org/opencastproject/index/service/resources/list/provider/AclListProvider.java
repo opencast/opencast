@@ -58,12 +58,6 @@ public class AclListProvider implements ResourceListProvider {
     this.aclServiceFactory = aclServiceFactory;
   }
 
-  public void unsetAclServiceFactory(AclServiceFactory aclServiceFactory) {
-    if (this.aclServiceFactory == aclServiceFactory) {
-      this.aclServiceFactory = null;
-    }
-  }
-
   /**
    * OSGI callback to get the security service
    *

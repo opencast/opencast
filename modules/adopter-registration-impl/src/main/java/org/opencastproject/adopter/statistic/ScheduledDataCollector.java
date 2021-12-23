@@ -223,12 +223,6 @@ public class ScheduledDataCollector extends TimerTask {
     this.assetManager = assetManager;
   }
 
-  public void unsetAssetManager(AssetManager assetManager) {
-    if (this.assetManager == assetManager) {
-      this.assetManager = null;
-    }
-  }
-
   /** OSGi setter for the series service. */
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
