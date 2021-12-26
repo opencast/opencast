@@ -52,6 +52,12 @@
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
       <version>${elasticsearch.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch</groupId>
@@ -126,13 +132,6 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
 
-    <!-- logging -->
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>2.11.1</version>
-    </dependency>
-
     <!-- testing -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -154,7 +153,6 @@
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-join</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queryparser</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.carrotsearch:hppc</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.logging.log4j:log4j-core</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
@@ -187,6 +185,7 @@
               !org.HdrHistogram.*,
               !org.apache.kafka.clients.producer.*,
               !org.apache.logging.log4j.util.internal,
+              !org.apache.logging.log4j.core*,
               !org.apache.lucene.*,
               !javax.activation.*,
               !javax.annotation,
@@ -216,8 +215,7 @@
               lucene-queryparser,
               rank-eval-client,
               httpasyncclient,
-              hppc,
-              log4j-core
+              hppc
             </Embed-Dependency>
             <_exportcontents>
               org.elasticsearch.*,
