@@ -32,8 +32,8 @@ these recomendations came from the experience of past release managers.
 
 ### After the end or begining of each month
 - Check the merged pull requests
--- Update the release notes (If necessary)
--- Add any missing tag from each pull request
+    - Update the release notes (If necessary)
+    - Add any missing tag from each pull request
 - Update the slides (If necessary)
 
 ### After the end of translation week
