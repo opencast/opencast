@@ -21,20 +21,107 @@
 
 package org.opencastproject.workflow.api;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.MappedSuperclass;
+
 /**
  * A configuration value for workflow operations.
  */
-public interface WorkflowConfiguration {
+@MappedSuperclass
+public abstract class WorkflowConfiguration implements Comparable<WorkflowConfiguration> {
 
-  String getKey();
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private Long id;
 
-  String getValue();
+  @Column(name = "key_part")
+  protected String key;
 
-  void setValue(String value);
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  @Column(name = "value_part")
+  protected String value;
 
-  int hashCode();
-  boolean equals(Object obj);
-  String toString();
+  public String getKey() {
+    return key;
+  }
 
-  int compareTo(WorkflowConfiguration o);
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((key == null) ? 0 : key.hashCode());
+    return result;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    WorkflowConfigurationForOperationInstance other = (WorkflowConfigurationForOperationInstance) obj;
+    if (key == null) {
+      if (other.key != null)
+        return false;
+    } else if (!key.equals(other.key))
+      return false;
+    return true;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Object#toString()
+   */
+  public String toString() {
+    return "workflow configuration " + this.key + "=" + this.value;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(WorkflowConfiguration o) {
+    return this.key.compareTo(o.getKey());
+  }
+
+//  String getKey();
+//
+//  String getValue();
+//
+//  void setValue(String value);
+//
+//  int hashCode();
+//  boolean equals(Object obj);
+//  String toString();
+//
+//  int compareTo(WorkflowConfiguration o);
 }

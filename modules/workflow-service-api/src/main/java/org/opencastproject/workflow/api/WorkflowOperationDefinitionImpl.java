@@ -212,7 +212,7 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
       return;
     for (JaxbWorkflowConfiguration config : configurations) {
       if (config.getKey().equals(key)) {
-        ((WorkflowConfiguration) config).setValue(value);
+        config.setValue(value);
         return;
       }
     }

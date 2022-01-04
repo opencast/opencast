@@ -23,13 +23,8 @@ package org.opencastproject.workflow.api;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -39,20 +34,8 @@ import javax.persistence.Table;
 @Entity(name = "WorkflowConfigurationForWorkflowInstance")
 @Access(AccessType.FIELD)
 @Table(name = "oc_workflow_instance_configuration")
-public class WorkflowConfigurationForWorkflowInstance implements WorkflowConfiguration, Comparable<WorkflowConfiguration> {
+public class WorkflowConfigurationForWorkflowInstance extends WorkflowConfiguration {
 
-  @Id
-  @GeneratedValue
-  @Column(name = "id")
-  private Long id;
-
-  @Column(name = "key_part")
-  protected String key;
-
-  @Lob
-  @Basic(fetch = FetchType.LAZY)
-  @Column(name = "value_part")
-  protected String value;
 
   @ManyToOne(fetch = FetchType.LAZY)
   private WorkflowInstance instance;
@@ -65,74 +48,7 @@ public class WorkflowConfigurationForWorkflowInstance implements WorkflowConfigu
     this.value = value;
   }
 
-  public String getKey() {
-    return key;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  public void setValue(String value) {
-    this.value = value;
-  }
-
   public void setWorkflowInstance(WorkflowInstance instance) {
     this.instance = instance;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((key == null) ? 0 : key.hashCode());
-    return result;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    WorkflowConfigurationForWorkflowInstance other = (WorkflowConfigurationForWorkflowInstance) obj;
-    if (key == null) {
-      if (other.key != null)
-        return false;
-    } else if (!key.equals(other.key))
-      return false;
-    return true;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString() {
-    return "workflow configuration " + this.key + "=" + this.value;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
-   */
-  @Override
-  public int compareTo(WorkflowConfiguration o) {
-    return this.key.compareTo(o.getKey());
   }
 }
