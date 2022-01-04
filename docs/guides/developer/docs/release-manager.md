@@ -19,6 +19,26 @@ meetings. It is important to note that, while release managers drive the release
 charge of both the work and the decision making, meaning that votes and successful proposals from this body take
 precedence over release manager decisions.
 
+Recommended practices for release managers
+------------------------------
+
+This is a recommendation of best practices to help to organize the duties of the release managers after they have been choosen
+these recomendations came from the experience of past release managers.
+
+### After the election of the release manager
+- Create a draft pull request for the release notes early
+- Create a draft article as a draft opencast.org Wordpress.
+- Create draft slides for presentation in summits and adopters meetings
+
+### After the end or begining of each month
+- Check the merged pull requests
+-- Update the release notes (If necessary)
+-- Add any missing tag from each pull request
+- Update the slides (If necessary)
+
+### After the end of translation week
+- Add/Remove languages acording the translation criteria
+
 
 Responsibilities
 ----------------
