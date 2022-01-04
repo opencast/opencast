@@ -628,6 +628,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
         throw new WorkflowDatabaseException(t);
       }
+    } catch (WorkflowServiceDatabaseException e) {
+      throw new WorkflowDatabaseException(e);
     } finally {
       logger.endUnitOfWork();
       lock.unlock();
@@ -1045,6 +1047,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
         //Remove workflow from database
         persistence.removeFromDatabase(instance);
+    } catch (WorkflowServiceDatabaseException e) {
+      throw new WorkflowDatabaseException(e);
     } finally {
       lock.unlock();
     }
@@ -1432,12 +1436,20 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
           throws WorkflowDatabaseException {
-    return persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
+    try {
+      return persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
+    } catch (WorkflowServiceDatabaseException e) {
+      throw new WorkflowDatabaseException(e);
+    }
   }
 
   @Override
   public boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException {
-    return persistence.mediaPackageHasActiveWorkflows(mediaPackageId);
+    try {
+      return persistence.mediaPackageHasActiveWorkflows(mediaPackageId);
+    } catch (WorkflowServiceDatabaseException e) {
+      throw new WorkflowDatabaseException(e);
+    }
   }
 
   /**
@@ -1718,6 +1730,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       throw new UndispatchableJobException(e);
     } catch (UnauthorizedException e) {
       logger.error("Authorization denied while requesting to loading workflow instance %s: %s", job.getId(),
+              e.getMessage());
+      throw new UndispatchableJobException(e);
+    } catch (WorkflowServiceDatabaseException e) {
+      logger.error("An database error occured while checking if a workflow is already active %s: %s", job.getId(),
               e.getMessage());
       throw new UndispatchableJobException(e);
     }

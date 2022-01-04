@@ -53,6 +53,7 @@ import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.QueryTerm;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 import org.opencastproject.workflow.api.WorkflowServiceDatabase;
+import org.opencastproject.workflow.api.WorkflowServiceDatabaseException;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport;
@@ -288,7 +289,11 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       logger.info("The workflow index is empty, looking for workflows to index");
       // this may be a new index, so get all of the existing workflows and index them
       List<WorkflowInstance> workflowInstances;
-      workflowInstances = persistence.getAllWorkflowInstances();
+      try {
+        workflowInstances = persistence.getAllWorkflowInstances();
+      } catch (WorkflowServiceDatabaseException e) {
+        throw new IllegalStateException("Unable to fetch workflows from database", e);
+      }
 
       final int total = workflowInstances.size();
       if (total == 0) {
