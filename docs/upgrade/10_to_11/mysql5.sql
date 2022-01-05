@@ -9,6 +9,9 @@ ALTER TABLE oc_assets_asset MODIFY COLUMN mime_type VARCHAR (255);
 -- could reasonably assume that almost all modification dates of real world series are unique. So
 -- we instead derive the modification dates from the series' events. Unix epoch only for series
 -- without events.
+--
+-- We use 1970-01-02 instead of 1970-01-01 to work around possible timezone problems. The exact value 
+-- doesn't matter anyway.
 ALTER TABLE oc_series ADD deletion_date TIMESTAMP NULL;
 ALTER TABLE oc_series ADD modified_date TIMESTAMP NULL;
 UPDATE oc_series
@@ -18,6 +21,6 @@ UPDATE oc_series
             WHERE oc_search.series_id = oc_series.id
     );
 UPDATE oc_series
-    SET modified_date = TIMESTAMP '1970-01-01 00:00:01'
+    SET modified_date = TIMESTAMP '1970-01-02 00:00:01'
     WHERE modified_date IS NULL;
 ALTER TABLE oc_series MODIFY modified_date TIMESTAMP NOT NULL;
