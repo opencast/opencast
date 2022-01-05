@@ -491,16 +491,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public WorkflowInstance getWorkflowById(long id) throws NotFoundException,
           UnauthorizedException {
-    // TODO: Be smarter about authorization? Should we store organization in workflow?
     try {
-      Job job = serviceRegistry.getJob(id);
       WorkflowInstance workflow = persistence.getWorkflow(id);
-      assertPermission(workflow, Permissions.Action.READ.toString(), job.getOrganization());
+      assertPermission(workflow, Permissions.Action.READ.toString(), workflow.getOrganizationId());
       return workflow;
     } catch (WorkflowServiceDatabaseException e) {
       throw new IllegalStateException("Got not get workflow from database with id ");
-    } catch (ServiceRegistryException e) {
-      throw new IllegalStateException("Error loading workflow job from the service registry");
     }
   }
 
