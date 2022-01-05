@@ -21,7 +21,6 @@
 
 package org.opencastproject.workflow.api;
 
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
@@ -137,25 +136,15 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see WorkflowServiceDatabase#getAllWorkflowInstances()
+   * @see WorkflowServiceDatabase#getAllWorkflowInstancesOrganizationIndependent()
    */
-  public List<WorkflowInstance> getAllWorkflowInstances() throws WorkflowServiceDatabaseException {
+  public List<WorkflowInstance> getAllWorkflowInstancesOrganizationIndependent() throws WorkflowServiceDatabaseException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
 
-      Organization orga = securityService.getOrganization();
+      Query query = em.createNamedQuery("Workflow.findAllOrganizationIndependent");
 
-      Query query;
-
-      // TODO: We don't get the organization here, it will be null. Should we even be trying to get organization here?
-      if (orga == null) {
-        query = em.createNamedQuery("Workflow.findAllTwo");
-      } else {
-        query = em.createNamedQuery("Workflow.findAll");
-        String orgId = securityService.getOrganization().getId();
-        query.setParameter("organizationId", orgId);
-      }
       List<WorkflowInstance> workflowInstances = query.getResultList();
       return workflowInstances;
     } catch (Exception e) {

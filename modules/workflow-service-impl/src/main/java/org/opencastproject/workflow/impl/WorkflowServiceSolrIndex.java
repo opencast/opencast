@@ -290,7 +290,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       // this may be a new index, so get all of the existing workflows and index them
       List<WorkflowInstance> workflowInstances;
       try {
-        workflowInstances = persistence.getAllWorkflowInstances();
+        workflowInstances = persistence.getAllWorkflowInstancesOrganizationIndependent();
       } catch (WorkflowServiceDatabaseException e) {
         throw new IllegalStateException("Unable to fetch workflows from database", e);
       }

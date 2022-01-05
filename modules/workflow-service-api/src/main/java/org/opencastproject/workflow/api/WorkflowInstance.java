@@ -80,7 +80,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
                 query = "select w from WorkflowInstance w where w.organizationId=:organizationId order by w.dateCreated"
         ),
         @NamedQuery(
-                name = "Workflow.findAllTwo",
+                name = "Workflow.findAllOrganizationIndependent",
                 query = "select w from WorkflowInstance w"
         ),
         @NamedQuery(
