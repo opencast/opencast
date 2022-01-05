@@ -654,9 +654,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                         properties, true)));
       }
 
-
-      // TODO: Get this working again? Needed to parse "$()" strings EVERYWHERE in the instance
-      // Band-aid code, should probably be replaced
+      // The previous approach was parsing all "$()" strings in a workflow instance (I think)
+      // Except it wasn't, as some "$()" strings remain workflow operations as values (and that is ok?)
+      // This approach is a band-aid to fix configuration values specifically
+      // Possible TODO: Make this more elegeant somehow
       for (String configKey : instance.getConfigurationKeys()) {
               String configValue = WorkflowConditionInterpreter.replaceVariables(instance.getConfiguration(configKey),
                       systemVariableGetter, wfProperties, false);
@@ -669,6 +670,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           operationInstance.setConfiguration(configKey, configValue);
         }
       }
+      
+      // Previous approach
 //      String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(instance),
 //              systemVariableGetter, wfProperties, false);
 //      return WorkflowParser.parseWorkflowInstance(xml);
