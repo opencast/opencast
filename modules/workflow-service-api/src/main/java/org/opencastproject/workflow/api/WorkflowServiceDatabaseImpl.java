@@ -217,8 +217,6 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   public List<WorkflowInstance> getRunningWorkflowInstancesByMediaPackage(String mediaPackageId)
           throws WorkflowServiceDatabaseException {
 
-    //TODO check authorization
-
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
