@@ -1,6 +1,6 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.event.comment.persistence.EventCommentDatabaseServiceImpl" immediate="true"
-               activate="activate" deactivate="deactivate">
+               activate="activate">
   <implementation class="org.opencastproject.event.comment.persistence.EventCommentDatabaseServiceImpl"/>
   <property name="service.description" value="Event Comment Database Service"/>
   <service>

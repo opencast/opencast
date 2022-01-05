@@ -52,5 +52,5 @@
              interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
              bind="setUrlSigningService"/>
   <reference name="asset-manager" interface="org.opencastproject.assetmanager.api.AssetManager"
-             cardinality="1..1" policy="dynamic" bind="setAssetManager"/>
+             bind="setAssetManager"/>
 </scr:component>

@@ -71,6 +71,12 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
     this.urlSigningService = urlSigningService;
   }
 
+  public void unsetUrlSigningService(UrlSigningService urlSigningService) {
+    if (this.urlSigningService == urlSigningService) {
+      this.urlSigningService = null;
+    }
+  }
+
   /** OSGi callback if properties file is present */
   @SuppressWarnings("rawtypes")
   @Override

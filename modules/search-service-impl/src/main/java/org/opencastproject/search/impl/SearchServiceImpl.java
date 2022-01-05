@@ -780,6 +780,15 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
+  protected void unsetMediaPackageSerializer(MediaPackageSerializer serializer) {
+    if (this.serializer == serializer) {
+      this.serializer = null;
+      if (solrRequester != null) {
+        solrRequester.setMediaPackageSerializer(null);
+      }
+    }
+  }
+
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     addJobLoad = LoadUtil.getConfiguredLoadValue(properties, ADD_JOB_LOAD_KEY, DEFAULT_ADD_JOB_LOAD, serviceRegistry);
