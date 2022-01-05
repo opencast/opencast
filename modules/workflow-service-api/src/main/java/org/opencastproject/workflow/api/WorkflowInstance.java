@@ -75,15 +75,20 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
         @Index(name = "IX_oc_workflow_mediaPackageId", columnList = ("mediaPackageId")),
         @Index(name = "IX_oc_workflow_seriesId", columnList = ("seriesId")), })
 @NamedQueries({
-        @NamedQuery(name = "Workflow.findAll", query = "select w from WorkflowInstance w where w.organizationId=:organizationId"),
-        @NamedQuery(name = "Workflow.findAllTwo", query = "select w from WorkflowInstance w"),
+        @NamedQuery(
+                name = "Workflow.findAll",
+                query = "select w from WorkflowInstance w where w.organizationId=:organizationId order by w.dateCreated"
+        ),
+        @NamedQuery(
+                name = "Workflow.findAllTwo",
+                query = "select w from WorkflowInstance w"
+        ),
         @NamedQuery(
                 name = "Workflow.workflowById",
                 query = "SELECT w FROM WorkflowInstance as w where w.workflowId=:workflowId and w.organizationId=:organizationId"
         ),
 
-        // for media packages
-        // TODO: Add back "order by w.dateCreated"?
+        // For media packages
         @NamedQuery(name = "Workflow.byMediaPackage", query = "SELECT w FROM WorkflowInstance w where "
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId order by w.dateCreated"),
         @NamedQuery(name = "Workflow.countActiveByMediaPackage", query = "SELECT COUNT(w) FROM WorkflowInstance w where "
@@ -91,7 +96,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
                 + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning)"),
         @NamedQuery(name = "Workflow.byMediaPackageAndOneOfThreeStates", query = "SELECT w FROM WorkflowInstance w where "
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
-                + "(w.state = :stateOne or w.state = :stateTwo or w.state = :stateThree)"),
+                + "(w.state = :stateOne or w.state = :stateTwo or w.state = :stateThree) order by w.dateCreated"),
 })
 public class WorkflowInstance {
 

@@ -1265,7 +1265,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                 updatedMediaPackage, seriesId, e);
           }
         }
-        
+
         workflowInstance.setMediaPackage(updatedMediaPackage);
       } catch (SeriesException e) {
         throw new WorkflowDatabaseException(e);
