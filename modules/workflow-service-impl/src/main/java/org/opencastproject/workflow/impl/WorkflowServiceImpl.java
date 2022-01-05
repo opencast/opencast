@@ -670,7 +670,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           operationInstance.setConfiguration(configKey, configValue);
         }
       }
-      
+
       // Previous approach
 //      String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(instance),
 //              systemVariableGetter, wfProperties, false);

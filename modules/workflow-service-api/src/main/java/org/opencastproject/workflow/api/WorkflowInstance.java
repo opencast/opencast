@@ -417,10 +417,9 @@ public class WorkflowInstance {
     if (operations == null || operations.isEmpty())
       return;
 
-    // Jaxb will lose the workflow operation's position, so we fix it here
-    // Newer insight: This is actually necessary even without Jaxb? Potential TODO: Set position on initialization of operation?
+    // Operation's position, so we fix it here
     for (int i = 0; i < operations.size(); i++) {
-      ((WorkflowOperationInstance) operations.get(i)).setPosition(i);
+      operations.get(i).setPosition(i);
     }
 
     initialized = true;
