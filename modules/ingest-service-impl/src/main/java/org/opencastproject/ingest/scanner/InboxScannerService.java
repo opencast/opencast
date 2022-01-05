@@ -179,22 +179,28 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
     var securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
             .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
-    // Only setup new inbox if security context could be acquired
-    if (securityContext.isPresent()) {
-      // remove old file install configuration
-      fileInstallCfg.foreach(removeFileInstallCfg);
-      // set up new file install config
-      fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
-      // create new scanner
-      Ingestor ingestor = new Ingestor(ingestService, securityContext.get(), workflowDefinition,
-              workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries);
-      this.ingestor = some(ingestor);
-      new Thread(ingestor).start();
-      logger.info("Now watching inbox {}", inbox.getAbsolutePath());
-    } else {
-      logger.warn("Cannot create security context for user {}, organization {}. "
-              + "Either the organization or the user does not exist", userId, orgId);
+    while (securityContext.isEmpty()) {
+      logger.debug("Could not create security context for user {}, organization {}. "
+              + "Either the organization or the user does not exist (yet).", userId, orgId);
+        try {
+          Thread.sleep(5000);
+        } catch (InterruptedException e) {
+          return;
+        }
+      securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
+              .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
     }
+
+    // remove old file install configuration
+    fileInstallCfg.foreach(removeFileInstallCfg);
+    // set up new file install config
+    fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
+    // create new scanner
+    Ingestor ingestor = new Ingestor(ingestService, securityContext.get(), workflowDefinition,
+            workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries);
+    this.ingestor = some(ingestor);
+    new Thread(ingestor).start();
+    logger.info("Now watching inbox {}", inbox.getAbsolutePath());
   }
 
   private static final Effect<Configuration> removeFileInstallCfg = new Effect.X<Configuration>() {
