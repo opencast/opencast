@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl"
-               immediate="true" activate="activate" deactivate="deactivate">
+               immediate="true" activate="activate">
   <implementation
       class="org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl"/>
   <property name="service.description" value="Themes Database Service"/>
