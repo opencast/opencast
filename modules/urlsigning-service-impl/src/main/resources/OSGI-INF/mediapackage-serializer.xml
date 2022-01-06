@@ -13,5 +13,5 @@
   <reference name="SecurityService" interface="org.opencastproject.security.api.SecurityService"
              cardinality="1..1" policy="static" bind="setSecurityService"/>
   <reference name="url-signing-service" interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
-             cardinality="0..1" policy="dynamic" bind="setUrlSigningService"/>
+             cardinality="0..1" policy="dynamic" bind="setUrlSigningService" unbind="unsetUrlSigningService"/>
 </scr:component>

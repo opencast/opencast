@@ -101,6 +101,12 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
     this.serializer = serializer;
   }
 
+  public void unsetMediaPackageSerializer(MediaPackageSerializer serializer) {
+    if (this.serializer == serializer) {
+      this.serializer = null;
+    }
+  }
+
   public void activate(@SuppressWarnings("rawtypes") Map properties) {
     logger.debug("activate()");
     if (properties != null) {

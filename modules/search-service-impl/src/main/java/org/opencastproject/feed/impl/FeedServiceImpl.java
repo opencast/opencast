@@ -28,6 +28,7 @@ import org.opencastproject.feed.api.Feed;
 import org.opencastproject.feed.api.FeedGenerator;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -321,6 +322,10 @@ public class FeedServiceImpl {
    */
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  public void setProfilesReadyIndicator(ReadinessIndicator readyIndicator) {
+    //Only activate service if ReadinessIndicator is registered.
   }
 
 }
