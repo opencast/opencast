@@ -33,7 +33,7 @@ import javax.persistence.Table;
  */
 @Entity(name = "WorkflowConfigurationForOperationInstance")
 @Access(AccessType.FIELD)
-@Table(name = "oc_workflow_operation_instance_configuration")
+@Table(name = "oc_workflow_operation_configuration")
 public class WorkflowConfigurationForOperationInstance extends WorkflowConfiguration {
 
   @ManyToOne(fetch = FetchType.LAZY)

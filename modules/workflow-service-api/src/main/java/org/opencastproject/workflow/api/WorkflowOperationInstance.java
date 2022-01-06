@@ -50,7 +50,7 @@ import javax.persistence.TemporalType;
  */
 @Entity(name = "WorkflowOperationInstance")
 @Access(AccessType.FIELD)
-@Table(name = "oc_workflow_operation_instance")
+@Table(name = "oc_workflow_operation")
 public class WorkflowOperationInstance implements Configurable {
   public enum OperationState {
     INSTANTIATED, RUNNING, PAUSED, SUCCEEDED, FAILED, SKIPPED, RETRY

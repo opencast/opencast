@@ -33,7 +33,7 @@ import javax.persistence.Table;
  */
 @Entity(name = "WorkflowConfigurationForWorkflowInstance")
 @Access(AccessType.FIELD)
-@Table(name = "oc_workflow_instance_configuration")
+@Table(name = "oc_workflow_configuration")
 public class WorkflowConfigurationForWorkflowInstance extends WorkflowConfiguration {
 
 
