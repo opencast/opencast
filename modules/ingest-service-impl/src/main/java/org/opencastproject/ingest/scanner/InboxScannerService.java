@@ -27,6 +27,7 @@ import static org.opencastproject.util.data.Collections.dict;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -34,6 +35,7 @@ import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
@@ -119,12 +121,14 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   public static final String INBOX_METADATA_REGEX = "inbox.metadata.regex";
   public static final String INBOX_DATETIME_FORMAT = "inbox.datetime.format";
+  public static final String INBOX_SCHEDULE_MATCH = "inbox.schedule.match";
 
   private IngestService ingestService;
   private SecurityService securityService;
   private UserDirectoryService userDir;
   private OrganizationDirectoryService orgDir;
   private SeriesService seriesService;
+  private SchedulerService schedulerService;
 
   private ComponentContext cc;
 
@@ -186,7 +190,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
             .map(Objects::toString)
             .map(DateTimeFormatter::ofPattern)
             .orElse(DateTimeFormatter.ISO_DATE_TIME);
-
+    var matchSchedule = BooleanUtils.toBoolean((String) properties.get(INBOX_SCHEDULE_MATCH));
 
     var securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
             .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
@@ -209,7 +213,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     // create new scanner
     this.ingestor = new Ingestor(ingestService, securityContext.get(), workflowDefinition,
             workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries,
-            metadataPattern, dateFormatter);
+            metadataPattern, dateFormatter, schedulerService, matchSchedule);
     new Thread(ingestor).start();
     logger.info("Now watching inbox {}", inbox.getAbsolutePath());
   }
@@ -342,5 +346,10 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
+  }
+
+  @Reference
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
   }
 }

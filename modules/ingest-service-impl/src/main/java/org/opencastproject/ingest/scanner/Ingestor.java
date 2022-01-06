@@ -22,6 +22,7 @@
 package org.opencastproject.ingest.scanner;
 
 import static java.lang.String.format;
+import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
 
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -32,6 +33,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -54,6 +56,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -64,6 +67,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /** Used by the {@link InboxScannerService} to do the actual ingest. */
 public class Ingestor implements Runnable {
@@ -86,6 +90,7 @@ public class Ingestor implements Runnable {
   private final File inbox;
 
   private final SeriesService seriesService;
+  private final SchedulerService schedulerService;
 
   private final int maxTries;
 
@@ -95,6 +100,8 @@ public class Ingestor implements Runnable {
 
   private final Optional<Pattern> metadataPattern;
   private final DateTimeFormatter dateFormatter;
+
+  private final boolean matchSchedule;
 
   /**
    * Thread pool to run the ingest worker.
@@ -151,12 +158,12 @@ public class Ingestor implements Runnable {
                       workflowInstance.getId());
             } else {
               /* Create MediaPackage and add Track */
-              MediaPackage mp = ingestService.createMediaPackage();
-              logger.info("Start ingest track from file {} to media package {}",
-                      artifact.getName(), mp.getIdentifier().toString());
+              logger.info("Start ingest track from file {}", artifact.getName());
 
-              DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
-              String title = null;
+              // Try extracting metadata from the file name and path
+              String title = artifact.getName();
+              String spatial = null;
+              Date created = null;
               if (metadataPattern.isPresent()) {
                 var matcher = metadataPattern.get().matcher(artifact.getName());
                 if (matcher.find()) {
@@ -166,16 +173,14 @@ public class Ingestor implements Runnable {
                     logger.debug("{} matches no title in {}", metadataPattern.get(), artifact.getName(), e);
                   }
                   try {
-                    dcc.add(DublinCore.PROPERTY_SPATIAL, matcher.group("spatial"));
+                    spatial = matcher.group("spatial");
                   } catch (IllegalArgumentException e) {
                     logger.debug("{} matches no spatial in {}", metadataPattern.get(), artifact.getName(), e);
                   }
                   try {
                     var value = matcher.group("created");
                     logger.debug("Trying to parse matched date '{}' with formatter {}", value, dateFormatter);
-                    var date = Timestamp.valueOf(LocalDateTime.parse(value, dateFormatter));
-                    var created = EncodingSchemeUtils.encodeDate(date, Precision.Second);
-                    dcc.add(DublinCore.PROPERTY_CREATED, created);
+                    created = Timestamp.valueOf(LocalDateTime.parse(value, dateFormatter));
                   } catch (DateTimeParseException e) {
                     logger.warn("Matched date does not match configured date-time format", e);
                   } catch (IllegalArgumentException e) {
@@ -185,34 +190,78 @@ public class Ingestor implements Runnable {
                   logger.debug("Regular expression {} does not match {}", metadataPattern.get(), artifact.getName());
                 }
               }
-              // fall back to filename for title if matcher did not catch any
-              dcc.add(DublinCore.PROPERTY_TITLE, StringUtils.isNotBlank(title) ? title : artifact.getName());
 
-              /* Check if we have a subdir and if its name matches an existing series */
-              File dir = artifact.getParentFile();
-              String seriesID;
-              if (FileUtils.directoryContains(inbox, dir)) {
-                /* cut away inbox path and trailing slash from artifact path */
-                seriesID = dir.getName();
-                if (seriesService.getSeries(seriesID) != null) {
-                  logger.info("Ingest from inbox into series with id {}", seriesID);
-                  dcc.add(DublinCore.PROPERTY_IS_PART_OF, seriesID);
+              MediaPackage mediaPackage = null;
+              var currentWorkflowDefinition = workflowDefinition;
+              var currentWorkflowConfig = workflowConfig;
+
+              // Check if we can match this to a scheduled event
+              if (matchSchedule && spatial != null && created != null) {
+                logger.debug("Try finding scheduled event for agent {} at time {}", spatial, created);
+                var mediaPackages = schedulerService.findConflictingEvents(spatial, created, created);
+                if (mediaPackages.size() > 1) {
+                  logger.warn("Metadata match multiple events. Not using any!");
+                } else if (mediaPackages.size() == 1) {
+                  mediaPackage = mediaPackages.get(0);
+                  var id = mediaPackage.getIdentifier().toString();
+                  var eventConfiguration = schedulerService.getCaptureAgentConfiguration(id);
+                  currentWorkflowDefinition = eventConfiguration.getOrDefault(
+                          "org.opencastproject.workflow.definition",
+                          workflowDefinition);
+                  currentWorkflowConfig = eventConfiguration.entrySet().stream()
+                          .filter(e -> e.getKey().startsWith("org.opencastproject.workflow.config."))
+                          .collect(Collectors.toMap(e -> e.getKey().substring(36), Map.Entry::getValue));
+                  schedulerService.updateRecordingState(id, UPLOAD_FINISHED);
+                  logger.info("Found matching scheduled event {}", mediaPackage);
+                } else {
+                  logger.debug("No matching event found.");
                 }
               }
 
-              try (ByteArrayOutputStream dcout = new ByteArrayOutputStream()) {
-                dcc.toXml(dcout, true);
-                try (InputStream dcin = new ByteArrayInputStream(dcout.toByteArray())) {
-                  mp = ingestService.addCatalog(dcin, "dublincore.xml", MediaPackageElements.EPISODE, mp);
-                  logger.info("Added DC catalog to media package for ingest from inbox");
+              // create new media package and metadata catalog if we have none
+              if (mediaPackage == null) {
+                // create new media package
+                mediaPackage = ingestService.createMediaPackage();
+
+                DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
+                if (spatial != null) {
+                  dcc.add(DublinCore.PROPERTY_SPATIAL, spatial);
+                }
+                if (created != null) {
+                  dcc.add(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(created, Precision.Second));
+                }
+                // fall back to filename for title if matcher did not catch any
+                dcc.add(DublinCore.PROPERTY_TITLE, title);
+
+                /* Check if we have a subdir and if its name matches an existing series */
+                final File dir = artifact.getParentFile();
+                if (FileUtils.directoryContains(inbox, dir)) {
+                  /* cut away inbox path and trailing slash from artifact path */
+                  var seriesID = dir.getName();
+                  if (seriesService.getSeries(seriesID) != null) {
+                    logger.info("Ingest from inbox into series with id {}", seriesID);
+                    dcc.add(DublinCore.PROPERTY_IS_PART_OF, seriesID);
+                  }
+                }
+
+                try (ByteArrayOutputStream dcout = new ByteArrayOutputStream()) {
+                  dcc.toXml(dcout, true);
+                  try (InputStream dcin = new ByteArrayInputStream(dcout.toByteArray())) {
+                    mediaPackage = ingestService.addCatalog(dcin, "dublincore.xml", MediaPackageElements.EPISODE,
+                            mediaPackage);
+                    logger.info("Added DC catalog to media package for ingest from inbox");
+                  }
                 }
               }
-              /* Ingest media*/
-              mp = ingestService.addTrack(in, artifact.getName(), mediaFlavor, mp);
-              logger.info("Ingested track from file {} to mediapackage {}",
-                      artifact.getName(), mp.getIdentifier().toString());
-              /* Ingest mediapackage */
-              WorkflowInstance workflowInstance = ingestService.ingest(mp, workflowDefinition, workflowConfig);
+
+              // Ingest media
+              mediaPackage = ingestService.addTrack(in, artifact.getName(), mediaFlavor, mediaPackage);
+              logger.info("Ingested track from file {} to media package {}",
+                      artifact.getName(), mediaPackage.getIdentifier().toString());
+
+              // Ingest media package
+              WorkflowInstance workflowInstance = ingestService.ingest(mediaPackage, currentWorkflowDefinition,
+                      currentWorkflowConfig);
               logger.info("Ingested {} from inbox, workflow {} started", artifact.getName(), workflowInstance.getId());
             }
           } catch (Exception e) {
@@ -274,7 +323,7 @@ public class Ingestor implements Runnable {
   public Ingestor(IngestService ingestService, SecurityContext secCtx,
           String workflowDefinition, Map<String, String> workflowConfig, String mediaFlavor, File inbox, int maxThreads,
           SeriesService seriesService, int maxTries, int secondsBetweenTries, Optional<Pattern> metadataPattern,
-          DateTimeFormatter dateFormatter) {
+          DateTimeFormatter dateFormatter, SchedulerService schedulerService, boolean matchSchedule) {
     this.ingestService = ingestService;
     this.secCtx = secCtx;
     this.workflowDefinition = workflowDefinition;
@@ -288,6 +337,8 @@ public class Ingestor implements Runnable {
     this.secondsBetweenTries = secondsBetweenTries;
     this.metadataPattern = metadataPattern;
     this.dateFormatter = dateFormatter;
+    this.schedulerService = schedulerService;
+    this.matchSchedule = matchSchedule;
   }
 
   /**

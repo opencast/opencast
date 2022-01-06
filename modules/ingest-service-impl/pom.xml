@@ -203,6 +203,8 @@
               META-INF.services;-split-package:=merge-first,
               de.schlichtherle.*;-split-package:=merge-first
             </Private-Package>
+            <!-- Remove once the scheduler uses OSGi annotations and generates capabilities -->
+            <_dsannotations-options>norequirements</_dsannotations-options>
           </instructions>
         </configuration>
       </plugin>
