@@ -22,7 +22,6 @@ package org.opencastproject.publication.oaipmh.endpoint;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 import static org.opencastproject.util.UrlSupport.uri;
 
@@ -47,7 +46,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.HashSet;
 
 /**
@@ -80,9 +78,9 @@ public class OaiPmhPublicationRestServiceTest {
     final ServiceRegistry registry = EasyMock.createNiceMock(ServiceRegistry.class);
     final ServiceRegistration registration = EasyMock.createNiceMock(ServiceRegistration.class);
     EasyMock.expect(registration.getHost())
-        .andReturn(url.getProtocol() + "://" + url.getHost() + ":" + url.getPort())
+        .andReturn(rt.host(""))
         .anyTimes();
-    EasyMock.expect(registration.getPath()).andReturn(url.getPath()).anyTimes();
+    EasyMock.expect(registration.getPath()).andReturn("").anyTimes();
     EasyMock.expect(registry.getServiceRegistrationsByLoad(EasyMock.anyString()))
         .andReturn(ListBuilders.SIA.mk(registration))
         .anyTimes();
@@ -114,8 +112,7 @@ public class OaiPmhPublicationRestServiceTest {
     }
   }
 
-  private static final URL url = localhostRandomPort();
-  private static final RestServiceTestEnv rt = testEnvForClasses(url, TestOaiPmhPublicationRestService.class);
+  private static final RestServiceTestEnv rt = testEnvForClasses(TestOaiPmhPublicationRestService.class);
 
   // Great. Checkstyle: "This method should no be static". JUnit: "Method setUp() should be static." ;)
   // CHECKSTYLE:OFF
