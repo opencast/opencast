@@ -4,15 +4,6 @@ Opencast Maven Repository
 The Maven repository server maintains a copy of all the Java dependencies used by Opencast.
 
 
-Adding Libraries To The Repository
-----------------------------------
-
-1. Login as an administrator on the [Opencast Nexus Master](https://nexus.opencast.org)
-2. Select repository
-3. Select the artifact upload tab
-4. Fill in the details and upload the file
-
-
 Setting-up Another Maven Repository
 -----------------------------------
 
@@ -88,8 +79,7 @@ generatePom | Whether or not to generate a pom file automatically               
 
 #### Pushing to Maven Central
 
-Opencast previously hosted our own Maven repository at nexus.opencast.org, however starting with Opencast 6.6 we are
-transitioning to using Maven Central.  There are a few steps prior to being able to push to Sonatype's repo:
+Opencast hosts its maven artifacts on Maven Central.  There are a few steps prior to being able to push to Sonatype's repo:
 
 - Create a GPG key, and push the public key to a key server
 - Sign up for an account on [Sonatype's JIRA instance](https://issues.sonatype.org)

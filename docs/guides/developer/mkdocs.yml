@@ -87,7 +87,6 @@ nav:
    - OAI-PMH: 'modules/oaipmh.md'
 - Infrastructure:
    - Overview: 'infrastructure/index.md'
-   - Notes: 'infrastructure/notes.md'
    - Maven Repository: 'infrastructure/maven-repository.md'
 - External API:
    - Introduction: 'api/index.md'
