@@ -21,24 +21,19 @@
 
 package org.opencastproject.workflow.api;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -124,13 +119,6 @@ public class WorkflowOperationInstance implements Configurable {
 
   @Column(name = "executionHost")
   protected String executionHost;
-
-  @ElementCollection
-  @CollectionTable(
-          name = "executionHistory",
-          joinColumns = @JoinColumn(name = "operationId"))
-  @Column(name = "executionHistoryEntry")
-  protected List<Long> executionHistory = new ArrayList<Long>();
 
   @Column(name = "retryStrategy", length = 128)
   protected RetryStrategy retryStrategy;
@@ -229,7 +217,6 @@ public class WorkflowOperationInstance implements Configurable {
           int maxAttempts,
           int failedAttempts,
           String executionHost,
-          List<Long> executionHistory,
           RetryStrategy retryStrategy) {
     this.id = id;
     this.template = template;
@@ -251,7 +238,6 @@ public class WorkflowOperationInstance implements Configurable {
     this.maxAttempts = maxAttempts;
     this.failedAttempts = failedAttempts;
     this.executionHost = executionHost;
-    this.executionHistory = executionHistory;
     this.retryStrategy = retryStrategy;
   }
 
@@ -644,25 +630,6 @@ public class WorkflowOperationInstance implements Configurable {
    */
   public void setExecutionHost(String executionHost) {
     this.executionHost = executionHost;
-  }
-
-  /**
-   * Adds a failed job to the execution history
-   *
-   * @param jobId
-   *          the failed job id
-   */
-  public void addToExecutionHistory(long jobId) {
-    executionHistory.add(jobId);
-  }
-
-  /**
-   * Returns a list of failed job executions
-   *
-   * @return the execution history
-   */
-  public List<Long> getExecutionHistory() {
-    return executionHistory;
   }
 
   public WorkflowInstance getWorkflowInstance() {

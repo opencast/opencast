@@ -1467,7 +1467,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     WorkflowOperationInstance currentOperation = (WorkflowOperationInstance) operation;
     int failedAttempt = currentOperation.getFailedAttempts() + 1;
     currentOperation.setFailedAttempts(failedAttempt);
-    currentOperation.addToExecutionHistory(currentOperation.getId());
 
     // Operation was aborted by the user, after going into hold state
     if (ERROR_RESOLUTION_HANDLER_ID.equals(currentOperation.getTemplate())

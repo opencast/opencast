@@ -24,9 +24,7 @@ package org.opencastproject.workflow.api;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -133,10 +131,6 @@ public class JaxbWorkflowOperationInstance {
   @XmlAttribute(name = "execution-host")
   protected String executionHost;
 
-  @XmlElementWrapper(name = "execution-history")
-  @XmlElement(name = "execution-history-entry")
-  protected List<Long> executionHistory = new ArrayList<Long>();
-
   @XmlJavaTypeAdapter(RetryStrategy.Adapter.class)
   @XmlAttribute(name = "retry-strategy")
   protected RetryStrategy retryStrategy;
@@ -177,7 +171,6 @@ public class JaxbWorkflowOperationInstance {
     this.maxAttempts = operation.getMaxAttempts();
     this.failedAttempts = operation.getFailedAttempts();
     this.executionHost = operation.getExecutionHost();
-    this.executionHistory = operation.getExecutionHistory();
     this.retryStrategy = operation.getRetryStrategy();
   }
 
@@ -186,7 +179,7 @@ public class JaxbWorkflowOperationInstance {
             configurations.stream().map(config -> new WorkflowConfigurationForOperationInstance(config.getKey(), config.getValue())).collect(Collectors.toSet()),
             holdStateUserInterfaceUrl, holdActionTitle, failWorkflowOnException, executeCondition,
             skipCondition, exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
-            executionHost, executionHistory, retryStrategy);
+            executionHost, retryStrategy);
   }
 
   public static JaxbWorkflowOperationInstance fromWorkflowOperationInstance(WorkflowOperationInstance operation) {
@@ -212,8 +205,7 @@ public class JaxbWorkflowOperationInstance {
             .append(continuable, jaxbWorkflowOperationInstance.continuable).append(dateStarted, jaxbWorkflowOperationInstance.dateStarted)
             .append(dateCompleted, jaxbWorkflowOperationInstance.dateCompleted).append(timeInQueue, jaxbWorkflowOperationInstance.timeInQueue)
             .append(maxAttempts, jaxbWorkflowOperationInstance.maxAttempts).append(failedAttempts, jaxbWorkflowOperationInstance.failedAttempts)
-            .append(executionHost, jaxbWorkflowOperationInstance.executionHost).append(executionHistory, jaxbWorkflowOperationInstance.executionHistory)
-            .append(retryStrategy, jaxbWorkflowOperationInstance.retryStrategy)
+            .append(executionHost, jaxbWorkflowOperationInstance.executionHost).append(retryStrategy, jaxbWorkflowOperationInstance.retryStrategy)
             .isEquals();
   }
 
@@ -222,7 +214,7 @@ public class JaxbWorkflowOperationInstance {
     return new HashCodeBuilder(17, 37).append(template).append(jobId).append(state).append(description).append(configurations)
             .append(holdStateUserInterfaceUrl).append(holdActionTitle).append(failWorkflowOnException).append(executeCondition).append(skipCondition).append(exceptionHandlingWorkflow)
             .append(abortable).append(continuable).append(dateStarted).append(dateCompleted).append(timeInQueue).append(maxAttempts).append(failedAttempts).append(executionHost)
-            .append(executionHistory).append(retryStrategy)
+            .append(retryStrategy)
             .toHashCode();
   }
 }
