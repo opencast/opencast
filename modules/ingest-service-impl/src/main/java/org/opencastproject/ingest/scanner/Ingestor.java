@@ -36,13 +36,18 @@ import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.IoSupport;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.google.common.util.concurrent.RateLimiter;
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,10 +57,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -100,8 +110,12 @@ public class Ingestor implements Runnable {
 
   private final Optional<Pattern> metadataPattern;
   private final DateTimeFormatter dateFormatter;
+  private final String ffprobe;
+
+  private final Gson gson = new Gson();
 
   private final boolean matchSchedule;
+  private final float matchThreshold;
 
   /**
    * Thread pool to run the ingest worker.
@@ -164,6 +178,7 @@ public class Ingestor implements Runnable {
               String title = artifact.getName();
               String spatial = null;
               Date created = null;
+              Float duration = null;
               if (metadataPattern.isPresent()) {
                 var matcher = metadataPattern.get().matcher(artifact.getName());
                 if (matcher.find()) {
@@ -191,6 +206,14 @@ public class Ingestor implements Runnable {
                 }
               }
 
+              // Try extracting additional metadata via ffprobe
+              if (ffprobe != null) {
+                JsonFormat json = probeMedia(artifact.getAbsolutePath()).format;
+                created = json.tags.getCreationTime() == null ? created : json.tags.getCreationTime();
+                duration = json.getDuration();
+                logger.debug("Extracted metadata from file: {}", json);
+              }
+
               MediaPackage mediaPackage = null;
               var currentWorkflowDefinition = workflowDefinition;
               var currentWorkflowConfig = workflowConfig;
@@ -198,7 +221,18 @@ public class Ingestor implements Runnable {
               // Check if we can match this to a scheduled event
               if (matchSchedule && spatial != null && created != null) {
                 logger.debug("Try finding scheduled event for agent {} at time {}", spatial, created);
-                var mediaPackages = schedulerService.findConflictingEvents(spatial, created, created);
+                var end = duration == null ? created : DateUtils.addSeconds(created, duration.intValue());
+                var mediaPackages = schedulerService.findConflictingEvents(spatial, created, end);
+                if (matchThreshold > 0F && mediaPackages.size() > 1) {
+                  var filteredMediaPackages = new ArrayList<MediaPackage>();
+                  for (var mp : mediaPackages) {
+                    var schedule =  schedulerService.getTechnicalMetadata(mp.getIdentifier().toString());
+                    if (overlap(schedule.getStartDate(), schedule.getEndDate(), created, end) > matchThreshold) {
+                      filteredMediaPackages.add(mp);
+                    }
+                  }
+                  mediaPackages = filteredMediaPackages;
+                }
                 if (mediaPackages.size() > 1) {
                   logger.warn("Metadata match multiple events. Not using any!");
                 } else if (mediaPackages.size() == 1) {
@@ -277,6 +311,63 @@ public class Ingestor implements Runnable {
           return RetriableIngestJob.this;
       });
     }
+
+    private JsonFFprobe probeMedia(final String file) throws IOException {
+
+      final String[] command = new String[] {
+              ffprobe,
+              "-show_format",
+              "-of",
+              "json",
+              file
+      };
+
+      // Execute ffprobe and obtain the result
+      logger.debug("Running ffprobe: {}", (Object) command);
+
+      String output;
+      Process process = null;
+      try {
+        process = new ProcessBuilder(command).start();
+        try (InputStream in = process.getInputStream()) {
+          output = IOUtils.toString(in, StandardCharsets.UTF_8);
+        }
+
+        if (process.waitFor() != 0) {
+          throw new IOException("FFprobe exited abnormally");
+        }
+      } catch (InterruptedException e) {
+        throw new IOException(e);
+      } finally {
+        IoSupport.closeQuietly(process);
+      }
+
+      return gson.fromJson(output, JsonFFprobe.class);
+    }
+
+    /**
+     * Calculate the overlap of two events `a` and `b`.
+     * @param aStart Begin of event a
+     * @param aEnd End of event a
+     * @param bStart Begin of event b
+     * @param bEnd End of event b
+     * @return How much of `a` overlaps with `n`. Return a float in the range of <pre>[0.0, 1.0]</pre>.
+     */
+    private float overlap(Date aStart, Date aEnd, Date bStart, Date bEnd) {
+      var min = Math.min(aStart.getTime(), bStart.getTime());
+      var max = Math.max(aEnd.getTime(), bEnd.getTime());
+      var aLen = aEnd.getTime() - aStart.getTime();
+      var bLen = bEnd.getTime() - bStart.getTime();
+      var overlap =  aLen + bLen - (max - min);
+      logger.debug("Detected overlap of {} ({})", overlap, overlap / (float) aLen);
+      if (aLen == 0F) {
+        return 1F;
+      }
+      if (overlap > 0F) {
+        return overlap / (float) aLen;
+      }
+      return 0.0F;
+    }
   }
 
   @Override
@@ -323,7 +414,8 @@ public class Ingestor implements Runnable {
   public Ingestor(IngestService ingestService, SecurityContext secCtx,
           String workflowDefinition, Map<String, String> workflowConfig, String mediaFlavor, File inbox, int maxThreads,
           SeriesService seriesService, int maxTries, int secondsBetweenTries, Optional<Pattern> metadataPattern,
-          DateTimeFormatter dateFormatter, SchedulerService schedulerService, boolean matchSchedule) {
+          DateTimeFormatter dateFormatter, SchedulerService schedulerService, String ffprobe, boolean matchSchedule,
+          float matchThreshold) {
     this.ingestService = ingestService;
     this.secCtx = secCtx;
     this.workflowDefinition = workflowDefinition;
@@ -338,7 +430,9 @@ public class Ingestor implements Runnable {
     this.metadataPattern = metadataPattern;
     this.dateFormatter = dateFormatter;
     this.schedulerService = schedulerService;
+    this.ffprobe = ffprobe;
     this.matchSchedule = matchSchedule;
+    this.matchThreshold = matchThreshold;
   }
 
   /**
@@ -385,5 +479,41 @@ public class Ingestor implements Runnable {
 
   public String myInfo() {
     return format("[%x thread=%x]", hashCode(), Thread.currentThread().getId());
+  }
+
+  class JsonFFprobe {
+    protected JsonFormat format;
+  }
+
+  class JsonFormat {
+    private String duration;
+    protected JsonTags tags;
+
+    Float getDuration() {
+      return duration == null ? null : Float.parseFloat(duration);
+    }
+
+    @Override
+    public String toString() {
+      return String.format("{duration=%s,tags=%s}", duration, tags);
+    }
+  }
+
+  class JsonTags {
+    @SerializedName(value = "creation_time")
+    private String creationTime;
+
+    Date getCreationTime() throws ParseException {
+      if (creationTime == null) {
+        return  null;
+      }
+      DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");
+      return format.parse(creationTime.replaceAll("000Z$", "+0000"));
+    }
+
+    @Override
+    public String toString() {
+      return String.format("{creation_time=%s}", creationTime);
+    }
   }
 }

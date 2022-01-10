@@ -121,7 +121,12 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   public static final String INBOX_METADATA_REGEX = "inbox.metadata.regex";
   public static final String INBOX_DATETIME_FORMAT = "inbox.datetime.format";
+  public static final String INBOX_METADATA_FFPROBE = "inbox.metadata.ffprobe";
   public static final String INBOX_SCHEDULE_MATCH = "inbox.schedule.match";
+  public static final String INBOX_SCHEDULE_MATCH_THRESHOLD = "inbox.schedule.match.threshold";
+
+  public static final String FFPROBE_BINARY_CONFIG = "org.opencastproject.inspection.ffprobe.path";
+  public static final String FFPROBE_BINARY_DEFAULT = "ffprobe";
 
   private IngestService ingestService;
   private SecurityService securityService;
@@ -190,7 +195,11 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
             .map(Objects::toString)
             .map(DateTimeFormatter::ofPattern)
             .orElse(DateTimeFormatter.ISO_DATE_TIME);
+    var ffprobe = BooleanUtils.toBoolean((String) properties.get(INBOX_METADATA_FFPROBE))
+            ? Objects.toString(cc.getBundleContext().getProperty(FFPROBE_BINARY_CONFIG), FFPROBE_BINARY_DEFAULT)
+            : null;
     var matchSchedule = BooleanUtils.toBoolean((String) properties.get(INBOX_SCHEDULE_MATCH));
+    var matchThreshold = NumberUtils.toFloat((String) properties.get(INBOX_SCHEDULE_MATCH_THRESHOLD), -1F);
 
     var securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
             .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
@@ -213,7 +222,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     // create new scanner
     this.ingestor = new Ingestor(ingestService, securityContext.get(), workflowDefinition,
             workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries,
-            metadataPattern, dateFormatter, schedulerService, matchSchedule);
+            metadataPattern, dateFormatter, schedulerService, ffprobe, matchSchedule, matchThreshold);
     new Thread(ingestor).start();
     logger.info("Now watching inbox {}", inbox.getAbsolutePath());
   }
