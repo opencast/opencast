@@ -21,9 +21,7 @@
 
 package org.opencastproject.workflow.api;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -44,7 +42,6 @@ public abstract class WorkflowConfiguration implements Comparable<WorkflowConfig
   protected String key;
 
   @Lob
-  @Basic(fetch = FetchType.LAZY)
   @Column(name = "value_part")
   protected String value;
 
@@ -86,7 +83,7 @@ public abstract class WorkflowConfiguration implements Comparable<WorkflowConfig
       return false;
     if (getClass() != obj.getClass())
       return false;
-    WorkflowConfigurationForOperationInstance other = (WorkflowConfigurationForOperationInstance) obj;
+    WorkflowConfiguration other = (WorkflowConfiguration) obj;
     if (key == null) {
       if (other.key != null)
         return false;

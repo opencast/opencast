@@ -154,8 +154,8 @@ public class JaxbWorkflowOperationInstance {
     this.jobId = operation.getId();
     this.state = operation.getState();
     this.description = operation.getDescription();
-    this.configurations = operation.getConfigurationKeys().stream()
-            .map(key -> new JaxbWorkflowConfiguration(key, operation.getConfiguration(key)))
+    this.configurations = operation.getConfigurations().stream()
+            .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
             .collect(Collectors.toSet());
     this.holdStateUserInterfaceUrl = operation.getHoldStateUserInterfaceUrl();
     this.holdActionTitle = operation.getHoldActionTitle();
@@ -180,10 +180,6 @@ public class JaxbWorkflowOperationInstance {
             holdStateUserInterfaceUrl, holdActionTitle, failWorkflowOnException, executeCondition,
             skipCondition, exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
             executionHost, retryStrategy);
-  }
-
-  public static JaxbWorkflowOperationInstance fromWorkflowOperationInstance(WorkflowOperationInstance operation) {
-    return new JaxbWorkflowOperationInstance(operation);
   }
 
   @Override

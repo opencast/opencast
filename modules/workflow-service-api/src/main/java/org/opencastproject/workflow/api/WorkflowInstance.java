@@ -61,6 +61,7 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
@@ -175,6 +176,7 @@ public class WorkflowInstance {
   @Column(name = "seriesId", length = 128)
   protected String seriesId;
 
+  @Transient
   protected boolean initialized = false;
 
   public enum WorkflowState {
@@ -497,6 +499,10 @@ public class WorkflowInstance {
     }
 
     return currentOperation;
+  }
+
+  public Set<WorkflowConfigurationForWorkflowInstance> getConfigurations() {
+    return configurations;
   }
 
   /**

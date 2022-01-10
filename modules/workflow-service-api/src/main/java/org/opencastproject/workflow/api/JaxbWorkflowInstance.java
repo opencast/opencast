@@ -112,10 +112,10 @@ public class JaxbWorkflowInstance {
     this.dateCompleted = workflow.getDateCompleted();
     this.mediaPackage = workflow.getMediaPackage();
     this.operations = workflow.getOperations().stream()
-            .map(operation -> JaxbWorkflowOperationInstance.fromWorkflowOperationInstance(operation))
+            .map(operation -> new JaxbWorkflowOperationInstance(operation))
             .collect(Collectors.toList());
-    this.configurations = workflow.getConfigurationKeys().stream()
-            .map(key -> new JaxbWorkflowConfiguration(key, workflow.getConfiguration(key)))
+    this.configurations = workflow.getConfigurations().stream()
+            .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
             .collect(Collectors.toSet());
     this.mediaPackageId = mediaPackage.getIdentifier().toString();
     this.seriesId = mediaPackage.getSeries();
@@ -127,10 +127,6 @@ public class JaxbWorkflowInstance {
             operations.stream().map(operation -> operation.toWorkflowOperationInstance()).collect(Collectors.toList()),
             configurations.stream().map(config -> new WorkflowConfigurationForWorkflowInstance(config.getKey(), config.getValue())).collect(Collectors.toSet()),
             mediaPackageId, seriesId);
-  }
-
-  public static JaxbWorkflowInstance fromWorkflowInstance(WorkflowInstance workflow) {
-    return new JaxbWorkflowInstance(workflow);
   }
 
   @Override

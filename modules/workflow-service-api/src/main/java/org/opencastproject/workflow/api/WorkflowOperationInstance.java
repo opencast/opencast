@@ -317,6 +317,10 @@ public class WorkflowOperationInstance implements Configurable {
     this.state = state;
   }
 
+  public Set<WorkflowConfigurationForOperationInstance> getConfigurations() {
+    return configurations;
+  }
+
   /**
    * {@inheritDoc}
    *
