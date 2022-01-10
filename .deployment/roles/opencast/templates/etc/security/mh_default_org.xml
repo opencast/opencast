@@ -701,7 +701,7 @@
     <property name="userDirectoryService" ref="userDirectoryService" />
     <property name="securityService" ref="securityService" />
     <property name="userReferenceProvider" ref="userReferenceProvider" />
-    <property name="jwksUrl" value="https://pr306.tobira.opencast.org/.well-known/jwks.json" />
+    <property name="jwksUrl" value="https://tobira.opencast.org/.well-known/jwks.json" />
     <property name="jwksCacheExpiresIn" value="1440" />
     <property name="expectedAlgorithms" ref="jwtExpectedAlgorithms" />
     <property name="claimConstraints" ref="jwtClaimConstraints" />
