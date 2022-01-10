@@ -668,8 +668,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       Date start = extendedEventDto.getStartDate();
       Date end = extendedEventDto.getEndDate();
 
-      verifyActive(mpId, end);
-
       if ((startDateTime.isSome() || endDateTime.isSome()) && endDateTime.getOr(end).before(startDateTime.getOr(start)))
         throw new SchedulerException("The end date is before the start date");
 
@@ -825,19 +823,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       return Opt.some(DublinCores.read(inputStream));
     } finally {
       IOUtils.closeQuietly(inputStream);
-    }
-  }
-
-  private void verifyActive(String eventId, Date end) throws SchedulerException {
-    if (end == null) {
-      throw new IllegalArgumentException("Start and/or end date for event ID " + eventId + " is not set");
-    }
-    // TODO: Assumption of no TimeZone adjustment because catalog temporal is local to server
-    if (new Date().after(end)) {
-      logger.info("Event ID {} has already ended as its end time was {} and current time is {}", eventId,
-          DateTimeSupport.toUTC(end.getTime()), DateTimeSupport.toUTC(new Date().getTime()));
-      throw new SchedulerException("Event ID " + eventId + " has already ended at "
-              + DateTimeSupport.toUTC(end.getTime()) + " and now is " + DateTimeSupport.toUTC(new Date().getTime()));
     }
   }
 
