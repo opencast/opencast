@@ -6,6 +6,11 @@ For most purposes, we recommend using the Ingest REST API instead of the inbox.
 It is more reliable and provides instant feedback if a problem occurs.
 </div>
 
+<div class=warn>
+Do not use the inbox on a CIFS mount.
+The mount may report inaccurate metadata, which may break ingests or cause files to not be recognized.
+</div>
+
 
 Overview
 --------
