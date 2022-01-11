@@ -23,6 +23,7 @@ package org.opencastproject.workflow.api;
 
 import org.opencastproject.util.NotFoundException;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,6 +72,17 @@ public interface WorkflowServiceDatabase {
   List<WorkflowInstance> getWorkflowInstances(int limit, int offset) throws WorkflowDatabaseException;
 
   /**
+   * Gets all workflow instances previous to the specified date
+   *
+   * @param state Only returns workflows currently in the given state
+   * @param dateCreated Only returns workflows created prior to the given date
+   * @return list of the {@link WorkflowInstance}s
+   * @throws WorkflowServiceDatabaseException
+   */
+  List<WorkflowInstance> getWorkflowInstancesForCleanup(WorkflowInstance.WorkflowState state, Date dateCreated)
+          throws WorkflowServiceDatabaseException;
+
+  /**
    * Gets the amount of workflow instances.
    *
    * @param state Only counts workflows currently in the given state
@@ -101,6 +113,14 @@ public interface WorkflowServiceDatabase {
    *           if there is a problem communicating with the underlying data store
    */
   List<WorkflowInstance> getRunningWorkflowInstancesByMediaPackage(String mediaPackageId) throws WorkflowDatabaseException;
+
+  /**
+   * Get all workflow instances belong to a series
+   * @param seriesId The id of the series
+   * @return list of all {@link WorkflowInstance}s for the given series id
+   * @throws WorkflowServiceDatabaseException
+   */
+  List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowServiceDatabaseException;
 
   /**
    * Returns true if the mediapackage with the given identifier currently has a workflow running on it.

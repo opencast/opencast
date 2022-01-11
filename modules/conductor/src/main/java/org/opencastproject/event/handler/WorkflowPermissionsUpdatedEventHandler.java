@@ -41,9 +41,7 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
@@ -56,6 +54,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 /** Responds to series events by re-distributing metadata and security policy files to workflows. */
 @Component(
@@ -169,83 +168,76 @@ public class WorkflowPermissionsUpdatedEventHandler {
     try {
       securityService.setUser(SecurityUtil.createSystemUser(systemAccount, prevOrg));
 
-      // Note: getWorkflowInstances will only return a given number of results (default 20)
-      WorkflowQuery q = new WorkflowQuery().withSeriesId(seriesId);
-      WorkflowSet result = workflowService.getWorkflowInstancesForAdministrativeRead(q);
-      Integer offset = 0;
+      // Get all mps for a series
+      List<WorkflowInstance> result = workflowService.getWorkflowInstancesBySeries(seriesId);
 
-      while (result.size() > 0) {
-        for (WorkflowInstance instance : result.getItems()) {
-          if (!instance.isActive()) {
-            continue;
-          }
+      for (WorkflowInstance instance : result) {
+        if (!instance.isActive()) {
+          continue;
+        }
 
-          Organization org = organizationDirectoryService.getOrganization(instance.getOrganizationId());
-          securityService.setOrganization(org);
+        Organization org = organizationDirectoryService.getOrganization(instance.getOrganizationId());
+        securityService.setOrganization(org);
 
-          MediaPackage mp = instance.getMediaPackage();
+        MediaPackage mp = instance.getMediaPackage();
 
-          // Update the series XACML file
-          if (SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())) {
-            // Build a new XACML file for this mediapackage
-            try {
-              if (seriesItem.getOverrideEpisodeAcl()) {
-                authorizationService.removeAcl(mp, AclScope.Episode);
-              }
-              authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl());
-            } catch (MediaPackageException e) {
-              logger.error("Error setting ACL for media package {}", mp.getIdentifier(), e);
+        // Update the series XACML file
+        if (SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())) {
+          // Build a new XACML file for this mediapackage
+          try {
+            if (seriesItem.getOverrideEpisodeAcl()) {
+              authorizationService.removeAcl(mp, AclScope.Episode);
             }
+            authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl());
+          } catch (MediaPackageException e) {
+            logger.error("Error setting ACL for media package {}", mp.getIdentifier(), e);
           }
+        }
+
+        // Update the series dublin core
+        if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())) {
+          DublinCoreCatalog seriesDublinCore = seriesItem.getMetadata();
+          mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
 
           // Update the series dublin core
-          if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())) {
-            DublinCoreCatalog seriesDublinCore = seriesItem.getMetadata();
-            mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
-
-            // Update the series dublin core
-            Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
-            if (seriesCatalogs.length == 1) {
-              Catalog c = seriesCatalogs[0];
-              String filename = FilenameUtils.getName(c.getURI().toString());
-              URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
-                      dublinCoreService.serialize(seriesDublinCore));
-              c.setURI(uri);
-              // setting the URI to a new source so the checksum will most like be invalid
-              c.setChecksum(null);
-            }
+          Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
+          if (seriesCatalogs.length == 1) {
+            Catalog c = seriesCatalogs[0];
+            String filename = FilenameUtils.getName(c.getURI().toString());
+            URI uri = workspace.put(mp.getIdentifier().toString(), c.getIdentifier(), filename,
+                    dublinCoreService.serialize(seriesDublinCore));
+            c.setURI(uri);
+            // setting the URI to a new source so the checksum will most like be invalid
+            c.setChecksum(null);
           }
-
-          // Remove the series catalog and isPartOf from episode catalog
-          if (SeriesItem.Type.Delete.equals(seriesItem.getType())) {
-            mp.setSeries(null);
-            mp.setSeriesTitle(null);
-            for (Catalog c : mp.getCatalogs(MediaPackageElements.SERIES)) {
-              mp.remove(c);
-              try {
-                workspace.delete(c.getURI());
-              } catch (NotFoundException e) {
-                logger.info("No series catalog to delete found {}", c.getURI());
-              }
-            }
-            for (Catalog episodeCatalog : mp.getCatalogs(MediaPackageElements.EPISODE)) {
-              DublinCoreCatalog episodeDublinCore = DublinCoreUtil.loadDublinCore(workspace, episodeCatalog);
-              episodeDublinCore.remove(DublinCore.PROPERTY_IS_PART_OF);
-              String filename = FilenameUtils.getName(episodeCatalog.getURI().toString());
-              URI uri = workspace.put(mp.getIdentifier().toString(), episodeCatalog.getIdentifier(), filename,
-                      dublinCoreService.serialize(episodeDublinCore));
-              episodeCatalog.setURI(uri);
-              // setting the URI to a new source so the checksum will most like be invalid
-              episodeCatalog.setChecksum(null);
-            }
-          }
-
-          // Update the search index with the modified mediapackage
-          workflowService.update(instance);
         }
-        offset++;
-        q = q.withStartPage(offset);
-        result = workflowService.getWorkflowInstancesForAdministrativeRead(q);
+
+        // Remove the series catalog and isPartOf from episode catalog
+        if (SeriesItem.Type.Delete.equals(seriesItem.getType())) {
+          mp.setSeries(null);
+          mp.setSeriesTitle(null);
+          for (Catalog c : mp.getCatalogs(MediaPackageElements.SERIES)) {
+            mp.remove(c);
+            try {
+              workspace.delete(c.getURI());
+            } catch (NotFoundException e) {
+              logger.info("No series catalog to delete found {}", c.getURI());
+            }
+          }
+          for (Catalog episodeCatalog : mp.getCatalogs(MediaPackageElements.EPISODE)) {
+            DublinCoreCatalog episodeDublinCore = DublinCoreUtil.loadDublinCore(workspace, episodeCatalog);
+            episodeDublinCore.remove(DublinCore.PROPERTY_IS_PART_OF);
+            String filename = FilenameUtils.getName(episodeCatalog.getURI().toString());
+            URI uri = workspace.put(mp.getIdentifier().toString(), episodeCatalog.getIdentifier(), filename,
+                    dublinCoreService.serialize(episodeDublinCore));
+            episodeCatalog.setURI(uri);
+            // setting the URI to a new source so the checksum will most like be invalid
+            episodeCatalog.setChecksum(null);
+          }
+        }
+
+        // Update the search index with the modified mediapackage
+        workflowService.update(instance);
       }
     } catch (WorkflowException | NotFoundException | IOException | UnauthorizedException e) {
       logger.warn("Unable to handle update event for series {}: {}", seriesItem, e.getMessage());

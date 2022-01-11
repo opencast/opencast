@@ -97,8 +97,9 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
                         + "(:operation is null or w.operation = :operation)"
         ),
         @NamedQuery(
-                name = "Workflow.getCount",
-                query = "select COUNT(w) from WorkflowInstance where w.organizationId=:organizationId"
+                name = "Workflow.toCleanup",
+                query = "SELECT w FROM Workflow w where w.state = :state "
+                + "and w.dateCreated < :dateCreated and w.organizationId = :organizationId"
         ),
 
         // For media packages

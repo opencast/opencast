@@ -40,7 +40,6 @@ import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -53,13 +52,10 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.util.requests.SortCriterion;
-import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowStateException;
 
@@ -67,7 +63,6 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -81,11 +76,9 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -157,178 +150,6 @@ public class WorkflowsEndpoint {
             RestConstants.SERVICE_PATH_PROPERTY);
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
     logger.debug("Configured service endpoint is {}", endpointBaseUrl);
-  }
-
-  @GET
-  @Path("")
-  @RestQuery(name = "getworkflowinstances", description = "Returns a list of workflow instance.", returnDescription = "", restParameters = {
-          @RestParameter(name = "withoperations", description = "Whether the workflow operations should be included in the response", isRequired = false, type = BOOLEAN),
-          @RestParameter(name = "withconfiguration", description = "Whether the workflow configuration should be included in the response", isRequired = false, type = BOOLEAN),
-          @RestParameter(name = "filter", description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", isRequired = false, type = STRING),
-          @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
-          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = INTEGER),
-          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = INTEGER) }, responses = {
-          @RestResponse(description = "A (potentially empty) list of workflow instances is returned.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
-  public Response getWorkflowInstances(@HeaderParam("Accept") String acceptHeader,
-          @QueryParam("withoperations") boolean withOperations,
-          @QueryParam("withconfiguration") boolean withConfiguration, @QueryParam("filter") String filter,
-          @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
-    WorkflowQuery query = new WorkflowQuery();
-
-    // Apply filter
-    if (StringUtils.isNotBlank(filter)) {
-      for (String f : filter.split(",")) {
-        int sepIdx = f.indexOf(':');
-        if (sepIdx < 0 || sepIdx == f.length() - 1) {
-          logger.info("No value for filter {} in filters list: {}", f, filter);
-          continue;
-        }
-        String name = f.substring(0, sepIdx);
-        String value = f.substring(sepIdx + 1);
-
-        switch (name) {
-          case "state":
-            try {
-              query.withState(jsonToEnum(WorkflowInstance.WorkflowState.class, value));
-            } catch (IllegalArgumentException e) {
-              return RestUtil.R.badRequest(String.format("Invalid workflow state '%s'", value));
-            }
-            break;
-          case "state_not":
-            try {
-              query.withoutState(jsonToEnum(WorkflowInstance.WorkflowState.class, value));
-            } catch (IllegalArgumentException e) {
-              return RestUtil.R.badRequest(String.format("Invalid workflow state '%s'", value));
-            }
-            break;
-          case "current_operation":
-            query.withCurrentOperation(value);
-            break;
-          case "current_operation_not":
-            query.withoutCurrentOperation(value);
-            break;
-          case "workflow_definition_identifier":
-            query.withWorkflowDefintion(value);
-            break;
-          case "event_identifier":
-            query.withMediaPackage(value);
-            break;
-          case "event_title":
-            query.withTitle(value);
-            break;
-          case "event_created":
-            try {
-              Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
-              query.withDateAfter(fromAndToCreationRange.getA());
-              query.withDateBefore(fromAndToCreationRange.getB());
-            } catch (Exception e) {
-              return RestUtil.R.badRequest(
-                      String.format("Filter 'event_created' could not be parsed: %s", e.getMessage()));
-            }
-            break;
-          case "event_creator":
-            query.withCreator(value);
-            break;
-          case "event_contributor":
-            query.withContributor(value);
-            break;
-          case "event_language":
-            query.withLanguage(value);
-            break;
-          case "event_license":
-            query.withLicense(value);
-            break;
-          case "event_subject":
-            query.withSubject(value);
-            break;
-          case "series_identifier":
-            query.withSeriesId(value);
-            break;
-          case "series_title":
-            query.withSeriesTitle(value);
-            break;
-          case "textFilter":
-            query.withText(value);
-            break;
-          default:
-            return RestUtil.R.badRequest(String.format("Unknown filter criterion in request: %s", name));
-        }
-      }
-    }
-
-    // Apply sort
-    // TODO: this only uses the last sorting criteria
-    if (isNoneBlank(sort)) {
-      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
-      for (SortCriterion criterion : sortCriteria) {
-        boolean isASC = criterion.getOrder() != Order.Descending;
-        switch (criterion.getFieldName()) {
-          case "event_identifier":
-            // FIXME: sorting by event_identifier leads to an Solr exception
-            query.withSort(WorkflowQuery.Sort.MEDIA_PACKAGE_ID, isASC);
-            break;
-          case "event_title":
-            query.withSort(WorkflowQuery.Sort.TITLE, isASC);
-            break;
-          case "event_created":
-            query.withSort(WorkflowQuery.Sort.DATE_CREATED, isASC);
-            break;
-          case "event_creator":
-            query.withSort(WorkflowQuery.Sort.CREATOR, isASC);
-            break;
-          case "event_contributor":
-            query.withSort(WorkflowQuery.Sort.CONTRIBUTOR, isASC);
-            break;
-          case "event_language":
-            query.withSort(WorkflowQuery.Sort.LANGUAGE, isASC);
-            break;
-          case "event_license":
-            query.withSort(WorkflowQuery.Sort.LICENSE, isASC);
-            break;
-          case "event_subject":
-            query.withSort(WorkflowQuery.Sort.SUBJECT, isASC);
-            break;
-          case "series_identifier":
-            query.withSort(WorkflowQuery.Sort.SERIES_ID, isASC);
-            break;
-          case "series_title":
-            query.withSort(WorkflowQuery.Sort.SERIES_TITLE, isASC);
-            break;
-          case "workflow_definition_identifier":
-            query.withSort(WorkflowQuery.Sort.WORKFLOW_DEFINITION_ID, isASC);
-            break;
-          default:
-            return RestUtil.R.badRequest(
-                    String.format("Unknown search criterion in request: %s", criterion.getFieldName()));
-        }
-      }
-    }
-
-    // Apply offset
-    if (offset != null && offset > 0) {
-      query.withStartIndex(offset);
-    }
-
-    // Apply limit
-    if (limit != null && limit > 0) {
-      query.withCount(limit);
-    }
-
-    // Get results
-    List<WorkflowInstance> workflowInstances;
-    try {
-      workflowInstances = workflowService.getWorkflowInstances(query).getItems();
-    } catch (Exception e) {
-      logger.error("The workflow service was not able to get the workflow instances", e);
-      return ApiResponses.serverError("Could not retrieve workflow instances, reason: '%s'", e.getMessage());
-    }
-
-    List<JValue> json = workflowInstances.stream()
-                              .map(wi -> workflowInstanceToJSON(wi, withOperations, withConfiguration))
-                              .collect(Collectors.toList());
-
-    return ApiResponses.Json.ok(acceptHeader, arr(json));
   }
 
   @POST

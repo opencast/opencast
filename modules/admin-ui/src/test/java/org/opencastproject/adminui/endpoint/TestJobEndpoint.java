@@ -33,7 +33,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 
@@ -103,8 +102,6 @@ public class TestJobEndpoint extends JobEndpoint {
 
 
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
-    EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
-            .andReturn(workflowSet).anyTimes();
     EasyMock.expect(workflowService.countWorkflowInstances()).andReturn((long) workflowSet.size()).anyTimes();
     EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(hosts).anyTimes();
     EasyMock.expect(serviceRegistry.getActiveJobs()).andReturn(jobs).anyTimes();

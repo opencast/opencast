@@ -99,10 +99,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowOperationResultImpl;
 import org.opencastproject.workflow.api.WorkflowParsingException;
-import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowServiceDatabase;
-import org.opencastproject.workflow.api.WorkflowSet;
+import org.opencastproject.workflow.api.WorkflowServiceDatabaseException;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
@@ -1297,31 +1296,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstances(org.opencastproject.workflow.api.WorkflowQuery)
-   */
-  @Override
-  public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
-    return index.getWorkflowInstances(query, Permissions.Action.READ.toString(), true);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesForAdministrativeRead(org.opencastproject.workflow.api.WorkflowQuery)
-   */
-  @Override
-  public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery query) throws WorkflowDatabaseException,
-          UnauthorizedException {
-    User user = securityService.getUser();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole()))
-      throw new UnauthorizedException(user, getClass().getName() + ".getForAdministrativeRead");
-
-    return index.getWorkflowInstances(query, Permissions.Action.WRITE.toString(), false);
-  }
-
   @Override
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
           throws WorkflowDatabaseException {
@@ -1351,6 +1325,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
 
     return optWorkflowInstance;
+  }
+
+  @Override
+  public List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowDatabaseException {
+    try {
+      return persistence.getWorkflowInstancesBySeries(seriesId);
+    } catch (WorkflowServiceDatabaseException e) {
+      throw new WorkflowDatabaseException(e);
+    }
   }
 
   @Override
@@ -1819,23 +1802,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     return serviceRegistry.count(JOB_TYPE, status);
   }
 
-  private List<WorkflowInstance> getHoldWorkflows() throws WorkflowDatabaseException {
-    List<WorkflowInstance> workflows = new ArrayList<>();
-    Organization organization = securityService.getOrganization();
-    try {
-      for (Organization org : organizationDirectoryService.getOrganizations()) {
-        securityService.setOrganization(org);
-        WorkflowQuery workflowQuery = new WorkflowQuery().withState(WorkflowInstance.WorkflowState.PAUSED).withCount(
-                Integer.MAX_VALUE);
-        WorkflowSet workflowSet = getWorkflowInstances(workflowQuery);
-        workflows.addAll(workflowSet.getItems());
-      }
-    } finally {
-      securityService.setOrganization(organization);
-    }
-    return workflows;
-  }
-
   /**
    * Converts a Map<String, String> to s key=value\n string, suitable for the properties form parameter expected by the
    * workflow rest endpoint.
@@ -2143,21 +2109,25 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     int instancesCleaned = 0;
     int cleaningFailed = 0;
 
-    WorkflowQuery query = new WorkflowQuery().withState(state).withDateBefore(DateUtils.addDays(new Date(), -buffer))
-            .withCount(Integer.MAX_VALUE);
-    for (WorkflowInstance workflowInstance : getWorkflowInstances(query).getItems()) {
-      try {
-        remove(workflowInstance.getId());
-        instancesCleaned++;
-      } catch (WorkflowDatabaseException | UnauthorizedException e) {
-        throw e;
-      } catch (NotFoundException e) {
-        // Since we are in a cleanup operation, we don't have to care about NotFoundExceptions
-        logger.debug("Workflow instance '{}' could not be removed", workflowInstance.getId(), e);
-      } catch (WorkflowParsingException | WorkflowStateException e) {
-        logger.warn("Workflow instance '{}' could not be removed", workflowInstance.getId(), e);
-        cleaningFailed++;
+    Date priorTo = DateUtils.addDays(new Date(), -buffer);
+
+    try {
+      for (WorkflowInstance workflowInstance : persistence.getWorkflowInstancesForCleanup(state, priorTo)) {
+        try {
+          remove(workflowInstance.getId());
+          instancesCleaned++;
+        } catch (WorkflowDatabaseException | UnauthorizedException e) {
+          throw e;
+        } catch (NotFoundException e) {
+          // Since we are in a cleanup operation, we don't have to care about NotFoundExceptions
+          logger.debug("Workflow instance '{}' could not be removed", workflowInstance.getId(), e);
+        } catch (WorkflowParsingException | WorkflowStateException e) {
+          logger.warn("Workflow instance '{}' could not be removed", workflowInstance.getId(), e);
+          cleaningFailed++;
+        }
       }
+    } catch (WorkflowServiceDatabaseException e) {
+      throw new WorkflowDatabaseException(e);
     }
 
     if (instancesCleaned == 0 && cleaningFailed == 0) {
