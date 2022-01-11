@@ -81,7 +81,6 @@ import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -106,9 +105,7 @@ import org.opencastproject.workflow.api.WorkflowServiceDatabase;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
-import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
-import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
@@ -123,7 +120,6 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -155,8 +151,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.management.ObjectInstance;
-
 /**
  * Implements WorkflowService with in-memory data structures to hold WorkflowOperations and WorkflowInstances.
  * WorkflowOperationHandlers are looked up in the OSGi service registry based on the "workflow.operation" property. If
@@ -185,17 +179,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     START_WORKFLOW, RESUME, START_OPERATION
   }
 
-  /** The configuration key for setting {@link #workflowStatsCollect} */
-  public static final String STATS_COLLECT_CONFIG_KEY = "workflowstats.collect";
-
-  /** The default value for {@link #workflowStatsCollect} */
-  public static final Boolean DEFAULT_STATS_COLLECT_CONFIG = false;
-
   /** Constant value indicating a <code>null</code> parent id */
   private static final String NULL_PARENT_ID = "-";
-
-  /** Workflow statistics JMX type */
-  private static final String JMX_WORKFLOWS_STATISTICS_TYPE = "WorkflowsStatistics";
 
   /** The load imposed on the system by a workflow job.
    *  We are keeping this hardcoded because otherwise bad things will likely happen,
@@ -203,19 +188,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   private static final float WORKFLOW_JOB_LOAD = 0.0f;
 
-  /** The list of registered JMX beans */
-  private final List<ObjectInstance> jmxBeans = new ArrayList<ObjectInstance>();
-
-  /** The JMX business object for workflows statistics */
-  private WorkflowsStatistics workflowsStatistics;
   /** Error resolution handler id constant */
   public static final String ERROR_RESOLUTION_HANDLER_ID = "error-resolution";
 
   /** Remove references to the component context once felix scr 1.2 becomes available */
   protected ComponentContext componentContext = null;
-
-  /** Flag whether to collect JMX statistics */
-  protected boolean workflowStatsCollect = DEFAULT_STATS_COLLECT_CONFIG;
 
   /** The metadata services */
   private SortedSet<MediaPackageMetadataService> metadataServices;
@@ -284,21 +261,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public void activate(ComponentContext componentContext) {
     this.componentContext = componentContext;
     executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-    try {
-      logger.info("Generating JMX workflow statistics");
-      workflowsStatistics = new WorkflowsStatistics(getBeanStatistics(), getHoldWorkflows());
-      jmxBeans.add(JmxUtil.registerMXBean(workflowsStatistics, JMX_WORKFLOWS_STATISTICS_TYPE));
-    } catch (WorkflowDatabaseException e) {
-      logger.error("Error registering JMX statistic beans", e);
-    }
     logger.info("Activate Workflow service");
-  }
-
-  @Deactivate
-  public void deactivate() {
-    for (ObjectInstance mxbean : jmxBeans) {
-      JmxUtil.unregisterMXBean(mxbean);
-    }
   }
 
   /**
@@ -1299,10 +1262,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             + "service registry and workflow table may be out of sync", e);
       }
 
-      if (workflowStatsCollect) {
-        workflowsStatistics.updateWorkflow(getBeanStatistics(), getHoldWorkflows());
-      }
-
       try {
         fireListeners(originalWorkflowInstance, workflowInstance);
       } catch (Exception e) {
@@ -1337,16 +1296,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     } catch (WorkflowServiceDatabaseException e) {
       throw new WorkflowDatabaseException(e);
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#getStatistics()
-   */
-  @Override
-  public WorkflowStatistics getStatistics() throws WorkflowDatabaseException {
-    return index.getStatistics();
   }
 
   /**
@@ -1871,46 +1820,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     return serviceRegistry.count(JOB_TYPE, status);
   }
 
-  private WorkflowStatistics getBeanStatistics() throws WorkflowDatabaseException {
-    WorkflowStatistics stats = new WorkflowStatistics();
-    long total = 0L;
-    long failed = 0L;
-    long failing = 0L;
-    long instantiated = 0L;
-    long paused = 0L;
-    long running = 0L;
-    long stopped = 0L;
-    long finished = 0L;
-
-    Organization organization = securityService.getOrganization();
-    try {
-      for (Organization org : organizationDirectoryService.getOrganizations()) {
-        securityService.setOrganization(org);
-        WorkflowStatistics statistics = getStatistics();
-        total += statistics.getTotal();
-        failed += statistics.getFailed();
-        failing += statistics.getFailing();
-        instantiated += statistics.getInstantiated();
-        paused += statistics.getPaused();
-        running += statistics.getRunning();
-        stopped += statistics.getStopped();
-        finished += statistics.getFinished();
-      }
-    } finally {
-      securityService.setOrganization(organization);
-    }
-
-    stats.setTotal(total);
-    stats.setFailed(failed);
-    stats.setFailing(failing);
-    stats.setInstantiated(instantiated);
-    stats.setPaused(paused);
-    stats.setRunning(running);
-    stats.setStopped(stopped);
-    stats.setFinished(finished);
-    return stats;
-  }
-
   private List<WorkflowInstance> getHoldWorkflows() throws WorkflowDatabaseException {
     List<WorkflowInstance> workflows = new ArrayList<>();
     Organization organization = securityService.getOrganization();
@@ -2133,17 +2042,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) {
-    String workflowStatsConfiguration = StringUtils.trimToNull((String) properties.get(STATS_COLLECT_CONFIG_KEY));
-    if (StringUtils.isNotEmpty(workflowStatsConfiguration)) {
-      try {
-         workflowStatsCollect = Boolean.parseBoolean(workflowStatsConfiguration);
-        logger.info("Workflow statistics collection is set to %s", workflowStatsConfiguration);
-      } catch (Exception e) {
-        logger.warn("Workflow statistics collection flag '%s' is malformed, setting to %s",
-                workflowStatsConfiguration, DEFAULT_STATS_COLLECT_CONFIG.toString());
-        workflowStatsCollect = DEFAULT_STATS_COLLECT_CONFIG;
-      }
-    }
+
   }
 
   /**

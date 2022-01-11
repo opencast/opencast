@@ -192,15 +192,6 @@ public interface WorkflowService {
   long countWorkflowInstances(WorkflowState state, String operation) throws WorkflowDatabaseException;
 
   /**
-   * Returns the statistics for the workflow service.
-   *
-   * @return workflow service statistics
-   * @throws WorkflowDatabaseException
-   *           if there is a problem accessing the workflow instances in persistence
-   */
-  WorkflowStatistics getStatistics() throws WorkflowDatabaseException;
-
-  /**
    * Stops a running workflow instance.
    *
    * @param workflowInstanceId
