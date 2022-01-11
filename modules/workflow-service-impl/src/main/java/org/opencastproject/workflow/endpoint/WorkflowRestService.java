@@ -70,8 +70,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
-import org.opencastproject.workflow.api.WorkflowStatistics;
-import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
@@ -226,22 +224,6 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(e);
     }
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_XML)
-  @Path("/statistics.xml")
-  @RestQuery(name = "statisticsasxml", description = "Returns the workflow statistics as XML", returnDescription = "An XML representation of the workflow statistics.", responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow statistics.") })
-  public WorkflowStatistics getStatisticsAsXml() throws WorkflowDatabaseException {
-    return service.getStatistics();
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("/statistics.json")
-  @RestQuery(name = "statisticsasjson", description = "Returns the workflow statistics as JSON", returnDescription = "A JSON representation of the workflow statistics.", responses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow statistics.") })
-  public WorkflowStatistics getStatisticsAsJson() throws WorkflowDatabaseException {
-    return getStatisticsAsXml();
   }
 
   @GET
