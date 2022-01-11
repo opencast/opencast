@@ -24,6 +24,7 @@ package org.opencastproject.workflow.api;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -156,6 +157,35 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       return query.getResultList();
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see WorkflowServiceDatabase#countWorkflows(WorkflowInstance.WorkflowState state, String operation)
+   */
+  public int countWorkflows(WorkflowInstance.WorkflowState state, String operation) throws WorkflowServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query query = em.createNamedQuery("Workflow.getCount");
+
+      String orgId = securityService.getOrganization().getId();
+      query.setParameter("organizationId", orgId);
+      query.setParameter("state", state);
+      if (StringUtils.isNotBlank(operation)) {
+        query.setParameter("operation", operation);
+      }
+
+      Long total = (Long) query.getSingleResult();
+      return total.intValue();
+    } catch (Exception e) {
+      logger.error("Could not find number of workflows.", e);
+      throw new WorkflowServiceDatabaseException(e);
     } finally {
       if (em != null)
         em.close();

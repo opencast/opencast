@@ -1321,7 +1321,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public long countWorkflowInstances() throws WorkflowDatabaseException {
-    return index.countWorkflowInstances(null, null);
+    return countWorkflowInstances(null, null);
   }
 
   /**
@@ -1332,7 +1332,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public long countWorkflowInstances(WorkflowState state, String operation) throws WorkflowDatabaseException {
-    return index.countWorkflowInstances(state, operation);
+    try {
+      return persistence.countWorkflows(state, operation);
+    } catch (WorkflowServiceDatabaseException e) {
+      throw new WorkflowDatabaseException(e);
+    }
   }
 
   /**

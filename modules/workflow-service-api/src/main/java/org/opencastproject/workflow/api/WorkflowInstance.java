@@ -90,6 +90,16 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
                 name = "Workflow.workflowById",
                 query = "SELECT w FROM WorkflowInstance as w where w.workflowId=:workflowId and w.organizationId=:organizationId"
         ),
+        @NamedQuery(
+                name = "Workflow.getCount",
+                query = "select COUNT(w) from WorkflowInstance where w.organizationId=:organizationId"
+                        + "(:state is null or w.state = :state)"
+                        + "(:operation is null or w.operation = :operation)"
+        ),
+        @NamedQuery(
+                name = "Workflow.getCount",
+                query = "select COUNT(w) from WorkflowInstance where w.organizationId=:organizationId"
+        ),
 
         // For media packages
         @NamedQuery(name = "Workflow.byMediaPackage", query = "SELECT w FROM WorkflowInstance w where "
