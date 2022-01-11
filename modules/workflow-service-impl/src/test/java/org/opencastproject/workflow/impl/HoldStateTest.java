@@ -79,8 +79,6 @@ import com.entwinemedia.fn.data.Opt;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -106,7 +104,6 @@ public class HoldStateTest {
   private WorkflowDefinition def = null;
   private WorkflowInstance workflow = null;
   private MediaPackage mp = null;
-  private WorkflowServiceSolrIndex dao = null;
   private SecurityService securityService = null;
   private Workspace workspace = null;
   private ResumableTestWorkflowOperationHandler holdingOperationHandler;
@@ -238,22 +235,6 @@ public class HoldStateTest {
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
     EasyMock.replay(assetManager, version, snapshot, aRec, p, r, t, selectQuery, query, v);
 
-    WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
-    workflowDb.setEntityManagerFactory(newTestEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
-    workflowDb.setSecurityService(securityService);
-    workflowDb.activate(null);
-    service.setPersistence(workflowDb);
-
-    dao = new WorkflowServiceSolrIndex();
-    dao.solrRoot = sRoot + File.separator + "solr";
-    dao.setServiceRegistry(serviceRegistry);
-    dao.setAuthorizationService(authzService);
-    dao.setSecurityService(securityService);
-    dao.setOrgDirectory(organizationDirectoryService);
-    dao.setAssetManager(assetManager);
-    dao.setPersistence(workflowDb);
-    dao.activate("System Admin");
-    service.setDao(dao);
     service.activate(null);
     service.setServiceRegistry(serviceRegistry);
 
@@ -271,12 +252,6 @@ public class HoldStateTest {
     EasyMock.replay(result, index);
 
     service.setIndex(index);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    dao.deactivate();
-    service.deactivate();
   }
 
   @Test

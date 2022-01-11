@@ -100,7 +100,6 @@ public class WorkflowStatisticsTest {
   private WorkflowDefinitionScanner scanner = null;
   private List<WorkflowDefinition> workflowDefinitions = null;
   protected Set<HandlerRegistration> workflowHandlers = null;
-  private WorkflowServiceSolrIndex dao = null;
   private Workspace workspace = null;
   private SecurityService securityService = null;
   private MediaPackage mediaPackage = null;
@@ -215,15 +214,6 @@ public class WorkflowStatisticsTest {
     service.setPersistence(workflowDb);
 
     // Create the workflow database (solr)
-    dao = new WorkflowServiceSolrIndex();
-    dao.solrRoot = sRoot + File.separator + "solr." + System.currentTimeMillis();
-    dao.setSecurityService(securityService);
-    dao.setServiceRegistry(serviceRegistry);
-    dao.setAuthorizationService(authzService);
-    dao.setOrgDirectory(organizationDirectoryService);
-    dao.setPersistence(workflowDb);
-    dao.activate("System Admin");
-    service.setDao(dao);
     service.setServiceRegistry(serviceRegistry);
     service.setSecurityService(securityService);
     service.activate(null);
@@ -252,12 +242,6 @@ public class WorkflowStatisticsTest {
 
     // Register the workflow service with the service registry
     serviceRegistry.registerService(service);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    dao.deactivate();
-    service.deactivate();
   }
 
   /**

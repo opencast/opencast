@@ -80,7 +80,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -103,7 +102,6 @@ public final class WorkflowOperationSkippingIntricateTest {
   private WorkflowServiceImpl service = null;
   private WorkflowDefinition workingDefinition = null;
   private MediaPackage mediapackage1 = null;
-  private WorkflowServiceSolrIndex dao = null;
   private Set<HandlerRegistration> handlerRegistrations = null;
   private Property property = null;
 
@@ -176,9 +174,6 @@ public final class WorkflowOperationSkippingIntricateTest {
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
             userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
-    dao = new WorkflowServiceSolrIndex();
-    dao.solrRoot = sRoot + File.separator + "solr." + System.currentTimeMillis();
-
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authzService.getActiveAcl(EasyMock.anyObject()))
             .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
@@ -225,20 +220,6 @@ public final class WorkflowOperationSkippingIntricateTest {
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
     EasyMock.replay(assetManager, version, snapshot, p, r, t, selectQuery, query, v, aRec);
 
-    WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
-    workflowDb.setEntityManagerFactory(newTestEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
-    workflowDb.setSecurityService(securityService);
-    workflowDb.activate(null);
-    service.setPersistence(workflowDb);
-
-    dao.setServiceRegistry(serviceRegistry);
-    dao.setSecurityService(securityService);
-    dao.setAuthorizationService(authzService);
-    dao.setOrgDirectory(organizationDirectoryService);
-    dao.setAssetManager(assetManager);
-    dao.setPersistence(workflowDb);
-    dao.activate("System Admin");
-    service.setDao(dao);
     service.setServiceRegistry(serviceRegistry);
     service.setUserDirectoryService(userDirectoryService);
     service.activate(null);
@@ -268,12 +249,6 @@ public final class WorkflowOperationSkippingIntricateTest {
     EasyMock.replay(result, index);
 
     service.setIndex(index);
-  }
-
-  @After
-  public void tearDown() {
-    dao.deactivate();
-    service.deactivate();
   }
 
   @Test
