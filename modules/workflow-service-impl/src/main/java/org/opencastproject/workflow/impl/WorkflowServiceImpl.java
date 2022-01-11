@@ -1250,7 +1250,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           updateWorkflowInstanceInIndex(workflowInstance, accessControlList, episodeDublinCoreCatalog,
                   elasticsearchIndex);
         }
-        index(workflowInstance);
       } catch (ServiceRegistryException e) {
         throw new WorkflowDatabaseException("Update of workflow job " + workflowInstance.getId()
             + " in the service registry failed, service registry and workflow table may be out of sync", e);
@@ -1935,17 +1934,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
-  }
-
-  /**
-   * Sets the search indexer to use in this service.
-   *
-   * @param index
-   *          The search index
-   */
-  @Reference
-  protected void setDao(WorkflowServiceIndex index) {
-    this.index = index;
   }
 
   /**
