@@ -157,8 +157,6 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
 
     // WorkflowService
     WorkflowService ws = createNiceMock(WorkflowService.class);
-    //all workflows
-    expect(ws.getWorkflowInstances(anyObject())).andReturn(workflows);
     //create
     WorkflowDefinition fastWorkflowDefinition = new WorkflowDefinitionImpl();
     expect(ws.getWorkflowDefinitionById("missing")).andThrow(new NotFoundException());
