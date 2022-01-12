@@ -200,13 +200,18 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
+
       Query query = em.createNamedQuery("Workflow.getCount");
+      if (StringUtils.isNotBlank(operation)) {
+        query = em.createNamedQuery("Workflow.getCountOperationState");
+      }
 
       String orgId = securityService.getOrganization().getId();
       query.setParameter("organizationId", orgId);
       query.setParameter("state", state);
       if (StringUtils.isNotBlank(operation)) {
         query.setParameter("operation", operation);
+        query.setParameter("operationStateRunning", WorkflowOperationInstance.OperationState.RUNNING);
       }
 
       Long total = (Long) query.getSingleResult();
