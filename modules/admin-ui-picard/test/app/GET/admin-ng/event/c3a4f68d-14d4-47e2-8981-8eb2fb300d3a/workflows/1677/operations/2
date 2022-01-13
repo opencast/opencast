@@ -1,0 +1,15 @@
+{
+    "failed_attempts":2,
+    "time_in_queue":10,
+    "description":"Finalize upload and ingest",
+    "fail_on_error":true,
+    "started":"2021-01-13T01:05:38Z",
+    "completed":"2021-01-13T01:05:39Z",
+    "max_attempts":3,
+    "name":"include",
+    "execution_host":"https:\/\/stable.opencast.org",
+    "state":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED",
+    "job":704,
+    "retry_strategy":"NONE",
+    "exception_handler_workflow":"example_exception_handler_workflow"
+}

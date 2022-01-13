@@ -1,8 +1,9 @@
 {
-  "duration": 179169,
+  "executionTime": 179169,
   "series_title": "",
   "license": "CC0",
   "workflow": "Process upon upload and schedule",
+  "creator":{"name":"Administrator","email":"admin@localhost","username":"admin"},
   "configuration": {
     "publishToYouTube": "false",
     "presenter_work_framerate": "29.97003",
@@ -30,10 +31,10 @@
     "publishToAws": "false"
   },
   "series": "",
-  "start": "2018-08-10T11:24:32Z",
-  "description": "",
-  "state": "SUCCEEDED",
-  "id": 1677,
+  "submittedAt": "2018-08-10T11:24:32Z",
+  "description": "A minimal workflow that transcodes media into distribution formats, then publishes the resulting distribution files, along with their associated metadata. ",
+  "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED",
+  "wiid": 1677,
   "title": "Mock Event Processing Complete",
-  "workflowId": "schedule-and-upload"
+  "wdid": "fast"
 }

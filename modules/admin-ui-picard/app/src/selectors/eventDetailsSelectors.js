@@ -14,9 +14,18 @@ export const isFetchingWorkflows = state => state.eventDetails.fetchingWorkflows
 export const getWorkflowDefinitions = state => state.eventDetails.workflowDefinitions;
 export const getWorkflowConfiguration = state => state.eventDetails.workflowConfiguration;
 export const getWorkflow = state => state.eventDetails.workflows.workflow;
+export const isFetchingWorkflowDetails = state => state.eventDetails.fetchingWorkflowDetailsInProgress;
 export const getBaseWorkflow = state => state.eventDetails.baseWorkflow;
 export const performingWorkflowAction = state => state.eventDetails.workflowActionInProgress;
 export const deletingWorkflow = state => state.eventDetails.deleteWorkflowInProgress;
+export const getWorkflowOperations = state => state.eventDetails.workflowOperations;
+export const isFetchingWorkflowOperations = state => state.eventDetails.fetchingWorkflowOperationsInProgress;
+export const getWorkflowOperationDetails = state => state.eventDetails.workflowOperationDetails;
+export const isFetchingWorkflowOperationDetails = state => state.eventDetails.fetchingWorkflowOperationDetailsInProgress;
+export const getWorkflowErrors = state => state.eventDetails.workflowErrors;
+export const isFetchingWorkflowErrors = state => state.eventDetails.fetchingWorkflowErrorsInProgress;
+export const getWorkflowErrorDetails = state => state.eventDetails.workflowErrorDetails;
+export const isFetchingWorkflowErrorDetails = state => state.eventDetails.fetchingWorkflowErrorDetailsInProgress;
 
 /* selectors for publications */
 export const getPublications = state => state.eventDetails.publications;

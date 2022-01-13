@@ -8,6 +8,10 @@ import EventDetailsAccessPolicyTab from "../ModalTabsAndPages/EventDetailsAccess
 import EventDetailsWorkflowTab from "../ModalTabsAndPages/EventDetailsWorkflowTab";
 import EventDetailsWorkflowDetails from "../ModalTabsAndPages/EventDetailsWorkflowDetails";
 import EventDetailsPublicationTab from "../ModalTabsAndPages/EventDetailsPublicationTab";
+import EventDetailsWorkflowOperations from "../ModalTabsAndPages/EventDetailsWorkflowOperations";
+import EventDetailsWorkflowOperationDetails from "../ModalTabsAndPages/EventDetailsWorkflowOperationDetails";
+import EventDetailsWorkflowErrors from "../ModalTabsAndPages/EventDetailsWorkflowErrors";
+import EventDetailsWorkflowErrorDetails from "../ModalTabsAndPages/EventDetailsWorkflowErrorDetails";
 
 
 // Get info about the current language and its date locale
@@ -154,7 +158,7 @@ const EventDetails = ({ tabIndex, eventId, close }) => {
                                                  t={t}/>
                             )}
                             {page === 5 && (
-                                workflowTabHierarchy === "entry" && (
+                                (workflowTabHierarchy === "entry" && (
                                     <EventDetailsWorkflowTab
                                         eventId={eventId}
                                         header={tabs[page].bodyHeaderTranslation}
@@ -167,7 +171,31 @@ const EventDetails = ({ tabIndex, eventId, close }) => {
                                         eventId={eventId}
                                         t={t}
                                         setHierarchy={setWorkflowTabHierarchy}/>
-                                )
+                                )) || (
+                                workflowTabHierarchy === "workflow-operations" && (
+                                    <EventDetailsWorkflowOperations
+                                        eventId={eventId}
+                                        t={t}
+                                        setHierarchy={setWorkflowTabHierarchy}/>
+                                )) || (
+                                workflowTabHierarchy === "workflow-operation-details" && (
+                                    <EventDetailsWorkflowOperationDetails
+                                        eventId={eventId}
+                                        t={t}
+                                        setHierarchy={setWorkflowTabHierarchy}/>
+                                )) || (
+                                workflowTabHierarchy === "errors-and-warnings" && (
+                                    <EventDetailsWorkflowErrors
+                                        eventId={eventId}
+                                        t={t}
+                                        setHierarchy={setWorkflowTabHierarchy}/>
+                                )) || (
+                                workflowTabHierarchy === "workflow-error-details" && (
+                                    <EventDetailsWorkflowErrorDetails
+                                        eventId={eventId}
+                                        t={t}
+                                        setHierarchy={setWorkflowTabHierarchy}/>
+                                ))
                             )}
                             {page === 6 && (
                                 <EventDetailsAccessPolicyTab

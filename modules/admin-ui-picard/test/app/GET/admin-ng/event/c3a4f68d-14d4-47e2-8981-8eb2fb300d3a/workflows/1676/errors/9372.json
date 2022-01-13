@@ -1,0 +1,20 @@
+{
+  "id": 9372,
+  "job_id": 200,
+  "service_type": "org.opencastproject.ingest",
+  "processing_host": "ingest00",
+  "timestamp": "2014-10-24T16:35:47+02:00",
+  "severity": "INFO",
+  "title": "Info message 9372",
+  "description": "A NullPointerException occurred somewhere non-vital.",
+  "details": [
+    {
+      "name": "stack-trace",
+      "value": "org.opencastproject.workflow.api.WorkflowOperationException: org.opencastproject.assetmanager.api.AssetManagerException: java.lang.NullPointerException\n\tat org.opencastproject.workflow.handler.assetmanager.AssetManagerSnapshotWorkflowOperationHandler.start(AssetManagerSnapshotWorkflowOperationHandler.java:113)\n\t... 17 more\n"
+    },
+    {
+      "name": "stack-trace",
+      "value": "org.opencastproject.workflow.api.WorkflowOperationException: org.opencastproject.assetmanager.api.AssetManagerException: java.lang.NullPointerException\n\tat org.opencastproject.workflow.handler.assetmanager.AssetManagerSnapshotWorkflowOperationHandler.start(AssetManagerSnapshotWorkflowOperationHandler.java:113)\n\tat org.opencastproject.workflow.impl.WorkflowOperationWorker.start(WorkflowOperationWorker.java:228)\n\t... 17 more\n"
+    }
+  ]
+}
