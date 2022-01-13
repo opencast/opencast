@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.impl;
 
+import org.opencastproject.workflow.api.WorkflowConfigurationForOperationInstance;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
@@ -30,15 +31,17 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class WorkflowConfigurationTest {
 
   @Test
   public void testConfigurationSerialization() throws Exception {
     WorkflowOperationInstance op = new WorkflowOperationInstance("op", OperationState.RUNNING);
-//    Set<WorkflowConfigurationForOperationInstance> config = new HashSet<WorkflowConfigurationForOperationInstance>();
-//    config.add(new WorkflowConfigurationForOperationInstance("this", "that"));
+    Set<WorkflowConfigurationForOperationInstance> config = new HashSet<WorkflowConfigurationForOperationInstance>();
+    config.add(new WorkflowConfigurationForOperationInstance("this", "that"));
     op.setConfiguration("this", "that");
     WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();

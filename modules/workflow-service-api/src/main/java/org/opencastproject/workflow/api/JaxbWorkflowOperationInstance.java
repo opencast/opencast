@@ -24,7 +24,9 @@ package org.opencastproject.workflow.api;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -154,7 +156,9 @@ public class JaxbWorkflowOperationInstance {
     this.jobId = operation.getId();
     this.state = operation.getState();
     this.description = operation.getDescription();
-    this.configurations = operation.getConfigurations().stream()
+    this.configurations = Optional.ofNullable(operation.getConfigurations())
+            .orElseGet(Collections::emptySet)
+            .stream()
             .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
             .collect(Collectors.toSet());
     this.holdStateUserInterfaceUrl = operation.getHoldStateUserInterfaceUrl();

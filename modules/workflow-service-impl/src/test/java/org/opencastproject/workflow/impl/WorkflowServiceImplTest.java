@@ -21,10 +21,12 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.CONTINUE;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
@@ -76,6 +78,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowQuery;
+import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateListener;
 import org.opencastproject.workflow.handler.workflow.ErrorResolutionWorkflowOperationHandler;
@@ -220,6 +223,8 @@ public class WorkflowServiceImplTest {
 
     workspace = createNiceMock(Workspace.class);
     expect(workspace.getCollectionContents((String) EasyMock.anyObject())).andReturn(new URI[0]);
+    EasyMock.expect(workspace.read(anyObject()))
+            .andAnswer(() -> getClass().getResourceAsStream("/dc-1.xml")).anyTimes();
     replay(workspace);
 
     IncidentService incidentService = createNiceMock(IncidentService.class);
@@ -232,12 +237,19 @@ public class WorkflowServiceImplTest {
     serviceRegistry.registerService(REMOTE_SERVICE, REMOTE_HOST, "/path", true);
     service.setWorkspace(workspace);
 
+    WorkflowServiceDatabaseImpl workflowDb = new WorkflowServiceDatabaseImpl();
+    workflowDb.setEntityManagerFactory(newTestEntityManagerFactory(WorkflowServiceDatabaseImpl.PERSISTENCE_UNIT));
+    workflowDb.setSecurityService(securityService);
+    workflowDb.activate(null);
+    service.setPersistence(workflowDb);
+
     dao = new WorkflowServiceSolrIndex();
     dao.setServiceRegistry(serviceRegistry);
     dao.setSecurityService(securityService);
     dao.setOrgDirectory(organizationDirectoryService);
     dao.setAuthorizationService(authzService);
     dao.solrRoot = sRoot + File.separator + "solr." + System.currentTimeMillis();
+    dao.setPersistence(workflowDb);
     dao.activate("System Admin");
     service.setDao(dao);
     service.setServiceRegistry(serviceRegistry);
@@ -605,27 +617,30 @@ public class WorkflowServiceImplTest {
     // We should get the first two workflows
     List<WorkflowInstance> firstTwoWorkflows = service.getWorkflowInstances(new WorkflowQuery().withText("Climate").withCount(2)
             .withStartPage(0)).getItems();
+    List<WorkflowInstance> climateWorkflows = service.getWorkflowInstances(new WorkflowQuery().withText("Climate")).getItems();
     Assert.assertEquals(2, firstTwoWorkflows.size());
-    Assert.assertEquals(3, firstTwoWorkflows.size()); // The total, non-paged number of results should be three
+    Assert.assertEquals(3, climateWorkflows.size()); // The total, non-paged number of results should be three
 
     // We should get the last workflow
     List<WorkflowInstance> lastWorkflow = service.getWorkflowInstances(new WorkflowQuery().withText("Climate").withCount(1)
             .withStartPage(2)).getItems();
     Assert.assertEquals(1, lastWorkflow.size());
-    Assert.assertEquals(3, lastWorkflow.size()); // The total, non-paged number of results should be three
+    Assert.assertEquals(3, climateWorkflows.size()); // The total, non-paged number of results should be three
 
     // We should get the first linguistics (mediapackage2) workflow
     List<WorkflowInstance> firstLinguisticsWorkflow = service.getWorkflowInstances(new WorkflowQuery().withText("Linguistics")
             .withCount(1).withStartPage(0)).getItems();
+    List<WorkflowInstance> linguisticsWorkflows = service.getWorkflowInstances(new WorkflowQuery().withText("Linguistics"))
+            .getItems();
     Assert.assertEquals(1, firstLinguisticsWorkflow.size());
-    Assert.assertEquals(2, firstLinguisticsWorkflow.size()); // The total, non-paged number of results should
+    Assert.assertEquals(2, linguisticsWorkflows.size()); // The total, non-paged number of results should
                                                                       // be two
 
     // We should get the second linguistics (mediapackage2) workflow
     List<WorkflowInstance> secondLinguisticsWorkflow = service.getWorkflowInstances(new WorkflowQuery().withText("Linguistics")
             .withCount(1).withStartPage(1)).getItems();
     Assert.assertEquals(1, secondLinguisticsWorkflow.size());
-    Assert.assertEquals(2, secondLinguisticsWorkflow.size()); // The total, non-paged number of results should
+    Assert.assertEquals(2, linguisticsWorkflows.size()); // The total, non-paged number of results should
                                                                        // be two
   }
 
@@ -924,7 +939,7 @@ public class WorkflowServiceImplTest {
     wi1 = service.getWorkflowById(wi1.getId());
 
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
-    expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(null);
+    expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(null).anyTimes();
     replay(userDirectoryService);
     service.setUserDirectoryService(userDirectoryService);
     service.remove(wi1.getId());

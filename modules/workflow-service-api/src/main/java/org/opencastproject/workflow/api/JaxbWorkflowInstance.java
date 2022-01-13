@@ -26,8 +26,10 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -111,21 +113,27 @@ public class JaxbWorkflowInstance {
     this.dateCreated = workflow.getDateCreated();
     this.dateCompleted = workflow.getDateCompleted();
     this.mediaPackage = workflow.getMediaPackage();
-    this.operations = workflow.getOperations().stream()
+    this.operations = Optional.ofNullable(workflow.getOperations())
+            .orElseGet(Collections::emptyList)
+            .stream()
             .map(operation -> new JaxbWorkflowOperationInstance(operation))
             .collect(Collectors.toList());
-    this.configurations = workflow.getConfigurations().stream()
+    this.configurations = Optional.ofNullable(workflow.getConfigurations())
+            .orElseGet(Collections::emptySet)
+            .stream()
             .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
             .collect(Collectors.toSet());
-    this.mediaPackageId = mediaPackage.getIdentifier().toString();
-    this.seriesId = mediaPackage.getSeries();
+    this.mediaPackageId = mediaPackage == null ? null : mediaPackage.getIdentifier().toString();
+    this.seriesId = mediaPackage == null ? null : mediaPackage.getSeries();
   }
 
   public WorkflowInstance toWorkflowInstance() {
     return new WorkflowInstance(id, state, template, title, description, parentId, creatorName, organizationId, dateCreated,
             dateCompleted, mediaPackage,
-            operations.stream().map(operation -> operation.toWorkflowOperationInstance()).collect(Collectors.toList()),
-            configurations.stream().map(config -> new WorkflowConfigurationForWorkflowInstance(config.getKey(), config.getValue())).collect(Collectors.toSet()),
+            Optional.ofNullable(operations).orElseGet(Collections::emptyList)
+                    .stream().map(operation -> operation.toWorkflowOperationInstance()).collect(Collectors.toList()),
+            Optional.ofNullable(configurations).orElseGet(Collections::emptySet)
+                    .stream().map(config -> new WorkflowConfigurationForWorkflowInstance(config.getKey(), config.getValue())).collect(Collectors.toSet()),
             mediaPackageId, seriesId);
   }
 

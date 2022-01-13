@@ -233,9 +233,9 @@ public class WorkflowInstance {
       this.organizationId = organization.getId();
     this.state = WorkflowState.INSTANTIATED;
     this.dateCreated = new Date();
-    this.mediaPackage = MediaPackageParser.getAsXml(mediaPackage);
-    this.mediaPackageId = mediaPackage.getIdentifier().toString();
-    this.seriesId = mediaPackage.getSeries();
+    this.mediaPackage = mediaPackage == null ? null : MediaPackageParser.getAsXml(mediaPackage);
+    this.mediaPackageId = mediaPackage == null ? null : mediaPackage.getIdentifier().toString();
+    this.seriesId = mediaPackage == null ? null : mediaPackage.getSeries();
 
     this.operations = new ArrayList<WorkflowOperationInstance>();
     try {
@@ -278,7 +278,7 @@ public class WorkflowInstance {
     this.organizationId = organizationId;
     this.dateCreated = dateCreated;
     this.dateCompleted = dateCompleted;
-    this.mediaPackage = MediaPackageParser.getAsXml(mediaPackage);
+    this.mediaPackage = mediaPackage == null ? null : MediaPackageParser.getAsXml(mediaPackage);
     this.operations = operations;
     this.configurations = configurations;
     this.mediaPackageId = mediaPackageId;
@@ -371,17 +371,21 @@ public class WorkflowInstance {
 
   public MediaPackage getMediaPackage()  {
     try {
+      if (mediaPackage == null) {
+        return null;
+      }
       return MediaPackageParser.getFromXml(mediaPackage);
     } catch (MediaPackageException e) {
+      // TODO: Error handling
       logger.error("Error: ", e);
     }
     return null;
   }
 
   public void setMediaPackage(MediaPackage mediaPackage) {
-    this.mediaPackage = MediaPackageParser.getAsXml(mediaPackage);
-    this.mediaPackageId = mediaPackage.getIdentifier().toString();
-    this.seriesId = mediaPackage.getSeries();
+    this.mediaPackage = mediaPackage == null ? null : MediaPackageParser.getAsXml(mediaPackage);
+    this.mediaPackageId = mediaPackage == null ? null : mediaPackage.getIdentifier().toString();
+    this.seriesId = mediaPackage == null ? null : mediaPackage.getSeries();
   }
 
   public boolean isActive() {
