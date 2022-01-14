@@ -1799,7 +1799,7 @@ public abstract class AbstractEventEndpoint {
                   f("submitter", v(creatorName, Jsons.BLANK))));
         }
 
-        JObject json = obj(f("results", arr(jsonList)));
+        JObject json = obj(f("results", arr(jsonList)), f("count", v(workflowInstances.size())));
         return okJson(json);
       }
     } catch (NotFoundException e) {
@@ -2012,7 +2012,8 @@ public abstract class AbstractEventEndpoint {
 
     WorkflowInstance instance;
     try {
-      instance = getWorkflowService().getWorkflowById(workflowInstanceId);    } catch (NotFoundException e) {
+      instance = getWorkflowService().getWorkflowById(workflowInstanceId);
+    } catch (NotFoundException e) {
       return notFound("Cannot find workflow %s", workflowId);
     } catch (WorkflowDatabaseException e) {
       logger.error("Unable to get workflow operation of event %s and workflow %s at position %s", eventId, workflowId,
