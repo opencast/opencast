@@ -197,7 +197,6 @@ public class WorkflowOperationInstance implements Configurable {
   }
 
   public WorkflowOperationInstance(
-          long id,
           String template,
           Long jobId,
           OperationState state,
@@ -218,7 +217,6 @@ public class WorkflowOperationInstance implements Configurable {
           int failedAttempts,
           String executionHost,
           RetryStrategy retryStrategy) {
-    this.id = id;
     this.template = template;
     this.jobId = jobId;
     this.state = state;

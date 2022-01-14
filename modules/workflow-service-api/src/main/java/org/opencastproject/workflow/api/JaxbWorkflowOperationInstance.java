@@ -179,8 +179,9 @@ public class JaxbWorkflowOperationInstance {
   }
 
   public WorkflowOperationInstance toWorkflowOperationInstance() {
-    return new WorkflowOperationInstance(id, template, jobId, state, description,
-            configurations.stream().map(config -> new WorkflowConfigurationForOperationInstance(config.getKey(), config.getValue())).collect(Collectors.toSet()),
+    return new WorkflowOperationInstance(template, jobId, state, description,
+            Optional.ofNullable(configurations).orElseGet(Collections::emptySet)
+                    .stream().map(config -> new WorkflowConfigurationForOperationInstance(config.getKey(), config.getValue())).collect(Collectors.toSet()),
             holdStateUserInterfaceUrl, holdActionTitle, failWorkflowOnException, executeCondition,
             skipCondition, exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
             executionHost, retryStrategy);
