@@ -136,84 +136,84 @@ const EventDetails = ({ tabIndex, eventId, close }) => {
                 }
             </nav>
 
-            {/* Initialize overall form */}
-                        <div>
-                            {page === 0 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
-                            )}
-                            {page === 1 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
-                            )}
-                            {page === 2 && (
-                                <EventDetailsPublicationTab eventId={eventId} />
-                            )}
-                            {page === 3  && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
-                            )}
-                            {page === 4 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
-                            )}
-                            {page === 5 && (
-                                (workflowTabHierarchy === "entry" && (
-                                    <EventDetailsWorkflowTab
-                                        eventId={eventId}
-                                        header={tabs[page].bodyHeaderTranslation}
-                                        t={t}
-                                        close={close}
-                                        setHierarchy={setWorkflowTabHierarchy}/>
-                                )) || (
-                                workflowTabHierarchy === "workflow-details" && (
-                                    <EventDetailsWorkflowDetails
-                                        eventId={eventId}
-                                        t={t}
-                                        setHierarchy={setWorkflowTabHierarchy}/>
-                                )) || (
-                                workflowTabHierarchy === "workflow-operations" && (
-                                    <EventDetailsWorkflowOperations
-                                        eventId={eventId}
-                                        t={t}
-                                        setHierarchy={setWorkflowTabHierarchy}/>
-                                )) || (
-                                workflowTabHierarchy === "workflow-operation-details" && (
-                                    <EventDetailsWorkflowOperationDetails
-                                        eventId={eventId}
-                                        t={t}
-                                        setHierarchy={setWorkflowTabHierarchy}/>
-                                )) || (
-                                workflowTabHierarchy === "errors-and-warnings" && (
-                                    <EventDetailsWorkflowErrors
-                                        eventId={eventId}
-                                        t={t}
-                                        setHierarchy={setWorkflowTabHierarchy}/>
-                                )) || (
-                                workflowTabHierarchy === "workflow-error-details" && (
-                                    <EventDetailsWorkflowErrorDetails
-                                        eventId={eventId}
-                                        t={t}
-                                        setHierarchy={setWorkflowTabHierarchy}/>
-                                ))
-                            )}
-                            {page === 6 && (
-                                <EventDetailsAccessPolicyTab
-                                    eventId={eventId}
-                                    header={tabs[page].bodyHeaderTranslation}
-                                    t={t}/>
-                            )}
-                            {page === 7 && (
-                                <EventDetailsCommentsTab
-                                    eventId={eventId}
-                                    header={tabs[page].bodyHeaderTranslation}
-                                    t={t}/>
-                            )}
-                            {page === 8 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
-                            )}
-                        </div>
+            {/* Initialize overall modal */}
+                <div>
+                    {page === 0 && (
+                        <MockDataPage header={tabs[page].bodyHeaderTranslation}
+                                         t={t}/>
+                    )}
+                    {page === 1 && (
+                        <MockDataPage header={tabs[page].bodyHeaderTranslation}
+                                         t={t}/>
+                    )}
+                    {page === 2 && (
+                        <EventDetailsPublicationTab eventId={eventId} />
+                    )}
+                    {page === 3  && (
+                        <MockDataPage header={tabs[page].bodyHeaderTranslation}
+                                         t={t}/>
+                    )}
+                    {page === 4 && (
+                        <MockDataPage header={tabs[page].bodyHeaderTranslation}
+                                         t={t}/>
+                    )}
+                    {page === 5 && (
+                        (workflowTabHierarchy === "entry" && (
+                            <EventDetailsWorkflowTab
+                                eventId={eventId}
+                                header={tabs[page].bodyHeaderTranslation}
+                                t={t}
+                                close={close}
+                                setHierarchy={setWorkflowTabHierarchy}/>
+                        )) || (
+                        workflowTabHierarchy === "workflow-details" && (
+                            <EventDetailsWorkflowDetails
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setWorkflowTabHierarchy}/>
+                        )) || (
+                        workflowTabHierarchy === "workflow-operations" && (
+                            <EventDetailsWorkflowOperations
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setWorkflowTabHierarchy}/>
+                        )) || (
+                        workflowTabHierarchy === "workflow-operation-details" && (
+                            <EventDetailsWorkflowOperationDetails
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setWorkflowTabHierarchy}/>
+                        )) || (
+                        workflowTabHierarchy === "errors-and-warnings" && (
+                            <EventDetailsWorkflowErrors
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setWorkflowTabHierarchy}/>
+                        )) || (
+                        workflowTabHierarchy === "workflow-error-details" && (
+                            <EventDetailsWorkflowErrorDetails
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setWorkflowTabHierarchy}/>
+                        ))
+                    )}
+                    {page === 6 && (
+                        <EventDetailsAccessPolicyTab
+                            eventId={eventId}
+                            header={tabs[page].bodyHeaderTranslation}
+                            t={t}/>
+                    )}
+                    {page === 7 && (
+                        <EventDetailsCommentsTab
+                            eventId={eventId}
+                            header={tabs[page].bodyHeaderTranslation}
+                            t={t}/>
+                    )}
+                    {page === 8 && (
+                        <MockDataPage header={tabs[page].bodyHeaderTranslation}
+                                         t={t}/>
+                    )}
+                </div>
         </>
 
     );

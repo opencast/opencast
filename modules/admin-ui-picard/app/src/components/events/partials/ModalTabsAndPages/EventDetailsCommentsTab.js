@@ -96,23 +96,30 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                         <header>{t(header)}</header>
                         <div className="obj-container">
                             <div className="comment-container">
-                                {
+                                { /* all comments listed below each other */
                                     comments.map( (comment, key) => (
 
+                                        /* one comment */
                                         <div className={`comment ${(replyCommentId === key) ? 'active' : ''}`} key={key}>
                                             <hr/>
+
+                                            {/* details about the comment */}
                                             <div className="date">{t('dateFormats.dateTime.short', {dateTime: new Date(comment.creationDate)}) || ''}</div>
                                             <h4>{ comment.author.name }</h4>
                                             <span className="category">
                                                 <strong>{t("EVENTS.EVENTS.DETAILS.COMMENTS.REASON")}</strong>:
                                                 { " " + t(comment.reason) || '' }
                                             </span>
+
+                                            {/* comment text */}
                                             <p>{ comment.text }</p>
+
+                                            {/* links with performable actions for the comment */}
                                             <a onClick={() => deleteComment(comment)}
                                                className="delete">
                                                 {t('EVENTS.EVENTS.DETAILS.COMMENTS.DELETE')}
                                             </a>
-                                            <a onClick={() => replyTo(comment, key)}
+                                            <a onClick={() => replyTo(comment, key) /* enters reply mode */}
                                                className="reply">{/* with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY" */}
                                                 {t('EVENTS.EVENTS.DETAILS.COMMENTS.REPLY')}
                                             </a>
@@ -120,10 +127,12 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                                 { t('EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED') }
                                             </span>
 
-                                            {
+                                            { /* all replies to this comment listed below each other */
                                                 comment.replies.map( (reply, replyKey) => (
                                                     <div className="comment is-reply" key={replyKey}>
                                                         <hr/>
+
+                                                        {/* details about the reply and reply text */}
                                                         <div className="date">
                                                             {t('dateFormats.dateTime.short', {dateTime: new Date(reply.creationDate)}) || ''}
                                                         </div>
@@ -135,6 +144,8 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                                         <p>
                                                             <span>@{ comment.author.name }</span> { reply.text }
                                                         </p>
+
+                                                        {/* link for deleting the reply */}
                                                         <a onClick={ () => deleteReply(comment, reply, replyKey)}
                                                            className="delete">{/* with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE" */}
                                                             <i className="fa fa-times-circle"/>
@@ -143,23 +154,24 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                                     </div>
                                                 ))
                                             }
-
-
                                         </div>
-
                                     ) )
                                 }
                             </div>
                         </div>
 
-                        {
+                        { /* form for writing a comment (not shown, while replying to a comment is active) */
                             replyToComment || (<form
                                 className="add-comment">{/* with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE">*/}
+
+                                {/* text field */}
                                 <textarea
                                     value={newCommentText}
                                     onChange={ (comment) => setNewCommentText(comment.target.value)}
                                     placeholder={t('EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER')}>
                                 </textarea>
+
+                                {/* drop-down for selecting a reason for the comment */}
                                 <div className="chosen-container chosen-container-single">
                                     <select className="chosen-single chosen-default"
                                             chosen
@@ -177,6 +189,8 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                         )}
                                     </select>
                                 </div>
+
+                                {/* submit button for comment (only active, if text has been written and a reason has been selected) */}
                                 <button
                                     disabled={ !!(!newCommentText.length || newCommentText.length <= 0 ||
                                         !commentReason.length || commentReason.length <= 0 ||
@@ -192,13 +206,17 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                             </form>)
                         }
 
-                        {
+                        { /* form for writing a reply to a comment (only shown, while replying to a comment is active) */
                             replyToComment && (<form className="add-comment reply">
+
+                                {/* text field */}
                                 <textarea
                                     value={commentReplyText}
                                     onChange={ (reply) => setCommentReplyText(reply.target.value)}
                                     placeholder={ t('EVENTS.EVENTS.DETAILS.COMMENTS.REPLY_TO') + "@" +  originalComment.author.name }>
                                 </textarea>
+
+                                {/* submit button for comment reply (only active, if text has been written) */}
                                 <button
                                     disabled={ !!(!commentReplyText.length || commentReplyText.length <= 0 ||
                                         isSavingCommentReply)}
@@ -210,9 +228,13 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                 >
                                     { t("EVENTS.EVENTS.DETAILS.COMMENTS.REPLY") /* Reply */}
                                 </button>
+
+                                {/* cancel button (exits reply mode) */}
                                 <button className="red" onClick={() => exitReplyMode()} >
                                     { t("EVENTS.EVENTS.DETAILS.COMMENTS.CANCEL_REPLY") /* Cancel */}
                                 </button>
+
+                                {/* 'resolved' checkbox */}
                                 <input type="checkbox"
                                        id="resolved-checkbox"
                                        className="ios"
