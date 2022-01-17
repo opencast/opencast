@@ -24,8 +24,6 @@ package org.opencastproject.ingest.scanner;
 
 import static org.opencastproject.security.util.SecurityUtil.getUserAndOrganization;
 import static org.opencastproject.util.data.Collections.dict;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.ingest.api.IngestService;
@@ -34,9 +32,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.data.Effect;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -127,8 +122,8 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   private ComponentContext cc;
 
-  private volatile Option<Ingestor> ingestor = none();
-  private volatile Option<Configuration> fileInstallCfg = none();
+  private volatile Ingestor ingestor = null;
+  private volatile Configuration fileInstallCfg = null;
 
   /** OSGi callback. */
   // synchronized with updated(Dictionary)
@@ -140,7 +135,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   /** OSGi callback. */
   @Deactivate
   public void deactivate() {
-    fileInstallCfg.foreach(removeFileInstallCfg);
+    removeFileInstallCfg();
   }
 
   // synchronized with activate(ComponentContext)
@@ -192,21 +187,24 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     }
 
     // remove old file install configuration
-    fileInstallCfg.foreach(removeFileInstallCfg);
+    removeFileInstallCfg();
     // set up new file install config
-    fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
+    fileInstallCfg = configureFileInstall(cc.getBundleContext(), inbox, interval);
     // create new scanner
-    Ingestor ingestor = new Ingestor(ingestService, securityContext.get(), workflowDefinition,
+    this.ingestor = new Ingestor(ingestService, securityContext.get(), workflowDefinition,
             workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries);
-    this.ingestor = some(ingestor);
     new Thread(ingestor).start();
     logger.info("Now watching inbox {}", inbox.getAbsolutePath());
   }
 
-  private static final Effect<Configuration> removeFileInstallCfg = new Effect.X<Configuration>() {
-    @Override
-    protected void xrun(Configuration cfg) throws Exception {
-      cfg.delete();
+  private void removeFileInstallCfg() {
+    if (fileInstallCfg != null) {
+      try {
+        fileInstallCfg.delete();
+      } catch (IOException e) {
+        logger.error("Failed to delete file install configuration", e);
+      }
+      fileInstallCfg = null;
     }
   };
 
@@ -245,23 +243,15 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   // are not set yet.
   @Override
   public boolean canHandle(final File artifact) {
-    return ingestor.fmap(new Function<Ingestor, Boolean>() {
-      @Override
-      public Boolean apply(Ingestor ingestor) {
-        return ingestor.canHandle(artifact);
-      }
-    }).getOrElse(false);
+    return ingestor != null && ingestor.canHandle(artifact);
   }
 
   @Override
   public void install(final File artifact) throws Exception {
-    logger.trace("install(): {}", artifact.getName());
-    ingestor.foreach(new Effect<Ingestor>() {
-      @Override
-      protected void run(Ingestor ingestor) {
-        ingestor.ingest(artifact);
-      }
-    });
+    if (ingestor != null) {
+      logger.trace("install(): {}", artifact.getName());
+      ingestor.ingest(artifact);
+    }
   }
 
   @Override
@@ -271,13 +261,10 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   @Override
   public void uninstall(File artifact) {
-    logger.trace("uninstall(): {}", artifact.getName());
-    ingestor.foreach(new Effect<Ingestor>() {
-      @Override
-      protected void run(Ingestor ingestor) {
-        ingestor.cleanup(artifact);
-      }
-    });
+    if (ingestor != null) {
+      logger.trace("uninstall(): {}", artifact.getName());
+      ingestor.cleanup(artifact);
+    }
   }
 
   // --
