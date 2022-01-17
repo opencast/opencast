@@ -347,9 +347,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
                 @Override
                 public WorkflowInstance answer() throws Throwable {
                   long id = (long) EasyMock.getCurrentArguments()[0];
-                  logger.error("MOCK");
                   if (id == 9999L) {
-                    logger.error("MOCK NOT FOUND");
                     throw new NotFoundException("999 was not found");
                   } else {
                     return workflowInstance1;
