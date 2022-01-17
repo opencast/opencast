@@ -87,8 +87,6 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   protected abstract AclServiceFactory getAclServiceFactory();
 
-  protected abstract String getEndpointBaseUrl();
-
   protected abstract SecurityService getSecurityService();
 
   protected abstract AssetManager getAssetManager();

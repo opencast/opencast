@@ -1030,12 +1030,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       final Organization organization = securityService.getOrganization();
       final User user = SecurityUtil.createSystemUser(systemUserName, organization);
-      List<MediaPackage> conflictingEvents = new ArrayList();
+      List<MediaPackage> conflictingEvents = new ArrayList<>();
 
       SecurityUtil.runAs(securityService, organization, user, () -> {
         try {
-          conflictingEvents.addAll(persistence.getEvents(captureDeviceID, startDate, endDate, Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS)
-            .stream().map(this::getEventMediaPackage).collect(Collectors.toList()));
+          persistence.getEvents(captureDeviceID, startDate, endDate, Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS)
+                  .stream()
+                  .map(id -> getEventMediaPackage(id, false))
+                  .forEach(conflictingEvents::add);
         } catch (SchedulerServiceDatabaseException e) {
           logger.error("Failed to get conflicting events", e);
         }
@@ -1582,17 +1584,24 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return wfPropertiesString.toString();
   }
 
-  private MediaPackage getEventMediaPackage(String mediaPackageId) {
+  private MediaPackage getEventMediaPackage(final String mediaPackageId, boolean checkOwner) {
     AQueryBuilder query = assetManager.createQuery();
-    AResult result = query.select(query.snapshot())
-            .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query))
-            .and(query.version().isLatest()))
-            .run();
-    Opt<ARecord> record = result.getRecords().head();
+    var predicate = withOrganization(query)
+            .and(query.mediaPackageId(mediaPackageId))
+            .and(query.version().isLatest());
+    if (checkOwner) {
+      predicate = predicate.and(withOwner(query));
+    }
+
+    Opt<ARecord> record = query.select(query.snapshot()).where(predicate).run().getRecords().head();
     if (record.isNone())
       throw new RuntimeNotFoundException(new NotFoundException());
 
     return record.bind(recordToMp).get();
+  }
+
+  private MediaPackage getEventMediaPackage(final String mediaPackageId) {
+    return getEventMediaPackage(mediaPackageId, true);
   }
 
   /**
