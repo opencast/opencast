@@ -29,7 +29,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.capture.CaptureParameters;
@@ -55,7 +54,7 @@ import java.util.Map;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class EventsEndpointTest {
-  private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(), TestEventsEndpoint.class);
+  private static final RestServiceTestEnv env = testEnvForClasses(TestEventsEndpoint.class);
 
    @BeforeClass
    public static void oneTimeSetUp() {

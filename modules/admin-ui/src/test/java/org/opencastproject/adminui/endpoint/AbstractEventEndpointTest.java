@@ -26,7 +26,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
@@ -70,7 +69,8 @@ import io.restassured.http.ContentType;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class AbstractEventEndpointTest {
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestEventEndpoint.class,
+  private static final RestServiceTestEnv rt = testEnvForClasses(
+          TestEventEndpoint.class,
           NotFoundExceptionMapper.class);
 
   public static TestEnv testEnv() {

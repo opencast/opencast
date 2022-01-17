@@ -24,7 +24,6 @@ package org.opencastproject.adminui.endpoint;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.adminui.util.ServiceEndpointTestsUtil;
@@ -50,8 +49,7 @@ import io.restassured.http.ContentType;
 
 public class AclEndpointTest {
 
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestAclEndpoint.class,
-          NotFoundExceptionMapper.class);
+  private static final RestServiceTestEnv rt = testEnvForClasses(TestAclEndpoint.class, NotFoundExceptionMapper.class);
 
   private JSONParser parser;
 

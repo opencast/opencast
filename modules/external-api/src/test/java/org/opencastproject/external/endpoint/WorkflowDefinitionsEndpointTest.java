@@ -26,7 +26,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -40,8 +39,7 @@ import org.junit.Test;
 
 public class WorkflowDefinitionsEndpointTest {
 
-  private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(),
-          TestWorkflowDefinitionsEndpoint.class);
+  private static final RestServiceTestEnv env = testEnvForClasses(TestWorkflowDefinitionsEndpoint.class);
 
   private static final JSONParser parser = new JSONParser();
 
