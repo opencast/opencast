@@ -170,7 +170,11 @@ public class EventHttpServletRequest {
           if (item.isFormField()) {
             setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName, startDatePattern, startTimePattern);
           } else {
-            ingestFile(ingestService, eventHttpServletRequest, item);
+            if (!item.getName().isBlank()) {
+              ingestFile(ingestService, eventHttpServletRequest, item);
+            } else {
+              logger.debug("Skipping field {} due to missing filename", item.getFieldName());
+            }
           }
         }
       } else {
