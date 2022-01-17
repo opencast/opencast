@@ -162,7 +162,7 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
 
     // test media package contains new smil catalog
     MediaPackageElementFlavor smilPartialFlavor = new MediaPackageElementFlavor("*", smilFlavorSubtypeProperty);
-    Catalog[] smilCatalogs = mp.getCatalogs(smilPartialFlavor);
+    Catalog[] smilCatalogs = result.getMediaPackage().getCatalogs(smilPartialFlavor);
     Assert.assertTrue("Media package should contain a smil catalog",
             smilCatalogs != null && smilCatalogs.length > 0);
   }

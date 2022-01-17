@@ -170,6 +170,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     Collection<Track> sourceTracks = trackSelector.select(mp, false);
     if (sourceTracks.isEmpty()) {
       logger.info("No source tracks found, skip silence detection");
+      workflowInstance.setMediaPackage(mp);
       return createResult(mp, Action.SKIP);
     }
 
@@ -250,6 +251,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
       }
     }
     logger.debug("Finished silence detection workflow operation for mediapackage {}", mp.getIdentifier().toString());
+    workflowInstance.setMediaPackage(mp);
     return createResult(mp, exportWorkflowProperties, Action.CONTINUE, 0);
   }
 

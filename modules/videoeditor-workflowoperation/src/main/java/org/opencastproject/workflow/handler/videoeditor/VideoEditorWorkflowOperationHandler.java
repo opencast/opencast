@@ -286,6 +286,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
         return skip(workflowInstance, context);
       }
       logger.info("Holding for video edit...");
+      workflowInstance.setMediaPackage(mp);
       return createResult(mp, Action.PAUSE);
     } else {
       logger.debug("Move on, SMIL catalog ({}) already exists for media package '{}'", targetSmilFlavor, mp);
@@ -320,6 +321,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     final boolean skipProcessing = BooleanUtils
             .toBoolean(worflowOperationInstance.getConfiguration(SKIP_PROCESSING_PROPERTY));
     if (skipProcessing) {
+      workflowInstance.setMediaPackage(mp);
       return createResult(mp, Action.SKIP);
     }
     // If not skipProcessing (set it up for process-smil), then clone and tag to target
@@ -355,6 +357,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
       mp.addDerived(clonedTrack, sourceTrack);
     }
 
+    workflowInstance.setMediaPackage(mp);
     return createResult(mp, Action.SKIP);
   }
 
@@ -451,6 +454,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     // to delivery format
     if (skipProcessing) {
       logger.info("VideoEdit workflow {} finished - smil file is {}", workflowInstance.getId(), smil.getId());
+      workflowInstance.setMediaPackage(mp);
       return createResult(mp, Action.CONTINUE);
     }
     // create video edit jobs and run them
@@ -570,6 +574,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     }
 
     logger.info("VideoEdit workflow {} finished", workflowInstance.getId());
+    workflowInstance.setMediaPackage(mp);
     return createResult(mp, Action.CONTINUE);
   }
 

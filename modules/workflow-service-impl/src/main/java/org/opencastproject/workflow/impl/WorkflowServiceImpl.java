@@ -1440,7 +1440,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
           throws WorkflowDatabaseException {
     try {
-      logger.error("YOLO persistence: " + persistence);
       return persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
     } catch (WorkflowServiceDatabaseException e) {
       throw new WorkflowDatabaseException(e);
