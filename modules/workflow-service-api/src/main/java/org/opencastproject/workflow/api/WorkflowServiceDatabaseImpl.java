@@ -179,7 +179,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
 
       String orgId = securityService.getOrganization().getId();
       query.setParameter("organizationId", orgId);
-      query.setParameter("state", state.toString());
+      query.setParameter("state", state);
       query.setParameter("dateCreated", dateCreated);
 
       return query.getResultList();
@@ -211,6 +211,8 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       query.setParameter("state", state);
       if (StringUtils.isNotBlank(operation)) {
         query.setParameter("operation", operation);
+        // TODO: Fix this. Is not actually looking for "running" operation, but for "current" operation. Way more difficult
+        // Might need to define a "currentOperation" variable in WorkflowInstance.java
         query.setParameter("operationStateRunning", WorkflowOperationInstance.OperationState.RUNNING);
       }
 
