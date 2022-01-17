@@ -355,6 +355,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
           matcher.appendReplacement(sb, elementFile.getAbsolutePath());
         } else if (matcher.group(1).equals("out")) {
           matcher.appendReplacement(sb, outFile.getAbsolutePath());
+        } else if (matcher.group(1).equals("org_id")) {
+          matcher.appendReplacement(sb, securityService.getOrganization().getId());
         } else if (properties.get(matcher.group(1)) != null) {
           matcher.appendReplacement(sb, (String) properties.get(matcher.group(1)));
         } else if (bundleContext.getProperty(matcher.group(1)) != null) {
@@ -414,6 +416,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
           arguments.set(i, arguments.get(i).replace(INPUT_FILE_PATTERN, trackFile.getAbsolutePath()));
           continue;
         }
+
         if (arguments.get(i).contains(OUTPUT_FILE_PATTERN)) {
           if (outFile != null) {
             arguments.set(i, arguments.get(i).replace(OUTPUT_FILE_PATTERN, outFile.getAbsolutePath()));
@@ -424,10 +427,17 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
                     OUTPUT_FILE_PATTERN + " pattern found, but no valid output filename was specified");
           }
         }
+
+        if (arguments.get(i).contains(MP_ID_PATTERN)) {
+          arguments.set(i, arguments.get(i).replace(MP_ID_PATTERN, element.getMediaPackage().getIdentifier().toString()));
+        }
+
+        if (arguments.get(i).contains(ORG_ID_PATTERN)) {
+          arguments.set(i, arguments.get(i).replace(ORG_ID_PATTERN, securityService.getOrganization().getId()));
+        }
       }
 
       return runCommand(arguments, outFile, expectedType);
-
     } catch (IOException e) {
       logger.error("Error retrieving file from workspace: {}", element.getURI());
       throw new ExecuteException("Error retrieving file from workspace: " + element.getURI(), e);
