@@ -75,6 +75,7 @@ nav:
         - References: 'modules/admin-ui/style/references.md'
    - Capture Agent:
      - Capture Agent: 'modules/capture-agent/capture-agent.md'
+     - Input Selection: modules/capture-agent/capture-agent-input.md
      - Test Cases: 'modules/capture-agent/testcases.md'
    - Player:
       - Architecture: 'modules/player/architecture.md'

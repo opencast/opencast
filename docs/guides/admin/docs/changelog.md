@@ -665,6 +665,38 @@ Opencast 10
 ----------
 
 
+### Opencast 10.9
+
+*Released on January 18th, 2021*
+
+- [[#3341](https://github.com/opencast/opencast/pull/3341)] -
+  Update Nexus related documentation
+- [[#3339](https://github.com/opencast/opencast/pull/3339)] -
+  Fix Scheduler Conflict Checks
+- [[#3334](https://github.com/opencast/opencast/pull/3334)] -
+  Warn against using CIFS for Inbox
+- [[#3322](https://github.com/opencast/opencast/pull/3322)] -
+  Show input selection only if applicable
+- [[#3305](https://github.com/opencast/opencast/pull/3305)] -
+  Update to pax-logging 1.11.13
+- [[#3300](https://github.com/opencast/opencast/pull/3300)] -
+  Fixup osgi services and xmls
+- [[#3299](https://github.com/opencast/opencast/pull/3299)] -
+  Remove Unused Additional Log4J
+- [[#3298](https://github.com/opencast/opencast/pull/3298)] -
+  Automate GitHub Release
+- [[#3295](https://github.com/opencast/opencast/pull/3295)] -
+  Fix Database Connection Tests
+- [[#3294](https://github.com/opencast/opencast/pull/3294)] -
+  Update Debian install documentation
+- [[#3293](https://github.com/opencast/opencast/pull/3293)] -
+  Fix pax-logging in startup.properties
+- [[#3283](https://github.com/opencast/opencast/pull/3283)] -
+  Opencast 10.8 Release Notes
+- [[#3251](https://github.com/opencast/opencast/pull/3251)] -
+  Inbox may fail at startup
+
+
 ### Opencast 10.8
 
 *Released on December 20th, 2021*
