@@ -37,13 +37,17 @@ jobs:
             -DskipTests \
             -Dcheckstyle.skip=true
 
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
       - name: create new release
         uses: softprops/action-gh-release@v1
         with:
           files: build/opencast-dist-*.tar.gz
           draft: true
           fail_on_unmatched_files: true
-          name: Opencast ${GITHUB_REF#refs/heads/}
+          name: Opencast ${{ steps.get_version.outputs.VERSION }}
           body: |
             This release …
             For further information, please take a look at:
