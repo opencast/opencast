@@ -1195,12 +1195,6 @@ public abstract class AbstractEventEndpoint {
     Event event = optEvent.get();
     MetadataList metadataList = new MetadataList();
 
-    // Load common metadata
-    EventCatalogUIAdapter eventCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
-    DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
-    EventUtils.setEventMetadataValues(event, metadataCollection);
-    metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), metadataCollection);
-
     // Load extended metadata
     List<EventCatalogUIAdapter> extendedCatalogUIAdapters = getIndexService().getExtendedEventCatalogUIAdapters();
     if (!extendedCatalogUIAdapters.isEmpty()) {
@@ -1221,6 +1215,14 @@ public abstract class AbstractEventEndpoint {
         metadataList.add(extendedCatalogUIAdapter, extendedCatalogUIAdapter.getFields(mediaPackage));
       }
     }
+
+    // Load common metadata
+    // We do this after extended metadata because we want to overwrite any extended metadata adapters with the same
+    // flavor instead of the other way around.
+    EventCatalogUIAdapter eventCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
+    DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
+    EventUtils.setEventMetadataValues(event, metadataCollection);
+    metadataList.add(eventCatalogUiAdapter, metadataCollection);
 
     // lock metadata?
     final String wfState = event.getWorkflowState();
@@ -2110,7 +2112,15 @@ public abstract class AbstractEventEndpoint {
   public Response getNewMetadata() {
     MetadataList metadataList = new MetadataList();
 
+    // Extended metadata
+    List<EventCatalogUIAdapter> extendedCatalogUIAdapters = getIndexService().getExtendedEventCatalogUIAdapters();
+    for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedCatalogUIAdapters) {
+      metadataList.add(extendedCatalogUIAdapter, extendedCatalogUIAdapter.getRawFields());
+    }
+
     // Common metadata
+    // We do this after extended metadata because we want to overwrite any extended metadata adapters with the same
+    // flavor instead of the other way around.
     EventCatalogUIAdapter commonCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
     DublinCoreMetadataCollection commonMetadata = commonCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
 
@@ -2144,12 +2154,6 @@ public abstract class AbstractEventEndpoint {
     }
 
     metadataList.add(commonCatalogUiAdapter, commonMetadata);
-
-    // Extended metadata
-    List<EventCatalogUIAdapter> extendedCatalogUIAdapters = getIndexService().getExtendedEventCatalogUIAdapters();
-    for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedCatalogUIAdapters) {
-      metadataList.add(extendedCatalogUIAdapter, extendedCatalogUIAdapter.getRawFields());
-    }
 
     return okJson(MetadataJson.listToJson(metadataList, true));
   }
