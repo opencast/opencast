@@ -358,6 +358,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           throw new WorkflowOperationException("Media package does not meet publication criteria: No tracks selected");
         }
 
+        // Prepare published elements to be added
+        MediaPackageElement[] mediaPackageElements = mediaPackageForSearch.getElements();
+
         logger.info("Publishing media package {} to search index", mediaPackageForSearch);
 
         URL engageBaseUrl;
@@ -379,6 +382,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         // Create new distribution element
         Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_ID,
                 engageUri, MimeTypes.parseMimeType("text/html"));
+
+        // Add published elements
+        for (MediaPackageElement element : mediaPackageElements) {
+          element.setIdentifier(null);
+          PublicationImpl.addElementToPublication(publicationElement, element);
+        }
+
         mediaPackage.add(publicationElement);
 
         // create publication URI for streaming
