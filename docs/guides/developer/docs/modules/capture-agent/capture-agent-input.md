@@ -2,8 +2,8 @@ Capture Agent Input Selection
 =============================
 
 Capture agents usually run autonomous with a minimum of user interaction.
-One of the few ways for users too interact is the optional input selection which may be shown when scheduling events.
-It allows capture agents to present a set of options which users can select for each event
+One of the few ways for users to interact is the optional input selection which may be shown when scheduling events.
+It allows capture agents to present a set of inputs which users can select for each event
 and which are returned to the capture agent as part of the schedule.
 
 A capture agent may specify and change potential inputs at any time.
