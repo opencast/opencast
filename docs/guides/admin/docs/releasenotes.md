@@ -43,6 +43,12 @@ API changes
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
 
+Additional Notes about 10.9
+---------------------------
+
+This fix is mainly bugfixes, with the notable exception of [#3305](https://github.com/opencast/opencast/pull/3305) which
+updates our logging system yet again.
+
 Additional Notes about 10.8
 ---------------------------
 
