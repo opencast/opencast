@@ -87,8 +87,8 @@ public class ConfigurableRetractWorkflowOperationHandler extends ConfigurableWor
     final String channelId = StringUtils.trimToEmpty(workflowInstance.getCurrentOperation().getConfiguration(
             CHANNEL_ID_KEY));
     if (StringUtils.isBlank((channelId))) {
-      throw new WorkflowOperationException("Unable to publish this mediapackage as the configuration key "
-              + CHANNEL_ID_KEY + " is missing. Unable to determine where to publish these elements.");
+      throw new WorkflowOperationException("Unable to unpublish this mediapackage as the configuration key "
+              + CHANNEL_ID_KEY + " is missing. Unable to determine from where to unpublish these elements.");
     }
 
     retract(mp, channelId, retractStreaming);
