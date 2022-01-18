@@ -24,6 +24,7 @@ package org.opencastproject.index.service.impl;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
+import static org.opencastproject.security.api.DefaultOrganization.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -160,6 +161,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -411,13 +413,35 @@ public class IndexServiceImpl implements IndexService {
   }
 
   public EventCatalogUIAdapter getCommonEventCatalogUIAdapter(String organization) {
-    return eventCatalogUIAdapters.stream().filter(a -> a instanceof CommonEventCatalogUIAdapter)
-            .filter(a -> organization.equals(a.getOrganization())).collect(Collectors.toList()).get(0);
+    Optional<EventCatalogUIAdapter> orgEventCatalogUIAdapter = eventCatalogUIAdapters.stream()
+            .filter(a -> a instanceof CommonEventCatalogUIAdapter)
+            .filter(a -> organization.equals(a.getOrganization()))
+            .findFirst();
+
+    if (orgEventCatalogUIAdapter.isPresent()) {
+      return orgEventCatalogUIAdapter.get();
+    } else if (organization != DEFAULT_ORGANIZATION_ID) {
+      return getCommonEventCatalogUIAdapter(DEFAULT_ORGANIZATION_ID);
+    } else {
+       throw new IllegalStateException("Common event metadata for " + DEFAULT_ORGANIZATION_ID + " needs to be "
+               + "configured!");
+    }
   }
 
   public SeriesCatalogUIAdapter getCommonSeriesCatalogUIAdapter(String organization) {
-    return seriesCatalogUIAdapters.stream().filter(a -> a instanceof CommonSeriesCatalogUIAdapter)
-            .filter(a -> organization.equals(a.getOrganization())).collect(Collectors.toList()).get(0);
+    Optional<SeriesCatalogUIAdapter> orgSeriesCatalogUIAdapter = seriesCatalogUIAdapters.stream()
+            .filter(a -> a instanceof CommonSeriesCatalogUIAdapter)
+            .filter(a -> organization.equals(a.getOrganization()))
+            .findFirst();
+
+    if (orgSeriesCatalogUIAdapter.isPresent()) {
+      return orgSeriesCatalogUIAdapter.get();
+    } else if (organization != DEFAULT_ORGANIZATION_ID) {
+      return getCommonSeriesCatalogUIAdapter(DEFAULT_ORGANIZATION_ID);
+    } else {
+      throw new IllegalStateException("Common series metadata for " + DEFAULT_ORGANIZATION_ID + " needs to be "
+              + "configured!");
+    }
   }
 
   @Override
