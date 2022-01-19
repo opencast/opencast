@@ -50,7 +50,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * The <tt>prepare media</tt> operation will make sure that media where audio and video track come in separate files
+ * The <code>prepare media</code> operation will make sure that media where audio and video track come in separate files
  * will be muxed prior to further processing.
  */
 public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperationHandler {

@@ -72,7 +72,7 @@ import java.util.Objects;
  * can be arbitrarily chosen and has no further meaning. <code>inbox-scanned-pid</code> must confirm to the PID given to
  * the InboxScanner in the declarative service (DS) configuration <code>OSGI-INF/inbox-scanner-service.xml</code>.
  *
- * <h3>Implementation notes</h3>
+ * <h2>Implementation notes</h2>
  * Monitoring leverages Apache FileInstall by implementing {@link ArtifactInstaller}.
  *
  * @see Ingestor

@@ -46,7 +46,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * The REST endpoint to test needs a no-arg constructor in order to be created by the framework.
  * <p>
  * Write REST unit tests using <a href="http://code.google.com/p/rest-assured/">rest assured</a>.
- * <h3>Example Usage</h3>
+ * <h2>Example Usage</h2>
  * 
  * <pre>
  *   import static com.jayway.restassured.RestAssured.*;

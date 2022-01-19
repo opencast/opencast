@@ -37,6 +37,7 @@
     <jackson.version>2.12.3</jackson.version>
     <jakarta.mail.version>1.6.7</jakarta.mail.version>
     <java.release>11</java.release>
+    <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
     <jersey.version>2.29.1</jersey.version>
     <jettison.version>1.4.1</jettison.version>
     <joda-time.version>2.10.10</joda-time.version>
@@ -497,7 +498,7 @@
                   <pluginExecutionFilter>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <versionRange>[3.0.0,)</versionRange>
+                    <versionRange>3.15.0</versionRange>
                     <goals>
                       <goal>pmd</goal>
                       <goal>cpd</goal>
@@ -543,11 +544,23 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <!-- NOTE: this should match the settings for the reporting plugin below -->
-          <version>2.10.4</version>
+          <version>$(javadoc-plugin.version}</version>
           <configuration>
             <detectJavaApiLink>true</detectJavaApiLink>
             <maxmemory>512m</maxmemory>
             <quiet>true</quiet>
+            <additionalDependencies>
+              <additionalDependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>2.9.3</version>
+              </additionalDependency>
+              <additionalDependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analyzers</artifactId>
+                <version>2.9.3</version>
+              </additionalDependency>
+            </additionalDependencies>
           </configuration>
           <executions>
             <execution>
@@ -596,7 +609,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.6</version>
+          <version>3.10.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -648,7 +661,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <version>3.6</version>
+          <version>3.15.0</version>
           <configuration>
             <!--<includeTests>true</includeTests> -->
             <typeResolution>true</typeResolution>
@@ -761,7 +774,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
+            <version>${javadoc-plugin.version}</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
@@ -1849,12 +1862,8 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <!-- NOTE: this should match the settings for the build plugin above -->
-        <version>2.10.4</version>
+        <version>${javadoc-plugin.version}</version>
         <configuration>
-          <!-- <aggregate>true</aggregate> -->
-          <!-- <detectLinks>true</detectLinks> -->
-          <!-- http://jira.codehaus.org/browse/MJAVADOC-273 -->
           <detectJavaApiLink>true</detectJavaApiLink>
           <maxmemory>512m</maxmemory>
           <quiet>true</quiet>
