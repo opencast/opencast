@@ -37,21 +37,21 @@ import java.util.List;
  * It also supports the association of {@linkplain Property properties} to a
  * history of snapshots which is called an episode.
  *
- * <h1>Terms</h1>
- * <h2>Snapshot</h2>
+ * <h2>Terms</h2>
+ * <h3>Snapshot</h3>
  * A snapshot saves a particular version of a media package. Snapshots are
  * immutable and can only be deleted.
  *
- * <h2>Episode</h2>
+ * <h3>Episode</h3>
  * An episode is the set of snapshots of a media package.
  *
- * <h2>Properties</h2>
+ * <h3>Properties</h3>
  * Properties are associated with an episode and have a volatile character.
  * They support the quick and easy storage of meta data.
  * This removes the need for services to create their own persistence layer if
  * they want to associate metadata with a media package.
  *
- * <h1>Notes</h1>
+ * <h2>Notes</h2>
  * Media package IDs are considered to be unique throughout the whole system.
  * The organization ID is just a discriminator and not necessary to uniquely identify a media package.
  */

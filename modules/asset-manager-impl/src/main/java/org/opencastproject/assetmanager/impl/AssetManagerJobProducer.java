@@ -251,7 +251,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    *  The String containing the number of successful and failed moves
-   *  [<> OK ][<> FAILED ]
+   *  [0 OK ][0 FAILED ]
    */
   protected String internalMoveById(final String mpId, final String targetStorage) {
     RichAResult results = tsam.getSnapshotsByIdOrderedByVersion(mpId, true);
@@ -356,7 +356,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
    *  The JSON String containing the number of successful and failed moves
-   *  {"OK":<>,"FAIL":<>}
+   *  {"OK": 0,"FAIL": 0}
    */
   protected String internalMoveByIdAndDate(
       final String mpId,
