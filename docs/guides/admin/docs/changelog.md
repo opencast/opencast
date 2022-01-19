@@ -4,6 +4,36 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.3
+
+*Released on January 19th, 2022*
+
+- [[#3337](https://github.com/opencast/opencast/pull/3337)] -
+  Remove non-optional optional
+- [[#3336](https://github.com/opencast/opencast/pull/3336)] -
+  Fix REST Test Network Bindings
+- [[#3329](https://github.com/opencast/opencast/pull/3329)] -
+  Use 1970-01-02 as dummy value in MySQL migration
+- [[#3328](https://github.com/opencast/opencast/pull/3328)] -
+  Java Dependency Update
+- [[#3301](https://github.com/opencast/opencast/pull/3301)] -
+  Add missing 11.2 changelog
+- [[#3297](https://github.com/opencast/opencast/pull/3297)] -
+  Mark Opencast 11 as Available
+- [[#3273](https://github.com/opencast/opencast/pull/3273)] -
+  Changed embed code selection design
+- [[#3254](https://github.com/opencast/opencast/pull/3254)] -
+  Prevent API failing on empty files
+- [[#3188](https://github.com/opencast/opencast/pull/3188)] -
+  Cover image surrogate problem
+- [[#3154](https://github.com/opencast/opencast/pull/3154)] -
+  Allow selection by tags in execute-once
+- [[#3152](https://github.com/opencast/opencast/pull/3152)] -
+  Add id to execute-many and org_id to execute-many and execute-once
+- [[#2855](https://github.com/opencast/opencast/pull/2855)] -
+  Added speech to text (Vosk)
+
+
 ### Opencast 11.2
 
 *Released on December 20th, 2021*
