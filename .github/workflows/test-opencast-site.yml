@@ -1,0 +1,74 @@
+name: Test Opencast Site
+
+on:
+  pull_request:
+    paths:
+      - 'pom.xml'
+      - 'modules/**'
+      - '.github/**'
+  push:
+    paths:
+      - 'pom.xml'
+      - 'modules/**'
+      - '.github/**'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        java:
+          - 11
+          - 13
+    name: build (java ${{ matrix.java }})
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: cache local maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
+      - name: install dependencies
+        run: |
+          sudo apt update -q
+          sudo apt install -y -q \
+            bzip2 \
+            ffmpeg \
+            gzip \
+            hunspell \
+            hunspell-de-de \
+            procps \
+            s3cmd \
+            sox \
+            tar \
+            tesseract-ocr \
+            tesseract-ocr-deu \
+            unzip
+
+      - name: prepare build
+        run: |
+          sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
+
+      - name: nuke the markers
+        run: |
+          find ~/.m2 -name _remote.repositories -exec rm -v {} \;
+
+      - name: build site docs
+        run: |
+          mvn site -P 'none,!frontend' \
+            --batch-mode \
+            -Daggregate=true \
+            -Dcheckstyle.skip=true \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            -Dhttp.keepAlive=false \
+            -Dmaven.wagon.http.pool=false \
+            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
