@@ -46,28 +46,26 @@ Behavior changes
     - `no.error.state.service.types` was added. With this, you can define service types that should never go into error
       state.
 - The default location of the user interface configuration service configuration is now
-  `etc/org.opencastproject.uiconfig.UIConfigRest.cfg `. For more details, take a look at
+  `etc/org.opencastproject.uiconfig.UIConfigRest.cfg`. For more details, take a look at
   [pull request #2860](https://github.com/opencast/opencast/pull/2860).
 - There are changes to how hosts are mapped to tenants. If you use a multi-tenant system you therefore need to update
   your `org.opencastproject.organization-*.cfg` configuration files:
   Before Opencast 11 the domain names were mapped to tenants and a common port number was assumed for all domains. Now
   you need to configure a URL per instance you want to map to a tenant.
-  ```
-  # Before:
-  port=8080
-  prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org 
-  prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
-
-  # Now:
-  prop.org.opencastproject.host.admin.example.org=https://tenant1-admin.example.org
-  prop.org.opencastproject.host.presentation.example.org=https://tenant1-presentation.example.org:8443
-  ```
+```
+# Before:
+port=8080
+prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org 
+prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
+# Now:
+prop.org.opencastproject.host.admin.example.org=https://tenant1-admin.example.org
+prop.org.opencastproject.host.presentation.example.org=https://tenant1-presentation.example.org:8443
+```
 - Support for automatically setting up an HLS encoding ladder via the `{video,audio}.bitrates.mink`
   and `{video,audio}.bitrates.maxk` encoding profile options was removed. Instead, users should now explicitly specify
   the bit rate and bit rate control mechanism in the `ffmpeg.command`.
 - Some S3 distribution workflow operation handlers have been renamed: *publish-aws* to *publish-engage-aws* and
   *retract-aws* to *retract-engage-aws*.
-- If an URL does not exist, it returns to the welcome page.
 - The amount of job statistics for servers displayed in the admin interface was reduced to running and queued jobs to
   avoid performance problems and remove incorrect and/or misleading data.
 
@@ -79,6 +77,18 @@ API changes
 - [[#2878](https://github.com/opencast/opencast/pull/2878)] - Add endpoint to resume Index Rebuild for specified service
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
+
+Additional Notes about 11.3
+---------------------------
+
+This release fixes several bugs and a security issue related to logging which was fixed in 10.9 and forward merged to
+this release (cf. [[#3305](https://github.com/opencast/opencast/pull/3305)]). A notable new feature is the
+`speechtotext` workflow operation introducing support for the STT Engine Vosk (cf. the
+[corresponding docs section](workflowoperationhandlers/speech-to-text-woh.md) and
+[[#2855](https://github.com/opencast/opencast/pull/2855)]). Additionally, the design of the embed code selection
+within the Admin UI was updated (cf. [[#3273](https://github.com/opencast/opencast/pull/3273)]). Furthermore,
+[[#3152](https://github.com/opencast/opencast/pull/3152)] and [[#3154](https://github.com/opencast/opencast/pull/3154)]
+introduced enhancements to the `execute-once` and `execute-many` workflow operations.
 
 Additional Notes about 11.2
 ---------------------------
