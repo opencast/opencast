@@ -93,7 +93,7 @@ public class UIConfigRest {
   /**
    * OSGI callback for activating this component
    *
-   * @param context
+   * @param cc
    *          the osgi component context
    */
   public void activate(ComponentContext cc) throws ConfigurationException {

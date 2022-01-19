@@ -62,7 +62,7 @@ import javax.persistence.EntityManagerFactory;
  * the retrieved records to the configured {@link RecordHandler} for the actual processing.
  * <p>
  * todo
- * <h3>Currently not supported</h3>
+ * <h2>Currently not supported</h2>
  * <ul>
  * <li>Recovery from network errors while processing a resumable request. Currently
  * the request sequence terminates and processing goes on with the next configured repository.
