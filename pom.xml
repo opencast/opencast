@@ -58,6 +58,10 @@
     <module>modules/animate-impl</module>
     <module>modules/animate-remote</module>
     <module>modules/animate-workflowoperation</module>
+    <module>modules/speech-to-text-api</module>
+    <module>modules/speech-to-text-impl</module>
+    <module>modules/speech-to-text-workflowoperation</module>
+    <module>modules/speech-to-text-remote</module>
     <module>modules/annotation-api</module>
     <module>modules/annotation-impl</module>
     <module>modules/elasticsearch-index</module>
