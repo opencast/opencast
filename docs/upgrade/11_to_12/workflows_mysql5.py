@@ -1,5 +1,3 @@
-# TODO: Add other indexes
-
 # Upgrade script for MySQL databases
 # Requires Python3 to run
 # Required packages:
@@ -147,6 +145,9 @@ execute_query(connection, delete_workflow_operation_table)
 execute_query(connection, delete_workflow_operation_configuration_table)
 
 ## Create new tables
+#  Currently added indexes:
+#  - Indexes for bidirectional relationships between Workflow <-> Operation <-> Configuration
+#  - mediaPackageId, seriesId for oc_workflow
 print("Create tables...")
 create_workflow_table = f"""
 CREATE TABLE IF NOT EXISTS {workflow_table_name} (
@@ -163,7 +164,9 @@ CREATE TABLE IF NOT EXISTS {workflow_table_name} (
   mediaPackage LONGTEXT,
   mediaPackageId VARCHAR(128),
   seriesId VARCHAR(128),
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  INDEX (mediaPackageId),
+  INDEX (seriesId)
 ) ENGINE = InnoDB
 """
 
