@@ -1,4 +1,3 @@
-# TODO: Delete duplicate info from oc_job after successfully copying it to the new tables?
 # TODO: Add other indexes
 
 # Upgrade script for MySQL databases
@@ -51,6 +50,16 @@ def execute_query(connection, query):
 
     try:
         cursor.execute(query)
+        connection.commit()
+        print("Query executed successfully")
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+def execute_query_with_data(connection, query, data):
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(query, data)
         connection.commit()
         print("Query executed successfully")
     except Error as e:
@@ -123,9 +132,11 @@ def parse_operation_state(state):
   return states.get(state, None)
 
 ### Connect
+print("Creating connection to database...")
 connection = create_connection(host, user, password, database)
 
 # Cleanup artifacts from previous runs of this script
+print("Clearing out potential artifacts from previous runs...")
 delete_workflow_table = f"DROP TABLE {workflow_table_name}"
 delete_workflow_configuration_table = f"DROP TABLE {workflow_configuration_table_name}"
 delete_workflow_operation_table = f"DROP TABLE {workflow_operation_table_name}"
@@ -136,6 +147,7 @@ execute_query(connection, delete_workflow_operation_table)
 execute_query(connection, delete_workflow_operation_configuration_table)
 
 ## Create new tables
+print("Create tables...")
 create_workflow_table = f"""
 CREATE TABLE IF NOT EXISTS {workflow_table_name} (
   id BIGINT(20),
@@ -214,6 +226,7 @@ execute_query(connection, create_workflow_operation_table)
 execute_query(connection, create_workflow_operation_configuration_table)
 
 ### Get information from database
+print("Collect information from oc_job table...")
 select_payload_from_job_table = """
 SELECT payload FROM oc_job WHERE operation="START_WORKFLOW"
 """
@@ -227,20 +240,19 @@ SELECT date_completed FROM oc_job WHERE operation="START_WORKFLOW"
 payloads = execute_read_query(connection, select_payload_from_job_table)
 date_createds = execute_read_query(connection, select_date_created_from_job_table)
 date_completeds = execute_read_query(connection, select_date_completed_from_job_table)
-#print(payloads)
-#print(date_createds)
-#print(date_completeds)
 
 ### Parse information from XML
+print("Put information from oc_job into the new tables...")
 wf_items = []
 wf_config = []
 wf_operation = []
 wf_operation_config = []
 for (payload, date_created, date_completed) in zip(payloads, date_createds, date_completeds):
-  root = ET.fromstring(payload)
-
-  #for item in root:
-  #  print(item)
+  try:
+    root = ET.fromstring(payload)
+  except:
+    print("Payload was not XML, not parsing. Payload: " + payload)
+    continue
 
   ### oc_workflow
   # Order is important
@@ -397,13 +409,18 @@ for (payload, date_created, date_completed) in zip(payloads, date_createds, date
 
 
 ### Delete workflow information from oc_job
+print("Delete information from oc_job table...")
+### Get information from database
+select_id_from_job_table = """
+SELECT payload FROM oc_job WHERE operation="START_WORKFLOW"
+"""
+ids = execute_read_query(connection, select_id_from_job_table)
 
+### Remove workflow XML from oc_job
+sql_update_job_payload_query = """
+UPDATE oc_job SET payload = %s where id = %s
+"""
+for id in ids:
+  execute_query_with_data(connection, sql_update_job_payload_query, (id, id))
 
-
-# print(wf_items)
-# print("-----")
-# print(wf_config)
-# print("-----")
-# print(wf_operation)
-# print("-----")
-# print(wf_operation_config)
+print("Update complete!")
