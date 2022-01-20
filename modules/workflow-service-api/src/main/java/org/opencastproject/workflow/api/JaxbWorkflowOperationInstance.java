@@ -24,11 +24,8 @@ package org.opencastproject.workflow.api;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -87,7 +84,7 @@ public class JaxbWorkflowOperationInstance {
 
   @XmlElement(name = "configuration")
   @XmlElementWrapper(name = "configurations")
-  protected Set<JaxbWorkflowConfiguration> configurations;
+  protected Map<String, String> configurations;
 
   @XmlElement(name = "holdurl")
   protected String holdStateUserInterfaceUrl;
@@ -156,11 +153,7 @@ public class JaxbWorkflowOperationInstance {
     this.jobId = operation.getId();
     this.state = operation.getState();
     this.description = operation.getDescription();
-    this.configurations = Optional.ofNullable(operation.getConfigurations())
-            .orElseGet(Collections::emptySet)
-            .stream()
-            .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
-            .collect(Collectors.toSet());
+    this.configurations = operation.getConfigurations();
     this.holdStateUserInterfaceUrl = operation.getHoldStateUserInterfaceUrl();
     this.holdActionTitle = operation.getHoldActionTitle();
     this.failWorkflowOnException = operation.isFailWorkflowOnException();
@@ -180,8 +173,7 @@ public class JaxbWorkflowOperationInstance {
 
   public WorkflowOperationInstance toWorkflowOperationInstance() {
     return new WorkflowOperationInstance(template, jobId, state, description,
-            Optional.ofNullable(configurations).orElseGet(Collections::emptySet)
-                    .stream().map(config -> new WorkflowConfigurationForOperationInstance(config.getKey(), config.getValue())).collect(Collectors.toSet()),
+            configurations,
             holdStateUserInterfaceUrl, holdActionTitle, failWorkflowOnException, executeCondition,
             skipCondition, exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
             executionHost, retryStrategy);

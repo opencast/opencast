@@ -22,20 +22,23 @@
 package org.opencastproject.workflow.api;
 
 import java.util.Date;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -68,13 +71,14 @@ public class WorkflowOperationInstance implements Configurable {
   @Column(name = "description")
   protected String description;
 
-  @OneToMany(
-          mappedBy = "operationInstance",
-          cascade = CascadeType.ALL,
-          orphanRemoval = true,
-          fetch = FetchType.LAZY
+  @ElementCollection
+  @CollectionTable(
+          name = "oc_workflow_operation_configuration",
+          joinColumns = @JoinColumn(name = "workflow_operation_id")
   )
-  protected Set<WorkflowConfigurationForOperationInstance> configurations;
+  @MapKeyColumn(name = "key_part", nullable = false)
+  @Column(name = "value_part", nullable = false)
+  protected Map<String, String> configurations;
 
   @Column(name = "holdurl")
   protected String holdStateUserInterfaceUrl;
@@ -158,7 +162,7 @@ public class WorkflowOperationInstance implements Configurable {
     setSkipCondition(def.getSkipCondition());
     setRetryStrategy(def.getRetryStrategy());
     Set<String> defConfigs = def.getConfigurationKeys();
-    this.configurations = new TreeSet<WorkflowConfigurationForOperationInstance>();
+    this.configurations = new TreeMap<String, String>();
     if (defConfigs != null) {
       for (String key : defConfigs) {
         addConfiguration(key, def.getConfiguration(key));
@@ -201,7 +205,7 @@ public class WorkflowOperationInstance implements Configurable {
           Long jobId,
           OperationState state,
           String description,
-          Set<WorkflowConfigurationForOperationInstance> configurations,
+          Map<String, String> configurations,
           String holdStateUserInterfaceUrl,
           String holdActionTitle,
           boolean failWorkflowOnException,
@@ -315,7 +319,7 @@ public class WorkflowOperationInstance implements Configurable {
     this.state = state;
   }
 
-  public Set<WorkflowConfigurationForOperationInstance> getConfigurations() {
+  public Map<String, String> getConfigurations() {
     return configurations;
   }
 
@@ -328,11 +332,12 @@ public class WorkflowOperationInstance implements Configurable {
   public String getConfiguration(String key) {
     if (key == null || configurations == null)
       return null;
-    for (WorkflowConfiguration config : configurations) {
-      if (config.getKey().equals(key))
-        return config.getValue();
-    }
-    return null;
+    return configurations.get(key);
+//    for (WorkflowConfiguration config : configurations) {
+//      if (config.getKey().equals(key))
+//        return config.getValue();
+//    }
+//    return null;
   }
 
   /**
@@ -344,14 +349,15 @@ public class WorkflowOperationInstance implements Configurable {
   public void removeConfiguration(String key) {
     if (key == null || configurations == null)
       return;
-    for (Iterator<WorkflowConfigurationForOperationInstance> configIter = configurations.iterator(); configIter.hasNext();) {
-      WorkflowConfigurationForOperationInstance config = configIter.next();
-      if (config.getKey().equals(key)) {
-        config.setWorkflowOperationInstance(null);
-        configIter.remove();
-        return;
-      }
-    }
+    configurations.remove(key);
+//    for (Iterator<WorkflowConfigurationForOperationInstance> configIter = configurations.iterator(); configIter.hasNext();) {
+//      WorkflowConfigurationForOperationInstance config = configIter.next();
+//      if (config.getKey().equals(key)) {
+//        config.setWorkflowOperationInstance(null);
+//        configIter.remove();
+//        return;
+//      }
+//    }
   }
 
   /**
@@ -364,16 +370,17 @@ public class WorkflowOperationInstance implements Configurable {
     if (key == null)
       return;
     if (configurations == null)
-      configurations = new TreeSet<WorkflowConfigurationForOperationInstance>();
+      configurations = new TreeMap<String, String>();
 
-    for (WorkflowConfigurationForOperationInstance config : configurations) {
-      if (config.getKey().equals(key)) {
-        ((WorkflowConfigurationForOperationInstance) config).setValue(value);
-        return;
-      }
-    }
-    // No configurations were found, so add a new one
-    addConfiguration(key, value);
+    configurations.put(key, value);
+//    for (WorkflowConfigurationForOperationInstance config : configurations) {
+//      if (config.getKey().equals(key)) {
+//        ((WorkflowConfigurationForOperationInstance) config).setValue(value);
+//        return;
+//      }
+//    }
+//    // No configurations were found, so add a new one
+//    addConfiguration(key, value);
   }
 
   /**
@@ -385,17 +392,18 @@ public class WorkflowOperationInstance implements Configurable {
   public Set<String> getConfigurationKeys() {
     Set<String> keys = new TreeSet<String>();
     if (configurations != null && !configurations.isEmpty()) {
-      for (WorkflowConfigurationForOperationInstance config : configurations) {
-        keys.add(config.getKey());
+      for (String key : configurations.keySet()) {
+        keys.add(key);
       }
     }
     return keys;
   }
 
   private void addConfiguration(String key, String value) {
-    WorkflowConfigurationForOperationInstance newConfig = new WorkflowConfigurationForOperationInstance(key, value);
-    newConfig.setWorkflowOperationInstance(this);
-    configurations.add(newConfig);
+    configurations.put(key, value);
+//    WorkflowConfigurationForOperationInstance newConfig = new WorkflowConfigurationForOperationInstance(key, value);
+//    newConfig.setWorkflowOperationInstance(this);
+//    configurations.add(newConfig);
   }
 
   /**

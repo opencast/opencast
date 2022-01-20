@@ -29,8 +29,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -86,7 +86,7 @@ public class JaxbWorkflowInstance {
 
   @XmlElement(name = "configuration")
   @XmlElementWrapper(name = "configurations")
-  protected Set<JaxbWorkflowConfiguration> configurations;
+  protected Map<String, String> configurations;
 
   @XmlElement
   protected String mediaPackageId;
@@ -118,11 +118,7 @@ public class JaxbWorkflowInstance {
             .stream()
             .map(operation -> new JaxbWorkflowOperationInstance(operation))
             .collect(Collectors.toList());
-    this.configurations = Optional.ofNullable(workflow.getConfigurations())
-            .orElseGet(Collections::emptySet)
-            .stream()
-            .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
-            .collect(Collectors.toSet());
+    this.configurations = workflow.getConfigurations();
     this.mediaPackageId = mediaPackage == null ? null : mediaPackage.getIdentifier().toString();
     this.seriesId = mediaPackage == null ? null : mediaPackage.getSeries();
   }
@@ -132,8 +128,7 @@ public class JaxbWorkflowInstance {
             dateCompleted, mediaPackage,
             Optional.ofNullable(operations).orElseGet(Collections::emptyList)
                     .stream().map(operation -> operation.toWorkflowOperationInstance()).collect(Collectors.toList()),
-            Optional.ofNullable(configurations).orElseGet(Collections::emptySet)
-                    .stream().map(config -> new WorkflowConfigurationForWorkflowInstance(config.getKey(), config.getValue())).collect(Collectors.toSet()),
+            configurations,
             mediaPackageId, seriesId);
   }
 
