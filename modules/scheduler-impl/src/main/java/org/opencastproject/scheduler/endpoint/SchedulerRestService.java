@@ -544,7 +544,7 @@ public class SchedulerRestService {
   @Path("calendar.json")
   @RestQuery(
     name = "getCalendarJSON",
-    description = "Returns a calendar in JSON format for specified events",
+    description = "Returns a calendar in JSON format for specified events. This endpoint is not yet stable and might change in the future with no priot notice.",
     returnDescription = "Calendar for events in JSON format",
     restParameters = {
       @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
