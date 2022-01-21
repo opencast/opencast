@@ -4,6 +4,7 @@
 #   $ pip install mysql-connector-python
 # Set vars to point to your database
 # Run on commandline: "python3 workflow_db_upgrade.py"
+# WARNING: THIS SCRIPT DELETES DATA. CREATE A BACKUP BEFORE RUNNING
 
 # Module Imports
 import mysql.connector
