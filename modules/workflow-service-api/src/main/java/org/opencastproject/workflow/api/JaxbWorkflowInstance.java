@@ -29,8 +29,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -86,7 +86,7 @@ public class JaxbWorkflowInstance {
 
   @XmlElement(name = "configuration")
   @XmlElementWrapper(name = "configurations")
-  protected Map<String, String> configurations;
+  protected Set<JaxbWorkflowConfiguration> configurations;
 
   @XmlElement
   protected String mediaPackageId;
@@ -118,7 +118,16 @@ public class JaxbWorkflowInstance {
             .stream()
             .map(operation -> new JaxbWorkflowOperationInstance(operation))
             .collect(Collectors.toList());
-    this.configurations = workflow.getConfigurations();
+    if (workflow.getConfigurations() != null) {
+      this.configurations = Optional.ofNullable(workflow.getConfigurations().entrySet())
+              .orElseGet(Collections::emptySet)
+              .stream()
+              .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
+              .collect(Collectors.toSet());
+    } else {
+      this.configurations = null;
+    }
+
     this.mediaPackageId = mediaPackage == null ? null : mediaPackage.getIdentifier().toString();
     this.seriesId = mediaPackage == null ? null : mediaPackage.getSeries();
   }
@@ -128,7 +137,9 @@ public class JaxbWorkflowInstance {
             dateCompleted, mediaPackage,
             Optional.ofNullable(operations).orElseGet(Collections::emptyList)
                     .stream().map(operation -> operation.toWorkflowOperationInstance()).collect(Collectors.toList()),
-            configurations,
+            Optional.ofNullable(configurations).orElseGet(Collections::emptySet)
+                    .stream()
+                    .collect(Collectors.toMap(JaxbWorkflowConfiguration::getKey, JaxbWorkflowConfiguration::getValue)),
             mediaPackageId, seriesId);
   }
 

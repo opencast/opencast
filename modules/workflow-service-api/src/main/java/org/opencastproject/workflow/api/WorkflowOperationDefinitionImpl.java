@@ -21,10 +21,7 @@
 
 package org.opencastproject.workflow.api;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -32,9 +29,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -64,9 +61,9 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   @XmlAttribute(name = "exception-handler-workflow")
   protected String exceptionHandlingWorkflow;
 
-  @XmlElement(name = "configurations")
-  @XmlJavaTypeAdapter(ConfigurationsXmlAdapter.class)
-  protected Map<String, String> configurations;
+  @XmlElement(name = "configuration")
+  @XmlElementWrapper(name = "configurations")
+  protected Set<JaxbWorkflowConfiguration> configurations;
 
   @XmlAttribute(name = "max-attempts")
   protected int maxAttempts;
@@ -174,70 +171,6 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   }
 
   /**
-   * JAXB properties xml adapter class.
-   */
-  private static class ConfigurationsXmlAdapter extends XmlAdapter<ConfigurationsAdapter, Map<String, String>> {
-
-    @Override
-    public Map<String, String> unmarshal(ConfigurationsAdapter ca) throws Exception {
-      Map<String, String> configurations = new HashMap<>();
-      if (ca != null) {
-        for (WorkflowOperationDefinitionImpl.Configuration c : ca.configurationsList) {
-          configurations.put(c.key, c.value);
-        }
-      }
-      return configurations;
-    }
-
-    @Override
-    public ConfigurationsAdapter marshal(Map<String, String> c) throws Exception {
-      if (c == null || c.size() == 0) return null;
-
-      ConfigurationsAdapter ca = new ConfigurationsAdapter();
-      for (String key : c.keySet()) {
-        ca.configurationsList.add(new WorkflowOperationDefinitionImpl.Configuration(key, c.get(key)));
-      }
-      return ca;
-    }
-  }
-
-  /**
-   * Properties map to list of entries adapter class.
-   */
-  private static class ConfigurationsAdapter {
-    @XmlElement(name = "configuration")
-    private List<Configuration> configurationsList;
-
-    ConfigurationsAdapter() {
-      this(new LinkedList<Configuration>());
-    }
-
-    ConfigurationsAdapter(List<Configuration> configurationsList) {
-      this.configurationsList = configurationsList;
-    }
-  }
-
-  /**
-   * Properties entry adapter class.
-   */
-  private static class Configuration {
-    @XmlAttribute(name = "key")
-    private String key;
-    @XmlValue
-    private String value;
-
-    Configuration() {
-      // Default constructor
-    }
-
-    Configuration(String key, String value) {
-      this.key = key;
-      this.value = value;
-    }
-  }
-
-
-  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getConfiguration(java.lang.String)
@@ -245,12 +178,11 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   public String getConfiguration(String key) {
     if (key == null || configurations == null)
       return null;
-    return configurations.get(key);
-//    for (JaxbWorkflowConfiguration config : configurations) {
-//      if (config.getKey().equals(key))
-//        return config.getValue();
-//    }
-//    return null;
+    for (JaxbWorkflowConfiguration config : configurations) {
+      if (config.getKey().equals(key))
+        return config.getValue();
+    }
+    return null;
   }
 
   /**
@@ -261,14 +193,13 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   public void removeConfiguration(String key) {
     if (key == null || configurations == null)
       return;
-    configurations.remove(key);
-//    for (Iterator<JaxbWorkflowConfiguration> configIter = configurations.iterator(); configIter.hasNext();) {
-//      JaxbWorkflowConfiguration config = configIter.next();
-//      if (config.getKey().equals(key)) {
-//        configIter.remove();
-//        return;
-//      }
-//    }
+    for (Iterator<JaxbWorkflowConfiguration> configIter = configurations.iterator(); configIter.hasNext();) {
+      JaxbWorkflowConfiguration config = configIter.next();
+      if (config.getKey().equals(key)) {
+        configIter.remove();
+        return;
+      }
+    }
   }
 
   /**
@@ -279,15 +210,14 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   public void setConfiguration(String key, String value) {
     if (key == null || configurations == null)
       return;
-    configurations.put(key, value);
-//    for (JaxbWorkflowConfiguration config : configurations) {
-//      if (config.getKey().equals(key)) {
-//        config.setValue(value);
-//        return;
-//      }
-//    }
-//    // No configurations were found, so add a new one
-//    configurations.add(new JaxbWorkflowConfiguration(key, value));
+    for (JaxbWorkflowConfiguration config : configurations) {
+      if (config.getKey().equals(key)) {
+        config.setValue(value);
+        return;
+      }
+    }
+    // No configurations were found, so add a new one
+    configurations.add(new JaxbWorkflowConfiguration(key, value));
   }
 
   /**
@@ -299,8 +229,8 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
   public Set<String> getConfigurationKeys() {
     Set<String> set = new TreeSet<String>();
     if (configurations != null) {
-      for (String key : configurations.keySet()) {
-        set.add(key);
+      for (JaxbWorkflowConfiguration config : configurations) {
+        set.add(config.getKey());
       }
     }
     return set;

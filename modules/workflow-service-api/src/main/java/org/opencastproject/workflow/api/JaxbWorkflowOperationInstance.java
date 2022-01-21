@@ -24,8 +24,11 @@ package org.opencastproject.workflow.api;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.Collections;
 import java.util.Date;
-import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -84,7 +87,7 @@ public class JaxbWorkflowOperationInstance {
 
   @XmlElement(name = "configuration")
   @XmlElementWrapper(name = "configurations")
-  protected Map<String, String> configurations;
+  protected Set<JaxbWorkflowConfiguration> configurations;
 
   @XmlElement(name = "holdurl")
   protected String holdStateUserInterfaceUrl;
@@ -153,7 +156,15 @@ public class JaxbWorkflowOperationInstance {
     this.jobId = operation.getId();
     this.state = operation.getState();
     this.description = operation.getDescription();
-    this.configurations = operation.getConfigurations();
+    if (operation.getConfigurations() != null) {
+      this.configurations = Optional.ofNullable(operation.getConfigurations().entrySet())
+              .orElseGet(Collections::emptySet)
+              .stream()
+              .map(config -> new JaxbWorkflowConfiguration(config.getKey(), config.getValue()))
+              .collect(Collectors.toSet());
+    } else {
+      this.configurations = null;
+    }
     this.holdStateUserInterfaceUrl = operation.getHoldStateUserInterfaceUrl();
     this.holdActionTitle = operation.getHoldActionTitle();
     this.failWorkflowOnException = operation.isFailWorkflowOnException();
@@ -173,7 +184,9 @@ public class JaxbWorkflowOperationInstance {
 
   public WorkflowOperationInstance toWorkflowOperationInstance() {
     return new WorkflowOperationInstance(template, jobId, state, description,
-            configurations,
+            Optional.ofNullable(configurations).orElseGet(Collections::emptySet)
+                    .stream()
+                    .collect(Collectors.toMap(JaxbWorkflowConfiguration::getKey, JaxbWorkflowConfiguration::getValue)),
             holdStateUserInterfaceUrl, holdActionTitle, failWorkflowOnException, executeCondition,
             skipCondition, exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
             executionHost, retryStrategy);

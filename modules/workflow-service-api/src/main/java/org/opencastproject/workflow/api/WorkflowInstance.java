@@ -147,11 +147,6 @@ public class WorkflowInstance {
   @Column(name = "mediaPackage", length = 16777215)
   private String mediaPackage;
 
-//  @Lob
-//  @Basic(fetch = FetchType.LAZY)
-//  @Column(name = "operations", length = 16777215)
-//  protected String operations;
-
   @OneToMany(
           mappedBy = "instance",
           cascade = CascadeType.ALL,
@@ -161,25 +156,13 @@ public class WorkflowInstance {
   @OrderColumn
   protected List<WorkflowOperationInstance> operations;
 
-//  @Lob
-//  @Basic(fetch = FetchType.LAZY)
-//  @Column(name = "configurations", length = 16777215)
-//  protected String configurations;
-
-//  @OneToMany(
-//          mappedBy = "instance",
-//          cascade = CascadeType.ALL,
-//          orphanRemoval = true,
-//          fetch = FetchType.LAZY
-//  )
-//  protected Set<WorkflowConfigurationForWorkflowInstance> configurations;
-
   @ElementCollection
   @CollectionTable(
           name = "oc_workflow_configuration",
           joinColumns = @JoinColumn(name = "workflow_id")
   )
   @MapKeyColumn(name = "key_part", nullable = false)
+  @Lob
   @Column(name = "value_part", nullable = false)
   protected Map<String, String> configurations;
 
@@ -531,11 +514,6 @@ public class WorkflowInstance {
     if (key == null || configurations == null)
       return null;
     return configurations.get(key);
-//    for (WorkflowConfiguration config : configurations) {
-//      if (config.getKey().equals(key))
-//        return config.getValue();
-//    }
-//    return null;
   }
 
   /**
@@ -562,14 +540,6 @@ public class WorkflowInstance {
     if (key == null || configurations == null)
       return;
     configurations.remove(key);
-//    for (Iterator<WorkflowConfigurationForWorkflowInstance> configIter = configurations.iterator(); configIter.hasNext();) {
-//      WorkflowConfigurationForWorkflowInstance config = configIter.next();
-//      if (config.getKey().equals(key)) {
-//        config.setWorkflowInstance(null);
-//        configIter.remove();
-//        return;
-//      }
-//    }
   }
 
   /**
@@ -585,22 +555,10 @@ public class WorkflowInstance {
 
     // Adjust already existing values
     configurations.put(key, value);
-//    for (WorkflowConfigurationForWorkflowInstance config : configurations) {
-//      if (config.getKey().equals(key)) {
-//        ((WorkflowConfigurationForWorkflowInstance) config).setValue(value);
-//        return;
-//      }
-//    }
-//
-//    // No configurations were found, so add a new one
-//    addConfiguration(key , value);
   }
 
   private void addConfiguration(String key, String value) {
     configurations.put(key, value);
-//    WorkflowConfigurationForWorkflowInstance newConfig = new WorkflowConfigurationForWorkflowInstance(key, value);
-//    newConfig.setWorkflowInstance(this);
-//    configurations.add(newConfig);
   }
 
   @Override

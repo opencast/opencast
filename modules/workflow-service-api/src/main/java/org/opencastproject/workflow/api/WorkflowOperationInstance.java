@@ -37,6 +37,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
@@ -77,6 +78,7 @@ public class WorkflowOperationInstance implements Configurable {
           joinColumns = @JoinColumn(name = "workflow_operation_id")
   )
   @MapKeyColumn(name = "key_part", nullable = false)
+  @Lob
   @Column(name = "value_part", nullable = false)
   protected Map<String, String> configurations;
 
@@ -166,7 +168,6 @@ public class WorkflowOperationInstance implements Configurable {
     if (defConfigs != null) {
       for (String key : defConfigs) {
         addConfiguration(key, def.getConfiguration(key));
-//        configurations.add(new WorkflowConfigurationForOperationInstance(key, def.getConfiguration(key)));
       }
     }
 
@@ -333,11 +334,6 @@ public class WorkflowOperationInstance implements Configurable {
     if (key == null || configurations == null)
       return null;
     return configurations.get(key);
-//    for (WorkflowConfiguration config : configurations) {
-//      if (config.getKey().equals(key))
-//        return config.getValue();
-//    }
-//    return null;
   }
 
   /**
@@ -350,14 +346,6 @@ public class WorkflowOperationInstance implements Configurable {
     if (key == null || configurations == null)
       return;
     configurations.remove(key);
-//    for (Iterator<WorkflowConfigurationForOperationInstance> configIter = configurations.iterator(); configIter.hasNext();) {
-//      WorkflowConfigurationForOperationInstance config = configIter.next();
-//      if (config.getKey().equals(key)) {
-//        config.setWorkflowOperationInstance(null);
-//        configIter.remove();
-//        return;
-//      }
-//    }
   }
 
   /**
@@ -373,14 +361,6 @@ public class WorkflowOperationInstance implements Configurable {
       configurations = new TreeMap<String, String>();
 
     configurations.put(key, value);
-//    for (WorkflowConfigurationForOperationInstance config : configurations) {
-//      if (config.getKey().equals(key)) {
-//        ((WorkflowConfigurationForOperationInstance) config).setValue(value);
-//        return;
-//      }
-//    }
-//    // No configurations were found, so add a new one
-//    addConfiguration(key, value);
   }
 
   /**
@@ -401,9 +381,6 @@ public class WorkflowOperationInstance implements Configurable {
 
   private void addConfiguration(String key, String value) {
     configurations.put(key, value);
-//    WorkflowConfigurationForOperationInstance newConfig = new WorkflowConfigurationForOperationInstance(key, value);
-//    newConfig.setWorkflowOperationInstance(this);
-//    configurations.add(newConfig);
   }
 
   /**
