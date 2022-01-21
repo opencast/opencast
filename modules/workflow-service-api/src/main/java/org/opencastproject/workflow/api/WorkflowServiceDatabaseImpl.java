@@ -24,7 +24,6 @@ package org.opencastproject.workflow.api;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -194,27 +193,18 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see WorkflowServiceDatabase#countWorkflows(WorkflowInstance.WorkflowState state, String operation)
+   * @see WorkflowServiceDatabase#countWorkflows(WorkflowInstance.WorkflowState state)
    */
-  public int countWorkflows(WorkflowInstance.WorkflowState state, String operation) throws WorkflowServiceDatabaseException {
+  public int countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowServiceDatabaseException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
 
       Query query = em.createNamedQuery("Workflow.getCount");
-      if (StringUtils.isNotBlank(operation)) {
-        query = em.createNamedQuery("Workflow.getCountOperationState");
-      }
 
       String orgId = securityService.getOrganization().getId();
       query.setParameter("organizationId", orgId);
       query.setParameter("state", state);
-      if (StringUtils.isNotBlank(operation)) {
-        query.setParameter("operation", operation);
-        // TODO: Fix this. Is not actually looking for "running" operation, but for "current" operation. Way more difficult
-        // Might need to define a "currentOperation" variable in WorkflowInstance.java
-        query.setParameter("operationStateRunning", WorkflowOperationInstance.OperationState.RUNNING);
-      }
 
       Long total = (Long) query.getSingleResult();
       return total.intValue();

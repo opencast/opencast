@@ -178,18 +178,16 @@ public interface WorkflowService {
   long countWorkflowInstances() throws WorkflowDatabaseException;
 
   /**
-   * Gets the total number of workflows that have been created to date and that match all of the specified criterias
-   * such as the workflow state or the current operation, both of which might be <code>null</code>.
+   * Gets the total number of workflows that have been created to date and that match the workflow state
+   * which might be <code>null</code>.
    *
    * @param state
    *          the workflow state
-   * @param operation
-   *          the current operation identifier
    * @return The number of workflow instances, regardless of their state
    * @throws WorkflowDatabaseException
    *           if there is a problem accessing the workflow instances in persistence
    */
-  long countWorkflowInstances(WorkflowState state, String operation) throws WorkflowDatabaseException;
+  long countWorkflowInstances(WorkflowState state) throws WorkflowDatabaseException;
 
   /**
    * Stops a running workflow instance.

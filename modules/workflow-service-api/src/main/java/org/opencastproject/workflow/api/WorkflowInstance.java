@@ -98,9 +98,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
         @NamedQuery(
                 name = "Workflow.getCountOperationState",
                 query = "select COUNT(w) from WorkflowInstance w where w.organizationId=:organizationId "
-                        + "and (:state is null or w.state = :state) "
-                        + "and ((SELECT COUNT(o) from w.operations o where "
-                        + "o.state = :operationStateRunning and o.template = :operation) > 0)"
+                        + "and (:state is null or w.state = :state)"
         ),
         @NamedQuery(
                 name = "Workflow.toCleanup",

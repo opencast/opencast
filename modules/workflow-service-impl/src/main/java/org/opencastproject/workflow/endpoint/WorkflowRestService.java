@@ -207,13 +207,13 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("/count")
-  @RestQuery(name = "count", description = "Returns the number of workflow instances in a specific state and operation", returnDescription = "Returns the number of workflow instances in a specific state and operation", restParameters = {
-          @RestParameter(name = "state", isRequired = false, description = "The workflow state", type = STRING),
-          @RestParameter(name = "operation", isRequired = false, description = "The current operation", type = STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The number of workflow instances.") })
+  @RestQuery(name = "count", description = "Returns the number of workflow instances in a specific state", returnDescription = "Returns the number of workflow instances in a specific state", restParameters = {
+          @RestParameter(name = "state", isRequired = false, description = "The workflow state", type = STRING)},
+          responses = { @RestResponse(responseCode = SC_OK, description = "The number of workflow instances.") })
   public Response getCount(@QueryParam("state") WorkflowInstance.WorkflowState state,
           @QueryParam("operation") String operation) {
     try {
-      Long count = service.countWorkflowInstances(state, operation);
+      Long count = service.countWorkflowInstances(state);
       return Response.ok(count).build();
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(e);

@@ -340,22 +340,19 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public long countWorkflowInstances() throws WorkflowDatabaseException {
-    return countWorkflowInstances(null, null);
+    return countWorkflowInstances(null);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState,
-   *      java.lang.String)
+   * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState)
    */
   @Override
-  public long countWorkflowInstances(WorkflowState state, String operation) throws WorkflowDatabaseException {
+  public long countWorkflowInstances(WorkflowState state) throws WorkflowDatabaseException {
     List<NameValuePair> queryStringParams = new ArrayList<>();
     if (state != null)
       queryStringParams.add(new BasicNameValuePair("state", state.toString()));
-    if (operation != null)
-      queryStringParams.add(new BasicNameValuePair("operation", operation));
 
     StringBuilder url = new StringBuilder("/count");
     if (queryStringParams.size() > 0) {

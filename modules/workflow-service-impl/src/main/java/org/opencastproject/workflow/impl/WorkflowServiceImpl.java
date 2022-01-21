@@ -1278,19 +1278,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public long countWorkflowInstances() throws WorkflowDatabaseException {
-    return countWorkflowInstances(null, null);
+    return countWorkflowInstances(null);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState,
-   *      java.lang.String)
+   * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState)
    */
   @Override
-  public long countWorkflowInstances(WorkflowState state, String operation) throws WorkflowDatabaseException {
+  public long countWorkflowInstances(WorkflowState state) throws WorkflowDatabaseException {
     try {
-      return persistence.countWorkflows(state, operation);
+      return persistence.countWorkflows(state);
     } catch (WorkflowServiceDatabaseException e) {
       throw new WorkflowDatabaseException(e);
     }

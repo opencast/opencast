@@ -86,11 +86,10 @@ public interface WorkflowServiceDatabase {
    * Gets the amount of workflow instances.
    *
    * @param state Only counts workflows currently in the given state
-   * @param operation Only counts workflows currently in the given operation
    * @return Amount of workflow instances
    * @throws WorkflowServiceDatabaseException
    */
-  int countWorkflows(WorkflowInstance.WorkflowState state, String operation) throws WorkflowServiceDatabaseException;
+  int countWorkflows(WorkflowInstance.WorkflowState state) throws WorkflowServiceDatabaseException;
 
   /**
    * Gets all workflow instances for a mediapackage.

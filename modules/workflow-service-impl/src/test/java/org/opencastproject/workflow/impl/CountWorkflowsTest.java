@@ -271,13 +271,8 @@ public class CountWorkflowsTest {
 
     // Test for two paused workflows in "op1"
     assertEquals(2, service.countWorkflowInstances());
-    assertEquals(2, service.countWorkflowInstances(WorkflowState.PAUSED, null));
-    // TODO: Fix this test. See WorkflowServiceDatabaseImpl.countWorkflows(WorkflowInstance.WorkflowState state, String operation)
-//    assertEquals(2, service.countWorkflowInstances(null, "op1"));
-//    assertEquals(2, service.countWorkflowInstances(WorkflowState.PAUSED, "op1"));
-    assertEquals(0, service.countWorkflowInstances(WorkflowState.SUCCEEDED, null));
-    assertEquals(0, service.countWorkflowInstances(null, "op2"));
-    assertEquals(0, service.countWorkflowInstances(WorkflowState.SUCCEEDED, "op1"));
+    assertEquals(2, service.countWorkflowInstances(WorkflowState.PAUSED));
+    assertEquals(0, service.countWorkflowInstances(WorkflowState.SUCCEEDED));
 
     // Continue one of the two workflows, waiting for success
     listener = new WorkflowStateListener(WorkflowState.SUCCEEDED);
@@ -290,10 +285,8 @@ public class CountWorkflowsTest {
 
     // Make sure one workflow is still on hold, the other is finished.
     assertEquals(2, service.countWorkflowInstances());
-    assertEquals(1, service.countWorkflowInstances(WorkflowState.PAUSED, null));
-    // TODO: See above
-//    assertEquals(1, service.countWorkflowInstances(WorkflowState.PAUSED, "op1"));
-    assertEquals(1, service.countWorkflowInstances(WorkflowState.SUCCEEDED, null));
+    assertEquals(1, service.countWorkflowInstances(WorkflowState.PAUSED));
+    assertEquals(1, service.countWorkflowInstances(WorkflowState.SUCCEEDED));
   }
 
   /**
