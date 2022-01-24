@@ -31,7 +31,7 @@ export const fetchEvents = () => async (dispatch, getState) => {
         let params = getURLParams(state);
 
         //admin-ng/event/events.json?filter={filter}&sort={sort}&limit=0&offset=0
-        let data = await axios.get('admin-ng/event/events.json', { params: params });
+        let data = await axios.get('/admin-ng/event/events.json', { params: params });
 
         const response =  await data.data;
 
@@ -70,7 +70,7 @@ export const fetchEventMetadata = () => async dispatch => {
     try {
         dispatch(loadEventMetadataInProgress());
 
-        let data = await axios.get('admin-ng/event/new/metadata');
+        let data = await axios.get('/admin-ng/event/new/metadata');
         const response = await data.data;
 
         const metadata = transformMetadataCollection(response[0]);

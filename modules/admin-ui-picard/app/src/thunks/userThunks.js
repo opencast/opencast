@@ -14,7 +14,7 @@ export const fetchUsers = () => async (dispatch, getState) => {
         let params = getURLParams(state);
 
         // /users.json?limit=0&offset=0&filter={filter}&sort={sort}
-        let data = await axios.get('admin-ng/users/users.json', { params: params });
+        let data = await axios.get('/admin-ng/users/users.json', { params: params });
 
         const users = await data.data;
         dispatch(loadUsersSuccess(users));

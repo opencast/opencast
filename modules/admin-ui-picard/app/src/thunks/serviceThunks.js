@@ -12,7 +12,7 @@ export const fetchServices = () => async (dispatch, getState) => {
         let params = getURLParams(state);
 
         // /services.json?limit=0&offset=0&filter={filter}&sort={sort}
-        let data = await axios.get('admin-ng/services/services.json', { params: params });
+        let data = await axios.get('/admin-ng/services/services.json', { params: params });
 
         const services = await data.data;
         dispatch(loadServicesSuccess(services));
@@ -28,7 +28,7 @@ export const restartService = async (host, serviceType) => {
     data.append("host", host);
     data.append("serviceType", serviceType);
 
-    axios.post('services/sanitize', data)
+    axios.post('/services/sanitize', data)
         .then(response => {
             console.log(response);
         }).catch(response => {

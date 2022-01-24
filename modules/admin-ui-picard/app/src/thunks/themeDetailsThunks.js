@@ -30,7 +30,7 @@ export const fetchUsage = id => async dispatch => {
     try {
         dispatch(loadThemeDetailsInProgress());
 
-        let data = await axios.get(`admin-ng/themes/${id}/usage.json`);
+        let data = await axios.get(`/admin-ng/themes/${id}/usage.json`);
 
         const themeUsage = await data.data;
 

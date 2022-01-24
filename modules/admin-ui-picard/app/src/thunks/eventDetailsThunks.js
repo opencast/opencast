@@ -53,7 +53,7 @@ export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
     data.append("acl", JSON.stringify(policies));
     data.append("override", true);
 
-    return axios.post(`admin-ng/event/${eventId}/access`, data.toString(), headers)
+    return axios.post(`/admin-ng/event/${eventId}/access`, data.toString(), headers)
         .then(response => {
             logger.info(response);
             dispatch(addNotification('info', 'SAVED_ACL_RULES', -1, null, NOTIFICATION_CONTEXT));
@@ -70,7 +70,7 @@ export const fetchAccessPolicies = (eventId) => async (dispatch) => {
     try {
         dispatch(loadEventPoliciesInProgress());
 
-        const policyData = await axios.get(`admin-ng/event/${eventId}/access.json`);
+        const policyData = await axios.get(`/admin-ng/event/${eventId}/access.json`);
         let accessPolicies = await policyData.data;
 
         let policies = [];
@@ -102,7 +102,7 @@ export const fetchAccessPolicies = (eventId) => async (dispatch) => {
 
 export const fetchHasActiveTransactions = (eventId) => async () => {
     try {
-        const transactionsData = await axios.get(`admin-ng/event/${eventId}/hasActiveTransaction`);
+        const transactionsData = await axios.get(`/admin-ng/event/${eventId}/hasActiveTransaction`);
         const hasActiveTransactions = await transactionsData.data;
         return hasActiveTransactions;
     } catch (e) {
@@ -117,10 +117,10 @@ export const fetchComments = (eventId) => async (dispatch) => {
     try {
         dispatch(loadEventCommentsInProgress());
 
-        const commentsData = await axios.get(`admin-ng/event/${eventId}/comments`);
+        const commentsData = await axios.get(`/admin-ng/event/${eventId}/comments`);
         const comments = await commentsData.data;
 
-        const commentReasonsData = await axios.get(`admin-ng/resources/components.json`);
+        const commentReasonsData = await axios.get(`/admin-ng/resources/components.json`);
         const commentReasons = (await commentReasonsData.data).eventCommentReasons;
 
         dispatch(loadEventCommentsSuccess(comments, commentReasons));
@@ -140,7 +140,7 @@ export const saveComment = (eventId, commentText, commentReason) => async (dispa
         data.append("text", commentText);
         data.append("reason", commentReason);
 
-        const commentSaved = await axios.post(`admin-ng/event/${eventId}/comment`,
+        const commentSaved = await axios.post(`/admin-ng/event/${eventId}/comment`,
             data.toString(), headers );
         await commentSaved.data;
 
@@ -155,7 +155,7 @@ export const saveComment = (eventId, commentText, commentReason) => async (dispa
 
 export const deleteComment = (eventId, commentId) => async () => {
     try {
-        const commentDeleted = await axios.delete(`admin-ng/event/${eventId}/comment/${commentId}`);
+        const commentDeleted = await axios.delete(`/admin-ng/event/${eventId}/comment/${commentId}`);
         await commentDeleted.data;
         return true;
     } catch (e) {
@@ -174,7 +174,7 @@ export const saveCommentReply = (eventId, commentId, replyText, commentResolved)
         data.append("text", replyText);
         data.append("resolved", commentResolved);
 
-        const commentReply = await axios.post(`admin-ng/event/${eventId}/comment/${commentId}/reply`,
+        const commentReply = await axios.post(`/admin-ng/event/${eventId}/comment/${commentId}/reply`,
             data.toString(), headers );
 
         await commentReply.data;
@@ -190,7 +190,7 @@ export const saveCommentReply = (eventId, commentId, replyText, commentResolved)
 
 export const deleteCommentReply = (eventId, commentId, replyId) => async () => {
     try {
-        const commentReplyDeleted = await axios.delete(`admin-ng/event/${eventId}/comment/${commentId}/${replyId}`);
+        const commentReplyDeleted = await axios.delete(`/admin-ng/event/${eventId}/comment/${commentId}/${replyId}`);
         await commentReplyDeleted.data;
 
         return true;
@@ -210,7 +210,7 @@ export const fetchWorkflows = (eventId) => async (dispatch, getState) => {
         // todo: show notification if there are active transactions
         // dispatch(addNotification('warning', 'ACTIVE_TRANSACTION', -1, null, NOTIFICATION_CONTEXT));
 
-        const data = await axios.get(`admin-ng/event/${eventId}/workflows.json`);
+        const data = await axios.get(`/admin-ng/event/${eventId}/workflows.json`);
         const workflowsData = await data.data;
 
         if(!!workflowsData.results){
@@ -291,7 +291,7 @@ export const performWorkflowAction = (eventId, workflowId, action, close) => asy
         "wfId": workflowId
     };
 
-    axios.put(`admin-ng/event/${eventId}/workflows/${workflowId}/action/${action}`, data, headers)
+    axios.put(`/admin-ng/event/${eventId}/workflows/${workflowId}/action/${action}`, data, headers)
         .then( response => {
             dispatch(addNotification('success', 'EVENTS_PROCESSING_ACTION_' + action, -1, null, NOTIFICATION_CONTEXT));
             close();
@@ -332,12 +332,12 @@ export const fetchEventPublications = eventId => async dispatch => {
     try {
         dispatch(loadEventPublicationsInProgress());
 
-        let data = await axios.get(`admin-ng/event/${eventId}/publications.json`);
+        let data = await axios.get(`/admin-ng/event/${eventId}/publications.json`);
 
         let publications = (await data.data);
 
         // get information about possible publication channels
-        data = await axios.get('admin-ng/resources/PUBLICATION.CHANNELS.json');
+        data = await axios.get('/admin-ng/resources/PUBLICATION.CHANNELS.json');
 
         let publicationChannels = await data.data;
 

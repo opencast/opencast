@@ -2,6 +2,7 @@
   "name": "admin-ui-picard",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/admin-ui",
   "dependencies": {
     "@date-io/date-fns": "^1.3.13",
     "@material-ui/core": "^4.11.1",

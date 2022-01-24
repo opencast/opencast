@@ -10,7 +10,7 @@ export const fetchUserDetails = username => async dispatch => {
     try {
         dispatch(loadUserDetailsInProgress());
 
-        let data = await axios.get(`admin-ng/users/${username}.json`);
+        let data = await axios.get(`/admin-ng/users/${username}.json`);
 
         const response = await (data.data);
 

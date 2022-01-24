@@ -28,7 +28,7 @@ export const fetchSeries = () => async (dispatch, getState) => {
        let params = getURLParams(state);
 
        // /series.json?sortorganizer={sortorganizer}&sort={sort}&filter={filter}&offset=0&limit=100
-       let data = await axios.get('admin-ng/series/series.json', { params: params });
+       let data = await axios.get('/admin-ng/series/series.json', { params: params });
 
 
        const series = await data.data;
@@ -45,7 +45,7 @@ export const fetchSeriesMetadata = () => async dispatch => {
     try {
        dispatch(loadSeriesMetadataInProgress());
 
-       let data = await axios.get('admin-ng/series/new/metadata');
+       let data = await axios.get('/admin-ng/series/new/metadata');
        const response = await data.data;
 
         const metadata = transformMetadataCollection(response[0]);

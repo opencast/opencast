@@ -24,7 +24,7 @@ export const fetchSeriesDetailsMetadata = id => async dispatch => {
         dispatch(loadSeriesDetailsInProgress());
 
         // fetch metadata
-        let data = await axios.get(`admin-ng/series/${id}/metadata.json`);
+        let data = await axios.get(`/admin-ng/series/${id}/metadata.json`);
 
         const metadataResponse = await data.data;
 
@@ -43,7 +43,7 @@ export const fetchSeriesDetailsAcls = id => async dispatch => {
         dispatch(loadSeriesDetailsInProgress());
 
         // fetch acl
-        let data = await axios.get(`admin-ng/series/${id}/access.json`);
+        let data = await axios.get(`/admin-ng/series/${id}/access.json`);
 
         const response = await data.data;
 
@@ -80,7 +80,7 @@ export const fetchSeriesDetailsFeeds = id => async dispatch => {
         dispatch(loadSeriesDetailsInProgress());
 
         // fetch feeds
-        let data = await axios.get('admin-ng/feeds/feeds');
+        let data = await axios.get('/admin-ng/feeds/feeds');
 
         const feedsResponse = await data.data;
 
@@ -126,7 +126,7 @@ export const fetchSeriesDetailsTheme = id => async dispatch => {
     try {
         dispatch(loadSeriesDetailsInProgress());
 
-        let data = await axios.get(`admin-ng/series/${id}/theme.json`);
+        let data = await axios.get(`/admin-ng/series/${id}/theme.json`);
 
         const themeResponse = await data.data;
 
@@ -211,7 +211,7 @@ export const updateSeriesAccess = (id, policies) => async (dispatch) => {
     data.append("acl", JSON.stringify(policies));
     data.append("override", true);
 
-    return axios.post(`admin-ng/series/${id}/access`, data, {
+    return axios.post(`/admin-ng/series/${id}/access`, data, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -236,7 +236,7 @@ export const updateSeriesTheme = (id, values) => async (dispatch, getState) => {
     let data = new URLSearchParams();
     data.append("themeId", themeId);
 
-    axios.put(`admin-ng/series/${id}/theme`, data)
+    axios.put(`/admin-ng/series/${id}/theme`, data)
         .then(response => {
             let themeResponse = response.data;
 

@@ -14,7 +14,7 @@ export const fetchAcls = () => async (dispatch, getState) => {
         let params = getURLParams(state);
 
         // /acls.json?limit=0&offset=0&filter={filter}&sort={sort}
-        let data = await axios.get('admin-ng/acl/acls.json', {params: params});
+        let data = await axios.get('/admin-ng/acl/acls.json', {params: params});
 
         const acls = await data.data;
         dispatch(loadAclsSuccess(acls));
