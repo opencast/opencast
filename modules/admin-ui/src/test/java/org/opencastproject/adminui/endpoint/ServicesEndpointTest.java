@@ -23,7 +23,6 @@ package org.opencastproject.adminui.endpoint;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.adminui.util.ServiceEndpointTestsUtil;
@@ -52,7 +51,7 @@ public class ServicesEndpointTest {
   private static final String TEST_DATA_JSON = "/services.json";
 
   /** REST endpoint test environment. */
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestServicesEndpoint.class);
+  private static final RestServiceTestEnv rt = testEnvForClasses(TestServicesEndpoint.class);
 
   /** Json parser. */
   private JSONParser parser;

@@ -529,6 +529,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(indexService.getEvent("updateFailure", searchIndex)).andReturn(Opt.some(event3)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(event)).andReturn(mp1).anyTimes();
     EasyMock.expect(indexService.getEventCatalogUIAdapters()).andReturn(eventCatalogAdapterList).anyTimes();
+    EasyMock.expect(indexService.getExtendedEventCatalogUIAdapters()).andReturn(Collections.emptyList()).anyTimes();
     EasyMock.expect(indexService.getCommonEventCatalogUIAdapter()).andReturn(eventCatalogAdapterList.get(0)).anyTimes();
     EasyMock.expect(indexService.getEventSource(event)).andReturn(Source.SCHEDULE).anyTimes();
     EasyMock.expect(indexService.getEventSource(event2)).andReturn(Source.ARCHIVE).anyTimes();

@@ -751,10 +751,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     }
     MediaPackage publishedMp = merge(filteredMp, removeMatchingNonExistantElements(filteredMp,
             (MediaPackage) result.getItems().get(0).getMediaPackage().clone(), parsedFlavors, tags));
-    // Does the media package have a title and track?
-    if (!MediaPackageSupport.isPublishable(publishedMp)) {
-      throw new PublicationException("Media package does not meet criteria for publication");
-    }
     // Publish the media package to OAI-PMH
     try {
       logger.debug("Updating metadata of media package {} in {}",
@@ -935,7 +931,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       // Is the element referencing anything?
       MediaPackageReference reference = element.getReference();
       if (reference != null) {
-        Map<String, String> referenceProperties = reference.getProperties();
         MediaPackageElement referencedElement = mediaPackage.getElementByReference(reference);
 
         // if we are distributing the referenced element, everything is fine. Otherwise...
@@ -956,13 +951,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
           // Done. Let's cut the path but keep references to the mediapackage itself
           if (reference != null && reference.getType().equals(MediaPackageReference.TYPE_MEDIAPACKAGE)) {
             element.setReference(reference);
-          } else if (reference != null && (referenceProperties == null || referenceProperties.size() == 0)) {
-            element.clearReference();
           } else {
-            // Ok, there is more to that reference than just pointing at an element. Let's keep the original,
-            // you never know.
-            referencedElement.setURI(null);
-            referencedElement.setChecksum(null);
+            element.clearReference();
           }
         }
       }

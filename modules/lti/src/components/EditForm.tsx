@@ -6,7 +6,7 @@ import {
     EventMetadataCollection,
     collectionToPairs
 } from "../OpencastRest";
-import Select, { ValueType } from "react-select";
+import Select, { OnChangeValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import i18n, { TFunction } from "i18next";
 
@@ -110,7 +110,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
             isClearable={true}
             id={field.id}
             value={(field.value as string[]).map((e) => ({ value: e, label: e }))}
-            onChange={(value: ValueType<OptionType, true>) =>
+            onChange={(value: OnChangeValue<OptionType, true>) =>
                 valueChange(field.id, value.map(v => v.value))}
             />;
     }
@@ -119,7 +119,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
         const currentValue = options.find((o: OptionType) => o.value === field.value);
         return <Select
             id={field.id}
-            onChange={(value: ValueType<OptionType, false>) =>
+            onChange={(value: OnChangeValue<OptionType, false>) =>
                 valueChange(field.id, value === null || Array.isArray(value) ? "" : value.value)}
             value={currentValue}
             options={options}
@@ -197,7 +197,6 @@ class TranslatedEditForm extends React.Component<EditFormProps> {
                                 onChange={(value) => this.props.onCaptionLanguageChange((value as OptionType).value)}
                                 options={languageOptions}
                                 placeholder={this.props.t("LTI.SELECT_OPTION")}
-                                required
                             />
                         </div>
                     }

@@ -26,6 +26,7 @@ The following table contains the workflow operations that are available in an ou
 |add-catalog         |Add a catalog to the media package                             |[Documentation](add-catalog-woh.md)|
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
+|analyze-mediapackage |Analyze media package                                         |[Documentation](analyze-mediapackage-woh.md)|
 |animate             |Create animated video sequence                                 |[Documentation](animate-woh.md)|
 |amberscript-start-transcription|Start AmberScript Transcription                     |[Documentation](amberscript-start-transcription-woh.md)|
 |amberscript-attach-transcription|Attach AmberScript Transcription                   |[Documentation](amberscript-attach-transcription-woh.md)|
@@ -92,10 +93,12 @@ The following table contains the workflow operations that are available in an ou
 |segment-video       |Extracting segments from presentation                          |[Documentation](segmentvideo-woh.md)|
 |segmentpreviews     |Extract segment images from a video using FFmpeg               |[Documentation](segmentpreviews-woh.md)|
 |select-streams      |Select streams for further processing                          |[Documentation](select-streams-woh.md)|
+|select-version      |Select a version of the media package to run the current workflow with|[Documentation](select-version-woh.md)|
 |send-email          |Sends email notifications at any part of a workflow            |[Documentation](send-email-woh.md)|
 |series              |Apply series to the mediapackage                               |[Documentation](series-woh.md)|
 |silence             |Silence detection on audio of the mediapackage                 |[Documentation](silence-woh.md)|
 |snapshot            |Archive the current state of the mediapackage                  |[Documentation](snapshot-woh.md)|
+|speech-to-text      |Create subtitles for video and audio sources                   |[Documentation](speech-to-text-woh.md)|
 |start-watson-transcription|Starts automated transcription provided by IBM Watson    |[Documentation](start-watson-transcription-woh.md)|
 |start-workflow      |Start a new workflow for given media package ID                |[Documentation](start-workflow-woh.md)|
 |statistics-writer   |Log statistical data about the video                           |[Documentation](statistics-writer.md)|

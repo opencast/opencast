@@ -83,7 +83,7 @@ import javax.xml.transform.TransformerException;
  * <li>xsi - http://www.w3.org/2001/XMLSchema-instance
  * </ul>
  * <p>
- * <h3>Limitations</h3>
+ * <h2>Limitations</h2>
  * XMLCatalog supports only <em>one</em> prefix binding per namespace name, so you cannot create documents like the
  * following using XMLCatalog:
  *

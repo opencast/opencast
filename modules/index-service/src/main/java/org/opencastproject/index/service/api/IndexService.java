@@ -289,6 +289,12 @@ public interface IndexService {
   List<EventCatalogUIAdapter> getEventCatalogUIAdapters();
 
   /**
+   * @return A {@link List} of extended {@link EventCatalogUIAdapter} that provide the metadata to the front end.
+   * Does not contain the common {@link EventCatalogUIAdapter}.
+   */
+  List<EventCatalogUIAdapter> getExtendedEventCatalogUIAdapters();
+
+  /**
    * @return the common {@link EventCatalogUIAdapter}
    */
   EventCatalogUIAdapter getCommonEventCatalogUIAdapter();

@@ -382,7 +382,6 @@ public class IndexServiceImplTest {
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setAuthorizationService(setupAuthorizationService(mediapackage));
     indexServiceImpl.setIngestService(ingestService);
-    indexServiceImpl.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexServiceImpl.addCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexServiceImpl.setUserDirectoryService(noUsersUserDirectoryService);
     indexServiceImpl.setSecurityService(securityService);
@@ -469,7 +468,6 @@ public class IndexServiceImplTest {
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setAuthorizationService(setupAuthorizationService(mediapackage));
     indexServiceImpl.setIngestService(ingestService);
-    indexServiceImpl.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexServiceImpl.addCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexServiceImpl.setUserDirectoryService(noUsersUserDirectoryService);
     indexServiceImpl.setSecurityService(securityService);
@@ -562,7 +560,6 @@ public class IndexServiceImplTest {
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setAuthorizationService(setupAuthorizationService(mediapackage));
     indexServiceImpl.setIngestService(ingestService);
-    indexServiceImpl.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexServiceImpl.addCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexServiceImpl.setSecurityService(securityService);
     indexServiceImpl.setUserDirectoryService(noUsersUserDirectoryService);
@@ -720,7 +717,6 @@ public class IndexServiceImplTest {
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setAuthorizationService(setupAuthorizationService(mediapackage));
     indexServiceImpl.setIngestService(setupIngestService(mediapackage, Capture.<InputStream> newInstance()));
-    indexServiceImpl.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexServiceImpl.addCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexServiceImpl.setSecurityService(securityService);
     indexServiceImpl.setUserDirectoryService(noUsersUserDirectoryService);
@@ -884,7 +880,6 @@ public class IndexServiceImplTest {
     IndexServiceImpl indexService = new IndexServiceImpl();
     indexService.setSecurityService(securityService);
     indexService.setSchedulerService(schedulerService);
-    indexService.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexService.addCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexService.setSeriesService(seriesService);
     indexService.setWorkspace(workspace);
@@ -1055,7 +1050,7 @@ public class IndexServiceImplTest {
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter();
     commonEventCatalogUIAdapter.updated(properties);
-    indexServiceImpl.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
+    indexServiceImpl.addCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexServiceImpl.setUserDirectoryService(userDirectoryService);
     indexServiceImpl.setSecurityService(securityService);
 

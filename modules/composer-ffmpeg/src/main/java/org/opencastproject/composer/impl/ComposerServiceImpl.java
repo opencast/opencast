@@ -490,41 +490,66 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // List of encoded tracks
     LinkedList<Track> encodedTracks = new LinkedList<>();
     // Do the work
-    int i = 0;
     Map<String, File> source = new HashMap<>();
     source.put("video", mediaFile);
     List<File> outputFiles = encoderEngine.process(source, profile, properties);
+    var returnURLs = new ArrayList<URI>();
     activeEncoder.remove(encoderEngine);
-    for (File encodingOutput: outputFiles) {
-      // Put the file in the workspace
-      URI returnURL;
-      final String targetTrackId = IdImpl.fromUUID().toString();
-
-      try (InputStream in = new FileInputStream(encodingOutput)) {
-        returnURL = workspace.putInCollection(COLLECTION,
-                job.getId() + "-" + i + "." + FilenameUtils.getExtension(encodingOutput.getAbsolutePath()), in);
-        logger.info("Copied the encoded file to the workspace at {}", returnURL);
-        if (encodingOutput.delete()) {
-          logger.info("Deleted the local copy of the encoded file at {}", encodingOutput.getAbsolutePath());
-        } else {
-          logger.warn("Unable to delete the encoding output at {}", encodingOutput);
+    int i = 0;
+    var fileMapping = new HashMap<String, String>();
+    for (File file: outputFiles) {
+      fileMapping.put(file.getName(), job.getId() + "_" + i + "." + FilenameUtils.getExtension(file.getName()));
+      i++;
+    }
+    boolean isHLS = false;
+    for (File file: outputFiles) {
+      // Rewrite HLS references if necessary
+      if (AdaptivePlaylist.isPlaylist(file)) {
+        isHLS = true;
+        logger.debug("Rewriting HLS references in {}", file);
+        try {
+          AdaptivePlaylist.hlsRewriteFileReference(file, fileMapping);
+        } catch (IOException e) {
+          throw new EncoderException("Unable to rewrite HLS references", e);
         }
+      }
+
+      // Put the file in the workspace
+      try (InputStream in = new FileInputStream(file)) {
+        var filename = fileMapping.get(file.getName());
+        var url = workspace.putInCollection(COLLECTION, filename, in);
+        returnURLs.add(url);
+        logger.info("Copied the encoded file to the workspace at {}", url);
       } catch (Exception e) {
         throw new EncoderException("Unable to put the encoded file into the workspace", e);
       }
+    }
 
-      // Have the encoded track inspected and return the result
-      Track inspectedTrack = inspect(job, returnURL);
+    // Have the encoded track inspected and return the result
+    final List<String> tags = profile.getTags();
+    for (Track inspectedTrack: inspect(job, returnURLs)) {
+      final String targetTrackId = IdImpl.fromUUID().toString();
       inspectedTrack.setIdentifier(targetTrackId);
 
-      List<String> tags = profile.getTags();
-      for (String tag : tags) {
-        if (encodingOutput.getName().endsWith(profile.getSuffix(tag)))
+      for (final String tag : tags) {
+        if (inspectedTrack.getURI().getPath().endsWith(profile.getSuffix(tag))) {
           inspectedTrack.addTag(tag);
+        }
+      }
+      if (isHLS) {
+        AdaptivePlaylist.setLogicalName(inspectedTrack);
       }
 
       encodedTracks.add(inspectedTrack);
-      i++;
+    }
+
+    // Clean up workspace
+    for (File encodingOutput: outputFiles) {
+      if (encodingOutput.delete()) {
+        logger.info("Deleted the local copy of the encoded file at {}", encodingOutput.getAbsolutePath());
+      } else {
+        logger.warn("Unable to delete the encoding output at {}", encodingOutput);
+      }
     }
 
     return encodedTracks;

@@ -12,7 +12,7 @@
     <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
       <!-- Metadata -->
     </a>
-    <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
+    <a ng-if="extendedMetadataCatalogs.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
       <!-- Ext-Metadata -->
     </a>
 
@@ -86,6 +86,7 @@
 
   <div class="modal-content" data-modal-tab-content="metadata">
     <div class="modal-body">
+      <div data-admin-ng-notifications="" context="events-metadata-common"></div>
       <div data-admin-ng-notifications="" context="events-access"></div>
       <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
       <div class="full-col">
@@ -93,14 +94,14 @@
           <header><span translate="EVENTS.EVENTS.DETAILS.METADATA.CAPTION"><!-- Event details --></span></header>
           <div class="obj-container">
             <table class="main-tbl">
-              <tr ng-repeat="(idx, row) in episodeCatalog.fields">
+              <tr ng-repeat="(idx, row) in commonMetadataCatalog.fields">
                 <td>
                   <span translate="{{ row.label }}"></span>
                   <i ng-show="row.required" class="required">*</i>
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(episodeCatalog.flavor)"
+                    params="row" save="getMetadataChangedFunction(commonMetadataCatalog.flavor)"
                     sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
@@ -109,25 +110,34 @@
         </div>
       </div>
     </div>
+    <footer>
+      <a
+        class="submit"
+        ng-class="{disabled: metadata.locked || !unsavedChanges([commonMetadataCatalog])}"
+        ng-click="metadataSave([commonMetadataCatalog])">
+        {{ "SAVE" | translate}}
+      </a>
+    </footer>
   </div>
 
-  <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="metadata.entries.length > 0">
+  <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="extendedMetadataCatalogs.length > 0">
     <div class="modal-body">
+      <div data-admin-ng-notifications="" context="events-metadata-extended"></div>
       <div data-admin-ng-notifications="" context="events-access"></div>
       <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
       <div class="full-col">
-        <div class="obj tbl-details" ng-repeat="catalog in metadata.entries">
-          <header><span>{{ catalog.title | translate }}</span></header>
+        <div class="obj tbl-details" ng-repeat="extendedMetadataCatalog in extendedMetadataCatalogs">
+          <header><span>{{ extendedMetadataCatalog.title | translate }}</span></header>
           <div class="obj-container">
             <table class="main-tbl">
-              <tr ng-repeat="row in catalog.fields track by $index">
+              <tr ng-repeat="row in extendedMetadataCatalog.fields track by $index">
                 <td>
                   <span translate="{{ row.label }}"></span>
                   <i ng-show="row.required" class="required">*</i>
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(catalog.flavor)"
+                    params="row" save="getMetadataChangedFunction(extendedMetadataCatalog.flavor)"
                     sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
@@ -136,6 +146,14 @@
         </div>
       </div>
     </div>
+    <footer>
+      <a
+        class="submit"
+        ng-class="{disabled: metadata.locked || !unsavedChanges(extendedMetadataCatalogs)}"
+        ng-click="metadataSave(extendedMetadataCatalogs)">
+        {{ "SAVE" | translate}}
+      </a>
+    </footer>
   </div>
 
   <div class="modal-content" data-modal-tab-content="assets">

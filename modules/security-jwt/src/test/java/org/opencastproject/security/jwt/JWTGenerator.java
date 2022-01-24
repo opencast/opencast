@@ -132,6 +132,21 @@ public final class JWTGenerator {
     );
   }
 
+  public String generateValidNonExpiringSymmetricJWT() {
+    return generateValidNonExpiringJWT(getSymmetricAlgorithm());
+  }
+
+  private String generateValidNonExpiringJWT(Algorithm algorithm) {
+    return JWT.create()
+        .withIssuer(issuer)
+        .withAudience(clientId)
+        .withClaim(usernameKey, username)
+        .withClaim(nameKey, name)
+        .withClaim(emailKey, email)
+        .withClaim(rolesKey, roles)
+        .sign(algorithm);
+  }
+
   public String getUsernameMapping() {
     return "['" + usernameKey + "'].asString()";
   }

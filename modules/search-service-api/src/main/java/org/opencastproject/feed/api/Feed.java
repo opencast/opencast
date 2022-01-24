@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * This interface defines the methods of a general feed.
  * <p>
- * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <tt>Rome</tt>
+ * Note that this interface is heavily inspired and backed by the excellent rss/atom feed library <code>Rome</code>
  * (http://https://rome.dev.java.net).
  */
 public interface Feed {

@@ -93,11 +93,6 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   }
 
   @Override
-  protected String getEndpointBaseUrl() {
-    return endpointBaseUrl;
-  }
-
-  @Override
   protected SecurityService getSecurityService() {
     return securityService;
   }

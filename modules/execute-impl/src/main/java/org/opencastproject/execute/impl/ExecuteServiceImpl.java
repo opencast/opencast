@@ -52,16 +52,17 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -315,7 +316,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     String params = arguments.remove(1);
 
     File outFile = null;
-    MediaPackageElement[] elementsByFlavor = null;
+    MediaPackageElement[] elements = null;
 
     try {
       if (outFileName != null) {
@@ -343,18 +344,32 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         if (matcher.group(1).equals("id")) {
           matcher.appendReplacement(sb, mp.getIdentifier().toString());
         } else if (matcher.group(1).equals("flavor")) {
-          elementsByFlavor = mp.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor(matcher.group(2)));
-          if (elementsByFlavor.length == 0)
+          elements = mp.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor(matcher.group(2)));
+          if (elements.length == 0)
             throw new ExecuteException("No elements in the MediaPackage match the flavor '" + matcher.group(2) + "'.");
 
-          if (elementsByFlavor.length > 1)
+          if (elements.length > 1)
             logger.warn("Found more than one element with flavor '{}'. Using {} by default...", matcher.group(2),
-                    elementsByFlavor[0].getIdentifier());
+                    elements[0].getIdentifier());
 
-          File elementFile = workspace.get(elementsByFlavor[0].getURI());
+          File elementFile = workspace.get(elements[0].getURI());
+          matcher.appendReplacement(sb, elementFile.getAbsolutePath());
+        } else if (matcher.group(1).equals("tags")) {
+          elements = mp.getElementsByTags(Arrays.asList(StringUtils.split(matcher.group(2), ",")));
+
+          if (elements.length == 0)
+            throw new ExecuteException("No elements in the MediaPackage match the tags '" + matcher.group(2) + "'.");
+
+          if (elements.length > 1)
+            logger.warn("Found more than one element with matching tags '{}'. Using {} by default...", matcher.group(2),
+                elements[0].getIdentifier());
+
+          File elementFile = workspace.get(elements[0].getURI());
           matcher.appendReplacement(sb, elementFile.getAbsolutePath());
         } else if (matcher.group(1).equals("out")) {
           matcher.appendReplacement(sb, outFile.getAbsolutePath());
+        } else if (matcher.group(1).equals("org_id")) {
+          matcher.appendReplacement(sb, securityService.getOrganization().getId());
         } else if (properties.get(matcher.group(1)) != null) {
           matcher.appendReplacement(sb, (String) properties.get(matcher.group(1)));
         } else if (bundleContext.getProperty(matcher.group(1)) != null) {
@@ -367,10 +382,10 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
       throw new ExecuteException("Tag 'flavor' must specify a valid MediaPackage element flavor.", e);
     } catch (NotFoundException e) {
       throw new ExecuteException(
-              "The element '" + elementsByFlavor[0].getURI().toString() + "' does not exist in the workspace.", e);
+              "The element '" + elements[0].getURI().toString() + "' does not exist in the workspace.", e);
     } catch (IOException e) {
       throw new ExecuteException("Error retrieving MediaPackage element from workspace: '"
-              + elementsByFlavor[0].getURI().toString() + "'.", e);
+              + elements[0].getURI().toString() + "'.", e);
     }
 
     arguments.addAll(splitParameters(params));
@@ -414,6 +429,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
           arguments.set(i, arguments.get(i).replace(INPUT_FILE_PATTERN, trackFile.getAbsolutePath()));
           continue;
         }
+
         if (arguments.get(i).contains(OUTPUT_FILE_PATTERN)) {
           if (outFile != null) {
             arguments.set(i, arguments.get(i).replace(OUTPUT_FILE_PATTERN, outFile.getAbsolutePath()));
@@ -424,10 +440,17 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
                     OUTPUT_FILE_PATTERN + " pattern found, but no valid output filename was specified");
           }
         }
+
+        if (arguments.get(i).contains(MP_ID_PATTERN)) {
+          arguments.set(i, arguments.get(i).replace(MP_ID_PATTERN, element.getMediaPackage().getIdentifier().toString()));
+        }
+
+        if (arguments.get(i).contains(ORG_ID_PATTERN)) {
+          arguments.set(i, arguments.get(i).replace(ORG_ID_PATTERN, securityService.getOrganization().getId()));
+        }
       }
 
       return runCommand(arguments, outFile, expectedType);
-
     } catch (IOException e) {
       logger.error("Error retrieving file from workspace: {}", element.getURI());
       throw new ExecuteException("Error retrieving file from workspace: " + element.getURI(), e);
@@ -451,6 +474,11 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
       pb.redirectErrorStream(true);
 
       p = pb.start();
+      BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      String line;
+      while ((line = stdout.readLine()) != null) {
+        logger.debug(line);
+      }
       result = p.waitFor();
 
       logger.debug("Command {} finished with result {}", command.get(0), result);
@@ -473,19 +501,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         }
         return "";
       } else {
-        // 'Scanner' reads tokens delimited by an specific character (set).
-        // By telling a Scanner to use the 'beginning of the input boundary' character as delimiter, which of course
-        // will never find, yields the whole String as the next token.
-        String line;
-        try (Scanner scanner = new Scanner(p.getInputStream())) {
-          scanner.useDelimiter("\\A");
-          line = scanner.next();
-        } catch (NoSuchElementException e) {
-          line = "";
-        }
-
-        throw new ExecuteException(String.format("Process %s returned error code %d with this output:\n%s",
-                command.get(0), result, line.trim()));
+        throw new ExecuteException(String.format("Process %s returned error code %d", command.get(0), result));
       }
     } catch (InterruptedException e) {
       throw new ExecuteException("The executor thread has been unexpectedly interrupted", e);

@@ -61,11 +61,8 @@ public class SeriesListProvider implements ResourceListProvider {
   public static final String TITLE = PROVIDER_PREFIX + ".TITLE";
   public static final String TITLE_EXTENDED = PROVIDER_PREFIX + ".TITLE_EXTENDED";
   public static final String LANGUAGE = PROVIDER_PREFIX + ".LANGUAGE";
-  public static final String CREATOR = PROVIDER_PREFIX + ".CREATOR";
   public static final String ORGANIZERS = PROVIDER_PREFIX + ".ORGANIZERS";
   public static final String LICENSE = PROVIDER_PREFIX + ".LICENSE";
-  public static final String ACCESS_POLICY = PROVIDER_PREFIX + ".ACCESS_POLICY";
-  public static final String CREATION_DATE = PROVIDER_PREFIX + ".CREATION_DATE";
 
   private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, ORGANIZERS, TITLE_EXTENDED };
 

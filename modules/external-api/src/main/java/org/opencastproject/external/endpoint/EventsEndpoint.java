@@ -22,6 +22,7 @@ package org.opencastproject.external.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.json.Jsons.BLANK;
+import static com.entwinemedia.fn.data.json.Jsons.NULL;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
@@ -1062,7 +1063,7 @@ public class EventsEndpoint implements ManagedService {
       }
     } else {
       fields.add(f("start", v(event.getRecordingStartDate(), BLANK)));
-      fields.add(f("duration", v(event.getDuration(), BLANK)));
+      fields.add(f("duration", v(event.getDuration(), NULL)));
     }
 
     if (StringUtils.trimToNull(event.getSubject()) != null) {
@@ -1662,7 +1663,7 @@ public class EventsEndpoint implements ManagedService {
               f("url", v(getSignedUrl(track.getURI(), sign), BLANK)), f("flavor", v(track.getFlavor(), BLANK)),
               f("size", v(track.getSize())), f("checksum", v(track.getChecksum(), BLANK)),
               f("tags", arr(track.getTags())), f("has_audio", v(track.hasAudio())),
-              f("has_video", v(track.hasVideo())), f("duration", v(track.getDuration(), BLANK)),
+              f("has_video", v(track.hasVideo())), f("duration", v(track.getDuration(), NULL)),
               f("description", v(track.getDescription(), BLANK))).merge(trackInfo));
     }
     return tracks;

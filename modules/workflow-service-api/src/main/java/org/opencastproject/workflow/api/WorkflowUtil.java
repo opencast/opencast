@@ -47,6 +47,10 @@ public final class WorkflowUtil {
    * @return True if the workflow is currently active, not stopped or failed.
    */
   public static boolean isActive(String workflowState) {
-    return !WorkflowState.valueOf(workflowState).isTerminated();
+    if (workflowState == null || workflowState.isBlank()) {
+      return false;
+    } else {
+      return !WorkflowState.valueOf(workflowState).isTerminated();
+    }
   }
 }

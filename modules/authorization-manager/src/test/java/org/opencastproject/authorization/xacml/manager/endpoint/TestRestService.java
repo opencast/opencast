@@ -22,7 +22,6 @@
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -70,8 +69,6 @@ import com.entwinemedia.fn.data.Opt;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 
-import java.net.URL;
-
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Path;
 
@@ -80,8 +77,6 @@ import javax.ws.rs.Path;
 // put @Ignore here to prevent maven surefire from complaining about missing test methods
 @Ignore
 public class TestRestService extends AbstractAclServiceRestEndpoint {
-
-  public static final URL BASE_URL = localhostRandomPort();
 
   // Declare this dependency static since the TestRestService gets instantiated multiple times.
   // Haven't found out who's responsible for this but that's the way it is.
@@ -215,11 +210,6 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
     EasyMock.replay(assetManager, version, query, predicate, select, result, record, snapshot);
     return assetManager;
-  }
-
-  @Override
-  protected String getEndpointBaseUrl() {
-    return BASE_URL.toString();
   }
 
 }

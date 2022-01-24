@@ -65,9 +65,9 @@ public final class XsltHelper {
         /* Abbreviate lines using ellipsis. Because of word wrapping, the line length can be less than maxChars.
            That case is covered by first appending the ellipsis and then applying abbreviate */
         String lastLine = lines[line - 1] + "...";
-        return StringUtils.abbreviate(lastLine, maxChars);
+        return StringUtils.abbreviate(lastLine, maxChars).trim();
       } else {
-        return lines[line - 1];
+        return lines[line - 1].trim();
       }
     } else {
       return null;

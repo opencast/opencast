@@ -38,5 +38,5 @@
              cardinality="1..1" policy="static" bind="setWorkspace"/>
   <reference name="serailizer"
              interface="org.opencastproject.mediapackage.MediaPackageSerializer"
-             cardinality="0..1" policy="dynamic" bind="setMediaPackageSerializer"/>
+             cardinality="0..1" policy="dynamic" bind="setMediaPackageSerializer" unbind="unsetMediaPackageSerializer"/>
 </scr:component>
