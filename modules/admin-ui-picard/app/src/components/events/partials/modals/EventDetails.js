@@ -8,6 +8,10 @@ import EventDetailsAccessPolicyTab from "../ModalTabsAndPages/EventDetailsAccess
 import EventDetailsWorkflowTab from "../ModalTabsAndPages/EventDetailsWorkflowTab";
 import EventDetailsWorkflowDetails from "../ModalTabsAndPages/EventDetailsWorkflowDetails";
 import EventDetailsPublicationTab from "../ModalTabsAndPages/EventDetailsPublicationTab";
+import {getMetadata, isFetchingMetadata} from "../../../../selectors/eventDetailsSelectors";
+import {fetchMetadata, updateMetadata} from "../../../../thunks/eventDetailsThunks";
+import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
+import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 
 
 // Get info about the current language and its date locale
@@ -16,9 +20,16 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manages the pages of the event details
  */
-const EventDetails = ({ tabIndex, eventId, close }) => {
+const EventDetails = ({ tabIndex, eventId, close,
+                          metadata, isLoadingMetadata,
+                          loadMetadata, updateMetadata, removeNotificationWizardForm }) => {
     const { t } = useTranslation();
 
+    useEffect(() => {
+        removeNotificationWizardForm();
+        loadMetadata(eventId).then(r => {});
+
+    }, []);
 
     const [page, setPage] = useState(tabIndex);
     const [workflowTabHierarchy, setWorkflowTabHierarchy] = useState("entry")
@@ -134,9 +145,12 @@ const EventDetails = ({ tabIndex, eventId, close }) => {
 
             {/* Initialize overall form */}
                         <div>
-                            {page === 0 && (
-                                <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                                 t={t}/>
+                            {page === 0 && (!isLoadingMetadata) && (
+                                <DetailsMetadataTab metadataFields={metadata}
+                                        resourceId={eventId}
+                                        header={tabs[page].bodyHeaderTranslation}
+                                        buttonLabel='SAVE'
+                                        updateResource={updateMetadata}/>
                             )}
                             {page === 1 && (
                                 <MockDataPage header={tabs[page].bodyHeaderTranslation}
@@ -220,6 +234,15 @@ const MockDataPage = ({ header, t }) => {
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
+    metadata: getMetadata(state),
+    isLoadingMetadata: isFetchingMetadata(state)
 });
 
-export default connect(mapStateToProps)(EventDetails);
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    loadMetadata: (id) => dispatch(fetchMetadata(id)),
+    updateMetadata: (id, values) => dispatch(updateMetadata(id, values)),
+    removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(EventDetails);

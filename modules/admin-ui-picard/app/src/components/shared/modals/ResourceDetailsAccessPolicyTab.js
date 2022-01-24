@@ -18,7 +18,7 @@ import {createPolicy, prepareAccessPolicyRulesForPost} from "../../../utils/reso
  * This component manages the access policy tab of resource details modals
  */
 const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetchHasActiveTransactions, fetchAccessPolicies, saveNewAccessPolicies, descriptionText,
-                                          addNotification, fetchAclTemplates, fetchRoles, removeNotificationWizardForm, buttonText }) => {
+                                          addNotification, fetchAclTemplates, fetchRoles, removeNotificationWizardForm, buttonText, saveButtonText }) => {
 
     const baseAclId = "";
 
@@ -435,7 +435,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                 disabled={ !formik.isValid}
                                                                 className={`save green  ${(!formik.isValid) ? "disabled" : ""}`}
                                                         >
-                                                            {t('EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS')/* Save */}
+                                                            {t(saveButtonText)/* Save */}
                                                         </button>
                                                     </div>
                                                 </footer>

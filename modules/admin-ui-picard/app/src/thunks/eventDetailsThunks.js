@@ -25,11 +25,20 @@ import {
     loadEventPublicationsInProgress,
     loadEventPublicationsSuccess,
     loadEventPublicationsFailure,
+    loadEventMetadataInProgress,
+    loadEventMetadataSuccess,
+    loadEventMetadataFailure, setEventMetadata,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
-import {createPolicy} from "../utils/resourceUtils";
+import {createPolicy, transformMetadataCollection} from "../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
-import {getBaseWorkflow, getWorkflow, getWorkflowDefinitions, getWorkflows} from "../selectors/eventDetailsSelectors";
+import {
+    getBaseWorkflow,
+    getMetadata,
+    getWorkflow,
+    getWorkflowDefinitions,
+    getWorkflows
+} from "../selectors/eventDetailsSelectors";
 import {fetchWorkflowDef} from "./workflowThunks";
 import {getWorkflowDef} from "../selectors/workflowSelectors";
 import {logger} from "../utils/logger";
@@ -44,10 +53,72 @@ const getHttpHeaders = () => {
 }
 
 
+// thunks for metadata
+
+export const fetchMetadata = (eventId) => async (dispatch) => {
+    try {
+        dispatch(loadEventMetadataInProgress());
+
+        const metadataRequest = await axios.get(`admin-ng/event/${eventId}/metadata.json`);
+        const metadataResponse = await metadataRequest.data;
+
+        const metadata = transformMetadataCollection(metadataResponse[0]);
+
+        dispatch(loadEventMetadataSuccess(metadata));
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventMetadataFailure());
+    }
+}
+
+export const updateMetadata = (eventId, values) => async (dispatch, getState) => {
+    try {
+        let metadataInfos = getMetadata(getState());
+
+        let fields = [];
+        let updatedFields = [];
+
+        metadataInfos.fields.forEach(field => {
+            if (field.value !== values[field.id]) {
+                let updatedField = {
+                    ...field,
+                    value: values[field.id]
+                }
+                updatedFields.push(updatedField);
+                fields.push(updatedField);
+            } else {
+                fields.push({...field});
+            }
+        });
+
+        const headers = getHttpHeaders();
+        let data = new URLSearchParams();
+        data.append("metadata",JSON.stringify([{
+            flavor: metadataInfos.flavor,
+            title: metadataInfos.title,
+            fields: updatedFields
+        }]));
+
+        await axios.put(`/admin-ng/event/${eventId}/metadata`, data, headers);
+
+        // updated metadata in event details redux store
+        let eventMetadata = {
+            flavor: metadataInfos.flavor,
+            title: metadataInfos.title,
+            fields: fields
+        };
+        dispatch(setEventMetadata(eventMetadata));
+    } catch (e) {
+        logger.error(e);
+    }
+}
+
+
 // thunks for access policies
+
 export const saveAccessPolicies = (eventId, policies) => async (dispatch) => {
 
-    let headers = getHttpHeaders();
+    const headers = getHttpHeaders();
 
     let data = new URLSearchParams();
     data.append("acl", JSON.stringify(policies));
