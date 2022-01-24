@@ -98,17 +98,18 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId order by w.dateCreated"),
         @NamedQuery(name = "Workflow.countActiveByMediaPackage", query = "SELECT COUNT(w) FROM WorkflowInstance w where "
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
-                + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning)"),
-        @NamedQuery(name = "Workflow.byMediaPackageAndOneOfThreeStates", query = "SELECT w FROM WorkflowInstance w where "
+                + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
+                + "or w.state = :stateFailing)"),
+        @NamedQuery(name = "Workflow.byMediaPackageAndActive", query = "SELECT w FROM WorkflowInstance w where "
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
-                + "(w.state = :stateOne or w.state = :stateTwo or w.state = :stateThree) order by w.dateCreated"),
+                + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
+                + "or w.state = :stateFailing) order by w.dateCreated"),
 })
 public class WorkflowInstance {
 
   /** Workflow ID, primary key */
   /** The workflow id is the same as the related job id */
   /** It is set by the workflow service when creating the instance */
-  /** TODO: Figure out reasonable lengths */
   @Id
   @Column(name = "id")
   private long workflowId;

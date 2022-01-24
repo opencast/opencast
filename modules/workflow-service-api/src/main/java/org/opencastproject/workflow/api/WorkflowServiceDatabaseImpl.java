@@ -220,14 +220,15 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      Query query = em.createNamedQuery("Workflow.byMediaPackageAndOneOfThreeStates");
+      Query query = em.createNamedQuery("Workflow.byMediaPackageAndActive");
 
       String orgId = securityService.getOrganization().getId();
       query.setParameter("organizationId", orgId);
       query.setParameter("mediaPackageId", mediaPackageId);
-      query.setParameter("stateOne", WorkflowInstance.WorkflowState.RUNNING);
-      query.setParameter("stateTwo", WorkflowInstance.WorkflowState.PAUSED);
-      query.setParameter("stateThree", WorkflowInstance.WorkflowState.FAILING);
+      query.setParameter("stateInstantiated", WorkflowInstance.WorkflowState.INSTANTIATED);
+      query.setParameter("stateRunning", WorkflowInstance.WorkflowState.RUNNING);
+      query.setParameter("statePaused", WorkflowInstance.WorkflowState.PAUSED);
+      query.setParameter("stateFailing", WorkflowInstance.WorkflowState.FAILING);
 
       return query.getResultList();
     } catch (Exception e) {
@@ -255,8 +256,9 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       query.setParameter("organizationId", orgId);
       query.setParameter("mediaPackageId", mediaPackageId);
       query.setParameter("stateInstantiated", WorkflowInstance.WorkflowState.INSTANTIATED);
-      query.setParameter("statePaused", WorkflowInstance.WorkflowState.PAUSED);
       query.setParameter("stateRunning", WorkflowInstance.WorkflowState.RUNNING);
+      query.setParameter("statePaused", WorkflowInstance.WorkflowState.PAUSED);
+      query.setParameter("stateFailing", WorkflowInstance.WorkflowState.FAILING);
       return ((Number) query.getSingleResult()).longValue() > 0;
     } catch (Exception e) {
       throw new WorkflowServiceDatabaseException(e);
