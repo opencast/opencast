@@ -1,7 +1,0 @@
-Opencast 11 comes with a completely new set of workflows. Please make sure to check your local configuration and adapt
-it accordingly if you made changes to your workflows before. Opencast will also continue to work with the old set of
-workflows. The new ones just remove a lot of redundancies, making the whole process more efficient.
-
-Some of the new workflows (e.g. `fast`) now use slightly different workflow configurations. This could potentially cause
-problems if you scheduled recordings using the old workflows but have the events processed using the new workflows.
-Please make sure the workflow you use work fine, or do not have anything scheduled via the upgrade.

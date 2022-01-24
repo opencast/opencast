@@ -45,7 +45,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,15 +81,12 @@ public interface AdaptivePlaylist extends Track {
   // Known tags that references other files include the following - but we only use EXT-X-MAP here
   // "#EXT-X-MAP:", "#EXT-X-MEDIA:", "#EXT-X-I-FRAME-STREAM-INF:", "#EXT-X-SESSION-DATA:",
   // Variant tags: see Section 4.4.2 in draft
-  List<String> extVariant = new ArrayList<String>(
-          Arrays.asList("#EXT-X-MAP:", "#EXT-X-TARGETDURATION:", "EXTINF", "#EXT-X-BYTERANGE:"));
+  List<String> extVariant = Arrays.asList("#EXT-X-MAP:", "#EXT-X-TARGETDURATION:", "EXTINF", "#EXT-X-BYTERANGE:");
   // Master tags: see Section 4.4.4
-  List<String> extMaster = new ArrayList<String>(
-          Arrays.asList("#EXT-X-MEDIA:", "#EXT-X-STREAM-INF:", "#EXT-X-I-FRAME-STREAM-INF:", "#EXT-X-SESSION-DATA:"));
-  Pattern masterPatt = Pattern.compile(extMaster.stream().collect(Collectors.joining("|")), Pattern.CASE_INSENSITIVE);
-  Pattern variantPatt = Pattern.compile(extVariant.stream().collect(Collectors.joining("|")), Pattern.CASE_INSENSITIVE);
-  Predicate<String> masterTags = f -> masterPatt.matcher(f) != null;
-  Predicate<String> variantTags = f -> variantPatt.matcher(f) != null;
+  List<String> extMaster = Arrays.asList("#EXT-X-MEDIA:", "#EXT-X-STREAM-INF:", "#EXT-X-I-FRAME-STREAM-INF:",
+          "#EXT-X-SESSION-DATA:");
+  Pattern masterPatt = Pattern.compile(String.join("|", extMaster), Pattern.CASE_INSENSITIVE);
+  Pattern variantPatt = Pattern.compile(String.join("|", extVariant), Pattern.CASE_INSENSITIVE);
   Predicate<File> isHLSFilePred = f -> "m3u8".equalsIgnoreCase(FilenameUtils.getExtension(f.getName()));
   Predicate<String> isPlaylistPred = f -> "m3u8".equalsIgnoreCase(FilenameUtils.getExtension(f));
   Predicate<Track> isHLSTrackPred = f -> "m3u8".equalsIgnoreCase(FilenameUtils.getExtension(f.getURI().getPath()));
@@ -115,16 +111,10 @@ public interface AdaptivePlaylist extends Track {
 
   static List<Track> getSortedTracks(List<Track> files, boolean segmentsOnly) {
     List<Track> fmp4 = files;
-    if (segmentsOnly)
+    if (segmentsOnly) {
       fmp4 = files.stream().filter(isHLSTrackPred.negate()).collect(Collectors.toList());
-    Collections.sort(fmp4, new Comparator<Track>() {
-      @Override
-      public int compare(Track lhs, Track rhs) {
-        // -1 - less than, 1 - greater than, 0 - equal, all inverted for descending
-        return FilenameUtils.getBaseName(lhs.getURI().getPath())
-                .compareTo(FilenameUtils.getBaseName(rhs.getURI().getPath()));
-      }
-    });
+    }
+    fmp4.sort(Comparator.comparing(track -> FilenameUtils.getBaseName(track.getURI().getPath())));
     return fmp4;
   }
 
@@ -330,15 +320,12 @@ public interface AdaptivePlaylist extends Track {
    *           if failed
    */
   static void hlsRewriteFileReference(File srcFile, File destFile, Map<String, String> mapNames) throws IOException {
-    FileWriter hlsReWriter = null;
-    BufferedReader br = null;
     // Many tags reference URIs - not all are dealt with in this code, eg:
     // "#EXT-X-MAP:", "#EXT-X-MEDIA:", "#EXT-X-I-FRAME-STREAM-INF:", "#EXT-X-SESSION-DATA:", "#EXT-X-KEY:",
     // "#EXT-X-SESSION-DATA:"
-    try {
-      hlsReWriter = new FileWriter(destFile.getAbsoluteFile(), false);
-      br = new BufferedReader(new FileReader(srcFile));
-      String line = null;
+    try (FileWriter hlsReWriter = new FileWriter(destFile.getAbsoluteFile(), false);
+         BufferedReader br = new BufferedReader(new FileReader(srcFile))) {
+      String line;
       while ((line = br.readLine()) != null) {
         // https://tools.ietf.org/html/draft-pantos-http-live-streaming-20
         // Each line is a URI, blank, or starts with the character #
@@ -376,11 +363,6 @@ public interface AdaptivePlaylist extends Track {
     } catch (Exception e) {
       logger.error("Failed to rewrite hls references " + e.getMessage());
       throw new IOException(e);
-    } finally {
-      br.close();
-      hlsReWriter.close();
-      br = null;
-      hlsReWriter = null;
     }
   }
 

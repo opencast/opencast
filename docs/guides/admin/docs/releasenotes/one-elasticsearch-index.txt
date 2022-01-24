@@ -1,5 +1,0 @@
-- There's now only one Elasticsearch index for both the Admin UI and the External API. Its structure is identical
-to the old Admin UI index, thus migration is possible, alternatively the index has to be rebuilt or the old Admin UI
-index can be configured (see upgrade guide).
-With this change the index rebuild should now be twice as fast as before. The index endpoints to clear and rebuild
-the index were moved to /index.

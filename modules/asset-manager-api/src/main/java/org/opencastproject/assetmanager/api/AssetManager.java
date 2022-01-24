@@ -37,21 +37,21 @@ import java.util.List;
  * It also supports the association of {@linkplain Property properties} to a
  * history of snapshots which is called an episode.
  *
- * <h1>Terms</h1>
- * <h2>Snapshot</h2>
+ * <h2>Terms</h2>
+ * <h3>Snapshot</h3>
  * A snapshot saves a particular version of a media package. Snapshots are
  * immutable and can only be deleted.
  *
- * <h2>Episode</h2>
+ * <h3>Episode</h3>
  * An episode is the set of snapshots of a media package.
  *
- * <h2>Properties</h2>
+ * <h3>Properties</h3>
  * Properties are associated with an episode and have a volatile character.
  * They support the quick and easy storage of meta data.
  * This removes the need for services to create their own persistence layer if
  * they want to associate metadata with a media package.
  *
- * <h1>Notes</h1>
+ * <h2>Notes</h2>
  * Media package IDs are considered to be unique throughout the whole system.
  * The organization ID is just a discriminator and not necessary to uniquely identify a media package.
  */
@@ -132,6 +132,19 @@ public interface AssetManager {
   RichAResult getSnapshotsById(String mpId);
 
   /**
+   * Returns a stream of {@link RichAResult} filtered by mediapackage IDs. This stream
+   * consists of all versions of all mediapackage ordered by the Version
+   *
+   * @param mpId
+   *   The mediapackage ID to filter results for
+   * @param asc
+   *   The asc {@link Boolean} decides if to order ascending (true) or descending (false)
+   * @return
+   *   The {@link RichAResult} stream filtered by mediapackage ID
+   */
+  RichAResult getSnapshotsByIdOrderedByVersion(String mpId, boolean asc);
+
+  /**
    * Returns a stream of {@link RichAResult} filtered by mediapackage ID and version
    *
    * @param mpId
@@ -144,8 +157,8 @@ public interface AssetManager {
   RichAResult getSnapshotsByIdAndVersion(String mpId, Version version);
 
   /**
-   * Returns a stream of {@link RichAResult} filtered by date. This stream consists of all versions of all mediapackages
-   * archived within the date range.
+   * Returns a stream of {@link RichAResult} filtered by date. This stream
+   * consists of all versions of all mediapackages archived within the date range.
    *
    * @param start
    *   The start {@link Date} to filter by
@@ -155,6 +168,19 @@ public interface AssetManager {
    *   The {@link RichAResult} stream filtered by date
    */
   RichAResult getSnapshotsByDate(Date start, Date end);
+
+  /**
+   * Returns a stream of {@link RichAResult} filtered by date. This stream consists of all
+   * a mediapackages which have at least one version archived within the date range.
+   *
+   * @param start
+   *   The start {@link Date} to filter by
+   * @param end
+   *   The end{@link Date} to filter by
+   * @return
+   *   The {@link RichAResult} stream filtered by date
+   */
+  RichAResult getSnapshotsByDateOrderedById(Date start, Date end);
 
   /**
    * Returns a stream of {@link RichAResult} filtered by date and mediapackage. This stream consists of all versions of
@@ -170,6 +196,24 @@ public interface AssetManager {
    *   The {@link RichAResult} stream filtered by date
    */
   RichAResult getSnapshotsByIdAndDate(String mpId, Date start, Date end);
+
+  /**
+   * Returns a stream of {@link RichAResult} filtered by date and mediapackage. 
+   * This stream consists of all versions of a mediapackage archived within the 
+   * date range ordered by there Version.
+   *
+   * @param mpId
+   *   The mediapackage ID to filter for
+   * @param start
+   *   The start {@link Date} to filter by
+   * @param end
+   *   The end {@link Date} to filter by
+   * @param asc
+   *   The asc {@link Boolean} decides if to order ascending (true) or descending (false)
+   * @return
+   *   The {@link RichAResult} stream filtered by date
+   */
+  RichAResult getSnapshotsByIdAndDateOrderedByVersion(String mpId, Date start, Date end, boolean asc);
 
   /**
    * Take a versioned snapshot of a media package.
@@ -254,7 +298,6 @@ public interface AssetManager {
    * @throws NotFoundException
    */
   void moveSnapshotsByIdAndDate(String mpId, Date start, Date end, String targetStore) throws NotFoundException;
-
 
   /* Properties */
 

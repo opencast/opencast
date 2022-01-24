@@ -24,7 +24,6 @@ package org.opencastproject.adminui.endpoint;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -41,7 +40,7 @@ import io.restassured.http.ContentType;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class JobEndpointTest {
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestJobEndpoint.class);
+  private static final RestServiceTestEnv rt = testEnvForClasses(TestJobEndpoint.class);
 
   private JSONParser parser;
 

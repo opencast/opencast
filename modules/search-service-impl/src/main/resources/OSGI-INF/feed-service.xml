@@ -15,5 +15,5 @@
   <reference name="security" interface="org.opencastproject.security.api.SecurityService" cardinality="1..1"
              policy="static" bind="setSecurityService"/>
   <reference name="profilesReadyIndicator" policy="static" cardinality="1..1"
-             interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=feed)"/>
+             interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=feed)" bind="setProfilesReadyIndicator"/>
 </scr:component>

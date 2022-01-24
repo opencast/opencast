@@ -51,7 +51,6 @@ public class AgentsListQuery extends ResourceListQueryImpl {
 
   public AgentsListQuery() {
     super();
-    this.availableFilters.add(createNameFilter(Option.<String> none()));
     this.availableFilters.add(createStatusFilter(Option.<String> none()));
   }
 

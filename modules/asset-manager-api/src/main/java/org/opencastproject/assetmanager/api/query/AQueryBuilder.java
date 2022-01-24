@@ -72,6 +72,9 @@ public interface AQueryBuilder {
   /** Create a predicate to match an snapshot's media package ID. */
   Predicate mediaPackageId(String mpId);
 
+  /** Get the snapshot's "mediaPackageId" field. Use it to create a predicate. */
+  Field<String> mediapackageId();
+
   /** Get the snapshot's "seriesId" field. Use it to create a predicate. */
   Field<String> seriesId();
 

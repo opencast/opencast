@@ -130,7 +130,8 @@
      },
      "WARNINGS": {
        "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
-       "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+       "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone.",
+       "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
      },
      "ERRORS": {
        "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
@@ -207,6 +208,7 @@
      "INVALID_ACL_RULES":   "Rules have to contain a valid role and read or/and write right(s).",
      "MISSING_ACL_RULES":   "At least one role with Read and Write permissions is required!",
      "SAVED_ACL_RULES":   "The access rules have been saved.",
+     "SAVED_METADATA":   "The metadata has been saved.",
      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
      "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
      "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",

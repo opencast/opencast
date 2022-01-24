@@ -110,7 +110,7 @@
         </header>
         <div class="obj-container">
           <ul>
-            <li  ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter:{type:'track'}| orderBy: 'displayOrder' track by asset.id">
+            <li ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter: {showAs: 'source'} | orderBy: 'displayOrder' track by asset.id">
               <div class="file-upload">
                 <input
                   id="{{asset.id}}"
@@ -267,8 +267,8 @@
                 </select>
               </td>
             </tr>
-            <tr>
-              <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
+            <tr ng-if="wizard.step.ud.SCHEDULE_SINGLE.device.inputs.length">
+              <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }}</td>
               <td>
                 <label ng-repeat="inputMethod in wizard.step.ud.SCHEDULE_SINGLE.device.inputs">
                   <input type="checkbox"
@@ -414,8 +414,8 @@
                 </select>
               </td>
             </tr>
-            <tr>
-              <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
+            <tr ng-if="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs.length">
+              <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }}</td>
               <td>
                 <label ng-repeat="inputMethod in wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs">
                   <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputMethods[inputMethod.id]" tabindex="20" />

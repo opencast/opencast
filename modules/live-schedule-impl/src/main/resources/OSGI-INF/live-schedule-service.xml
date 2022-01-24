@@ -16,7 +16,7 @@
              bind="setAuthorizationService"/>
   <reference name="distributionService" cardinality="1..n"
              interface="org.opencastproject.distribution.api.DownloadDistributionService"
-             policy="dynamic" bind="setDownloadDistributionService"/>
+             policy="dynamic" bind="setDownloadDistributionService" unbind="unsetDownloadDistributionService"/>
   <reference name="dublinCoreService" cardinality="1..1"
              interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
              policy="static" bind="setDublinCoreService"/>

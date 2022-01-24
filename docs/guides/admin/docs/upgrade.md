@@ -7,9 +7,18 @@ please refer to [older release notes](https://docs.opencast.org).
 
 1. Stop your current Opencast instance
 2. Replace Opencast with the new version
-3. Review the configuration changes and adjust your configuration accordingly
-4. [Migrate, rebuild or rename Elasticsearch index](#elasticsearch-migration)
-5. Start Opencast if you haven't already done so
+3. Read the release notes (especially the section of behaviour changes)
+4. Review the configuration changes and adjust your configuration accordingly
+5. Do the [database migration](#database-migration)
+6. [Migrate, rebuild or rename Elasticsearch index](#elasticsearch-migration)
+7. Start Opencast if you haven't already done so
+
+Database Migration
+------------------
+
+Upgrading to Opencast 11 requires a DB migration, as some tables have changed slightly.
+Migration scripts can be found in `doc/upgrade/10_to_11/`.
+There are separate scripts for MariaDB/MySQL (`mysql5.sql`) and PostgreSQL (`postgresql.sql`).
 
 Elasticsearch Migration
 -----------------------

@@ -40,6 +40,12 @@ public interface ExecuteService {
   /** Placeholder to be replaced by the actual track location in the command line */
   String OUTPUT_FILE_PATTERN = "#{out}";
 
+  /** Placeholder to be replaced by the actual organization id in the command line */
+  String ORG_ID_PATTERN = "#{org_id}";
+
+  /** Placeholder to be replaced by the actual mediapackage id in the command line */
+  String MP_ID_PATTERN = "#{id}";
+
   /** The subdirectory of the REST endpoint for this service */
   String ENDPOINT_NAME = "execute";
 

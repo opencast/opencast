@@ -334,11 +334,6 @@ profile.hls-full-res-presentation-mp4.jobload=4.0
 profile.multiencode-hls.name = multiencode-hls
 # adaptive type - only used in a group to supplement encoding only HLS is supported
 profile.multiencode-hls.adaptive.type = HLS
-# Delivery format SHOULD state video and audio bitrates, but the process will try to generate bitrate settings high to low, if bitrates are absent
-profile.multiencode-hls.video.bitrates.maxk = 4000
-profile.multiencode-hls.video.bitrates.mink = 300
-profile.multiencode-hls.audio.bitrates.maxk = 128
-profile.multiencode-hls.audio.bitrates.mink = 32
 profile.multiencode-hls.input = visual
 # manifest type means that it is a supplement
 profile.multiencode-hls.output = manifest
@@ -363,11 +358,6 @@ profile.multiencode-hls.jobload=1.0
 profile.multiencode-hls-4s.name = multiencode-hls-4s
 # adaptive type - only used in a group to supplement encoding only HLS is supported
 profile.multiencode-hls-4s.adaptive.type = HLS
-# Delivery format should state video and audio bitrates, but the process will try to generate bitrate settings high to low, if bitrates are absent
-profile.multiencode-hls-4s.video.bitrates.maxk = 3000
-profile.multiencode-hls-4s.video.bitrates.mink = 300
-profile.multiencode-hls-4s.audio.bitrates.maxk = 128
-profile.multiencode-hls-4s.audio.bitrates.mink = 32
 profile.multiencode-hls-4s.input = visual
 # manifest type means that it is a supplement
 profile.multiencode-hls-4s.output = manifest

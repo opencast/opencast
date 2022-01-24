@@ -37,10 +37,10 @@
       "CURRENT_JOBS": "Trabajos de hoy",
       "PRESENTER": "Ponente",
       "PRESENTER_DESCRIPTION": "Archivo de vídeo para presenter track",
-      "VIDEOFILE": "Videofile",
-      "VIDEOFILE_DESCRIPTION": "Video file for upload",
+      "VIDEOFILE": "Archivo de vídeo",
+      "VIDEOFILE_DESCRIPTION": "Archivo de vídeo para subir",
       "CAPTION": "Subtítulos",
-      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
+      "CAPTION_DESCRIPTION": "Archivo de subtítulos; formatos VTT o dfxp son soportados",
       "UPLOAD": "Subir",
       "UPLOADING": "Subiendo",
       "EDIT": "Guardar",
@@ -128,7 +128,8 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Esta serie contiene eventos. Eliminar la serie no eliminará los acontecimientos.",
-         "EVENT_WILL_BE_GONE": "Si continúa, el evento se eliminará permanentemente."
+         "EVENT_WILL_BE_GONE": "Si continúa, el evento se eliminará permanentemente.",
+         "UNSAVED_CHANGES": "Tiene cambios sin guardar. Si continúa, esos cambios serán descartados. ¿Está seguro que desea continuar?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Esta serie no se puede eliminar ya que todavía contiene eventos."
@@ -205,6 +206,7 @@
       "INVALID_ACL_RULES": "Las reglas deben contener un nombre de rol válido y permiso(s) de lectura y/o escritura.",
       "MISSING_ACL_RULES": "¡Se requiere al menos un rol con permisos de Lectura y Escritura!",
       "SAVED_ACL_RULES": "Se han guardado las reglas de acceso.",
+      "SAVED_METADATA": "Los metadatos han sido guardados.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Los eventos que contiene esta serie deberán ser reprocesados",
       "SERIES_ACL_LOCKED": "No es posible editar las Políticas de Acceso cuando existen operaciones activas en algún evento de la serie",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
@@ -644,7 +646,7 @@
             "PENDING": "Pendiente",
             "PROCESSING": "Procesando",
             "PAUSED": "En pausa",
-            "PROCESSED": "Procesado",
+            "PROCESSED": "Finalizado",
             "RECORDING_FAILURE": "Fallo en la grabación",
             "PROCESSING_FAILURE": "Fallo en el procesamiento",
             "PROCESSING_CANCELLED": "Procesamiento cancelado"
@@ -1015,7 +1017,7 @@
                   "JOB": "Trabajo",
                   "TIME_IN_QUEUE": "Tiempo en cola",
                   "STARTED": "Iniciado",
-                  "FINISHED": "Procesado",
+                  "FINISHED": "Finalizado",
                   "RETRY_STRATEGY": "Estrategia de reintento",
                   "FAILED_ATTEMPTS": "Intentos fallidos",
                   "MAX_ATTEMPTS": "Máx",
@@ -1605,7 +1607,7 @@
             "QUEUED": "En cola",
             "PAUSED": "En pausa",
             "RUNNING": "Procesando",
-            "FINISHED": "Procesado",
+            "FINISHED": "Finalizado",
             "FAILED": "Error",
             "DELETED": "Eliminado",
             "INSTANTIATED": "Instanciado",
@@ -2033,7 +2035,7 @@
    "TABLE_EDIT": "Modificar",
    "DASHBOARD": {
       "RUNNING": "Procesando",
-      "FINISHED": "Procesado",
+      "FINISHED": "Finalizado",
       "PAUSED": "En pausa",
       "FAILED": "Error",
       "FINISHED_WITH_COMMENTS": "Pendiente",

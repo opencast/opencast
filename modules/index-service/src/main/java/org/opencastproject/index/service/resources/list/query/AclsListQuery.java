@@ -45,7 +45,6 @@ public class AclsListQuery extends ResourceListQueryImpl {
 
   public AclsListQuery() {
     super();
-    this.availableFilters.add(createNameFilter(Option.<String> none()));
   }
 
   /**

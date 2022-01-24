@@ -325,11 +325,16 @@ The following steps outline the necessary steps for cutting the final release:
 
         git push <remote> 6.0:6.0
 
-8. Push the built artifacts to Maven. Bug the QA Coordinator to do this so that he remembers to set this up from the CI
-    servers. If you want to do this yourself please read the [infra documentation](infrastructure/maven-repository.md#pushing-to-maven-central).
+8 Check the “Create new release” GitHub Actions workflow.
+   It will automatically build and upload the release tarballs and create a new release draft.
+   Once it is finished, review the draft, adjust the description and publish the release.
 
-9. Create a new release on GitHub using the [graphical user interface](https://github.com/opencast/opencast/releases)
-    to upload the distribution tarballs.
+   If the workflow fails, investigate what was going wrong and either restart the workflow or create the release
+   manually in the GitHub user interface.
+
+9. Check that the release is published on [Maven Central](https://repo1.maven.org/maven2/org/opencastproject/opencast-common/).
+    This can take some time, and is done via [Buildbot](http://ci.opencast.org).  If in doubt, ask the QA Coordinator to
+    check.  If you need to do this yourself please read the [infra documentation](infrastructure/maven-repository.md#pushing-to-maven-central).
 
 Finally, send a release notice to Opencast's announcement list. Note that posting to this list is restricted to those
 who need access to avoid general discussions on that list. In case you do not already have permissions to post on this

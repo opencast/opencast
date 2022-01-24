@@ -28,15 +28,15 @@ angular.module('adminNg.controllers')
   'EventWorkflowDetailsResource', 'ResourcesListResource', 'RolesResource', 'EventAccessResource',
   'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
   'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
-  'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable',
+  'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable', 'Modal', '$translate',
   function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
     EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
     EventWorkflowDetailsResource, ResourcesListResource, RolesResource, EventAccessResource,
     EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
     ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
-    EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable) {
+    EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable, Modal, $translate) {
 
-    var saveFns = {},
+    var metadataChangedFns = {},
         me = this,
         NOTIFICATION_CONTEXT = 'events-access',
         SCHEDULING_CONTEXT = 'event-scheduling',
@@ -276,48 +276,47 @@ angular.module('adminNg.controllers')
           });
 
           $scope.metadata =  EventMetadataResource.get({ id: id }, function (metadata) {
-            var episodeCatalogIndex;
+            $scope.extendedMetadataCatalogs = [];
             angular.forEach(metadata.entries, function (catalog, index) {
+              // common metadata
               if (catalog.flavor === mainCatalog) {
-                $scope.episodeCatalog = catalog;
-                episodeCatalogIndex = index;
-                var keepGoing = true;
-                var tabindex = 2;
-                angular.forEach(catalog.fields, function (entry) {
-                  if (entry.id === 'title' && angular.isString(entry.value)) {
-                    $scope.titleParams = { resourceId: entry.value.substring(0,70) };
-                  }
-                  if (keepGoing && entry.locked) {
-                    metadata.locked = entry.locked;
-                    keepGoing = false;
-                  }
-                  entry.tabindex = tabindex ++;
-                });
+                $scope.commonMetadataCatalog = catalog;
+              // extended metadata
+              } else {
+                $scope.extendedMetadataCatalogs.push(catalog);
               }
+
+              // hook up tabindex
+              var tabindex = 2;
+              angular.forEach(catalog.fields, function (entry) {
+                entry.tabindex = tabindex ++;
+                // find title
+                if (catalog.flavor === mainCatalog && entry.id === 'title' && angular.isString(entry.value)) {
+                  $scope.titleParams = { resourceId: entry.value.substring(0,70) };
+                }
+                // metadata locked?
+                if (entry.locked) {
+                  metadata.locked = entry.locked;
+                }
+                // save original values
+                if (entry.value instanceof Array) {
+                  entry.oldValue = entry.value.slice(0);
+                } else {
+                  entry.oldValue = entry.value;
+                }
+              });
             });
 
-            if (angular.isDefined(episodeCatalogIndex)) {
-              metadata.entries.splice(episodeCatalogIndex, 1);
-            }
           });
 
           //<===============================
-          // Enable asset upload (catalogs and attachments) to existing events
+          // Enable asset upload (catalogs, attachments and tracks) to existing events
 
           // Retrieve option configuration for asset upload
           UploadAssetOptions.getOptionsPromise().then(function(data){
             if (data) {
               $scope.assetUploadWorkflowDefId = data.workflow;
-              $scope.uploadAssetOptions = [];
-              // Filter out asset options of type "track".
-              // Not allowing tracks to be added to existing mediapackages
-              // for this iteration of the upload option feature.
-              // TODO: consider enabling track uploads to existing mps.
-              angular.forEach(data.options, function(option) {
-                if (option.type !== 'track') {
-                  $scope.uploadAssetOptions.push(option);
-                }
-              });
+              $scope.uploadAssetOptions = data.options;
               // if no asset options, undefine the option variable
               $scope.uploadAssetOptions = $scope.uploadAssetOptions.length > 0 ? $scope.uploadAssetOptions : undefined;
               $scope.newAssets = {};
@@ -430,8 +429,8 @@ angular.module('adminNg.controllers')
 
           $scope.roles = RolesResource.queryNameOnly({limit: -1, target:'ACL' });
 
-          //MH-11716: We have to wait for both the access (series ACL), and the roles (list of system roles)
-          //to resolve before we can add the roles that are present in the series but not in the system
+          //MH-11716: We have to wait for both the access (event ACL), and the roles (list of system roles)
+          //to resolve before we can add the roles that are present in the event but not in the system
           $scope.access.$promise.then(function () {
             $scope.roles.$promise.then(function() {
               angular.forEach(Object.keys($scope.access.episode_access.privileges), function(newRole) {
@@ -694,52 +693,128 @@ angular.module('adminNg.controllers')
 
     // Generate proxy function for the save metadata function based on the given flavor
     // Do not generate it
-    $scope.getSaveFunction = function (flavor) {
-      var fn = saveFns[flavor],
-          catalog;
+    $scope.getMetadataChangedFunction = function (flavor) {
+      var fn = metadataChangedFns[flavor];
+      var catalog;
 
       if (angular.isUndefined(fn)) {
-        if ($scope.episodeCatalog.flavor === flavor) {
-          catalog = $scope.episodeCatalog;
-        } else {
-          angular.forEach($scope.metadata.entries, function (c) {
-            if (flavor === c.flavor) {
-              catalog = c;
-            }
-          });
-        }
+        angular.forEach($scope.metadata.entries, function (c) {
+          if (flavor === c.flavor) {
+            catalog = c;
+          }
+        });
 
         fn = function (id, callback) {
-          $scope.metadataSave(id, callback, catalog);
+          $scope.metadataChanged(id, callback, catalog);
         };
 
-        saveFns[flavor] = fn;
+        metadataChangedFns[flavor] = fn;
       }
       return fn;
     };
 
-    $scope.metadataSave = function (id, callback, catalog) {
-      catalog.attributeToSend = id;
+    $translate('CONFIRMATIONS.WARNINGS.UNSAVED_CHANGES').then(function (translation) {
+      window.unloadConfirmMsg = translation;
+    }).catch(angular.noop);
 
-      if (Object.prototype.hasOwnProperty.call(catalog, 'fields')) {
-        for (var fieldNo in catalog.fields) {
-          var field = catalog.fields[fieldNo];
+    var confirmUnsaved = function() {
+      // eslint-disable-next-line
+      return confirm(window.unloadConfirmMsg);
+    };
 
+    $scope.close = function() {
+      if (($scope.unsavedChanges([$scope.commonMetadataCatalog]) === false
+           && $scope.unsavedChanges($scope.extendedMetadataCatalogs)  === false)
+          || confirmUnsaved()) {
+        Modal.$scope.close();
+      }
+    };
+
+    $scope.unsavedChanges = function(catalogs) {
+      if (angular.isDefined(catalogs)) {
+        return catalogs.some(function(catalog) {
+          if (angular.isDefined(catalog)) {
+            return catalog.fields.some(function(field) {
+              return field.dirty === true;
+            });
+          }
+          return false;
+        });
+      }
+      return false;
+    };
+
+    $scope.metadataChanged = function (id, callback, catalog) {
+      // Mark the saved attribute as dirty
+      angular.forEach(catalog.fields, function (entry) {
+        if (entry.id === id) {
+          if (differentValue(entry)) {
+            entry.dirty = true;
+          } else {
+            entry.dirty = false;
+          }
+        }
+      });
+
+      if (angular.isDefined(callback)) {
+        callback();
+      }
+    };
+
+    var differentValue = function(entry) {
+      if (!entry.value && !entry.oldValue) {
+        return false;
+      }
+
+      if ((!entry.value && entry.oldValue) || (entry.value && !entry.oldValue)) {
+        return true;
+      }
+
+      if (entry.value instanceof Array) {
+        if (entry.value.length != entry.oldValue.length) {
+          return true;
+        }
+        for (var i = 0; i < entry.value.length; i++) {
+          if (entry.value[i] !== entry.oldValue[i]) {
+            return true;
+          }
+        }
+        return false;
+      } else {
+        return (entry.value !== entry.oldValue);
+      }
+    };
+
+    $scope.metadataSave = function (catalogs) {
+      var catalogsWithUnsavedChanges = catalogs.filter(function(catalog) {
+        return catalog.fields.some(function(field) {
+          return field.dirty === true;
+        });
+      });
+
+      catalogsWithUnsavedChanges.forEach(function(catalog) {
+        // don't send collections
+        catalog.fields.forEach(function(field) {
           if (Object.prototype.hasOwnProperty.call(field, 'collection')) {
             field.collection = [];
           }
-        }
-      }
+        });
 
-      EventMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
-        if (angular.isDefined(callback)) {
-          callback();
-        }
-        // Mark the saved attribute as saved
-        angular.forEach(catalog.fields, function (entry) {
-          if (entry.id === id) {
-            entry.saved = true;
-          }
+        EventMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
+          var notificationContext = catalog === $scope.commonMetadataCatalog ? 'events-metadata-common'
+            : 'events-metadata-extended';
+          Notifications.add('info', 'SAVED_METADATA', notificationContext, 1200);
+
+          // Unmark entries
+          angular.forEach(catalog.fields, function (entry) {
+            entry.dirty = false;
+            // new original value
+            if (entry.value instanceof Array) {
+              entry.oldValue = entry.value.slice(0);
+            } else {
+              entry.oldValue = entry.value;
+            }
+          });
         });
       });
     };
