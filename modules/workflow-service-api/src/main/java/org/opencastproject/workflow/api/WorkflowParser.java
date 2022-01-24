@@ -149,14 +149,14 @@ public final class WorkflowParser {
    *           if creating the workflow instance fails
    */
   public static WorkflowInstance parseWorkflowInstance(String in) throws WorkflowParsingException {
-      return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
+    return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
   }
 
   /**
    * Loads workflow statistics from the given input stream.
    *
    * @param in
-   *          the input stream
+   *          the input streamapplication/v1.7.0+json
    * @return the workflow statistics
    * @throws WorkflowParsingException
    *           if creating the workflow statistics fails

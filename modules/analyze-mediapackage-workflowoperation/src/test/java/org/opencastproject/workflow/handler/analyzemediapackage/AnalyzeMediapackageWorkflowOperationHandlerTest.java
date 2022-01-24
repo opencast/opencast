@@ -29,10 +29,9 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.apache.commons.lang3.StringUtils;
@@ -72,9 +71,9 @@ public class AnalyzeMediapackageWorkflowOperationHandlerTest {
     mediaPackage.add(mediaPackageElementBuilder.newElement(MediaPackageElement.Type.Track,
         MediaPackageElementFlavor.flavor("presenter", "source")));
 
-    var operation = new WorkflowOperationInstanceImpl("test-id", WorkflowOperationInstance.OperationState.RUNNING);
+    var operation = new WorkflowOperationInstance("test-id", WorkflowOperationInstance.OperationState.RUNNING);
     // operation.setConfiguration("source-flavor", "presenter/source");
-    var workflowInstance = new WorkflowInstanceImpl();
+    var workflowInstance = new WorkflowInstance();
     workflowInstance.setMediaPackage(mediaPackage);
     workflowInstance.setOperations(Collections.singletonList(operation));
     var service = new AnalyzeMediapackageWorkflowOperationHandler();
@@ -109,9 +108,9 @@ public class AnalyzeMediapackageWorkflowOperationHandlerTest {
     mediaPackage.add(mediaPackageElementBuilder.newElement(MediaPackageElement.Type.Track,
         MediaPackageElementFlavor.flavor("presenter", "source")));
 
-    var operation = new WorkflowOperationInstanceImpl("test-id", WorkflowOperationInstance.OperationState.RUNNING);
+    var operation = new WorkflowOperationInstance("test-id", WorkflowOperationInstance.OperationState.RUNNING);
     operation.setConfiguration("source-flavor", "presenter/source");
-    var workflowInstance = new WorkflowInstanceImpl();
+    var workflowInstance = new WorkflowInstance();
     workflowInstance.setMediaPackage(mediaPackage);
     workflowInstance.setOperations(Collections.singletonList(operation));
     var service = new AnalyzeMediapackageWorkflowOperationHandler();
@@ -140,9 +139,9 @@ public class AnalyzeMediapackageWorkflowOperationHandlerTest {
     mediaPackage.add(mediaPackageElementBuilder.newElement(MediaPackageElement.Type.Track,
         MediaPackageElementFlavor.flavor("presenter", "source")));
 
-    var operation = new WorkflowOperationInstanceImpl("test-id", WorkflowOperationInstance.OperationState.RUNNING);
+    var operation = new WorkflowOperationInstance("test-id", WorkflowOperationInstance.OperationState.RUNNING);
     operation.setConfiguration("source-flavor", "foo/bar");
-    var workflowInstance = new WorkflowInstanceImpl();
+    var workflowInstance = new WorkflowInstance();
     workflowInstance.setMediaPackage(mediaPackage);
     workflowInstance.setOperations(Collections.singletonList(operation));
     var service = new AnalyzeMediapackageWorkflowOperationHandler();
@@ -154,9 +153,9 @@ public class AnalyzeMediapackageWorkflowOperationHandlerTest {
 
   @Test
   public void testWithEmptyMediapackage() throws WorkflowOperationException {
-    var operation = new WorkflowOperationInstanceImpl("test-id", WorkflowOperationInstance.OperationState.RUNNING);
+    var operation = new WorkflowOperationInstance("test-id", WorkflowOperationInstance.OperationState.RUNNING);
     operation.setConfiguration("source-flavor", "foo/bar");
-    var workflowInstance = new WorkflowInstanceImpl();
+    var workflowInstance = new WorkflowInstance();
     workflowInstance.setMediaPackage(mediaPackage);
     workflowInstance.setOperations(Collections.singletonList(operation));
     var service = new AnalyzeMediapackageWorkflowOperationHandler();
