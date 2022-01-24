@@ -8,6 +8,8 @@ import {fetchHealthStatus} from "../thunks/healthThunks";
 import {getHealthStatus} from "../selectors/healthSelectors";
 import {getCurrentLanguageInformation} from "../utils/utils";
 import {logger} from "../utils/logger";
+import {getUserBasicInfo} from "../selectors/userInfoSelectors";
+import axios from "axios";
 
 
 // Todo: Find suitable place to define them and get these links out of config-file or whatever
@@ -40,17 +42,20 @@ function showHotkeyCheatSheet() {
     console.log('Show Hot Keys');
 }
 
-//Todo: implement logout-method
 function logout() {
-    console.log('logout');
+    axios.get('/j_spring_security_logout')
+        .then(response => {
+            logger.info("Successful logout");
+        })
+        .catch(response => {
+            logger.error(response);
+        });
 }
-
-
 
 /**
  * Component that renders the header and the navigation in the upper right corner.
  */
-const Header = ({ loadingHealthStatus, healthStatus }) => {
+const Header = ({ loadingHealthStatus, healthStatus, user }) => {
     const { t } = useTranslation();
     // State for opening (true) and closing (false) the dropdown menus for language, notification, help and user
     const [displayMenuLang, setMenuLang] = useState(false);
@@ -162,8 +167,7 @@ const Header = ({ loadingHealthStatus, healthStatus }) => {
 
                 {/* Username */}
                 <div className="nav-dd user-dd" id="user-dd" ref={containerUser}>
-                    {/* Todo: User name of currently logged in user*/}
-                    <div className="h-nav" onClick={() => setMenuUser(!displayMenuUser)}>Here is space for a name <span className="dropdown-icon"/></div>
+                    <div className="h-nav" onClick={() => setMenuUser(!displayMenuUser)}>{user.name || user.username}<span className="dropdown-icon"/></div>
                     {/* Click on username, a dropdown menu with the option to logout opens */}
                     {displayMenuUser && (
                         <MenuUser />
@@ -250,7 +254,7 @@ const MenuUser = () => {
     return (
         <ul className="dropdown-ul">
             <li>
-                <a onClick={() => logout}>
+                <a onClick={() => logout()}>
                 <span className="logout-icon">
                     {t('LOGOUT')}
                 </span>
@@ -262,7 +266,8 @@ const MenuUser = () => {
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    healthStatus: getHealthStatus(state)
+    healthStatus: getHealthStatus(state),
+    user: getUserBasicInfo(state)
 });
 
 // Mapping actions to dispatch
