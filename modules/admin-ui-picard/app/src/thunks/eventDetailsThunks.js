@@ -59,7 +59,7 @@ export const fetchMetadata = (eventId) => async (dispatch) => {
     try {
         dispatch(loadEventMetadataInProgress());
 
-        const metadataRequest = await axios.get(`admin-ng/event/${eventId}/metadata.json`);
+        const metadataRequest = await axios.get(`/admin-ng/event/${eventId}/metadata.json`);
         const metadataResponse = await metadataRequest.data;
 
         const metadata = transformMetadataCollection(metadataResponse[0]);
