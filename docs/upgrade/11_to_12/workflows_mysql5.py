@@ -214,8 +214,8 @@ CREATE TABLE IF NOT EXISTS {workflow_operation_table_name} (
 create_workflow_operation_configuration_table = f"""
 CREATE TABLE IF NOT EXISTS {workflow_operation_configuration_table_name} (
   workflow_operation_id BIGINT(20),
-  key_part VARCHAR(255),
-  value_part LONGTEXT,
+  key_part VARCHAR(255) NOT NULL,
+  value_part LONGTEXT NOT NULL,
   INDEX (workflow_operation_id)
 ) ENGINE = InnoDB
 """
@@ -407,19 +407,19 @@ for (payload, date_created, date_completed) in zip(payloads, date_createds, date
   wf_operation_config = []
 
 
-# ### Delete workflow information from oc_job
-# print("Delete information from oc_job table...")
-# ### Get information from database
-# select_id_from_job_table = """
-# SELECT payload FROM oc_job WHERE operation="START_WORKFLOW"
-# """
-# ids = execute_read_query(connection, select_id_from_job_table)
-#
-# ### Remove workflow XML from oc_job
-# sql_update_job_payload_query = """
-# UPDATE oc_job SET payload = %s where id = %s
-# """
-# for id in ids:
-#   execute_query_with_data(connection, sql_update_job_payload_query, (id, id))
+### Delete workflow information from oc_job
+print("Delete information from oc_job table...")
+### Get information from database
+select_id_from_job_table = """
+SELECT payload FROM oc_job WHERE operation="START_WORKFLOW"
+"""
+ids = execute_read_query(connection, select_id_from_job_table)
+
+### Remove workflow XML from oc_job
+sql_update_job_payload_query = """
+UPDATE oc_job SET payload = %s where id = %s
+"""
+for id in ids:
+  execute_query_with_data(connection, sql_update_job_payload_query, (id, id))
 
 print("Update complete!")
