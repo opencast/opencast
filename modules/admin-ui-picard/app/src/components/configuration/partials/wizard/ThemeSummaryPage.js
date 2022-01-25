@@ -18,39 +18,39 @@ const ThemeSummaryPage = ({ formik, previousPage }) => {
                             <div className="obj-container summary-list padded">
                                 <ul>
                                     {/* show only when file is uploaded for a list item */}
-                                    {formik.values.bumperFile.id && (
+                                    {formik.values.bumperFile&& (
                                         <li>
                                             <h4>{t('CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION')}</h4>
                                             <p>
                                                 <span>{t('CONFIGURATION.THEMES.DETAILS.BUMPER.FILE_UPLOADED')}</span>
-                                                {formik.values.bumperFile.name}
+                                                {formik.values.bumperFileName}
                                             </p>
                                         </li>
                                     )}
-                                    {formik.values.trailerFile.id && (
+                                    {formik.values.trailerFile && (
                                         <li>
                                             <h4>{t('CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION')}</h4>
                                             <p>
                                                 <span>{t('CONFIGURATION.THEMES.DETAILS.TRAILER.FILE_UPLOADED')}</span>
-                                                {formik.values.trailerFile.name}
+                                                {formik.values.trailerFileName}
                                             </p>
                                         </li>
                                     )}
-                                    {(formik.values.titleSlideMode === 'upload' && formik.values.titleSlideBackground.id) && (
+                                    {(formik.values.titleSlideMode === 'upload' && formik.values.titleSlideBackground) && (
                                         <li>
                                             <h4>{t('CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION')}</h4>
                                             <p>
                                                 <span>{t('CONFIGURATION.THEMES.DETAILS.TITLE.FILE_UPLOADED')}</span>
-                                                {formik.values.titleSlideBackground.name}
+                                                {formik.values.titleSlideBackgroundName}
                                             </p>
                                         </li>
                                     )}
-                                    {formik.values.watermarkFile.id && (
+                                    {formik.values.watermarkFile && (
                                         <li>
                                             <h4>{t('CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION')}</h4>
                                             <p>
                                                 <span>{t('CONFIGURATION.THEMES.DETAILS.WATERMARK.FILE_UPLOADED')}</span>
-                                                {formik.values.watermarkFile.name}
+                                                {formik.values.watermarkFileName}
                                             </p>
                                         </li>
                                     )}
