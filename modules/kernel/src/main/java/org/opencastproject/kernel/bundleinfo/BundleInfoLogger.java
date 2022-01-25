@@ -37,12 +37,20 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Log information about bundle build versions. The bundle needs to have the manifest header "Build-Number" set.
  */
+@Component(
+    immediate = true
+)
 public class BundleInfoLogger implements BundleListener {
 
   private static final Logger logger = LoggerFactory.getLogger(BundleInfoLogger.class);
@@ -57,6 +65,11 @@ public class BundleInfoLogger implements BundleListener {
   private String host;
 
   /** OSGi DI */
+  @Reference(
+      name = "bundleInfoDb",
+      policy = ReferencePolicy.STATIC,
+      unbind = "unsetDb"
+  )
   public void setDb(BundleInfoDb db) {
     this.db = some(db);
   }
@@ -67,6 +80,7 @@ public class BundleInfoLogger implements BundleListener {
   }
 
   /** OSGi callback */
+  @Activate
   public void activate(ComponentContext cc) {
     host = option(getContextProperty(cc, OpencastConstants.SERVER_URL_PROPERTY)).bind(Strings.trimToNone).getOrElse(
             UrlSupport.DEFAULT_BASE_URL);
@@ -79,6 +93,7 @@ public class BundleInfoLogger implements BundleListener {
   }
 
   /** OSGi callback */
+  @Deactivate
   public void deactivate() {
     for (BundleInfoDb a : db) {
       logger.info("Clearing versions");

@@ -91,6 +91,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,6 +113,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Component(
+    immediate = true,
+    service = { TranscriptionService.class,IBMWatsonTranscriptionService.class },
+    property = {
+        "service.description=IBM Watson Transcription Service",
+        "provider=ibm.watson"
+    }
+)
 public class IBMWatsonTranscriptionService extends AbstractJobProducer implements TranscriptionService {
 
   /** The logger */
@@ -232,6 +244,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     if (cc != null) {
       // Has this service been enabled?
@@ -849,42 +862,82 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     return callbackAlreadyRegistered;
   }
 
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference(
+      name = "securityService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(
+      name = "userDirectoryService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference(
+      name = "organizationDirectoryService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference(
+      name = "smtpService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSmtpService(SmtpService service) {
     this.smtpService = service;
   }
 
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
+  @Reference(
+      name = "workingFileRepository",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }
 
+  @Reference(
+      name = "database",
+      policy = ReferencePolicy.STATIC
+  )
   public void setDatabase(TranscriptionDatabase service) {
     this.database = service;
   }
 
+  @Reference(
+      name = "assetManager",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }
 
+  @Reference(
+      name = "workflowService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }

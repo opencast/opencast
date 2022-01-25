@@ -78,6 +78,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +106,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component(
+    immediate = true,
+    service = LiveScheduleService.class,
+    property = {
+        "service.description=Live Schedule Service"
+    }
+)
 public class LiveScheduleServiceImpl implements LiveScheduleService {
   /** The server url property **/
   static final String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
@@ -176,6 +188,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
    * @param context
    *          the component context
    */
+  @Activate
   protected void activate(ComponentContext context) {
     BundleContext bundleContext = context.getBundleContext();
 
@@ -624,12 +637,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     return false;
   }
 
-  /*
-   * public void setDublinCoreService(DublinCoreCatalogService service) { this.dublinCoreService = service; }
-   *
-   * public void setWorkspace(Workspace workspace) { this.workspace = workspace; }
-   */
-
   private JobBarrier.Result waitForStatus(Job... jobs) throws IllegalStateException, IllegalArgumentException {
     if (serviceRegistry == null) {
       throw new IllegalStateException("Can't wait for job status without providing a service registry first");
@@ -868,49 +875,101 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  // === Set by OSGI - begin
+  @Reference(
+      name = "dublinCoreService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setDublinCoreService(DublinCoreCatalogService service) {
     this.dublinCoreService = service;
   }
 
+  @Reference(
+      name = "searchService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSearchService(SearchService service) {
     this.searchService = service;
   }
 
+  @Reference(
+      name = "seriesService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSeriesService(SeriesService service) {
     this.seriesService = service;
   }
 
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   public void setServiceRegistry(ServiceRegistry service) {
     this.serviceRegistry = service;
   }
 
+  @Reference(
+      name = "captureAgentService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setCaptureAgentService(CaptureAgentStateService service) {
     this.captureAgentService = service;
   }
 
+  @Reference(
+      name = "distributionService",
+      cardinality = ReferenceCardinality.AT_LEAST_ONE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetDownloadDistributionService"
+  )
   public void setDownloadDistributionService(DownloadDistributionService service) {
     if (distributionServiceType.equalsIgnoreCase(service.getDistributionType())) {
       this.downloadDistributionService = service;
     }
   }
 
+  public void unsetDownloadDistributionService(DownloadDistributionService service) {
+    if (distributionServiceType.equalsIgnoreCase(service.getDistributionType())
+        && downloadDistributionService.equals(service)) {
+      this.downloadDistributionService = null;
+    }
+  }
+
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
+  @Reference(
+      name = "assetManager",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
+  @Reference(
+      name = "authorizationService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAuthorizationService(AuthorizationService service) {
     this.authService = service;
   }
 
+  @Reference(
+      name = "organizationService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrganizationService(OrganizationDirectoryService service) {
     this.organizationService = service;
   }
 
+  @Reference(
+      name = "securityService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService service) {
     this.securityService = service;
   }

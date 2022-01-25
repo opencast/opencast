@@ -32,6 +32,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -39,11 +40,23 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Attach Transcription Workflow Operation Handler",
+        "workflow.operation=attach-watson-transcription"
+    }
+)
 public class AttachTranscriptionOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -61,6 +74,7 @@ public class AttachTranscriptionOperationHandler extends AbstractWorkflowOperati
   private CaptionService captionService;
 
   @Override
+  @Activate
   protected void activate(ComponentContext cc) {
     super.activate(cc);
   }
@@ -134,14 +148,27 @@ public class AttachTranscriptionOperationHandler extends AbstractWorkflowOperati
     return createResult(mediaPackage, Action.CONTINUE);
   }
 
+  @Reference(
+      name = "TranscriptionService",
+      policy = ReferencePolicy.STATIC,
+      target = "(provider=ibm.watson)"
+  )
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
   }
 
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace service) {
     this.workspace = service;
   }
 
+  @Reference(
+      name = "captionService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setCaptionService(CaptionService service) {
     this.captionService = service;
   }

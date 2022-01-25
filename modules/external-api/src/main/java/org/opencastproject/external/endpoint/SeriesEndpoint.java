@@ -96,6 +96,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,6 +133,15 @@ import javax.ws.rs.core.Response.Status;
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
 @RestService(name = "externalapiseries", title = "External API Series Service", notes = {},
              abstractText = "Provides resources and operations related to the series")
+@Component(
+    immediate = true,
+    service = SeriesEndpoint.class,
+    property = {
+        "service.description=External API - Series Endpoint",
+        "opencast.service.type=org.opencastproject.external",
+        "opencast.service.path=/api/series"
+    }
+)
 public class SeriesEndpoint {
 
   private static final int CREATED_BY_UI_ORDER = 9;
@@ -146,26 +159,43 @@ public class SeriesEndpoint {
   private SeriesService seriesService;
 
   /** OSGi DI */
+  @Reference(
+      name = "ElasticsearchIndex",
+      policy = ReferencePolicy.STATIC
+  )
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "IndexService",
+      policy = ReferencePolicy.STATIC
+  )
   void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "SecurityService",
+      policy = ReferencePolicy.STATIC
+  )
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "SeriesService",
+      policy = ReferencePolicy.STATIC
+  )
   void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi activation method */
+  @Activate
   void activate(ComponentContext cc) {
     logger.info("Activating External API - Series Endpoint");
 

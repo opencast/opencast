@@ -38,6 +38,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -50,6 +51,13 @@ import java.util.List;
 /**
  * Proxies a set of remote composer services for use as a JVM-local service. Remote services are selected at random.
  */
+@Component(
+    immediate = true,
+    service = CaptionService.class,
+    property = {
+        "service.description=Caption Remote Service Proxy"
+    }
+)
 public class CaptionServiceRemoteImpl extends RemoteBase implements CaptionService {
 
   /** The logger */

@@ -39,6 +39,10 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +80,15 @@ import javax.ws.rs.core.Response;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@Component(
+    immediate = true,
+    service = StatisticsRestService.class,
+    property = {
+        "service.description=Statistics REST Endpoint",
+        "opencast.service.type=org.opencastproject.statistics",
+        "opencast.service.path=/statistics"
+    }
+)
 public class StatisticsRestService {
 
   /** Logging utility */
@@ -89,6 +102,10 @@ public class StatisticsRestService {
    *
    * @param statisticsService
    */
+  @Reference(
+      name = "service-impl",
+      policy = ReferencePolicy.STATIC
+  )
   public void setService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
@@ -99,6 +116,7 @@ public class StatisticsRestService {
    * @param cc
    *          ComponentContext
    */
+  @Activate
   public void activate(ComponentContext cc) {
   }
 

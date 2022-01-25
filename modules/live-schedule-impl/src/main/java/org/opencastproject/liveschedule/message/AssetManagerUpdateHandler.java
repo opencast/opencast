@@ -27,9 +27,17 @@ import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteEpisode;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(
+    immediate = true,
+    service = UpdateHandler.class,
+    property = {
+        "service.description=Asset Manager Update Listener for Live Schedule Service"
+    }
+)
 public class AssetManagerUpdateHandler extends UpdateHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerUpdateHandler.class);

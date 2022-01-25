@@ -25,6 +25,7 @@ import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
+import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.AudioStream;
@@ -53,6 +54,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentException;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
@@ -91,6 +95,14 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Distributes media to the local media delivery directory.
  */
+@Component(
+    immediate = true,
+    service = { DistributionService.class, StreamingDistributionService.class },
+    property = {
+        "service.description=Distribution Service (Streaming)",
+        "distribution.channel=streaming"
+    }
+)
 public class WowzaStreamingDistributionService extends AbstractDistributionService
         implements StreamingDistributionService {
 
@@ -199,11 +211,13 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     return DISTRIBUTION_TYPE;
   }
 
+  @Activate
   public void activate(BundleContext bundleContext, Map<String, Object> properties)
           throws ComponentException, ConfigurationException {
     modified(bundleContext, properties);
   }
 
+  @Modified
   public void modified(BundleContext bundleContext, Map<String, Object> properties)
           throws ComponentException, ConfigurationException {
 

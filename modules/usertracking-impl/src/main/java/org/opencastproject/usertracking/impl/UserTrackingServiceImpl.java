@@ -39,6 +39,10 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +66,14 @@ import javax.persistence.TemporalType;
  *
  * @see org.opencastproject.usertracking.api.UserTrackingService
  */
+@Component(
+    immediate = true,
+    service = { UserTrackingService.class,ManagedService.class },
+    property = {
+        "service.description=User Tracking Service",
+        "service.pid=org.opencastproject.usertracking.impl.UserTrackingServiceImpl"
+    }
+)
 public class UserTrackingServiceImpl implements UserTrackingService, ManagedService {
 
   /** JPA persistence unit name */
@@ -87,6 +99,11 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   /** OSGi DI */
 
   /** OSGi DI */
+  @Reference(
+      name = "entityManagerFactory",
+      policy = ReferencePolicy.STATIC,
+      target = "(osgi.unit.name=org.opencastproject.usertracking)"
+  )
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -94,6 +111,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   /**
    * Activation callback to be executed once all dependencies are set
    */
+  @Activate
   public void activate() {
     logger.debug("activate()");
   }

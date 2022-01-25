@@ -68,6 +68,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +87,13 @@ import java.util.TimeZone;
 /**
  * A proxy to a remote series service.
  */
+@Component(
+    immediate = true,
+    service = SchedulerService.class,
+    property = {
+        "service.description=Scheduler Remote Service Proxy"
+    }
+)
 public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerService {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceRemoteImpl.class);

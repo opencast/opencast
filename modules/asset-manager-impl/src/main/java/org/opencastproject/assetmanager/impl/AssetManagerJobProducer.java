@@ -42,6 +42,10 @@ import com.entwinemedia.fn.data.Opt;
 import com.google.gson.Gson;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +56,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+@Component(
+    immediate = true,
+    name = "org.opencastproject.assetmanager.impl.TieredStorageAssetManagerJobProducer",
+    service = AssetManagerJobProducer.class,
+    property = {
+        "service.description=Opencast Asset Manager Job Producer"
+    }
+)
 public class AssetManagerJobProducer extends AbstractJobProducer {
 
   /** The logging facility */
@@ -84,6 +96,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    *          the component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating tiered storage assetmanager job service");
     super.activate(cc);
@@ -438,6 +451,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return result;
   }
 
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -447,10 +461,15 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.serviceRegistry;
   }
 
+  @Reference(name = "assetManager")
   protected void setAssetManager(AssetManager assetManager) {
     this.tsam = assetManager;
   }
 
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -460,6 +479,10 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.securityService;
   }
 
+  @Reference(
+      name = "user-directory",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setUserDirectoryService(UserDirectoryService uds) {
     this.userDirectoryService = uds;
   }
@@ -469,6 +492,10 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.userDirectoryService;
   }
 
+  @Reference(
+      name = "orgDirectory",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setOrganizationDirectoryService(OrganizationDirectoryService os) {
     this.organizationDirectoryService = os;
   }

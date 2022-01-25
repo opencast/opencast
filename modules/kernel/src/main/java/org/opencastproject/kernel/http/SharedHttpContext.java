@@ -28,6 +28,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.http.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +47,15 @@ import javax.servlet.http.HttpServletResponse;
  * Opencast's shared {@link HttpContext}. All Servlet and {@link org.opencastproject.rest.StaticResource}
  * registrations should use the {@link HttpContext} that is registered with the OSGi service registry.
  */
+@Component(
+    immediate = true,
+    service = HttpContext.class,
+    property = {
+        "service.description=Opencast HttpContent",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true"
+    }
+)
 public class SharedHttpContext implements HttpContext {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(SharedHttpContext.class);
@@ -52,12 +64,14 @@ public class SharedHttpContext implements HttpContext {
   protected BundleContext bundleContext = null;
 
   /** Activate the component */
+  @Activate
   public void activate(ComponentContext cc) {
     this.bundleContext = cc.getBundleContext();
     logger.debug("Shared http context activated with bundle context {}", this.bundleContext);
   }
 
   /** Deactivate the component */
+  @Deactivate
   public void deactivate() {
     this.bundleContext = null;
     logger.debug("Shared http context deactivated");

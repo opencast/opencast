@@ -64,6 +64,9 @@ import com.entwinemedia.fn.data.Opt;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +86,13 @@ import java.util.stream.Stream;
 /**
  * Publishes a recording to an OAI-PMH publication repository.
  */
+@Component(
+    immediate = true,
+    service = OaiPmhPublicationService.class,
+    property = {
+        "service.description=Publication Service (OAI-PMH)"
+    }
+)
 public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements OaiPmhPublicationService {
 
   /** Logging facility */
@@ -1082,41 +1092,74 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   }
 
   /** OSGI DI */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** OSGI DI */
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGI DI */
+  @Reference(
+      name = "user-directory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
   /** OSGI DI */
+  @Reference(
+      name = "orgDirectory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** OSGI DI */
+  @Reference(
+      name = "downloadDistributionService",
+      policy = ReferencePolicy.STATIC,
+      target = "(distribution.channel=download)"
+  )
   public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
 
   /** OSGI DI */
+  @Reference(
+      name = "streamingDistributionService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
 
   /** OSGI DI */
+  @Reference(
+      name = "oaiPmhServerInfo",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOaiPmhServerInfo(OaiPmhServerInfo oaiPmhServerInfo) {
     this.oaiPmhServerInfo = oaiPmhServerInfo;
   }
 
   /** OSGI DI */
+  @Reference(
+      name = "persistence",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOaiPmhDatabase(OaiPmhDatabase oaiPmhDatabase) {
     this.oaiPmhDatabase = oaiPmhDatabase;
   }

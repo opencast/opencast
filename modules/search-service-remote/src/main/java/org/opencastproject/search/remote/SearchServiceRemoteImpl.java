@@ -42,6 +42,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +52,13 @@ import java.util.List;
 /**
  * A proxy to a remote search service.
  */
+@Component(
+    immediate = true,
+    service = SearchService.class,
+    property = {
+        "service.description=Search Remote Service Proxy"
+    }
+)
 public class SearchServiceRemoteImpl extends RemoteBase implements SearchService {
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceRemoteImpl.class);
 

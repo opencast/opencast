@@ -31,11 +31,21 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = UpdateHandler.class,
+    property = {
+        "service.description=Scheduler Update Listener for Live Schedule Service"
+    }
+)
 public class SchedulerUpdateHandler extends UpdateHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerUpdateHandler.class);
@@ -132,6 +142,10 @@ public class SchedulerUpdateHandler extends UpdateHandler {
   }
 
   // === Set by OSGI begin
+  @Reference(
+      name = "schedulerService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSchedulerService(SchedulerService service) {
     this.schedulerService = service;
   }

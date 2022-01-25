@@ -35,12 +35,17 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +54,14 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Start Transcription Workflow Operation Handler (Amberscript)",
+        "workflow.operation=amberscript-start-transcription"
+    }
+)
 public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AmberscriptStartTranscriptionOperationHandler.class);
@@ -77,6 +90,7 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
   }
 
   @Override
+  @Activate
   protected void activate(ComponentContext cc) {
     super.activate(cc);
   }
@@ -152,6 +166,11 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     return createResult(Action.CONTINUE);
   }
 
+  @Reference(
+      name = "TranscriptionService",
+      policy = ReferencePolicy.STATIC,
+      target = "(provider=amberscript)"
+  )
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
   }

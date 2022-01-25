@@ -54,6 +54,10 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +81,14 @@ import javax.activation.FileTypeMap;
  * match for specified input or output format {@link UnsupportedCaptionFormatException} is thrown.
  *
  */
+@Component(
+    immediate = true,
+    service = { CaptionService.class,ManagedService.class },
+    property = {
+        "service.description=Caption Converter Service",
+        "service.pid=org.opencastproject.caption.impl.CaptionServiceImpl"
+    }
+)
 public class CaptionServiceImpl extends AbstractJobProducer implements CaptionService, ManagedService {
 
   /**
@@ -131,6 +143,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    *          the component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext componentContext) {
     super.activate(componentContext);
     this.componentContext = componentContext;
@@ -488,6 +501,10 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   /**
    * Setter for workspace via declarative activation
    */
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -495,6 +512,10 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   /**
    * Setter for remote service manager via declarative activation
    */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -505,6 +526,10 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    * @param securityService
    *          the securityService to set
    */
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -515,6 +540,10 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(
+      name = "user-directory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -525,6 +554,10 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(
+      name = "orgDirectory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }

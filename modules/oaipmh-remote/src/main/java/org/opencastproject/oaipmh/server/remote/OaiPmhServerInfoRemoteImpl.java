@@ -32,11 +32,19 @@ import org.opencastproject.util.UrlSupport;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+@Component(
+    immediate = true,
+    service = OaiPmhServerInfo.class,
+    property = {
+        "service.description=OAI-PMH server info remote proxy"
+    }
+)
 public class OaiPmhServerInfoRemoteImpl extends RemoteBase implements OaiPmhServerInfo {
   private static final Logger logger = LoggerFactory.getLogger(OaiPmhServerInfoRemoteImpl.class);
 

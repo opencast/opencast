@@ -41,6 +41,8 @@ import com.google.gson.Gson;
 
 import org.apache.http.client.methods.HttpPost;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +51,14 @@ import java.util.List;
 import java.util.Set;
 
 /** A remote distribution service invoker. */
+@Component(
+    immediate = true,
+    service = { DistributionService.class,DownloadDistributionService.class },
+    property = {
+        "service.description=Distribution (Download) Remote Service Proxy",
+        "distribution.channel=download"
+    }
+)
 public class DownloadDistributionServiceRemoteImpl extends RemoteBase
         implements DistributionService, DownloadDistributionService {
   /** The logger */
@@ -76,6 +86,7 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
   }
 
   /** activates the component */
+  @Activate
   protected void activate(ComponentContext cc) {
     this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
     super.serviceType = JOB_TYPE_PREFIX + this.distributionChannel;

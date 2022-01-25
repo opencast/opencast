@@ -37,6 +37,9 @@ import org.opencastproject.videosegmenter.api.VideoSegmenterException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +70,16 @@ import javax.ws.rs.core.Response;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@Component(
+    immediate = true,
+    service = VideoSegmenterRestEndpoint.class,
+    property = {
+        "service.description=Video Segmentation REST Endpoint",
+        "opencast.service.type=org.opencastproject.videosegmenter",
+        "opencast.service.path=/analysis/videosegmenter",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -87,6 +100,10 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -97,6 +114,10 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
    * @param videoSegmenter
    *          the segmenter
    */
+  @Reference(
+      name = "segmenter",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setVideoSegmenter(VideoSegmenterService videoSegmenter) {
     this.service = videoSegmenter;
   }

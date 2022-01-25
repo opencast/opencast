@@ -142,6 +142,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,6 +180,13 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Component(
+    immediate = true,
+    service = IndexService.class,
+    property = {
+        "service.description=Index Services Implementation"
+    }
+)
 public class IndexServiceImpl implements IndexService {
 
   private static final String WORKFLOW_CONFIG_PREFIX = "org.opencastproject.workflow.config.";
@@ -225,6 +238,10 @@ public class IndexServiceImpl implements IndexService {
    * @param aclServiceFactory
    *          the factory to set
    */
+  @Reference(
+      name = "AclServiceFactory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
@@ -235,6 +252,10 @@ public class IndexServiceImpl implements IndexService {
    * @param authorizationService
    *          the service to set
    */
+  @Reference(
+      name = "AuthorizationService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -245,6 +266,10 @@ public class IndexServiceImpl implements IndexService {
    * @param captureAgentStateService
    *          the service to set
    */
+  @Reference(
+      name = "CaptureAgentStateService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setCaptureAgentStateService(CaptureAgentStateService captureAgentStateService) {
     this.captureAgentStateService = captureAgentStateService;
   }
@@ -255,6 +280,10 @@ public class IndexServiceImpl implements IndexService {
    * @param eventCommentService
    *          the service to set
    */
+  @Reference(
+      name = "EventCommentService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }
@@ -265,6 +294,12 @@ public class IndexServiceImpl implements IndexService {
    * @param catalogUIAdapter
    *          the adapter to add
    */
+  @Reference(
+      name = "EventCatalogUIAdapter",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     eventCatalogUIAdapters.add(catalogUIAdapter);
   }
@@ -285,6 +320,12 @@ public class IndexServiceImpl implements IndexService {
    * @param catalogUIAdapter
    *          the adapter to add
    */
+  @Reference(
+      name = "SeriesCatalogUIAdapter",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
     seriesCatalogUIAdapters.add(catalogUIAdapter);
   }
@@ -305,6 +346,10 @@ public class IndexServiceImpl implements IndexService {
    * @param ingestService
    *          the service to set
    */
+  @Reference(
+      name = "IngestService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
@@ -315,6 +360,10 @@ public class IndexServiceImpl implements IndexService {
    * @param listProvidersService
    *          the service to set
    */
+  @Reference(
+      name = "ListProvidersService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
@@ -325,6 +374,10 @@ public class IndexServiceImpl implements IndexService {
    * @param assetManager
    *          the manager to set
    */
+  @Reference(
+      name = "AssetManager",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -335,6 +388,10 @@ public class IndexServiceImpl implements IndexService {
    * @param schedulerService
    *          the service to set
    */
+  @Reference(
+      name = "SchedulerService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
@@ -345,6 +402,10 @@ public class IndexServiceImpl implements IndexService {
    * @param securityService
    *          the service to set
    */
+  @Reference(
+      name = "SecurityService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -355,6 +416,10 @@ public class IndexServiceImpl implements IndexService {
    * @param seriesService
    *          the service to set
    */
+  @Reference(
+      name = "SeriesService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -365,6 +430,10 @@ public class IndexServiceImpl implements IndexService {
    * @param workflowService
    *          the service to set
    */
+  @Reference(
+      name = "workflowService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
@@ -375,6 +444,10 @@ public class IndexServiceImpl implements IndexService {
    * @param workspace
    *          the workspace to set
    */
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -385,6 +458,10 @@ public class IndexServiceImpl implements IndexService {
    * @param userDirectoryService
    *          the service to set
    */
+  @Reference(
+      name = "userDirectoryService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -471,10 +548,12 @@ public class IndexServiceImpl implements IndexService {
     return getCommonSeriesCatalogUIAdapter(securityService.getOrganization().getId());
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     workflowService.addWorkflowListener(new RetractionListener(this, securityService, retractions));
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     executorService.shutdown();
   }

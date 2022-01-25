@@ -26,6 +26,7 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.event.comment.EventComment;
@@ -44,6 +45,10 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +70,13 @@ import javax.persistence.Query;
 /**
  * Implements permanent storage for event comments.
  */
+@Component(
+    immediate = true,
+    service = { EventCommentDatabaseService.class, IndexProducer.class },
+    property = {
+        "service.description=Event Comment Database Service"
+    }
+)
 public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer implements EventCommentDatabaseService {
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(EventCommentDatabaseServiceImpl.class);
@@ -93,12 +105,18 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   private ElasticsearchIndex index;
 
   /** OSGi component activation callback */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for event comments");
     this.cc = cc;
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "entityManagerFactory",
+      policy = ReferencePolicy.STATIC,
+      target = "(osgi.unit.name=org.opencastproject.event.comment)"
+  )
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
     this.env = PersistenceEnvs.mk(emf);
@@ -110,6 +128,10 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param securityService
    *          The security service
    */
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -120,6 +142,10 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param userDirectoryService
    *          the user directory service
    */
+  @Reference(
+      name = "userDirectory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -130,6 +156,10 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param organizationDirectoryService
    *          the organization directory service
    */
+  @Reference(
+      name = "organization-directory-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
@@ -140,6 +170,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param index
    *          the API index.
    */
+  @Reference(name = "elasticsearch-index")
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }

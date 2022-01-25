@@ -46,6 +46,10 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +89,15 @@ import javax.ws.rs.core.MediaType;
       + "deployed and the current user context.",
     notes = {}
 )
+@Component(
+    immediate = true,
+    service = RuntimeInfo.class,
+    property = {
+        "service.description=Runtime Information REST Endpoint",
+        "opencast.service.type=org.opencastproject.info",
+        "opencast.service.path=/info"
+    }
+)
 public class RuntimeInfo {
 
   private static final Logger logger = LoggerFactory.getLogger(RuntimeInfo.class);
@@ -113,6 +126,12 @@ public class RuntimeInfo {
   private BundleContext bundleContext;
   private URL serverUrl;
 
+  @Reference(
+      name = "userid-role-provider",
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetUserIdRoleProvider"
+  )
   protected void setUserIdRoleProvider(UserIdRoleProvider userIdRoleProvider) {
     this.userIdRoleProvider = userIdRoleProvider;
   }
@@ -123,10 +142,12 @@ public class RuntimeInfo {
     }
   }
 
+  @Reference(name = "security-service")
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(name = "service-registry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

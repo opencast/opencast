@@ -33,6 +33,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,13 @@ import java.util.List;
 /**
  * This is a remote waveform service that will call the waveform service implementation on a remote host.
  */
+@Component(
+    immediate = true,
+    service = WaveformService.class,
+    property = {
+        "service.description=Waveform Remote Service Proxy"
+    }
+)
 public class WaveformServiceRemote extends RemoteBase implements WaveformService {
   private static final Logger logger = LoggerFactory.getLogger(WaveformServiceRemote.class);
 

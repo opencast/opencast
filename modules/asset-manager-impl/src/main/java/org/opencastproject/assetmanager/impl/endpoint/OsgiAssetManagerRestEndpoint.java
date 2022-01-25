@@ -22,10 +22,24 @@ package org.opencastproject.assetmanager.impl.endpoint;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
 @Path("/")
+@Component(
+    immediate = true,
+    service = OsgiAssetManagerRestEndpoint.class,
+    property = {
+        "service.description=AssetManager REST Endpoint",
+        "opencast.service.type=org.opencastproject.assetmanager",
+        "opencast.service.path=/assets",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class OsgiAssetManagerRestEndpoint extends AbstractTieredStorageAssetManagerRestEndpoint {
   private AssetManager assetManager;
 
@@ -34,6 +48,10 @@ public class OsgiAssetManagerRestEndpoint extends AbstractTieredStorageAssetMana
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "asset-manager",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }

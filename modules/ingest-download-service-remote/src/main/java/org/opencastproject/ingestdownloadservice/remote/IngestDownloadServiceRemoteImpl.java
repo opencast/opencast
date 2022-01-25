@@ -34,6 +34,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,13 @@ import java.util.List;
 /**
  * Remote implementation of the ingest download service
  */
+@Component(
+    immediate = true,
+    service = IngestDownloadService.class,
+    property = {
+        "service.description=Calls Ingest Download Service"
+    }
+)
 public class IngestDownloadServiceRemoteImpl extends RemoteBase implements IngestDownloadService {
 
   /** The logger */

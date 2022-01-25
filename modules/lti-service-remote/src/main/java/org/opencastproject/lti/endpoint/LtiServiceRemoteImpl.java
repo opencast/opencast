@@ -38,6 +38,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.InputStreamBody;
+import org.osgi.service.component.annotations.Component;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,6 +50,13 @@ import javax.ws.rs.core.Response;
 /**
  * The service calling the LTI REST endpoint (for multi-node setups with LTI)
  */
+@Component(
+    immediate = true,
+    service = LtiService.class,
+    property = {
+        "service.description=LTI Service Remote Service"
+    }
+)
 public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
   private static final Gson gson = new Gson();
 

@@ -36,6 +36,10 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +66,16 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
         + "other words, there is a bug! You should file an error report with your server logs from the time when the "
         + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+    immediate = false,
+    service = TextAnalysisRestEndpoint.class,
+    property = {
+        "service.description=Text Analysis REST Endpoint",
+        "opencast.service.type=org.opencastproject.textanalyzer",
+        "opencast.service.path=/analysis/text",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logging facility */
@@ -79,6 +93,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
    * @param cc
    *          OSGi component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     // String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
@@ -135,6 +150,10 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -145,6 +164,10 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
    * @param textAnalyzer
    *          the text analyzer
    */
+  @Reference(
+      name = "textAnalyzer",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setTextAnalyzer(TextAnalyzerService textAnalyzer) {
     this.service = textAnalyzer;
   }

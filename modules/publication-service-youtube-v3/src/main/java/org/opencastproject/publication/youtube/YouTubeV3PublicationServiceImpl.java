@@ -53,6 +53,10 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +72,13 @@ import java.util.UUID;
 /**
  * Publishes media to a Youtube play list.
  */
+@Component(
+    immediate = true,
+    service = { ManagedService.class,YouTubePublicationService.class },
+    property = {
+        "service.description=Publication Service (Youtube API Version 3)"
+    }
+)
 public class YouTubeV3PublicationServiceImpl
     extends AbstractJobProducer
     implements YouTubePublicationService, ManagedService {
@@ -165,6 +176,7 @@ public class YouTubeV3PublicationServiceImpl
    * Called when service activates. Defined in OSGi resource file.
    */
   @Override
+  @Activate
   public synchronized void activate(final ComponentContext cc) {
     super.activate(cc);
     properties.setBundleContext(cc.getBundleContext());
@@ -404,6 +416,10 @@ public class YouTubeV3PublicationServiceImpl
    * @param workspace
    *          the workspace
    */
+  @Reference(
+      name = "WORKSPACE",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -414,6 +430,10 @@ public class YouTubeV3PublicationServiceImpl
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -434,6 +454,10 @@ public class YouTubeV3PublicationServiceImpl
    * @param securityService
    *          the securityService to set
    */
+  @Reference(
+      name = "securityService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -444,6 +468,10 @@ public class YouTubeV3PublicationServiceImpl
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(
+      name = "userDirectoryService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -454,6 +482,10 @@ public class YouTubeV3PublicationServiceImpl
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(
+      name = "organizationDirectoryService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }

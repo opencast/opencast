@@ -30,6 +30,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -40,6 +42,16 @@ import javax.ws.rs.core.Response;
         title = "Nop Service",
         notes = {},
         abstractText = "No operation service. Creates empty jobs for testing purposes.")
+@Component(
+    immediate = true,
+    service = NopServiceEndpoint.class,
+    property = {
+        "service.description=No operation service REST endpoint",
+        "opencast.service.type=org.opencastproject.nop",
+        "opencast.service.path=/nop",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class NopServiceEndpoint extends OsgiAbstractJobProducerEndpoint<NopServiceImpl> {
   @GET
   @Path("nop")

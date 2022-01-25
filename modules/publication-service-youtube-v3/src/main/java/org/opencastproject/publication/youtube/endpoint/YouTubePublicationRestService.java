@@ -41,6 +41,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +68,16 @@ import javax.ws.rs.core.Response.Status;
             + "not anticipated. In other words, there is a bug! You should file an error report "
             + "with your server logs from the time when the error occurred: "
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
+@Component(
+    immediate = true,
+    service = YouTubePublicationRestService.class,
+    property = {
+        "service.description=Youtube Publication REST Endpoint",
+        "opencast.service.type=org.opencastproject.publication.youtube",
+        "opencast.service.path=/youtube",
+        "opencast.service.jobproducer=true"
     }
 )
 public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {

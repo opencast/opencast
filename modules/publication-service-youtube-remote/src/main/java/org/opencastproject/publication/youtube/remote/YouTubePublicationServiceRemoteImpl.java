@@ -34,6 +34,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,13 @@ import java.util.List;
 /**
  * A remote youtube service invoker.
  */
+@Component(
+    immediate = true,
+    service = YouTubePublicationService.class,
+    property = {
+        "service.description=Publication (youTube) Remote Service Proxy"
+    }
+)
 public class YouTubePublicationServiceRemoteImpl extends RemoteBase implements YouTubePublicationService {
 
   /** The logger */

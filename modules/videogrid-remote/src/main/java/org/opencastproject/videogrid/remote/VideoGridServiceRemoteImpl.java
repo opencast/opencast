@@ -37,6 +37,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Component(
+    immediate = true,
+    service = VideoGridService.class,
+    property = {
+        "service.description=Remote Video Grid Service"
+    }
+)
 public class VideoGridServiceRemoteImpl extends RemoteBase implements VideoGridService {
 
   private static final Logger logger = LoggerFactory.getLogger(VideoGridServiceRemoteImpl.class);

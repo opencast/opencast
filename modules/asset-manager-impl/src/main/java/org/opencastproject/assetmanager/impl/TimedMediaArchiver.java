@@ -35,6 +35,9 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.quartz.CronExpression;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -46,6 +49,13 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.concurrent.TimeUnit;
 
+@Component(
+    immediate = true,
+    service = ManagedService.class,
+    property = {
+        "service.description=Timed media archiver Service"
+    }
+)
 public class TimedMediaArchiver extends AbstractScanner implements ManagedService {
   private static final Log logger = new Log(LoggerFactory.getLogger(TimedMediaArchiver.class));
 
@@ -160,6 +170,10 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
     return SCANNER_NAME;
   }
 
+  @Reference(
+      name = "AssetManager",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAssetManager(AssetManager am) {
     this.assetManager = am;
   }

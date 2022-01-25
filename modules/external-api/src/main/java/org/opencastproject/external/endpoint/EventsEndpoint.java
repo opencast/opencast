@@ -129,6 +129,11 @@ import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,6 +180,15 @@ import javax.ws.rs.core.Response.Status;
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
+@Component(
+    immediate = true,
+    service = { EventsEndpoint.class,ManagedService.class },
+    property = {
+        "service.description=External API - Events Endpoint",
+        "opencast.service.type=org.opencastproject.external.events",
+        "opencast.service.path=/api/events"
+    }
+)
 public class EventsEndpoint implements ManagedService {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
@@ -225,26 +239,46 @@ public class EventsEndpoint implements ManagedService {
   private CaptureAgentStateService agentStateService;
 
   /** OSGi DI */
+  @Reference(
+      name = "ElasticsearchIndex",
+      policy = ReferencePolicy.STATIC
+  )
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "IndexService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "IngestService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "SecurityService",
+      policy = ReferencePolicy.STATIC
+  )
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "UrlSigningService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
@@ -257,16 +291,30 @@ public class EventsEndpoint implements ManagedService {
     return schedulerService;
   }
 
+  @Reference(
+      name = "SchedulerService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
   /** OSGi DI. */
+  @Reference(
+      name = "CommonEventCatalogUIAdapter",
+      policy = ReferencePolicy.STATIC
+  )
   public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
     this.eventCatalogUIAdapter = eventCatalogUIAdapter;
   }
 
   /** OSGi DI. */
+  @Reference(
+      name = "EventCatalogUIAdapter",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     catalogUIAdapters.add(catalogUIAdapter);
   }
@@ -282,6 +330,10 @@ public class EventsEndpoint implements ManagedService {
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "agentStateService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAgentStateService(CaptureAgentStateService agentStateService) {
     this.agentStateService = agentStateService;
   }
@@ -301,6 +353,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   /** OSGi activation method */
+  @Activate
   void activate(ComponentContext cc) {
     logger.info("Activating External API - Events Endpoint");
 

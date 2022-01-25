@@ -35,6 +35,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.impl.StdSchedulerFactory;
@@ -43,6 +44,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 
+@Component(
+    immediate = true,
+    service = ManagedService.class,
+    property = {
+        "service.description=Workflow Cleanup Scanner Service"
+    }
+)
 public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implements ManagedService {
   private static final String SCANNER_NAME = "Workflow Cleanup Scanner";
 

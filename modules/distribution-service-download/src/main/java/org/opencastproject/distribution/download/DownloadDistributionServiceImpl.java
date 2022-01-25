@@ -62,6 +62,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +94,15 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Distributes media to the local media delivery directory.
  */
+@Component(
+    immediate = true,
+    service = { DistributionService.class,DownloadDistributionService.class,ManagedService.class },
+    property = {
+        "service.description=Distribution Service (Local)",
+        "service.pid=org.opencastproject.distribution.download.DownloadDistributionServiceImpl",
+        "distribution.channel=download"
+    }
+)
 public class DownloadDistributionServiceImpl extends AbstractDistributionService
         implements DistributionService, DownloadDistributionService, ManagedService {
 
@@ -148,6 +159,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    *          the OSGi component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     serviceUrl = cc.getBundleContext().getProperty("org.opencastproject.download.url");

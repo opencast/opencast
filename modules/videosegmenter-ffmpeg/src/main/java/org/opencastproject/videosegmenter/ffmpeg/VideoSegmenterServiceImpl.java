@@ -53,6 +53,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +83,13 @@ import java.util.regex.Pattern;
  * ffmpeg -nostats -i in.mp4 -filter:v 'select=gt(scene\,0.04),showinfo' -f null - 2&gt;&amp;1 | grep Parsed_showinfo_1
  * </pre>
  */
+@Component(
+    immediate = true,
+    service = { VideoSegmenterService.class,ManagedService.class },
+    property = {
+        "service.description=VideoSegmenter Service"
+    }
+)
 public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
     VideoSegmenterService, ManagedService {
 
@@ -949,6 +959,10 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param workspace
    *            an instance of the workspace
    */
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -970,6 +984,10 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param serviceRegistry
    *            the service registry
    */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -990,6 +1008,10 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param securityService
    *            the securityService to set
    */
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

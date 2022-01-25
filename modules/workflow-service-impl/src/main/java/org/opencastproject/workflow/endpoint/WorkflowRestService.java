@@ -81,6 +81,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,6 +119,16 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+    immediate = true,
+    service = WorkflowRestService.class,
+    property = {
+        "service.description=Workflow REST Endpoint",
+        "opencast.service.type=org.opencastproject.workflow",
+        "opencast.service.path=/workflow",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   /** The default number of results returned */
@@ -146,6 +160,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -156,6 +174,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
    * @param service
    *          the workflow service instance
    */
+  @Reference(
+      name = "service-impl",
+      policy = ReferencePolicy.STATIC
+  )
   public void setService(WorkflowService service) {
     this.service = service;
   }
@@ -166,6 +188,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
    * @param workspace
    *          the workspace
    */
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -176,6 +202,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
    * @param cc
    *          the OSGI declarative services component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     // Get the configured server URL
     if (cc == null) {

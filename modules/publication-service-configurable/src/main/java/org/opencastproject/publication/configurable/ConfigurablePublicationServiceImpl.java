@@ -44,6 +44,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,6 +54,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+@Component(
+    immediate = true,
+    service = ConfigurablePublicationService.class,
+    property = {
+        "service.description=Publication Service (Configurable)"
+    }
+)
 public class ConfigurablePublicationServiceImpl extends AbstractJobProducer implements ConfigurablePublicationService {
 
   /* Gson is thread-safe so we use a single instance */

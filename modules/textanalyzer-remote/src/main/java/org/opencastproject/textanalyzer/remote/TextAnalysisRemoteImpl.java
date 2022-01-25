@@ -33,12 +33,20 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component(
+    immediate = true,
+    service = TextAnalyzerService.class,
+    property = {
+        "service.description=Text Analysis Remote Service Proxy"
+    }
+)
 public class TextAnalysisRemoteImpl extends RemoteBase implements TextAnalyzerService {
 
   /** The logger */

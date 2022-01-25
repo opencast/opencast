@@ -27,12 +27,22 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A service that provides presets.
  */
+@Component(
+    immediate = true,
+    service = PresetProvider.class,
+    property = {
+        "service.description=Provides Series and Organization Presets"
+    }
+)
 public class PresetProviderImpl implements PresetProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(PresetProvider.class);
@@ -41,10 +51,18 @@ public class PresetProviderImpl implements PresetProvider {
   /** The security service to get the current user's organization */
   private SecurityService securityService;
 
+  @Reference(
+      name = "seriesService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
+  @Reference(
+      name = "SecurityService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

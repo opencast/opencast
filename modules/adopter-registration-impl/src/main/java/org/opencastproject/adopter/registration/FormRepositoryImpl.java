@@ -21,6 +21,9 @@
 
 package org.opencastproject.adopter.registration;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,13 @@ import javax.persistence.TypedQuery;
 /**
  * Repository that handles registration forms for the adopter statistics.
  */
+@Component(
+    immediate = true,
+    service = FormRepository.class,
+    property = {
+        "service.description=Repository for the statistics registration form"
+    }
+)
 public class FormRepositoryImpl implements FormRepository {
 
   /** The logger */
@@ -45,6 +55,11 @@ public class FormRepositoryImpl implements FormRepository {
   protected EntityManagerFactory emf = null;
 
   /** OSGi setter for the entity manager factory. */
+  @Reference(
+      name = "entityManagerFactory",
+      policy = ReferencePolicy.STATIC,
+      target = "(osgi.unit.name=org.opencastproject.adopter)"
+  )
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }

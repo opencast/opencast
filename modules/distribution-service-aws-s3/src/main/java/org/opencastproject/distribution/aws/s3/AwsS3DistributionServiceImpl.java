@@ -26,6 +26,7 @@ import static org.opencastproject.util.RequireUtil.notNull;
 import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
+import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.aws.s3.api.AwsS3DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.AdaptivePlaylist;
@@ -75,6 +76,9 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,6 +103,14 @@ import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
+@Component(
+    immediate = true,
+    service = { DistributionService.class, DownloadDistributionService.class, AwsS3DistributionService.class },
+    property = {
+        "service.description=Distribution Service (AWS S3)",
+        "distribution.channel=aws.s3"
+    }
+)
 public class AwsS3DistributionServiceImpl extends AbstractDistributionService
         implements AwsS3DistributionService, DistributionService {
 
@@ -210,6 +222,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   }
 
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
 
     // Get the configuration
@@ -335,6 +348,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     return distributionChannel;
   }
 
+  @Deactivate
   public void deactivate() {
     // Transfer manager is null if service disabled
     if (s3TransferManager != null) {

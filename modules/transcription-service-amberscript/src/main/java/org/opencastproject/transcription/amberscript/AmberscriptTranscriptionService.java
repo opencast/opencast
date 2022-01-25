@@ -78,6 +78,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +99,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Component(
+    immediate = true,
+    service = { TranscriptionService.class,AmberscriptTranscriptionService.class },
+    property = {
+        "service.description=AmberScript Transcription Service",
+        "provider=amberscript"
+    }
+)
 public class AmberscriptTranscriptionService extends AbstractJobProducer implements TranscriptionService {
 
   private static final Logger logger = LoggerFactory.getLogger(AmberscriptTranscriptionService.class);
@@ -159,6 +172,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     super(JOB_TYPE);
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
 
     Option<Boolean> enabledOpt = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), ENABLED_CONFIG);
@@ -246,6 +260,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     logger.info("Activated.");
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     if (scheduledExecutor != null) {
       scheduledExecutor.shutdown();
@@ -643,38 +658,74 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return PathSupport.toSafeName(jobId + "." + extension);
   }
 
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference(
+      name = "securityService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(
+      name = "userDirectoryService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference(
+      name = "organizationDirectoryService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
+  @Reference(
+      name = "workingFileRepository",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }
 
+  @Reference(
+      name = "database",
+      policy = ReferencePolicy.STATIC
+  )
   public void setDatabase(TranscriptionDatabase service) {
     this.database = service;
   }
 
+  @Reference(
+      name = "assetManager",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }
 
+  @Reference(
+      name = "workflowService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }

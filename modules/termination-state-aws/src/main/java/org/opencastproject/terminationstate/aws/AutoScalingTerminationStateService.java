@@ -22,6 +22,7 @@ package org.opencastproject.terminationstate.aws;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.terminationstate.api.AbstractJobTerminationStateService;
+import org.opencastproject.terminationstate.api.TerminationStateService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
@@ -50,6 +51,9 @@ import com.amazonaws.util.EC2MetadataUtils;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -65,6 +69,16 @@ import org.slf4j.LoggerFactory;
 import java.util.Dictionary;
 import java.util.List;
 
+@Component(
+    immediate = true,
+    service = TerminationStateService.class,
+    property = {
+        "service.description=Termination State Service: AWS Auto Scaling",
+        "service.pid=org.opencastproject.terminationstate.aws.AutoScalingTerminationStateService",
+        "vendor.name=aws",
+        "vendor.service=autoscaling"
+    }
+)
 public final class AutoScalingTerminationStateService extends AbstractJobTerminationStateService {
   private static final Logger logger = LoggerFactory.getLogger(AutoScalingTerminationStateService.class);
 
@@ -106,6 +120,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   private Option<String> accessKeyIdOpt = Option.none();
   private Option<String> accessKeySecretOpt = Option.none();
 
+  @Activate
   protected void activate(ComponentContext componentContext) {
     try {
       configure(componentContext.getProperties());
@@ -404,6 +419,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   /**
    * OSGI deactivate callback
    */
+  @Deactivate
   public void deactivate() {
     stop();
   }

@@ -39,6 +39,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,16 @@ import javax.ws.rs.core.Response;
             + "underlying service is not working and is either restarting or has failed. A status "
             + "code 500 means a general failure has occurred which is not recoverable and was not "
             + "anticipated. In other words, there is a bug!"
+    }
+)
+@Component(
+    immediate = true,
+    service = ConfigurablePublicationRestService.class,
+    property = {
+        "service.description=Configurable Publication REST Endpoint",
+        "opencast.service.type=org.opencastproject.publication.configurable",
+        "opencast.service.path=/publication/api",
+        "opencast.service.jobproducer=true"
     }
 )
 public class ConfigurablePublicationRestService extends AbstractJobProducerEndpoint {

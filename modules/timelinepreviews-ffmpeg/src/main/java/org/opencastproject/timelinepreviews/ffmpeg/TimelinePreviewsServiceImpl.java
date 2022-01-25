@@ -51,6 +51,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +73,13 @@ import java.util.UUID;
  * Media analysis plugin that takes a video stream and generates preview images that can be shown on the timeline.
  * This will be done using FFmpeg.
  */
+@Component(
+    immediate = true,
+    service = { TimelinePreviewsService.class,ManagedService.class },
+    property = {
+        "service.description=TimelinePreviews Service"
+    }
+)
 public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
     TimelinePreviewsService, ManagedService {
 
@@ -478,6 +488,10 @@ public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
    * @param workspace
    *            an instance of the workspace
    */
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -488,6 +502,10 @@ public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
    * @param serviceRegistry
    *            the service registry
    */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -508,6 +526,10 @@ public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
    * @param securityService
    *            the securityService to set
    */
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

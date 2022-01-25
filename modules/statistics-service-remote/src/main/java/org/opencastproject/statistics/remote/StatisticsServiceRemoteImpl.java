@@ -44,6 +44,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.osgi.service.component.annotations.Component;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -74,6 +75,16 @@ import javax.ws.rs.Path;
             + "not anticipated. In other words, there is a bug! You should file an error report "
             + "with your server logs from the time when the error occurred: "
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
+@Component(
+    immediate = true,
+    service = StatisticsService.class,
+    property = {
+        "service.description=Statistics Remote Service Proxy",
+        "opencast.service.type=org.opencastproject.statistics",
+        "opencast.service.path=/statistics",
+        "opencast.service.publish=false"
     }
 )
 public class StatisticsServiceRemoteImpl extends RemoteBase implements StatisticsService {

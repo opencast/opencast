@@ -32,6 +32,9 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NeedleEye;
 
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
@@ -39,6 +42,13 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component(
+    immediate = true,
+    service = ManagedService.class,
+    property = {
+        "service.description=Cleanup Finished Recordings from the Schedule Scanner"
+    }
+)
 public class OldScheduledScanner extends AbstractBufferScanner implements ManagedService {
 
   /** The logging facility */
@@ -72,6 +82,10 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
    *
    * @param service
    */
+  @Reference(
+      name = "SchedulerService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setService(SchedulerService service) {
     this.service = service;
   }

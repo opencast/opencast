@@ -22,12 +22,16 @@ package org.opencastproject.terminationstate.impl;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.terminationstate.api.AbstractJobTerminationStateService;
+import org.opencastproject.terminationstate.api.TerminationStateService;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -41,6 +45,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 
+@Component(
+    immediate = true,
+    service = TerminationStateService.class,
+    property = {
+        "service.description=Termination State Service",
+        "service.pid=org.opencastproject.terminationstate.impl.TerminationStateService",
+        "vendor.name=opencast",
+        "vendor.service=basic"
+    }
+)
 public final class TerminationStateServiceImpl extends AbstractJobTerminationStateService {
   private static final Log logger = new Log(LoggerFactory.getLogger(TerminationStateServiceImpl.class));
 
@@ -57,6 +71,7 @@ public final class TerminationStateServiceImpl extends AbstractJobTerminationSta
   private int jobPollingPeriod = DEFAULT_JOB_POLLING_PERIOD;
 
 
+  @Activate
   protected void activate(ComponentContext componentContext) {
     try {
       configure(componentContext.getProperties());
@@ -157,6 +172,7 @@ public final class TerminationStateServiceImpl extends AbstractJobTerminationSta
   /**
    * OSGI deactivate callback
    */
+  @Deactivate
   public void deactivate() {
     stop();
   }

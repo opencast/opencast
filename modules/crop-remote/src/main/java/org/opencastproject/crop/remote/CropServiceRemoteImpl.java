@@ -34,6 +34,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,13 @@ import java.util.List;
 /**
  * Remote implementation for {@link CropService}
  */
+@Component(
+    immediate = true,
+    service = CropService.class,
+    property = {
+        "service.description=Crop Remote Service Proxy"
+    }
+)
 public class CropServiceRemoteImpl extends RemoteBase implements CropService {
 
   /** The logger */

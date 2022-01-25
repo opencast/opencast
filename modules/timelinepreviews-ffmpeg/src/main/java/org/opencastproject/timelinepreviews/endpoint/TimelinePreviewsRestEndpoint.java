@@ -37,6 +37,9 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +70,16 @@ import javax.ws.rs.core.Response;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@Component(
+    immediate = true,
+    service = TimelinePreviewsRestEndpoint.class,
+    property = {
+        "service.description=Timeline previews REST Endpoint",
+        "opencast.service.type=org.opencastproject.timelinepreviews",
+        "opencast.service.path=/timelinepreviews",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -87,6 +100,10 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -97,6 +114,10 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
    * @param timelinePreviewsService
    *          the timeline previews service
    */
+  @Reference(
+      name = "timelinepreviews",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setTimelinePreviewsService(TimelinePreviewsService timelinePreviewsService) {
     this.service = timelinePreviewsService;
   }

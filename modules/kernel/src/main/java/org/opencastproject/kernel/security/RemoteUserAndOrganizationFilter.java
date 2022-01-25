@@ -46,6 +46,9 @@ import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +68,17 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Security filter used to set the organization and user in remote implementations.
  */
+@Component(
+    immediate = true,
+    service = Filter.class,
+    property = {
+        "service.description=Remote User and Organization Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=5",
+        "urlPatterns=*"
+    }
+)
 public class RemoteUserAndOrganizationFilter implements Filter {
 
   /** The logger */
@@ -265,6 +279,10 @@ public class RemoteUserAndOrganizationFilter implements Filter {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(
+      name = "securityService",
+      policy = ReferencePolicy.STATIC
+  )
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -275,6 +293,10 @@ public class RemoteUserAndOrganizationFilter implements Filter {
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(
+      name = "orgDirectory",
+      policy = ReferencePolicy.STATIC
+  )
   void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectory = organizationDirectory;
   }
@@ -285,6 +307,10 @@ public class RemoteUserAndOrganizationFilter implements Filter {
    * @param userDirectory
    *          the user directory
    */
+  @Reference(
+      name = "userDirectoryService",
+      policy = ReferencePolicy.STATIC
+  )
   void setUserDirectoryService(UserDirectoryService userDirectory) {
     this.userDirectory = userDirectory;
   }

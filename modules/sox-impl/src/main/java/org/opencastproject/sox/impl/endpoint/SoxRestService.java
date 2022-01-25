@@ -40,6 +40,9 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +73,16 @@ import javax.ws.rs.core.Response;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@Component(
+    immediate = true,
+    service = SoxRestService.class,
+    property = {
+        "service.description=SoX REST Endpoint",
+        "opencast.service.type=org.opencastproject.sox",
+        "opencast.service.path=/sox",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class SoxRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -93,6 +106,10 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -103,6 +120,10 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
    * @param soxService
    *          the SoX service
    */
+  @Reference(
+      name = "composerService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSoxService(SoxService soxService) {
     this.soxService = soxService;
   }

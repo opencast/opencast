@@ -38,6 +38,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,13 @@ import java.util.List;
 /**
  * Remote implementation of the execute service
  */
+@Component(
+    immediate = true,
+    service = ExecuteService.class,
+    property = {
+        "service.description=Execute Service Remote Service Proxy"
+    }
+)
 public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteService {
 
   /** The logger */

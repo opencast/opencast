@@ -20,16 +20,29 @@
  */
 package org.opencastproject.oaipmh.persistence.impl;
 
+import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManagerFactory;
 
 /** Implements {@link org.opencastproject.oaipmh.persistence.OaiPmhDatabase}. Defines permanent storage for OAI-PMH. */
+@Component(
+    immediate = true,
+    name = "org.opencastproject.oaipmh.persistence.OaiPmhDatabaseImpl",
+    service = OaiPmhDatabase.class,
+    property = {
+        "service.description=OAI-PMH Service Persistence"
+    }
+)
 public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
 
   public static final String PERSISTENCE_UNIT_NAME = "org.opencastproject.oaipmh";
@@ -65,11 +78,17 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
    *
    * @param cc
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for OAI-PMH");
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "entityManagerFactory",
+      policy = ReferencePolicy.STATIC,
+      target = "(osgi.unit.name=org.opencastproject.oaipmh)"
+  )
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -80,6 +99,10 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -90,6 +113,10 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
    * @param workspace
    *          the workspace to set
    */
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

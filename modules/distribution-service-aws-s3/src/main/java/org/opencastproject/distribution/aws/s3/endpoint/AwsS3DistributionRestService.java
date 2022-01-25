@@ -43,6 +43,10 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +80,16 @@ import javax.ws.rs.core.Response.Status;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@Component(
+    immediate = true,
+    service = AwsS3DistributionRestService.class,
+    property = {
+        "service.description=AWS S3 Distribution REST Endpoint",
+        "opencast.service.type=org.opencastproject.distribution.aws.s3",
+        "opencast.service.path=/distribution/s3",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -93,6 +107,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
    * @param cc
    *          this component's context
    */
+  @Activate
   public void activate(ComponentContext cc) {
   }
 
@@ -102,6 +117,10 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -110,6 +129,11 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
    * @param service
    *          the service to set
    */
+  @Reference(
+      name = "distributionService",
+      policy = ReferencePolicy.STATIC,
+      target = "(distribution.channel=aws.s3)"
+  )
   public void setService(AwsS3DistributionService service) {
     this.service = service;
   }

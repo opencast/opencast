@@ -27,6 +27,10 @@ import org.opencastproject.annotation.api.AnnotationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -40,6 +44,13 @@ import javax.persistence.TemporalType;
 /**
  * JPA-based implementation of the {@link AnnotationService}
  */
+@Component(
+    immediate = true,
+    service = AnnotationService.class,
+    property = {
+        "service.description=Annotation Service"
+    }
+)
 public class AnnotationServiceJpaImpl implements AnnotationService {
 
   /** JPA persistence unit name */
@@ -52,6 +63,11 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
   protected SecurityService securityService;
 
   /** OSGi DI */
+  @Reference(
+      name = "entityManagerFactory",
+      policy = ReferencePolicy.STATIC,
+      target = "(osgi.unit.name=org.opencastproject.annotation)"
+  )
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -62,6 +78,10 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

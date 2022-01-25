@@ -57,6 +57,11 @@ import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +85,13 @@ import javax.xml.bind.JAXBException;
 /**
  * Implementation of VideoeditorService using FFMPEG
  */
+@Component(
+    immediate = true,
+    service = { VideoEditorService.class,ManagedService.class },
+    property = {
+        "service.description=Video Editor Service"
+    }
+)
 public class VideoEditorServiceImpl extends AbstractJobProducer implements VideoEditorService, ManagedService {
 
   public static final String JOB_LOAD_KEY = "job.load.videoeditor";
@@ -438,12 +450,14 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   }
 
   @Override
+  @Activate
   public void activate(ComponentContext context) {
     logger.debug("activating...");
     super.activate(context);
     FFmpegEdit.init(context.getBundleContext());
   }
 
+  @Deactivate
   protected void deactivate(ComponentContext context) {
     logger.debug("deactivating...");
   }
@@ -466,30 +480,58 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
   }
 
+  @Reference(
+      name = "inspection-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setMediaInspectionService(MediaInspectionService inspectionService) {
     this.inspectionService = inspectionService;
   }
 
+  @Reference(
+      name = "service-registry",
+      policy = ReferencePolicy.STATIC
+  )
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(
+      name = "user-directory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference(
+      name = "organization-directory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference(
+      name = "smil-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }

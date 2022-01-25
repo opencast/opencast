@@ -53,6 +53,11 @@ import org.joda.time.DateTime;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -72,6 +77,13 @@ import java.util.Map;
 import java.util.Set;
 
 /** Prolong immediate recordings before reaching the end, as long as there are no conflicts */
+@Component(
+    immediate = true,
+    service = { ManagedService.class,CaptureNowProlongingService.class },
+    property = {
+        "service.description=Capture Prolonging Service"
+    }
+)
 public class CaptureNowProlongingService implements ManagedService {
 
   /** Log facility */
@@ -113,26 +125,46 @@ public class CaptureNowProlongingService implements ManagedService {
   private ComponentContext componentContext;
 
   /** Sets the scheduler service */
+  @Reference(
+      name = "scheduler-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
   /** Sets the security service */
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** Sets the service registry */
+  @Reference(
+      name = "service-registry",
+      policy = ReferencePolicy.STATIC
+  )
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** Sets the organization directory service */
+  @Reference(
+      name = "organization-directory-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
   }
 
   /** Sets the workspace */
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -143,6 +175,7 @@ public class CaptureNowProlongingService implements ManagedService {
    * @param cc
    *          the component's context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     componentContext = cc;
     try {
@@ -162,6 +195,7 @@ public class CaptureNowProlongingService implements ManagedService {
   /**
    * Deactivates the component
    */
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     componentContext = null;
     shutdown();
