@@ -144,7 +144,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
                                   loadResourceIntoTable={loadingGroupsIntoTable}
                                   resource={'groups'}/>
                     <h1>{t('USERS.GROUPS.TABLE.CAPTION')}</h1>
-                    <h4>{t('TABLE_SUMMARY', { numberOfRows: groups.length})}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: groups })}</h4>
                 </div>
                 {/* Include table component */}
                 <Table templateMap={groupsTemplateMap} />
