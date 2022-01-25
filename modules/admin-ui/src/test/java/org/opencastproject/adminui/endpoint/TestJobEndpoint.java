@@ -53,13 +53,11 @@ import javax.ws.rs.Path;
 public class TestJobEndpoint extends JobEndpoint {
 
   private ServiceRegistry serviceRegistry;
-  private WorkflowService workflowService;
   private MediaPackageBuilderImpl mpBuilder;
 
   public TestJobEndpoint() throws Exception {
     mpBuilder = new MediaPackageBuilderImpl();
     this.serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
-    this.workflowService = EasyMock.createNiceMock(WorkflowService.class);
     Job job = new JobImpl(12L);
 
     WorkflowDefinition wfD = new WorkflowDefinitionImpl();
@@ -102,15 +100,12 @@ public class TestJobEndpoint extends JobEndpoint {
 
 
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
-    EasyMock.expect(workflowService.countWorkflowInstances()).andReturn((long) workflowSet.size()).anyTimes();
     EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(hosts).anyTimes();
     EasyMock.expect(serviceRegistry.getActiveJobs()).andReturn(jobs).anyTimes();
 
-    EasyMock.replay(workflowService);
     EasyMock.replay(serviceRegistry);
 
     this.setServiceRegistry(serviceRegistry);
-    this.setWorkflowService(workflowService);
     this.activate(null);
   }
 
