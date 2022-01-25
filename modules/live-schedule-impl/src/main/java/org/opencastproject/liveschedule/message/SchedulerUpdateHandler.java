@@ -20,6 +20,7 @@
  */
 package org.opencastproject.liveschedule.message;
 
+import org.opencastproject.liveschedule.api.LiveScheduleService;
 import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
@@ -31,6 +32,8 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -56,6 +59,12 @@ public class SchedulerUpdateHandler extends UpdateHandler {
 
   public SchedulerUpdateHandler() {
     super(DESTINATION_SCHEDULER);
+  }
+
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
   }
 
   protected void execute(MessageItem messageItem) {
@@ -148,6 +157,15 @@ public class SchedulerUpdateHandler extends UpdateHandler {
   )
   public void setSchedulerService(SchedulerService service) {
     this.schedulerService = service;
+  }
+
+  @Reference(
+      name = "liveScheduleService",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setLiveScheduleService(LiveScheduleService liveScheduleService) {
+    super.setLiveScheduleService(liveScheduleService);
   }
   // === Set by OSGI end
 

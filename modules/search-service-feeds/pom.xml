@@ -76,9 +76,9 @@
               org.opencastproject.feed.impl;version=${project.version},
               *
             </Import-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/feed-scanner.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

@@ -163,6 +163,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     this.securityService = securityService;
   }
 
+  @Reference(name = "AssetManager")
   public void setAssetManager(final AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -683,6 +684,5 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       throw new IllegalArgumentException("Unknown filter :" + name);
     }
   }
-
 
 }

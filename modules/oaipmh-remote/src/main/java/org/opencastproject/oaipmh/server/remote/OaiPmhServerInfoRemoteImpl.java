@@ -26,13 +26,17 @@ import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.oaipmh.server.OaiPmhServerInfo;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,4 +81,23 @@ public class OaiPmhServerInfoRemoteImpl extends RemoteBase implements OaiPmhServ
     }
     throw new RuntimeException("Cannot contact remote service");
   }
+
+  @Reference(
+      name = "trustedHttpClient",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference(
+      name = "remoteServiceManager",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
+  }
+
 }

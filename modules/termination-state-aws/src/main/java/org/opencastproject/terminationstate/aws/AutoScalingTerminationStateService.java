@@ -20,6 +20,7 @@
  */
 package org.opencastproject.terminationstate.aws;
 
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.terminationstate.api.AbstractJobTerminationStateService;
 import org.opencastproject.terminationstate.api.TerminationStateService;
@@ -54,6 +55,8 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -441,4 +444,14 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   protected void setScheduler(Scheduler scheduler) {
     this.scheduler = scheduler;
   }
+
+  @Reference(
+      name = "ServiceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
@@ -188,6 +189,12 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
   @Reference(name = "captionService")
   public void setCaptionService(CaptionService service) {
     this.captionService = service;
+  }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

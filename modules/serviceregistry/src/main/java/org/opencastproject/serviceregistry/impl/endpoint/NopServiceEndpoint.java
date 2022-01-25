@@ -24,6 +24,8 @@ package org.opencastproject.serviceregistry.impl.endpoint;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import org.opencastproject.rest.OsgiAbstractJobProducerEndpoint;
+import org.opencastproject.serviceregistry.api.NopService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.impl.NopServiceImpl;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -31,6 +33,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -63,4 +67,22 @@ public class NopServiceEndpoint extends OsgiAbstractJobProducerEndpoint<NopServi
   public Response nop() {
     return RestUtil.R.ok(getSvc().nop());
   }
+
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference(
+      name = "nopService",
+      policy = ReferencePolicy.STATIC
+  )
+  public void setService(NopService nopService) {
+    super.setService((NopServiceImpl)nopService);
+  }
+
 }

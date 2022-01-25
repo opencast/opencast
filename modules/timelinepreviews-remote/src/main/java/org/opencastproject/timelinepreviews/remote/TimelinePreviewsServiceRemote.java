@@ -25,7 +25,9 @@ import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.timelinepreviews.api.TimelinePreviewsException;
 import org.opencastproject.timelinepreviews.api.TimelinePreviewsService;
 
@@ -34,6 +36,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,6 +103,24 @@ public class TimelinePreviewsServiceRemote extends RemoteBase implements Timelin
     }
     throw new TimelinePreviewsException("Unable to create timeline preview images from " + sourceTrack
             + " using a remote service");
+  }
+
+  @Reference(
+      name = "trustedHttpClient",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference(
+      name = "remoteServiceManager",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
   }
 
 }

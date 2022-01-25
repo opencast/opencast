@@ -124,10 +124,10 @@
               org.opencastproject.ingestdownloadservice.impl;version=${project.version},
               org.opencastproject.ingestdownloadservice.impl.endpoint;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/ingest-download-service-endpoint.xml,
               OSGI-INF/ingest-download-service-impl.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

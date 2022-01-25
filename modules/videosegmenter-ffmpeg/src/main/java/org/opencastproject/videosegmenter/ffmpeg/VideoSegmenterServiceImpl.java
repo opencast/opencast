@@ -973,6 +973,10 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param mpeg7CatalogService
    *            an instance of the mpeg7 catalog service
    */
+  @Reference(
+      name = "Mpeg7Service",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setMpeg7CatalogService(
       Mpeg7CatalogService mpeg7CatalogService) {
     this.mpeg7CatalogService = mpeg7CatalogService;
@@ -1022,6 +1026,10 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param userDirectoryService
    *            the userDirectoryService to set
    */
+  @Reference(
+      name = "user-directory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUserDirectoryService(
       UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
@@ -1033,6 +1041,10 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
    * @param organizationDirectory
    *            the organization directory
    */
+  @Reference(
+      name = "orgDirectory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrganizationDirectoryService(
       OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;

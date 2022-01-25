@@ -20,6 +20,7 @@
  */
 package org.opencastproject.security.urlsigning.provider.impl;
 
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.WowzaResourceStrategyImpl;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.provider.UrlSigningProvider;
@@ -29,6 +30,8 @@ import org.opencastproject.urlsigning.common.ResourceStrategy;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -189,7 +192,7 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
    *             the encription key
    * @param startTime
    *             start time
-   * @param endtime
+   * @param endTime
    *             end time
    * @return the generated hashed
    * @exception Exception
@@ -241,4 +244,14 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
 
     return base64Hash;
   }
+
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
+  }
+
 }

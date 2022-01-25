@@ -540,6 +540,10 @@ public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
    * @param userDirectoryService
    *            the userDirectoryService to set
    */
+  @Reference(
+      name = "user-directory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setUserDirectoryService(
       UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
@@ -551,6 +555,10 @@ public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
    * @param organizationDirectory
    *            the organization directory
    */
+  @Reference(
+      name = "orgDirectory",
+      policy = ReferencePolicy.STATIC
+  )
   public void setOrganizationDirectoryService(
       OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;

@@ -27,7 +27,11 @@ import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteEpisode;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +50,12 @@ public class AssetManagerUpdateHandler extends UpdateHandler {
 
   public AssetManagerUpdateHandler() {
     super(DESTINATION_ASSET_MANAGER);
+  }
+
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
   }
 
   @Override
@@ -94,4 +104,14 @@ public class AssetManagerUpdateHandler extends UpdateHandler {
               Thread.currentThread().getId());
     }
   }
+
+  @Reference(
+      name = "liveScheduleService",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setLiveScheduleService(LiveScheduleService liveScheduleService) {
+    super.setLiveScheduleService(liveScheduleService);
+  }
+
 }

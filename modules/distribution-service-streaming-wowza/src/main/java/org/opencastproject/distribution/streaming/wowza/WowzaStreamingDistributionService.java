@@ -37,6 +37,10 @@ import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.TrackImpl.StreamingProtocol;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
@@ -45,6 +49,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.XmlSafeParser;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -57,6 +62,8 @@ import org.osgi.service.component.ComponentException;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
@@ -1130,4 +1137,50 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
   public File getDistributionDirectory() {
     return distributionDirectory;
   }
+
+  @Reference(
+      name = "WORKSPACE",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setWorkspace(Workspace workspace) {
+    super.setWorkspace(workspace);
+  }
+
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
+  }
+
+  @Reference(
+      name = "user-directory",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    super.setUserDirectoryService(userDirectoryService);
+  }
+
+  @Reference(
+      name = "orgDirectory",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    super.setOrganizationDirectoryService(organizationDirectoryService);
+  }
+
 }

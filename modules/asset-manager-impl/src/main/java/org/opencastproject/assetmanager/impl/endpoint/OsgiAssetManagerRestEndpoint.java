@@ -21,6 +21,8 @@
 package org.opencastproject.assetmanager.impl.endpoint;
 
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.impl.AssetManagerJobProducer;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -55,4 +57,23 @@ public class OsgiAssetManagerRestEndpoint extends AbstractTieredStorageAssetMana
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
+
+  @Reference(
+      name = "job-producer",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setJobProducer(AssetManagerJobProducer assetManagerJobProducer) {
+    super.setJobProducer(assetManagerJobProducer);
+  }
+
+  @Reference(
+      name = "service-registry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

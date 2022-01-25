@@ -24,7 +24,9 @@ package org.opencastproject.statistics.remote;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.statistics.api.DataResolution;
 import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.StatisticsProvider;
@@ -45,6 +47,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -261,4 +265,23 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
     }
     return providers;
   }
+
+  @Reference(
+      name = "trustedHttpClient",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference(
+      name = "remoteServiceManager",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
+  }
+
 }

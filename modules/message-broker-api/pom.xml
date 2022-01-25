@@ -97,8 +97,8 @@
               org.opencastproject.message.broker.api.theme;version=${project.version},
               org.opencastproject.message.broker.api.workflow;version=${project.version}
             </Export-Package>
-            <Service-Component>
-            </Service-Component>
+            <!--Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

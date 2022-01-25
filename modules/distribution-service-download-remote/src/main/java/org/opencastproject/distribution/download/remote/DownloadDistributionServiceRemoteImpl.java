@@ -34,7 +34,9 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.OsgiUtil;
 
 import com.google.gson.Gson;
@@ -43,6 +45,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,4 +186,23 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
             + "mediapackage '%s' using a remote destribution service proxy",
         elementIds.size(), mediaPackage.getIdentifier().toString()));
   }
+
+  @Reference(
+      name = "trustedHttpClient",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+
+  @Reference(
+      name = "remoteServiceManager",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
+  }
+
 }

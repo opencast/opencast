@@ -41,8 +41,13 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
@@ -51,6 +56,7 @@ import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.functions.Misc;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -64,6 +70,8 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -879,6 +887,60 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
             }
           });
     });
+  }
+
+  @Reference(
+      name = "WORKSPACE",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setWorkspace(Workspace workspace) {
+    super.setWorkspace(workspace);
+  }
+
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
+  }
+
+  @Reference(
+      name = "user-directory",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    super.setUserDirectoryService(userDirectoryService);
+  }
+
+  @Reference(
+      name = "orgDirectory",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    super.setOrganizationDirectoryService(organizationDirectoryService);
+  }
+
+  @Reference(
+      name = "trustedHttpClient",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
   }
 
 }

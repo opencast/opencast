@@ -69,10 +69,10 @@
               org.opencastproject.list.query,
               org.opencastproject.list.util
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/list_providers_scanner.xml,
               OSGI-INF/list_providers_service.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

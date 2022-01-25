@@ -37,12 +37,17 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -79,6 +84,8 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -970,6 +977,51 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     } catch (IOException e) {
       logger.info("AWS S3 bucket cannot create {} ", tmpPath);
     }
+  }
+
+  @Reference(
+      name = "workspace",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setWorkspace(Workspace workspace) {
+    super.setWorkspace(workspace);
+  }
+
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
+  }
+
+  @Reference(
+      name = "user-directory",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    super.setUserDirectoryService(userDirectoryService);
+  }
+
+  @Reference(
+      name = "orgDirectory",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    super.setOrganizationDirectoryService(organizationDirectoryService);
   }
 
 }

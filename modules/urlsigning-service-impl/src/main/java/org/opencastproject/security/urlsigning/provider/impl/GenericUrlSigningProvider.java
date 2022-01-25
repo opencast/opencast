@@ -20,12 +20,15 @@
  */
 package org.opencastproject.security.urlsigning.provider.impl;
 
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.provider.UrlSigningProvider;
 import org.opencastproject.urlsigning.common.BasicResourceStrategyImpl;
 import org.opencastproject.urlsigning.common.ResourceStrategy;
 
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +58,15 @@ public class GenericUrlSigningProvider extends AbstractUrlSigningProvider {
   @Override
   public String toString() {
     return "Generic URL Signing Provider";
+  }
+
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
   }
 
 }

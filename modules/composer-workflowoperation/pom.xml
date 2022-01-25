@@ -109,7 +109,7 @@
             <Export-Package>
               org.opencastproject.workflow.handler.composer;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/operations/composite.xml,
               OSGI-INF/operations/concat.xml,
               OSGI-INF/operations/demux.xml,
@@ -124,7 +124,7 @@
               OSGI-INF/operations/sanitize-adaptive.xml,
               OSGI-INF/operations/segmentpreviews.xml,
               OSGI-INF/operations/select-tracks.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

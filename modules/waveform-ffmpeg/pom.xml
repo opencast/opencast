@@ -106,9 +106,9 @@
               org.opencastproject.waveform.ffmpeg;version=${project.version},
               org.opencastproject.waveform.endpoint;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/waveform.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

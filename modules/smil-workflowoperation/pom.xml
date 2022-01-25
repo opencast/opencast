@@ -101,9 +101,9 @@
             <Export-Package>
               org.opencastproject.workflow.handler.smil;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/operations/cut-marks-to-smil.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

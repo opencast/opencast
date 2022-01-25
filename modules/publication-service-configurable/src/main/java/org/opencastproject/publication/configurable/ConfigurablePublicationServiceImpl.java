@@ -45,6 +45,8 @@ import com.google.gson.reflect.TypeToken;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -93,46 +95,6 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
   private OrganizationDirectoryService organizationDirectoryService;
 
   private ServiceRegistry serviceRegistry;
-
-  public void setDownloadDistributionService(final DownloadDistributionService distributionService) {
-    this.distributionService = distributionService;
-  }
-
-  public void setServiceRegistry(final ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = serviceRegistry;
-  }
-
-  @Override
-  protected ServiceRegistry getServiceRegistry() {
-    return this.serviceRegistry;
-  }
-
-  @Override
-  protected SecurityService getSecurityService() {
-    return this.securityService;
-  }
-
-  public void setSecurityService(final SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
-  public void setUserDirectoryService(final UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
-  }
-
-  public void setOrganizationDirectoryService(final OrganizationDirectoryService organizationDirectoryService) {
-    this.organizationDirectoryService = organizationDirectoryService;
-  }
-
-  @Override
-  protected UserDirectoryService getUserDirectoryService() {
-    return this.userDirectoryService;
-  }
-
-  @Override
-  protected OrganizationDirectoryService getOrganizationDirectoryService() {
-    return this.organizationDirectoryService;
-  }
 
   @Override
   public Job replace(final MediaPackage mediaPackage, final String channelId,
@@ -305,4 +267,66 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
   private Optional<Publication> getPublication(final MediaPackage mp, final String channelId) {
     return Arrays.stream(mp.getPublications()).filter(p -> p.getChannel().equalsIgnoreCase(channelId)).findAny();
   }
+
+  @Override
+  protected ServiceRegistry getServiceRegistry() {
+    return this.serviceRegistry;
+  }
+
+  @Override
+  protected SecurityService getSecurityService() {
+    return this.securityService;
+  }
+
+  @Override
+  protected UserDirectoryService getUserDirectoryService() {
+    return this.userDirectoryService;
+  }
+
+  @Override
+  protected OrganizationDirectoryService getOrganizationDirectoryService() {
+    return this.organizationDirectoryService;
+  }
+
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
+  public void setSecurityService(SecurityService securityService) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  @Reference(
+      name = "user-directory",
+      policy = ReferencePolicy.STATIC
+  )
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
+  }
+
+  @Reference(
+      name = "orgDirectory",
+      policy = ReferencePolicy.STATIC
+  )
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  @Reference(
+      name = "DownloadDistributionService",
+      policy = ReferencePolicy.STATIC,
+      target = "(distribution.channel=download)"
+  )
+  public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
+    this.distributionService = downloadDistributionService;
+  }
+
 }
