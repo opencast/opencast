@@ -19,7 +19,7 @@ const EventDetailsWorkflowDetailsHierarchyNavigation = ({openSubTab, hierarchyDe
                onClick={() => openSubTab('workflow-details')}
             >
                 {t("EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE") /* Workflow Details */}
-                {(hierarchyDepth > 0) && (<a style={style_nav_hierarchy_inactive}> > </a>)}
+                {(hierarchyDepth > 0) && (<span style={style_nav_hierarchy_inactive}> > </span>)}
             </a>
             {(hierarchyDepth > 0) && (
                 <a className="breadcrumb-link scope"
@@ -27,7 +27,7 @@ const EventDetailsWorkflowDetailsHierarchyNavigation = ({openSubTab, hierarchyDe
                    onClick={() => openSubTab(subTabArgument1)}
                 >
                     {t(translationKey1) /* Errors & Warnings   or   Workflow Operations */}
-                    {(hierarchyDepth > 1) && (<a style={style_nav_hierarchy_inactive}> > </a>)}
+                    {(hierarchyDepth > 1) && (<span style={style_nav_hierarchy_inactive}> > </span>)}
                 </a>
             )}
             {(hierarchyDepth > 1) && (

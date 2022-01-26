@@ -57,10 +57,10 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                                 <td>{workflowData.title}</td>
                                             </tr>
                                             {workflowData.description && (
-                                                <tr>
-                                                    <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.DESCRIPTION") /* Description */ }</td>
-                                                    <td>{workflowData.description}</td>
-                                                </tr>
+                                            <tr>
+                                                <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.DESCRIPTION") /* Description */ }</td>
+                                                <td>{workflowData.description}</td>
+                                            </tr>
                                             )}
                                             <tr>
                                                 <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTER") /* Submitter*/ }</td>
@@ -79,11 +79,11 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                                 <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.STATUS") /* Status */ }</td>
                                                 <td>{t(workflowData.status)}</td>
                                             </tr>
-                                            { (workflowData.status !== 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.RUNNING') && (
-                                                <tr>
-                                                    <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.EXECUTION_TIME") /* Execution time */ }</td>
-                                                    <td>{formatDuration(workflowData.executionTime) || humanDuration}</td>
-                                                </tr>
+                                            {(workflowData.status !== 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.RUNNING') && (
+                                            <tr>
+                                                <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.EXECUTION_TIME") /* Execution time */ }</td>
+                                                <td>{formatDuration(workflowData.executionTime) || humanDuration}</td>
+                                            </tr>
                                             )}
                                             <tr with-role="ROLE_ADMIN">
                                                 <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.ID") /* ID */ }</td>
@@ -163,8 +163,7 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                 <div className="obj-container">
                                     <table className="main-tbl vertical-headers">
                                         <tbody>
-                                        <tr>
-                                        </tr>
+                                            <tr/>
                                         </tbody>
                                     </table>
                                 </div>
@@ -178,8 +177,7 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                 <div className="obj-container">
                                     <table className="main-tbl">
                                         <tbody>
-                                        <tr>
-                                        </tr>
+                                            <tr/>
                                         </tbody>
                                     </table>
                                 </div>
@@ -193,17 +191,17 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                 <div className="obj-container">
                                     <ul>
                                         <li>
-                                                <span>
-                                                  {t("EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.DETAILS_LINK") /* Operations */ }
-                                                </span>
+                                            <span>
+                                              {t("EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.DETAILS_LINK") /* Operations */ }
+                                            </span>
                                             <a className="details-link">
                                                 {t("EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS") /* Details */ }
                                             </a>
                                         </li>
                                         <li>
-                                                <span>
-                                                  {t("EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE") /* Errors & Warnings */ }
-                                                </span>
+                                            <span>
+                                              {t("EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE") /* Errors & Warnings */ }
+                                            </span>
                                             <a className="details-link">
                                                 {t("EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS") /* Details */ }
                                             </a>
