@@ -291,8 +291,6 @@ const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
                                         </div>
                                     </div>
 
-
-
                                         {/* Save and cancel buttons */}
                                         { (hasCurrentAgentAccess() && isRoleWorkflowEdit && !!workflowConfiguration && !!workflowConfiguration.workflowId/* && formik.dirty*/) && (
                                             <footer style={{padding: '15px'}}>
@@ -310,7 +308,7 @@ const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
                                                             disabled={ true/*todo: !formik.isValid*/}
                                                             className={`save green  ${(true/*todo: !formik.isValid*/) ? "disabled" : ""}`}
                                                     >
-                                                        {t('EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS')/* Save */}
+                                                        {t('SAVE')/* Save */}
                                                     </button>
                                                 </div>
                                             </footer>

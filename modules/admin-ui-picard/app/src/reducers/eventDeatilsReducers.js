@@ -24,11 +24,16 @@ import {
     LOAD_EVENT_PUBLICATIONS_SUCCESS,
     LOAD_EVENT_PUBLICATIONS_IN_PROGRESS,
     LOAD_EVENT_PUBLICATIONS_FAILURE,
+    LOAD_EVENT_METADATA_IN_PROGRESS,
+    LOAD_EVENT_METADATA_SUCCESS,
+    LOAD_EVENT_METADATA_FAILURE, SET_EVENT_METADATA,
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
 const initialState = {
     eventId: "",
+    metadata: {},
+    fetchingMetadataInProgress: false,
     policies: [],
     fetchingPoliciesInProgress: false,
     savingCommentReplyInProgress: false,
@@ -61,6 +66,33 @@ const initialState = {
 const eventDetails = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {
+        case LOAD_EVENT_METADATA_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingMetadataInProgress: true,
+            };
+        }
+        case LOAD_EVENT_METADATA_SUCCESS: {
+            const { metadata } = payload;
+            return {
+                ...state,
+                fetchingMetadataInProgress: false,
+                metadata: metadata
+            };
+        }
+        case LOAD_EVENT_METADATA_FAILURE: {
+            return {
+                ...state,
+                fetchingMetadataInProgress: false,
+            };
+        }
+        case SET_EVENT_METADATA: {
+            const { metadata } = payload;
+            return {
+                ...state,
+                metadata: metadata
+            };
+        }
         case LOAD_EVENT_POLICIES_IN_PROGRESS: {
             return {
                 ...state,

@@ -1,3 +1,7 @@
+/* selectors for metadata */
+export const getMetadata = state => state.eventDetails.metadata;
+export const isFetchingMetadata = state => state.eventDetails.fetchingMetadataInProgress;
+
 /* selectors for policies */
 export const getPolicies = state => state.eventDetails.policies;
 
