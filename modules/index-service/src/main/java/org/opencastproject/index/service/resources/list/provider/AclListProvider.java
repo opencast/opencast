@@ -29,6 +29,10 @@ import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +40,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Acl list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.AclListProvider"
+    }
+)
 public class AclListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "ACL";
@@ -49,11 +61,13 @@ public class AclListProvider implements ResourceListProvider {
   private AclServiceFactory aclServiceFactory;
   private SecurityService securityService;
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("ACL list provider activated!");
   }
 
   /** OSGi callback for acl services. */
+  @Reference(name = "aclServiceFactory")
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
@@ -63,6 +77,10 @@ public class AclListProvider implements ResourceListProvider {
    *
    * @param securityService the security service
    */
+  @Reference(
+      name = "security-service",
+      policy = ReferencePolicy.STATIC
+  )
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

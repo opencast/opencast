@@ -33,6 +33,10 @@ import org.opencastproject.util.SmartIterator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +45,14 @@ import java.util.List;
 import java.util.Map;
 
 /** Services list provider. */
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Servers list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.ServicesListProvider"
+    }
+)
 public class ServicesListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesListProvider.class);
@@ -119,11 +131,16 @@ public class ServicesListProvider implements ResourceListProvider {
   }
 
   /** OSGi service activation callback. */
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Services list provider activated!");
   }
 
   /** OSGi callback for the service registry. */
+  @Reference(
+      name = "serviceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
