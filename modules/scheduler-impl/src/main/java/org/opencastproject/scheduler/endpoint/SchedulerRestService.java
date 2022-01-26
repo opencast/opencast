@@ -578,10 +578,13 @@ public class SchedulerRestService {
         }
       }
 
-      var result = new ArrayList<TechnicalMetadata>();
+      var result = new ArrayList<Map<String, Object>>();
       for (var event: service.search(agent, Opt.none(), Opt.none(), Opt.some(new Date()), endDate)) {
         var id = event.getIdentifier().toString();
-        result.add(service.getTechnicalMetadata(id));
+        result.add(Map.of(
+                "data", service.getTechnicalMetadata(id),
+                "episode-dublincore", service.getDublinCore(id).toXmlString()
+                ));
       }
 
       final ResponseBuilder response = Response.ok(gson.toJson(result));
