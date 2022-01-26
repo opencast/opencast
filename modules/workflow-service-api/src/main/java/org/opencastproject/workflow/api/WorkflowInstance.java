@@ -164,7 +164,7 @@ public class WorkflowInstance {
   )
   @MapKeyColumn(name = "key_part", nullable = false)
   @Lob
-  @Column(name = "value_part", nullable = false)
+  @Column(name = "value_part")
   protected Map<String, String> configurations;
 
   @Column(name = "mediaPackageId", length = 128)

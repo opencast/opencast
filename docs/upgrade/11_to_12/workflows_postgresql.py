@@ -171,7 +171,7 @@ create_workflow_configuration_table = f"""
 CREATE TABLE IF NOT EXISTS {workflow_configuration_table_name} (
   workflow_id BIGINT REFERENCES {workflow_table_name} (id),
   key_part VARCHAR(255) NOT NULL,
-  value_part TEXT NOT NULL
+  value_part TEXT
 )
 """
 
@@ -208,7 +208,7 @@ create_workflow_operation_configuration_table = f"""
 CREATE TABLE IF NOT EXISTS {workflow_operation_configuration_table_name} (
   workflow_operation_id BIGINT REFERENCES {workflow_operation_table_name} (id),
   key_part VARCHAR(255) NOT NULL,
-  value_part TEXT NOT NULL
+  value_part TEXT
 )
 """
 
