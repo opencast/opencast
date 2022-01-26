@@ -18,3 +18,10 @@ Database Migration
 Upgrading to Opencast 12 requires a DB migration, as some tables have changed slightly.
 Migration scripts can be found in `doc/upgrade/11_to_12/`.
 There are separate scripts for MariaDB/MySQL (`mysql5.sql`) and PostgreSQL (`postgresql.sql`).
+
+Optional: Delete Workflow Service Solr Index
+-----------------------
+
+Starting with Opencast 12, the Workflow Service does not store data in its Solr Index anymore. Therefore, the index can
+be deleted to save on disk space. Unless you setup Solr yourself, the index can likely be found under
+ `/var/lib/opencast/solr-indexes/workflows/`.

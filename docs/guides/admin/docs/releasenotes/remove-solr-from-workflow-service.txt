@@ -1,0 +1,22 @@
+
+Improvements
+------------
+
+- The Workflow Service does not require a Solr Index anymore, simplifying the installation of Opencast.
+
+Behavior changes
+-----------------
+
+- Internally, workflows were stored as huge xml objects in the job table in the databaase. With Opencast 12,
+workflows now get their own tables in the database. This makes it easier and quicker to query for workflows when
+not using the Solr Index.
+
+
+API changes
+-----------
+- [TBD] - Remove tasks.json Endpoint from Admin-UI JobEndpoint
+- [TBD] - Add check for active workflows on a mediapackage to WorkflowRestService
+- [TBD] - Add GET all workflows of a mediapackage to WorkflowRestService
+- [TBD2] - Remove full text query for workflow instances from the WorkflowsEndpoint
+- [TBD2] - Remove full text query for workflow instances from the WorkflowRestService
+- [TBD2] - Remove filtering by currentOperation from the countWorkflow endpoint of the WorkflowRestService
