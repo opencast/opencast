@@ -53,11 +53,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * The inbox scanner monitors a directory for incoming media packages.
@@ -113,6 +116,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   public static final String INBOX_THREADS = "inbox.threads";
   public static final String INBOX_TRIES = "inbox.tries";
   public static final String INBOX_TRIES_BETWEEN_SEC = "inbox.tries.between.sec";
+
+  public static final String INBOX_METADATA_REGEX = "inbox.metadata.regex";
+  public static final String INBOX_DATETIME_FORMAT = "inbox.datetime.format";
 
   private IngestService ingestService;
   private SecurityService securityService;
@@ -172,6 +178,16 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     final int maxTries = NumberUtils.toInt(Objects.toString(properties.get(INBOX_TRIES), "3"));
     final int secondsBetweenTries = NumberUtils.toInt(Objects.toString(properties.get(INBOX_TRIES_BETWEEN_SEC), "300"));
 
+    // Metadata parsing configuration
+    var metadataPattern = Optional.ofNullable(properties.get(INBOX_METADATA_REGEX))
+            .map(Objects::toString)
+            .map(Pattern::compile);
+    var dateFormatter = Optional.ofNullable(properties.get(INBOX_DATETIME_FORMAT))
+            .map(Objects::toString)
+            .map(DateTimeFormatter::ofPattern)
+            .orElse(DateTimeFormatter.ISO_DATE_TIME);
+
+
     var securityContext = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
             .map(a -> new SecurityContext(securityService, a.getB(), a.getA()));
     while (securityContext.isEmpty()) {
@@ -192,7 +208,8 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     fileInstallCfg = configureFileInstall(cc.getBundleContext(), inbox, interval);
     // create new scanner
     this.ingestor = new Ingestor(ingestService, securityContext.get(), workflowDefinition,
-            workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries);
+            workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries,
+            metadataPattern, dateFormatter);
     new Thread(ingestor).start();
     logger.info("Now watching inbox {}", inbox.getAbsolutePath());
   }
