@@ -822,6 +822,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     return processingOperation;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowDefinitionById(String)
+   */
   @Override
   public WorkflowDefinition getWorkflowDefinitionById(String id) throws NotFoundException {
     final WorkflowIdentifier workflowIdentifier = new WorkflowIdentifier(id, securityService.getOrganization().getId());
@@ -1138,7 +1143,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   protected boolean assertMediaPackagePermission(String mediaPackageId, String action) throws UnauthorizedException {
     User currentUser = securityService.getUser();
-    Organization currentOrg = securityService.getOrganization();
 
     MediaPackage mediapackage;
     Opt<MediaPackage> assetMediapackage = assetManager.getMediaPackage(mediaPackageId);
@@ -1315,6 +1319,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesByMediaPackage(String)
+   */
   @Override
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
           throws WorkflowDatabaseException {
@@ -1349,6 +1358,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstancesBySeries(String)
+   */
   @Override
   public List<WorkflowInstance> getWorkflowInstancesBySeries(String seriesId) throws WorkflowDatabaseException {
     try {
@@ -1358,6 +1372,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#mediaPackageHasActiveWorkflows(String)
+   */
   @Override
   public boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException {
     return persistence.mediaPackageHasActiveWorkflows(mediaPackageId);
