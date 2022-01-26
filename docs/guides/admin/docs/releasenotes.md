@@ -17,7 +17,9 @@ not using the Solr Index.
 
 API changes
 -----------
-- [TBD] - Removes tasks.json Endpoint from Admin-UI JobEndpoint
+- [TBD] - Remove tasks.json Endpoint from Admin-UI JobEndpoint
+- [TBD] - Add check for active workflows on a mediapackage to WorkflowRestService
+- [TBD] - Add GET all workflows of a mediapackage to WorkflowRestService
 
 
 Release Schedule
