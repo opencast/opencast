@@ -66,7 +66,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
-              org.opencastproject.workflow.handler.notification;version=${project.version}
+              org.opencastproject.workflow.handler.mattermost.notification;version=${project.version}
             </Export-Package>
             <!--Service-Component>
               OSGI-INF/operations/mattermost-notify.xml
