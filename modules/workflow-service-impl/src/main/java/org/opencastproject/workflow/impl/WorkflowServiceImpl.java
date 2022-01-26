@@ -59,6 +59,7 @@ import org.opencastproject.metadata.api.MetadataService;
 import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
@@ -67,6 +68,7 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -1134,6 +1136,24 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
   }
 
+  protected boolean assertMediaPackagePermission(String mediaPackageId, String action) throws UnauthorizedException {
+    User currentUser = securityService.getUser();
+    Organization currentOrg = securityService.getOrganization();
+
+    MediaPackage mediapackage;
+    Opt<MediaPackage> assetMediapackage = assetManager.getMediaPackage(mediaPackageId);
+    if (assetMediapackage.isSome()) {
+      mediapackage = assetMediapackage.get();
+      if (currentUser.hasRole(GLOBAL_ADMIN_ROLE)
+              || authorizationService.hasPermission(mediapackage, action)) {
+        return true;
+      } else {
+        throw new UnauthorizedException(currentUser, action);
+      }
+    }
+    return false;
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -1298,32 +1318,35 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
           throws WorkflowDatabaseException {
-    return persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
-  }
+    try {
+      List<WorkflowInstance> workflows = persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#getRunningWorkflowInstanceByMediaPackage(String, String)
-   */
-  @Override
-  public Optional<WorkflowInstance> getRunningWorkflowInstanceByMediaPackage(String mediaPackageId, String action)
-          throws WorkflowException, UnauthorizedException, WorkflowDatabaseException {
-    List<WorkflowInstance> workflowInstances = persistence.getRunningWorkflowInstancesByMediaPackage(mediaPackageId);
+      // If we have read permission to the mediapackage, return all workflows
+      boolean authorized = false;
+      try {
+        authorized = assertMediaPackagePermission(mediaPackageId, Permissions.Action.READ.toString());
+        if (authorized) {
+          return workflows;
+        }
+      } catch (UnauthorizedException e) {
+        // Ignore
+      }
 
-    // If there is more than workflow running something is very wrong
-    if (workflowInstances.size() > 1) {
-      throw new WorkflowException("Multiple workflows are active on mediapackage " + mediaPackageId);
+      // If we do not have permission, check for each workflow individually
+      List<WorkflowInstance> workflowsWithPermission = new ArrayList<>();
+      for (WorkflowInstance workflow : workflows) {
+        try {
+          assertPermission(workflow, Permissions.Action.READ.toString(), workflow.getOrganizationId());
+          workflowsWithPermission.add(workflow);
+        } catch (UnauthorizedException e) {
+          // Ignore
+        }
+      }
+
+      return workflowsWithPermission;
+    } catch (WorkflowServiceDatabaseException e) {
+      throw new WorkflowDatabaseException(e);
     }
-
-    Optional<WorkflowInstance> optWorkflowInstance = Optional.empty();
-    if (workflowInstances.size() == 1) {
-      WorkflowInstance wfInstance = workflowInstances.get(0);
-      optWorkflowInstance = Optional.of(wfInstance);
-      assertPermission(wfInstance, action, wfInstance.getOrganizationId());
-    }
-
-    return optWorkflowInstance;
   }
 
   @Override
