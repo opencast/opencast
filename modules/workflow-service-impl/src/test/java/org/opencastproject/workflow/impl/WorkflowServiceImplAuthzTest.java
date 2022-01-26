@@ -23,7 +23,6 @@ package org.opencastproject.workflow.impl;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
@@ -289,7 +288,6 @@ public class WorkflowServiceImplAuthzTest {
     // Ensure that this instructor can access the workflow
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -298,7 +296,6 @@ public class WorkflowServiceImplAuthzTest {
     userResponder.setResponse(DEFAULT_ORG_ADMIN);
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -307,7 +304,6 @@ public class WorkflowServiceImplAuthzTest {
     userResponder.setResponse(globalAdmin);
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -317,7 +313,6 @@ public class WorkflowServiceImplAuthzTest {
     userResponder.setResponse(instructor2);
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -333,7 +328,6 @@ public class WorkflowServiceImplAuthzTest {
     } catch (Exception e) {
       // expected
     }
-    assertEquals(0, service.countWorkflowInstances());
   }
 
   @Test
@@ -360,7 +354,6 @@ public class WorkflowServiceImplAuthzTest {
     // Ensure that this instructor can access the workflow
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -369,7 +362,6 @@ public class WorkflowServiceImplAuthzTest {
     userResponder.setResponse(DEFAULT_ORG_ADMIN);
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -378,7 +370,6 @@ public class WorkflowServiceImplAuthzTest {
     userResponder.setResponse(globalAdmin);
     try {
       service.getWorkflowById(workflow.getId());
-      assertEquals(1, service.countWorkflowInstances());
     } catch (Exception e) {
       fail(e.getMessage());
     }
@@ -391,8 +382,6 @@ public class WorkflowServiceImplAuthzTest {
     } catch (UnauthorizedException e) {
       // expected
     }
-    // TODO: Fix this failing Assertion
-//    assertEquals(0, service.countWorkflowInstances());
 
     // Ensure the instructor from a different org can not see the workflow, even though they share a role
     organizationResponder.setResponse(otherOrganization);
@@ -403,7 +392,6 @@ public class WorkflowServiceImplAuthzTest {
     } catch (Exception e) {
       // expected
     }
-    assertEquals(0, service.countWorkflowInstances());
   }
 
 }
