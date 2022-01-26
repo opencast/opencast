@@ -31,17 +31,22 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationTagUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +61,14 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Hide/unhide specific tracks in a media package",
+        "workflow.operation=select-tracks"
+    }
+)
 public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   private static final Logger logger = LoggerFactory.getLogger(SelectStreamsWorkflowOperationHandler.class);
 
@@ -99,8 +112,21 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param composerService
    *          the local composer service
    */
+  @Reference(
+      name = "ComposerService",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setComposerService(final ComposerService composerService) {
     this.composerService = composerService;
+  }
+
+  @Reference(
+      name = "ServiceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   /**
@@ -110,6 +136,10 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(
+      name = "Workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(final Workspace workspace) {
     this.workspace = workspace;
   }

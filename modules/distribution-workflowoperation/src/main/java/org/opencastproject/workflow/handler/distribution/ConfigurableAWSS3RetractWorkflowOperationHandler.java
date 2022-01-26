@@ -18,52 +18,44 @@
  * the License.
  *
  */
+package org.opencastproject.workflow.handler.distribution;
 
-package org.opencastproject.workflow.handler.workflow;
-
-import org.opencastproject.job.api.JobContext;
+import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
-import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
-import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Operation to test retry strategies on failing
+ * WOH that retracts elements from an internal distribution channel and removes the reflective publication elements from
+ * the media package.
  */
 @Component(
     immediate = true,
+    name = "org.opencastproject.workflow.handler.distribution.ConfigurableAWSS3RetractWorkflowOperationHandler",
     service = WorkflowOperationHandler.class,
     property = {
-        "service.description=Failing Workflow Operation Handler",
-        "workflow.operation=failing"
+        "service.description=Configurable Retraction Workflow Handler",
+        "workflow.operation=retract-configure-aws"
     }
 )
-public class FailingWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
+public class ConfigurableAWSS3RetractWorkflowOperationHandler extends ConfigurableRetractWorkflowOperationHandler {
 
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(FailingWorkflowOperationHandler.class);
-
-  @Override
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
-          throws WorkflowOperationException {
-    logger.info("Start failing test operation");
-    throw new WorkflowOperationException("Test operation for failed ");
+  /** OSGi DI */
+  @Reference(
+      name = "DownloadDistributionService",
+      policy = ReferencePolicy.STATIC,
+      target = "(distribution.channel=aws.s3)"
+  )
+  void setDownloadDistributionService(DownloadDistributionService distributionService) {
+    super.setDownloadDistributionService(distributionService);
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
-  @Override
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }
+
 }

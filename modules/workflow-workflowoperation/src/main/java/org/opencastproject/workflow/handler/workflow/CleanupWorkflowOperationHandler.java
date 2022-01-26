@@ -31,12 +31,14 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -48,6 +50,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpDelete;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +65,14 @@ import java.util.List;
  * Removes all files in the working file repository for mediapackage elements that don't match one of the
  * "preserve-flavors" configuration value.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Cleanup Workflow Operation Handler",
+        "workflow.operation=cleanup"
+    }
+)
 public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logger */
@@ -88,6 +101,10 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param workspace
    *          the workspace
    */
+  @Reference(
+      name = "Workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -98,6 +115,10 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param client
    *          the trusted http client
    */
+  @Reference(
+      name = "trustedHttpClient",
+      policy = ReferencePolicy.STATIC
+  )
   public void setTrustedHttpClient(TrustedHttpClient client) {
     this.client = client;
   }
@@ -298,4 +319,14 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
       }
     }
   }
+
+  @Reference(
+      name = "ServiceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

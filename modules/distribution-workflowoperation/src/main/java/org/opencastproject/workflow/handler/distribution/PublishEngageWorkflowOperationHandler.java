@@ -54,6 +54,7 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -61,6 +62,7 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -69,6 +71,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +96,15 @@ import java.util.stream.Collectors;
 /**
  * The workflow definition for handling "engage publication" operations
  */
+
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Engage Publication Workflow Handler",
+        "workflow.operation=publish-engage"
+    }
+)
 public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -140,6 +155,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param streamingDistributionService
    *          the streaming distribution service
    */
+  @Reference(
+      name = "StreamingDistributionService",
+      policy = ReferencePolicy.STATIC,
+      target = "(distribution.channel=streaming)"
+  )
   protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
@@ -150,6 +170,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param downloadDistributionService
    *          the download distribution service
    */
+  @Reference(
+      name = "DownloadDistributionService",
+      policy = ReferencePolicy.STATIC,
+      target = "(distribution.channel=download)"
+  )
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
@@ -161,12 +186,26 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param searchService
    *          an instance of the search service
    */
+  @Reference(
+      name = "SearchService",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
+  @Reference(name = "organizationDirectoryService")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  @Reference(
+      name = "ServiceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   /** Supported streaming formats */
@@ -179,6 +218,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           TrackImpl.StreamingProtocol.SMOOTH));
 
   @Override
+  @Activate
   protected void activate(ComponentContext cc) {
     super.activate(cc);
     BundleContext bundleContext = cc.getBundleContext();

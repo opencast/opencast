@@ -42,11 +42,13 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -54,6 +56,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +72,14 @@ import java.util.Map;
 /**
  * Workflow operation used to inspect all tracks of a media package.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Compose Workflow Operation Handler",
+        "workflow.operation=inspect"
+    }
+)
 public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -92,6 +105,10 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** The local workspace */
   private Workspace workspace;
 
+  @Reference(
+      name = "dc",
+      policy = ReferencePolicy.STATIC
+  )
   public void setDublincoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
@@ -102,6 +119,10 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param inspectionService
    *          the inspection service
    */
+  @Reference(
+      name = "InspectionService",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setInspectionService(MediaInspectionService inspectionService) {
     this.inspectionService = inspectionService;
   }
@@ -113,6 +134,10 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(
+      name = "Workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -266,6 +291,15 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
     } finally {
       IOUtils.closeQuietly(in);
     }
+  }
+
+  @Reference(
+      name = "ServiceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
 }

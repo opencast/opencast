@@ -31,12 +31,14 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.selector.AttachmentSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
@@ -44,6 +46,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +60,14 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Image Convert Workflow Operation Handler",
+        "workflow.operation=image-convert"
+    }
+)
 public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(ImageConvertWorkflowOperationHandler.class);
@@ -81,6 +94,10 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param composerService
    *          the composer service
    */
+  @Reference(
+      name = "ComposerService",
+      policy = ReferencePolicy.STATIC
+  )
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -91,6 +108,10 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(
+      name = "Workspace",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -252,4 +273,14 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
       }
     }
   }
+
+  @Reference(
+      name = "ServiceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

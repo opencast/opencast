@@ -34,13 +34,18 @@ import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSele
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.publication.api.PublicationException;
 import org.opencastproject.publication.api.YouTubePublicationService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +55,14 @@ import java.util.List;
 /**
  * The workflow definition for handling "publish" operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=YouTube Publication Workflow Handler",
+        "workflow.operation=publish-youtube"
+    }
+)
 public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -64,8 +77,21 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
    * @param publicationService
    *          the publication service
    */
+  @Reference(
+      name = "PublicationService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setPublicationService(YouTubePublicationService publicationService) {
     this.publicationService = publicationService;
+  }
+
+  @Reference(
+      name = "ServiceRegistry",
+      policy = ReferencePolicy.STATIC
+  )
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)

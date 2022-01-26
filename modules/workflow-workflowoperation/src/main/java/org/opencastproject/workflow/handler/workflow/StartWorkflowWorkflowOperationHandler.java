@@ -32,12 +32,16 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.data.Opt;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +51,14 @@ import java.util.Map;
 /**
  * This WOH starts a new workflow for given media package.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Start Workflow Workflow Operation Handler",
+        "workflow.operation=start-workflow"
+    }
+)
 public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   private static final Logger logger = LoggerFactory.getLogger(StartWorkflowWorkflowOperationHandler.class);
 
@@ -66,6 +78,10 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param assetManager
    *          the asset manager
    */
+  @Reference(
+      name = "asset-manager",
+      policy = ReferencePolicy.STATIC
+  )
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -76,6 +92,10 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param workflowService
    *          the workflow service
    */
+  @Reference(
+      name = "workflowService",
+      policy = ReferencePolicy.STATIC
+  )
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
