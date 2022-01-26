@@ -1,6 +1,7 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import EventDetails from "./EventDetails";
+import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 
 
 /**
@@ -10,6 +11,7 @@ const EventDetailsModal = ({ handleClose, showModal, tabIndex, eventTitle, event
     const { t } = useTranslation();
 
     const close = () => {
+        removeNotificationWizardForm();
         handleClose();
     }
 

@@ -36,17 +36,13 @@ const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
     }
 
     const workflowAction = (workflowId, action) => {
-        if(performingWorkflowAction){
-            return;
-        } else {
+        if(!performingWorkflowAction){
             performWorkflowAction(eventId, workflowId, action, close);
         }
     }
 
     const deleteWorkflow = (workflowId) => {
-        if(deletingWorkflow){
-            return;
-        } else {
+        if(!deletingWorkflow){
             deleteWf(eventId, workflowId);
         }
     }
@@ -106,7 +102,7 @@ const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
                                                             {t("EVENTS.EVENTS.DETAILS.WORKFLOWS.ACTIONS") /* Actions */}
                                                         </th>
                                                     )}
-                                                    <th className="medium"></th>
+                                                    <th className="medium"/>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -291,30 +287,28 @@ const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
                                         </div>
                                     </div>
 
-
-
-                                        {/* Save and cancel buttons */}
-                                        { (hasCurrentAgentAccess() && isRoleWorkflowEdit && !!workflowConfiguration && !!workflowConfiguration.workflowId/* && formik.dirty*/) && (
-                                            <footer style={{padding: '15px'}}>
-                                                <div className="pull-left">
-                                                    <button type="reset"
-                                                            onClick={() => {} /*todo: formik.resetForm*/}
-                                                            disabled={ true/*todo: !formik.isValid*/}
-                                                            className={`cancel  ${(true/*todo: !formik.isValid*/) ? "disabled" : ""}`}
-                                                    >
-                                                        {t('CANCEL')/* Cancel */}
-                                                    </button>
-                                                </div>
-                                                <div className="pull-right">
-                                                    <button onClick={() => {}/*todo: save formik.values*/}
-                                                            disabled={ true/*todo: !formik.isValid*/}
-                                                            className={`save green  ${(true/*todo: !formik.isValid*/) ? "disabled" : ""}`}
-                                                    >
-                                                        {t('EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS')/* Save */}
-                                                    </button>
-                                                </div>
-                                            </footer>
-                                        )}
+                                    {/* Save and cancel buttons */}
+                                    { (hasCurrentAgentAccess() && isRoleWorkflowEdit && !!workflowConfiguration && !!workflowConfiguration.workflowId/* && formik.dirty*/) && (
+                                        <footer style={{padding: '15px'}}>
+                                            <div className="pull-left">
+                                                <button type="reset"
+                                                        onClick={() => {} /*todo: formik.resetForm*/}
+                                                        disabled={ true/*todo: !formik.isValid*/}
+                                                        className={`cancel  ${(true/*todo: !formik.isValid*/) ? "disabled" : ""}`}
+                                                >
+                                                    {t('CANCEL')/* Cancel */}
+                                                </button>
+                                            </div>
+                                            <div className="pull-right">
+                                                <button onClick={() => {}/*todo: save formik.values*/}
+                                                        disabled={ true/*todo: !formik.isValid*/}
+                                                        className={`save green  ${(true/*todo: !formik.isValid*/) ? "disabled" : ""}`}
+                                                >
+                                                    {t('SAVE')/* Save */}
+                                                </button>
+                                            </div>
+                                        </footer>
+                                    )}
 
                                 </div>
                             )}

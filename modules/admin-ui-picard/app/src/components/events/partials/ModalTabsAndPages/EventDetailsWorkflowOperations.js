@@ -7,6 +7,9 @@ import {
     isFetchingWorkflowOperations
 } from "../../../../selectors/eventDetailsSelectors";
 import {fetchWorkflowOperationDetails} from "../../../../thunks/eventDetailsThunks";
+import {style_nav, style_nav_hierarchy, style_nav_hierarchy_inactive} from "../../../../utils/workflowDetailsUtils";
+import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
+import EventDetailsWorkflowDetailsHierarchyNavigation from "./EventDetailsWorkflowDetailsHierarchyNavigation";
 
 
 /**
@@ -17,24 +20,8 @@ const EventDetailsWorkflowOperations =  ({ eventId, t, setHierarchy,
                                            fetchOperationDetails
                                       }) => {
 
-    const style_nav = {
-        borderBottom: "1px solid #d6d6d6",
-        lineHeight: "35px",
-    }
-
-    const style_nav_hierarchy_inactive = {
-        marginLeft: "30px",
-        color: "#92a0ab"
-    }
-
-    const style_nav_hierarchy = {
-        marginLeft: "30px",
-        marginRight: "30px",
-        fontWeight: "600",
-        color: "#5d7589"
-    }
-
-    const openSubTab = (tabType, operationId) => {
+    const openSubTab = (tabType, operationId = null) => {
+        removeNotificationWizardForm();
         setHierarchy(tabType);
         if(tabType === "workflow-operation-details"){
             fetchOperationDetails(eventId, workflowId, operationId).then(r => {});
@@ -44,21 +31,12 @@ const EventDetailsWorkflowOperations =  ({ eventId, t, setHierarchy,
     return (
         <div className="modal-content">
             {/* Hierarchy navigation */}
-            <nav className="scope" style={style_nav}>
-                <a className="breadcrumb-link scope"
-                   style={style_nav_hierarchy_inactive}
-                   onClick={() => openSubTab('workflow-details', null)}
-                >
-                    {t("EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE") /* Workflow Details */}
-                    <a style={style_nav_hierarchy_inactive}> > </a>
-                </a>
-                <a className="breadcrumb-link scope"
-                   style={style_nav_hierarchy}
-                   onClick={() => openSubTab('workflow-operations', null)}
-                >
-                    {t("EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE") /* Workflow Operations */}
-                </a>
-            </nav>
+            <EventDetailsWorkflowDetailsHierarchyNavigation
+                openSubTab={openSubTab}
+                hierarchyDepth={1}
+                translationKey1={"EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE"}
+                subTabArgument1={'workflow-operations'}
+            />
 
             <div className="modal-body">
                 {/* Notifications */}
@@ -78,12 +56,12 @@ const EventDetailsWorkflowOperations =  ({ eventId, t, setHierarchy,
                                             <tr>
                                                 <th>{t("EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.STATUS") /* Status */}</th>
                                                 <th>{t("EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.TITLE") /* Title */}
-                                                    <i></i>
+                                                    <i/>
                                                 </th>
                                                 <th>{t("EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.DESCRIPTION") /* Description */}
-                                                    <i></i>
+                                                    <i/>
                                                 </th>
-                                                <th className="medium"></th>
+                                                <th className="medium"/>
                                             </tr>
                                         </thead>
                                         <tbody>

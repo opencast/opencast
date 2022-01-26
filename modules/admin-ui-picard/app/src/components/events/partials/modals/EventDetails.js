@@ -12,6 +12,7 @@ import EventDetailsWorkflowOperations from "../ModalTabsAndPages/EventDetailsWor
 import EventDetailsWorkflowOperationDetails from "../ModalTabsAndPages/EventDetailsWorkflowOperationDetails";
 import EventDetailsWorkflowErrors from "../ModalTabsAndPages/EventDetailsWorkflowErrors";
 import EventDetailsWorkflowErrorDetails from "../ModalTabsAndPages/EventDetailsWorkflowErrorDetails";
+import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 
 
 // Get info about the current language and its date locale
@@ -79,6 +80,7 @@ const EventDetails = ({ tabIndex, eventId, close }) => {
     ];
 
     const openTab = (tabNr) => {
+        removeNotificationWizardForm();
         setWorkflowTabHierarchy("entry")
         setPage(tabNr);
     }

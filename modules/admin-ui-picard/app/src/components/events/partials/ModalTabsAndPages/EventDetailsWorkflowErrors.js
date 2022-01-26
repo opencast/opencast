@@ -7,6 +7,8 @@ import {
     isFetchingWorkflowErrors
 } from "../../../../selectors/eventDetailsSelectors";
 import {fetchWorkflowErrorDetails} from "../../../../thunks/eventDetailsThunks";
+import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
+import EventDetailsWorkflowDetailsHierarchyNavigation from "./EventDetailsWorkflowDetailsHierarchyNavigation";
 
 
 /**
@@ -16,23 +18,6 @@ const EventDetailsWorkflowErrors =  ({ eventId, t, setHierarchy,
                                        workflowId, errors, isFetching,
                                        fetchErrorDetails
                                          }) => {
-
-    const style_nav = {
-        borderBottom: "1px solid #d6d6d6",
-        lineHeight: "35px",
-    }
-
-    const style_nav_hierarchy_inactive = {
-        marginLeft: "30px",
-        color: "#92a0ab"
-    }
-
-    const style_nav_hierarchy = {
-        marginLeft: "30px",
-        marginRight: "30px",
-        fontWeight: "600",
-        color: "#5d7589"
-    }
 
     const severityColor = (severity) => {
       switch (severity.toUpperCase()) {
@@ -45,7 +30,8 @@ const EventDetailsWorkflowErrors =  ({ eventId, t, setHierarchy,
           }
     };
 
-    const openSubTab = (tabType, errorId) => {
+    const openSubTab = (tabType, errorId = null) => {
+        removeNotificationWizardForm();
         setHierarchy(tabType);
         if(tabType === "workflow-error-details"){
             fetchErrorDetails(eventId, workflowId, errorId).then(r => {});
@@ -55,21 +41,12 @@ const EventDetailsWorkflowErrors =  ({ eventId, t, setHierarchy,
     return (
         <div className="modal-content">
             {/* Hierarchy navigation */}
-            <nav className="scope" style={style_nav}>
-                <a className="breadcrumb-link scope"
-                   style={style_nav_hierarchy_inactive}
-                   onClick={() => openSubTab('workflow-details')}
-                >
-                    {t("EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE") /* Workflow Details */}
-                    <a style={style_nav_hierarchy_inactive}> > </a>
-                </a>
-                <a className="breadcrumb-link scope"
-                   style={style_nav_hierarchy}
-                   onClick={() => openSubTab('errors-and-warnings')}
-                >
-                    {t("EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE") /* Errors & Warnings */}
-                </a>
-            </nav>
+            <EventDetailsWorkflowDetailsHierarchyNavigation
+                openSubTab={openSubTab}
+                hierarchyDepth={1}
+                translationKey1={"EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE"}
+                subTabArgument1={'errors-and-warnings'}
+            />
 
             <div className="modal-body">
                 {/* Notifications */}
@@ -91,11 +68,11 @@ const EventDetailsWorkflowErrors =  ({ eventId, t, setHierarchy,
                                             <th className="small"/>
                                             <th>
                                                 {t("EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DATE") /* Date */ }
-                                                <i></i>
+                                                <i/>
                                             </th>
                                             <th>
                                                 {t("EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE") /* Errors & Warnings */}
-                                                <i></i>
+                                                <i/>
                                             </th>
                                             <th className="medium"/>
                                         </tr>
@@ -127,7 +104,7 @@ const EventDetailsWorkflowErrors =  ({ eventId, t, setHierarchy,
                                             ))
                                         }
                                         { /* No errors message */
-                                            errors.entries.length == 0 && (
+                                            errors.entries.length === 0 && (
                                                 <tr>
                                                     <td colSpan="4">
                                                         {t("EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.EMPTY") /* No errors found. */}

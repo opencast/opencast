@@ -2,8 +2,11 @@ import React from "react";
 import {connect} from "react-redux";
 import Notifications from "../../../shared/Notifications";
 import {getWorkflow, isFetchingWorkflowDetails} from "../../../../selectors/eventDetailsSelectors";
-import moment from "moment";
 import {fetchWorkflowErrors, fetchWorkflowOperations} from "../../../../thunks/eventDetailsThunks";
+import {formatDuration} from "../../../../utils/workflowDetailsUtils";
+import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
+import EventDetailsWorkflowDetailsHierarchyNavigation from "./EventDetailsWorkflowDetailsHierarchyNavigation";
+
 
 /**
  * This component manages the workflow details for the workflows tab of the event details modal
@@ -13,49 +16,25 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                         fetchOperations, fetchErrors
                                        }) => {
 
-    const style_nav = {
-        borderBottom: "1px solid #d6d6d6",
-        lineHeight: "35px",
-    }
-
-    const style_nav_hierarchy = {
-        marginLeft: "30px",
-        marginRight: "30px",
-        fontWeight: "600",
-        color: "#5d7589"
-    }
-
     const humanDuration = "5h"  //todo dont't know, where the old version gets this value, couldn't find it!
 
-    const openSubTab = (tabType, id) => {
+    const openSubTab = (tabType) => {
+        removeNotificationWizardForm();
         setHierarchy(tabType);
         if(tabType === "workflow-operations"){
-            fetchOperations(eventId, id).then(r => {});
+            fetchOperations(eventId, workflowData.wiid).then(r => {});
         } else if(tabType === "errors-and-warnings"){
-            fetchErrors(eventId, id).then(r => {});
-        }
-    }
-
-    const formatDuration = (durationInMS) => {
-        const duration = moment.duration(durationInMS);
-        if (duration.asHours() > 1) {
-            return Math.floor(duration.asHours()) + moment.utc(duration.asMilliseconds()).format(":mm:ss");
-        } else {
-            return moment.utc(duration.asMilliseconds()).format("mm:ss");
+            fetchErrors(eventId, workflowData.wiid).then(r => {});
         }
     }
 
     return (
         <div className="modal-content">
             {/* Hierarchy navigation */}
-            <nav className="scope" style={style_nav}>
-                <a className="breadcrumb-link scope"
-                   style={style_nav_hierarchy}
-                   onClick={() => openSubTab('workflow-details', workflowData.wiid)}
-                >
-                    {t("EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE") /* Details */}
-                </a>
-            </nav>
+            <EventDetailsWorkflowDetailsHierarchyNavigation
+                openSubTab={openSubTab}
+                hierarchyDepth={0}
+            />
 
             <div className="modal-body">
                 <div className="full-col">
@@ -152,7 +131,7 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                               {t("EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.DETAILS_LINK") /* Operations */ }
                                             </span>
                                             <a className="details-link"
-                                               onClick={() => openSubTab('workflow-operations', workflowData.wiid, true)}
+                                               onClick={() => openSubTab('workflow-operations')}
                                             >
                                                 {t("EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS") /* Details */ }
                                             </a>
@@ -162,7 +141,7 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                               {t("EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE") /* Errors & Warnings */ }
                                             </span>
                                             <a className="details-link"
-                                               onClick={() => openSubTab('errors-and-warnings', workflowData.wiid, true)}
+                                               onClick={() => openSubTab('errors-and-warnings')}
                                             >
                                                 {t("EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS") /* Details */ }
                                             </a>

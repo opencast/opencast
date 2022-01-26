@@ -2,10 +2,13 @@ import {connect} from "react-redux";
 import React from "react";
 import Notifications from "../../../shared/Notifications";
 import {
-    getWorkflow, getWorkflowErrorDetails,
+    getWorkflowErrorDetails,
     isFetchingWorkflowErrorDetails
 } from "../../../../selectors/eventDetailsSelectors";
 import {fetchWorkflowErrorDetails} from "../../../../thunks/eventDetailsThunks";
+import {error_detail_style} from "../../../../utils/workflowDetailsUtils";
+import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
+import EventDetailsWorkflowDetailsHierarchyNavigation from "./EventDetailsWorkflowDetailsHierarchyNavigation";
 
 
 /**
@@ -15,57 +18,22 @@ const EventDetailsWorkflowErrorDetails =  ({ eventId, t, setHierarchy,
                                          errorDetails, isFetching
                                      }) => {
 
-    const style_nav = {
-        borderBottom: "1px solid #d6d6d6",
-        lineHeight: "35px",
-    }
-
-    const style_nav_hierarchy_inactive = {
-        marginLeft: "30px",
-        color: "#92a0ab"
-    }
-
-    const style_nav_hierarchy = {
-        marginLeft: "30px",
-        marginRight: "30px",
-        fontWeight: "600",
-        color: "#5d7589"
-    }
-
-    const error_detail_style = {
-        overflow: "auto",
-        width: "750px"
-    }
-
     const openSubTab = (tabType) => {
+        removeNotificationWizardForm();
         setHierarchy(tabType);
     }
 
     return (
         <div className="modal-content">
             {/* Hierarchy navigation */}
-            <nav className="scope" style={style_nav}>
-                <a className="breadcrumb-link scope"
-                   style={style_nav_hierarchy_inactive}
-                   onClick={() => openSubTab('workflow-details')}
-                >
-                    {t("EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE") /* Workflow Details */}
-                    <a style={style_nav_hierarchy_inactive}> > </a>
-                </a>
-                <a className="breadcrumb-link scope"
-                   style={style_nav_hierarchy_inactive}
-                   onClick={() => openSubTab('errors-and-warnings')}
-                >
-                    {t("EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE") /* Errors & Warnings */}
-                    <a style={style_nav_hierarchy_inactive}> > </a>
-                </a>
-                <a className="breadcrumb-link scope"
-                   style={style_nav_hierarchy}
-                   onClick={() => openSubTab('workflow-error-details')}
-                >
-                    {t("EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HEADER") /* Error Details */}
-                </a>
-            </nav>
+            <EventDetailsWorkflowDetailsHierarchyNavigation
+                openSubTab={openSubTab}
+                hierarchyDepth={2}
+                translationKey1={"EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE"}
+                subTabArgument1={'errors-and-warnings'}
+                translationKey2={"EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HEADER"}
+                subTabArgument2={'workflow-error-details'}
+            />
 
             <div className="modal-body">
                 {/* Notifications */}
