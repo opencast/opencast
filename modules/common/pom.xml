@@ -294,9 +294,6 @@
             <Provide-Capability>
               osgi.service;objectClass="org.opencastproject.util.ReadinessIndicator"
             </Provide-Capability>
-            <!--Service-Component>
-              OSGI-INF/chaining-mp-serializer.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

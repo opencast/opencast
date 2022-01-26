@@ -44,9 +44,6 @@
               org.opencastproject.videoeditor.ffmpeg;version=${project.version},
               org.opencastproject.videoeditor.impl;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/videoeditor-service.xml,
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

@@ -58,9 +58,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <!--Service-Component>
-              OSGI-INF/text-remote.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

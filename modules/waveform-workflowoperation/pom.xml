@@ -92,9 +92,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.waveform;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/operations/waveform.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

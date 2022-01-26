@@ -68,9 +68,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.mattermost.notification;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/operations/mattermost-notify.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

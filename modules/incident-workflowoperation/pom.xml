@@ -52,9 +52,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.incident;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/operations/incident.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

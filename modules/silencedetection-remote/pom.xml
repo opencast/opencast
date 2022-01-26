@@ -33,9 +33,6 @@
             <Export-Package>
               org.opencastproject.silencedetection.remote;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/silencedetection-remote.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>
