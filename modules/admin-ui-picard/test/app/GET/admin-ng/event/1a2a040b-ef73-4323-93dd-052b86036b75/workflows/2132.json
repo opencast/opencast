@@ -1,8 +1,9 @@
 {
-  "duration": 180426,
+  "executionTime": 20180426,
   "series_title": "",
   "license": "CC-BY-NC",
   "workflow": "Process upon upload and schedule",
+  "creator":{"name":"Administrator","email":"admin@localhost","username":"admin"},
   "configuration": {
     "publishToYouTube": "false",
     "presenter_work_framerate": "29.97003",
@@ -30,10 +31,10 @@
     "publishToAws": "false"
   },
   "series": "",
-  "start": "2018-08-10T12:39:28Z",
+  "submittedAt": "2018-08-10T12:39:28Z",
   "description": "",
-  "state": "SUCCEEDED",
-  "id": 2132,
+  "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED",
+  "wiid": 2132,
   "title": "Mock Event Unpublished",
-  "workflowId": "schedule-and-upload"
+  "wdid": "schedule-and-upload"
 }

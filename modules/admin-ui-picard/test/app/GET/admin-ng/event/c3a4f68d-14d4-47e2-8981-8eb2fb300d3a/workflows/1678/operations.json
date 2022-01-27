@@ -20,7 +20,7 @@
     "description":"Applying default configuration values",
     "id":1677,
     "title":"defaults",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -29,7 +29,7 @@
     "description":"Export workflow settings to Java properties file",
     "id":1678,
     "title":"export-wf-properties",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -38,7 +38,7 @@
     "description":"Finalize upload and ingest",
     "id":1679,
     "title":"include",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -47,7 +47,7 @@
     "description":"Ingesting external elements",
     "id":1680,
     "title":"ingest-download",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -57,7 +57,7 @@
     "description":"Inspecting audio and video streams",
     "id":1681,
     "title":"inspect",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -67,7 +67,7 @@
     "description":"Applying access control entries",
     "id":1683,
     "title":"series",
-    "status":"SKIPPED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SKIPPED"
   },
   {
     "configuration":{
@@ -77,7 +77,7 @@
     "description":"Tagging source material for archival",
     "id":1684,
     "title":"tag",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -87,7 +87,7 @@
     "description":"Tagging uploaded assets for distribution",
     "id":1685,
     "title":"tag",
-    "status":"SKIPPED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SKIPPED"
   },
   {
     "configuration":{
@@ -97,7 +97,7 @@
     "description":"Tagging metadata catalogs for publication",
     "id":1686,
     "title":"tag",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -107,7 +107,7 @@
     "description":"Tagging captions for publication",
     "id":1687,
     "title":"tag",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -116,7 +116,7 @@
     "description":"Archive raw recording after ingest",
     "id":1688,
     "title":"snapshot",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -125,7 +125,7 @@
     "description":"Prepare the recording for further processing",
     "id":1689,
     "title":"include",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -138,7 +138,7 @@
     "description":"Preparing presenter (camera) audio and video work versions",
     "id":1690,
     "title":"prepare-av",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -151,7 +151,7 @@
     "description":"Preparing presentation (screen) audio and video work version",
     "id":1691,
     "title":"prepare-av",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -160,7 +160,7 @@
     "description":"Prepare preview versions of the recording",
     "id":1692,
     "title":"include",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -169,7 +169,7 @@
     "description":"Analyze tracks in media package an set control variables",
     "id":1693,
     "title":"analyze-tracks",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -181,7 +181,7 @@
     "description":"Create single-stream video preview",
     "id":1694,
     "title":"compose",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -198,7 +198,7 @@
     "description":"Create dual-stream video preview",
     "id":1697,
     "title":"composite",
-    "status":"SKIPPED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SKIPPED"
   },
   {
     "configuration":{
@@ -209,7 +209,7 @@
     "description":"Generating waveform",
     "id":1698,
     "title":"waveform",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -220,7 +220,7 @@
     "description":"Detecting silence",
     "id":1699,
     "title":"silence",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -230,7 +230,7 @@
     "description":"Preparing silence detection for preview",
     "id":1700,
     "title":"tag",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -242,7 +242,7 @@
     "description":"Publish to preview publication channel",
     "id":1751,
     "title":"publish-configure",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -251,7 +251,7 @@
     "description":"Archive preview information",
     "id":1753,
     "title":"snapshot",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -262,7 +262,7 @@
     "description":"Mark the recording for cutting",
     "id":1754,
     "title":"comment",
-    "status":"SKIPPED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SKIPPED"
   },
   {
     "configuration":{
@@ -273,7 +273,7 @@
     "description":"Mark the recording for review",
     "id":1755,
     "title":"comment",
-    "status":"SKIPPED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SKIPPED"
   },
   {
     "configuration":{
@@ -282,7 +282,7 @@
     "description":"Publish the recording",
     "id":1756,
     "title":"include",
-    "status":"SKIPPED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SKIPPED"
   },
   {
     "configuration":{
@@ -291,7 +291,7 @@
     "description":"Archive publishing information",
     "id":1757,
     "title":"snapshot",
-    "status":"SKIPPED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SKIPPED"
   },
   {
     "configuration":{
@@ -300,7 +300,7 @@
     "description":"Remove temporary processing artifacts",
     "id":1758,
     "title":"include",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   },
   {
     "configuration":{
@@ -310,6 +310,6 @@
     "description":"Remove temporary processing artifacts",
     "id":1759,
     "title":"cleanup",
-    "status":"SUCCEEDED"
+    "status":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED"
   }
 ]

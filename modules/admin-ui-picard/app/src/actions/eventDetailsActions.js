@@ -29,6 +29,9 @@ export const SAVE_COMMENT_REPLY_IN_PROGRESS = 'SAVE_COMMENT_REPLY_IN_PROGRESS';
 export const LOAD_EVENT_WORKFLOWS_IN_PROGRESS = 'LOAD_EVENT_WORKFLOWS_IN_PROGRESS';
 export const LOAD_EVENT_WORKFLOWS_SUCCESS = 'LOAD_EVENT_WORKFLOWS_SUCCESS';
 export const LOAD_EVENT_WORKFLOWS_FAILURE = 'LOAD_EVENT_WORKFLOWS_FAILURE';
+export const LOAD_EVENT_WORKFLOW_DETAILS_IN_PROGRESS = 'LOAD_EVENT_WORKFLOW_DETAILS_IN_PROGRESS';
+export const LOAD_EVENT_WORKFLOW_DETAILS_SUCCESS = 'LOAD_EVENT_WORKFLOW_DETAILS_SUCCESS';
+export const LOAD_EVENT_WORKFLOW_DETAILS_FAILURE = 'LOAD_EVENT_WORKFLOW_DETAILS_FAILURE';
 export const SET_EVENT_WORKFLOW_DEFINITIONS = 'SET_EVENT_WORKFLOW_DEFINITIONS';
 export const SET_EVENT_WORKFLOW = 'SET_EVENT_WORKFLOW';
 export const SET_EVENT_WORKFLOW_CONFIGURATION = 'SET_EVENT_WORKFLOW_CONFIGURATION';
@@ -38,6 +41,18 @@ export const DO_EVENT_WORKFLOW_ACTION_FAILURE = 'DO_EVENT_WORKFLOW_ACTION_FAILUR
 export const DELETE_EVENT_WORKFLOW_IN_PROGRESS = 'DELETE_EVENT_WORKFLOW_IN_PROGRESS';
 export const DELETE_EVENT_WORKFLOW_SUCCESS = 'DELETE_EVENT_WORKFLOW_SUCCESS';
 export const DELETE_EVENT_WORKFLOW_FAILURE = 'DELETE_EVENT_WORKFLOW_FAILURE';
+export const LOAD_EVENT_WORKFLOW_OPERATIONS_IN_PROGRESS = 'LOAD_EVENT_WORKFLOW_OPERATIONS_IN_PROGRESS';
+export const LOAD_EVENT_WORKFLOW_OPERATIONS_SUCCESS = 'LOAD_EVENT_WORKFLOW_OPERATIONS_SUCCESS';
+export const LOAD_EVENT_WORKFLOW_OPERATIONS_FAILURE = 'LOAD_EVENT_WORKFLOW_OPERATIONS_FAILURE';
+export const LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_IN_PROGRESS = 'LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_IN_PROGRESS';
+export const LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_SUCCESS = 'LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_SUCCESS';
+export const LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_FAILURE = 'LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_FAILURE';
+export const LOAD_EVENT_WORKFLOW_ERRORS_IN_PROGRESS = 'LOAD_EVENT_WORKFLOW_ERRORS_IN_PROGRESS';
+export const LOAD_EVENT_WORKFLOW_ERRORS_SUCCESS = 'LOAD_EVENT_WORKFLOW_ERRORS_SUCCESS';
+export const LOAD_EVENT_WORKFLOW_ERRORS_FAILURE = 'LOAD_EVENT_WORKFLOW_ERRORS_FAILURE';
+export const LOAD_EVENT_WORKFLOW_ERROR_DETAILS_IN_PROGRESS = 'LOAD_EVENT_WORKFLOW_ERROR_DETAILS_IN_PROGRESS';
+export const LOAD_EVENT_WORKFLOW_ERROR_DETAILS_SUCCESS = 'LOAD_EVENT_WORKFLOW_ERROR_DETAILS_SUCCESS';
+export const LOAD_EVENT_WORKFLOW_ERROR_DETAILS_FAILURE = 'LOAD_EVENT_WORKFLOW_ERROR_DETAILS_FAILURE';
 
 
 // Actions affecting fetching of event details from server
@@ -144,6 +159,81 @@ export const loadEventWorkflowsSuccess = ( workflows ) => ({
 
 export const loadEventWorkflowsFailure = () => ({
     type: LOAD_EVENT_WORKFLOWS_FAILURE
+});
+
+export const loadEventWorkflowDetailsInProgress = () => ({
+    type: LOAD_EVENT_WORKFLOW_DETAILS_IN_PROGRESS
+});
+
+export const loadEventWorkflowDetailsSuccess = ( workflowDetails ) => ({
+    type: LOAD_EVENT_WORKFLOW_DETAILS_SUCCESS,
+    payload: {
+        workflowDetails
+    }
+});
+
+export const loadEventWorkflowDetailsFailure = () => ({
+    type: LOAD_EVENT_WORKFLOW_DETAILS_FAILURE
+});
+
+export const loadEventWorkflowOperationsInProgress = () => ({
+    type: LOAD_EVENT_WORKFLOW_OPERATIONS_IN_PROGRESS
+});
+
+export const loadEventWorkflowOperationsSuccess = ( workflowOperations ) => ({
+    type: LOAD_EVENT_WORKFLOW_OPERATIONS_SUCCESS,
+    payload: {
+        workflowOperations
+    }
+});
+
+export const loadEventWorkflowOperationsFailure = () => ({
+    type: LOAD_EVENT_WORKFLOW_OPERATIONS_FAILURE
+});
+
+export const loadEventWorkflowOperationDetailsInProgress = () => ({
+    type: LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_IN_PROGRESS
+});
+
+export const loadEventWorkflowOperationDetailsSuccess = ( workflowOperationDetails ) => ({
+    type: LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_SUCCESS,
+    payload: {
+        workflowOperationDetails
+    }
+});
+
+export const loadEventWorkflowOperationDetailsFailure = () => ({
+    type: LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_FAILURE
+});
+
+export const loadEventWorkflowErrorsInProgress = () => ({
+    type: LOAD_EVENT_WORKFLOW_ERRORS_IN_PROGRESS
+});
+
+export const loadEventWorkflowErrorsSuccess = ( workflowErrors ) => ({
+    type: LOAD_EVENT_WORKFLOW_ERRORS_SUCCESS,
+    payload: {
+        workflowErrors
+    }
+});
+
+export const loadEventWorkflowErrorsFailure = () => ({
+    type: LOAD_EVENT_WORKFLOW_ERRORS_FAILURE
+});
+
+export const loadEventWorkflowErrorDetailsInProgress = () => ({
+    type: LOAD_EVENT_WORKFLOW_ERROR_DETAILS_IN_PROGRESS
+});
+
+export const loadEventWorkflowErrorDetailsSuccess = ( workflowErrorDetails ) => ({
+    type: LOAD_EVENT_WORKFLOW_ERROR_DETAILS_SUCCESS,
+    payload: {
+        workflowErrorDetails
+    }
+});
+
+export const loadEventWorkflowErrorDetailsFailure = () => ({
+    type: LOAD_EVENT_WORKFLOW_ERROR_DETAILS_FAILURE
 });
 
 export const setEventWorkflowDefinitions = (workflows, workflowDefinitions) => ({

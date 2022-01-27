@@ -25,6 +25,21 @@ import {
     loadEventPublicationsInProgress,
     loadEventPublicationsSuccess,
     loadEventPublicationsFailure,
+    loadEventWorkflowDetailsInProgress,
+    loadEventWorkflowDetailsSuccess,
+    loadEventWorkflowDetailsFailure,
+    loadEventWorkflowOperationsInProgress,
+    loadEventWorkflowOperationsSuccess,
+    loadEventWorkflowOperationsFailure,
+    loadEventWorkflowOperationDetailsFailure,
+    loadEventWorkflowOperationDetailsSuccess,
+    loadEventWorkflowOperationDetailsInProgress,
+    loadEventWorkflowErrorsInProgress,
+    loadEventWorkflowErrorsSuccess,
+    loadEventWorkflowErrorsFailure,
+    loadEventWorkflowErrorDetailsInProgress,
+    loadEventWorkflowErrorDetailsSuccess,
+    loadEventWorkflowErrorDetailsFailure,
     loadEventMetadataInProgress,
     loadEventMetadataSuccess,
     loadEventMetadataFailure, setEventMetadata,
@@ -315,7 +330,22 @@ export const fetchWorkflows = (eventId) => async (dispatch, getState) => {
         }
     } catch (e) {
         dispatch(loadEventWorkflowsFailure());
-        console.log(e);
+        logger.error(e);
+    }
+}
+
+export const fetchWorkflowDetails = (eventId, workflowId) => async (dispatch) => {
+
+    try {
+        dispatch(loadEventWorkflowDetailsInProgress());
+
+        const data = await axios.get(`/admin-ng/event/${eventId}/workflows/${workflowId}.json`);
+        const workflowData = await data.data;
+        dispatch(loadEventWorkflowDetailsSuccess(workflowData));
+    } catch (e) {
+        dispatch(loadEventWorkflowDetailsFailure())
+        // todo: probably needs a Notification to the user
+        logger.error(e);
     }
 }
 
@@ -394,6 +424,64 @@ export const deleteWorkflow = (eventId, workflowId) => async (dispatch, getState
             dispatch(addNotification('error', 'EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED', -1, null, NOTIFICATION_CONTEXT));
             dispatch(deleteEventWorkflowFailure());
         });
+}
+
+export const fetchWorkflowOperations = (eventId, workflowId) => async (dispatch) => {
+    try {
+        dispatch(loadEventWorkflowOperationsInProgress());
+
+        const data = await axios.get(`/admin-ng/event/${eventId}/workflows/${workflowId}/operations.json`);
+        const workflowOperationsData = await data.data;
+        const workflowOperations = {entries: workflowOperationsData}
+        dispatch(loadEventWorkflowOperationsSuccess(workflowOperations));
+    } catch (e) {
+        dispatch(loadEventWorkflowOperationsFailure())
+        // todo: probably needs a Notification to the user
+        logger.error(e);
+    }
+}
+
+export const fetchWorkflowOperationDetails = (eventId, workflowId, operationId) => async (dispatch) => {
+    try {
+        dispatch(loadEventWorkflowOperationDetailsInProgress());
+
+        const data = await axios.get(`/admin-ng/event/${eventId}/workflows/${workflowId}/operations/${operationId}`);
+        const workflowOperationDetails = await data.data;
+        dispatch(loadEventWorkflowOperationDetailsSuccess(workflowOperationDetails));
+    } catch (e) {
+        dispatch(loadEventWorkflowOperationDetailsFailure())
+        // todo: probably needs a Notification to the user
+        logger.error(e);
+    }
+}
+
+export const fetchWorkflowErrors = (eventId, workflowId) => async (dispatch) => {
+    try {
+        dispatch(loadEventWorkflowErrorsInProgress());
+
+        const data = await axios.get(`/admin-ng/event/${eventId}/workflows/${workflowId}/errors.json`);
+        const workflowErrorsData = await data.data;
+        const workflowErrors = {entries: workflowErrorsData}
+        dispatch(loadEventWorkflowErrorsSuccess(workflowErrors));
+    } catch (e) {
+        dispatch(loadEventWorkflowErrorsFailure())
+        // todo: probably needs a Notification to the user
+        logger.error(e);
+    }
+}
+
+export const fetchWorkflowErrorDetails = (eventId, workflowId, errorId) => async (dispatch) => {
+    try {
+        dispatch(loadEventWorkflowErrorDetailsInProgress());
+
+        const data = await axios.get(`/admin-ng/event/${eventId}/workflows/${workflowId}/errors/${errorId}.json`);
+        const workflowErrorDetails = await data.data;
+        dispatch(loadEventWorkflowErrorDetailsSuccess(workflowErrorDetails));
+    } catch (e) {
+        dispatch(loadEventWorkflowErrorDetailsFailure())
+        // todo: probably needs a Notification to the user
+        logger.error(e);
+    }
 }
 
 

@@ -1,0 +1,15 @@
+{
+    "failed_attempts":0,
+    "time_in_queue":0,
+    "description":"Export workflow settings to Java properties file",
+    "fail_on_error":true,
+    "started":"2022-01-13T01:04:38Z",
+    "completed":"2022-01-13T01:04:39Z",
+    "max_attempts":1,
+    "name":"export-wf-properties",
+    "execution_host":"https:\/\/stable.opencast.org",
+    "state":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED",
+    "job":703,
+    "retry_strategy":"NONE",
+    "exception_handler_workflow":""
+}

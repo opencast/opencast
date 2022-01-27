@@ -12,6 +12,9 @@ import {
     LOAD_EVENT_WORKFLOWS_IN_PROGRESS,
     LOAD_EVENT_WORKFLOWS_SUCCESS,
     LOAD_EVENT_WORKFLOWS_FAILURE,
+    LOAD_EVENT_WORKFLOW_DETAILS_IN_PROGRESS,
+    LOAD_EVENT_WORKFLOW_DETAILS_SUCCESS,
+    LOAD_EVENT_WORKFLOW_DETAILS_FAILURE,
     SET_EVENT_WORKFLOW_DEFINITIONS,
     SET_EVENT_WORKFLOW,
     SET_EVENT_WORKFLOW_CONFIGURATION,
@@ -21,6 +24,18 @@ import {
     DELETE_EVENT_WORKFLOW_IN_PROGRESS,
     DELETE_EVENT_WORKFLOW_SUCCESS,
     DELETE_EVENT_WORKFLOW_FAILURE,
+    LOAD_EVENT_WORKFLOW_OPERATIONS_IN_PROGRESS,
+    LOAD_EVENT_WORKFLOW_OPERATIONS_SUCCESS,
+    LOAD_EVENT_WORKFLOW_OPERATIONS_FAILURE,
+    LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_IN_PROGRESS,
+    LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_SUCCESS,
+    LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_FAILURE,
+    LOAD_EVENT_WORKFLOW_ERRORS_IN_PROGRESS,
+    LOAD_EVENT_WORKFLOW_ERRORS_SUCCESS,
+    LOAD_EVENT_WORKFLOW_ERRORS_FAILURE,
+    LOAD_EVENT_WORKFLOW_ERROR_DETAILS_IN_PROGRESS,
+    LOAD_EVENT_WORKFLOW_ERROR_DETAILS_SUCCESS,
+    LOAD_EVENT_WORKFLOW_ERROR_DETAILS_FAILURE,
     LOAD_EVENT_PUBLICATIONS_SUCCESS,
     LOAD_EVENT_PUBLICATIONS_IN_PROGRESS,
     LOAD_EVENT_PUBLICATIONS_FAILURE,
@@ -42,6 +57,7 @@ const initialState = {
     comments: [],
     commentReasons: [],
     fetchingWorkflowsInProgress: false,
+    fetchingWorkflowDetailsInProgress: false,
     workflows: {
         scheduling: false,
         entries: [],
@@ -58,6 +74,14 @@ const initialState = {
     baseWorkflow: {},
     workflowActionInProgress: false,
     deleteWorkflowInProgress: false,
+    fetchingWorkflowOperationsInProgress: false,
+    workflowOperations: {},
+    fetchingWorkflowOperationDetailsInProgress: false,
+    workflowOperationDetails: {},
+    fetchingWorkflowErrorsInProgress: false,
+    workflowErrors: {},
+    fetchingWorkflowErrorDetailsInProgress: false,
+    workflowErrorDetails: {},
     loadingPublications: false,
     publications: []
 }
@@ -178,6 +202,48 @@ const eventDetails = (state=initialState, action) => {
                 savingCommentReplyInProgress: false
             };
         }
+        case LOAD_EVENT_WORKFLOW_DETAILS_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingWorkflowDetailsInProgress: true
+            };
+        }
+        case LOAD_EVENT_WORKFLOW_DETAILS_SUCCESS: {
+            const { workflowDetails } = payload;
+            return {
+                ...state,
+                workflows: {
+                    ...state.workflows,
+                    workflow: workflowDetails
+                },
+                fetchingWorkflowDetailsInProgress: false
+            }
+        }
+        case LOAD_EVENT_WORKFLOW_DETAILS_FAILURE: {
+            const emptyWorkflowData = {
+                creator: {
+                    name: "",
+                    email: ""
+                },
+                title: "",
+                description: "",
+                submittedAt: "",
+                state: "",
+                executionTime: "",
+                wiid: "",
+                wdid: "",
+                configuration: {}
+            }
+
+            return {
+                ...state,
+                workflows: {
+                    ...state.workflows,
+                    workflow: emptyWorkflowData
+                },
+                fetchingWorkflowDetailsInProgress: false
+            };
+        }
         case LOAD_EVENT_WORKFLOWS_IN_PROGRESS: {
             return {
                 ...state,
@@ -265,9 +331,114 @@ const eventDetails = (state=initialState, action) => {
                 deleteWorkflowInProgress: false
             }
         }
+        case LOAD_EVENT_WORKFLOW_OPERATIONS_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingWorkflowOperationsInProgress: true
+            };
+        }
+        case LOAD_EVENT_WORKFLOW_OPERATIONS_SUCCESS: {
+            const { workflowOperations } = payload;
+            return {
+                ...state,
+                workflowOperations: workflowOperations,
+                fetchingWorkflowOperationsInProgress: false
+            }
+        }
+        case LOAD_EVENT_WORKFLOW_OPERATIONS_FAILURE: {
+            return {
+                ...state,
+                workflowOperations: {entries: []},
+                fetchingWorkflowOperationsInProgress: false
+            };
+        }
+        case LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingWorkflowOperationDetailsInProgress: true
+            };
+        }
+        case LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_SUCCESS: {
+            const { workflowOperationDetails } = payload;
+            return {
+                ...state,
+                workflowOperationDetails: workflowOperationDetails,
+                fetchingWorkflowOperationDetailsInProgress: false
+            }
+        }
+        case LOAD_EVENT_WORKFLOW_OPERATION_DETAILS_FAILURE: {
+            const emptyOperationDetails = {
+                name: "",
+                description: "",
+                state: "",
+                execution_host: "",
+                job: "",
+                time_in_queue: "",
+                started: "",
+                completed: "",
+                retry_strategy: "",
+                failed_attempts: "",
+                max_attempts: "",
+                exception_handler_workflow: "",
+                fail_on_error: ""
+            };
+
+            return {
+                ...state,
+                workflowOperationDetails: emptyOperationDetails,
+                fetchingWorkflowOperationDetailsInProgress: false
+            };
+        }
+        case LOAD_EVENT_WORKFLOW_ERRORS_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingWorkflowErrorsInProgress: true
+            };
+        }
+        case LOAD_EVENT_WORKFLOW_ERRORS_SUCCESS: {
+            const { workflowErrors } = payload;
+            return {
+                ...state,
+                workflowErrors: workflowErrors,
+                fetchingWorkflowErrorsInProgress: false
+            }
+        }
+        case LOAD_EVENT_WORKFLOW_ERRORS_FAILURE: {
+            return {
+                ...state,
+                workflowErrors: {entries: []},
+                fetchingWorkflowErrorsInProgress: false
+            };
+        }
+        case LOAD_EVENT_WORKFLOW_ERROR_DETAILS_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingWorkflowErrorDetailsInProgress: true
+            };
+        }
+        case LOAD_EVENT_WORKFLOW_ERROR_DETAILS_SUCCESS: {
+            const { workflowErrorDetails } = payload;
+            return {
+                ...state,
+                workflowErrorDetails: workflowErrorDetails,
+                fetchingWorkflowErrorDetailsInProgress: false
+            }
+        }
+        case LOAD_EVENT_WORKFLOW_ERROR_DETAILS_FAILURE: {
+            const emptyErrorDetails = {
+            };
+
+            return {
+                ...state,
+                workflowErrorDetails: emptyErrorDetails,
+                fetchingWorkflowErrorDetailsInProgress: false
+            };
+        }
         default:
             return state;
     }
 };
+
+
 
 export default eventDetails;

@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import {Field, Formik} from "formik";
 import {
     updateWorkflow,
-    fetchWorkflows, performWorkflowAction, deleteWorkflow
+    fetchWorkflows, performWorkflowAction, deleteWorkflow, fetchWorkflowDetails
 } from "../../../../thunks/eventDetailsThunks";
 import {
     getWorkflowConfiguration,
@@ -20,7 +20,7 @@ import {removeNotificationWizardForm} from "../../../../actions/notificationActi
  */
 const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
                                    workflow, workflows, isLoading, workflowDefinitions, workflowConfiguration, performingWorkflowAction, deletingWorkflow,
-                                   loadWorkflows, updateWorkflow, performWorkflowAction, deleteWf}) => {
+                                   loadWorkflows, updateWorkflow, loadWorkflowDetails, performWorkflowAction, deleteWf}) => {
     const isRoleWorkflowEdit = true; /*todo: if: "$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"*/
     const isRoleWorkflowDelete = true; /*todo: if: "$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE')"*/
 
@@ -36,25 +36,21 @@ const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
     }
 
     const workflowAction = (workflowId, action) => {
-        if(performingWorkflowAction){
-            return;
-        } else {
+        if(!performingWorkflowAction){
             performWorkflowAction(eventId, workflowId, action, close);
         }
     }
 
     const deleteWorkflow = (workflowId) => {
-        if(deletingWorkflow){
-            return;
-        } else {
+        if(!deletingWorkflow){
             deleteWf(eventId, workflowId);
         }
     }
 
-    const openSubTab = (tabType, resourceType, id, someBool=false) => {
+    const openSubTab = (tabType, workflowId) => {
+        loadWorkflowDetails(eventId, workflowId).then(r => {});
         setHierarchy(tabType);
-        //todo
-        console.log(`Open Sub Tab ${tabType}, res: ${resourceType}, id: ${id}, ${someBool}`);
+        removeNotificationWizardForm();
     }
 
     const hasCurrentAgentAccess= () => {
@@ -106,7 +102,7 @@ const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
                                                             {t("EVENTS.EVENTS.DETAILS.WORKFLOWS.ACTIONS") /* Actions */}
                                                         </th>
                                                     )}
-                                                    <th className="medium"></th>
+                                                    <th className="medium"/>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -163,7 +159,7 @@ const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
                                                         )}
                                                         <td>
                                                             <a className="details-link"
-                                                               onClick={() => openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)}
+                                                               onClick={() => openSubTab('workflow-details', item.id)}
                                                             >
                                                                 {t("EVENTS.EVENTS.DETAILS.MEDIA.DETAILS") /* Details */}
                                                             </a>
@@ -291,28 +287,28 @@ const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
                                         </div>
                                     </div>
 
-                                        {/* Save and cancel buttons */}
-                                        { (hasCurrentAgentAccess() && isRoleWorkflowEdit && !!workflowConfiguration && !!workflowConfiguration.workflowId/* && formik.dirty*/) && (
-                                            <footer style={{padding: '15px'}}>
-                                                <div className="pull-left">
-                                                    <button type="reset"
-                                                            onClick={() => {} /*todo: formik.resetForm*/}
-                                                            disabled={ true/*todo: !formik.isValid*/}
-                                                            className={`cancel  ${(true/*todo: !formik.isValid*/) ? "disabled" : ""}`}
-                                                    >
-                                                        {t('CANCEL')/* Cancel */}
-                                                    </button>
-                                                </div>
-                                                <div className="pull-right">
-                                                    <button onClick={() => {}/*todo: save formik.values*/}
-                                                            disabled={ true/*todo: !formik.isValid*/}
-                                                            className={`save green  ${(true/*todo: !formik.isValid*/) ? "disabled" : ""}`}
-                                                    >
-                                                        {t('SAVE')/* Save */}
-                                                    </button>
-                                                </div>
-                                            </footer>
-                                        )}
+                                    {/* Save and cancel buttons */}
+                                    { (hasCurrentAgentAccess() && isRoleWorkflowEdit && !!workflowConfiguration && !!workflowConfiguration.workflowId/* && formik.dirty*/) && (
+                                        <footer style={{padding: '15px'}}>
+                                            <div className="pull-left">
+                                                <button type="reset"
+                                                        onClick={() => {} /*todo: formik.resetForm*/}
+                                                        disabled={ true/*todo: !formik.isValid*/}
+                                                        className={`cancel  ${(true/*todo: !formik.isValid*/) ? "disabled" : ""}`}
+                                                >
+                                                    {t('CANCEL')/* Cancel */}
+                                                </button>
+                                            </div>
+                                            <div className="pull-right">
+                                                <button onClick={() => {}/*todo: save formik.values*/}
+                                                        disabled={ true/*todo: !formik.isValid*/}
+                                                        className={`save green  ${(true/*todo: !formik.isValid*/) ? "disabled" : ""}`}
+                                                >
+                                                    {t('SAVE')/* Save */}
+                                                </button>
+                                            </div>
+                                        </footer>
+                                    )}
 
                                 </div>
                             )}
@@ -339,6 +335,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     loadWorkflows: (eventId) => dispatch(fetchWorkflows(eventId)),
     updateWorkflow: (saveWorkflow, workflow) => dispatch(updateWorkflow(saveWorkflow, workflow)),
+    loadWorkflowDetails: (eventId, workflowId) => dispatch(fetchWorkflowDetails(eventId, workflowId)),
     performWorkflowAction: (eventId, workflowId, action, close) => dispatch(performWorkflowAction(eventId, workflowId, action, close)),
     deleteWf: (eventId, workflowId) => dispatch(deleteWorkflow(eventId, workflowId))
 });

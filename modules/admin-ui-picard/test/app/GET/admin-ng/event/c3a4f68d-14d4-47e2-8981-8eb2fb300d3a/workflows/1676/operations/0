@@ -1,0 +1,15 @@
+{
+    "failed_attempts":0,
+    "time_in_queue":0,
+    "description":"Applying default configuration values",
+    "fail_on_error":true,
+    "started":"2021-01-10T01:03:38Z",
+    "completed":"2021-01-10T01:03:39Z",
+    "max_attempts":1,
+    "name":"defaults",
+    "execution_host":"https:\/\/stable.opencast.org",
+    "state":"EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED",
+    "job":702,
+    "retry_strategy":"NONE",
+    "exception_handler_workflow":""
+}
