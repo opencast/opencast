@@ -85,6 +85,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
+import com.google.gson.Gson;
 
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -113,6 +114,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -159,6 +161,8 @@ public class SchedulerRestService {
   private CaptureAgentStateService agentService;
   private CaptureNowProlongingService prolongingService;
   private Workspace workspace;
+
+  private final Gson gson = new Gson();
 
   private String defaultWorkflowDefinitionId;
 
@@ -532,6 +536,63 @@ public class SchedulerRestService {
     } catch (Exception e) {
       logger.error("Unable to get calendar for capture agent '{}':", captureAgentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces("application/json")
+  @Path("calendar.json")
+  @RestQuery(
+    name = "getCalendarJSON",
+    description = "Returns a calendar in JSON format for specified events. This endpoint is not yet stable and might change in the future with no priot notice.",
+    returnDescription = "Calendar for events in JSON format",
+    restParameters = {
+      @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
+      @RestParameter(name = "cutoff", description = "A cutoff date in UNIX milliseconds to limit the number of events returned in the calendar.", isRequired = false, type = Type.INTEGER)
+    }, responses = {
+      @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
+      @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body")
+    })
+  public Response getCalendarJson(
+          @QueryParam("agentid") String captureAgentId,
+          @QueryParam("cutoff") Long cutoff,
+          @Context HttpServletRequest request) {
+    try {
+      var endDate = Optional.ofNullable(cutoff)
+              .map(Date::new)
+              .map(Opt::some)
+              .orElse(Opt.none());
+      var agent = Optional.ofNullable(captureAgentId)
+              .map(String::trim)
+              .filter(id -> !id.isEmpty())
+              .map(Opt::some)
+              .orElse(Opt.none());
+
+      String lastModified = null;
+      // If the `etag` matches the if-not-modified header,return a 304
+      if (agent.isSome()) {
+        lastModified = service.getScheduleLastModified(agent.get());
+        String ifNoneMatch = request.getHeader(HttpHeaders.IF_NONE_MATCH);
+        if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals(lastModified)) {
+          return Response.notModified(lastModified).expires(null).build();
+        }
+      }
+
+      var result = new ArrayList<TechnicalMetadata>();
+      for (var event: service.search(agent, Opt.none(), Opt.none(), Opt.some(new Date()), endDate)) {
+        var id = event.getIdentifier().toString();
+        result.add(service.getTechnicalMetadata(id));
+      }
+
+      final ResponseBuilder response = Response.ok(gson.toJson(result));
+      if (StringUtils.isNotBlank(lastModified)) {
+        response.header(HttpHeaders.ETAG, lastModified);
+      }
+      return response.build();
+    } catch (Exception e) {
+      throw new WebApplicationException(
+              String.format("Unable to get calendar for capture agent %s", captureAgentId),
+              e, Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
 

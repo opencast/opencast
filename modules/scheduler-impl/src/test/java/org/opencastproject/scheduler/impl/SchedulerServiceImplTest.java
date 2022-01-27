@@ -701,41 +701,6 @@ public class SchedulerServiceImplTest {
     assertEquals(2, events.size());
   }
 
-  /**
-   * Test for failure updating past events
-   */
-  @Test(expected = SchedulerException.class)
-  public void testUpdateExpiredEvent() throws Exception {
-    long currentTime = System.currentTimeMillis();
-
-    final String initialTitle = "Recording 1";
-    final MediaPackage mediaPackage = generateEvent(Opt.<String> none());
-    final Date startDateTime = new Date(currentTime - 20 * 1000);
-    final Date endTime = new Date(currentTime - 10 * 1000);
-    final DublinCoreCatalog initalEvent = generateEvent("Device A", Opt.<String> none(), Opt.some(initialTitle),
-            startDateTime, endTime);
-    String catalogId = addDublinCore(Opt.<String> none(), mediaPackage, initalEvent);
-
-    Map<String, String> caMetadata = map(tuple("org.opencastproject.workflow.config.archiveOp", "true"),
-            tuple("org.opencastproject.workflow.definition", "full"));
-
-    schedSvc.addEvent(startDateTime, endTime, "Device A", Collections.<String> emptySet(), mediaPackage, wfProperties,
-            caMetadata, Opt.<String> none());
-
-    MediaPackage mp = schedSvc.getMediaPackage(mediaPackage.getIdentifier().toString());
-    Assert.assertEquals(mediaPackage, mp);
-
-    // test single update
-    final String updatedTitle1 = "Recording 2";
-    final DublinCoreCatalog updatedEvent1 = generateEvent("Device A", Opt.some(mediaPackage.getIdentifier().toString()),
-            Opt.some(updatedTitle1), startDateTime, endTime);
-    addDublinCore(Opt.some(catalogId), mediaPackage, updatedEvent1);
-    schedSvc.updateEvent(mediaPackage.getIdentifier().toString(), Opt.<Date> none(), Opt.<Date> none(),
-            Opt.<String> none(), Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.some(wfPropertiesUpdated),
-            Opt.<Map<String, String>> none());
-    Assert.fail("Schedule should not update a recording that has ended (single)");
-  }
-
   @Test(expected = SchedulerException.class)
   public void testConflictCreation() throws Exception {
     long currentTime = System.currentTimeMillis();
