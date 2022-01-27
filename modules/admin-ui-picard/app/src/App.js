@@ -1,8 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import {connect} from "react-redux";
 import {HashRouter, Route, Switch} from "react-router-dom";
 import './App.scss';
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import Events from "./components/events/Events";
 import Recordings from "./components/recordings/Recordings";
 import Jobs from "./components/systems/Jobs";
@@ -10,19 +9,23 @@ import Themes from "./components/configuration/Themes";
 import Users from "./components/users/Users";
 import Statistics from "./components/statistics/Statistics";
 import Series from "./components/events/Series";
-import Login from "./components/Login";
 import Servers from "./components/systems/Servers";
 import Services from "./components/systems/Services";
 import Groups from "./components/users/Groups";
 import Acls from "./components/users/Acls";
+import {fetchUserInfo} from "./thunks/userInfoThunks";
 
-function App() {
+function App({loadingUserInfo}) {
+    useEffect(() => {
+       // Load information about current user on mount
+       loadingUserInfo();
+    });
   return (
           <HashRouter>
               <Switch>
+                  {/*Todo: When user is logged in then redirect to Events*/}
                   <Route exact path={"/"}>
-                      <Login />
-                      {/*<Events />*/}
+                      <Events />
                   </Route>
                   <Route exact path={"/events/events"}>
                       <Events />
@@ -62,4 +65,8 @@ function App() {
   );
 }
 
-export default App;
+const mapDispatchToProps = dispatch => ({
+    loadingUserInfo: () => dispatch(fetchUserInfo())
+});
+
+export default connect(null, mapDispatchToProps)(App);

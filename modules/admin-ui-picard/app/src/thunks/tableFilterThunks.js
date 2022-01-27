@@ -12,7 +12,7 @@ export const fetchFilters = resource => async dispatch => {
     try {
         dispatch(loadFiltersInProgress());
 
-        const data = await axios.get(`admin-ng/resources/${resource}/filters.json`);
+        const data = await axios.get(`/admin-ng/resources/${resource}/filters.json`);
         const resourceData = await data.data;
 
         let response = transformResponse(resourceData);
@@ -33,7 +33,7 @@ export const fetchFilters = resource => async dispatch => {
 export const fetchStats = () => async dispatch => {
     try {
         // fetch information about possible status an event can have
-        let data =  await axios.get('admin-ng/resources/STATS.json');
+        let data =  await axios.get('/admin-ng/resources/STATS.json');
         let response = await data.data;
 
         // transform response
@@ -57,7 +57,7 @@ export const fetchStats = () => async dispatch => {
                 }
                 filter.push(name + ':' + value);
             }
-            let data = await axios.get('admin-ng/event/events.json', {
+            let data = await axios.get('/admin-ng/event/events.json', {
                 params: {
                     filter: filter.join(','),
                     limit: 1

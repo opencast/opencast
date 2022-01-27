@@ -14,6 +14,10 @@
         <opencast.basedir>${project.basedir}/../..</opencast.basedir>
         <checkstyle.skip>false</checkstyle.skip>
         <skipTests>false</skipTests>
+        <frontend-src-dir>${project.basedir}/app</frontend-src-dir>
+        <node.version>v14.15.4</node.version>
+        <yarn.version>v1.16.0</yarn.version>
+        <frontend-maven-plugin.version>1.7.6</frontend-maven-plugin.version>
     </properties>
     <profiles>
         <profile>
@@ -25,24 +29,42 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>npm install</id>
+                                <id>npm ci</id>
                                 <goals>
-                                    <goal>npm</goal>
+                                    <goal>exec</goal>
                                 </goals>
+                                <phase>initialize</phase>
                                 <configuration>
-                                    <arguments>
-                                        <argument>install</argument>
-                                    </arguments>
+                                    <executable>npm</executable>
+                                    <arguements>
+                                        <arguement>ci</arguement>
+                                    </arguements>
                                 </configuration>
                             </execution>
                             <execution>
                                 <id>frontend build</id>
                                 <goals>
-                                    <goal>npm</goal>
+                                    <goal>exec</goal>
                                 </goals>
+                                <phase>compile</phase>
                                 <configuration>
+                                    <executable>npm</executable>
                                     <arguments>
-                                        <argument>run build</argument>
+                                        <argument>build</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>esline</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <executable>npm</executable>
+                                    <arguments>
+                                        <argument>run</argument>
+                                        <argument>eslint</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -63,7 +85,7 @@
                         <artifactId>frontend-maven-plugin</artifactId>
                         <configuration>
                             <nodeVersion>${node.version}</nodeVersion>
-                            <workingDirectory>app/public/</workingDirectory>
+                            <workingDirectory>${frontend-src-dir}</workingDirectory>
                         </configuration>
                         <executions>
                             <execution>
@@ -71,23 +93,28 @@
                                 <goals>
                                     <goal>install-node-and-npm</goal>
                                 </goals>
+                                <phase>generate-resources</phase>
                             </execution>
+
                             <execution>
                                 <id>npm install</id>
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>
+                                <phase>generate-resources</phase>
                                 <configuration>
                                     <arguments>install</arguments>
                                 </configuration>
                             </execution>
+
                             <execution>
-                                <id>npm run build</id>
+                                <id>npm run-script build</id>
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>
+                                <phase>generate-resources</phase>
                                 <configuration>
-                                    <arguments>run build</arguments>
+                                    <arguments>run-script build</arguments>
                                 </configuration>
                             </execution>
                         </executions>
@@ -100,6 +127,31 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/webapp</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/app/build</directory>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
             <plugin>
@@ -110,17 +162,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Build-Number>${buildNumber}</Build-Number>
-<!--                        <Http-Alias>/admin-ng</Http-Alias>-->
-<!--                        <Http-Classpath>/webapp</Http-Classpath>-->
-<!--                        <Http-Welcome>index.html</Http-Welcome>-->
-                        <!--            <Import-Package>
-                                      net.fortuna.ical4j.*,
-                                      org.opencastproject.index.service.message,
-                                      org.opencastproject.adminui.index,
-                                      javax.ws.rs;version=2.0.1,
-                                      javax.ws.rs.core;version=2.0.1,
-                                      *
-                                    </Import-Package>-->
+                        <Http-Alias>/admin-ui</Http-Alias>
+                        <Http-Classpath>/webapp</Http-Classpath>
+                        <Http-Welcome>index.html</Http-Welcome>
                         <Private-Package>
                             webapp.*
                         </Private-Package>

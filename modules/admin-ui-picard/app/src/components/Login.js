@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
+import { useHistory } from "react-router-dom";
 import {Field, Formik} from "formik";
 import languages from "../i18n/languages";
 import i18n from "../i18n/i18n";
@@ -33,6 +34,7 @@ const Login = () => {
     const [displayMenuLang, setMenuLang] = useState(false);
     const [isError, setError] = useState(false);
 
+    let history = useHistory();
 
     let initialValues = {
         j_username: '',
@@ -63,9 +65,10 @@ const Login = () => {
         data.append('j_password', values.j_password);
         data.append('_spring_security_remember_me', values._spring_security_remember_me);
 
-        axios.post('admin-ng/j_spring_security_check', data)
+        axios.post('/admin-ng/j_spring_security_check', data)
             .then(response => {
                 logger.info(response);
+                history.push('/events/events');
             })
             .catch(response => {
                 logger.error(response);

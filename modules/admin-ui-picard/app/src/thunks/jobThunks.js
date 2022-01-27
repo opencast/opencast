@@ -13,7 +13,7 @@ export const fetchJobs = () => async (dispatch, getState) => {
         let params = getURLParams(state);
 
         // /jobs.json?limit=0&offset=0&filter={filter}&sort={sort}
-        let data = await axios.get('admin-ng/job/jobs.json?', { params: params });
+        let data = await axios.get('/admin-ng/job/jobs.json?', { params: params });
 
         const jobs = await data.data;
         dispatch(loadJobsSuccess(jobs));

@@ -12,7 +12,7 @@ export const fetchServers = () => async (dispatch, getState) => {
         let params = getURLParams(state);
 
         // /servers.json?limit=0&offset=0&filter={filter}&sort={sort}
-        let data = await axios.get('admin-ng/server/servers.json', { params: params });
+        let data = await axios.get('/admin-ng/server/servers.json', { params: params });
 
         const servers = await data.data;
 
@@ -31,7 +31,7 @@ export const setServerMaintenance = async (host, maintenance) => {
     data.append("host", host);
     data.append("maintenance", maintenance);
 
-    axios.post('services/maintenance', data)
+    axios.post('/services/maintenance', data)
         .then(response => {
         logger.info(response);
     }).catch(response => {

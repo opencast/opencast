@@ -13,7 +13,7 @@ export const fetchGroupDetails = groupName => async dispatch => {
     try {
         dispatch(loadGroupDetailsInProgress());
 
-        let data = await axios.get(`admin-ng/groups/${groupName}`);
+        let data = await axios.get(`/admin-ng/groups/${groupName}`);
 
         const response = await (data.data);
 
@@ -49,7 +49,7 @@ export const updateGroupDetails = (values, groupId) => async dispatch => {
     let data = buildGroupBody(values);
 
     // PUT request
-    axios.put(`admin-ng/groups/${groupId}`, data)
+    axios.put(`/admin-ng/groups/${groupId}`, data)
         .then(response => {
         logger.info(response);
         dispatch(addNotification('success', 'GROUP_UPDATED'));

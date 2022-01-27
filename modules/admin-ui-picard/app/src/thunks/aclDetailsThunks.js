@@ -9,7 +9,7 @@ export const fetchAclDetails = aclId => async dispatch => {
     try {
         dispatch(loadAclDetailsInProgress());
 
-        let data = await axios.get(`admin-ng/acl/${aclId}`);
+        let data = await axios.get(`/admin-ng/acl/${aclId}`);
 
         let aclDetails = await data.data;
 
