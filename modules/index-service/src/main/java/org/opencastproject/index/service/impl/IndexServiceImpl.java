@@ -97,6 +97,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -1221,8 +1222,8 @@ public class IndexServiceImpl implements IndexService {
     switch (getEventSource(event)) {
       case WORKFLOW:
         try {
-          Optional<WorkflowInstance> workflowInstance =
-                  getCurrentWorkflowInstanceForMediaPackage(event.getIdentifier());
+          Optional<WorkflowInstance> workflowInstance = workflowService.
+                  getRunningWorkflowInstanceByMediaPackage(event.getIdentifier(), Permissions.Action.WRITE.toString());
           if (!workflowInstance.isPresent()) {
             logger.error("No workflow instance for event {} found!", event.getIdentifier());
             throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
@@ -1254,15 +1255,6 @@ public class IndexServiceImpl implements IndexService {
         throw new IndexServiceException(
                 String.format("Unable to handle event source type '%s'", getEventSource(event)));
     }
-  }
-
-  Optional<WorkflowInstance> getCurrentWorkflowInstanceForMediaPackage(String mediaPackageId)
-          throws WorkflowDatabaseException {
-    List<WorkflowInstance> workflowInstances = workflowService.getWorkflowInstancesByMediaPackage(mediaPackageId);
-    if (workflowInstances.size() == 0) {
-      return Optional.empty();
-    }
-    return Optional.of(workflowInstances.get(0)); //first is current
   }
 
   @Override
@@ -1306,7 +1298,8 @@ public class IndexServiceImpl implements IndexService {
     switch (getEventSource(event)) {
       case WORKFLOW:
         try {
-          Optional<WorkflowInstance> workflowInstance = getCurrentWorkflowInstanceForMediaPackage(event.getIdentifier());
+          Optional<WorkflowInstance> workflowInstance = workflowService.
+                  getRunningWorkflowInstanceByMediaPackage(event.getIdentifier(), Permissions.Action.WRITE.toString());
           if (!workflowInstance.isPresent()) {
             logger.error("No workflow instance for event {} found!", event.getIdentifier());
             throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
@@ -1555,8 +1548,8 @@ public class IndexServiceImpl implements IndexService {
     switch (getEventSource(event)) {
       case WORKFLOW:
         try {
-          Optional<WorkflowInstance> currentWorkflowInstance =
-                  getCurrentWorkflowInstanceForMediaPackage(event.getIdentifier());
+          Optional<WorkflowInstance> currentWorkflowInstance = workflowService.
+                  getRunningWorkflowInstanceByMediaPackage(event.getIdentifier(), Permissions.Action.READ.toString());
           if (!currentWorkflowInstance.isPresent()) {
             logger.error("No workflow instance for event {} found!", event.getIdentifier());
             throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
@@ -1565,6 +1558,12 @@ public class IndexServiceImpl implements IndexService {
         } catch (WorkflowDatabaseException e) {
           logger.error("Unable to get current workflow instance for event with id {} from workflow service",
                   event.getIdentifier(), e);
+          throw new IndexServiceException(e.getMessage(), e);
+        } catch (UnauthorizedException e) {
+          logger.error("Not authorized to read mediapackage from workflow", event.getIdentifier(), e);
+          throw new IndexServiceException(e.getMessage(), e);
+        } catch (WorkflowException e) {
+          logger.error("Unable to get event mediapackage {} from WorkflowService because", event.getIdentifier(), e);
           throw new IndexServiceException(e.getMessage(), e);
         }
       case ARCHIVE:
@@ -1910,8 +1909,8 @@ public class IndexServiceImpl implements IndexService {
         switch (getEventSource(event)) {
           case WORKFLOW:
             logger.info("Update workflow mediapacakge {} with updated comments catalog.", event.getIdentifier());
-            Optional<WorkflowInstance> workflowInstance =
-                    getCurrentWorkflowInstanceForMediaPackage(event.getIdentifier());
+            Optional<WorkflowInstance> workflowInstance = workflowService.
+                    getRunningWorkflowInstanceByMediaPackage(event.getIdentifier(), Permissions.Action.WRITE.toString());
             if (!workflowInstance.isPresent()) {
               logger.error("No workflow instance for event {} found!", event.getIdentifier());
               throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());

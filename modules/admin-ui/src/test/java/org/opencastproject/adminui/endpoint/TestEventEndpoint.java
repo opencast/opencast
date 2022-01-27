@@ -342,13 +342,13 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.getWorkflowDefinitionById(EasyMock.anyString())).andReturn(wfD).anyTimes();
-    EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())) //.andReturn(workflowInstance1).anyTimes();
+    EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong()))
               .andAnswer(new IAnswer<WorkflowInstance>() {
                 @Override
                 public WorkflowInstance answer() throws Throwable {
                   long id = (long) EasyMock.getCurrentArguments()[0];
                   if (id == 9999L) {
-                    throw new NotFoundException("999 was not found");
+                    throw new NotFoundException("Workflow 9999 was not found");
                   } else {
                     return workflowInstance1;
                   }
