@@ -29,11 +29,13 @@ import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
+import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.data.Opt;
@@ -51,7 +53,7 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final Logger logger = LoggerFactory.getLogger(StartWorkflowWorkflowOperationHandler.class);
 
   /** Name of the configuration option that provides the media package ID */
-  public static final String MEDIA_PACKAGE_ID = "media-package";
+  public static final String MEDIA_PACKAGE_ID = "media-packages";
 
   /** Name of the configuration option that provides the workflow definition ID */
   public static final String WORKFLOW_DEFINITION = "workflow-definition";
@@ -85,16 +87,9 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
           throws WorkflowOperationException {
 
     final WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
-    final String configuredMediaPackageID = trimToEmpty(operation.getConfiguration(MEDIA_PACKAGE_ID));
+    final String configuredMediaPackageIDs = trimToEmpty(operation.getConfiguration(MEDIA_PACKAGE_ID));
     final String configuredWorkflowDefinition = trimToEmpty(operation.getConfiguration(WORKFLOW_DEFINITION));
-
-    // Get media package
-    Opt<MediaPackage> mpOpt = assetManager.getMediaPackage(configuredMediaPackageID);
-    if (mpOpt.isNone()) {
-      throw new WorkflowOperationException(format("Media package %s not found", configuredMediaPackageID));
-    }
-    final MediaPackage mp = mpOpt.get();
-
+    final Boolean failOnError = operation.isFailWorkflowOnException();
     // Get workflow parameter
     final Map<String, String> properties = new HashMap<>();
     for (String key : operation.getConfigurationKeys()) {
@@ -104,22 +99,49 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
       properties.put(key, operation.getConfiguration(key));
     }
 
+    final WorkflowDefinition workflowDefinition;
     try {
       // Get workflow definition
-      final WorkflowDefinition workflowDefinition = workflowService.getWorkflowDefinitionById(
+      workflowDefinition = workflowService.getWorkflowDefinitionById(
               configuredWorkflowDefinition);
-
-      // Start workflow
-      logger.info("Starting '{}' workflow for media package '{}'", configuredWorkflowDefinition,
-              configuredMediaPackageID);
-      workflowService.start(workflowDefinition, mp, properties);
-
     } catch (NotFoundException e) {
       throw new WorkflowOperationException(format("Workflow Definition '%s' not found", configuredWorkflowDefinition));
-    } catch (Exception e) {
+    } catch (WorkflowDatabaseException e) {
       throw new WorkflowOperationException(e);
     }
-
+    String errors = "";
+    String delim = "";
+    for (String mpId : asList(configuredMediaPackageIDs)) {
+      // Get media package
+      Opt<MediaPackage> mpOpt = assetManager.getMediaPackage(mpId);
+      if (mpOpt.isNone()) {
+        String errstr = format("Media package %s not found", mpId);
+        if (failOnError) {
+          throw new WorkflowOperationException(errstr);
+        } else {
+          logger.error(errstr);
+          errors += delim + errstr;
+          delim = "\n";
+        }
+      }
+      final MediaPackage mp = mpOpt.get();
+      try {
+        // Start workflow
+        logger.info("Starting '{}' workflow for media package '{}'", configuredWorkflowDefinition,
+                mpId);
+        workflowService.start(workflowDefinition, mp, properties);
+      } catch (WorkflowDatabaseException | WorkflowParsingException e) {
+        if (failOnError) {
+          throw new WorkflowOperationException(e);
+        } else {
+          logger.error(e.getMessage(),e);
+          errors += delim + e.getMessage();
+        }
+      }
+    }
+    if (!errors.isEmpty()) {
+      throw new WorkflowOperationException(errors);
+    }
     return createResult(WorkflowOperationResult.Action.CONTINUE);
   }
 }
