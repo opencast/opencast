@@ -12,6 +12,9 @@ import EventDetailsWorkflowOperations from "../ModalTabsAndPages/EventDetailsWor
 import EventDetailsWorkflowOperationDetails from "../ModalTabsAndPages/EventDetailsWorkflowOperationDetails";
 import EventDetailsWorkflowErrors from "../ModalTabsAndPages/EventDetailsWorkflowErrors";
 import EventDetailsWorkflowErrorDetails from "../ModalTabsAndPages/EventDetailsWorkflowErrorDetails";
+import {getMetadata, isFetchingMetadata} from "../../../../selectors/eventDetailsSelectors";
+import {fetchMetadata, updateMetadata} from "../../../../thunks/eventDetailsThunks";
+import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 
 
@@ -21,9 +24,16 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manages the pages of the event details
  */
-const EventDetails = ({ tabIndex, eventId, close }) => {
+const EventDetails = ({ tabIndex, eventId, close,
+                          metadata, isLoadingMetadata,
+                          loadMetadata, updateMetadata, removeNotificationWizardForm }) => {
     const { t } = useTranslation();
 
+    useEffect(() => {
+        removeNotificationWizardForm();
+        loadMetadata(eventId).then(r => {});
+
+    }, []);
 
     const [page, setPage] = useState(tabIndex);
     const [workflowTabHierarchy, setWorkflowTabHierarchy] = useState("entry")
@@ -137,7 +147,6 @@ const EventDetails = ({ tabIndex, eventId, close }) => {
                         </a>
                 }
             </nav>
-
             {/* Initialize overall modal */}
                 <div>
                     {page === 0 && (
@@ -250,6 +259,15 @@ const MockDataPage = ({ header, t }) => {
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
+    metadata: getMetadata(state),
+    isLoadingMetadata: isFetchingMetadata(state)
 });
 
-export default connect(mapStateToProps)(EventDetails);
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    loadMetadata: (id) => dispatch(fetchMetadata(id)),
+    updateMetadata: (id, values) => dispatch(updateMetadata(id, values)),
+    removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(EventDetails);

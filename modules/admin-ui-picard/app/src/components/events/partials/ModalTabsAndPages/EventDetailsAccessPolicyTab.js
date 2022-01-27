@@ -18,6 +18,7 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
         <ResourceDetailsAccessPolicyTab resourceId={eventId}
                                         header={header}
                                         buttonText={'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL'}
+                                        saveButtonText={'SAVE'}
                                         t={t}
                                         policies={policies}
                                         fetchAccessPolicies={fetchAccessPolicies}

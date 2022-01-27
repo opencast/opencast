@@ -108,8 +108,8 @@ const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, button
                                                         )}>
                                                     {t(buttonLabel)}
                                                 </button>
-                                                <button onClick={() => formik.resetForm({values: ''})}
-                                                        className="cancel">
+                                                <button className="cancel"
+                                                        onClick={() => formik.resetForm({values: ''})}>
                                                     {t('CANCEL')}
                                                 </button>
                                             </footer>

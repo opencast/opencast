@@ -2,12 +2,18 @@
  * This file contains all redux actions that can be executed on event details
  */
 
-// Constant of actions types affecting the access policies tab tab
+// Constants of actions types affecting the metadata tab
+export const LOAD_EVENT_METADATA_SUCCESS = 'LOAD_EVENT_METADATA_SUCCESS';
+export const LOAD_EVENT_METADATA_FAILURE = 'LOAD_EVENT_METADATA_FAILURE';
+export const LOAD_EVENT_METADATA_IN_PROGRESS = 'LOAD_EVENT_METADATA_IN_PROGRESS';
+export const SET_EVENT_METADATA = 'SET_EVENT_METADATA';
+
+// Constants of actions types affecting the access policies tab
 export const LOAD_EVENT_POLICIES_SUCCESS = 'LOAD_EVENT_POLICIES_SUCCESS';
 export const LOAD_EVENT_POLICIES_FAILURE = 'LOAD_EVENT_POLICIES_FAILURE';
 export const LOAD_EVENT_POLICIES_IN_PROGRESS = 'LOAD_EVENT_POLICIES_IN_PROGRESS';
 
-// Constant of actions types affecting the comments tab
+// Constants of actions types affecting the comments tab
 export const LOAD_EVENT_COMMENTS_SUCCESS = 'LOAD_EVENT_COMMENTS_SUCCESS';
 export const LOAD_EVENT_COMMENTS_FAILURE = 'LOAD_EVENT_COMMENTS_FAILURE';
 export const LOAD_EVENT_COMMENTS_IN_PROGRESS = 'LOAD_EVENT_COMMENTS_IN_PROGRESS';
@@ -19,7 +25,7 @@ export const SAVE_COMMENT_IN_PROGRESS = 'SAVE_COMMENT_IN_PROGRESS';
 export const SAVE_COMMENT_REPLY_DONE = 'SAVE_COMMENT_REPLY_DONE';
 export const SAVE_COMMENT_REPLY_IN_PROGRESS = 'SAVE_COMMENT_REPLY_IN_PROGRESS';
 
-// Constant of actions types affecting the workflows tab
+// Constants of actions types affecting the workflows tab
 export const LOAD_EVENT_WORKFLOWS_IN_PROGRESS = 'LOAD_EVENT_WORKFLOWS_IN_PROGRESS';
 export const LOAD_EVENT_WORKFLOWS_SUCCESS = 'LOAD_EVENT_WORKFLOWS_SUCCESS';
 export const LOAD_EVENT_WORKFLOWS_FAILURE = 'LOAD_EVENT_WORKFLOWS_FAILURE';
@@ -50,6 +56,29 @@ export const LOAD_EVENT_WORKFLOW_ERROR_DETAILS_FAILURE = 'LOAD_EVENT_WORKFLOW_ER
 
 
 // Actions affecting fetching of event details from server
+
+// actions for metadata
+export const loadEventMetadataInProgress = () => ({
+    type: LOAD_EVENT_METADATA_IN_PROGRESS
+});
+
+export const loadEventMetadataSuccess = ( metadata ) => ({
+    type: LOAD_EVENT_METADATA_SUCCESS,
+    payload: {
+        metadata
+    }
+});
+
+export const loadEventMetadataFailure = () => ({
+    type: LOAD_EVENT_METADATA_FAILURE
+});
+
+export const setEventMetadata = ( metadata ) => ({
+    type: SET_EVENT_METADATA,
+    payload: {
+        metadata
+    }
+});
 
 // actions for access policies
 export const loadEventPoliciesInProgress = () => ({
