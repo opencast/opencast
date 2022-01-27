@@ -644,9 +644,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       for (String key : instance.getConfigurationKeys()) {
         wfProperties.put(key, instance.getConfiguration(key));
       }
-      final Function<String, String> systemVariableGetter = key -> componentContext == null
-              ? null
-              : componentContext.getBundleContext().getProperty(key);
+      final Organization currentOrg = securityService.getOrganization();
+      final Function<String, String> systemVariableGetter = key -> {
+        if (key.startsWith("org_")) {
+          String value = currentOrg.getProperties().get(key.substring(4));
+          if (value != null) {
+            return value;
+          }
+        }
+        return componentContext == null
+            ? null
+            : componentContext.getBundleContext().getProperty(key);
+      };
       if (instance.getOperations().stream().anyMatch(op -> op.getExecutionCondition() != null)) {
         instance.getOperations().stream().filter(op -> op.getExecutionCondition() != null).forEach(
                 op -> op.setExecutionCondition(WorkflowConditionInterpreter.replaceVariables(op.getExecutionCondition(),
