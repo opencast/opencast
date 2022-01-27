@@ -53,7 +53,10 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final Logger logger = LoggerFactory.getLogger(StartWorkflowWorkflowOperationHandler.class);
 
   /** Name of the configuration option that provides the media package ID */
-  public static final String MEDIA_PACKAGE_ID = "media-packages";
+  @Deprecated
+  public static final String MEDIA_PACKAGE_ID = "media-package";
+
+  public static final String MEDIA_PACKAGE_IDS = "media-packages";
 
   /** Name of the configuration option that provides the workflow definition ID */
   public static final String WORKFLOW_DEFINITION = "workflow-definition";
@@ -87,13 +90,17 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
           throws WorkflowOperationException {
 
     final WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
-    final String configuredMediaPackageIDs = trimToEmpty(operation.getConfiguration(MEDIA_PACKAGE_ID));
+    String mediaPackageIDs = trimToEmpty(operation.getConfiguration(MEDIA_PACKAGE_IDS));
+    if ("".equals(mediaPackageIDs)) {
+      mediaPackageIDs = trimToEmpty(operation.getConfiguration(MEDIA_PACKAGE_ID));
+    }
+    final String configuredMediaPackageIDs = mediaPackageIDs;
     final String configuredWorkflowDefinition = trimToEmpty(operation.getConfiguration(WORKFLOW_DEFINITION));
     final Boolean failOnError = operation.isFailWorkflowOnException();
     // Get workflow parameter
     final Map<String, String> properties = new HashMap<>();
     for (String key : operation.getConfigurationKeys()) {
-      if (MEDIA_PACKAGE_ID.equals(key) || WORKFLOW_DEFINITION.equals(key)) {
+      if (MEDIA_PACKAGE_ID.equals(key) || MEDIA_PACKAGE_IDS.equals(key) || WORKFLOW_DEFINITION.equals(key)) {
         continue;
       }
       properties.put(key, operation.getConfiguration(key));
@@ -123,6 +130,7 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
           errors += delim + errstr;
           delim = "\n";
         }
+        continue;
       }
       final MediaPackage mp = mpOpt.get();
       try {
