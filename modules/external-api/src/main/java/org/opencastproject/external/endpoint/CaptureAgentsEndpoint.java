@@ -40,7 +40,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,10 +89,7 @@ public class CaptureAgentsEndpoint {
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "agentStateService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "agentStateService")
   public void setAgentStateService(CaptureAgentStateService agentStateService) {
     this.agentStateService = agentStateService;
   }

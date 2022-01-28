@@ -35,7 +35,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.util.List;
 
@@ -61,10 +60,7 @@ public class DefaultRepository extends OaiPmhRepository {
           Collections.list(new MatterhornMetadataProvider(), new MatterhornInlinedMetadataProvider());
 
   /** OSGi DI */
-  @Reference(
-      name = "persistence",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "persistence")
   public void setPersistence(OaiPmhDatabase persistence) {
     this.persistence = persistence;
   }

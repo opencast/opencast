@@ -56,7 +56,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -445,10 +444,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
     this.scheduler = scheduler;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

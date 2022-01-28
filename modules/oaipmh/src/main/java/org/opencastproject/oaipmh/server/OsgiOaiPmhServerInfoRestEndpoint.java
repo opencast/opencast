@@ -24,7 +24,6 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import javax.ws.rs.Path;
 
@@ -53,10 +52,7 @@ public class OsgiOaiPmhServerInfoRestEndpoint extends AbstractOaiPmhServerInfoRe
   }
 
   /** OSGi DI. */
-  @Reference(
-      name = "oaiPmhServerInfo",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "oaiPmhServerInfo")
   public void setOaiPmhServerInfo(OaiPmhServerInfo oaiPmhServerInfo) {
     this.oaiPmhServerInfo = oaiPmhServerInfo;
   }

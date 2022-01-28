@@ -46,7 +46,6 @@ import com.google.gson.reflect.TypeToken;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -288,41 +287,28 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
     return this.organizationDirectoryService;
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(
-      name = "user-directory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  @Reference(
-      name = "orgDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   @Reference(
       name = "DownloadDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=download)"
   )
   public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {

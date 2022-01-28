@@ -58,7 +58,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,10 +104,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** The local workspace */
   private Workspace workspace;
 
-  @Reference(
-      name = "dc",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "dc")
   public void setDublincoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
@@ -119,10 +115,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param inspectionService
    *          the inspection service
    */
-  @Reference(
-      name = "InspectionService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "InspectionService")
   protected void setInspectionService(MediaInspectionService inspectionService) {
     this.inspectionService = inspectionService;
   }
@@ -134,10 +127,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -293,10 +283,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
     }
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

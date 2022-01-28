@@ -30,7 +30,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * Implementation of {@link CoverImageWorkflowOperationHandlerBase} for usage in an OSGi context
@@ -63,10 +62,7 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param coverImageService
    *          an instance of the cover image service
    */
-  @Reference(
-      name = "CoverImageService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "CoverImageService")
   protected void setCoverImageService(CoverImageService coverImageService) {
     this.coverImageService = coverImageService;
   }
@@ -77,10 +73,7 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param workspace
    *          an instance of the workspace service
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -93,7 +86,6 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    */
   @Reference(
       name = "MetadataService",
-      policy = ReferencePolicy.STATIC,
       target = "(metadata.source=dublincore)"
   )
   protected void setStaticMetadataService(StaticMetadataService srv) {
@@ -106,18 +98,12 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param dcService
    *          an instance of the dublin core catalog service
    */
-  @Reference(
-      name = "DublinCoreCatalogService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "DublinCoreCatalogService")
   protected void setDublinCoreCatalogService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

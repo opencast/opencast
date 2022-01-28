@@ -25,7 +25,6 @@ import org.opencastproject.mediapackage.MediaPackageSerializer;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,10 +54,7 @@ public class PresignedUrlMediaPackageSerializer implements MediaPackageSerialize
     logger.info("Init PresignedUrlMediaPackageSerializer");
   }
 
-  @Reference(
-      name = "distributionService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "distributionService")
   public void setService(AwsS3DistributionService service) {
     this.service = service;
   }

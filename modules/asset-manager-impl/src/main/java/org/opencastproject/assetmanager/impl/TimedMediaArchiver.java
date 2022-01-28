@@ -43,7 +43,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.quartz.CronExpression;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -188,10 +187,7 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
     return SCANNER_NAME;
   }
 
-  @Reference(
-      name = "AssetManager",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "AssetManager")
   public void setAssetManager(AssetManager am) {
     this.assetManager = am;
   }
@@ -218,28 +214,19 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
     }
   }
 
-  @Reference(
-      name = "OrganizationDirectoryService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "OrganizationDirectoryService")
   @Override
   public void bindOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.bindOrganizationDirectoryService(organizationDirectoryService);
   }
 
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   @Override
   public void bindSecurityService(SecurityService securityService) {
     super.bindSecurityService(securityService);
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   @Override
   public void bindServiceRegistry(ServiceRegistry serviceRegistry) {
     super.bindServiceRegistry(serviceRegistry);

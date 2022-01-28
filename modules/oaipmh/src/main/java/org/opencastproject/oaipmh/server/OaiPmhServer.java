@@ -119,10 +119,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
   }
 
   /** OSGi DI. */
-  @Reference(
-      name = "securityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

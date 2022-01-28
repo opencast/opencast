@@ -39,7 +39,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,10 +149,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -164,10 +160,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
    * @param textAnalyzer
    *          the text analyzer
    */
-  @Reference(
-      name = "textAnalyzer",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "textAnalyzer")
   protected void setTextAnalyzer(TextAnalyzerService textAnalyzer) {
     this.service = textAnalyzer;
   }

@@ -72,7 +72,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -894,18 +893,12 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     return wfPropertiesString.toString();
   }
 
-  @Reference(
-      name = "trustedHttpClient",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "trustedHttpClient")
   @Override
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     super.setTrustedHttpClient(trustedHttpClient);
   }
-  @Reference(
-      name = "remoteServiceManager",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "remoteServiceManager")
   @Override
   public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
     super.setRemoteServiceManager(serviceRegistry);

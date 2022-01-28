@@ -46,7 +46,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,10 +176,7 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
    * @param videosegmenter
    *          the video segmenter
    */
-  @Reference(
-      name = "VideoSegmenterService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "VideoSegmenterService")
   protected void setVideoSegmenter(VideoSegmenterService videosegmenter) {
     this.videosegmenter = videosegmenter;
   }
@@ -192,18 +188,12 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

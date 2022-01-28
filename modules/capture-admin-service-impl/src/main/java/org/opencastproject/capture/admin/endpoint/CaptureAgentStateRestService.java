@@ -132,10 +132,7 @@ public class CaptureAgentStateRestService {
     this.service = null;
   }
 
-  @Reference(
-      name = "scheduler-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "scheduler-service")
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }

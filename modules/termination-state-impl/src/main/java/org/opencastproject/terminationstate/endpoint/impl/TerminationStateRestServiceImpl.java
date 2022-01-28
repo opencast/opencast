@@ -37,7 +37,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.FormParam;
@@ -169,7 +168,6 @@ public class TerminationStateRestServiceImpl implements TerminationStateRestServ
    */
   @Reference(
       name = "termination-state-service",
-      policy = ReferencePolicy.STATIC,
       target = "(&(vendor.name=opencast)(vendor.service=basic))"
   )
   public void setService(TerminationStateService service) {

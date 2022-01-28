@@ -36,7 +36,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,18 +150,12 @@ public class SchedulerUpdateHandler extends UpdateHandler {
   }
 
   // === Set by OSGI begin
-  @Reference(
-      name = "schedulerService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "schedulerService")
   public void setSchedulerService(SchedulerService service) {
     this.schedulerService = service;
   }
 
-  @Reference(
-      name = "liveScheduleService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "liveScheduleService")
   @Override
   public void setLiveScheduleService(LiveScheduleService liveScheduleService) {
     super.setLiveScheduleService(liveScheduleService);

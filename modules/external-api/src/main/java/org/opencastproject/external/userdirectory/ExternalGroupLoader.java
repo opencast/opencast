@@ -40,7 +40,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,10 +86,7 @@ public class ExternalGroupLoader {
    * @param groupRoleProvider
    *          the groupRoleProvider to set
    */
-  @Reference(
-      name = "groupRoleProvider",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "groupRoleProvider")
   public void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
@@ -99,18 +95,12 @@ public class ExternalGroupLoader {
    * @param organizationDirectoryService
    *          the organizationDirectoryService to set
    */
-  @Reference(
-      name = "organizationDirectoryService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "organizationDirectoryService")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

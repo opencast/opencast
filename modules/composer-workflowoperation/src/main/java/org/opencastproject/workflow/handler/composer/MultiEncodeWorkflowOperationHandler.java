@@ -53,7 +53,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,10 +102,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param composerService
    *          the local composer service
    */
-  @Reference(
-      name = "ComposerService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ComposerService")
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -118,10 +114,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -554,10 +547,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     }
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -50,7 +50,6 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,19 +142,13 @@ public class StaticFileRestService {
   protected boolean useWebserver = false;
 
   /** OSGi callback to bind service instance. */
-  @Reference(
-      name = "UploadStaticFileService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "UploadStaticFileService")
   public void setStaticFileService(StaticFileService staticFileService) {
     this.staticFileService = staticFileService;
   }
 
   /** OSGi callback to bind service instance. */
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

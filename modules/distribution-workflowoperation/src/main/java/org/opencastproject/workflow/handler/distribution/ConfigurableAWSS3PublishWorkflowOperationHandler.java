@@ -28,7 +28,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * WOH that distributes selected elements to an internal distribution channel and adds reflective publication elements
@@ -48,7 +47,6 @@ public class ConfigurableAWSS3PublishWorkflowOperationHandler extends Configurab
   /** OSGi DI */
   @Reference(
       name = "DownloadDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=aws.s3)"
   )
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
@@ -64,10 +62,7 @@ public class ConfigurableAWSS3PublishWorkflowOperationHandler extends Configurab
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   protected void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);
   }

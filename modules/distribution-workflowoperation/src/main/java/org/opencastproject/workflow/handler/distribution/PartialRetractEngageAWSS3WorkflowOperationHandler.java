@@ -28,7 +28,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * Workflow operation for retracting parts of a media package from the engage player.
@@ -52,7 +51,6 @@ public class PartialRetractEngageAWSS3WorkflowOperationHandler extends PartialRe
    */
   @Reference(
       name = "DownloadDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=download)"
   )
   public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
@@ -66,10 +64,7 @@ public class PartialRetractEngageAWSS3WorkflowOperationHandler extends PartialRe
    * @param searchService
    *          an instance of the search service
    */
-  @Reference(
-      name = "SearchService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SearchService")
   public void setSearchService(SearchService searchService) {
     super.setSearchService(searchService);
   }

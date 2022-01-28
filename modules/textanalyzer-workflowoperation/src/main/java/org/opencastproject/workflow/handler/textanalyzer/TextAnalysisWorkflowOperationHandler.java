@@ -73,7 +73,6 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,10 +138,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param analysisService
    *          the text analysis service
    */
-  @Reference(
-      name = "TextAnalysisService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "TextAnalysisService")
   protected void setTextAnalyzer(TextAnalyzerService analysisService) {
     this.analysisService = analysisService;
   }
@@ -154,10 +150,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -168,10 +161,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    * @param catalogService
    *          the catalog service
    */
-  @Reference(
-      name = "Mpeg7Service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Mpeg7Service")
   protected void setMpeg7CatalogService(Mpeg7CatalogService catalogService) {
     this.mpeg7CatalogService = catalogService;
   }
@@ -539,18 +529,12 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
    *
    * @param composerService
    */
-  @Reference(
-      name = "Composer",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Composer")
   void setComposerService(ComposerService composerService) {
     this.composer = composerService;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

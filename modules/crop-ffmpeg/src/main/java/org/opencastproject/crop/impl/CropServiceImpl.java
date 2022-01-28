@@ -46,7 +46,6 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -485,42 +484,27 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     return organizationDirectoryService;
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(
-      name = "user-directory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  @Reference(
-      name = "orgDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

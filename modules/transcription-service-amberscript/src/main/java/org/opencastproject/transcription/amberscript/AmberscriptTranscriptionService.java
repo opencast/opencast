@@ -82,7 +82,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -658,74 +657,47 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return PathSupport.toSafeName(jobId + "." + extension);
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(
-      name = "securityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(
-      name = "userDirectoryService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "userDirectoryService")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  @Reference(
-      name = "organizationDirectoryService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "organizationDirectoryService")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
-  @Reference(
-      name = "workingFileRepository",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workingFileRepository")
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }
 
-  @Reference(
-      name = "database",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "database")
   public void setDatabase(TranscriptionDatabase service) {
     this.database = service;
   }
 
-  @Reference(
-      name = "assetManager",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "assetManager")
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }
 
-  @Reference(
-      name = "workflowService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workflowService")
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }

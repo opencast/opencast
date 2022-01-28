@@ -875,42 +875,27 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  @Reference(
-      name = "dublinCoreService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "dublinCoreService")
   public void setDublinCoreService(DublinCoreCatalogService service) {
     this.dublinCoreService = service;
   }
 
-  @Reference(
-      name = "searchService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "searchService")
   public void setSearchService(SearchService service) {
     this.searchService = service;
   }
 
-  @Reference(
-      name = "seriesService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "seriesService")
   public void setSeriesService(SeriesService service) {
     this.seriesService = service;
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry service) {
     this.serviceRegistry = service;
   }
 
-  @Reference(
-      name = "captureAgentService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "captureAgentService")
   public void setCaptureAgentService(CaptureAgentStateService service) {
     this.captureAgentService = service;
   }
@@ -934,42 +919,27 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
-  @Reference(
-      name = "assetManager",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "assetManager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
-  @Reference(
-      name = "authorizationService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "authorizationService")
   public void setAuthorizationService(AuthorizationService service) {
     this.authService = service;
   }
 
-  @Reference(
-      name = "organizationService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "organizationService")
   public void setOrganizationService(OrganizationDirectoryService service) {
     this.organizationService = service;
   }
 
-  @Reference(
-      name = "securityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService service) {
     this.securityService = service;
   }

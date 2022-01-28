@@ -26,7 +26,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * WOH that retracts elements from an internal distribution channel and removes the reflective publication elements from
@@ -46,7 +45,6 @@ public class ConfigurableAWSS3RetractWorkflowOperationHandler extends Configurab
   /** OSGi DI */
   @Reference(
       name = "DownloadDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=aws.s3)"
   )
   void setDownloadDistributionService(DownloadDistributionService distributionService) {

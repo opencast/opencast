@@ -71,7 +71,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -889,55 +888,37 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     });
   }
 
-  @Reference(
-      name = "WORKSPACE",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "WORKSPACE")
   @Override
   public void setWorkspace(Workspace workspace) {
     super.setWorkspace(workspace);
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }
 
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   @Override
   public void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);
   }
 
-  @Reference(
-      name = "user-directory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "user-directory")
   @Override
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     super.setUserDirectoryService(userDirectoryService);
   }
 
-  @Reference(
-      name = "orgDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "orgDirectory")
   @Override
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.setOrganizationDirectoryService(organizationDirectoryService);
   }
 
-  @Reference(
-      name = "trustedHttpClient",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "trustedHttpClient")
   @Override
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     super.setTrustedHttpClient(trustedHttpClient);

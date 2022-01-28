@@ -34,7 +34,6 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -68,19 +67,13 @@ public class NopServiceEndpoint extends OsgiAbstractJobProducerEndpoint<NopServi
     return RestUtil.R.ok(getSvc().nop());
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }
 
-  @Reference(
-      name = "nopService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "nopService")
   public void setService(NopService nopService) {
     super.setService((NopServiceImpl)nopService);
   }

@@ -74,7 +74,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,7 +156,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    */
   @Reference(
       name = "StreamingDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=streaming)"
   )
   protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
@@ -172,7 +170,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    */
   @Reference(
       name = "DownloadDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=download)"
   )
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
@@ -186,10 +183,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param searchService
    *          an instance of the search service
    */
-  @Reference(
-      name = "SearchService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SearchService")
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
@@ -199,10 +193,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -49,7 +49,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,18 +153,12 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     logger.info("Configuration updated. Jobs older than {} hours are deleted.", jobMaxTTL);
   }
 
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(
-      name = "ingest-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ingest-service")
   protected void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }

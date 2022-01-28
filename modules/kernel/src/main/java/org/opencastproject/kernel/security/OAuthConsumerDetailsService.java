@@ -26,7 +26,6 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -81,10 +80,7 @@ public class OAuthConsumerDetailsService implements ConsumerDetailsService, User
   /**
    * OSGi DI
    */
-  @Reference(
-      name = "userDetailsService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "userDetailsService")
   public void setDelegate(UserDetailsService delegate) {
     this.delegate = delegate;
   }

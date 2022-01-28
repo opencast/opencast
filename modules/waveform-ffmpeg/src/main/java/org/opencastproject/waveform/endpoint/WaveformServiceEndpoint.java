@@ -38,7 +38,6 @@ import org.opencastproject.waveform.api.WaveformServiceException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,18 +133,12 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
     return serviceRegistry;
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(
-      name = "WaveformService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "WaveformService")
   public void setWaveformService(WaveformService waveformService) {
     this.waveformService = waveformService;
   }

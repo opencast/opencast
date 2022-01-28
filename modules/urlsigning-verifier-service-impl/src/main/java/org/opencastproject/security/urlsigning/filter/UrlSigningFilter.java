@@ -33,7 +33,6 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,10 +84,7 @@ public class UrlSigningFilter implements Filter, ManagedService {
   private boolean strict = true;
 
   /** OSGi DI */
-  @Reference(
-      name = "urlSigningVerifier",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "urlSigningVerifier")
   public void setUrlSigningVerifier(UrlSigningVerifier urlSigningVerifier) {
     this.urlSigningVerifier = urlSigningVerifier;
   }

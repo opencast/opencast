@@ -46,7 +46,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,10 +105,7 @@ public class UserTrackingRestService {
    *
    * @param service
    */
-  @Reference(
-      name = "service-impl",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "service-impl")
   public void setService(UserTrackingService service) {
     this.usertrackingService = service;
   }
@@ -120,10 +116,7 @@ public class UserTrackingRestService {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

@@ -152,18 +152,12 @@ public class LiveScheduleMessageReceiver {
   }
 
   // === Set by OSGI begin
-  @Reference(
-      name = "messageReceiver",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "messageReceiver")
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
 
-  @Reference(
-      name = "securityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

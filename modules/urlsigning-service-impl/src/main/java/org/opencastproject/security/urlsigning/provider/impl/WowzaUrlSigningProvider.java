@@ -31,7 +31,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -245,10 +244,7 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
     return base64Hash;
   }
 
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   @Override
   public void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);

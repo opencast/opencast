@@ -341,17 +341,13 @@ public class FeedServiceImpl {
    * @param securityService
    *          the security service
    */
-  @Reference(
-      name = "security",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security")
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   @Reference(
       name = "profilesReadyIndicator",
-      policy = ReferencePolicy.STATIC,
       target = "(artifact=feed)"
   )
   public void setProfilesReadyIndicator(ReadinessIndicator readyIndicator) {

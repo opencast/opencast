@@ -48,7 +48,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -266,19 +265,13 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
     return providers;
   }
 
-  @Reference(
-      name = "trustedHttpClient",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "trustedHttpClient")
   @Override
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     super.setTrustedHttpClient(trustedHttpClient);
   }
 
-  @Reference(
-      name = "remoteServiceManager",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "remoteServiceManager")
   @Override
   public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
     super.setRemoteServiceManager(serviceRegistry);

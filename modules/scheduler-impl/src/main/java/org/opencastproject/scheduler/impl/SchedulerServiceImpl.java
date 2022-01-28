@@ -252,10 +252,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param messageSender
    */
-  @Reference(
-      name = "message-broker-sender",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "message-broker-sender")
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
@@ -265,10 +262,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param persistence
    */
-  @Reference(
-      name = "scheduler-persistence",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "scheduler-persistence")
   public void setPersistence(SchedulerServiceDatabase persistence) {
     this.persistence = persistence;
   }
@@ -278,10 +272,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param seriesService
    */
-  @Reference(
-      name = "series-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "series-service")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -291,10 +282,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param securityService
    */
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -304,10 +292,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param assetManager
    */
-  @Reference(
-      name = "asset-manager",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -317,10 +302,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param workspace
    */
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -330,10 +312,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param authorizationService
    */
-  @Reference(
-      name = "authorization-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "authorization-service")
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -354,10 +333,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param orgDirectoryService
    */
-  @Reference(
-      name = "org-directory-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "org-directory-service")
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
   }

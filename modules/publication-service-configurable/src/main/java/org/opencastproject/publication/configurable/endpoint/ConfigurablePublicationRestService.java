@@ -41,7 +41,6 @@ import com.google.gson.reflect.TypeToken;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,18 +92,12 @@ public class ConfigurablePublicationRestService extends AbstractJobProducerEndpo
   private ConfigurablePublicationService service;
   private ServiceRegistry serviceRegistry;
 
-  @Reference(
-      name = "publicationService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "publicationService")
   public void setService(final ConfigurablePublicationService service) {
     this.service = service;
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(final ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

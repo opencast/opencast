@@ -48,7 +48,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +113,6 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   /** OSGi DI */
   @Reference(
       name = "entityManagerFactory",
-      policy = ReferencePolicy.STATIC,
       target = "(osgi.unit.name=org.opencastproject.event.comment)"
   )
   public void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -128,10 +126,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param securityService
    *          The security service
    */
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -142,10 +137,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param userDirectoryService
    *          the user directory service
    */
-  @Reference(
-      name = "userDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "userDirectory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -156,10 +148,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param organizationDirectoryService
    *          the organization directory service
    */
-  @Reference(
-      name = "organization-directory-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "organization-directory-service")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }

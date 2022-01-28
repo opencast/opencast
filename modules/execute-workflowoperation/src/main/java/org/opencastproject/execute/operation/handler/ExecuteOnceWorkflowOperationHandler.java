@@ -48,7 +48,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -292,10 +291,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
    * 
    * @param service
    */
-  @Reference(
-      name = "execute",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "execute")
   public void setExecuteService(ExecuteService service) {
     this.executeService = service;
   }
@@ -305,10 +301,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
    * 
    * @param workspace
    */
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -319,18 +312,12 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param mediaInspectionService
    *          an instance of the media inspection service
    */
-  @Reference(
-      name = "inspection-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "inspection-service")
   protected void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     this.inspectionService = mediaInspectionService;
   }
 
-  @Reference(
-      name = "registry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "registry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

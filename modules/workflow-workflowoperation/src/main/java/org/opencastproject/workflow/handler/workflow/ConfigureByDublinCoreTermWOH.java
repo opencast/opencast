@@ -41,7 +41,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,10 +88,7 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

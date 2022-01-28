@@ -36,7 +36,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,19 +84,13 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
   private int sumInstalledFiles = 0;
 
   /** Sets the search service */
-  @Reference(
-      name = "search-service-impl",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "search-service-impl")
   public void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
   /** Sets the series service */
-  @Reference(
-      name = "series-service-impl",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "series-service-impl")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }

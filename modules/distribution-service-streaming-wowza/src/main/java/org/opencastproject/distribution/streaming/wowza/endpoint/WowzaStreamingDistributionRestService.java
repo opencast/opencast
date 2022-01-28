@@ -48,7 +48,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,10 +120,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -133,10 +129,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
    * @param service
    *          the service to set
    */
-  @Reference(
-      name = "distributionService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "distributionService")
   public void setService(StreamingDistributionService service) {
     this.service = service;
   }

@@ -38,7 +38,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,10 +157,7 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
   /**
    * OSGi callback for setting the organization directory service.
    */
-  @Reference(
-      name = "orgDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "orgDirectory")
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }

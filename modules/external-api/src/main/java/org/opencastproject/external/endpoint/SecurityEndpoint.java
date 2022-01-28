@@ -49,7 +49,6 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,10 +94,7 @@ public class SecurityEndpoint implements ManagedService {
   private UrlSigningService urlSigningService;
 
   /** OSGi DI */
-  @Reference(
-      name = "UrlSigningService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "UrlSigningService")
   void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }

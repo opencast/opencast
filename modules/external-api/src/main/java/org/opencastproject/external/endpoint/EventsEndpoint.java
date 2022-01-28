@@ -239,46 +239,31 @@ public class EventsEndpoint implements ManagedService {
   private CaptureAgentStateService agentStateService;
 
   /** OSGi DI */
-  @Reference(
-      name = "ElasticsearchIndex",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ElasticsearchIndex")
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "IndexService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "IndexService")
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "IngestService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "IngestService")
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "UrlSigningService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "UrlSigningService")
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
@@ -291,19 +276,13 @@ public class EventsEndpoint implements ManagedService {
     return schedulerService;
   }
 
-  @Reference(
-      name = "SchedulerService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SchedulerService")
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
   /** OSGi DI. */
-  @Reference(
-      name = "CommonEventCatalogUIAdapter",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "CommonEventCatalogUIAdapter")
   public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
     this.eventCatalogUIAdapter = eventCatalogUIAdapter;
   }
@@ -330,10 +309,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "agentStateService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "agentStateService")
   public void setAgentStateService(CaptureAgentStateService agentStateService) {
     this.agentStateService = agentStateService;
   }

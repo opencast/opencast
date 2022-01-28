@@ -42,7 +42,6 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +100,6 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   /** OSGi DI */
   @Reference(
       name = "entityManagerFactory",
-      policy = ReferencePolicy.STATIC,
       target = "(osgi.unit.name=org.opencastproject.usertracking)"
   )
   void setEntityManagerFactory(EntityManagerFactory emf) {

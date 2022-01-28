@@ -57,7 +57,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,10 +105,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param publicationService
    *          the publication service
    */
-  @Reference(
-      name = "PublicationService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "PublicationService")
   public void setPublicationService(OaiPmhPublicationService publicationService) {
     this.publicationService = publicationService;
   }
@@ -128,10 +124,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
     this.streamingDistributionService = streamingDistributionService;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

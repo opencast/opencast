@@ -39,7 +39,6 @@ import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,10 +99,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -114,10 +110,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
    * @param videoSegmenter
    *          the segmenter
    */
-  @Reference(
-      name = "segmenter",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "segmenter")
   protected void setVideoSegmenter(VideoSegmenterService videoSegmenter) {
     this.service = videoSegmenter;
   }

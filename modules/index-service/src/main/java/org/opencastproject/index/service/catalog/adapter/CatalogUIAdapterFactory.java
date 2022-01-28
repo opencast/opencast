@@ -47,7 +47,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,28 +207,19 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   }
 
   /** OSGi callback to bind {@link ListProvidersService} instance. */
-  @Reference(
-      name = "listProvidersService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "listProvidersService")
   void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
 
   /** OSGi callback to bind {@link SeriesService} instance. */
-  @Reference(
-      name = "seriesService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "seriesService")
   void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi callback to bind {@link Workspace} instance. */
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

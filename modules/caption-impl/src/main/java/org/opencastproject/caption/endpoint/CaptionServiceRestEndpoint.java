@@ -137,10 +137,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

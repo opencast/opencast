@@ -52,7 +52,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -572,10 +571,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -606,10 +602,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * @param securityService
    *          the securityService to set
    */
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -620,10 +613,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(
-      name = "user-directory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -654,10 +644,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(
-      name = "orgDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -667,10 +654,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    *
    * @param workspace
    */
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

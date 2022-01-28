@@ -40,7 +40,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,10 +72,7 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "asset-manager",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -115,10 +111,7 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
     return createResult(mediaPackage, Action.CONTINUE);
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

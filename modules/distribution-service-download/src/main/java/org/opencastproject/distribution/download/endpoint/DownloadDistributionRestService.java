@@ -49,7 +49,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,10 +104,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -119,7 +115,6 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
    */
   @Reference(
       name = "distributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=download)"
   )
   public void setService(DownloadDistributionService service) {

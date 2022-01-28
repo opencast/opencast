@@ -63,7 +63,6 @@ import org.apache.commons.collections4.ComparatorUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,10 +115,7 @@ public class GroupsEndpoint {
   private SecurityService securityService;
 
   /** OSGi DI */
-  @Reference(
-      name = "ElasticsearchIndex",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ElasticsearchIndex")
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }

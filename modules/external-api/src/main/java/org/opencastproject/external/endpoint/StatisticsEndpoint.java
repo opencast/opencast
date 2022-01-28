@@ -58,7 +58,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,42 +107,27 @@ public class StatisticsEndpoint {
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(
-      name = "IndexService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "IndexService")
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
-  @Reference(
-      name = "ElasticsearchIndex",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ElasticsearchIndex")
   public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
-  @Reference(
-      name = "StatisticsService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "StatisticsService")
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
 
-  @Reference(
-      name = "StatisticsExportCSV",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "StatisticsExportCSV")
   public void setStatisticsExportService(StatisticsExportService statisticsExportService) {
     this.statisticsExportService = statisticsExportService;
   }

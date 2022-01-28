@@ -79,7 +79,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,10 +211,7 @@ public class SeriesRestService {
    *
    * @param seriesService
    */
-  @Reference(
-      name = "service-impl",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "service-impl")
   public void setService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -225,10 +221,7 @@ public class SeriesRestService {
    *
    * @param dcService
    */
-  @Reference(
-      name = "dc",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "dc")
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }

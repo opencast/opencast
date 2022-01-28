@@ -61,7 +61,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -480,58 +479,37 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
   }
 
-  @Reference(
-      name = "inspection-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "inspection-service")
   public void setMediaInspectionService(MediaInspectionService inspectionService) {
     this.inspectionService = inspectionService;
   }
 
-  @Reference(
-      name = "service-registry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "service-registry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(
-      name = "user-directory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  @Reference(
-      name = "organization-directory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "organization-directory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(
-      name = "smil-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "smil-service")
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }

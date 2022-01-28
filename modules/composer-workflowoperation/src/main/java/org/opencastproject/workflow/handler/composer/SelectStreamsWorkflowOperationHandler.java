@@ -46,7 +46,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,18 +111,12 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param composerService
    *          the local composer service
    */
-  @Reference(
-      name = "ComposerService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ComposerService")
   protected void setComposerService(final ComposerService composerService) {
     this.composerService = composerService;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
@@ -136,10 +129,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   public void setWorkspace(final Workspace workspace) {
     this.workspace = workspace;
   }

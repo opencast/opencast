@@ -39,7 +39,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -64,10 +63,7 @@ public class StatisticsWriterWorkflowOperationHandler extends AbstractWorkflowOp
 
   private StatisticsWriter statisticsWriter;
 
-  @Reference(
-      name = "StatisticsWriter",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "StatisticsWriter")
   public void setStatisticsWriter(StatisticsWriter statisticsWriter) {
     this.statisticsWriter = statisticsWriter;
   }
@@ -79,10 +75,7 @@ public class StatisticsWriterWorkflowOperationHandler extends AbstractWorkflowOp
     this.securityService = securityService;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

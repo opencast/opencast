@@ -51,7 +51,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -115,10 +114,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
    */
   private SmilService smilService;
 
-  @Reference(
-      name = "smil-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "smil-service")
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }

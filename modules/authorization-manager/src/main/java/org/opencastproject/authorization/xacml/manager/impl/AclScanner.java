@@ -42,7 +42,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,28 +101,19 @@ public class AclScanner implements ArtifactInstaller {
   }
 
   /** OSGi DI. */
-  @Reference(
-      name = "organizationDirectoryService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "organizationDirectoryService")
   void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** OSGi callback for setting persistence. */
-  @Reference(
-      name = "acl-service-factory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "acl-service-factory")
   void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

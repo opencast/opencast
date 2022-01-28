@@ -43,7 +43,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.util.Arrays;
 import java.util.List;
@@ -98,18 +97,12 @@ public class IncidentCreatorWorkflowOperationHandler extends AbstractWorkflowOpe
   }
 
   /** OSGi DI. */
-  @Reference(
-      name = "nopService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "nopService")
   public void setNopService(NopService nopService) {
     this.nopService = nopService;
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

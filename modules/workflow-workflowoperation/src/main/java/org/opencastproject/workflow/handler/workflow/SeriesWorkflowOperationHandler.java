@@ -132,10 +132,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param authorizationService
    *          the authorization service
    */
-  @Reference(
-      name = "authorization",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "authorization")
   protected void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -146,10 +143,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param seriesService
    *          the series service
    */
-  @Reference(
-      name = "series",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "series")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -160,10 +154,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param workspace
    *          the workspace
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -174,10 +165,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    * @param securityService
    *          the securityService
    */
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -198,10 +186,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
     seriesCatalogUIAdapters.remove(catalogUIAdapter);
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

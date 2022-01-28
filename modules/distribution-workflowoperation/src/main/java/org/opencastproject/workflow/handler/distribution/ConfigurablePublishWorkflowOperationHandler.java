@@ -51,7 +51,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +132,6 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   /** OSGi DI */
   @Reference(
       name = "DownloadDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=download)"
   )
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
@@ -149,10 +147,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -464,10 +459,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     throw new WorkflowOperationException("There is already a Published Media, fail Stragy for Mediapackage ");
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

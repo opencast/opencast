@@ -47,7 +47,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,19 +147,13 @@ public class StaticFileServiceImpl implements StaticFileService {
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "OrganizationDirectoryService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "OrganizationDirectoryService")
   public void setOrganizationDirectoryService(OrganizationDirectoryService directoryService) {
     orgDirectory = directoryService;
   }

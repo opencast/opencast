@@ -27,7 +27,6 @@ import org.opencastproject.util.persistence.PersistenceEnv;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +48,6 @@ public class OsgiBundleInfoDb extends AbstractBundleInfoDb {
   /** OSGi DI */
   @Reference(
       name = "entityManagerFactory",
-      policy = ReferencePolicy.STATIC,
       target = "(osgi.unit.name=org.opencastproject.kernel)"
   )
   void setEntityManagerFactory(EntityManagerFactory emf) {

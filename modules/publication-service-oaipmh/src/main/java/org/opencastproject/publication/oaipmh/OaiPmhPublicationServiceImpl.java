@@ -66,7 +66,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1092,37 +1091,25 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   }
 
   /** OSGI DI */
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** OSGI DI */
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGI DI */
-  @Reference(
-      name = "user-directory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
   /** OSGI DI */
-  @Reference(
-      name = "orgDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
@@ -1130,7 +1117,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   /** OSGI DI */
   @Reference(
       name = "downloadDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=download)"
   )
   public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
@@ -1138,28 +1124,19 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   }
 
   /** OSGI DI */
-  @Reference(
-      name = "streamingDistributionService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "streamingDistributionService")
   public void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
 
   /** OSGI DI */
-  @Reference(
-      name = "oaiPmhServerInfo",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "oaiPmhServerInfo")
   public void setOaiPmhServerInfo(OaiPmhServerInfo oaiPmhServerInfo) {
     this.oaiPmhServerInfo = oaiPmhServerInfo;
   }
 
   /** OSGI DI */
-  @Reference(
-      name = "persistence",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "persistence")
   public void setOaiPmhDatabase(OaiPmhDatabase oaiPmhDatabase) {
     this.oaiPmhDatabase = oaiPmhDatabase;
   }

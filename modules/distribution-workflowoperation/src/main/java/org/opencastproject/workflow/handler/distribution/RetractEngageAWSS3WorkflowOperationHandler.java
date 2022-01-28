@@ -30,7 +30,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * Workflow operation for retracting a media package from the engage player.
@@ -55,7 +54,6 @@ public class RetractEngageAWSS3WorkflowOperationHandler extends RetractEngageWor
    */
   @Reference(
       name = "DownloadDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=aws.s3)"
   )
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
@@ -69,10 +67,7 @@ public class RetractEngageAWSS3WorkflowOperationHandler extends RetractEngageWor
    * @param searchService
    *          an instance of the search service
    */
-  @Reference(
-      name = "SearchService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SearchService")
   protected void setSearchService(SearchService searchService) {
     super.setSearchService(searchService);
   }

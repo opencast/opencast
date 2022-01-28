@@ -23,7 +23,6 @@ package org.opencastproject.adopter.registration;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +56,6 @@ public class FormRepositoryImpl implements FormRepository {
   /** OSGi setter for the entity manager factory. */
   @Reference(
       name = "entityManagerFactory",
-      policy = ReferencePolicy.STATIC,
       target = "(osgi.unit.name=org.opencastproject.adopter)"
   )
   void setEntityManagerFactory(EntityManagerFactory emf) {

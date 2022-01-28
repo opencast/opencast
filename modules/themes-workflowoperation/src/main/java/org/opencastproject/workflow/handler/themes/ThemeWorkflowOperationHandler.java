@@ -62,7 +62,6 @@ import com.entwinemedia.fn.fns.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,45 +132,30 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private Workspace workspace;
 
   /** OSGi callback for the series service. */
-  @Reference(
-      name = "SeriesService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SeriesService")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi callback for the themes database service. */
-  @Reference(
-      name = "ThemesServiceDatabase",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ThemesServiceDatabase")
   public void setThemesServiceDatabase(ThemesServiceDatabase themesServiceDatabase) {
     this.themesServiceDatabase = themesServiceDatabase;
   }
 
   /** OSGi callback for the static file service. */
-  @Reference(
-      name = "StaticFileService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "StaticFileService")
   public void setStaticFileService(StaticFileService staticFileService) {
     this.staticFileService = staticFileService;
   }
 
   /** OSGi callback for the workspace. */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

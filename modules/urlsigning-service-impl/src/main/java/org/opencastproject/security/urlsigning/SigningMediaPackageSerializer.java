@@ -73,10 +73,7 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

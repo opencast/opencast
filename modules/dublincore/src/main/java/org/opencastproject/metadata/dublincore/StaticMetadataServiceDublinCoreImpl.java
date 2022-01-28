@@ -107,10 +107,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
 
   protected MediaPackageSerializer serializer = null;
 
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

@@ -755,50 +755,32 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
-  @Reference(
-      name = "mpeg7",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "mpeg7")
   public void setMpeg7CatalogService(Mpeg7CatalogService mpeg7CatalogService) {
     this.mpeg7CatalogService = mpeg7CatalogService;
   }
 
-  @Reference(
-      name = "search-persistence",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "search-persistence")
   public void setPersistence(SearchServiceDatabase persistence) {
     this.persistence = persistence;
   }
 
-  @Reference(
-      name = "series",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "series")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(
-      name = "authorization",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "authorization")
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -809,10 +791,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param securityService
    *          the securityService to set
    */
-  @Reference(
-      name = "security",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -823,10 +802,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(
-      name = "user-directory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -837,10 +813,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(
-      name = "orgDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectory = organizationDirectory;
   }

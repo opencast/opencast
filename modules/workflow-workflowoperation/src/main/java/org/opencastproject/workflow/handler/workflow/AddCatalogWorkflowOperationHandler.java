@@ -38,7 +38,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,10 +95,7 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
    * @param workspace
    *          the workspace
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

@@ -99,7 +99,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,37 +158,25 @@ public class SeriesEndpoint {
   private SeriesService seriesService;
 
   /** OSGi DI */
-  @Reference(
-      name = "ElasticsearchIndex",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ElasticsearchIndex")
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "IndexService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "IndexService")
   void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "SeriesService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SeriesService")
   void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }

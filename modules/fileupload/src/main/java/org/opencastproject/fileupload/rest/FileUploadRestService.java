@@ -41,7 +41,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +108,6 @@ public class FileUploadRestService {
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
   @Reference(
       name = "fileupload-service",
-      policy = ReferencePolicy.STATIC,
       unbind = "unsetFileUploadService"
   )
   protected void setFileUploadService(FileUploadService service) {

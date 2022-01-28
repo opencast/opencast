@@ -39,7 +39,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,10 +99,7 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -114,10 +110,7 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
    * @param timelinePreviewsService
    *          the timeline previews service
    */
-  @Reference(
-      name = "timelinepreviews",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "timelinepreviews")
   protected void setTimelinePreviewsService(TimelinePreviewsService timelinePreviewsService) {
     this.service = timelinePreviewsService;
   }

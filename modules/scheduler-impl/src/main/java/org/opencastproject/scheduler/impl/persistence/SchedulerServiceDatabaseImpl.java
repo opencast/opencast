@@ -34,7 +34,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +74,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   /** OSGi DI */
   @Reference(
       name = "entityManagerFactory",
-      policy = ReferencePolicy.STATIC,
       target = "(osgi.unit.name=org.opencastproject.scheduler.impl.persistence)"
   )
   public void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -83,10 +81,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

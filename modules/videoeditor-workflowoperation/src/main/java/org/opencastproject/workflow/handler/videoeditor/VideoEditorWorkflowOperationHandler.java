@@ -66,7 +66,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -639,34 +638,22 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     return smilResponse.getSmil();
   }
 
-  @Reference(
-      name = "smil-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "smil-service")
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
 
-  @Reference(
-      name = "videoeditor-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "videoeditor-service")
   public void setVideoEditorService(VideoEditorService editor) {
     videoEditorService = editor;
   }
 
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -43,7 +43,6 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,10 +176,7 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(
-      name = "serviceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(final ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -201,10 +197,7 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
    * @param service
    *          the service to set
    */
-  @Reference(
-      name = "publicationService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "publicationService")
   protected void setService(final YouTubePublicationService service) {
     this.service = service;
   }

@@ -31,7 +31,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,10 +57,7 @@ public class FailingWorkflowOperationHandler extends AbstractWorkflowOperationHa
     throw new WorkflowOperationException("Test operation for failed ");
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

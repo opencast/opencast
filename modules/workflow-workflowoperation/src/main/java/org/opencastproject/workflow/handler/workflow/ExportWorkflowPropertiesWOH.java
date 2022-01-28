@@ -47,7 +47,6 @@ import com.entwinemedia.fn.fns.Strings;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,10 +86,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
   private Workspace workspace;
 
   /** OSGi DI */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

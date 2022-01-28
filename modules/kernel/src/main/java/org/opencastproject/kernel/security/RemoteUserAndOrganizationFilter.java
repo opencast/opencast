@@ -48,7 +48,6 @@ import com.entwinemedia.fn.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -279,10 +278,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(
-      name = "securityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "securityService")
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -293,10 +289,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(
-      name = "orgDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "orgDirectory")
   void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectory = organizationDirectory;
   }
@@ -307,10 +300,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
    * @param userDirectory
    *          the user directory
    */
-  @Reference(
-      name = "userDirectoryService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "userDirectoryService")
   void setUserDirectoryService(UserDirectoryService userDirectory) {
     this.userDirectory = userDirectory;
   }

@@ -41,7 +41,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +66,6 @@ public class BundleInfoLogger implements BundleListener {
   /** OSGi DI */
   @Reference(
       name = "bundleInfoDb",
-      policy = ReferencePolicy.STATIC,
       unbind = "unsetDb"
   )
   public void setDb(BundleInfoDb db) {

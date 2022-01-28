@@ -41,7 +41,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,10 +108,7 @@ public class AnnotationRestService {
    * @param service
    *          the annotation service implementation
    */
-  @Reference(
-      name = "service-impl",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "service-impl")
   public void setService(AnnotationService service) {
     this.annotationService = service;
   }

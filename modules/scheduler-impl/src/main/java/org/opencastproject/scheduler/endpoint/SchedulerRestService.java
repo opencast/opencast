@@ -254,10 +254,7 @@ public class SchedulerRestService {
    *
    * @param workspace
    */
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

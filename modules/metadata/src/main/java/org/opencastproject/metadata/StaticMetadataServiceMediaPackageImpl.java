@@ -38,7 +38,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,10 +71,7 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
   protected Workspace workspace = null;
 
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

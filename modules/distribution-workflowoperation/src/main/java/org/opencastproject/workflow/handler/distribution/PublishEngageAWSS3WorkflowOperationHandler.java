@@ -31,7 +31,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * The workflow definition for handling "engage publication" operations
@@ -55,7 +54,6 @@ public class PublishEngageAWSS3WorkflowOperationHandler extends PublishEngageWor
    */
   @Reference(
       name = "DownloadDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=aws.s3)"
   )
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
@@ -69,10 +67,7 @@ public class PublishEngageAWSS3WorkflowOperationHandler extends PublishEngageWor
    * @param searchService
    *          an instance of the search service
    */
-  @Reference(
-      name = "SearchService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SearchService")
   protected void setSearchService(SearchService searchService) {
     super.setSearchService(searchService);
   }

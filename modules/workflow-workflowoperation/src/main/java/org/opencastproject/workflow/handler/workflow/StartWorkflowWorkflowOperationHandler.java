@@ -41,7 +41,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,10 +77,7 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param assetManager
    *          the asset manager
    */
-  @Reference(
-      name = "asset-manager",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -92,10 +88,7 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param workflowService
    *          the workflow service
    */
-  @Reference(
-      name = "workflowService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workflowService")
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }

@@ -36,7 +36,6 @@ import org.opencastproject.videoeditor.api.VideoEditorService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.util.List;
 
@@ -125,26 +124,17 @@ public class VideoEditorServiceEndpoint extends AbstractJobProducerEndpoint {
     return serviceRegistry;
   }
 
-  @Reference(
-      name = "videoeditor-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "videoeditor-service")
   public void setVideoEditorService(VideoEditorService videoEditorService) {
     this.videoEditorService = videoEditorService;
   }
 
-  @Reference(
-      name = "service-registry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "service-registry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(
-      name = "smil-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "smil-service")
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }

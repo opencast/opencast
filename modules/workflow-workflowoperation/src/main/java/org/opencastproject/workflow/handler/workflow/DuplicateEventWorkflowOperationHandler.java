@@ -72,7 +72,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,10 +189,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * @param assetManager
    *          the asset manager
    */
-  @Reference(
-      name = "asset-manager",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -204,10 +200,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * @param workspace
    *          the workspace
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -220,7 +213,6 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    */
   @Reference(
       name = "distributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=download)"
   )
   public void setDistributionService(DistributionService distributionService) {
@@ -581,10 +573,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     }
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

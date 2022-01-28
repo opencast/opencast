@@ -25,7 +25,6 @@ import org.opencastproject.util.NotFoundException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.util.List;
 
@@ -49,10 +48,7 @@ public class EventCommentServiceImpl implements EventCommentService {
    * @param eventCommentDatabaseService
    *          the event comment database service
    */
-  @Reference(
-      name = "eventCommentDatabaseService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "eventCommentDatabaseService")
   public void setEventCommentDatabaseService(EventCommentDatabaseService eventCommentDatabaseService) {
     this.eventCommentDatabaseService = eventCommentDatabaseService;
   }

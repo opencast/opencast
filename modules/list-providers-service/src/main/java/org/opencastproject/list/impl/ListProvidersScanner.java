@@ -33,7 +33,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,10 +74,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
   /** The list providers service to add the list provider to. **/
   private ListProvidersService listProvidersService;
 
-  @Reference(
-      name = "listProvidersService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "listProvidersService")
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }

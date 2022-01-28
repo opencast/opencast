@@ -28,7 +28,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +85,6 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
   /** OSGi DI */
   @Reference(
       name = "entityManagerFactory",
-      policy = ReferencePolicy.STATIC,
       target = "(osgi.unit.name=org.opencastproject.oaipmh)"
   )
   void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -99,10 +97,7 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -113,10 +108,7 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
    * @param workspace
    *          the workspace to set
    */
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

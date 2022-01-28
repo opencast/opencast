@@ -26,7 +26,6 @@ import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,10 +70,7 @@ public final class SecurityFilter implements Filter {
   private SecurityService securityService;
 
   /** OSGi DI. */
-  @Reference(
-      name = "securityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

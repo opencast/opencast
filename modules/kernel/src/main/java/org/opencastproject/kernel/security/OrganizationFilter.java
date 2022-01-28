@@ -29,7 +29,6 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,10 +78,7 @@ public class OrganizationFilter implements Filter {
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(
-      name = "orgDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectory = organizationDirectory;
   }
@@ -165,10 +161,7 @@ public class OrganizationFilter implements Filter {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(
-      name = "securityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

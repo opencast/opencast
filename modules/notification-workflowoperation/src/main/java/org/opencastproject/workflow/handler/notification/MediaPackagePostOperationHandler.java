@@ -49,7 +49,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,18 +77,12 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
   /** search service **/
   private SearchService searchService;
 
-  @Reference(
-      name = "search-service-impl",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "search-service-impl")
   public void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

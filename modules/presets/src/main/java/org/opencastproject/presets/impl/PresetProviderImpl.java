@@ -29,7 +29,6 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,18 +50,12 @@ public class PresetProviderImpl implements PresetProvider {
   /** The security service to get the current user's organization */
   private SecurityService securityService;
 
-  @Reference(
-      name = "seriesService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "seriesService")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

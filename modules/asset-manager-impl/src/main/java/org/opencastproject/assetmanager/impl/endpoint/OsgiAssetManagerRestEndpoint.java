@@ -26,7 +26,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import javax.ws.rs.Path;
 
@@ -50,27 +49,18 @@ public class OsgiAssetManagerRestEndpoint extends AbstractTieredStorageAssetMana
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "asset-manager",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
-  @Reference(
-      name = "job-producer",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "job-producer")
   @Override
   public void setJobProducer(AssetManagerJobProducer assetManagerJobProducer) {
     super.setJobProducer(assetManagerJobProducer);
   }
 
-  @Reference(
-      name = "service-registry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "service-registry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -57,7 +57,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -125,46 +124,31 @@ public class CaptureNowProlongingService implements ManagedService {
   private ComponentContext componentContext;
 
   /** Sets the scheduler service */
-  @Reference(
-      name = "scheduler-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "scheduler-service")
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
   /** Sets the security service */
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** Sets the service registry */
-  @Reference(
-      name = "service-registry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "service-registry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** Sets the organization directory service */
-  @Reference(
-      name = "organization-directory-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "organization-directory-service")
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
   }
 
   /** Sets the workspace */
-  @Reference(
-      name = "workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

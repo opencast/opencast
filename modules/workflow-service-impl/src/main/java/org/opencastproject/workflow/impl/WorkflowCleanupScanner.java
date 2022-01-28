@@ -44,7 +44,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.impl.StdSchedulerFactory;
@@ -258,37 +257,25 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
     }
   }
 
-  @Reference(
-      name = "WorkflowService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "WorkflowService")
   @Override
   public void bindWorkflowService(WorkflowService workflowService) {
     super.bindWorkflowService(workflowService);
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void bindServiceRegistry(ServiceRegistry serviceRegistry) {
     super.bindServiceRegistry(serviceRegistry);
   }
 
-  @Reference(
-      name = "OrganizationDirectoryService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "OrganizationDirectoryService")
   @Override
   public void bindOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.bindOrganizationDirectoryService(organizationDirectoryService);
   }
 
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   @Override
   public void bindSecurityService(SecurityService securityService) {
     super.bindSecurityService(securityService);

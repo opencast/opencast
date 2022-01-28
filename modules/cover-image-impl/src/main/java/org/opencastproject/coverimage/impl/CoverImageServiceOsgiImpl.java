@@ -32,7 +32,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,10 +70,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param workspace
    *          the workspace service
    */
-  @Reference(
-      name = "Workspace",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "Workspace")
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -85,10 +81,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param serviceRegistry
    *          the service registry service
    */
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -99,10 +92,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param securityService
    *          the security service
    */
-  @Reference(
-      name = "SecurityService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "SecurityService")
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -113,10 +103,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param userDirectoryService
    *          the user directory service
    */
-  @Reference(
-      name = "UserDirectoryService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "UserDirectoryService")
   protected void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -127,10 +114,7 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param organizationDirectoryService
    *          the organization directory service
    */
-  @Reference(
-      name = "OrganizationDirectoryService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "OrganizationDirectoryService")
   protected void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }

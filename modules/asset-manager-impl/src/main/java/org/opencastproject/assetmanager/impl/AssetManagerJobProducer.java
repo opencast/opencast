@@ -45,7 +45,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -465,10 +464,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     this.tsam = assetManager;
   }
 
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -478,10 +474,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.securityService;
   }
 
-  @Reference(
-      name = "user-directory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "user-directory")
   protected void setUserDirectoryService(UserDirectoryService uds) {
     this.userDirectoryService = uds;
   }
@@ -491,10 +484,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.userDirectoryService;
   }
 
-  @Reference(
-      name = "orgDirectory",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "orgDirectory")
   protected void setOrganizationDirectoryService(OrganizationDirectoryService os) {
     this.organizationDirectoryService = os;
   }

@@ -38,7 +38,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * WOH that retracts elements from an internal distribution channel and removes the reflective publication elements from
@@ -66,7 +65,6 @@ public class ConfigurableRetractWorkflowOperationHandler extends ConfigurableWor
   /** OSGi DI */
   @Reference(
       name = "DownloadDistributionService",
-      policy = ReferencePolicy.STATIC,
       target = "(distribution.channel=download)"
   )
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
@@ -118,10 +116,7 @@ public class ConfigurableRetractWorkflowOperationHandler extends ConfigurableWor
     return createResult(mp, Action.CONTINUE);
   }
 
-  @Reference(
-      name = "ServiceRegistry",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "ServiceRegistry")
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

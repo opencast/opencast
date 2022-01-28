@@ -29,7 +29,6 @@ import org.opencastproject.util.NotFoundException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -65,7 +64,6 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
   /** OSGi DI */
   @Reference(
       name = "entityManagerFactory",
-      policy = ReferencePolicy.STATIC,
       target = "(osgi.unit.name=org.opencastproject.annotation)"
   )
   void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -78,10 +76,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(
-      name = "security-service",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

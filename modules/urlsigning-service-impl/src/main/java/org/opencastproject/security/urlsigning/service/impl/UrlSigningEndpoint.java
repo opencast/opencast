@@ -35,7 +35,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -68,10 +67,7 @@ public class UrlSigningEndpoint {
   private UrlSigningService signingService;
 
   /** OSGi DI callback */
-  @Reference(
-      name = "urlSigningService",
-      policy = ReferencePolicy.STATIC
-  )
+  @Reference(name = "urlSigningService")
   void setUrlSigningService(UrlSigningService signingService) {
     this.signingService = signingService;
   }
