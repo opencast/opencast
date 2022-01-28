@@ -53,7 +53,6 @@ import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.QueryTerm;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 import org.opencastproject.workflow.api.WorkflowServiceDatabase;
-import org.opencastproject.workflow.api.WorkflowServiceDatabaseException;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport;
@@ -291,7 +290,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       List<WorkflowInstance> workflowInstances;
       try {
         workflowInstances = persistence.getAllWorkflowInstancesOrganizationIndependent();
-      } catch (WorkflowServiceDatabaseException e) {
+      } catch (WorkflowDatabaseException e) {
         throw new IllegalStateException("Unable to fetch workflows from database", e);
       }
 

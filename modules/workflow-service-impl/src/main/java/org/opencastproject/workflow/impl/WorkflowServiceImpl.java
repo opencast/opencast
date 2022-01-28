@@ -102,7 +102,6 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowServiceDatabase;
-import org.opencastproject.workflow.api.WorkflowServiceDatabaseException;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
@@ -495,7 +494,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       WorkflowInstance workflow = persistence.getWorkflow(id);
       assertPermission(workflow, Permissions.Action.READ.toString(), workflow.getOrganizationId());
       return workflow;
-    } catch (WorkflowServiceDatabaseException e) {
+    } catch (WorkflowDatabaseException e) {
       throw new IllegalStateException("Got not get workflow from database with id ");
     }
   }
@@ -624,8 +623,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
         throw new WorkflowDatabaseException(t);
       }
-    } catch (WorkflowServiceDatabaseException e) {
-      throw new WorkflowDatabaseException(e);
     } finally {
       logger.endUnitOfWork();
       lock.unlock();
@@ -1057,8 +1054,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
         //Remove workflow from database
         persistence.removeFromDatabase(instance);
-    } catch (WorkflowServiceDatabaseException e) {
-      throw new WorkflowDatabaseException(e);
     } finally {
       lock.unlock();
     }
@@ -1448,11 +1443,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
           throws WorkflowDatabaseException {
-    try {
-      return persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
-    } catch (WorkflowServiceDatabaseException e) {
-      throw new WorkflowDatabaseException(e);
-    }
+    return persistence.getWorkflowInstancesByMediaPackage(mediaPackageId);
   }
 
   /**
@@ -1463,34 +1454,26 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public Optional<WorkflowInstance> getRunningWorkflowInstanceByMediaPackage(String mediaPackageId, String action)
           throws WorkflowException, UnauthorizedException, WorkflowDatabaseException {
-    try {
-      List<WorkflowInstance> workflowInstances = persistence.getRunningWorkflowInstancesByMediaPackage(mediaPackageId);
+    List<WorkflowInstance> workflowInstances = persistence.getRunningWorkflowInstancesByMediaPackage(mediaPackageId);
 
-      // If there is more than workflow running something is very wrong
-      if (workflowInstances.size() > 1) {
-        throw new WorkflowException("Multiple workflows are active on mediapackage " + mediaPackageId);
-      }
-
-      Optional<WorkflowInstance> optWorkflowInstance = Optional.empty();
-      if (workflowInstances.size() == 1) {
-        WorkflowInstance wfInstance = workflowInstances.get(0);
-        optWorkflowInstance = Optional.of(wfInstance);
-        assertPermission(wfInstance, action, wfInstance.getOrganizationId());
-      }
-
-      return optWorkflowInstance;
-    } catch (WorkflowServiceDatabaseException e) {
-      throw new WorkflowDatabaseException(e);
+    // If there is more than workflow running something is very wrong
+    if (workflowInstances.size() > 1) {
+      throw new WorkflowException("Multiple workflows are active on mediapackage " + mediaPackageId);
     }
+
+    Optional<WorkflowInstance> optWorkflowInstance = Optional.empty();
+    if (workflowInstances.size() == 1) {
+      WorkflowInstance wfInstance = workflowInstances.get(0);
+      optWorkflowInstance = Optional.of(wfInstance);
+      assertPermission(wfInstance, action, wfInstance.getOrganizationId());
+    }
+
+    return optWorkflowInstance;
   }
 
   @Override
   public boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException {
-    try {
-      return persistence.mediaPackageHasActiveWorkflows(mediaPackageId);
-    } catch (WorkflowServiceDatabaseException e) {
-      throw new WorkflowDatabaseException(e);
-    }
+    return persistence.mediaPackageHasActiveWorkflows(mediaPackageId);
   }
 
   /**
@@ -1583,7 +1566,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           errorDef = getWorkflowDefinitionById(errorDefId);
           workflow.extend(errorDef);
           workflow.setOperations(updateConfiguration(workflow, configuration).getOperations());
-        } catch (NotFoundException | WorkflowParsingException notFoundException) {
+        } catch (NotFoundException notFoundException) {
           throw new IllegalStateException("Unable to find the error workflow definition '" + errorDefId + "'");
         }
       }

@@ -96,7 +96,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    * @see WorkflowServiceDatabase#getWorkflow(long)
    */
   @Override
-  public WorkflowInstance getWorkflow(long workflowId) throws NotFoundException, WorkflowServiceDatabaseException {
+  public WorkflowInstance getWorkflow(long workflowId) throws NotFoundException, WorkflowDatabaseException {
     EntityManager em = emf.createEntityManager();
     EntityTransaction tx = em.getTransaction();
     try {
@@ -127,7 +127,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       if (tx.isActive()) {
         tx.rollback();
       }
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       em.close();
     }
@@ -138,7 +138,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    *
    * @see WorkflowServiceDatabase#getAllWorkflowInstancesOrganizationIndependent()
    */
-  public List<WorkflowInstance> getAllWorkflowInstancesOrganizationIndependent() throws WorkflowServiceDatabaseException {
+  public List<WorkflowInstance> getAllWorkflowInstancesOrganizationIndependent() throws WorkflowDatabaseException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
@@ -148,7 +148,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       List<WorkflowInstance> workflowInstances = query.getResultList();
       return workflowInstances;
     } catch (Exception e) {
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
@@ -160,7 +160,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    *
    * @see WorkflowServiceDatabase#getAllWorkflowInstances(int limit, int offset)
    */
-  public List<WorkflowInstance> getAllWorkflowInstances(int limit, int offset) throws WorkflowServiceDatabaseException {
+  public List<WorkflowInstance> getAllWorkflowInstances(int limit, int offset) throws WorkflowDatabaseException {
 
     EntityManager em = null;
     try {
@@ -175,7 +175,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       logger.debug("Requesting workflows using query: {}", query);
       return query.getResultList();
     } catch (Exception e) {
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
@@ -188,7 +188,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    * @see WorkflowServiceDatabase#getWorkflowInstancesByMediaPackage(String mediaPackageId)
    */
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
-          throws WorkflowServiceDatabaseException {
+          throws WorkflowDatabaseException {
 
     EntityManager em = null;
     try {
@@ -202,7 +202,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       List<WorkflowInstance> workflowInstances = query.getResultList();
       return workflowInstances;
     } catch (Exception e) {
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
@@ -215,7 +215,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    * @see WorkflowServiceDatabase#getRunningWorkflowInstancesByMediaPackage(String mediaPackageId)
    */
   public List<WorkflowInstance> getRunningWorkflowInstancesByMediaPackage(String mediaPackageId)
-          throws WorkflowServiceDatabaseException {
+          throws WorkflowDatabaseException {
 
     EntityManager em = null;
     try {
@@ -232,7 +232,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
 
       return query.getResultList();
     } catch (Exception e) {
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
@@ -244,7 +244,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    *
    * @see WorkflowServiceDatabase#mediaPackageHasActiveWorkflows(String mediaPackageId)
    */
-  public boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowServiceDatabaseException {
+  public boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException {
 
     EntityManager em = null;
     try {
@@ -261,7 +261,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       query.setParameter("stateFailing", WorkflowInstance.WorkflowState.FAILING);
       return ((Number) query.getSingleResult()).longValue() > 0;
     } catch (Exception e) {
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
@@ -273,7 +273,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    *
    * @see WorkflowServiceDatabase#updateInDatabase(WorkflowInstance instance)
    */
-  public void updateInDatabase(WorkflowInstance instance) throws WorkflowServiceDatabaseException {
+  public void updateInDatabase(WorkflowInstance instance) throws WorkflowDatabaseException {
 
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -294,7 +294,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       if (tx.isActive()) {
         tx.rollback();
       }
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
@@ -306,7 +306,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    *
    * @see WorkflowServiceDatabase#removeFromDatabase(WorkflowInstance instance)
    */
-  public void removeFromDatabase(WorkflowInstance instance) throws WorkflowServiceDatabaseException {
+  public void removeFromDatabase(WorkflowInstance instance) throws WorkflowDatabaseException {
 
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -329,7 +329,7 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
       if (tx.isActive()) {
         tx.rollback();
       }
-      throw new WorkflowServiceDatabaseException(e);
+      throw new WorkflowDatabaseException(e);
     } finally {
       if (em != null)
         em.close();
