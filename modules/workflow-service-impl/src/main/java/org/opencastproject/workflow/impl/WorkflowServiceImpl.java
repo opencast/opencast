@@ -1163,7 +1163,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       workflowJob = serviceRegistry.getJob(workflowInstanceId);
       workflowJob.setStatus(Status.RUNNING);
-//      workflowJob.setPayload(WorkflowParser.toXml(workflowInstance));
       serviceRegistry.updateJob(workflowJob);
 
       Job operationJob = serviceRegistry.getJob(operationJobId);
@@ -2190,7 +2189,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     this.elasticsearchIndex = index;
   }
 
-  /** OSGi callback for setting persistance. */
+  /**
+   * Callback to set the workflow database
+   *
+   * @param persistence
+   *          the workflow database
+   */
   @Reference(name = "workflow-persistence")
   public void setPersistence(WorkflowServiceDatabase persistence) {
     this.persistence = persistence;
@@ -2395,7 +2399,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       do {
         try {
           workflows = persistence.getAllWorkflowInstances(limit, offset);
-//          workflows = serviceRegistry.getJobPayloads(startWorkflow, limit, offset);
         } catch (Exception e) {
           logIndexRebuildError(logger.getSlf4jLogger(), index.getIndexName(), total, current, e);
           throw new IndexRebuildException(index.getIndexName(), getService(), e);

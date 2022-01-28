@@ -226,8 +226,7 @@ public class WorkflowInstance {
     this.description = def.getDescription();
     this.parentId = parentWorkflowId;
     this.creatorName = creator != null ? creator.getUsername() : null;
-    if (organization != null)
-      this.organizationId = organization.getId();
+    this.organizationId = organization != null ? organization.getId() : null;
     this.state = WorkflowState.INSTANTIATED;
     this.dateCreated = new Date();
     this.mediaPackage = mediaPackage == null ? null : MediaPackageParser.getAsXml(mediaPackage);
@@ -235,11 +234,7 @@ public class WorkflowInstance {
     this.seriesId = mediaPackage == null ? null : mediaPackage.getSeries();
 
     this.operations = new ArrayList<WorkflowOperationInstance>();
-    try {
-      extend(def);
-    } catch (WorkflowParsingException e) {
-      logger.error("Error: ", e);
-    }
+    extend(def);
 
     this.configurations = new TreeMap<String, String>();
     if (properties != null) {
@@ -582,7 +577,7 @@ public class WorkflowInstance {
   }
 
 
-  public void extend(WorkflowDefinition workflowDefinition) throws WorkflowParsingException {
+  public void extend(WorkflowDefinition workflowDefinition) {
     if (!workflowDefinition.getOperations().isEmpty()) {
       for (WorkflowOperationDefinition entry : workflowDefinition.getOperations()) {
         operations.add(new WorkflowOperationInstance(entry, -1));

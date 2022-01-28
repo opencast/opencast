@@ -97,36 +97,20 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
    */
   @Override
   public WorkflowInstance getWorkflow(long workflowId) throws NotFoundException, WorkflowDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    EntityTransaction tx = em.getTransaction();
+    EntityManager em = null;
     try {
-      tx.begin();
-      WorkflowInstance entity = getWorkflowInstance(workflowId, em);
-      if (entity == null) {
-        throw new NotFoundException("No workflow with id=" + workflowId + " exists");
-      }
-//      // Ensure this user is allowed to read this series
-//      String accessControlXml = entity.getAccessControl();
-//      if (accessControlXml != null) {
-//        AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-//        User currentUser = securityService.getUser();
-//        Organization currentOrg = securityService.getOrganization();
-//        // There are several reasons a user may need to load a series: to read content, to edit it, or add content
-//        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
-//                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg,
-//                Permissions.Action.CONTRIBUTE.toString())
-//                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
-//          throw new UnauthorizedException(currentUser + " is not authorized to see series " + seriesId);
-//        }
-//      }
-      return entity;
-    } catch (NotFoundException e) {
-      throw e;
+      em = emf.createEntityManager();
+
+      String orgId = securityService.getOrganization().getId();
+      Query q = em.createNamedQuery("Workflow.workflowById");
+      q.setParameter("workflowId", workflowId);
+      q.setParameter("organizationId", orgId);
+
+      return (WorkflowInstance) q.getSingleResult();
+    } catch (NoResultException e) {
+      throw new NotFoundException("No workflow with id=" + workflowId + " exists");
     } catch (Exception e) {
       logger.error("Could not retrieve workflow with ID '{}'", workflowId, e);
-      if (tx.isActive()) {
-        tx.rollback();
-      }
       throw new WorkflowDatabaseException(e);
     } finally {
       em.close();
@@ -333,26 +317,6 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     } finally {
       if (em != null)
         em.close();
-    }
-  }
-
-
-  /**
-   * Gets a series by its ID, using the current organizational context.
-   *
-   * @param id
-   *          the series identifier
-   * @param em
-   *          an open entity manager
-   * @return the series entity, or null if not found or if the series is deleted.
-   */
-  protected WorkflowInstance getWorkflowInstance(long id, EntityManager em) {
-    String orgId = securityService.getOrganization().getId();
-    Query q = em.createNamedQuery("Workflow.workflowById").setParameter("workflowId", id).setParameter("organizationId", orgId);
-    try {
-      return (WorkflowInstance) q.getSingleResult();
-    } catch (NoResultException e) {
-      return null;
     }
   }
 }

@@ -192,10 +192,26 @@ public final class WorkflowParser {
     }
   }
 
+  /**
+   * Converts a workflowInstance to an xml string
+   *
+   * @param workflowInstance
+   *          the workflowInstance
+   * @return workflowInstance as xml string
+   * @throws WorkflowParsingException
+   */
   public static String toXml(WorkflowInstance workflowInstance) throws WorkflowParsingException {
     return toXml(new JaxbWorkflowInstance(workflowInstance));
   }
 
+  /**
+   * Converts a xml annotated workflowInstance to an xml string
+   *
+   * @param workflowInstance
+   *          the xml annotated workflowInstance
+   * @return workflowInstance as xml string
+   * @throws WorkflowParsingException
+   */
   public static String toXml(JaxbWorkflowInstance workflowInstance) throws WorkflowParsingException {
     try {
       Marshaller marshaller = jaxbContext.createMarshaller();
@@ -208,6 +224,14 @@ public final class WorkflowParser {
 
   }
 
+  /**
+   * Converts a workflowDefinition to an xml string
+   *
+   * @param workflowDefinition
+   *          the workflowDefinition
+   * @return workflowDefinition as xml string
+   * @throws WorkflowParsingException
+   */
   public static String toXml(WorkflowDefinition workflowDefinition) throws WorkflowParsingException {
     try {
       Marshaller marshaller = jaxbContext.createMarshaller();

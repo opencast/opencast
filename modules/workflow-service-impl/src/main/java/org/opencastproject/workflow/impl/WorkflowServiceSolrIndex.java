@@ -1032,7 +1032,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       set.setStartPage(query.getStartPage());
       set.setSearchTime(searchTime);
 
-//       Iterate through the results
+      // Iterate through the results
       for (SolrDocument doc : items) {
         String xml = (String) doc.get(XML_KEY);
         try {
@@ -1101,7 +1101,12 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     this.serviceRegistry = registry;
   }
 
-  /** OSGi callback for setting persistance. */
+  /**
+   * Callback for setting the workflow database
+   *
+   * @param persistence
+   *          the workflow database to set
+   */
   @Reference(name = "workflow-persistence")
   public void setPersistence(WorkflowServiceDatabase persistence) {
     this.persistence = persistence;
