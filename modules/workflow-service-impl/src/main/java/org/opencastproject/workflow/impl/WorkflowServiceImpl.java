@@ -101,7 +101,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResultImpl;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowServiceDatabase;
-import org.opencastproject.workflow.api.WorkflowServiceDatabaseException;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.XmlWorkflowParser;

@@ -321,6 +321,35 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   }
 
   @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("mediaPackage/{id}/currentInstance.json")
+  @RestQuery(name = "currentworkflowofmediapackage", description = "Returns the current workflow for a media package",
+          returnDescription = "Returns the currentworkflow that are associated with the media package as JSON.",
+          pathParameters = {
+                  @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
+          responses = {
+                  @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Current workflow not found.") })
+  public Response getRunningWorkflowOfMediaPackage(@PathParam("id") String mediaPackageId) {
+    try {
+      Optional<WorkflowInstance> optWorkflowInstance = service.
+              getRunningWorkflowInstanceByMediaPackage(mediaPackageId, Permissions.Action.READ.toString());
+      if (optWorkflowInstance.isPresent()) {
+        return Response.ok(new JaxbWorkflowInstance(optWorkflowInstance.get())).build();
+      } else {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+
+    } catch (WorkflowDatabaseException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (UnauthorizedException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    } catch (WorkflowException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
   @Produces(MediaType.TEXT_XML)
   @Path("instance/{id}.xml")
   @RestQuery(name = "workflowasxml", description = "Get a specific workflow instance.", returnDescription = "An XML representation of a workflow instance", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, responses = {
