@@ -32,7 +32,6 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
     immediate = true,
-    name = "org.opencastproject.adopter.registration.Service",
     service = Service.class,
     property = {
         "service.description=Adopter Statistics Registration Service"

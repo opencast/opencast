@@ -58,7 +58,7 @@ import javax.xml.bind.JAXBException;
 
 @Component(
     immediate = true,
-    service = { ArtifactInstaller.class,AclScanner.class },
+    service = { ArtifactInstaller.class, AclScanner.class },
     property = {
         "service.description=Acl Scanner"
     }

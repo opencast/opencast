@@ -58,7 +58,6 @@ import java.util.function.Consumer;
 
 @Component(
     immediate = true,
-    name = "org.opencastproject.assetmanager.impl.TieredStorageAssetManagerJobProducer",
     service = AssetManagerJobProducer.class,
     property = {
         "service.description=Opencast Asset Manager Job Producer"
@@ -98,7 +97,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
   @Override
   @Activate
   public void activate(ComponentContext cc) {
-    logger.info("Activating tiered storage assetmanager job service");
+    logger.info("Activating assetmanager job service");
     super.activate(cc);
   }
 
