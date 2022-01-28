@@ -262,6 +262,7 @@
               OSGI-INF/external-workflow-definitions-endpoint.xml,
               OSGI-INF/external-workflows-endpoint.xml
             <Service-Component-->
+            <!-- The option is needed because there are still services that are not DS. e.g. CatalogUIAdapters -->
             <_dsannotations-options>norequirements</_dsannotations-options>
           </instructions>
         </configuration>
