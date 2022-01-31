@@ -22,7 +22,12 @@
 package org.opencastproject.workflow.handler.rename;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -41,7 +46,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -94,11 +102,11 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
 
     // Read configuration
     // source-flavors source-tags
-    String namePattern = operation.getConfiguration("name-pattern");
-    if (namePattern == null) {
+    String pattern = operation.getConfiguration("name-pattern");
+    if (pattern == null) {
       throw new WorkflowOperationException("name-pattern must be configured");
     }
-    logger.info("name-pattern {}", namePattern);
+    logger.debug("name-pattern {}", pattern);
 
 
     var tagsAndFlavors = getTagsAndFlavors(
@@ -116,7 +124,13 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
         var uri = track.getURI();
         var extension = FilenameUtils.getExtension(uri.toString());
         var newElementId = UUID.randomUUID().toString();
-        var filename = mediaPackage.getTitle() + '.' + extension;
+
+        // Prepare placeholders and filename
+        var filename = pattern;
+        for (var entry: placeholders(mediaPackage, track).entrySet()) {
+          filename = filename.replace(entry.getKey(), entry.getValue());
+        }
+        filename = filename.replaceAll("#\\{[a-z.]*}", "_");
 
         // Put updated filename in working file repository and update the track.
         // Make sure it has a new identifier to prevent conflicts with the old files.
@@ -141,6 +155,44 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
     }
 
     return createResult(mediaPackage, Action.CONTINUE);
+  }
+
+  /**
+   * Generate map or placeholders.
+   *
+   * @param element
+   *          Current media package element
+   * @param mediaPackage
+   *          Current media package
+   * @return Map of placeholders.
+   */
+  private Map<String, String> placeholders(MediaPackage mediaPackage, MediaPackageElement element) {
+
+    var placeholders = new HashMap<String, String>();
+
+    // file placeholders
+    placeholders.put("#{file.extension}", FilenameUtils.getExtension(element.getURI().toString()));
+    placeholders.put("#{file.basename}", FilenameUtils.getBaseName(element.getURI().toString()));
+
+    // flavor placeholders
+    placeholders.put("#{flavor.type}", element.getFlavor().getType());
+    placeholders.put("#{flavor.subtype}", element.getFlavor().getSubtype());
+
+    // metadata placeholders
+    for (var flavor: Arrays.asList(MediaPackageElements.EPISODE, MediaPackageElements.SERIES)) {
+      // Get metadata catalogs
+      for (var catalog : mediaPackage.getCatalogs(flavor)) {
+        DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
+        for (var entry : dc.getValues().entrySet()) {
+          var key = String.format("#{%s.%s}", flavor.getSubtype(), entry.getKey().getLocalName());
+          var value = entry.getValue().get(0).getValue();
+          placeholders.put(key, value);
+        }
+      }
+    }
+
+    logger.debug("Placeholders to use for renaming: {}", placeholders);
+    return placeholders;
   }
 
   @Activate
