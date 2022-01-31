@@ -48,6 +48,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +71,13 @@ import java.util.concurrent.TimeUnit;
  * This service creates a waveform image from a media file with at least one audio channel.
  * This will be done using ffmpeg.
  */
+@Component(
+    immediate = true,
+    service = { WaveformService.class,ManagedService.class },
+    property = {
+        "service.description=Waveform Service"
+    }
+)
 public class WaveformServiceImpl extends AbstractJobProducer implements WaveformService, ManagedService {
 
   /** The logging facility */
@@ -166,6 +176,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   }
 
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     logger.info("Activate ffmpeg waveform service");
@@ -479,22 +490,27 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     return organizationDirectoryService;
   }
 
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(name = "userDirectory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

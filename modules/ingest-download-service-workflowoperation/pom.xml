@@ -37,6 +37,11 @@
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -55,9 +60,9 @@
             <Export-Package>
               org.opencastproject.workflow.handler.ingest;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/operations/ingest-download.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

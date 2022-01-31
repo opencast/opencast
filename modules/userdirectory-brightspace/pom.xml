@@ -86,9 +86,9 @@
               !net.sf.cglib.proxy,
               *
             </Import-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/brightspace-user-factory.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

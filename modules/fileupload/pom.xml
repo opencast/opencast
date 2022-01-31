@@ -96,10 +96,10 @@
               org.opencastproject.fileupload.api.job;version=${project.version},
               org.opencastproject.fileupload.service;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/fileupload-service.xml,
               OSGI-INF/fileupload-service-rest.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

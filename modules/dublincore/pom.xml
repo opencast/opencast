@@ -138,9 +138,9 @@
             <Private-Package>
               javax.annotation*
             </Private-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/static-metadata-service.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

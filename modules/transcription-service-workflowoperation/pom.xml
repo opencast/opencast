@@ -102,14 +102,14 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/google-speech-attach-transcription.xml,
               OSGI-INF/google-speech-start-transcription.xml,
               OSGI-INF/amberscript-attach-transcription.xml,
               OSGI-INF/amberscript-start-transcription.xml,
               OSGI-INF/start-watson-transcription.xml,
               OSGI-INF/attach-watson-transcription.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

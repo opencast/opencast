@@ -189,10 +189,10 @@
               org.opencastproject.oaipmh.server;version=${project.version};-split-package:=merge-first,
               org.opencastproject.oaipmh.util;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/oai-pmh-server.xml,
               OSGI-INF/default-repository.xml
-            </Service-Component>
+            <Service-Component-->
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

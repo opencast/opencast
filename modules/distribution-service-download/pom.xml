@@ -122,9 +122,9 @@
               *
             </Import-Package>
             <Export-Package> org.opencastproject.distribution.download;version=${project.version} </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/distribution-service-download.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

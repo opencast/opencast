@@ -96,9 +96,9 @@
               org.opencastproject.themes;version=${project.version},
               org.opencastproject.themes.persistence;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/themes-service-persistence.xml
-            </Service-Component>
+            <Service-Component-->
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

@@ -37,6 +37,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+@Component(
+    immediate = true,
+    service = ManagedServiceFactory.class,
+    property = {
+        "service.pid=org.opencastproject.userdirectory.brightspace",
+        "service.description=Provides Brightspace user directory instances"
+    }
+)
 public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(BrightspaceUserProviderFactory.class);
@@ -86,6 +97,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   /**
    * OSGi callback for setting the organization directory service.
    */
+  @Reference(name = "orgDirectory")
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
@@ -95,6 +107,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
    *
    * @param cc the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("Activate BrightspaceUserProviderFactory");
     this.bundleContext = cc.getBundleContext();

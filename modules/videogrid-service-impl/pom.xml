@@ -113,10 +113,10 @@
               org.opencastproject.videogrid.impl;version=${project.version},
               org.opencastproject.videogrid.endpoint;version=${project.version},
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/videogrid.xml,
               OSGI-INF/videogrid-endpoint.xml,
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>
