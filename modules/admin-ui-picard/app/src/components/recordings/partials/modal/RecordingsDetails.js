@@ -6,6 +6,7 @@ import ConfigurationDetailsTab from "../wizards/ConfigurationDetailsTab";
 import CapabilitiesDetailsTab from "../wizards/CapabilitiesDetailsTab";
 import {getRecordingDetails} from "../../../../selectors/recordingDetailsSelectors";
 import ModalNavigation from "../../../shared/modals/ModalNavigation";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 
 /**
  * This component manages the pages of the recording details
@@ -19,14 +20,17 @@ const RecordingsDetails = ({ agent }) => {
     const tabs = [
         {
             tabTranslation: 'RECORDINGS.RECORDINGS.DETAILS.TAB.GENERAL',
+            accessRole: 'ROLE_UI_LOCATIONS_DETAILS_GENERAL_VIEW',
             name: 'general'
         },
         {
             tabTranslation: 'RECORDINGS.RECORDINGS.DETAILS.TAB.CONFIGURATION',
+            accessRole: 'ROLE_UI_LOCATIONS_DETAILS_CONFIGURATION_VIEW',
             name: 'configuration'
         },
         {
             tabTranslation: 'RECORDINGS.RECORDINGS.DETAILS.TAB.CAPABILITIES',
+            accessRole: 'ROLE_UI_LOCATIONS_DETAILS_CAPABILITIES_VIEW',
             name: 'capabilities'
         }
     ];

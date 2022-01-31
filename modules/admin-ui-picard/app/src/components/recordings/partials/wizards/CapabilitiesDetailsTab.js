@@ -19,13 +19,15 @@ const CapabilitiesDetailsTab = ({ agent }) => {
                             </header>
                             <div className="obj-container">
                                 <table className="main-tbl">
-                                    {/* Render table row for each capability item*/}
-                                    {agent.capabilities.map((item, key) => (
-                                        <tr key={key}>
-                                            <td>{item.key}</td>
-                                            <td>{item.value}</td>
-                                        </tr>
-                                    ))}
+                                    <tbody>
+                                        {/* Render table row for each capability item*/}
+                                        {agent.capabilities.map((item, key) => (
+                                            <tr key={key}>
+                                                <td>{item.key}</td>
+                                                <td>{item.value}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
                                 </table>
                             </div>
                         </div>

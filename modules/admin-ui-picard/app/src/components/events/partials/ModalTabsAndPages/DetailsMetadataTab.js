@@ -6,11 +6,14 @@ import _ from 'lodash';
 import Notifications from "../../../shared/Notifications";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import RenderField from "../../../shared/wizard/RenderField";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {connect} from "react-redux";
+import {hasAccess} from "../../../../utils/utils";
 
 /**
  * This component renders metadata details of a certain event or series
  */
-const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, buttonLabel, header }) => {
+const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, buttonLabel, header, editAccessRole, user }) => {
     const { t } = useTranslation();
 
     const handleSubmit = values => {
@@ -32,7 +35,8 @@ const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, button
     }
 
     const checkValidity = formik => {
-        if (formik.dirty && formik.isValid) {
+        if (formik.dirty && formik.isValid
+            && hasAccess(editAccessRole, user)) {
             // check if user provided values differ from initial ones
             return !_.isEqual(formik.values, formik.initialValues);
         } else {
@@ -72,7 +76,6 @@ const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, button
                                                         <td>{field.value}</td>
                                                     ) : (
                                                         <td className="editable ng-isolated-scope">
-                                                            {/* todo: role: ROLE_UI_SERIES_DETAILS_METADATA_EDIT */}
                                                             {/* Render single value or multi value editable input */}
                                                             {(field.type === "mixed_text" && field.collection.length !== 0) ? (
                                                                 <Field name={field.id}
@@ -128,4 +131,9 @@ const DetailsMetadataTab = ({ metadataFields, updateResource, resourceId, button
     );
 };
 
-export default DetailsMetadataTab;
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
+
+export default connect(mapStateToProps)(DetailsMetadataTab);

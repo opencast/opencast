@@ -66,7 +66,8 @@ const AclDetails = ({close, aclDetails, updateAclDetails}) => {
                         )}
                         {page === 1 && (
                             <AclAccessPage formik={formik}
-                                           isEdit />
+                                           isEdit
+                                           accessRole={"ROLE_UI_SERIES_DETAILS_ACL_EDIT"} />
                         )}
 
                         {/* Navigation buttons and validation */}

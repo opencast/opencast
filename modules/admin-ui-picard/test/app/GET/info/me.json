@@ -1,7 +1,5 @@
 {
   "roles": [
-    "MATTERHORN_ADMINISTRATOR",
-    "ROLE_ADMIN",
     "ROLE_ANONYMOUS",
     "ROLE_GROUP_ADMIN",
     "ROLE_OAUTH_USER",

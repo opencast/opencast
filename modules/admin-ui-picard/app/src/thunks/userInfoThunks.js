@@ -1,6 +1,7 @@
 import {loadUserInfoFailure, loadUserInfoInProgress, loadUserInfoSuccess} from "../actions/userInfoActions";
 import axios from "axios";
 import {logger} from "../utils/logger";
+import {getUserInformation} from "../selectors/userInfoSelectors";
 
 export const fetchUserInfo = () => async dispatch => {
     try {
@@ -8,7 +9,14 @@ export const fetchUserInfo = () => async dispatch => {
 
         let data = await axios.get('/info/me.json');
 
-        const userInfo = await (data.data);
+        let userInfo = await (data.data);
+
+        // add direct information about user being an admin
+        userInfo = {
+            isAdmin: userInfo.roles.includes("ROLE_ADMIN"),
+            isOrgAdmin: userInfo.roles.includes(userInfo.org.adminRole),
+            ...userInfo
+        };
 
         dispatch(loadUserInfoSuccess(userInfo));
     } catch (e) {

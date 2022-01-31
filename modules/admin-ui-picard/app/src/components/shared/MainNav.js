@@ -16,13 +16,15 @@ import {fetchUsers} from "../../thunks/userThunks";
 import {fetchThemes} from "../../thunks/themeThunks";
 import {fetchStats} from "../../thunks/tableFilterThunks";
 import {setOffset} from "../../actions/tableActions";
+import {getUserInformation} from "../../selectors/userInfoSelectors";
+import {hasAccess} from "../../utils/utils";
 
 /**
  * This component renders the main navigation that opens when the burger button is clicked
  */
 const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, loadingStats, loadingRecordings,
                      loadingRecordingsIntoTable, loadingJobs, loadingJobsIntoTable, loadingUsers, loadingUsersIntoTable,
-                     loadingThemes, loadingThemesIntoTable, resetOffset }) => {
+                     loadingThemes, loadingThemesIntoTable, resetOffset, user }) => {
     const { t } = useTranslation();
 
     const loadEvents = () => {
@@ -89,26 +91,37 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
                 {isOpen && (
                     <nav id="roll-up-menu">
                         <div id="nav-container">
-                            {/* Todo: add role management (see MainNav in admin-ui-frontend)*/}
-                            {/* todo: more than one href? how? (see MainNav admin-ui-frontend)*/}
-                            <Link to="/events/events" onClick={() => loadEvents()}>
-                                <i className="events" title={t('NAV.EVENTS.TITLE')}/>
-                            </Link>
-                            <Link to="/recordings/recordings" onClick={() => loadRecordings()}>
-                                <i className="recordings" title={t('NAV.CAPTUREAGENTS.TITLE')}/>
-                            </Link>
-                            <Link to="/systems/jobs" onClick={() => loadJobs()}>
-                                <i className="systems" title={t('NAV.SYSTEMS.TITLE')}/>
-                            </Link>
-                            <Link to="/users/users" onClick={() => loadUsers()}>
-                                <i className="users" title={t('NAV.USERS.TITLE')}/>
-                            </Link>
-                            <Link to="/configuration/themes" onClick={() => loadThemes()}>
-                                <i className="configuration" title={t('NAV.CONFIGURATION.TITLE')}/>
-                            </Link>
-                            <Link to="/statistics/organization">
-                                <i className="statistics" title={t('NAV.STATISTICS.TITLE')}/>
-                            </Link>
+                            {/* todo: more than one href? how? roles? (see MainNav admin-ui-frontend)*/}
+                            {hasAccess("ROLE_UI_NAV_RECORDINGS_VIEW", user) && (
+                                <Link to="/events/events" onClick={() => loadEvents()}>
+                                    <i className="events" title={t('NAV.EVENTS.TITLE')}/>
+                                </Link>
+                            )}
+                            {hasAccess("ROLE_UI_NAV_CAPTURE_VIEW", user) && (
+                                <Link to="/recordings/recordings" onClick={() => loadRecordings()}>
+                                    <i className="recordings" title={t('NAV.CAPTUREAGENTS.TITLE')}/>
+                                </Link>
+                            )}
+                            {hasAccess("ROLE_UI_NAV_SYSTEMS_VIEW", user) && (
+                                <Link to="/systems/jobs" onClick={() => loadJobs()}>
+                                    <i className="systems" title={t('NAV.SYSTEMS.TITLE')}/>
+                                </Link>
+                            )}
+                            {hasAccess("ROLE_UI_NAV_ORGANIZATION_VIEW", user) && (
+                                <Link to="/users/users" onClick={() => loadUsers()}>
+                                    <i className="users" title={t('NAV.USERS.TITLE')}/>
+                                </Link>
+                            )}
+                            {hasAccess("ROLE_UI_NAV_CONFIGURATION_VIEW", user) && (
+                                <Link to="/configuration/themes" onClick={() => loadThemes()}>
+                                    <i className="configuration" title={t('NAV.CONFIGURATION.TITLE')}/>
+                                </Link>
+                            )}
+                            {hasAccess("ROLE_UI_NAV_STATISTICS_VIEW", user) && (
+                                <Link to="/statistics/organization">
+                                    <i className="statistics" title={t('NAV.STATISTICS.TITLE')}/>
+                                </Link>
+                            )}
                         </div>
                     </nav>
                 )}
@@ -117,6 +130,11 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
         </>
     );
 }
+
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
@@ -134,4 +152,4 @@ const mapDispatchToProps = dispatch => ({
     resetOffset: () => dispatch(setOffset(0))
 });
 
-export default connect(null, mapDispatchToProps)(MainNav);
+export default connect(mapStateToProps, mapDispatchToProps)(MainNav);

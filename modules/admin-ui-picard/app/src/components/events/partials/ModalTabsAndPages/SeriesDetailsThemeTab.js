@@ -6,11 +6,13 @@ import cn from "classnames";
 import {connect} from "react-redux";
 import Notifications from "../../../shared/Notifications";
 import {updateSeriesTheme} from "../../../../thunks/seriesDetailsThunks";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../../utils/utils";
 
 /**
  * This component renders the tab for editing the theme of a certain series
  */
-const SeriesDetailsThemeTab = ({ theme, seriesId, themeNames, updateTheme }) => {
+const SeriesDetailsThemeTab = ({ theme, seriesId, themeNames, updateTheme, user }) => {
     const { t } = useTranslation();
 
     const handleSubmit = values => {
@@ -42,7 +44,8 @@ const SeriesDetailsThemeTab = ({ theme, seriesId, themeNames, updateTheme }) => 
                                         <ul>
                                             <li>
                                                 <p>{t('EVENTS.SERIES.NEW.THEME.DESCRIPTION.TEXT')}</p>
-                                                {themeNames.length > 0 && (
+                                                {themeNames.length > 0
+                                                && hasAccess("ROLE_UI_SERIES_DETAILS_THEMES_EDIT", user) && (
                                                     <p>
                                                         <Field name="theme"
                                                                as="select"
@@ -92,8 +95,13 @@ const SeriesDetailsThemeTab = ({ theme, seriesId, themeNames, updateTheme }) => 
     );
 };
 
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
+
 const mapDispatchToProps = dispatch => ({
     updateTheme: (id, values) => dispatch(updateSeriesTheme(id, values))
 });
 
-export default connect(null, mapDispatchToProps)(SeriesDetailsThemeTab);
+export default connect(mapStateToProps, mapDispatchToProps)(SeriesDetailsThemeTab);

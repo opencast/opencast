@@ -1,5 +1,6 @@
 import languages from "../i18n/languages";
 import i18n from "../i18n/i18n";
+import {getUserInformation} from "../selectors/userInfoSelectors";
 
 /**
  * This File contains methods that are needed in more than one places
@@ -90,6 +91,14 @@ export const transformToObjectArray = data => {
             ...data[key]
         }
     });
+}
+
+/*
+* checks if an user is admin or has the required role to access an ui element
+*/
+export const hasAccess = (role, userInfo) =>  {
+
+    return !!(userInfo.isAdmin || userInfo.roles.includes(role));
 }
 
 

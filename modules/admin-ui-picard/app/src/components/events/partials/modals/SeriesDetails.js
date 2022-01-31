@@ -14,11 +14,13 @@ import SeriesDetailsThemeTab from "../ModalTabsAndPages/SeriesDetailsThemeTab";
 import SeriesDetailsStatisticTab from "../ModalTabsAndPages/SeriesDetailsStatisticTab";
 import SeriesDetailsFeedsTab from "../ModalTabsAndPages/SeriesDetailsFeedsTab";
 import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
+import {hasAccess} from "../../../../utils/utils";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 
 /**
  * This component manages the tabs of the series details modal
  */
-const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, updateSeries }) => {
+const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, updateSeries, user }) => {
     const { t } = useTranslation();
 
     const [page, setPage] = useState(0);
@@ -27,23 +29,28 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, upd
     const tabs = [
         {
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.METADATA',
+            accessRole: 'ROLE_UI_SERIES_DETAILS_METADATA_VIEW',
             name: 'metadata'
         },
         {
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA',
+            accessRole: 'ROLE_UI_SERIES_DETAILS_METADATA_VIEW',
             name: 'extended-metadata',
             hidden: true
         },
         {
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.PERMISSIONS',
+            accessRole: 'ROLE_UI_SERIES_DETAILS_ACL_VIEW',
             name: 'permissions'
         },
         {
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.THEME',
+            accessRole: 'ROLE_UI_SERIES_DETAILS_THEMES_VIEW',
             name: 'theme'
         },
         {
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.STATISTICS',
+            accessRole: 'ROLE_UI_SERIES_DETAILS_STATISTICS_VIEW',
             name: 'statistics',
             hidden: true
         },
@@ -59,33 +66,38 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, upd
 
     return (
         <>
-            {/* todo: role management */}
             {/* navigation for navigating between tabs */}
             <nav className="modal-nav" id="modal-nav">
-                <a className={cn({active: page === 0})}
-                   onClick={() => openTab(0)}>
-                    {t(tabs[0].tabNameTranslation)}
-                </a>
+                {hasAccess(tabs[0].accessRole, user) && (
+                    <a className={cn({active: page === 0})}
+                       onClick={() => openTab(0)}>
+                        {t(tabs[0].tabNameTranslation)}
+                    </a>
+                )}
                 {
                     tabs[1].hidden ?
-                        null :
+                        null : hasAccess(tabs[1].accessRole, user) &&
                         <a className={cn({active: page === 1})}
                            onClick={() => openTab(1)}>
                             {t(tabs[1].tabNameTranslation)}
                         </a>
 
                 }
-                <a className={cn({active: page === 2})}
-                   onClick={() => openTab(2)}>
-                    {t(tabs[2].tabNameTranslation)}
-                </a>
-                <a className={cn({active: page === 3})}
-                   onClick={() => openTab(3)}>
-                    {t(tabs[3].tabNameTranslation)}
-                </a>
+                {hasAccess(tabs[2].accessRole, user) && (
+                    <a className={cn({active: page === 2})}
+                       onClick={() => openTab(2)}>
+                        {t(tabs[2].tabNameTranslation)}
+                    </a>
+                )}
+                {hasAccess(tabs[3].accessRole, user) && (
+                    <a className={cn({active: page === 3})}
+                       onClick={() => openTab(3)}>
+                        {t(tabs[3].tabNameTranslation)}
+                    </a>
+                )}
                 {
                     tabs[4].hidden ?
-                        null :
+                        null : hasAccess(tabs[4].accessRole, user) &&
                         <a className={cn({active: page === 4})}
                            onClick={() => openTab(4)}>
                             {t(tabs[4].tabNameTranslation)}
@@ -107,7 +119,8 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, upd
                                         resourceId={seriesId}
                                         header={tabs[page].tabNameTranslation}
                                         buttonLabel='EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA'
-                                        updateResource={updateSeries}/>
+                                        updateResource={updateSeries}
+                                        editAccessRole='ROLE_UI_EVENTS_DETAILS_METADATA_EDIT'/>
                 )}
                 {page === 1 && (
                     <SeriesDetailsExtendedMetadataTab />
@@ -136,7 +149,8 @@ const mapStateToProps = state => ({
     metadataFields: getSeriesDetailsMetadata(state),
     feeds: getSeriesDetailsFeeds(state),
     theme: getSeriesDetailsTheme(state),
-    themeNames: getSeriesDetailsThemeNames(state)
+    themeNames: getSeriesDetailsThemeNames(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

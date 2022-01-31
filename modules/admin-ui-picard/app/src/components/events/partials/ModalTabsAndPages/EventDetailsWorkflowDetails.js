@@ -6,6 +6,8 @@ import {fetchWorkflowErrors, fetchWorkflowOperations} from "../../../../thunks/e
 import {formatDuration} from "../../../../utils/workflowDetailsUtils";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import EventDetailsWorkflowDetailsHierarchyNavigation from "./EventDetailsWorkflowDetailsHierarchyNavigation";
+import {hasAccess} from "../../../../utils/utils";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 
 
 /**
@@ -13,7 +15,8 @@ import EventDetailsWorkflowDetailsHierarchyNavigation from "./EventDetailsWorkfl
  */
 const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                         workflowData, isFetching,
-                                        fetchOperations, fetchErrors
+                                        fetchOperations, fetchErrors,
+                                        user
                                        }) => {
 
     const humanDuration = "5h"  //todo dont't know, where the old version gets this value, couldn't find it!
@@ -85,37 +88,44 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                                 <td>{formatDuration(workflowData.executionTime) || humanDuration}</td>
                                             </tr>
                                             )}
-                                            <tr with-role="ROLE_ADMIN">
-                                                <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.ID") /* ID */ }</td>
-                                                <td>{workflowData.wiid}</td>
-                                            </tr>
-                                            <tr with-role="ROLE_ADMIN">
-                                                <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.WDID") /* Workflow definition */ }</td>
-                                                <td>{workflowData.wdid}</td>
-                                            </tr>
+                                            {hasAccess("ROLE_ADMIN", user) && (
+                                                <>
+                                                    <tr>
+                                                        <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.ID") /* ID */ }</td>
+                                                        <td>{workflowData.wiid}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.WDID") /* Workflow definition */ }</td>
+                                                        <td>{workflowData.wdid}</td>
+                                                    </tr>
+                                                </>
+                                            )}
+
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
 
                             {/* 'Workflow configuration' table */}
-                            <div className="obj tbl-details" with-role="ROLE_ADMIN">
-                                <header>
-                                    {t("EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION") /* Workflow configuration */ }
-                                </header>
-                                <div className="obj-container">
-                                    <table className="main-tbl">
-                                        <tbody>
+                            {hasAccess("ROLE_ADMIN", user) && (
+                                <div className="obj tbl-details">
+                                    <header>
+                                        {t("EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION") /* Workflow configuration */ }
+                                    </header>
+                                    <div className="obj-container">
+                                        <table className="main-tbl">
+                                            <tbody>
                                             { Object.entries(workflowData.configuration).map(([confKey, confValue], key) => (
                                                 <tr key={key}>
                                                     <td>{confKey}</td>
                                                     <td>{confValue}</td>
                                                 </tr>
                                             )) }
-                                        </tbody>
-                                    </table>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             {/* 'More Information' table */}
                             <div className="obj tbl-container more-info-actions">
@@ -170,18 +180,20 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                             </div>
 
                             {/* 'Workflow configuration' table */}
-                            <div className="obj tbl-details" with-role="ROLE_ADMIN">
-                                <header>
-                                    {t("EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION") /* Workflow configuration */ }
-                                </header>
-                                <div className="obj-container">
-                                    <table className="main-tbl">
-                                        <tbody>
+                            {hasAccess("ROLE_ADMIN") && (
+                                <div className="obj tbl-details">
+                                    <header>
+                                        {t("EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION") /* Workflow configuration */ }
+                                    </header>
+                                    <div className="obj-container">
+                                        <table className="main-tbl">
+                                            <tbody>
                                             <tr/>
-                                        </tbody>
-                                    </table>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             {/* 'More Information' table */}
                             <div className="obj tbl-container more-info-actions">
@@ -220,7 +232,8 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     workflowData: getWorkflow(state),
-    isFetching: isFetchingWorkflowDetails(state)
+    isFetching: isFetchingWorkflowDetails(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

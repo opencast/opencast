@@ -22,13 +22,15 @@ import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
 import Footer from "../Footer";
+import {getUserInformation} from "../../selectors/userInfoSelectors";
+import {hasAccess} from "../../utils/utils";
 
 /**
  * This component renders the table view of users
  */
 const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                    loadingGroups, loadingGroupsIntoTable, loadingAcls,
-                   loadingAclsIntoTable, resetTextFilter, resetOffset }) => {
+                   loadingAclsIntoTable, resetTextFilter, resetOffset, user }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewUserModal, setNewUserModal] = useState(false);
@@ -99,11 +101,12 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
 
                 {/* Add user button */}
                 <div className="btn-group">
-                    {/*todo: implement onClick and with role*/}
-                    <button className="add" onClick={() => showNewUserModal()}>
-                        <i className="fa fa-plus"/>
-                        <span>{t('USERS.ACTIONS.ADD_USER')}</span>
-                    </button>
+                    {hasAccess("ROLE_UI_USERS_CREATE", user) && (
+                        <button className="add" onClick={() => showNewUserModal()}>
+                            <i className="fa fa-plus"/>
+                            <span>{t('USERS.ACTIONS.ADD_USER')}</span>
+                        </button>
+                    )}
                 </div>
 
                 {/* Display modal for new acl if add acl button is clicked */}
@@ -116,22 +119,27 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                          toggleMenu={toggleNavigation} />
 
                 <nav>
-                    {/*todo: with role*/}
-                    <Link to="/users/users"
-                          className={cn({active: true})}
-                          onClick={() => loadUsers()}>
-                        {t('USERS.NAVIGATION.USERS')}
-                    </Link>
-                    <Link to="/users/groups"
-                          className={cn({active: false})}
-                          onClick={() => loadGroups()}>
-                        {t('USERS.NAVIGATION.GROUPS')}
-                    </Link>
-                    <Link to="/users/acls"
-                          className={cn({active: false})}
-                          onClick={() => loadAcls()}>
-                        {t('USERS.NAVIGATION.PERMISSIONS')}
-                    </Link>
+                    {hasAccess("ROLE_UI_USERS_VIEW", user) && (
+                        <Link to="/users/users"
+                              className={cn({active: true})}
+                              onClick={() => loadUsers()}>
+                            {t('USERS.NAVIGATION.USERS')}
+                        </Link>
+                    )}
+                    {hasAccess("ROLE_UI_GROUPS_VIEW", user) && (
+                        <Link to="/users/groups"
+                              className={cn({active: false})}
+                              onClick={() => loadGroups()}>
+                            {t('USERS.NAVIGATION.GROUPS')}
+                        </Link>
+                    )}
+                    {hasAccess("ROLE_UI_ACLS_VIEW", user) && (
+                        <Link to="/users/acls"
+                              className={cn({active: false})}
+                              onClick={() => loadAcls()}>
+                            {t('USERS.NAVIGATION.PERMISSIONS')}
+                        </Link>
+                    )}
                 </nav>
             </section>
 
@@ -157,7 +165,8 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    users: getTotalUsers(state)
+    users: getTotalUsers(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

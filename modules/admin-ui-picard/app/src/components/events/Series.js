@@ -22,6 +22,8 @@ import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
 import Footer from "../Footer";
+import {getUserInformation} from "../../selectors/userInfoSelectors";
+import {hasAccess} from "../../utils/utils";
 
 
 
@@ -33,7 +35,7 @@ const containerAction = React.createRef();
  */
 const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEvents, loadingEventsIntoTable,
                     series, loadingFilters, loadingStats, loadingSeriesMetadata, loadingSeriesThemes, resetTextFilter,
-                    resetOffset }) => {
+                    resetOffset, user }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -119,12 +121,13 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         <>
             <Header />
             <section className="action-nav-bar">
-                {/*TODO: include with role ROLE_UI_SERIES_CREATE */}
                 <div className="btn-group">
-                    <button className="add" onClick={() => showNewSeriesModal()}>
-                        <i className="fa fa-plus" />
-                        <span>{t('EVENTS.EVENTS.ADD_SERIES')}</span>
-                    </button>
+                    {hasAccess("ROLE_UI_SERIES_CREATE", user) && (
+                        <button className="add" onClick={() => showNewSeriesModal()}>
+                            <i className="fa fa-plus" />
+                            <span>{t('EVENTS.EVENTS.ADD_SERIES')}</span>
+                        </button>
+                    )}
                 </div>
 
                 {/* Display modal for new series if add series button is clicked */}
@@ -141,17 +144,20 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                           toggleMenu={toggleNavigation}/>
 
                 <nav>
-                    {/*Todo: Show only if user has ROLE_UI_EVENTS_VIEW*/}
-                    <Link to="/events/events"
-                          className={cn({active: false})}
-                          onClick={() => loadEvents()}>
-                        {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
-                    </Link>
-                    <Link to="/events/series"
-                          className={cn({active: true})}
-                          onClick={() => loadSeries()}>
-                        {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
-                    </Link>
+                    {hasAccess("ROLE_UI_EVENTS_VIEW", user) && (
+                        <Link to="/events/events"
+                              className={cn({active: false})}
+                              onClick={() => loadEvents()}>
+                            {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
+                        </Link>
+                    )}
+                    {hasAccess("ROLE_UI_SERIES_VIEW", user) && (
+                        <Link to="/events/series"
+                              className={cn({active: true})}
+                              onClick={() => loadSeries()}>
+                            {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
+                        </Link>
+                    )}
                 </nav>
             </section>
 
@@ -168,13 +174,13 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                             {/* show dropdown if actions is clicked*/}
                             { displayActionMenu && (
                                 <ul className="dropdown-ul">
-                                    {/*todo: show only if user has right to delete resource (with-role ROLE_UI_{{ table.resource }}_DELETE*/}
-                                    <li>
-                                        {/*todo: open overlay for deletion */}
-                                        <a onClick={() => setDeleteSeriesModal(true)}>
-                                            {t('BULK_ACTIONS.DELETE.SERIES.CAPTION')}
-                                        </a>
-                                    </li>
+                                    {hasAccess("ROLE_UI_SERIES_DELETE", user) && (
+                                        <li>
+                                            <a onClick={() => setDeleteSeriesModal(true)}>
+                                                {t('BULK_ACTIONS.DELETE.SERIES.CAPTION')}
+                                            </a>
+                                        </li>
+                                    )}
                                 </ul>
                             )}
                         </div>
@@ -200,6 +206,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
 const mapStateToProps = state => ({
     series: getTotalSeries(state),
     showActions: isShowActions(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

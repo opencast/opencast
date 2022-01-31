@@ -1,4 +1,7 @@
 import React from "react";
+import {connect} from "react-redux";
+import {getUserInformation} from "../selectors/userInfoSelectors";
+import {hasAccess} from "../utils/utils";
 
 /**
  * Component that renders the footer
@@ -9,15 +12,16 @@ const version = {
 };
 const feedbackUrl = 'https://opencast.org/';
 
-const Footer = () => (
+const Footer = ({ user }) => (
         <footer id="main-footer" >
             <div className="default-footer">
                 {/* Only render if a version is set */}
                 {!!version.version && (
                     <div className="meta">
                         Opencast {version.version}
-                        {/*Todo: Only if user is admin*/}
-                        <span> - {version.buildNumber || 'undefined'}</span>
+                        {hasAccess("ROLE_ADMIN", user) && (
+                            <span> - {version.buildNumber || 'undefined'}</span>
+                        )}
                     </div>
                 )}
                 {/* Only render if a feedback URL is set*/}
@@ -30,5 +34,11 @@ const Footer = () => (
         </footer>
 );
 
-export default Footer;
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
+
+
+export default connect(mapStateToProps)(Footer);
 

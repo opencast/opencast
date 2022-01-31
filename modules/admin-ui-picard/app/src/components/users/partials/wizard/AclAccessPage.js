@@ -14,17 +14,21 @@ import {
 } from "../../../../thunks/aclThunks";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../../utils/utils";
 
 /**
  * This component renders the access policy page in the new ACL wizard and in the ACL details modal
  */
-const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess, isEdit }) => {
+const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess, isEdit, user }) => {
     const { t } = useTranslation();
 
     const [aclTemplates, setAclTemplates] = useState([]);
     const [aclActions, setAclActions] = useState([]);
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const isAccess = (isEdit && hasAccess("ROLE_UI_SERIES_DETAILS_ACL_EDIT", user)) || !isEdit;
 
     useEffect(() => {
         // fetch data about roles, acl templates and actions from backend
@@ -107,13 +111,14 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
 
                                             {/* Template selection */}
                                             <div className="obj tbl-list">
-                                                <table className="main-tbl">
-                                                    <thead>
+                                                {isAccess && (
+                                                    <table className="main-tbl">
+                                                        <thead>
                                                         <tr>
                                                             <th>{t('USERS.ACLS.NEW.ACCESS.TEMPLATES.TITLE')}</th>
                                                         </tr>
-                                                    </thead>
-                                                    <tbody>
+                                                        </thead>
+                                                        <tbody>
                                                         <tr>
                                                             {aclTemplates.length > 0 ? (
                                                                 <td>
@@ -148,8 +153,9 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                 </td>
                                                             )}
                                                         </tr>
-                                                    </tbody>
-                                                </table>
+                                                        </tbody>
+                                                    </table>
+                                                )}
                                             </div>
 
                                             <div className="obj-container">
@@ -192,6 +198,7 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                                 <Field style={{width: '360px'}}
                                                                                                        name={`acls.${index}.role`}
                                                                                                        as="select"
+                                                                                                       disabled={!isAccess}
                                                                                                        placeholder={t('USERS.ACLS.NEW.ACCESS.ROLES.LABEL')}>
                                                                                                     {roles.length > 0 && (
                                                                                                         <>
@@ -211,27 +218,55 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                                 <Field type="checkbox" name={`acls.${index}.write`}/>
                                                                                             </td>
                                                                                             {aclActions.length > 0 && (
-                                                                                                <td className="fit editable">
-                                                                                                    <div>
-                                                                                                        <Field
-                                                                                                            name={`acls.${index}.actions`}
-                                                                                                            fieldInfo={
-                                                                                                                {
-                                                                                                                    id: `acls.${index}.actions`,
-                                                                                                                    type: 'mixed_text',
-                                                                                                                    collection: aclActions
+                                                                                                !isEdit ? (
+                                                                                                    <td className="fit editable">
+                                                                                                        <div>
+                                                                                                            <Field
+                                                                                                                name={`acls.${index}.actions`}
+                                                                                                                fieldInfo={
+                                                                                                                    {
+                                                                                                                        id: `acls.${index}.actions`,
+                                                                                                                        type: 'mixed_text',
+                                                                                                                        collection: aclActions
+                                                                                                                    }
                                                                                                                 }
-                                                                                                            }
-                                                                                                            onlyCollectionValues
-                                                                                                            component={RenderMultiField}/>
-                                                                                                    </div>
-                                                                                                </td>
+                                                                                                                onlyCollectionValues
+                                                                                                                component={RenderMultiField}/>
+                                                                                                        </div>
+                                                                                                    </td>
+                                                                                                    ) : (hasAccess("ROLE_UI_SERIES_DETAILS_ACL_EDIT'", user) ? (
+                                                                                                    <td className="fit editable">
+                                                                                                        <div>
+                                                                                                            <Field
+                                                                                                                name={`acls.${index}.actions`}
+                                                                                                                fieldInfo={
+                                                                                                                    {
+                                                                                                                        id: `acls.${index}.actions`,
+                                                                                                                        type: 'mixed_text',
+                                                                                                                        collection: aclActions
+                                                                                                                    }
+                                                                                                                }
+                                                                                                                onlyCollectionValues
+                                                                                                                component={RenderMultiField}/>
+                                                                                                        </div>
+                                                                                                    </td>
+                                                                                                ) : (
+                                                                                                    <td className="fit">
+                                                                                                        {/*repeat for each additional action*/}
+                                                                                                        {aclActions.map((action, key) => (
+                                                                                                            <div key={key}>{action}</div>
+                                                                                                        ))}
+                                                                                                    </td>
+                                                                                                ))
+
                                                                                             )}
                                                                                             {/*Remove policy*/}
-                                                                                            <td>
-                                                                                                <a onClick={() => remove(index)}
-                                                                                                   className="remove"/>
-                                                                                            </td>
+                                                                                            {isAccess && (
+                                                                                                <td>
+                                                                                                    <a onClick={() => remove(index)}
+                                                                                                       className="remove"/>
+                                                                                                </td>
+                                                                                            )}
                                                                                         </tr>
                                                                                     ))
                                                                             ) : (
@@ -240,21 +275,22 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                 </tr>
                                                                             )}
 
-                                                                            {/*Todo: show only if user has role ROLE_UI_SERIES_DETAILS_ACL_EDIT */}
-                                                                            <tr>
-                                                                                {/*Add additional policy row*/}
-                                                                                <td colSpan="5">
-                                                                                    <a onClick={() => {
-                                                                                        push({
-                                                                                            role: '',
-                                                                                            read: false,
-                                                                                            write: false,
-                                                                                            actions: []
-                                                                                        });
-                                                                                        checkAcls();
-                                                                                    }}> + {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.NEW')}</a>
-                                                                                </td>
-                                                                            </tr>
+                                                                            {hasAccess("ROLE_UI_SERIES_DETAILS_ACL_EDIT'", user) && (
+                                                                                <tr>
+                                                                                    {/*Add additional policy row*/}
+                                                                                    <td colSpan="5">
+                                                                                        <a onClick={() => {
+                                                                                            push({
+                                                                                                role: '',
+                                                                                                read: false,
+                                                                                                write: false,
+                                                                                                actions: []
+                                                                                            });
+                                                                                            checkAcls();
+                                                                                        }}> + {t('USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.NEW')}</a>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            )}
                                                                         </>
                                                                     )}
                                                                 </FieldArray>
@@ -301,9 +337,14 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
     );
 };
 
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
+
 const mapDispatchToProps = dispatch => ({
     addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
     removeNotificationWizardAccess: () => dispatch(removeNotificationWizardAccess())
 });
 
-export default connect(null, mapDispatchToProps)(AclAccessPage);
+export default connect(mapStateToProps, mapDispatchToProps)(AclAccessPage);

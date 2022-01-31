@@ -13,12 +13,15 @@ import {addNotification} from "../../../thunks/notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../../../configs/modalConfig";
 import {removeNotificationWizardForm} from "../../../actions/notificationActions";
 import {createPolicy, prepareAccessPolicyRulesForPost} from "../../../utils/resourceUtils";
+import {getPolicies} from "../../../selectors/eventDetailsSelectors";
+import {getUserInformation} from "../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../utils/utils";
 
 /**
  * This component manages the access policy tab of resource details modals
  */
 const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetchHasActiveTransactions, fetchAccessPolicies, saveNewAccessPolicies, descriptionText,
-                                          addNotification, fetchAclTemplates, fetchRoles, removeNotificationWizardForm, buttonText, saveButtonText }) => {
+                                          addNotification, fetchAclTemplates, fetchRoles, removeNotificationWizardForm, buttonText, saveButtonText, editAccessRole, user }) => {
 
     const baseAclId = "";
 
@@ -197,61 +200,63 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                             {/* policy templates */}
                                             <div className="obj-container">
                                                 <div className="obj tbl-list">
-                                                    <table className="main-tbl">{/*todo: show only if: $root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') */}
-                                                        <thead>
+                                                    {hasAccess(editAccessRole, user) && (
+                                                        <table className="main-tbl">
+                                                            <thead>
                                                             <tr>
                                                                 <th>
                                                                     {t("EVENTS.EVENTS.DETAILS.ACCESS.TEMPLATES.TITLE") /* Templates */}
                                                                 </th>
                                                             </tr>
-                                                        </thead>
+                                                            </thead>
 
-                                                        <tbody>
-                                                        <tr>
-                                                            <td>
-                                                                <div className="obj-container padded chosen-container chosen-container-single">
-                                                                    <p>
-                                                                        {descriptionText /* Description text for policies*/}
-                                                                    </p>
-                                                                    {!transactions.read_only ? (
+                                                            <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div className="obj-container padded chosen-container chosen-container-single">
+                                                                        <p>
+                                                                            {descriptionText /* Description text for policies*/}
+                                                                        </p>
+                                                                        {!transactions.read_only ? (
 
-                                                                        /* dropdown for selecting a policy template */
-                                                                        <Field className="chosen-single chosen-default"
-                                                                               style={{width: '200px'}}
-                                                                               name={"template"}
-                                                                               as="select"
-                                                                               onChange={event => handleTemplateChange(event.target.value, formik.setFieldValue)}
-                                                                        >
-                                                                            {(aclTemplates && aclTemplates.length > 0) ? (
-                                                                                <>
+                                                                            /* dropdown for selecting a policy template */
+                                                                            <Field className="chosen-single chosen-default"
+                                                                                   style={{width: '200px'}}
+                                                                                   name={"template"}
+                                                                                   as="select"
+                                                                                   onChange={event => handleTemplateChange(event.target.value, formik.setFieldValue)}
+                                                                            >
+                                                                                {(aclTemplates && aclTemplates.length > 0) ? (
+                                                                                    <>
+                                                                                        <option value="" defaultValue hidden>
+                                                                                            {t(buttonText)}
+                                                                                        </option>
+                                                                                        {
+                                                                                            aclTemplates.map((template, key) => (
+                                                                                                <option value={template.id}
+                                                                                                        key={key}
+                                                                                                >
+                                                                                                    {template.value}
+                                                                                                </option>
+                                                                                            ))
+                                                                                        }
+                                                                                    </>
+                                                                                ) : (
                                                                                     <option value="" defaultValue hidden>
-                                                                                        {t(buttonText)}
+                                                                                        {t('EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY')}
                                                                                     </option>
-                                                                                    {
-                                                                                        aclTemplates.map((template, key) => (
-                                                                                            <option value={template.id}
-                                                                                                    key={key}
-                                                                                            >
-                                                                                                {template.value}
-                                                                                            </option>
-                                                                                        ))
-                                                                                    }
-                                                                                </>
-                                                                            ) : (
-                                                                                <option value="" defaultValue hidden>
-                                                                                    {t('EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY')}
-                                                                                </option>
-                                                                            )}
-                                                                        </Field>
+                                                                                )}
+                                                                            </Field>
 
-                                                                    ) : (
-                                                                        baseAclId
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
+                                                                        ) : (
+                                                                            baseAclId
+                                                                        )}
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -280,7 +285,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                         {t("EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS") /* <!-- Additional Actions --> */}
                                                                     </th>
                                                                 )}
-                                                                { true /* todo: show only if: $root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') */ && (
+                                                                {hasAccess(editAccessRole, user) && (
                                                                     <th className="fit">
                                                                         {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ACTION") /* <!-- Action --> */}
                                                                     </th>
@@ -339,29 +344,33 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                                 </td>
 
                                                                                 {/* Checkboxes for policy.read and policy.write */}
-                                                                                <td className="fit text-center">
-                                                                                    <Field type="checkbox"
-                                                                                           name={`policies.${index}.read`}
-                                                                                           disabled={ transactions.read_only }
-                                                                                           className={`${transactions.read_only ?
-                                                                                               "disabled" : "false"}`}
-                                                                                           onChange={ (read) => replace(index, {...policy, read: read.target.checked})}
-                                                                                    /> {/*Todo: show only if: !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')*/}
-                                                                                </td>
-                                                                                <td className="fit text-center">
-                                                                                    <Field type="checkbox"
-                                                                                           name={`policies.${index}.write`}
-                                                                                           disabled={ transactions.read_only }
-                                                                                           className={`${transactions.read_only ?
-                                                                                               "disabled" : "false"}`}
-                                                                                           onChange={ (write) => replace(index, {...policy, write: write.target.checked})}
-                                                                                    /> {/*Todo: show only if: !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')*/}
-                                                                                </td>
+                                                                                {hasAccess(editAccessRole, user) && (
+                                                                                    <>
+                                                                                        <td className="fit text-center">
+                                                                                            <Field type="checkbox"
+                                                                                                   name={`policies.${index}.read`}
+                                                                                                   disabled={ transactions.read_only }
+                                                                                                   className={`${transactions.read_only ?
+                                                                                                       "disabled" : "false"}`}
+                                                                                                   onChange={ (read) => replace(index, {...policy, read: read.target.checked})}
+                                                                                            />
+                                                                                        </td>
+                                                                                        <td className="fit text-center">
+                                                                                            <Field type="checkbox"
+                                                                                                   name={`policies.${index}.write`}
+                                                                                                   disabled={ transactions.read_only }
+                                                                                                   className={`${transactions.read_only ?
+                                                                                                       "disabled" : "false"}`}
+                                                                                                   onChange={ (write) => replace(index, {...policy, write: write.target.checked})}
+                                                                                            />
+                                                                                        </td>
+                                                                                    </>
+                                                                                )}
 
                                                                                 {/* Multi value field for policy.actions (additional actions) */}
                                                                                 { hasActions && (
                                                                                     <td className="fit editable">
-                                                                                        { !transactions.read_only /*Todo:  && $root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')*/ && (
+                                                                                        { !transactions.read_only && hasAccess(editAccessRole, user) && (
                                                                                             <div>
                                                                                                 <Field
                                                                                                     fieldInfo={
@@ -377,7 +386,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                                                 />
                                                                                             </div>
                                                                                         )}
-                                                                                        {transactions.read_only /*Todo:  || ((!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')*/ && (
+                                                                                        {transactions.read_only && !hasAccess(editAccessRole, user) && (
                                                                                             policy.actions.map((customAction, actionKey) => (
                                                                                                 <div key={actionKey}>
                                                                                                     {customAction}
@@ -388,7 +397,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                                 )}
 
                                                                                 {/* Remove policy */}
-                                                                                { true /*Todo: show only if: $root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')*/ && (
+                                                                                { hasAccess(editAccessRole, user) && (
                                                                                     <td>
                                                                                         { !transactions.read_only && (
                                                                                             <a onClick={() => remove(index)} className="remove" />
@@ -400,7 +409,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                         }
 
                                                                         {/* create additional policy */}
-                                                                        { !transactions.read_only /*Todo:   && $root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') */ && (
+                                                                        { !transactions.read_only && hasAccess(editAccessRole, user) && (
                                                                             <tr>
                                                                                 <td colSpan="5">
                                                                                     <a onClick={() => push(createPolicy(""))}>
@@ -456,6 +465,10 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
     );
 };
 
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
@@ -465,4 +478,4 @@ const mapDispatchToProps = dispatch => ({
     removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
 });
 
-export default connect(null, mapDispatchToProps)(ResourceDetailsAccessPolicyTab);
+export default connect(mapStateToProps, mapDispatchToProps)(ResourceDetailsAccessPolicyTab);
