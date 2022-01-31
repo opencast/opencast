@@ -22,14 +22,12 @@
 package org.opencastproject.workflow.handler.rename;
 
 import org.opencastproject.job.api.JobContext;
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
-import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
-import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -38,12 +36,13 @@ import org.apache.commons.io.FilenameUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The <code>RenameFilesWorkflowOperationHandler</code> will rename files referenced in tracks based on metadata
@@ -72,6 +71,7 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -86,8 +86,9 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
 
-    final WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
-    final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
+    final var operation = workflowInstance.getCurrentOperation();
+    final var mediaPackage = workflowInstance.getMediaPackage();
+    final var mediaPackageId = mediaPackage.getIdentifier().toString();
 
     logger.info("Running rename files workflow operation on workflow {}", workflowInstance.getId());
 
@@ -100,41 +101,45 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
     logger.info("name-pattern {}", namePattern);
 
 
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
-            Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+    var tagsAndFlavors = getTagsAndFlavors(
+            workflowInstance,
+            Configuration.none,  // source-tags
+            Configuration.many,  // source-flavors
+            Configuration.none,  // target-tags
+            Configuration.none); // target-flavors
 
     // Select tracks by evaluating source tags and flavors
     List<MediaPackageElementFlavor> sourceFlavors = tagsAndFlavors.getSrcFlavors();
 
     for (var flavor: sourceFlavors) {
       for (var track: mediaPackage.getTracks(flavor)) {
-        // rename files in tracks
+        var uri = track.getURI();
+        var extension = FilenameUtils.getExtension(uri.toString());
+        var newElementId = UUID.randomUUID().toString();
+        var filename = mediaPackage.getTitle() + '.' + extension;
 
-        var uri = track.toString();
-        logger.info("##### uri: {}", uri);
+        // Put updated filename in working file repository and update the track.
+        // Make sure it has a new identifier to prevent conflicts with the old files.
+        try (var in = workspace.read(uri)) {
+          var newUri = workspace.put(mediaPackageId, newElementId, filename, in);
+          logger.info("Renaming {} to {}", uri, newUri);
+          track.setIdentifier(newElementId);
+          track.setURI(newUri);
+        } catch (NotFoundException | IOException e) {
+          throw new WorkflowOperationException("Failed moving track file", e);
+        }
 
-        String filename = FilenameUtils.getBaseName(uri.toString());
-        String extension = FilenameUtils.getExtension(uri.toString());
-        String path = FilenameUtils.getFullPath(uri.toString());
-
-        filename = mediaPackage.getTitle().replaceAll("\\s", "_");
-        URI newUri = null;
-
+        // Delete the old files from the working file repository and workspace if they were in there
+        logger.debug("Removing old track file {}", uri);
         try {
-          newUri = new URI(path + filename + "." + extension);
-          logger.info("##### newUri: {}", newUri);
+          workspace.delete(uri);
+        } catch (NotFoundException | IOException e) {
+          logger.debug("Could not remove track from workspace. Could be it was never there.");
         }
-        catch (URISyntaxException e) {
-          logger.error("Error setting Filename {}", e);
-        }
-
-        track.setURI(newUri);
 
       }
     }
 
-    logger.info("Continue with unmodified media package (createResult)");
-    // Continue with unmodified media package
     return createResult(mediaPackage, Action.CONTINUE);
   }
 
@@ -142,7 +147,5 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
-    logger.info("Rename Files WOH activated.");
   }
-
 }
