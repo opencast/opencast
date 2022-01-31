@@ -252,7 +252,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param messageSender
    */
-  @Reference(name = "message-broker-sender")
+  @Reference
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
@@ -262,7 +262,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param persistence
    */
-  @Reference(name = "scheduler-persistence")
+  @Reference
   public void setPersistence(SchedulerServiceDatabase persistence) {
     this.persistence = persistence;
   }
@@ -272,7 +272,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param seriesService
    */
-  @Reference(name = "series-service")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -282,7 +282,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param securityService
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -292,7 +292,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param assetManager
    */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -302,7 +302,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param workspace
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -312,7 +312,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param authorizationService
    */
-  @Reference(name = "authorization-service")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -333,7 +333,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param orgDirectoryService
    */
-  @Reference(name = "org-directory-service")
+  @Reference
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
   }
@@ -344,14 +344,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param index
    *          the API index.
    */
-  @Reference(name = "elasticsearch-index")
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 
   /** OSGi callback to add {@link EventCatalogUIAdapter} instance. */
   @Reference(
-      name = "event-catalog-ui-adapter",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeCatalogUIAdapter"

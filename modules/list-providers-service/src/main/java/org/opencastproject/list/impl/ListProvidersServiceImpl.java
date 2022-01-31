@@ -94,14 +94,13 @@ public class ListProvidersServiceImpl implements ListProvidersService {
   }
 
     /** OSGi callback for security service */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback for provider. */
   @Reference(
-      name = "provider",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeProvider"

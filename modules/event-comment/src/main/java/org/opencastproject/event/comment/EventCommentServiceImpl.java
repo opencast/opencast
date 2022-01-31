@@ -48,7 +48,7 @@ public class EventCommentServiceImpl implements EventCommentService {
    * @param eventCommentDatabaseService
    *          the event comment database service
    */
-  @Reference(name = "eventCommentDatabaseService")
+  @Reference
   public void setEventCommentDatabaseService(EventCommentDatabaseService eventCommentDatabaseService) {
     this.eventCommentDatabaseService = eventCommentDatabaseService;
   }

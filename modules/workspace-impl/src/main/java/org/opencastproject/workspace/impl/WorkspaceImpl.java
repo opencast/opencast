@@ -875,7 +875,7 @@ public final class WorkspaceImpl implements Workspace {
     return wfr.getBaseUri();
   }
 
-  @Reference(name = "REPO")
+  @Reference
   public void setRepository(WorkingFileRepository repo) {
     this.wfr = repo;
     if (repo instanceof PathMappable) {
@@ -884,12 +884,12 @@ public final class WorkspaceImpl implements Workspace {
     }
   }
 
-  @Reference(name = "trustedHttpClient")
+  @Reference
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     this.trustedHttpClient = trustedHttpClient;
   }
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

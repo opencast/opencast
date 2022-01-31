@@ -64,10 +64,7 @@ public class BundleInfoLogger implements BundleListener {
   private String host;
 
   /** OSGi DI */
-  @Reference(
-      name = "bundleInfoDb",
-      unbind = "unsetDb"
-  )
+  @Reference(unbind = "unsetDb")
   public void setDb(BundleInfoDb db) {
     this.db = some(db);
   }

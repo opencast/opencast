@@ -52,10 +52,7 @@ public class PublishEngageAWSS3WorkflowOperationHandler extends PublishEngageWor
    * @param downloadDistributionService
    *          the download distribution service
    */
-  @Reference(
-      name = "DownloadDistributionService",
-      target = "(distribution.channel=aws.s3)"
-  )
+  @Reference(target = "(distribution.channel=aws.s3)")
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     super.setDownloadDistributionService(downloadDistributionService);
   }
@@ -67,12 +64,12 @@ public class PublishEngageAWSS3WorkflowOperationHandler extends PublishEngageWor
    * @param searchService
    *          an instance of the search service
    */
-  @Reference(name = "SearchService")
+  @Reference
   protected void setSearchService(SearchService searchService) {
     super.setSearchService(searchService);
   }
 
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.setOrganizationDirectoryService(organizationDirectoryService);
   }

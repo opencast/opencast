@@ -107,7 +107,6 @@ public class FileUploadRestService {
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
   @Reference(
-      name = "fileupload-service",
       unbind = "unsetFileUploadService"
   )
   protected void setFileUploadService(FileUploadService service) {

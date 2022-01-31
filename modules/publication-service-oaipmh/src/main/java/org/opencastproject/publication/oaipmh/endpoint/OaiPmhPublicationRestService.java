@@ -105,7 +105,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -114,7 +114,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
    * @param service
    *          the service to set
    */
-  @Reference(name = "publicationService")
+  @Reference
   public void setService(OaiPmhPublicationService service) {
     this.service = service;
   }

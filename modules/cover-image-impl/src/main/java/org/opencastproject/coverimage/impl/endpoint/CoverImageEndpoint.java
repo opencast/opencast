@@ -171,7 +171,7 @@ public class CoverImageEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "ServiceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -181,7 +181,7 @@ public class CoverImageEndpoint extends AbstractJobProducerEndpoint {
    *
    * @param coverImageService
    */
-  @Reference(name = "CoverImageService")
+  @Reference
   protected void setCoverImageService(CoverImageService coverImageService) {
     this.coverImageService = coverImageService;
   }

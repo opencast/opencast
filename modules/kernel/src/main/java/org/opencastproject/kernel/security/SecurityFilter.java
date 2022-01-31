@@ -70,7 +70,7 @@ public final class SecurityFilter implements Filter {
   private SecurityService securityService;
 
   /** OSGi DI. */
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

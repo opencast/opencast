@@ -111,10 +111,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.event.comment)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.event.comment)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
     this.env = PersistenceEnvs.mk(emf);
@@ -126,7 +123,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param securityService
    *          The security service
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -137,7 +134,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param userDirectoryService
    *          the user directory service
    */
-  @Reference(name = "userDirectory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -148,7 +145,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param organizationDirectoryService
    *          the organization directory service
    */
-  @Reference(name = "organization-directory-service")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
@@ -159,7 +156,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param index
    *          the API index.
    */
-  @Reference(name = "elasticsearch-index")
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }

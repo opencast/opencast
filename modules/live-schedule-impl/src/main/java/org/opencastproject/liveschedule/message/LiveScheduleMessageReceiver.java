@@ -152,18 +152,17 @@ public class LiveScheduleMessageReceiver {
   }
 
   // === Set by OSGI begin
-  @Reference(name = "messageReceiver")
+  @Reference
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   @Reference(
-      name = "updateHandler",
       cardinality = ReferenceCardinality.AT_LEAST_ONE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeUpdateHandler"

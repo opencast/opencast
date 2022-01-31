@@ -70,7 +70,7 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param publicationService
    *          the publication service
    */
-  @Reference(name = "PublicationService")
+  @Reference
   public void setPublicationService(OaiPmhPublicationService publicationService) {
     this.publicationService = publicationService;
   }
@@ -129,7 +129,7 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

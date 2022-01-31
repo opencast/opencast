@@ -106,7 +106,6 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
 
   /** OSGi DI. */
   @Reference(
-      name = "repository",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetRepository"
@@ -119,7 +118,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
   }
 
   /** OSGi DI. */
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

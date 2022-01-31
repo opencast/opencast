@@ -60,7 +60,7 @@ public class StatisticsProviderRandomService implements ArtifactInstaller {
   private StatisticsCoordinator statisticsCoordinator;
   private Map<String, StatisticsProvider> fileNameToProvider = new ConcurrentHashMap<>();
 
-  @Reference(name = "statistics-service")
+  @Reference
   public void setStatisticsCoordinator(StatisticsCoordinator service) {
     this.statisticsCoordinator = service;
   }

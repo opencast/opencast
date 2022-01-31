@@ -213,38 +213,37 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * OSGi dependencies
    */
 
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.assetmanager.impl)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.assetmanager.impl)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.db = new Database(emf);
   }
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(name = "authorizationService")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
-  @Reference(name = "orgDir")
+  @Reference
   public void setOrgDir(OrganizationDirectoryService orgDir) {
     this.orgDir = orgDir;
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "assetStore")
+  @Reference
   public void setAssetStore(AssetStore assetStore) {
     this.assetStore = assetStore;
   }
 
   @Reference(
-      name = "remoteAssetStores",
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeRemoteAssetStore"
@@ -257,22 +256,22 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     remoteStores.remove(store.getStoreType());
   }
 
-  @Reference(name = "httpAssetProvider")
+  @Reference
   public void setHttpAssetProvider(HttpAssetProvider httpAssetProvider) {
     this.httpAssetProvider = httpAssetProvider;
   }
 
-  @Reference(name = "messageSender")
+  @Reference
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
 
-  @Reference(name = "aclServiceFactory")
+  @Reference
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
-  @Reference(name = "index")
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }

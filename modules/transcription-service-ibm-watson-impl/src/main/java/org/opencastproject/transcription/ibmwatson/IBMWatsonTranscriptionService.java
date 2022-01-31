@@ -861,52 +861,52 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     return callbackAlreadyRegistered;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  @Reference(name = "organizationDirectoryService")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference(name = "smtpService")
+  @Reference
   public void setSmtpService(SmtpService service) {
     this.smtpService = service;
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
-  @Reference(name = "workingFileRepository")
+  @Reference
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }
 
-  @Reference(name = "database")
+  @Reference
   public void setDatabase(TranscriptionDatabase service) {
     this.database = service;
   }
 
-  @Reference(name = "assetManager")
+  @Reference
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }
 
-  @Reference(name = "workflowService")
+  @Reference
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }

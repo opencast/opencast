@@ -52,7 +52,7 @@ public class OsgiOaiPmhServerInfoRestEndpoint extends AbstractOaiPmhServerInfoRe
   }
 
   /** OSGi DI. */
-  @Reference(name = "oaiPmhServerInfo")
+  @Reference
   public void setOaiPmhServerInfo(OaiPmhServerInfo oaiPmhServerInfo) {
     this.oaiPmhServerInfo = oaiPmhServerInfo;
   }

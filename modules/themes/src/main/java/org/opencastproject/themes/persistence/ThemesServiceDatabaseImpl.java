@@ -104,10 +104,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   /** OSGi DI */
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.themes)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.themes)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -118,7 +115,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    * @param securityService
    *          the security service
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -129,19 +126,19 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    * @param userDirectoryService
    *          the user directory service
    */
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
   /** OSGi DI */
-  @Reference(name = "organization-directory-service")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** OSGi DI */
-  @Reference(name = "elasticsearch-index")
+  @Reference
   public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }

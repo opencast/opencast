@@ -115,19 +115,19 @@ public class GroupsEndpoint {
   private SecurityService securityService;
 
   /** OSGi DI */
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI. */
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
-  @Reference(name = "groupRoleProvider")
+  @Reference
   public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }

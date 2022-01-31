@@ -148,22 +148,22 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     logger.info("Deactivating Statistics Service");
   }
 
-  @Reference(name = "IndexService")
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
-  @Reference(name = "StatisticsService")
+  @Reference
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
 
-  @Reference(name = "SecurityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  @Reference(name = "AssetManager")
+  @Reference
   public void setAssetManager(final AssetManager assetManager) {
     this.assetManager = assetManager;
   }

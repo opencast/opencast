@@ -54,10 +54,7 @@ public class FormRepositoryImpl implements FormRepository {
   protected EntityManagerFactory emf = null;
 
   /** OSGi setter for the entity manager factory. */
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.adopter)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.adopter)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }

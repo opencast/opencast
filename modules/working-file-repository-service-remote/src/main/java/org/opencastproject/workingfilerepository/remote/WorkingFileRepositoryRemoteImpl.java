@@ -79,7 +79,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    * @param client
    */
   @Override
-  @Reference(name = "trustedHttpClient")
+  @Reference
   public void setTrustedHttpClient(TrustedHttpClient client) {
     super.setTrustedHttpClient(client);
   }
@@ -90,7 +90,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    * @param remoteServiceManager
    */
   @Override
-  @Reference(name = "remoteServiceManager")
+  @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     super.setRemoteServiceManager(remoteServiceManager);
   }
