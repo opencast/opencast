@@ -84,16 +84,6 @@
       </configurations>
     </operation>
 
-    <operation
-      id="rename-files"
-      description="Renaming files">
-      <configurations>
-        <configuration key="name-pattern">*/source</configuration>
-        <configuration key="source-flavor">presenter/preview</configuration>
-        <configuration key="target-tags">engage-download</configuration>
-      </configurations>
-    </operation>
-
     <!-- encode to engage search result thumbnails -->
     <!-- skip this when manually uploaded */search+preview -->
     <operation
