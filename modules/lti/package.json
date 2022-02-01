@@ -17,7 +17,7 @@
     "react-bootstrap": "^2.1.0",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
-    "react-i18next": "^11.15.2",
+    "react-i18next": "^11.15.3",
     "react-js-pagination": "^3.0.2",
     "react-scripts": "^5.0.0",
     "react-select": "^5.2.0",
