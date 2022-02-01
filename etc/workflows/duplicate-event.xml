@@ -41,7 +41,7 @@
               min="1"
               value="1"
               max="25"
-            /> 
+            />
           </div>
           <br/>
           <div>
@@ -84,7 +84,7 @@
         <configuration key="set-start-date-time">${startDate} ${startTime}</configuration>
         <configuration key="target-tags"></configuration>
         <configuration key="property-namespaces">org.opencastproject.assetmanager.security,org.opencastproject.workflow.configuration</configuration>
-        <configuration key="no-suffix">${noCopySuffix}</configuration>        
+        <configuration key="no-suffix">${noCopySuffix}</configuration>
         <configuration key="copy-number-prefix">copy</configuration>
       </configurations>
     </operation>
