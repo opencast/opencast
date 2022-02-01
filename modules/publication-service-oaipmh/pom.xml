@@ -99,9 +99,6 @@
             <Export-Package>
               org.opencastproject.publication.oaipmh;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/publication-service-oaipmh.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

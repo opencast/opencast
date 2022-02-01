@@ -95,9 +95,6 @@
             <Export-Package>
               org.opencastproject.statistics.export.impl;version=${project.version},
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/statistics-export-service.xml,
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

@@ -127,9 +127,6 @@
             <Export-Package>
               org.opencastproject.distribution.streaming;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/distribution-service-streaming.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

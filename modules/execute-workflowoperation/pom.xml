@@ -103,10 +103,6 @@
             <Export-Package>
               org.opencastproject.execute.operation.handler;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/operations/execute-once.xml,
-              OSGI-INF/operations/execute-many.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

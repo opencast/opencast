@@ -77,9 +77,6 @@
             <Export-Package>
               org.opencastproject.statistics.remote;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/statistics-service-remote.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

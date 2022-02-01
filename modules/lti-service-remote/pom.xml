@@ -84,9 +84,6 @@
             <Export-Package>
               org.opencastproject.lti.endpoint
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/lti-service-remote-impl.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

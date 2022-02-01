@@ -64,9 +64,6 @@
             <Export-Package>
               org.opencastproject.crop.remote;version=${project.version},
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/crop-remote.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

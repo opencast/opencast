@@ -66,9 +66,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.videosegmenter;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/operations/analyze-videosegments.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

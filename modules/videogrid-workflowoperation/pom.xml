@@ -116,9 +116,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.videogrid;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/operations/videogrid.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

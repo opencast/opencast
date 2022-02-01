@@ -56,9 +56,6 @@
             <Export-Package>
               org.opencastproject.oaipmh.server.remote;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/oai-pmh-server-info-remote.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

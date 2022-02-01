@@ -84,9 +84,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.themes;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/operations/theme.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

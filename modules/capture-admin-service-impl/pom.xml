@@ -127,9 +127,6 @@
               *
             </Import-Package>
             <Export-Package> org.opencastproject.capture.admin.*;version=${project.version} </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/capture-admin-service-rest.xml,
-            <Service-Component-->
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

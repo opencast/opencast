@@ -61,9 +61,6 @@
             <Export-Package>
               org.opencastproject.search.remote;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/search-service-remote.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

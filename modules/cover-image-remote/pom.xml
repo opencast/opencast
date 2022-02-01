@@ -71,9 +71,6 @@
             <Export-Package>
               org.opencastproject.coverimage.remote;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/cover-image-service-remote.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>
