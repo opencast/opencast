@@ -31,7 +31,7 @@
 'use strict';
 
 angular.module('adminNg.directives')
-    .directive('pwStrength', [function () {
+    .directive('pwStrength', ['$translate', function ($translate) {
       return {
         restrict: 'E',
         scope: {
@@ -39,13 +39,14 @@ angular.module('adminNg.directives')
         },
 
         link: function (scope, elem, attrs, ctrl) {
+
           scope.$watch('password', function (pw) {
 
             scope.rule =
                 requirements(pw && /[A-Z]/.test(pw)) +
                 requirements(pw && /[a-z]/.test(pw)) +
                 requirements(pw && /\d/.test(pw)) +
-                requirements(pw && /(?=.*\W)/.test(pw)) +
+                requirements(pw && /\W/.test(pw)) +
                 requirements(pw && /^.{8,}$/.test(pw));
 
             // bad passwords from https://en.wikipedia.org/wiki/List_of_the_most_common_passwords
@@ -60,7 +61,6 @@ angular.module('adminNg.directives')
               'Qwertyuiop', 'welcome', 'zxcvbnm', 'opencast' ];
 
             var bar_color = 'background:white;';
-            var bar_width = 'width:0%;';
             var bar_text = '';
             var strength = calcStrength(scope.rule, pw);
 
@@ -79,14 +79,14 @@ angular.module('adminNg.directives')
               // for every unused rule/requirement = -5 points
               var usedRules = (rule - 5) * 5;
 
-              var uniqueChars = (pw.split('').sort().join('').replace(/(.)\1+/g, '').length) * 2;
+              var uniqueChars = new Set(pw).size * 2;
               var pw_length = pw.length * 4;
               var lowerCase = (pw.length - pw.replace(/[a-z]/g, '').length) * 2;
               var upperCase = (pw.length - pw.replace(/[A-Z]/g, '').length) * 2;
               var number = (pw.length - pw.replace(/[0-9]/g, '').length) * 4;
               var symbol = (pw.length - pw.replace(/\W/g, '').length) * 6;
 
-              var strength = usedRules + uniqueChars + pw_length + lowerCase + upperCase + number + symbol;
+              var strength = Math.max(1, usedRules + uniqueChars + pw_length + lowerCase + upperCase + number + symbol);
               return strength;
             }
 
@@ -94,37 +94,34 @@ angular.module('adminNg.directives')
 
               if (strength >= 90) {
                 bar_color = 'background:#388ed6;';
-                bar_width = 'width:' + strength + '%;';
-                bar_text = 'Very strong';
+                bar_text = 'USERS.USERS.DETAILS.STRENGTH.VERYSTRONG';
               }
               else if (strength >= 70) {
                 bar_color = 'background:green;';
-                bar_width = 'width:' + strength + '%;';
-                bar_text = 'Strong';
+                bar_text = 'USERS.USERS.DETAILS.STRENGTH.STRONG';
               }
               else if (strength >= 50) {
                 bar_color = 'background:gold;';
-                bar_width = 'width:' + strength + '%;';
-                bar_text = 'Good';
+                bar_text = 'USERS.USERS.DETAILS.STRENGTH.GOOD';
               }
               else if (strength >= 30) {
                 bar_color = 'background:darkorange;';
-                bar_width = 'width:' + strength + '%;';
-                bar_text = 'Weak';
+                bar_text = 'USERS.USERS.DETAILS.STRENGTH.WEAK';
               }
-              else if (strength >= 1) {
+              else if (strength >= 2) {
                 bar_color = 'background:red;';
-                bar_width = 'width:' + strength + '%;';
-                bar_text = 'Very weak';
+                bar_text = 'USERS.USERS.DETAILS.STRENGTH.VERYWEAK';
               }
-              else if (strength == 0){
+              else if (strength <= 1){
+                strength = 0;
                 bar_color = 'background:white;';
-                bar_width = 'width:' + 0 + '%;';
-                bar_text = 'Bad password';
+                bar_text = 'USERS.USERS.DETAILS.STRENGTH.BAD';
               }
 
-              document.getElementById('bar').style = bar_color + bar_width;
-              document.getElementById('pw').innerText = bar_text;
+              document.getElementById('bar').style = bar_color + 'width:' + strength + '%;';
+              $translate(bar_text).then(function(translation) {
+                document.getElementById('pw').innerText = translation;
+              });
             }
 
           });
