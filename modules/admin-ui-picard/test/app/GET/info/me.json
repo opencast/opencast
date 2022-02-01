@@ -1,5 +1,6 @@
 {
   "roles": [
+    "ROLE_ADMIN",
     "ROLE_ANONYMOUS",
     "ROLE_GROUP_ADMIN",
     "ROLE_OAUTH_USER",
@@ -67,7 +68,6 @@
     "ROLE_UI_USERS_CREATE",
     "ROLE_UI_USERS_DELETE",
     "ROLE_UI_USERS_EDIT",
-    "ROLE_UI_USERS_VIEW",
     "ROLE_USER"
   ],
   "org": {
