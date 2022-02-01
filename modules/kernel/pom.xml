@@ -281,7 +281,7 @@
             <_exportcontents>
               org.springframework.security.oauth.*
             </_exportcontents>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/bundle-info.xml,
               OSGI-INF/cleansessions.xml,
               OSGI-INF/http-context.xml,
@@ -296,7 +296,7 @@
               OSGI-INF/remote-user-and-role-filter.xml,
               OSGI-INF/security-config-scanner.xml,
               OSGI-INF/transparentproxy-filter.xml
-            </Service-Component>
+            <Service-Component-->
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

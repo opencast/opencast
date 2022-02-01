@@ -261,7 +261,7 @@
               org.opencastproject.index.service.resources.list.query,
               org.opencastproject.index.service.util
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/catalog-ui-adapter-factory.xml,
               OSGI-INF/index_service.xml,
               OSGI-INF/list-providers/acl.xml,
@@ -276,8 +276,8 @@
               OSGI-INF/list-providers/servers.xml,
               OSGI-INF/list-providers/services.xml,
               OSGI-INF/list-providers/themes.xml,
-              OSGI-INF/list-providers/users.xml,
-            </Service-Component>
+              OSGI-INF/list-providers/users.xml
+            <Service-Component-->
             <JPA-PersistenceUnits>
               org.opencastproject.index.service
             </JPA-PersistenceUnits>

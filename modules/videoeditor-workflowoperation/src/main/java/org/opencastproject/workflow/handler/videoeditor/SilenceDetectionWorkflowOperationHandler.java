@@ -31,6 +31,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
 import org.opencastproject.silencedetection.api.SilenceDetectionService;
 import org.opencastproject.smil.api.SmilException;
@@ -43,6 +44,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -51,6 +53,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +71,14 @@ import java.util.stream.Collectors;
  * workflowoperationhandler for silencedetection executes the silencedetection and adds a SMIL document to the
  * mediapackage containing the cutting points
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Silence Detection Workflow Operation Handler",
+        "workflow.operation=silence"
+    }
+)
 public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Logger */
@@ -278,15 +290,25 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     logger.info("Registering silence detection workflow operation handler");
   }
 
+  @Reference(name = "detectionService")
   public void setDetectionService(SilenceDetectionService detectionService) {
     this.detetionService = detectionService;
   }
 
+  @Reference(name = "SmilService")
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
 
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

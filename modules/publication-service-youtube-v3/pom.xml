@@ -181,9 +181,9 @@
               checker-qual,
               org.apache.felix.http.bundle;inline=true
             </Embed-Dependency>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/publication-service-youtube.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

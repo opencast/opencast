@@ -82,9 +82,9 @@
               org.opencastproject.staticfiles.impl;version=${project.version},
               org.opencastproject.staticfiles.jmx;version=${project.version}
             </Private-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/static-file-service.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

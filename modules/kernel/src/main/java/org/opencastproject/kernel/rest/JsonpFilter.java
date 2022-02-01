@@ -23,6 +23,7 @@ package org.opencastproject.kernel.rest;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,17 @@ import javax.servlet.http.HttpServletResponseWrapper;
 /**
  * Adds padding to json responses when the 'jsonp' parameter is specified.
  */
+@Component(
+    immediate = true,
+    service = Filter.class,
+    property = {
+        "service.description=JSONP Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=10",
+        "urlPatterns=*"
+    }
+)
 public class JsonpFilter implements Filter {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JsonpFilter.class);

@@ -76,6 +76,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,6 +127,15 @@ import javax.ws.rs.core.Response;
             + "not anticipated. In other words, there is a bug! You should file an error report "
             + "with your server logs from the time when the error occurred: "
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
+@Component(
+    immediate = true,
+    service = SeriesRestService.class,
+    property = {
+        "service.description=Series REST Endpoint",
+        "opencast.service.type=org.opencastproject.series",
+        "opencast.service.path=/series"
     }
 )
 public class SeriesRestService {
@@ -199,6 +211,7 @@ public class SeriesRestService {
    *
    * @param seriesService
    */
+  @Reference(name = "service-impl")
   public void setService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -208,6 +221,7 @@ public class SeriesRestService {
    *
    * @param dcService
    */
+  @Reference(name = "dc")
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
@@ -218,6 +232,7 @@ public class SeriesRestService {
    * @param cc
    *          ComponentContext
    */
+  @Activate
   public void activate(ComponentContext cc) {
     if (cc == null) {
       this.serverUrl = "http://localhost:8080";
