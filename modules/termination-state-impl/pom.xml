@@ -82,10 +82,10 @@
               javax.ws.rs.core;version=2.0.1,
               *;resolution:=optional
             </Import-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/termination-state-service-impl.xml,
               OSGI-INF/termination-state-rest-service-impl.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

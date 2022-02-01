@@ -50,6 +50,9 @@ import com.entwinemedia.fn.data.json.SimpleSerializer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +77,15 @@ import javax.ws.rs.core.Response;
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
 @RestService(name = "externalapiservice", title = "External API Service", notes = {},
              abstractText = "Provides a location for external apis to query the current server of the API.")
+@Component(
+    immediate = true,
+    service = BaseEndpoint.class,
+    property = {
+        "service.description=External API - Base Endpoint",
+        "opencast.service.type=org.opencastproject.external",
+        "opencast.service.path=/api"
+    }
+)
 public class BaseEndpoint {
 
   /** The logging facility */
@@ -89,11 +101,13 @@ public class BaseEndpoint {
   private SecurityService securityService;
 
   /** OSGi DI */
+  @Reference(name = "SecurityService")
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi activation method */
+  @Activate
   void activate(ComponentContext cc) {
     logger.info("Activating External API - Base Endpoint");
 

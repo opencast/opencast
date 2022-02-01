@@ -135,12 +135,12 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/asset-manager-update-handler.xml,
               OSGI-INF/live-schedule-message-receiver.xml,
               OSGI-INF/live-schedule-service.xml,
               OSGI-INF/scheduler-update-handler.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

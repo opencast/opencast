@@ -89,9 +89,9 @@
               org.opencastproject.textanalyzer.impl;version=${project.version},
               org.opencastproject.textanalyzer.impl.endpoint;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/textanalyzer.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

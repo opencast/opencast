@@ -92,10 +92,10 @@
               org.opencastproject.security.urlsigning.filter,
               org.opencastproject.security.urlsigning.verifier.impl
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/signing-verifier.xml,
               OSGI-INF/signing-verifier-filter.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

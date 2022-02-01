@@ -103,9 +103,9 @@
               org.opencastproject.timelinepreviews.ffmpeg;version=${project.version},
               org.opencastproject.timelinepreviews.ffmpeg.endpoint;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/timelinepreviews.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

@@ -144,9 +144,9 @@
               org.opencastproject.serviceregistry.impl;version=${project.version},
               org.opencastproject.serviceregistry.impl.endpoint;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/nop-service.xml
-            </Service-Component>
+            <Service-Component-->
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

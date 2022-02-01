@@ -56,6 +56,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +81,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 
+@Component(
+    immediate = true,
+    service = { ManagedService.class,StatisticsExportService.class },
+    property = {
+        "service.description=Statistics Export Service"
+    }
+)
 public class StatisticsExportServiceImpl implements StatisticsExportService, ManagedService {
 
   /** Logging utility */
@@ -128,26 +139,32 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
         ));
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating Statistics Service");
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating Statistics Service");
   }
 
+  @Reference(name = "IndexService")
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
+  @Reference(name = "StatisticsService")
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
 
+  @Reference(name = "SecurityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(name = "AssetManager")
   public void setAssetManager(final AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -669,6 +686,5 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       throw new IllegalArgumentException("Unknown filter :" + name);
     }
   }
-
 
 }

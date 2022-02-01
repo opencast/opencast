@@ -56,6 +56,9 @@ import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +84,15 @@ import javax.ws.rs.core.Response;
             ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0 })
 @RestService(name = "externalapiworkflowdefinitions", title = "External API Workflow Definitions Service", notes = {},
              abstractText = "Provides resources and operations related to the workflow definitions")
+@Component(
+    immediate = true,
+    service = WorkflowDefinitionsEndpoint.class,
+    property = {
+        "service.description=External API - Workflow Definitions Endpoint",
+        "opencast.service.type=org.opencastproject.external.workflows.definitions",
+        "opencast.service.path=/api/workflow-definitions"
+    }
+)
 public class WorkflowDefinitionsEndpoint {
 
   /**
@@ -103,6 +115,7 @@ public class WorkflowDefinitionsEndpoint {
   /**
    * OSGi DI
    */
+  @Reference(name = "workflowService")
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
@@ -110,6 +123,7 @@ public class WorkflowDefinitionsEndpoint {
   /**
    * OSGi activation method
    */
+  @Activate
   void activate(ComponentContext cc) {
     logger.info("Activating External API - Workflow Definitions Endpoint");
   }

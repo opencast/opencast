@@ -101,7 +101,7 @@
             <Private-Package>
               org.opencastproject.caption.util
             </Private-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/caption-service.xml,
               OSGI-INF/converters/dfxp-caption-converter.xml,
               OSGI-INF/converters/subrip-caption-converter.xml,
@@ -109,7 +109,7 @@
               OSGI-INF/converters/google-speech-caption-converter.xml,
               OSGI-INF/converters/ibm-watson-caption-converter.xml,
               OSGI-INF/converters/webvtt-caption-converter.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

@@ -189,12 +189,12 @@
               jdom2;inline=true,
               itunes;inline=true
             </Embed-Dependency>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/feed-service.xml,
               OSGI-INF/search-service.xml,
               OSGI-INF/search-service-persistence.xml,
               OSGI-INF/search-service-rest.xml
-            </Service-Component>
+            <Service-Component-->
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

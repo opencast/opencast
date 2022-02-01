@@ -81,6 +81,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +101,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Component(
+    immediate = true,
+    service = { TranscriptionService.class,GoogleSpeechTranscriptionService.class },
+    property = {
+        "service.description=Google Speech Transcription Service",
+        "provider=google.speech"
+    }
+)
 public class GoogleSpeechTranscriptionService extends AbstractJobProducer implements TranscriptionService {
 
   /**
@@ -202,6 +213,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     super(JOB_TYPE);
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     // Has this service been enabled?
     enabled = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), ENABLED_CONFIG).get();
@@ -928,42 +940,52 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     return 0;
   }
 
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(name = "userDirectoryService")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference(name = "organizationDirectoryService")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference(name = "smtpService")
   public void setSmtpService(SmtpService service) {
     this.smtpService = service;
   }
 
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
+  @Reference(name = "workingFileRepository")
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }
 
+  @Reference(name = "database")
   public void setDatabase(TranscriptionDatabase service) {
     this.database = service;
   }
 
+  @Reference(name = "assetManager")
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }
 
+  @Reference(name = "workflowService")
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }

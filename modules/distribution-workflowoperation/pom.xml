@@ -103,7 +103,7 @@
             <Export-Package>
               org.opencastproject.workflow.handler.distribution;version=${project.version}
             </Export-Package>
-            <Service-Component>
+            <!--Service-Component>
               OSGI-INF/operations/publish-engage-aws.xml,
               OSGI-INF/operations/publish-engage.xml,
               OSGI-INF/operations/publish-configurable-aws.xml,
@@ -119,7 +119,7 @@
               OSGI-INF/operations/retract-oaipmh.xml,
               OSGI-INF/operations/retract-partial-aws.xml,
               OSGI-INF/operations/retract-partial.xml
-            </Service-Component>
+            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>
