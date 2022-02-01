@@ -79,7 +79,6 @@ public class ServiceRegistrationTest {
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     expect(organizationDirectoryService.getOrganization((String) anyObject())).andReturn(organization).anyTimes();
     EasyMock.replay(organizationDirectoryService);
-    serviceRegistry.setOrganizationDirectoryService(organizationDirectoryService);
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
     User anonymous = new JaxbUser("anonymous", "test", jaxbOrganization, new JaxbRole(

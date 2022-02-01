@@ -104,7 +104,6 @@ public class JobTest {
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
     .andReturn(organization).anyTimes();
     EasyMock.replay(organizationDirectoryService);
-    serviceRegistry.setOrganizationDirectoryService(organizationDirectoryService);
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
     User anonymous = new JaxbUser("anonymous", "test", jaxbOrganization, new JaxbRole(
