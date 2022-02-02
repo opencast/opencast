@@ -27,13 +27,6 @@ import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntity
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.ASelectQuery;
-import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.Target;
-import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
@@ -62,7 +55,6 @@ import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
@@ -123,39 +115,20 @@ public class PauseWorkflowTest {
     service.addWorkflowDefinitionScanner(scanner);
 
     final AssetManager assetManager = createNiceMock(AssetManager.class);
-    final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
-    final Target t = EasyMock.createNiceMock(Target.class);
-    final Predicate p = EasyMock.createNiceMock(Predicate.class);
-    EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
-    EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
-    EasyMock.expect(query.propertiesOf(EasyMock.anyString())).andReturn(t).anyTimes();
-    final VersionField v = EasyMock.createNiceMock(VersionField.class);
-    EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
-    EasyMock.expect(query.version()).andReturn(v).anyTimes();
     EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
-    EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
-    final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
-    EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
-    final AResult r = EasyMock.createNiceMock(AResult.class);
-    EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
-    final Stream<ARecord> recStream = Stream.mk();
-    EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
-    EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class)))
-            .andReturn(selectQuery).anyTimes();
-    EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
-    EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
+    EasyMock.replay(assetManager);
     service.setAssetManager(assetManager);
 
     // security service
     DefaultOrganization organization = new DefaultOrganization();
-    securityService = EasyMock.createNiceMock(SecurityService.class);
+    securityService = createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(SecurityServiceStub.DEFAULT_ORG_ADMIN).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
     EasyMock.replay(securityService);
 
     service.setSecurityService(securityService);
 
-    AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);
+    AuthorizationService authzService = createNiceMock(AuthorizationService.class);
     EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
             .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.replay(authzService);
@@ -167,7 +140,7 @@ public class PauseWorkflowTest {
     EasyMock.replay(userDirectoryService);
     service.setUserDirectoryService(userDirectoryService);
 
-    MediaPackageMetadataService mds = EasyMock.createNiceMock(MediaPackageMetadataService.class);
+    MediaPackageMetadataService mds = createNiceMock(MediaPackageMetadataService.class);
     EasyMock.replay(mds);
     service.addMetadataService(mds);
 
@@ -181,9 +154,9 @@ public class PauseWorkflowTest {
     service.setOrganizationDirectoryService(organizationDirectoryService);
 
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
-            userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
+            userDirectoryService, organizationDirectoryService, createNiceMock(IncidentService.class));
 
-    workspace = EasyMock.createNiceMock(Workspace.class);
+    workspace = createNiceMock(Workspace.class);
     EasyMock.expect(workspace.getCollectionContents((String) EasyMock.anyObject())).andReturn(new URI[0]);
     EasyMock.expect(workspace.read(anyObject()))
             .andAnswer(() -> getClass().getResourceAsStream("/dc-1.xml")).anyTimes();
@@ -203,9 +176,9 @@ public class PauseWorkflowTest {
     def = XmlWorkflowParser.parseWorkflowDefinition(is);
     IOUtils.closeQuietly(is);
 
-    SearchResult result = EasyMock.createNiceMock(SearchResult.class);
+    SearchResult result = createNiceMock(SearchResult.class);
 
-    final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    final ElasticsearchIndex index = createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
     EasyMock.replay(result, index);
