@@ -58,9 +58,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.statisticswriter;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/operations/statistics-writer-woh.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

@@ -73,9 +73,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.timelinepreviews;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/operations/timelinepreviews.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

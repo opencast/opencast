@@ -81,9 +81,6 @@
             <Export-Package>
               org.opencastproject.metadata.mpeg7;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/mpeg7-service.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

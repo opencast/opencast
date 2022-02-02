@@ -105,9 +105,6 @@
             </Import-Package>
             <Private-Package>org.apache.xmlrpc.*</Private-Package>
             <Export-Package>org.opencastproject.sox.impl.*;version=${project.version}</Export-Package>
-            <!--Service-Component>
-              OSGI-INF/sox-service.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

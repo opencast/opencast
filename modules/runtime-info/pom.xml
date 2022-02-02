@@ -98,9 +98,6 @@
             <Export-Package>
               org.opencastproject.runtimeinfo
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/info.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

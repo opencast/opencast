@@ -67,9 +67,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <!--Service-Component>
-              OSGI-INF/statistics-provider-random-service.xml,
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

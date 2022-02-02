@@ -96,9 +96,6 @@
             <Export-Package>
               org.opencastproject.execute.impl.*;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/execute.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>
