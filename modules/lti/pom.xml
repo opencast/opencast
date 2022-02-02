@@ -243,10 +243,6 @@
             <Export-Package>
               org.opencastproject.lti;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/opencast-lti.xml,
-              OSGI-INF/opencast-lti-service-gui-endpoint.xml
-            <Service-Component-->
             <Private-Package>tools.*</Private-Package>
             <Http-Alias>/ltitools</Http-Alias>
             <Http-Classpath>/tools</Http-Classpath>

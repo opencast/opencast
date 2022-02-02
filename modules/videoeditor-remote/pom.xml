@@ -33,9 +33,6 @@
             <Export-Package>
               org.opencastproject.videoeditor.remote;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/videoeditor-remote.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

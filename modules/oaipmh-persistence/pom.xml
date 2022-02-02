@@ -109,9 +109,6 @@
             <Export-Package>
               org.opencastproject.oaipmh.persistence;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/oai-pmh-persistence.xml
-            <Service-Component-->
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

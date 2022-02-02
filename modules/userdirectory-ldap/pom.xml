@@ -105,9 +105,6 @@
             <Export-Package>
               org.opencastproject.userdirectory.ldap;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/ldap-user-factory.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

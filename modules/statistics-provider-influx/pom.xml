@@ -109,9 +109,6 @@
               org.influxdb.*,
               javax.annotation
             </Private-Package>
-            <!--Service-Component>
-              OSGI-INF/statistics-provider-influx-service.xml,
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

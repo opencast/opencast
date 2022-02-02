@@ -94,10 +94,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.sox;version=${project.version}
             </Export-Package>
-            <!--Service-Component>
-              OSGI-INF/operations/analyze-audio.xml,
-              OSGI-INF/operations/normalize-audio.xml
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>

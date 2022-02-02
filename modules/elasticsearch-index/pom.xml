@@ -172,8 +172,6 @@
               org.opencastproject.elasticsearch.index.objects.series,
               org.opencastproject.elasticsearch.index.objects.theme
             </Export-Package>
-            <!--Service-Component>
-            <Service-Component-->
           </instructions>
         </configuration>
       </plugin>
