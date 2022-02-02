@@ -161,26 +161,6 @@ public final class XmlWorkflowParser {
   }
 
   /**
-   * Loads workflow statistics from the given input stream.
-   *
-   * @param in
-   *          the input streamapplication/v1.7.0+json
-   * @return the workflow statistics
-   * @throws WorkflowParsingException
-   *           if creating the workflow statistics fails
-   */
-  public static WorkflowStatistics parseWorkflowStatistics(InputStream in) throws WorkflowParsingException {
-    try {
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowStatistics.class).getValue();
-    } catch (Exception e) {
-      throw new WorkflowParsingException(e);
-    } finally {
-      IoSupport.closeQuietly(in);
-    }
-  }
-
-  /**
    * Loads a set of workflow instances from the given input stream.
    *
    * @param in
