@@ -76,7 +76,6 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -85,7 +84,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -109,25 +107,10 @@ public class HoldStateTest {
   private ResumableTestWorkflowOperationHandler holdingOperationHandler;
   private Property property = null;
 
-  private File sRoot = null;
-
   private AccessControlList acl = new AccessControlList();
-
-  protected static final String getStorageRoot() {
-    return "." + File.separator + "target" + File.separator + System.currentTimeMillis();
-  }
 
   @Before
   public void setUp() throws Exception {
-    // always start with a fresh solr root directory
-    sRoot = new File(getStorageRoot());
-    try {
-      FileUtils.deleteDirectory(sRoot);
-      FileUtils.forceMkdir(sRoot);
-    } catch (IOException e) {
-      Assert.fail(e.getMessage());
-    }
-
     MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(new File("target/test-classes")));
     InputStream is = CountWorkflowsTest.class.getResourceAsStream("/mediapackage-1.xml");

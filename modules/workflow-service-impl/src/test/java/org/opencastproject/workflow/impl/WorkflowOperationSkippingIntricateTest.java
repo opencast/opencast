@@ -78,14 +78,12 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -107,19 +105,8 @@ public final class WorkflowOperationSkippingIntricateTest {
 
   private AccessControlList acl = new AccessControlList();
 
-  private static String getStorageRoot() {
-    return "." + File.separator + "target" + File.separator + System.currentTimeMillis();
-  }
-
   @Before
   public void setUp() throws Exception {
-    File sRoot = new File(getStorageRoot());
-    try {
-      FileUtils.forceMkdir(sRoot);
-    } catch (IOException e) {
-      Assert.fail(e.getMessage());
-    }
-
     // create operation handlers for our workflows
     SucceedingWorkflowOperationHandler succeedingOperationHandler = new SucceedingWorkflowOperationHandler(
             mediapackage1);

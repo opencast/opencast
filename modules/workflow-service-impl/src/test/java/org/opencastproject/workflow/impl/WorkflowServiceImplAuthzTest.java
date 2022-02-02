@@ -61,13 +61,11 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,12 +94,6 @@ public class WorkflowServiceImplAuthzTest {
   private Workspace workspace = null;
   private ServiceRegistryInMemoryImpl serviceRegistry = null;
   private SecurityService securityService = null;
-
-  private File sRoot = null;
-
-  protected static final String getStorageRoot() {
-    return "." + File.separator + "target" + File.separator + System.currentTimeMillis();
-  }
 
   private static class Responder<A> implements IAnswer<A> {
     private A response;
@@ -242,9 +234,6 @@ public class WorkflowServiceImplAuthzTest {
     service.setPersistence(workflowDb);
 
     // Search Index
-    sRoot = new File(getStorageRoot());
-    FileUtils.forceMkdir(sRoot);
-
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
 
     final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
