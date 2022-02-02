@@ -288,7 +288,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     final User currentUser = securityService.getUser();
     final Organization currentOrganization = securityService.getOrganization();
     for (final WorkflowListener listener : listeners) {
-      if (oldWorkflowInstance == null || oldWorkflowInstance.getState() != newWorkflowInstance.getState()) {
+      if (oldWorkflowInstance == null || !oldWorkflowInstance.getState().equals(newWorkflowInstance.getState())) {
         Runnable runnable = () -> {
           try {
             securityService.setUser(currentUser);
