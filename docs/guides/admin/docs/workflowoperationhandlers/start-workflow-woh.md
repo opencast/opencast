@@ -20,7 +20,7 @@ The StartWorkflowWorkflowOperationHandler can be used to start a new workflow fo
 <operation id="start-workflow">
   <configurations>
     <configuration key="workflow-definition">fast</configuration>
-    <configuration key="media-packages">${duplicate\_media\_package\_ids}</configuration>
+    <configuration key="media-packages">${duplicate_media_package_ids}</configuration>
     <configuration key="key">value</configuration>
     <configuration key="publish">true</configuration>
   </configurations>
