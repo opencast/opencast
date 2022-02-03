@@ -391,7 +391,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
         }
 
         // Create and add new episode dublin core with changed title
-      newMp = copyDublinCore(mediaPackage, originalEpisodeDc[0],
+        newMp = copyDublinCore(mediaPackage, originalEpisodeDc[0],
               newMp, series, removeTags, addTags, overrideTags,
               temporaryFiles, startDate);
 
