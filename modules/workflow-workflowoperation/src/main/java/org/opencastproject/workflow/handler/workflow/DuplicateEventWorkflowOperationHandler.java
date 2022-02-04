@@ -323,8 +323,9 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
           + originalEpisodeDc.length + " episode dublin cores while it is expected to have exactly 1. Aborting.");
     }
 
+    String mpIds = "";
+    String sep = "";
     Map<String, String> properties = new HashMap<>();
-
     for (int i = 0; i < numberOfEvents; i++) {
       final List<URI> temporaryFiles = new ArrayList<>();
       MediaPackage newMp = null;
@@ -385,12 +386,15 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
         // Store media package ID as workflow property
         properties.put("duplicate_media_package_" + (i + 1) + "_id", newMp.getIdentifier().toString());
+        mpIds += sep + newMp.getIdentifier().toString();
+        sep = ", ";
       } catch (IOException | MediaPackageException e) {
         throw new WorkflowOperationException(e);
       } finally {
         cleanup(temporaryFiles, Optional.ofNullable(newMp));
       }
     }
+    properties.put("duplicate_media_package_ids", mpIds);
     return createResult(mediaPackage, properties, Action.CONTINUE, 0);
   }
 
