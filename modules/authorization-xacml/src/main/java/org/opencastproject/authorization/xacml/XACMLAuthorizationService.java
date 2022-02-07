@@ -138,30 +138,10 @@ public class XACMLAuthorizationService implements AuthorizationService {
     // Start with the requested scope but fall back to the less specific scope if it does not exist.
     // The order is: episode -> series -> general (deprecated) -> global
     if (AclScope.Episode.equals(scope) || AclScope.Merged.equals(scope)) {
-      for (Attachment xacml : mp.getAttachments(XACML_POLICY_EPISODE)) {
-        URI uri = xacml.getURI();
-        try {
-          if (serializer != null) {
-            uri = serializer.decodeURI(uri);
-          }
-        } catch (URISyntaxException e) {
-          logger.warn("URI {} syntax error, skip decoding", uri);
-        }
-        episode = loadAcl(uri);
-      }
+      episode = getAclByFlavor(mp, XACML_POLICY_EPISODE);
     }
     if (Arrays.asList(AclScope.Episode, AclScope.Series, AclScope.Merged).contains(scope)) {
-      for (Attachment xacml : mp.getAttachments(XACML_POLICY_SERIES)) {
-        URI uri = xacml.getURI();
-        try {
-          if (serializer != null) {
-            uri = serializer.decodeURI(uri);
-          }
-        } catch (URISyntaxException e) {
-          logger.warn("URI {} syntax error, skip decoding", uri);
-        }
-        series = loadAcl(uri);
-      }
+      series = getAclByFlavor(mp, XACML_POLICY_SERIES);
     }
 
     if (episode.isPresent() && series.isPresent()) {
@@ -189,6 +169,22 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
     logger.debug("Falling back to global default ACL");
     return tuple(new AccessControlList(), AclScope.Global);
+  }
+
+  private Optional<AccessControlList> getAclByFlavor(MediaPackage mp, MediaPackageElementFlavor xacmlPolicyFlavor) {
+    Optional<AccessControlList> acl = Optional.empty();
+    for (Attachment xacml : mp.getAttachments(xacmlPolicyFlavor)) {
+      URI uri = xacml.getURI();
+      try {
+        if (serializer != null) {
+          uri = serializer.decodeURI(uri);
+        }
+      } catch (URISyntaxException e) {
+        logger.warn("URI {} syntax error, skip decoding", uri);
+      }
+      acl = loadAcl(uri);
+    }
+    return acl;
   }
 
   @Override
