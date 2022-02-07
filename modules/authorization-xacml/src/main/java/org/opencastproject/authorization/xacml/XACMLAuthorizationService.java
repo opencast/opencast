@@ -45,7 +45,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -60,8 +59,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -73,9 +70,9 @@ import javax.xml.bind.JAXBException;
     property = {
         "service.description=Provides translation between access control entries and xacml documents"
     },
-    service = { AuthorizationService.class, ManagedService.class }
+    service = { AuthorizationService.class }
 )
-public class XACMLAuthorizationService implements AuthorizationService, ManagedService {
+public class XACMLAuthorizationService implements AuthorizationService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(XACMLAuthorizationService.class);
@@ -102,30 +99,17 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   }
 
   @Activate
-  public void activate(ComponentContext cc) {
-    updated(cc.getProperties());
-  }
-
   @Modified
-  public void modified(Map<String, Object> config) {
-    // this prevents the service from restarting on configuration updated.
-    // updated() will handle the configuration update.
-  }
+  public void activate(ComponentContext cc) {
+    var properties = cc.getProperties();
 
-  @Reference(cardinality = ReferenceCardinality.OPTIONAL)
-  public void setMediaPackageSerializer(MediaPackageSerializer serializer) {
-    this.serializer = serializer;
-  }
-
-  @Override
-  public synchronized void updated(Dictionary<String, ?> properties) {
     if (properties == null) {
       mergeMode = MergeMode.OVERRIDE;
       logger.debug("Merge mode set to {}", mergeMode);
       return;
     }
     final String mode = StringUtils.defaultIfBlank((String) properties.get(CONFIG_MERGE_MODE),
-            MergeMode.OVERRIDE.toString());
+        MergeMode.OVERRIDE.toString());
     try {
       mergeMode = MergeMode.valueOf(mode.toUpperCase());
     } catch (IllegalArgumentException e) {
@@ -133,6 +117,11 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
       mergeMode = MergeMode.OVERRIDE;
     }
     logger.debug("Merge mode set to {}", mergeMode);
+  }
+
+  @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+  public void setMediaPackageSerializer(MediaPackageSerializer serializer) {
+    this.serializer = serializer;
   }
 
   @Override
