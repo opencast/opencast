@@ -15,8 +15,8 @@ Parameter Table
 
 |configuration keys|description                                                                      |
 |------------------|---------------------------------------------------------------------------------|
-|sorce-flavors     |Comma separated list of flavors to select tracks to rename
-|sorce-flavor      |Same as `sorce-flavors` but can only select a single flavor
+|source-flavors     |Comma separated list of flavors to select tracks to rename
+|source-flavor      |Same as `source-flavors` but can only select a single flavor
 |name-pattern      |Pattern to use for renaming the media files
 
 
