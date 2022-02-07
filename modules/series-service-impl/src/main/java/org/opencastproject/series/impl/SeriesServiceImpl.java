@@ -39,7 +39,7 @@ import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.message.broker.api.series.SeriesItem;
-import org.opencastproject.message.broker.api.update.ISeriesUpdateHandler;
+import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -83,7 +83,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -128,7 +127,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
   private AclServiceFactory aclServiceFactory;
 
-  private ArrayList<ISeriesUpdateHandler> updateHandlers = new ArrayList<>();
+  private ArrayList<SeriesUpdateHandler> updateHandlers = new ArrayList<>();
 
   /** OSGi callback for setting index. */
   @Reference
@@ -160,11 +159,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       cardinality = ReferenceCardinality.MULTIPLE,
       unbind = "removeMessageHandler"
   )
-  public void addMessageHandler(ISeriesUpdateHandler handler) {
+  public void addMessageHandler(SeriesUpdateHandler handler) {
     this.updateHandlers.add(handler);
   }
 
-  public void removeMessageHandler(ISeriesUpdateHandler handler) {
+  public void removeMessageHandler(SeriesUpdateHandler handler) {
     this.updateHandlers.remove(handler);
   }
 
@@ -664,7 +663,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   private void triggerEventHandlers(SeriesItem item) {
-    for (ISeriesUpdateHandler handler : updateHandlers) {
+    for (SeriesUpdateHandler handler : updateHandlers) {
       handler.execute(item);
     }
   }

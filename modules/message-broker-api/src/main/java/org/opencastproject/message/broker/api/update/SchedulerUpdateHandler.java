@@ -23,6 +23,6 @@ package org.opencastproject.message.broker.api.update;
 
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 
-public interface ISchedulerUpdateHandler {
+public interface SchedulerUpdateHandler {
   void execute(String mpId, SchedulerItem schedulerItem);
 }

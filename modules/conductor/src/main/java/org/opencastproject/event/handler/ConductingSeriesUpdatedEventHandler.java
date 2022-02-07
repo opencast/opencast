@@ -22,7 +22,7 @@
 package org.opencastproject.event.handler;
 
 import org.opencastproject.message.broker.api.series.SeriesItem;
-import org.opencastproject.message.broker.api.update.ISeriesUpdateHandler;
+import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * Very simple approach to serialize the work of all three dependend update handlers. Todo: Merge all handlers into one
  * to avoid unnecessary distribution updates etc.
  */
-public class ConductingSeriesUpdatedEventHandler implements ISeriesUpdateHandler {
+public class ConductingSeriesUpdatedEventHandler implements SeriesUpdateHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(ConductingSeriesUpdatedEventHandler.class);
 

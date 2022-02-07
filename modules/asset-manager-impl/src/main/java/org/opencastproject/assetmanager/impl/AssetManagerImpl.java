@@ -79,7 +79,7 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
-import org.opencastproject.message.broker.api.update.IAssetManagerUpdateHandler;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -171,7 +171,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
-  private ArrayList<IAssetManagerUpdateHandler> handlers = new ArrayList<>();
+  private ArrayList<AssetManagerUpdateHandler> handlers = new ArrayList<>();
 
   private SecurityService securityService;
   private AuthorizationService authorizationService;
@@ -249,11 +249,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeEventHandler"
   )
-  public void addEventHandler(IAssetManagerUpdateHandler handler) {
+  public void addEventHandler(AssetManagerUpdateHandler handler) {
     this.handlers.add(handler);
   }
 
-  public void removeEventHandler(IAssetManagerUpdateHandler handler) {
+  public void removeEventHandler(AssetManagerUpdateHandler handler) {
     this.handlers.remove(handler);
   }
 
@@ -1454,7 +1454,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   public void fireEventHandlers(AssetManagerItem item) {
-    for (IAssetManagerUpdateHandler handler : handlers) {
+    for (AssetManagerUpdateHandler handler : handlers) {
       handler.execute(item);
     }
   }

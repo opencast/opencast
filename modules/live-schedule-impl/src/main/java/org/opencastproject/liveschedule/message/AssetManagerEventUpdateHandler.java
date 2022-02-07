@@ -25,7 +25,7 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteEpisode;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
-import org.opencastproject.message.broker.api.update.IAssetManagerUpdateHandler;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -36,14 +36,14 @@ import org.slf4j.LoggerFactory;
 
 @Component(
     immediate = true,
-    service = { UpdateHandler.class, IAssetManagerUpdateHandler.class },
+    service = { UpdateHandler.class, AssetManagerUpdateHandler.class },
     property = {
         "service.description=Asset Manager Update Listener for Live Schedule Service"
     }
 )
-public class AssetManagerUpdateHandler extends UpdateHandler implements IAssetManagerUpdateHandler {
+public class AssetManagerEventUpdateHandler extends UpdateHandler implements AssetManagerUpdateHandler {
 
-  private static final Logger logger = LoggerFactory.getLogger(AssetManagerUpdateHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(AssetManagerEventUpdateHandler.class);
 
   @Activate
   @Override

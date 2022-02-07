@@ -22,7 +22,7 @@ package org.opencastproject.liveschedule.message;
 
 import org.opencastproject.liveschedule.api.LiveScheduleService;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
-import org.opencastproject.message.broker.api.update.ISchedulerUpdateHandler;
+import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -42,14 +42,14 @@ import java.util.Map;
 
 @Component(
     immediate = true,
-    service = { UpdateHandler.class, ISchedulerUpdateHandler.class },
+    service = { UpdateHandler.class, SchedulerUpdateHandler.class },
     property = {
         "service.description=Scheduler Update Listener for Live Schedule Service"
     }
 )
-public class SchedulerUpdateHandler extends UpdateHandler implements ISchedulerUpdateHandler {
+public class SchedulerEventUpdateHandler extends UpdateHandler implements SchedulerUpdateHandler {
 
-  private static final Logger logger = LoggerFactory.getLogger(SchedulerUpdateHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(SchedulerEventUpdateHandler.class);
 
   protected SchedulerService schedulerService;
 

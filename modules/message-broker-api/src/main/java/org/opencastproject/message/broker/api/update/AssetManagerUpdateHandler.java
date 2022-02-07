@@ -21,8 +21,8 @@
 
 package org.opencastproject.message.broker.api.update;
 
-import org.opencastproject.message.broker.api.series.SeriesItem;
+import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 
-public interface ISeriesUpdateHandler {
-  void execute(SeriesItem seriesItem);
+public interface AssetManagerUpdateHandler {
+  void execute(AssetManagerItem messageItem);
 }

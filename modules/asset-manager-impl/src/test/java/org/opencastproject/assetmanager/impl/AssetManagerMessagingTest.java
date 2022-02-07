@@ -27,7 +27,7 @@ import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteEpisode;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteSnapshot;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
-import org.opencastproject.message.broker.api.update.IAssetManagerUpdateHandler;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 
 import com.entwinemedia.fn.Fx;
 import com.entwinemedia.fn.data.Opt;
@@ -42,11 +42,11 @@ import java.io.Serializable;
  * Test message sending via the AM.
  */
 public class AssetManagerMessagingTest extends AssetManagerTestBase {
-  private IAssetManagerUpdateHandler handler;
+  private AssetManagerUpdateHandler handler;
 
   @Override
   public AssetManagerImpl makeAssetManager() throws Exception {
-    handler = EasyMock.createMock(IAssetManagerUpdateHandler.class);
+    handler = EasyMock.createMock(AssetManagerUpdateHandler.class);
 
     AssetManagerImpl am = super.makeAssetManager();
     am.addEventHandler(handler);
@@ -158,7 +158,7 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
   }
 
   private void expectObjectMessage(
-          final IAssetManagerUpdateHandler handler,
+          final AssetManagerUpdateHandler handler,
           final Class<? extends Serializable> messageType,
           final int times) {
     if (times > 0) {

@@ -65,7 +65,7 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
-import org.opencastproject.message.broker.api.update.ISchedulerUpdateHandler;
+import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -237,7 +237,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /** The list of registered event catalog UI adapters */
   private List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
-  private List<ISchedulerUpdateHandler> schedulerUpdateHandlers = new ArrayList<>();
+  private List<SchedulerUpdateHandler> schedulerUpdateHandlers = new ArrayList<>();
 
   /** The system user name */
   private String systemUserName;
@@ -254,11 +254,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       policy = ReferencePolicy.DYNAMIC,
       unbind = "removeSchedulerUpdateHandler"
   )
-  public void addSchedulerUpdateHandler(ISchedulerUpdateHandler handler) {
+  public void addSchedulerUpdateHandler(SchedulerUpdateHandler handler) {
     this.schedulerUpdateHandlers.add(handler);
   }
 
-  public void removeSchedulerUpdateHandler(ISchedulerUpdateHandler handler) {
+  public void removeSchedulerUpdateHandler(SchedulerUpdateHandler handler) {
     this.schedulerUpdateHandlers.remove(handler);
   }
 
@@ -330,7 +330,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private void sendSchedulerUpdate(SchedulerItemList list) {
     for (SchedulerItem item : list.getItems()) {
       String mpId = list.getId();
-      for (ISchedulerUpdateHandler handler : this.schedulerUpdateHandlers) {
+      for (SchedulerUpdateHandler handler : this.schedulerUpdateHandlers) {
         handler.execute(mpId, item);
       }
     }

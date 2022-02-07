@@ -22,7 +22,7 @@
 package org.opencastproject.event.handler;
 
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
-import org.opencastproject.message.broker.api.update.IAssetManagerUpdateHandler;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This handler listens for changes to episodes. Whenever a change is done, this is propagated to OAI-PMH.
  */
-public class ConductingEpisodeUpdatedEventHandler implements IAssetManagerUpdateHandler {
+public class ConductingEpisodeUpdatedEventHandler implements AssetManagerUpdateHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(ConductingEpisodeUpdatedEventHandler.class);
 
