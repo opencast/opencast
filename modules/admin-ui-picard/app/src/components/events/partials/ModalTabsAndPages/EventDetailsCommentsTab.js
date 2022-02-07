@@ -117,10 +117,12 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                             <p>{ comment.text }</p>
 
                                             {/* links with performable actions for the comment */}
-                                            <a onClick={() => deleteComment(comment)}
-                                               className="delete">
-                                                {t('EVENTS.EVENTS.DETAILS.COMMENTS.DELETE')}
-                                            </a>
+                                            {hasAccess("ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE", user) && (
+                                                <a onClick={() => deleteComment(comment)}
+                                                   className="delete">
+                                                    {t('EVENTS.EVENTS.DETAILS.COMMENTS.DELETE')}
+                                                </a>
+                                            )}
                                             {hasAccess("ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY", user) && (
                                                 <a onClick={() => replyTo(comment, key) /* enters reply mode */}
                                                    className="reply">

@@ -15,7 +15,8 @@ const ModalNavigation = ({ tabInformation, page, openTab, user }) => {
         <nav className="modal-nav" id="modal-nav">
             {tabInformation.map((tab, key) => (
                 hasAccess(tab.accessRole, user) && (
-                    <a className={cn({active: page === key})}
+                    <a key={key}
+                       className={cn({active: page === key})}
                        onClick={() => openTab(key)}>
                         {t(tab.tabTranslation)}
                     </a>

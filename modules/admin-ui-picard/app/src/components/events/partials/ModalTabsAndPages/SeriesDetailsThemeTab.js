@@ -44,11 +44,11 @@ const SeriesDetailsThemeTab = ({ theme, seriesId, themeNames, updateTheme, user 
                                         <ul>
                                             <li>
                                                 <p>{t('EVENTS.SERIES.NEW.THEME.DESCRIPTION.TEXT')}</p>
-                                                {themeNames.length > 0
-                                                && hasAccess("ROLE_UI_SERIES_DETAILS_THEMES_EDIT", user) && (
+                                                {themeNames.length > 0 && (
                                                     <p>
                                                         <Field name="theme"
                                                                as="select"
+                                                               disabled={!hasAccess("ROLE_UI_SERIES_DETAILS_THEMES_EDIT", user)}
                                                                style={{width: '100%'}}>
                                                             <option value={theme}>{theme}</option>
                                                             {themeNames.map((theme, key) => (

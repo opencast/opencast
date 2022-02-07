@@ -180,7 +180,7 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                             </div>
 
                             {/* 'Workflow configuration' table */}
-                            {hasAccess("ROLE_ADMIN") && (
+                            {hasAccess("ROLE_ADMIN", user) && (
                                 <div className="obj tbl-details">
                                     <header>
                                         {t("EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION") /* Workflow configuration */ }

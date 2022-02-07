@@ -198,9 +198,9 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                             <header>{t(header)/* Access Policy */}</header>
 
                                             {/* policy templates */}
-                                            <div className="obj-container">
-                                                <div className="obj tbl-list">
-                                                    {hasAccess(editAccessRole, user) && (
+                                            {hasAccess(editAccessRole, user) && (
+                                                <div className="obj-container">
+                                                    <div className="obj tbl-list">
                                                         <table className="main-tbl">
                                                             <thead>
                                                             <tr>
@@ -256,9 +256,9 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                             </tr>
                                                             </tbody>
                                                         </table>
-                                                    )}
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
 
                                             {/* list of policy details and interface for changing them */}
                                             <div className="obj-container">
@@ -309,6 +309,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                                                style={{width: '360px'}}
                                                                                                name={`policies.${index}.role`}
                                                                                                as="select"
+                                                                                               disabled={!hasAccess(editAccessRole, user)}
                                                                                                onChange={role => replace(index, {...policy, role:role.target.value})}
                                                                                         >
                                                                                             { (roles && roles.length > 0) && (
@@ -344,28 +345,26 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                                 </td>
 
                                                                                 {/* Checkboxes for policy.read and policy.write */}
-                                                                                {hasAccess(editAccessRole, user) && (
-                                                                                    <>
-                                                                                        <td className="fit text-center">
-                                                                                            <Field type="checkbox"
-                                                                                                   name={`policies.${index}.read`}
-                                                                                                   disabled={ transactions.read_only }
-                                                                                                   className={`${transactions.read_only ?
-                                                                                                       "disabled" : "false"}`}
-                                                                                                   onChange={ (read) => replace(index, {...policy, read: read.target.checked})}
-                                                                                            />
-                                                                                        </td>
-                                                                                        <td className="fit text-center">
-                                                                                            <Field type="checkbox"
-                                                                                                   name={`policies.${index}.write`}
-                                                                                                   disabled={ transactions.read_only }
-                                                                                                   className={`${transactions.read_only ?
-                                                                                                       "disabled" : "false"}`}
-                                                                                                   onChange={ (write) => replace(index, {...policy, write: write.target.checked})}
-                                                                                            />
-                                                                                        </td>
-                                                                                    </>
-                                                                                )}
+                                                                                <td className="fit text-center">
+                                                                                    <Field type="checkbox"
+                                                                                           name={`policies.${index}.read`}
+                                                                                           disabled={ transactions.read_only || !hasAccess(editAccessRole, user)}
+                                                                                           className={`${transactions.read_only ?
+                                                                                               "disabled" : "false"}`}
+                                                                                           onChange={ (read) => replace(index, {...policy, read: read.target.checked})}
+                                                                                    />
+                                                                                </td>
+                                                                                <td className="fit text-center">
+                                                                                    <Field type="checkbox"
+                                                                                           name={`policies.${index}.write`}
+                                                                                           disabled={ transactions.read_only || !hasAccess(editAccessRole, user)}
+                                                                                           className={`${transactions.read_only ?
+                                                                                               "disabled" : "false"}`}
+                                                                                           onChange={ (write) => replace(index, {...policy, write: write.target.checked})}
+                                                                                    />
+                                                                                </td>
+
+
 
                                                                                 {/* Multi value field for policy.actions (additional actions) */}
                                                                                 { hasActions && (

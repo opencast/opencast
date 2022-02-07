@@ -234,30 +234,32 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                                                 component={RenderMultiField}/>
                                                                                                         </div>
                                                                                                     </td>
-                                                                                                    ) : (hasAccess("ROLE_UI_SERIES_DETAILS_ACL_EDIT'", user) ? (
-                                                                                                    <td className="fit editable">
-                                                                                                        <div>
-                                                                                                            <Field
-                                                                                                                name={`acls.${index}.actions`}
-                                                                                                                fieldInfo={
-                                                                                                                    {
-                                                                                                                        id: `acls.${index}.actions`,
-                                                                                                                        type: 'mixed_text',
-                                                                                                                        collection: aclActions
-                                                                                                                    }
-                                                                                                                }
-                                                                                                                onlyCollectionValues
-                                                                                                                component={RenderMultiField}/>
-                                                                                                        </div>
-                                                                                                    </td>
-                                                                                                ) : (
-                                                                                                    <td className="fit">
-                                                                                                        {/*repeat for each additional action*/}
-                                                                                                        {aclActions.map((action, key) => (
-                                                                                                            <div key={key}>{action}</div>
-                                                                                                        ))}
-                                                                                                    </td>
-                                                                                                ))
+                                                                                                    ) : (
+                                                                                                        hasAccess("ROLE_UI_SERIES_DETAILS_ACL_EDIT", user) ? (
+                                                                                                            <td className="fit editable">
+                                                                                                                <div>
+                                                                                                                    <Field
+                                                                                                                        name={`acls.${index}.actions`}
+                                                                                                                        fieldInfo={
+                                                                                                                            {
+                                                                                                                                id: `acls.${index}.actions`,
+                                                                                                                                type: 'mixed_text',
+                                                                                                                                collection: aclActions
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                        onlyCollectionValues
+                                                                                                                        component={RenderMultiField}/>
+                                                                                                                </div>
+                                                                                                            </td>
+                                                                                                        ) : (
+                                                                                                            <td className="fit">
+                                                                                                                {/*repeat for each additional action*/}
+                                                                                                                {formik.values.acls[index].actions.map((action, key) => (
+                                                                                                                    <div key={key}>{action.value}</div>
+                                                                                                                ))}
+                                                                                                            </td>
+                                                                                                        )
+                                                                                                )
 
                                                                                             )}
                                                                                             {/*Remove policy*/}

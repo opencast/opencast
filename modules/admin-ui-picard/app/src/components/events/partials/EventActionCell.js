@@ -69,10 +69,11 @@ const EventActionCell = ({ row, deleteEvent, user })  => {
                                eventId={row.id} />
 
             {/* Open event details */}
-            {hasAccess("ROLE_UI_EVENTS_DETAILS_VIEW", user)}
-            <a onClick={() => onClickEventDetails()}
-               className="more"
-               title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DETAILS')}/>
+            {hasAccess("ROLE_UI_EVENTS_DETAILS_VIEW", user) && (
+                <a onClick={() => onClickEventDetails()}
+                   className="more"
+                   title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DETAILS')}/>
+            )}
 
             {/* If event belongs to a series then the corresponding series details can be opened */}
             {(!!row.series && hasAccess("ROLE_UI_SERIES_DETAILS_VIEW", user)) && (
