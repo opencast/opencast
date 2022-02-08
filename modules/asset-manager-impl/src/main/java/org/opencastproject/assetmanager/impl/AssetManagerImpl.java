@@ -141,6 +141,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -171,7 +172,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
-  private ArrayList<AssetManagerUpdateHandler> handlers = new ArrayList<>();
+  private ArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
   private SecurityService securityService;
   private AuthorizationService authorizationService;
