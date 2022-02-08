@@ -895,6 +895,13 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
+  public void unsetDownloadDistributionService(DownloadDistributionService service) {
+    if (distributionServiceType.equalsIgnoreCase(service.getDistributionType())
+        && downloadDistributionService.equals(service)) {
+      this.downloadDistributionService = null;
+    }
+  }
+
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
