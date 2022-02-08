@@ -163,12 +163,12 @@ public class Ingestor implements Runnable {
                   try {
                     title = matcher.group("title");
                   } catch (IllegalArgumentException e) {
-                    logger.debug("{} matches no title in {}", metadataPattern.get(), artifact.getName(), e);
+                    logger.debug("{} matches no 'title' in {}", metadataPattern.get(), artifact.getName(), e);
                   }
                   try {
                     dcc.add(DublinCore.PROPERTY_SPATIAL, matcher.group("spatial"));
                   } catch (IllegalArgumentException e) {
-                    logger.debug("{} matches no spatial in {}", metadataPattern.get(), artifact.getName(), e);
+                    logger.debug("{} matches no 'spatial' in {}", metadataPattern.get(), artifact.getName(), e);
                   }
                   try {
                     var value = matcher.group("created");
@@ -179,7 +179,7 @@ public class Ingestor implements Runnable {
                   } catch (DateTimeParseException e) {
                     logger.warn("Matched date does not match configured date-time format", e);
                   } catch (IllegalArgumentException e) {
-                    logger.debug("{} matches no spatial in {}", metadataPattern, artifact.getName(), e);
+                    logger.debug("{} matches no 'created' in {}", metadataPattern.get(), artifact.getName(), e);
                   }
                 } else {
                   logger.debug("Regular expression {} does not match {}", metadataPattern.get(), artifact.getName());
