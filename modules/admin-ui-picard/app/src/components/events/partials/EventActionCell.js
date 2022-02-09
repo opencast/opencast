@@ -4,6 +4,7 @@ import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteEvent} from "../../../thunks/eventThunks";
 import {connect} from "react-redux";
 import EventDetailsModal from "./modals/EventDetailsModal";
+import EmbeddingCodeModal from "./modals/EmbeddingCodeModal";
 
 
 
@@ -16,7 +17,8 @@ const EventActionCell = ({ row, deleteEvent })  => {
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
     const [displayEventDetailsModal, setEventDetailsModal] = useState(false);
-    const [eventDetailsTabIndex, setEventDetailsTabIndex] = useState(0)
+    const [eventDetailsTabIndex, setEventDetailsTabIndex] = useState(0);
+    const [displayEmbeddingCodeModal, setEmbeddingCodeModal] = useState(false);
 
     const hideDeleteConfirmation = () => {
         setDeleteConfirmation(false);
@@ -26,7 +28,13 @@ const EventActionCell = ({ row, deleteEvent })  => {
         deleteEvent(id);
     };
 
-    
+    const hideEmbeddingCodeModal = () => {
+        setEmbeddingCodeModal(false);
+    };
+
+    const showEmbeddingCodeModal = () => {
+        setEmbeddingCodeModal(true);
+    };
 
     const showEventDetailsModal = () => {
         setEventDetailsModal(true);
@@ -145,9 +153,14 @@ const EventActionCell = ({ row, deleteEvent })  => {
 
            {/* Open dialog for embedded code*/}
            {/*todo: with-role ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW*/}
-           <a onClick={() => onClickEmbeddedCode()}
+           <a onClick={() => showEmbeddingCodeModal()}
               title={t('EVENTS.EVENTS.TABLE.TOOLTIP.EMBEDDING_CODE')}
               className="fa fa-link"/>
+
+            {displayEmbeddingCodeModal && (
+                <EmbeddingCodeModal close={hideEmbeddingCodeModal}
+                                    eventId={row.id}/>
+            )}
         </>
     );
 }
@@ -155,11 +168,6 @@ const EventActionCell = ({ row, deleteEvent })  => {
 //todo: implement!
 const onClickSeriesDetails = () => {
     console.log("Should open series-details.");
-}
-
-//todo: implement!
-const onClickEmbeddedCode = () => {
-    console.log("Should open dialog for embedded code.");
 }
 
 // Mapping actions to dispatch
