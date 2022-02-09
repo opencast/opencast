@@ -63,11 +63,8 @@ The option affects the `org.opencastproject.userdirectory.ldap.roleattributes` a
 Opencast 9.2 came with a [completely new system for securing static file content](configuration/serving-static-files.md)
 which is now active by default in Opencast 10. If you are deferring the file access authorization to another system
 using Opencast's [security token mechanism](configuration/stream-security.md), you need to deactivate this protection
-in:
+in `etc/org.opencastproject.fsresources.StaticResourceServlet.cfg`.
 
-```
-etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
-
-The [ILIAS plugin](https://github.com/fluxapps/OpenCast), for example, does not authenticate users against Opencast.     
-If you are using that plugin, this is why you probably want to disable this feature and make your media publically       
+The [ILIAS plugin](https://github.com/fluxapps/OpenCast), for example, does not authenticate users against Opencast.
+If you are using that plugin, this is why you probably want to disable this feature and make your media publically
 accessable.
