@@ -9,6 +9,11 @@ Description
 The rename files operation allows you to rename media files using different metadata.
 This can be used to, for example, generate human readable names for downloads.
 
+<div class=warn>
+    The operation will only rename, not convert files.
+    Make sure your pattern contains a valid file extension.
+    You can use `#{file.extension}` to keep the old extension.
+</div>
 
 Parameter Table
 ---------------
