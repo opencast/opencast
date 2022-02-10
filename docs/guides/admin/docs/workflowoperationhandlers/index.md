@@ -79,6 +79,7 @@ The following table contains the workflow operations that are available in an ou
 |publish-engage      |Distribute and publish media to the engage player              |[Documentation](publish-engage-woh.md)|
 |publish-oaipmh      |Distribute and publish media to a OAI-PMH repository           |[Documentation](publish-oaipmh-woh.md)|
 |publish-youtube     |Distribute and publish media to YouTube                        |[Documentation](publish-youtube-woh.md)|
+|rename-files        |Rename media files using metadata                              |[Documentation](rename-files-woh.md)|
 |republish-oaipmh    |Update media in a OAI-PMH repository                           |[Documentation](republish-oaipmh-woh.md)|
 |retract-aws         |Retracts media from AWS S3 and Cloudfront publication          |[Documentation](retract-aws-woh.md)|
 |retract-configure   |Retracts media from configured publication                     |[Documentation](retract-configure-woh.md)|
