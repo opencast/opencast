@@ -1,0 +1,9 @@
+Dropping MySQL Support
+----------------------
+
+Due to the lack of usage and thus testing, we decided to drop the official support of Opencast for MySQL databases.
+Please use MariaDB or PostegreSQL instead.
+
+This does not mean that Opencast will stop working with MySQL immediately,
+but we like to highlight that developers are not spending any time on testing this,
+nor do we provide any configuration examples or support if additional steps may be necessary.
