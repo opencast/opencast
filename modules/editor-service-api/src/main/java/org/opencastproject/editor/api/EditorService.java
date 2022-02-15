@@ -36,7 +36,17 @@ public interface EditorService {
   /**
    * Provide information to edit video and audio data relevant to the given mediaPackageId
    */
-  EditingData getEditData(String mediaPackageId) throws EditorServiceException, UnauthorizedException;
+  EditingData getEditData(String mediaPackageId)
+          throws EditorServiceException, UnauthorizedException;
+
+  void lockMediaPackage(String mediaPackageId, LockData lockData) throws EditorServiceException;
+
+    /**
+   * renew the editor lock for the given mediaPackageId
+   */
+  void refreshMediaPackageLock(String mediaPackageId) throws EditorServiceException;
+
+  void releaseMediaPackageLock(String mediaPackageId) throws EditorServiceException;
 
   /**
    * Store information about edited data relevant to the given mediaPackageId

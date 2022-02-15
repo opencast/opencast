@@ -34,6 +34,7 @@ import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.EditorService;
 import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
+import org.opencastproject.editor.api.LockData;
 import org.opencastproject.editor.api.SegmentData;
 import org.opencastproject.editor.api.TrackData;
 import org.opencastproject.editor.api.TrackSubData;
@@ -136,6 +137,26 @@ public class EditorServiceImpl implements EditorService {
   /** Tag that marks workflow for being used from the editor tool */
   private static final String EDITOR_WORKFLOW_TAG = "editor";
 
+  private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
+  private static final String DEFAULT_PREVIEW_TAG = "editor";
+  private static final String DEFAULT_SMIL_CATALOG_FLAVOR = "smil/cutting";
+  private static final String DEFAULT_SMIL_CATALOG_TAGS = "archive";
+  private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
+  private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
+  private static final int DEFAULT_LOCK_TIMEOUT_SECONDS = 300; // ( 5 mins )
+  private static final int DEFAULT_LOCK_REFRESH_SECONDS = 60;  // ( 1 min )
+
+  public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
+  public static final String OPT_PREVIEW_TAG = "preview.tag";
+  public static final String OPT_SMIL_CATALOG_FLAVOR = "smil.catalog.flavor";
+  public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
+  public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
+  public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
+  public static final String OPT_LOCK_ENABLED = "lock.enable";
+  public static final String OPT_LOCK_TIMEOUT = "lock.release.after.seconds";
+  public static final String OPT_LOCK_REFRESH = "lock.refresh.after.seconds";
+
+  private static EditorLock editorLock;
 
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
@@ -156,23 +177,12 @@ public class EditorServiceImpl implements EditorService {
   private String previewVideoSubtype;
   private String previewTag;
   private String previewSubtype;
+  private Boolean lockingActive;
+  private int lockRefresh = DEFAULT_LOCK_REFRESH_SECONDS;
+  private int lockTimeout = DEFAULT_LOCK_TIMEOUT_SECONDS;
   private MediaPackageElementFlavor smilSilenceFlavor;
   private ElasticsearchIndex searchIndex;
 
-  private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
-  private static final String DEFAULT_PREVIEW_TAG = "editor";
-  private static final String DEFAULT_SMIL_CATALOG_FLAVOR = "smil/cutting";
-  private static final String DEFAULT_SMIL_CATALOG_TAGS = "archive";
-  private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
-  private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
-
-  public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
-  public static final String OPT_PREVIEW_TAG = "preview.tag";
-  public static final String OPT_SMIL_CATALOG_FLAVOR = "smil.catalog.flavor";
-  public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
-  public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
-
-  public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
 
   private final Set<String> smilCatalogTagSet = new HashSet<>();
 
@@ -283,7 +293,27 @@ public class EditorServiceImpl implements EditorService {
 
     // Preview Video subtype
     previewVideoSubtype =  Objects.toString(properties.get(OPT_PREVIEW_VIDEO_SUBTYPE), DEFAULT_PREVIEW_VIDEO_SUBTYPE);
+
     logger.debug("Preview video subtype set to '{}'", previewVideoSubtype);
+
+    lockingActive = Boolean.parseBoolean(StringUtils.trimToEmpty((String) properties.get(OPT_LOCK_ENABLED)));
+
+    try {
+      lockTimeout = Integer.parseUnsignedInt(
+           Objects.toString(properties.get(OPT_LOCK_TIMEOUT)));
+    } catch (NumberFormatException e) {
+      logger.warn("Configuration {} contains invalid value", OPT_LOCK_TIMEOUT);
+    }
+
+    try {
+      lockRefresh = Integer.parseUnsignedInt(
+            Objects.toString(properties.get(OPT_LOCK_REFRESH)));
+    } catch (NumberFormatException e) {
+      logger.warn("Configuration {} contains invalid value", OPT_LOCK_REFRESH);
+    }
+
+    editorLock = new EditorLock(lockTimeout);
+
   }
 
   private Boolean elementHasPreviewTag(MediaPackageElement element) {
@@ -630,6 +660,28 @@ public class EditorServiceImpl implements EditorService {
   }
 
   @Override
+  public void lockMediaPackage(final String mediaPackageId, LockData lData) throws EditorServiceException {
+    LockData lockData = null;
+    if (editorLock.isLocked(mediaPackageId)) {
+      lockData = editorLock.getLockData(mediaPackageId);
+      String lockMessage = "MediaPackage " + mediaPackageId + lockData.toString();
+      throw new EditorServiceException(lockMessage,ErrorStatus.MEDIAPACKAGE_LOCKED_BY_USER);
+    }
+    editorLock.lock(mediaPackageId, lData);
+  }
+
+  @Override
+  public void refreshMediaPackageLock(final String mediaPackageId) throws EditorServiceException {
+    editorLock.refresh(mediaPackageId);
+  }
+
+  @Override
+  public void releaseMediaPackageLock(final String mediaPackageId) throws EditorServiceException {
+    editorLock.unlock(mediaPackageId);
+  }
+
+
+  @Override
   public EditingData getEditData(final String mediaPackageId) throws EditorServiceException, UnauthorizedException {
 
     Event event = getEvent(mediaPackageId);
@@ -703,7 +755,7 @@ public class EditorServiceImpl implements EditorService {
     }).collect(Collectors.toList());
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName(), workflowActive);
+            event.getSeriesId(), event.getSeriesName(), workflowActive, lockingActive, lockRefresh);
   }
 
 

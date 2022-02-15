@@ -21,6 +21,8 @@
 
 package org.opencastproject.editor.api;
 
+import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
@@ -40,6 +42,7 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -85,6 +88,69 @@ public abstract class EditorRestEndpointBase {
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).entity("No write access to this event.").build();
     }
+  }
+
+  @POST
+  @Path("{mediaPackageId}/editorLock")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "lockMediapackage",
+          description = "creates and updates the lock for a mediapackage in the editor",
+          returnDescription = "",
+          pathParameters = {
+            @RestParameter(name = "mediaPackageId", description = "The id of the media package", isRequired = true,
+                    type = RestParameter.Type.STRING)
+          },
+          responses = {
+            @RestResponse(description = "Lock Refreshed", responseCode = SC_OK),
+            @RestResponse(description = "Mediapackage Lock created", responseCode = SC_CREATED),
+            @RestResponse(description = "Mediapackage locked", responseCode = SC_CONFLICT),
+            @RestResponse(description = "Lock not found", responseCode = SC_NOT_FOUND)
+          })
+  public Response lockMediapackage(@PathParam("mediaPackageId") final String mediaPackageId,
+          @Context HttpServletRequest request) {
+    String details = null;
+    try {
+      details = readInputStream(request);
+      logger.debug("Editor POST-Request received: {}", details);
+      LockData lockInfo = LockData.parse(details);
+      if (lockInfo.isRefresh()) {
+        editorService.refreshMediaPackageLock(mediaPackageId);
+        return RestUtil.R.ok("Lock Refreshed");
+      } else {
+        editorService.lockMediaPackage(mediaPackageId, lockInfo);
+      }
+    } catch (EditorServiceException e) {
+      return checkErrorState(mediaPackageId, e);
+    } catch (Exception e) {
+      logger.debug("Unable to parse Lock information ({})", details, e);
+      return RestUtil.R.badRequest("Unable to parse details");
+    }
+
+    return RestUtil.R.ok();
+  }
+
+  @DELETE
+  @Path("{mediaPackageId}/editorLock")
+  @RestQuery(name = "unlockMediapackage",
+          description = "releases the lock for a mediapackage in the editor",
+          returnDescription = "",
+          pathParameters = {
+            @RestParameter(name = "mediaPackageId", description = "The id of the media package", isRequired = true,
+                    type = RestParameter.Type.STRING)
+          },
+          responses = {
+            @RestResponse(description = "Lock Deleted", responseCode = SC_OK),
+            @RestResponse(description = "Lock not found", responseCode = SC_NOT_FOUND)
+          })
+
+  public Response unlockMediapackage(@PathParam("mediaPackageId") final String mediaPackageId) {
+    try {
+      editorService.releaseMediaPackageLock(mediaPackageId);
+    } catch (EditorServiceException e) {
+      logger.warn("No Lock information found for Mediapackage: {}", mediaPackageId);
+      return RestUtil.R.notFound(String.format("No Lock information found for Mediapackage: '{%s}' ", mediaPackageId));
+    }
+    return RestUtil.R.ok();
   }
 
   @POST
@@ -156,6 +222,8 @@ public abstract class EditorRestEndpointBase {
     switch (e.getErrorStatus()) {
       case MEDIAPACKAGE_NOT_FOUND:
         return RestUtil.R.notFound(String.format("Event '{%s}' not Found", eventId), MediaType.TEXT_PLAIN_TYPE);
+      case MEDIAPACKAGE_LOCKED_BY_USER:
+        return RestUtil.R.conflict(String.format("Media package '{%s}' is {%s}", eventId, e.getMessage()));
       case WORKFLOW_ACTIVE:
         return RestUtil.R.locked();
       case WORKFLOW_NOT_FOUND:

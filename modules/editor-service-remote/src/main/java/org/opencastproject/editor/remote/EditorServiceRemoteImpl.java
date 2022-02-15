@@ -24,6 +24,7 @@ import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.EditorService;
 import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
+import org.opencastproject.editor.api.LockData;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -31,6 +32,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -53,6 +55,7 @@ import java.io.UnsupportedEncodingException;
 public class EditorServiceRemoteImpl extends RemoteBase implements EditorService {
   private static final Logger logger = LoggerFactory.getLogger(EditorServiceRemoteImpl.class);
   public static final String EDIT_SUFFIX = "/edit.json";
+  public static final String LOCK_SUFFIX = "/editorLock";
   public static final String METADATA_SUFFIX = "/metadata.json";
 
   /**
@@ -63,7 +66,8 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
   }
 
   @Override
-  public EditingData getEditData(String mediaPackageId) throws EditorServiceException {
+  public EditingData getEditData(String mediaPackageId)
+          throws EditorServiceException {
     return EditingData.parse(doGetForMediaPackage(mediaPackageId, EDIT_SUFFIX));
   }
 
@@ -82,13 +86,54 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
     doPostForMediaPackage(mediaPackageId, METADATA_SUFFIX, metadata);
   }
 
+  @Override
+  public void lockMediaPackage(String mediaPackageId, LockData lockData) throws EditorServiceException {
+    doPostForMediaPackage(mediaPackageId, LOCK_SUFFIX, lockData.toJSONString());
+  }
+
+    /**
+   * renew the editor lock for the given mediaPackageId
+   */
+  @Override
+  public void refreshMediaPackageLock(String mediaPackageId) throws EditorServiceException {
+    LockData lockData = new LockData("","","",true);
+    doPostForMediaPackage(mediaPackageId, LOCK_SUFFIX, lockData.toJSONString());
+  }
+
+  @Override
+  public void releaseMediaPackageLock(String mediaPackageId) throws EditorServiceException {
+    doDeleteForMediaPackage(mediaPackageId, LOCK_SUFFIX);
+  }
+
+  protected String doDeleteForMediaPackage(String mediaPackageId, final String urlSuffix)
+          throws EditorServiceException {
+    logger.debug("Editor Remote Lock POST Request for mediaPackage : '{}'", mediaPackageId);
+    HttpDelete delete = new HttpDelete(mediaPackageId + urlSuffix);
+    HttpResponse response = null;
+    try {
+      response = getResponse(delete, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND, HttpStatus.SC_BAD_REQUEST);
+      if (response == null || response.getStatusLine() == null) {
+        throw new EditorServiceException("No response for setEditData", ErrorStatus.UNKNOWN);
+      }
+      if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+        evaluateResponseCode(response);
+      }
+      return null;
+    } catch (Exception e) {
+      throw new EditorServiceException("Editor Remote call failed", ErrorStatus.UNKNOWN, e);
+    } finally {
+      closeConnection(response);
+    }
+  }
+
   protected String doGetForMediaPackage(final String mediaPackageId, final String urlSuffix)
           throws EditorServiceException {
     logger.debug("Editor Remote GET Request for mediaPackage: '{}' to url: '{}'", mediaPackageId, urlSuffix);
     HttpGet get = new HttpGet(mediaPackageId + urlSuffix);
     HttpResponse response = null;
     try {
-      response = getResponse(get, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND, HttpStatus.SC_BAD_REQUEST);
+      response = getResponse(get, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND,
+        HttpStatus.SC_BAD_REQUEST, HttpStatus.SC_CONFLICT);
       if (response == null || response.getStatusLine() == null) {
         throw new EditorServiceException("HTTP Request failed", ErrorStatus.UNKNOWN);
       }
@@ -137,6 +182,8 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
     switch (response.getStatusLine().getStatusCode()) {
       case HttpStatus.SC_NOT_FOUND:
         throw new EditorServiceException("MediaPackage not found", ErrorStatus.MEDIAPACKAGE_NOT_FOUND);
+      case HttpStatus.SC_CONFLICT:
+        throw new EditorServiceException(response.getEntity().toString(), ErrorStatus.MEDIAPACKAGE_LOCKED_BY_USER);
       case HttpStatus.SC_BAD_REQUEST:
         throw new EditorServiceException("Request invalid", ErrorStatus.UNKNOWN);
       default:

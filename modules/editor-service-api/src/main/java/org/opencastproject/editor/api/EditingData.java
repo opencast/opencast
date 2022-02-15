@@ -36,6 +36,8 @@ import java.util.List;
  */
 public final class EditingData {
   public static final String WORKFLOW_ACTIVE = "workflow_active";
+  public static final String LOCKING_ACTIVE = "locking_active";
+  public static final String LOCK_REFRESH = "lock_refresh";
   private final List<SegmentData> segments;
   private final List<WorkflowData> workflows;
   private final List<TrackData> tracks;
@@ -45,9 +47,14 @@ public final class EditingData {
   private final SeriesData series;
   @SerializedName(WORKFLOW_ACTIVE)
   private final Boolean workflowActive;
+  @SerializedName(LOCKING_ACTIVE)
+  private final Boolean lockingActive;
+  @SerializedName(LOCK_REFRESH)
+  private final Integer lockRefresh;
 
   public EditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows, Long duration,
-          String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive) {
+          String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive,
+          Boolean lockingActive, Integer lockRefresh) {
     this.segments = segments;
     this.tracks = tracks;
     this.workflows = workflows;
@@ -56,6 +63,8 @@ public final class EditingData {
     this.date = recordingStartDate;
     this.series = new SeriesData(seriesId, seriesName);
     this.workflowActive = workflowActive;
+    this.lockingActive = lockingActive;
+    this.lockRefresh = lockRefresh;
   }
 
   public static EditingData parse(String json) {
