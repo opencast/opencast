@@ -8,7 +8,7 @@ import {
 } from "../../../../selectors/eventDetailsSelectors";
 import {fetchWorkflowErrorDetails} from "../../../../thunks/eventDetailsThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
-import EventDetailsWorkflowDetailsHierarchyNavigation from "./EventDetailsWorkflowDetailsHierarchyNavigation";
+import EventDetailsTabHierarchyNavigation from "./EventDetailsTabHierarchyNavigation";
 
 
 /**
@@ -41,9 +41,11 @@ const EventDetailsWorkflowErrors =  ({ eventId, t, setHierarchy,
     return (
         <div className="modal-content">
             {/* Hierarchy navigation */}
-            <EventDetailsWorkflowDetailsHierarchyNavigation
+            <EventDetailsTabHierarchyNavigation
                 openSubTab={openSubTab}
                 hierarchyDepth={1}
+                translationKey0={"EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE"}
+                subTabArgument0={'workflow-details'}
                 translationKey1={"EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE"}
                 subTabArgument1={'errors-and-warnings'}
             />
