@@ -385,7 +385,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                                                                 />
                                                                                             </div>
                                                                                         )}
-                                                                                        {transactions.read_only && !hasAccess(editAccessRole, user) && (
+                                                                                        {(transactions.read_only || !hasAccess(editAccessRole, user)) && (
                                                                                             policy.actions.map((customAction, actionKey) => (
                                                                                                 <div key={actionKey}>
                                                                                                     {customAction}

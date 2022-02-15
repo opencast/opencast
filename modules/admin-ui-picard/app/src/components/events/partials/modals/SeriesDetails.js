@@ -74,14 +74,11 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, upd
                         {t(tabs[0].tabNameTranslation)}
                     </a>
                 )}
-                {
-                    tabs[1].hidden ?
-                        null : hasAccess(tabs[1].accessRole, user) &&
-                        <a className={cn({active: page === 1})}
-                           onClick={() => openTab(1)}>
-                            {t(tabs[1].tabNameTranslation)}
-                        </a>
-
+                {(!tabs[1].hidden && hasAccess(tabs[1].accessRole, user)) &&
+                    <a className={cn({active: page === 1})}
+                       onClick={() => openTab(1)}>
+                        {t(tabs[1].tabNameTranslation)}
+                    </a>
                 }
                 {hasAccess(tabs[2].accessRole, user) && (
                     <a className={cn({active: page === 2})}
@@ -95,14 +92,11 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, upd
                         {t(tabs[3].tabNameTranslation)}
                     </a>
                 )}
-                {
-                    tabs[4].hidden ?
-                        null : hasAccess(tabs[4].accessRole, user) &&
-                        <a className={cn({active: page === 4})}
-                           onClick={() => openTab(4)}>
-                            {t(tabs[4].tabNameTranslation)}
-                        </a>
-
+                {(!tabs[4].hidden && hasAccess(tabs[4].accessRole, user)) &&
+                    <a className={cn({active: page === 4})}
+                       onClick={() => openTab(4)}>
+                        {t(tabs[4].tabNameTranslation)}
+                    </a>
                 }
                 {feeds.length > 0 && (
                     <a className={cn({active: page === 5})}
@@ -120,7 +114,7 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, upd
                                         header={tabs[page].tabNameTranslation}
                                         buttonLabel='EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA'
                                         updateResource={updateSeries}
-                                        editAccessRole='ROLE_UI_EVENTS_DETAILS_METADATA_EDIT'/>
+                                        editAccessRole='ROLE_UI_SERIES_DETAILS_METADATA_EDIT'/>
                 )}
                 {page === 1 && (
                     <SeriesDetailsExtendedMetadataTab />

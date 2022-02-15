@@ -28,7 +28,7 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const isAccess = (isEdit && hasAccess("ROLE_UI_SERIES_DETAILS_ACL_EDIT", user)) || !isEdit;
+    const isAccess = (hasAccess("ROLE_UI_SERIES_DETAILS_ACL_EDIT", user)) || !isEdit;
 
     useEffect(() => {
         // fetch data about roles, acl templates and actions from backend
@@ -218,7 +218,7 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                                 <Field type="checkbox" name={`acls.${index}.write`}/>
                                                                                             </td>
                                                                                             {aclActions.length > 0 && (
-                                                                                                !isEdit ? (
+                                                                                                isAccess ? (
                                                                                                     <td className="fit editable">
                                                                                                         <div>
                                                                                                             <Field
@@ -235,32 +235,13 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                                         </div>
                                                                                                     </td>
                                                                                                     ) : (
-                                                                                                        hasAccess("ROLE_UI_SERIES_DETAILS_ACL_EDIT", user) ? (
-                                                                                                            <td className="fit editable">
-                                                                                                                <div>
-                                                                                                                    <Field
-                                                                                                                        name={`acls.${index}.actions`}
-                                                                                                                        fieldInfo={
-                                                                                                                            {
-                                                                                                                                id: `acls.${index}.actions`,
-                                                                                                                                type: 'mixed_text',
-                                                                                                                                collection: aclActions
-                                                                                                                            }
-                                                                                                                        }
-                                                                                                                        onlyCollectionValues
-                                                                                                                        component={RenderMultiField}/>
-                                                                                                                </div>
-                                                                                                            </td>
-                                                                                                        ) : (
-                                                                                                            <td className="fit">
-                                                                                                                {/*repeat for each additional action*/}
-                                                                                                                {formik.values.acls[index].actions.map((action, key) => (
-                                                                                                                    <div key={key}>{action.value}</div>
-                                                                                                                ))}
-                                                                                                            </td>
+                                                                                                        <td className="fit">
+                                                                                                            {/*repeat for each additional action*/}
+                                                                                                            {formik.values.acls[index].actions.map((action, key) => (
+                                                                                                                <div key={key}>{action.value}</div>
+                                                                                                            ))}
+                                                                                                        </td>
                                                                                                         )
-                                                                                                )
-
                                                                                             )}
                                                                                             {/*Remove policy*/}
                                                                                             {isAccess && (
@@ -277,7 +258,7 @@ const AclAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                                 </tr>
                                                                             )}
 
-                                                                            {hasAccess("ROLE_UI_SERIES_DETAILS_ACL_EDIT'", user) && (
+                                                                            {isAccess && (
                                                                                 <tr>
                                                                                     {/*Add additional policy row*/}
                                                                                     <td colSpan="5">

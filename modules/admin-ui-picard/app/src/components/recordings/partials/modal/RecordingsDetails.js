@@ -6,7 +6,6 @@ import ConfigurationDetailsTab from "../wizards/ConfigurationDetailsTab";
 import CapabilitiesDetailsTab from "../wizards/CapabilitiesDetailsTab";
 import {getRecordingDetails} from "../../../../selectors/recordingDetailsSelectors";
 import ModalNavigation from "../../../shared/modals/ModalNavigation";
-import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 
 /**
  * This component manages the pages of the recording details

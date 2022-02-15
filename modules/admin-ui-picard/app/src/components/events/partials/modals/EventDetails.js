@@ -114,13 +114,11 @@ const EventDetails = ({ tabIndex, eventId, close,
                         {t(tabs[0].tabNameTranslation)}
                     </a>
                 )}
-                {
-                    tabs[1].hidden ?
-                        null : hasAccess(tabs[1].accessRole, user) &&
-                        <a className={cn({active: page === 1})}
-                              onClick={() => openTab(1)}>
-                            {t(tabs[1].tabNameTranslation)}
-                        </a>
+                {(!tabs[1].hidden && hasAccess(tabs[1].accessRole, user)) &&
+                    <a className={cn({active: page === 1})}
+                          onClick={() => openTab(1)}>
+                        {t(tabs[1].tabNameTranslation)}
+                    </a>
                 }
                 {hasAccess(tabs[2].accessRole, user) && (
                     <a className={cn({active: page === 2})}
@@ -134,13 +132,11 @@ const EventDetails = ({ tabIndex, eventId, close,
                         {t(tabs[3].tabNameTranslation)}
                     </a>
                 )}
-                {
-                    tabs[4].hidden ?
-                        null : hasAccess(tabs[4].accessRole, user) &&
-                        <a className={cn({active: page === 4})}
-                              onClick={() => openTab(4)}>
-                            {t(tabs[4].tabNameTranslation)}
-                </a>
+                {(tabs[4].hidden && hasAccess(tabs[4].accessRole, user)) &&
+                    <a className={cn({active: page === 4})}
+                          onClick={() => openTab(4)}>
+                        {t(tabs[4].tabNameTranslation)}
+                    </a>
                 }
                 {hasAccess(tabs[5].accessRole, user) && (
                     <a className={cn({active: page === 5})}
@@ -161,13 +157,11 @@ const EventDetails = ({ tabIndex, eventId, close,
                     </a>
                 )}
 
-                {
-                    tabs[8].hidden ?
-                        null : hasAccess(tabs[8].accessRole, user) &&
-                        <a className={cn({active: page === 8})}
-                              onClick={() => openTab(8)}>
-                            {t(tabs[8].tabNameTranslation)}
-                        </a>
+                {(!tabs[8].hidden && hasAccess(tabs[8].accessRole, user)) &&
+                    <a className={cn({active: page === 8})}
+                          onClick={() => openTab(8)}>
+                        {t(tabs[8].tabNameTranslation)}
+                    </a>
                 }
             </nav>
             {/* Initialize overall modal */}

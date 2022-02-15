@@ -4,10 +4,13 @@ import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 import {
     loadAclsIntoTable,
-    loadEventsIntoTable, loadGroupsIntoTable,
+    loadEventsIntoTable,
+    loadGroupsIntoTable,
     loadJobsIntoTable,
     loadRecordingsIntoTable,
-    loadSeriesIntoTable, loadServersIntoTable, loadServicesIntoTable,
+    loadSeriesIntoTable,
+    loadServersIntoTable,
+    loadServicesIntoTable,
     loadThemesIntoTable,
     loadUsersIntoTable
 } from "../../thunks/tableThunks";

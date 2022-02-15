@@ -50,7 +50,6 @@ const UsersActionCell = ({ row, deleteUser, fetchUserDetails, user }) => {
             )}
 
             {(row.manageable && hasAccess("ROLE_UI_USERS_DELETE", user)) && (
-                // TODO: with-Role
                 <>
                     <a onClick={() => setDeleteConfirmation(true)}
                        className="remove"

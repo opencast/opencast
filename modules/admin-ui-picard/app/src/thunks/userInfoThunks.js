@@ -1,7 +1,6 @@
 import {loadUserInfoFailure, loadUserInfoInProgress, loadUserInfoSuccess} from "../actions/userInfoActions";
 import axios from "axios";
 import {logger} from "../utils/logger";
-import {getUserInformation} from "../selectors/userInfoSelectors";
 
 export const fetchUserInfo = () => async dispatch => {
     try {
