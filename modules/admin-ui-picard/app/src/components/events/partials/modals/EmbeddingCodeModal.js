@@ -35,19 +35,17 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
 
     const updateTextArea = e => {
         let frameSize = e.target ? e.target.textContent : e.toElement.textContent;
-        console.log(frameSize);
+
         let embedSizeButtons = document.getElementsByClassName("embedSizeButton");
-        console.log(embedSizeButtons);
+
 
         if (frameSize) {
             for (let i = 0; i < embedSizeButtons.length; i++) {
                 console.log(embedSizeButtons[i]);
                 console.log(embedSizeButtons[i].id)
                 if (frameSize === embedSizeButtons[i].id) {
-                    console.log("I'm here");
                     embedSizeButtons[i].classList.add("embedSizeButtonSelected");
                 } else {
-                    console.log("instead I'm here");
                     embedSizeButtons[i].classList.remove("embedSizeButtonSelected");
                 }
             }
