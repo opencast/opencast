@@ -38,6 +38,8 @@ import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +59,7 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.common.TextFormat;
+import io.prometheus.client.hotspot.DefaultExports;
 
 /**
  * Opencast metrics endpoint
@@ -122,11 +125,7 @@ public class MetricsExporter {
       .help("Version of Opencast (based on metrics module)")
       .labelNames("part")
       .register();
-  private final Gauge eventsInAssetManager = Gauge.build()
-      .name("opencast_asset_manager_events")
-      .help("Events in Asset Manager")
-      .labelNames("organization")
-      .register();
+  private Gauge eventsInAssetManager;
 
   /** OSGi services */
   private ServiceRegistry serviceRegistry;
@@ -138,6 +137,7 @@ public class MetricsExporter {
     final Version version = bundleContext.getBundle().getVersion();
     this.version.labels("major").set(version.getMajor());
     this.version.labels("minor").set(version.getMinor());
+    DefaultExports.initialize();
   }
 
   @GET
@@ -204,10 +204,12 @@ public class MetricsExporter {
     }
 
     // Get numbers from asset manager
-    for (Organization organization: organizationDirectoryService.getOrganizations()) {
-      eventsInAssetManager
-          .labels(organization.getId())
-          .set(assetManager.countEvents(organization.getId()));
+    if (assetManager != null) {
+      for (Organization organization: organizationDirectoryService.getOrganizations()) {
+        eventsInAssetManager
+            .labels(organization.getId())
+            .set(assetManager.countEvents(organization.getId()));
+      }
     }
 
     // collect metrics
@@ -226,8 +228,23 @@ public class MetricsExporter {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
-  @Reference
+  @Reference(
+      policy = ReferencePolicy.DYNAMIC,
+      cardinality = ReferenceCardinality.OPTIONAL,
+      unbind = "unsetAssetManager"
+  )
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
+    eventsInAssetManager = Gauge.build()
+        .name("opencast_asset_manager_events")
+        .help("Events in Asset Manager")
+        .labelNames("organization")
+        .register();
   }
+
+  public void unsetAssetManager(AssetManager assetManager) {
+    this.assetManager = null;
+    registry.unregister(eventsInAssetManager);
+  }
+
 }

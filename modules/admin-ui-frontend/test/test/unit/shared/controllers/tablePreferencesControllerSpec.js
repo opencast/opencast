@@ -50,7 +50,7 @@ describe('Table Preferences Controller', function () {
         $provide = _$provide_;
         $provide.value('$location', locationMock);
     }));
-    
+
     beforeEach(inject(function (_$rootScope_, _$controller_) {
         $controller = _$controller_;
         $scope = _$rootScope_.$new();
@@ -64,13 +64,6 @@ describe('Table Preferences Controller', function () {
             Storage = _Storage_;
             $controller('TablePreferencesCtrl', {$scope: $scope});
         }));
-
-        
-        it('defaults all columns to be active', function () {
-            angular.forEach(Table.columns, function (column) {
-                expect(column.deactivated).toBeFalsy();
-            });
-        });
 
         it('correctly subdivides the deactivated from the active columns', function () {
             expect($scope.deactivatedColumns.length).toEqual(0);

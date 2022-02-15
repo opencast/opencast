@@ -28,17 +28,22 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.ReadinessIndicator;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -48,6 +53,13 @@ import java.util.Properties;
 /**
  * Installs feeds matching "*.properties" in the feeds watch directory.
  */
+@Component(
+    immediate = true,
+    service = ArtifactInstaller.class,
+    property = {
+        "service.description=Feed Definition Scanner"
+    }
+)
 public class FeedRegistrationScanner implements ArtifactInstaller {
   public static final String FEED_CLASS = "feed.class";
   public static final String FEED_URI = "feed.uri";
@@ -72,11 +84,13 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
   private int sumInstalledFiles = 0;
 
   /** Sets the search service */
+  @Reference(name = "search-service-impl")
   public void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
   /** Sets the series service */
+  @Reference(name = "series-service-impl")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -87,6 +101,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
    * @param cc
    *          the component's context
    */
+  @Activate
   protected void activate(ComponentContext cc) {
     this.bundleContext = cc.getBundleContext();
   }
@@ -94,6 +109,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
   /**
    * Deactivates the component
    */
+  @Deactivate
   protected void deactivate() {
     this.bundleContext = null;
   }
@@ -117,12 +133,8 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
   public void install(File artifact) throws Exception {
     logger.info("Installing a feed from '{}'", artifact.getName());
     Properties props = new Properties();
-    FileInputStream in = null;
-    try {
-      in = new FileInputStream(artifact);
-      props.load(in);
-    } finally {
-      IOUtils.closeQuietly(in);
+    try (InputStreamReader reader = new InputStreamReader(new FileInputStream(artifact), StandardCharsets.UTF_8)) {
+      props.load(reader);
     }
     // Always include the server URL obtained from the bundle context
     props.put("org.opencastproject.server.url", bundleContext.getProperty("org.opencastproject.server.url"));

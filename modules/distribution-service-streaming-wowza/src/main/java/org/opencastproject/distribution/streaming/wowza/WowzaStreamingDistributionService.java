@@ -25,6 +25,7 @@ import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
+import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.AudioStream;
@@ -36,6 +37,10 @@ import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.TrackImpl.StreamingProtocol;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
@@ -43,6 +48,8 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.XmlSafeParser;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -52,6 +59,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentException;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
@@ -81,17 +92,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 /**
  * Distributes media to the local media delivery directory.
  */
+@Component(
+    immediate = true,
+    service = { DistributionService.class, StreamingDistributionService.class },
+    property = {
+        "service.description=Distribution Service (Streaming)",
+        "distribution.channel=streaming"
+    }
+)
 public class WowzaStreamingDistributionService extends AbstractDistributionService
         implements StreamingDistributionService {
 
@@ -200,11 +217,13 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     return DISTRIBUTION_TYPE;
   }
 
+  @Activate
   public void activate(BundleContext bundleContext, Map<String, Object> properties)
           throws ComponentException, ConfigurationException {
     modified(bundleContext, properties);
   }
 
+  @Modified
   public void modified(BundleContext bundleContext, Map<String, Object> properties)
           throws ComponentException, ConfigurationException {
 
@@ -233,7 +252,8 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
         try {
           Files.createDirectories(distributionDirectory.toPath());
         } catch (IOException e) {
-          throw new ComponentException("Distribution directory does not exist and can't be created", e);
+          throw new ComponentException("Distribution directory " + distributionDirectory
+              + " does not exist and can't be created", e);
         }
       }
 
@@ -591,8 +611,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
   private Document getSmilDocument(File smilFile) throws DistributionException {
     if (!smilFile.isFile()) {
       try {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+        DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
         Document doc = docBuilder.newDocument();
         Element smil = doc.createElement("smil");
         doc.appendChild(smil);
@@ -614,8 +633,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     }
 
     try {
-      DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+      DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
       Document doc = docBuilder.parse(smilFile);
 
       if (!"smil".equalsIgnoreCase(doc.getDocumentElement().getNodeName())) {
@@ -638,8 +656,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
   private void saveSmilFile(File smilFile, Document doc) throws DistributionException {
     try {
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      Transformer transformer = transformerFactory.newTransformer();
+      Transformer transformer = XmlSafeParser.newTransformerFactory().newTransformer();
       DOMSource source = new DOMSource(doc);
       StreamResult stream = new StreamResult(smilFile);
       transformer.transform(source, stream);
@@ -1119,4 +1136,35 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
   public File getDistributionDirectory() {
     return distributionDirectory;
   }
+
+  @Reference(name = "WORKSPACE")
+  @Override
+  public void setWorkspace(Workspace workspace) {
+    super.setWorkspace(workspace);
+  }
+
+  @Reference(name = "serviceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference(name = "security-service")
+  @Override
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
+  }
+
+  @Reference(name = "user-directory")
+  @Override
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    super.setUserDirectoryService(userDirectoryService);
+  }
+
+  @Reference(name = "orgDirectory")
+  @Override
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    super.setOrganizationDirectoryService(organizationDirectoryService);
+  }
+
 }

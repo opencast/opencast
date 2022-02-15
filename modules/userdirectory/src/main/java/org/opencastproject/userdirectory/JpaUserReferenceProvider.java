@@ -64,11 +64,11 @@ import javax.persistence.Query;
  * Manages and locates users references using JPA.
  */
 @Component(
-  property = {
-    "service.description=Provides a user reference directory"
-  },
-  immediate = true,
-  service = { UserProvider.class, RoleProvider.class, UserReferenceProvider.class }
+    property = {
+        "service.description=Provides a user reference directory"
+    },
+    immediate = true,
+    service = { UserProvider.class, RoleProvider.class, UserReferenceProvider.class }
 )
 public class JpaUserReferenceProvider implements UserReferenceProvider, UserProvider, RoleProvider {
 
@@ -196,8 +196,9 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    */
   @Override
   public Iterator<User> findUsers(String query, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
     String orgId = securityService.getOrganization().getId();
     List<User> users = new ArrayList<User>();
     for (JpaUserReference userRef : findUserReferencesByQuery(orgId, query, limit, offset, emf)) {
@@ -257,8 +258,9 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    */
   private User loadUser(String userName, String organization) {
     JpaUserReference userReference = findUserReference(userName, organization, emf);
-    if (userReference != null)
+    if (userReference != null) {
       return userReference.toUser(PROVIDER_NAME);
+    }
     return null;
   }
 
@@ -324,8 +326,9 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       if (tx.isActive()) {
         tx.rollback();
       }
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
     updateGroupMembership(user);
   }
@@ -356,8 +359,9 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       if (tx.isActive()) {
         tx.rollback();
       }
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
     updateGroupMembership(user);
   }
@@ -382,7 +386,11 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       }
     }
 
-    groupRoleProvider.updateGroupMembershipFromRoles(user.getUsername(), user.getOrganization().getId(), internalGroupRoles, "ROLE_GROUP_AAI_");
+    groupRoleProvider.updateGroupMembershipFromRoles(
+        user.getUsername(),
+        user.getOrganization().getId(),
+        internalGroupRoles
+    );
   }
 
   /**
@@ -420,8 +428,9 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -452,8 +461,9 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       q.setParameter("org", orgId);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -476,8 +486,9 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       q.setParameter("names", names);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -503,8 +514,9 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       q.setParameter("org", orgId);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -518,8 +530,9 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       q.setParameter("org", orgId);
       return ((Number) q.getSingleResult()).longValue();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 

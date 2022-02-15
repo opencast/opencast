@@ -37,6 +37,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
@@ -59,6 +62,14 @@ import javax.management.ObjectName;
 /**
  * LDAP implementation of the spring UserDetailsService, taking configuration information from the component context.
  */
+@Component(
+    immediate = true,
+    service = ManagedServiceFactory.class,
+    property = {
+        "service.pid=org.opencastproject.userdirectory.ldap",
+        "service.description=Provides ldap user directory instances"
+    }
+)
 public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /** The logger */
@@ -110,10 +121,12 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   private static final String GROUP_CHECK_PREFIX_KEY = "org.opencastproject.userdirectory.ldap.groupcheckprefix";
 
   /** Specifies, whether the roleattributes should be added as a role */
-  private static final String APPLY_ROLEATTRIBUTES_AS_ROLES_KEY = "org.opencastproject.userdirectory.ldap.roleattributes.applyasroles";
+  private static final String APPLY_ROLEATTRIBUTES_AS_ROLES_KEY
+      = "org.opencastproject.userdirectory.ldap.roleattributes.applyasroles";
 
   /** Specifies, whether the roleattributes should be added as a group */
-  private static final String APPLY_ROLEATTRIBUTES_AS_GROUPS_KEY = "org.opencastproject.userdirectory.ldap.roleattributes.applyasgroups";
+  private static final String APPLY_ROLEATTRIBUTES_AS_GROUPS_KEY
+      = "org.opencastproject.userdirectory.ldap.roleattributes.applyasgroups";
 
   /** The prefix of the keys, which map a ldap attribute to opencast roles */
   private static final String ATTRIBUTE_MAPPING_KEY_PREFIX = "org.opencastproject.userdirectory.ldap.map.";
@@ -158,16 +171,19 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   private SecurityService securityService;
 
   /** OSGi callback for setting the organization directory service. */
+  @Reference(name = "orgDirectory")
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
 
   /** OSGi callback for setting the role group service. */
+  @Reference(name = "groupRoleProvider")
   public void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
 
   /** OSGi callback for setting the security service. */
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -178,6 +194,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("Activate LdapUserProviderFactory");
     bundleContext = cc.getBundleContext();
@@ -394,10 +411,12 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
         }
       }
     } finally {
-      if (providerRegistration != null)
+      if (providerRegistration != null) {
         providerRegistration.unregister();
-      if (authoritiesPopulatorRegistration != null)
+      }
+      if (authoritiesPopulatorRegistration != null) {
         authoritiesPopulatorRegistration.unregister();
+      }
     }
   }
 

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -eux
+
+mkdir -p js
+npm ci
+cp -v node_modules/jquery/dist/jquery.min* js/
+cp -v node_modules/anchor-js/anchor.min.js js/
+cp -rv node_modules/bootstrap/dist/ js/bootstrap
+
+echo '$( document ).ready(function() {anchors.add();});' > js/docs.js

@@ -54,6 +54,7 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -61,6 +62,7 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -69,6 +71,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +95,15 @@ import java.util.stream.Collectors;
 /**
  * The workflow definition for handling "engage publication" operations
  */
+
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Engage Publication Workflow Handler",
+        "workflow.operation=publish-engage"
+    }
+)
 public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -140,6 +154,10 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param streamingDistributionService
    *          the streaming distribution service
    */
+  @Reference(
+      name = "StreamingDistributionService",
+      target = "(distribution.channel=streaming)"
+  )
   protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
@@ -150,6 +168,10 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param downloadDistributionService
    *          the download distribution service
    */
+  @Reference(
+      name = "DownloadDistributionService",
+      target = "(distribution.channel=download)"
+  )
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
@@ -161,12 +183,20 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param searchService
    *          an instance of the search service
    */
+  @Reference(name = "SearchService")
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
+  @Reference(name = "organizationDirectoryService")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   /** Supported streaming formats */
@@ -179,6 +209,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           TrackImpl.StreamingProtocol.SMOOTH));
 
   @Override
+  @Activate
   protected void activate(ComponentContext cc) {
     super.activate(cc);
     BundleContext bundleContext = cc.getBundleContext();
@@ -350,9 +381,16 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           // nothing to do here
         }
 
-        if (!isPublishable(mediaPackageForSearch)) {
-          throw new WorkflowOperationException("Media package does not meet criteria for publication");
+        // Check that the media package meets the criteria for publication
+        if (isBlank(mediaPackageForSearch.getTitle())) {
+          throw new WorkflowOperationException("Media package does not meet publication criteria: Missing title");
         }
+        if (!mediaPackageForSearch.hasTracks()) {
+          throw new WorkflowOperationException("Media package does not meet publication criteria: No tracks selected");
+        }
+
+        // Prepare published elements to be added
+        MediaPackageElement[] mediaPackageElements = mediaPackageForSearch.getElements();
 
         logger.info("Publishing media package {} to search index", mediaPackageForSearch);
 
@@ -375,6 +413,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         // Create new distribution element
         Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_ID,
                 engageUri, MimeTypes.parseMimeType("text/html"));
+
+        // Add published elements
+        for (MediaPackageElement element : mediaPackageElements) {
+          element.setIdentifier(null);
+          PublicationImpl.addElementToPublication(publicationElement, element);
+        }
+
         mediaPackage.add(publicationElement);
 
         // create publication URI for streaming
@@ -613,21 +658,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     }
   }
 
-  /** Media package must meet these criteria in order to be published. */
-  private boolean isPublishable(MediaPackage mp) {
-    boolean hasTitle = !isBlank(mp.getTitle());
-    if (!hasTitle) {
-      logger.warn("Media package does not meet criteria for publication: There is no title");
-    }
-
-    boolean hasTracks = mp.hasTracks();
-    if (!hasTracks) {
-      logger.warn("Media package does not meet criteria for publication: There are no tracks");
-    }
-
-    return hasTitle && hasTracks;
-  }
-
   protected MediaPackage getDistributedMediapackage(String mediaPackageID) throws WorkflowOperationException {
     MediaPackage mediaPackage = null;
     SearchQuery query = new SearchQuery().withId(mediaPackageID);
@@ -738,7 +768,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           }
         }
 
-        if (streamingDistributionService.publishToStreaming()) {
+        if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()) {
           for (MediaPackageElement element : distributedMediaPackage.getElements()) {
             Job retractStreamingJob
                 = streamingDistributionService.retract(CHANNEL_ID, distributedMediaPackage, element.getIdentifier());

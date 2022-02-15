@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -43,6 +43,11 @@
       <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -64,10 +69,6 @@
               org.opencastproject.list.query,
               org.opencastproject.list.util
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/list_providers_scanner.xml,
-              OSGI-INF/list_providers_service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

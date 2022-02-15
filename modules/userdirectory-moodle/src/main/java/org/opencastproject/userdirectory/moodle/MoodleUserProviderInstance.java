@@ -215,8 +215,9 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
    */
   @Override
   public float getCacheHitRatio() {
-    if (loadUserRequests.get() == 0)
+    if (loadUserRequests.get() == 0) {
       return 0;
+    }
     return (float) (loadUserRequests.get() - moodleWebServiceRequests.get()) / loadUserRequests.get();
   }
 
@@ -321,14 +322,17 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
    */
   @Override
   public Iterator<User> findUsers(String query, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
 
-    if (query.endsWith("%"))
+    if (query.endsWith("%")) {
       query = query.substring(0, query.length() - 1);
+    }
 
-    if (query.isEmpty())
+    if (query.isEmpty()) {
       return Collections.emptyIterator();
+    }
 
     // Check if user matches pattern
     try {
@@ -345,8 +349,9 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
     List<User> users = new LinkedList<>();
 
     User user = loadUser(query);
-    if (user != null)
+    if (user != null) {
       users.add(user);
+    }
 
     return users.iterator();
   }
@@ -394,14 +399,13 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
    * {@inheritDoc}
    * <p>
    * We search for COURSEID, COURSEID_Learner, COURSEID_Instructor
-   *
-   * @see org.opencastproject.security.api.RoleProvider#findRoles(java.lang.String, org.opencastproject.security.api.Role.Target, int, int)
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     // Don't return roles for users or groups
-    if (target == Role.Target.USER)
+    if (target == Role.Target.USER) {
       return Collections.emptyIterator();
+    }
 
     boolean exact = true;
     boolean ltirole = false;
@@ -411,8 +415,9 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
       query = query.substring(0, query.length() - 1);
     }
 
-    if (query.isEmpty())
+    if (query.isEmpty()) {
       return Collections.emptyIterator();
+    }
 
     // Verify query starts with prefix configured for this user provider instance
     if (!query.startsWith(contextRolePrefix)) {
@@ -421,10 +426,11 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
 
     // Verify that role name ends with LEARNER_ROLE_SUFFIX or INSTRUCTOR_ROLE_SUFFIX
     if (exact
-            && !query.endsWith("_" + LEARNER_ROLE_SUFFIX)
-            && !query.endsWith("_" + INSTRUCTOR_ROLE_SUFFIX)
-            && !query.endsWith("_" + GROUP_ROLE_SUFFIX))
+        && !query.endsWith("_" + LEARNER_ROLE_SUFFIX)
+        && !query.endsWith("_" + INSTRUCTOR_ROLE_SUFFIX)
+        && !query.endsWith("_" + GROUP_ROLE_SUFFIX)) {
       return Collections.emptyIterator();
+    }
 
     final String groupRolePrefix = contextRolePrefix + GROUP_ROLE_PREFIX;
     final boolean findGroupRole = groupRoles && query.startsWith(groupRolePrefix);
@@ -495,8 +501,9 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
 
     logger.debug("loadUserFromMoodle({})", username);
 
-    if (cache == null)
+    if (cache == null) {
       throw new IllegalStateException("The Moodle user detail service has not yet been configured");
+    }
 
     // Don't answer for admin, anonymous or empty user
     if (ignoredUsernames.contains(username)) {
@@ -526,7 +533,9 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
       // Load Roles
       List<String> courseIdsInstructor = client.toolOpencastGetCoursesForInstructor(username);
       List<String> courseIdsLearner = client.toolOpencastGetCoursesForLearner(username);
-      List<String> groupIdsLearner = groupRoles ? client.toolOpencastGetGroupsForLearner(username) : Collections.emptyList();
+      List<String> groupIdsLearner = groupRoles
+          ? client.toolOpencastGetGroupsForLearner(username)
+          : Collections.emptyList();
 
       // Create Opencast Objects
       Set<JaxbRole> roles = new HashSet<>();

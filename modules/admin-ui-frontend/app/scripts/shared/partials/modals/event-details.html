@@ -12,7 +12,7 @@
     <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
       <!-- Metadata -->
     </a>
-    <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
+    <a ng-if="extendedMetadataCatalogs.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
       <!-- Ext-Metadata -->
     </a>
 
@@ -86,6 +86,7 @@
 
   <div class="modal-content" data-modal-tab-content="metadata">
     <div class="modal-body">
+      <div data-admin-ng-notifications="" context="events-metadata-common"></div>
       <div data-admin-ng-notifications="" context="events-access"></div>
       <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
       <div class="full-col">
@@ -93,14 +94,14 @@
           <header><span translate="EVENTS.EVENTS.DETAILS.METADATA.CAPTION"><!-- Event details --></span></header>
           <div class="obj-container">
             <table class="main-tbl">
-              <tr ng-repeat="(idx, row) in episodeCatalog.fields">
+              <tr ng-repeat="(idx, row) in commonMetadataCatalog.fields">
                 <td>
                   <span translate="{{ row.label }}"></span>
                   <i ng-show="row.required" class="required">*</i>
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(episodeCatalog.flavor)"
+                    params="row" save="getMetadataChangedFunction(commonMetadataCatalog.flavor)"
                     sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
@@ -109,25 +110,34 @@
         </div>
       </div>
     </div>
+    <footer>
+      <a
+        class="submit"
+        ng-class="{disabled: metadata.locked || !unsavedChanges([commonMetadataCatalog])}"
+        ng-click="metadataSave([commonMetadataCatalog])">
+        {{ "SAVE" | translate}}
+      </a>
+    </footer>
   </div>
 
-  <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="metadata.entries.length > 0">
+  <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="extendedMetadataCatalogs.length > 0">
     <div class="modal-body">
+      <div data-admin-ng-notifications="" context="events-metadata-extended"></div>
       <div data-admin-ng-notifications="" context="events-access"></div>
       <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
       <div class="full-col">
-        <div class="obj tbl-details" ng-repeat="catalog in metadata.entries">
-          <header><span>{{ catalog.title | translate }}</span></header>
+        <div class="obj tbl-details" ng-repeat="extendedMetadataCatalog in extendedMetadataCatalogs">
+          <header><span>{{ extendedMetadataCatalog.title | translate }}</span></header>
           <div class="obj-container">
             <table class="main-tbl">
-              <tr ng-repeat="row in catalog.fields track by $index">
+              <tr ng-repeat="row in extendedMetadataCatalog.fields track by $index">
                 <td>
                   <span translate="{{ row.label }}"></span>
                   <i ng-show="row.required" class="required">*</i>
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(catalog.flavor)"
+                    params="row" save="getMetadataChangedFunction(extendedMetadataCatalog.flavor)"
                     sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
@@ -136,6 +146,14 @@
         </div>
       </div>
     </div>
+    <footer>
+      <a
+        class="submit"
+        ng-class="{disabled: metadata.locked || !unsavedChanges(extendedMetadataCatalogs)}"
+        ng-click="metadataSave(extendedMetadataCatalogs)">
+        {{ "SAVE" | translate}}
+      </a>
+    </footer>
   </div>
 
   <div class="modal-content" data-modal-tab-content="assets">
@@ -145,7 +163,7 @@
         <div class="obj tbl-container operations-tbl">
           <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CAPTION"><!-- Assets --></header>
           <div class="obj-container">
-            <table cellpadding="0" cellspacing="0" class="main-tbl">
+            <table class="main-tbl">
               <thead>
                 <tr>
                   <th translate="EVENTS.EVENTS.DETAILS.ASSETS.TYPE"><!-- Type --></th>
@@ -269,7 +287,7 @@
                           ng-change="onTemporalValueChange('start')"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                           ng-options="h.index as h.value for h in hours"
-                          />
+                          ></select>
                     <select chosen
                             ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                             data-width="'100px'"
@@ -277,7 +295,7 @@
                             ng-change="onTemporalValueChange('start')"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                             ng-options="m.index as m.value for m in minutes"
-                            />
+                            ></select>
                 </td>
                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                   {{ source.start.hour | addLeadingZeros : 2 }} : {{ source.start.minute | addLeadingZeros : 2}}
@@ -293,7 +311,7 @@
                           ng-change="onTemporalValueChange('duration')"
                           placeholder-text-single="'{{ 'WIZARD.DURATION.HOURS' | translate }}'"
                           ng-options="h.index as h.value for h in hours"
-                          />
+                          ></select>
 
                     <select chosen
                             ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
@@ -302,7 +320,7 @@
                             ng-change="onTemporalValueChange('duration')"
                             placeholder-text-single="'{{ 'WIZARD.DURATION.MINUTES' | translate }}'"
                             ng-options="m.index as m.value for m in minutes"
-                            />
+                            ></select>
                 </td>
                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                   {{ source.duration.hour | addLeadingZeros : 2 }} : {{ source.duration.minute | addLeadingZeros : 2}}
@@ -318,7 +336,7 @@
                           ng-change="onTemporalValueChange('end')"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                           ng-options="h.index as h.value for h in hours"
-                          />
+                          ></select>
                     <select chosen
                             ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                             data-width="'100px'"
@@ -326,16 +344,16 @@
                             ng-change="onTemporalValueChange('end')"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                             ng-options="m.index as m.value for m in minutes"
-                            />
+                            ></select>
                       <span ng-bind="source.end.date"
                             ng-show="source.end.date !== source.start.date"
-                            />
+                            ></span>
                 </td>
                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                   {{ source.end.hour | addLeadingZeros : 2 }} : {{ source.end.minute | addLeadingZeros : 2}}
                   <span ng-bind="source.end.date"
                         ng-show="source.end.date !== source.start.date"
-                        />
+                        ></span>
                 </td>
               </tr>
               <tr>
@@ -349,7 +367,7 @@
                           ng-model="source.device"
                           ng-options="ca.name for ca in captureAgents | filter:currentAgentOrAccess track by ca.id"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
-                          />
+                          ></select>
                 </td>
                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                   {{ source.device.name }}
@@ -474,7 +492,7 @@
                                     ng-options="w.id as w.title for w in workflowDefinitions | orderBy: 'displayOrder':true"
                                     placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}'"
                                     no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
-                                    />
+                                    ></select>
                               <div class="obj-container padded">{{ workflows.workflow.description }}</div>
                           </div>
                         </td>
@@ -499,7 +517,6 @@
                         <td>
                           <div class="obj-container padded">
                             <div id="event-workflow-configuration"
-                                 class="checkbox-container"
                                  ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT') || !hasCurrentAgentAccess()"
                                  ng-bind-html="workflowConfiguration"
                                  class="obj-container">
@@ -562,7 +579,7 @@
                                       ng-options="id as name for (id, name) in acls"
                                       placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                       no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                      />
+                                      ></select>
                             </div>
                             <p ng-show="transactions.read_only">{{baseAclId}}</p>
                           </div>
@@ -613,7 +630,7 @@
                                       call-on-search="getMatchingRoles"
                                       placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                       no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
-                                      />
+                                      ></select>
                             </td>
                             <td ng-show="transactions.read_only">
                               <p>{{policy.role}}</p>
@@ -956,7 +973,7 @@
         <div class="obj tbl-container operations-tbl">
           <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.CAPTION"><!-- Attachments --></header>
           <div class="obj-container">
-            <table cellpadding="0" cellspacing="0" class="main-tbl">
+            <table class="main-tbl">
               <thead>
                 <tr>
                   <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.ID"><!-- ID --></th>
@@ -995,7 +1012,7 @@
         <div class="obj tbl-container operations-tbl">
           <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.CAPTION"><!-- Catalogs --></header>
           <div class="obj-container">
-            <table cellpadding="0" cellspacing="0" class="main-tbl">
+            <table class="main-tbl">
               <thead>
                 <tr>
                   <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.ID"><!-- ID --></th>
@@ -1034,7 +1051,7 @@
         <div class="obj tbl-container operations-tbl">
           <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION"><!-- Media --></header>
           <div class="obj-container">
-            <table cellpadding="0" cellspacing="0" class="main-tbl">
+            <table class="main-tbl">
               <thead>
                 <tr>
                   <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.ID"><!-- ID --></th>
@@ -1073,7 +1090,7 @@
             <!-- Publications -->
           </header>
           <div class="obj-container">
-            <table cellpadding="0" cellspacing="0" class="main-tbl">
+            <table class="main-tbl">
               <thead>
                 <tr>
                   <th translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.ID"><!-- ID --></th>
@@ -1501,7 +1518,7 @@
                 <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTER"><!-- Submitter--></td>
                 <td>
                   {{ subNavData.creator.name }}
-                  <span ng-if="subNavData.creator.email">{{'<' + subNavData.creator.email + '>' }}</span>
+                  <span ng-if="subNavData.creator.email">{{'&lt;' + subNavData.creator.email + '&gt;' }}</span>
                 </td>
               </tr>
               <tr>

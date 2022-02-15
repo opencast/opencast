@@ -28,12 +28,25 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.SecurityService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component(
+    immediate = true,
+    service = ListProvidersService.class,
+    property = {
+        "service.description=Resources list providers service",
+        "opencast.service.type=org.opencastproject.list.api.ListProvidersService"
+    }
+)
 public class ListProvidersServiceImpl implements ListProvidersService {
 
   static final String ALL_ORGANIZATIONS = "*";
@@ -81,11 +94,18 @@ public class ListProvidersServiceImpl implements ListProvidersService {
   }
 
     /** OSGi callback for security service */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback for provider. */
+  @Reference(
+      name = "provider",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeProvider"
+  )
   public void addProvider(ResourceListProvider provider) {
     for (String listName : provider.getListNames()) {
       addProvider(listName, provider);

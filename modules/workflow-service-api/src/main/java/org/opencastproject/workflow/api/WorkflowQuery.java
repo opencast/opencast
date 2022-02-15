@@ -117,6 +117,20 @@ public class WorkflowQuery {
   }
 
   /**
+   * Limit results to workflow instances with active states.
+   *
+   * @return Reference to itself
+   */
+  public WorkflowQuery isActive() {
+    for (WorkflowState state: WorkflowState.values()) {
+      if (!state.isTerminated()) {
+        stateTerms.add(new QueryTerm(state.toString(), true));
+      }
+    }
+    return this;
+  }
+
+  /**
    * Limit results to workflow instances not in a specific state. This method overrides and will be overridden by future
    * calls to {@link #withState(WorkflowState)}
    *

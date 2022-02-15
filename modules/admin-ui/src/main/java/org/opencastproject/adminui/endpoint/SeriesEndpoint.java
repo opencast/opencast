@@ -42,6 +42,7 @@ import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.R.badRequest;
 import static org.opencastproject.util.RestUtil.R.conflict;
+import static org.opencastproject.util.RestUtil.R.forbidden;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
@@ -50,26 +51,26 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
-import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
-import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesIndexSchema;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.theme.IndexTheme;
-import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
+import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.resources.list.provider.SeriesListProvider;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
-import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
@@ -88,7 +89,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.OpencastConstants;
-import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -114,15 +114,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -152,7 +154,16 @@ import javax.ws.rs.core.Response.Status;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
-public class SeriesEndpoint implements ManagedService {
+@Component(
+        immediate = true,
+        service = SeriesEndpoint.class,
+        property = {
+                "service.description=Admin UI - SeriesEndpoint Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.SeriesEndpoint",
+                "opencast.service.path=/admin-ng/series",
+        }
+)
+public class SeriesEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesEndpoint.class);
 
@@ -176,37 +187,43 @@ public class SeriesEndpoint implements ManagedService {
   private AclServiceFactory aclServiceFactory;
   private IndexService indexService;
   private ListProvidersService listProvidersService;
-  private AdminUISearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
   /** Default server URL */
   private String serverUrl = "http://localhost:8080";
 
   /** OSGi callback for the series service. */
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi callback for the search index. */
-  public void setIndex(AdminUISearchIndex index) {
+  @Reference
+  public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }
 
   /** OSGi DI. */
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi callback for the list provider service */
+  @Reference
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
 
   /** OSGi callback for the security service */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback for the acl service factory */
+  @Reference
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
@@ -215,34 +232,39 @@ public class SeriesEndpoint implements ManagedService {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
-  protected void activate(ComponentContext cc) {
+  @Activate
+  protected void activate(ComponentContext cc, Map<String, Object> properties) {
     if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl != null)
         this.serverUrl = ccServerUrl;
+
+      modified(properties);
     }
     logger.info("Activate series endpoint");
   }
 
   /** OSGi callback if properties file is present */
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Modified
+  public void modified(Map<String, Object> properties) {
     if (properties == null) {
       logger.info("No configuration available, using defaults");
       return;
     }
 
-    Object dictionaryValue = properties.get(SERIES_HASEVENTS_DELETE_ALLOW_KEY);
-    if (dictionaryValue != null) {
-      deleteSeriesWithEventsAllowed = BooleanUtils.toBoolean(dictionaryValue.toString());
+    Object mapValue = properties.get(SERIES_HASEVENTS_DELETE_ALLOW_KEY);
+    if (mapValue != null) {
+      deleteSeriesWithEventsAllowed = BooleanUtils.toBoolean(mapValue.toString());
     }
 
-    dictionaryValue = properties.get(SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY);
-    onlySeriesWithWriteAccessSeriesTab = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
+    mapValue = properties.get(SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY);
+    onlySeriesWithWriteAccessSeriesTab = BooleanUtils.toBoolean(Objects.toString(mapValue, "true"));
 
-    dictionaryValue = properties.get(EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY);
-    onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
+    mapValue = properties.get(EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY);
+    onlySeriesWithWriteAccessEventsFilter = BooleanUtils.toBoolean(Objects.toString(mapValue, "true"));
+
+    logger.info("Configuration updated");
   }
 
   @GET
@@ -697,15 +719,6 @@ public class SeriesEndpoint implements ManagedService {
    *         depending on the parameter
    */
   public Map<String, String> getUserSeriesByAccess(boolean writeAccess) {
-    String listProviderName = null;
-    MetadataField seriesMetadataField = indexService.getCommonEventCatalogUIAdapter().getRawFields().getOutputFields()
-        .get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-    if (seriesMetadataField != null && StringUtils.isNotEmpty(seriesMetadataField.getListprovider())) {
-      listProviderName = seriesMetadataField.getListprovider();
-    }
-    if (StringUtils.isEmpty(listProviderName)) {
-      listProviderName = "SERIES";
-    }
     SeriesListQuery query = new SeriesListQuery();
     if (writeAccess) {
       query.withoutPermissions();
@@ -713,7 +726,7 @@ public class SeriesEndpoint implements ManagedService {
       query.withWritePermission(true);
     }
     try {
-      return listProvidersService.getList(listProviderName, query, true);
+      return listProvidersService.getList(SeriesListProvider.PROVIDER_PREFIX, query, true);
     } catch (ListProviderException e) {
       logger.warn("Could not perform search query.", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -941,7 +954,8 @@ public class SeriesEndpoint implements ManagedService {
           @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the given ACL"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error") })
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error"),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response applyAclToSeries(@PathParam("seriesId") String seriesId, @FormParam("acl") String acl,
           @DefaultValue("false") @FormParam("override") boolean override) throws SearchIndexException {
 
@@ -964,13 +978,14 @@ public class SeriesEndpoint implements ManagedService {
     }
 
     try {
-      if (getAclService().applyAclToSeries(seriesId, accessControlList, override))
-        return ok();
-      else {
-        logger.warn("Unable to find series '{}' to apply the ACL.", seriesId);
-        return notFound();
-      }
-    } catch (AclServiceException e) {
+      seriesService.updateAccessControl(seriesId, accessControlList, override);
+      return ok();
+    } catch (NotFoundException e) {
+      logger.warn("Unable to find series '{}' to apply the ACL.", seriesId);
+      return notFound();
+    } catch (UnauthorizedException e) {
+      return forbidden();
+    } catch (SeriesException e) {
       logger.error("Error applying acl to series {}", seriesId);
       return serverError();
     }

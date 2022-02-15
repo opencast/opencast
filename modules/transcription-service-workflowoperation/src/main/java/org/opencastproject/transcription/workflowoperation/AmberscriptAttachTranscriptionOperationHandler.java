@@ -23,19 +23,17 @@ package org.opencastproject.transcription.workflowoperation;
 import org.opencastproject.caption.api.CaptionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElementBuilder;
-import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
-import org.opencastproject.util.MimeType;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -43,17 +41,24 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URI;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.UUID;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Attach Transcription Workflow Operation Handler (Amberscript)",
+        "workflow.operation=amberscript-attach-transcription"
+    }
+)
 public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AmberscriptAttachTranscriptionOperationHandler.class);
@@ -81,16 +86,11 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
   }
 
   @Override
+  @Activate
   protected void activate(ComponentContext cc) {
     super.activate(cc);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -100,59 +100,51 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     logger.debug("Attach transcription for mediapackage '{}' started.", mediaPackage);
 
     String jobId = StringUtils.trimToNull(operation.getConfiguration(TRANSCRIPTION_JOB_ID));
-    if (jobId == null)
+    if (jobId == null) {
       throw new WorkflowOperationException(TRANSCRIPTION_JOB_ID + " missing.");
+    }
 
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.many);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
+        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.many);
     List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
     List<String> targetTagOption = tagsAndFlavors.getTargetTags();
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
 
-    // Target flavor is mandatory if target-caption-format was NOT informed and no conversion is done
-    if (targetFlavorOption.isEmpty() && captionFormatOption == null)
-      throw new WorkflowOperationException(TARGET_FLAVOR + " missing.");
-
-    // Target flavor is optional if target-caption-format was informed because the default flavor
-    // will be "captions/<format>". If informed, will override the default.
     MediaPackageElementFlavor flavor = null;
-    if (!targetFlavorOption.isEmpty())
+    if (!targetFlavorOption.isEmpty()) {
       flavor = targetFlavorOption.get(0);
+    } else {
+      // If the target format is not specified, we will leave it as is (srt).
+      String format = (captionFormatOption != null) ? captionFormatOption : "srt";
+      if (service.getLanguage() != null) {
+        flavor = new MediaPackageElementFlavor("captions", format + "+" + service.getLanguage());
+      } else {
+        flavor = new MediaPackageElementFlavor("captions", format);
+      }
+    }
 
     try {
-      MediaPackageElement transcription = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
+      MediaPackageElement transcription
+          = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
 
+      MediaPackageElement convertedTranscription = null;
       if (captionFormatOption != null) {
         Job job = captionService.convert(transcription, "subrip", captionFormatOption, service.getLanguage());
         if (!waitForStatus(job).isSuccess()) {
           throw new WorkflowOperationException("Transcription format conversion job did not complete successfully.");
         }
-        transcription = MediaPackageElementParser.getFromXml(job.getPayload());
+        convertedTranscription = MediaPackageElementParser.getFromXml(job.getPayload());
+        workspace.delete(transcription.getURI());
+      } else {
+        convertedTranscription = transcription;
       }
-
-        InputStream zis = new FileInputStream(workspace.get(transcription.getURI()));
-        MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-        MediaPackageElement vttElement = builder.newElement(Attachment.TYPE, new MediaPackageElementFlavor("captions", "vtt"));
-        vttElement.setIdentifier(UUID.randomUUID().toString());
-        vttElement.setMimeType(MimeType.mimeType("text", "vtt"));
-        URI vttURI = workspace.put(mediaPackage.getIdentifier().toString(), vttElement.getIdentifier(), "captions.vtt", zis);
-        vttElement.setURI(vttURI);
-        mediaPackage.add(vttElement);
-
-        // Set the target flavor if informed
-        if (flavor != null)
-          vttElement.setFlavor(flavor);
-
-        for (String tag : targetTagOption) {
-            vttElement.addTag(tag);
-        }
-
-      // Add the vtt file to the  media package
-      transcription.setIdentifier("amberscript-transcript-" + jobId);
-      transcription.setURI(workspace.moveTo(transcription.getURI(), mediaPackage.getIdentifier().toString(),
-              transcription.getIdentifier(), "amberscript-" + jobId + ".vtt"));
-      mediaPackage.add(transcription);
-
-      logger.info("Added this URI to mediapackage {}: {}", mediaPackage.getIdentifier(), transcription.getURI());
+      convertedTranscription.setFlavor(flavor);
+      for (String tag : targetTagOption) {
+        convertedTranscription.addTag(tag);
+      }
+      mediaPackage.add(convertedTranscription);
+      logger.info("Added transcription to the mediapackage {}: {}",
+          mediaPackage.getIdentifier(), convertedTranscription.getURI());
 
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
@@ -161,17 +153,28 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     return createResult(mediaPackage, Action.CONTINUE);
   }
 
+  @Reference(
+      name = "TranscriptionService",
+      target = "(provider=amberscript)"
+  )
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
   }
 
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace service) {
     this.workspace = service;
   }
 
+  @Reference(name = "captionService")
   public void setCaptionService(CaptionService service) {
     this.captionService = service;
   }
 
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
 
 }

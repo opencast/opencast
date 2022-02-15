@@ -334,10 +334,13 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
           appendXml(xml, "creators", getValuesAsString(entry));
           break;
         case "isPartOf":
-          xml.append("<series>");
           //get series catalog
           Catalog[] seriesCatalogs =
                   mp.getCatalogs(new MediaPackageElementFlavor(seriesFlavor.getType(), seriesFlavor.getSubtype()));
+          if (seriesCatalogs.length == 0) {
+            continue;
+          }
+          xml.append("<series>");
           //get Series metadata
           DublinCoreCatalog dcSeries = DublinCoreUtil.loadDublinCore(getWorkspace(), seriesCatalogs[0]);
           Map<EName, List<DublinCoreValue>> seriesMetadata = dcSeries.getValues();

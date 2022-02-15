@@ -150,7 +150,21 @@ public class TasksEndpoint {
 
   @POST
   @Path("/new")
-  @RestQuery(name = "createNewTask", description = "Creates a new task by the given metadata as JSON", returnDescription = "The task identifiers", restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, responses = {
+  @RestQuery(
+      name = "createNewTask",
+      description = "Creates a new task by the given metadata as JSON",
+      returnDescription = "The task identifiers",
+      restParameters = {
+          @RestParameter(name = "metadata", isRequired = true,
+              description = "The metadata as JSON.<p>Example:<p>"
+                  + "<code><pre>{\n"
+                  + "  \"workflow\":\"republish-metadata\",\n"
+                  + "  \"configuration\":{\n"
+                  + "    \"ID-dual-stream-demo\":{\"workflowVar\":\"true\"},\n"
+                  + "    \"ID-about-opencast\":{\"workflowVar\":\"true\"}\n"
+                  + "  }\n"
+                  + "}</pre></code>", type = RestParameter.Type.TEXT) },
+      responses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Task sucessfully added"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the workflow definition is not found"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "If the metadata is not set or couldn't be parsed") })

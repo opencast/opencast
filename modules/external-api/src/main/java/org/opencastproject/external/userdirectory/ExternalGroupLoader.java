@@ -37,6 +37,9 @@ import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +52,13 @@ import java.util.TreeSet;
 /**
  * The external group loader
  */
+@Component(
+    immediate = true,
+    service = ExternalGroupLoader.class,
+    property = {
+        "service.description=External group loader"
+    }
+)
 public class ExternalGroupLoader {
 
   /** The logging facility */
@@ -76,6 +86,7 @@ public class ExternalGroupLoader {
    * @param groupRoleProvider
    *          the groupRoleProvider to set
    */
+  @Reference(name = "groupRoleProvider")
   public void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
@@ -84,10 +95,12 @@ public class ExternalGroupLoader {
    * @param organizationDirectoryService
    *          the organizationDirectoryService to set
    */
+  @Reference(name = "organizationDirectoryService")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -98,6 +111,7 @@ public class ExternalGroupLoader {
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) throws Exception {
     logger.debug("Activate external group loader");
 

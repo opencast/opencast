@@ -62,10 +62,14 @@
                 display: block;
             }
         }
-        
+
         .scheduling-conflict {
           @include alert-variant($state-danger-bg, $state-danger-border, $state-danger-text);
           margin-bottom: 15px;
+        }
+
+        #new-event-workflow-configuration {
+          margin-top: 10px;
         }
     }
 }

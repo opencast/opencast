@@ -39,13 +39,17 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
+import org.opencastproject.mediapackage.EName;
+import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.api.Series;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
@@ -65,12 +69,16 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
+import com.google.gson.Gson;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,8 +87,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -117,9 +129,20 @@ import javax.ws.rs.core.Response;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@Component(
+    immediate = true,
+    service = SeriesRestService.class,
+    property = {
+        "service.description=Series REST Endpoint",
+        "opencast.service.type=org.opencastproject.series",
+        "opencast.service.path=/series"
+    }
+)
 public class SeriesRestService {
 
   private static final String SERIES_ELEMENT_CONTENT_TYPE_PREFIX = "series/";
+
+  private static final Gson gson = new Gson();
 
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(SeriesRestService.class);
@@ -188,6 +211,7 @@ public class SeriesRestService {
    *
    * @param seriesService
    */
+  @Reference(name = "service-impl")
   public void setService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -197,6 +221,7 @@ public class SeriesRestService {
    *
    * @param dcService
    */
+  @Reference(name = "dc")
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
@@ -207,6 +232,7 @@ public class SeriesRestService {
    * @param cc
    *          ComponentContext
    */
+  @Activate
   public void activate(ComponentContext cc) {
     if (cc == null) {
       this.serverUrl = "http://localhost:8080";
@@ -341,6 +367,90 @@ public class SeriesRestService {
     return getSeriesAccessControlList(seriesID);
   }
 
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/allInRangeAdministrative.json")
+  @RestQuery(
+      name = "allInRangeAdministrative",
+      description = "Internal API! Returns all series (included deleted ones!) in the given "
+          + "range 'from' (inclusive) .. 'to' (exclusive). Returns at most 'limit' many series. "
+          + "Can only be used as administrator!",
+      returnDescription = "Series in the range",
+      restParameters = {
+          @RestParameter(
+              name = "from",
+              isRequired = true,
+              description = "Start of date range (inclusive) in milliseconds "
+                  + "since 1970-01-01T00:00:00Z. Has to be >=0.",
+              type = Type.INTEGER
+          ),
+          @RestParameter(
+              name = "to",
+              isRequired = false,
+              // TODO: this shows the default value as 0 despite us not setting this value!
+              description = "End of date range (exclusive) in milliseconds "
+                  + "since 1970-01-01T00:00:00Z. Has to be > 'from'.",
+              type = Type.INTEGER
+          ),
+          @RestParameter(
+              name = "limit",
+              isRequired = true,
+              description = "Maximum number of series to be returned. Has to be >0.",
+              type = Type.INTEGER
+          ),
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "All series in the range"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "if the given parameters are invalid"),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the user is not an administrator"),
+      }
+  )
+  public Response getAllInRangeAdministrative(
+      @FormParam("from") Long from,
+      @FormParam("to") Long to,
+      @FormParam("limit") Integer limit
+  ) throws UnauthorizedException {
+    // Parameter error handling
+    if (from == null) {
+      return badRequestAllInRange("Required parameter 'from' not specified");
+    }
+    if (limit == null) {
+      return badRequestAllInRange("Required parameter 'limit' not specified");
+    }
+    if (from < 0) {
+      return badRequestAllInRange("Parameter 'from' < 0, but it has to be >= 0");
+    }
+    if (to != null && to <= from) {
+      return badRequestAllInRange("Parameter 'to' <= 'from', but that is not allowed");
+    }
+    if (limit <= 0) {
+      return badRequestAllInRange("Parameter 'limit' <= 0, but it has to be > 0");
+    }
+
+    try {
+      final List<Series> series = seriesService.getAllForAdministrativeRead(
+          new Date(from),
+          Optional.ofNullable(to).map(millis -> new Date(millis)),
+          limit);
+
+      return Response.ok(gson.toJson(series)).build();
+    } catch (SeriesException e) {
+      logger.error("Unexpected exception in getAllInRangeAdministrative", e);
+      return Response.status(INTERNAL_SERVER_ERROR)
+          .entity("internal server error")
+          .build();
+    }
+  }
+
+  /**
+   * Returns a {@code Response} object representing a BAD_REQUEST to `allInRangeAdministrative`
+   * with the given message as body. Also logs the message.
+   */
+  private static Response badRequestAllInRange(String msg) {
+    logger.debug("Bad request to /series/allInRangeAdministrative: {}", msg);
+    return Response.status(BAD_REQUEST).entity(msg).build();
+  }
+
   /**
    * Retrieves ACL associated with series.
    *
@@ -361,6 +471,13 @@ public class SeriesRestService {
     throw new WebApplicationException(INTERNAL_SERVER_ERROR);
   }
 
+  private void addDcData(final DublinCoreCatalog dc, final String field, final String value) {
+    if (StringUtils.isNotBlank(value)) {
+      EName en = new EName(DublinCore.TERMS_NS_URI, field);
+      dc.add(en, value);
+    }
+  }
+
   @POST
   @Path("/")
   @RestQuery(
@@ -370,9 +487,9 @@ public class SeriesRestService {
       restParameters = {
           @RestParameter(
               name = "series",
-              isRequired = true,
+              isRequired = false,
               defaultValue = SAMPLE_DUBLIN_CORE,
-              description = "The series document",
+              description = "The series document. Will take precedence over metadata fields",
               type = TEXT
           ),
           @RestParameter(
@@ -381,6 +498,174 @@ public class SeriesRestService {
               defaultValue = SAMPLE_ACCESS_CONTROL_LIST,
               description = "The access control list for the series",
               type = TEXT
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "abstract",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "accessRights",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "available",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "contributor",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "coverage",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "created",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "creator",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "date",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "description",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "extent",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "format",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "identifier",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "isPartOf",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "isReferencedBy",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "isReplacedBy",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "language",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "license",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "publisher",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "relation",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "replaces",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "rights",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "rightsHolder",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "source",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "spatial",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "subject",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "temporal",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "title",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "Series metadata value",
+              isRequired = false,
+              name = "type",
+              type = RestParameter.Type.STRING
           ),
           @RestParameter(
               name = "override",
@@ -412,32 +697,93 @@ public class SeriesRestService {
   public Response addOrUpdateSeries(
       @FormParam("series") String series,
       @FormParam("acl") String accessControl,
+      @FormParam("abstract") String dcAbstract,
+      @FormParam("accessRights") String dcAccessRights,
+      @FormParam("available") String dcAvailable,
+      @FormParam("contributor") String dcContributor,
+      @FormParam("coverage") String dcCoverage,
+      @FormParam("created") String dcCreated,
+      @FormParam("creator") String dcCreator,
+      @FormParam("date") String dcDate,
+      @FormParam("description") String dcDescription,
+      @FormParam("extent") String dcExtent,
+      @FormParam("format") String dcFormat,
+      @FormParam("identifier") String dcIdentifier,
+      @FormParam("isPartOf") String dcIsPartOf,
+      @FormParam("isReferencedBy") String dcIsReferencedBy,
+      @FormParam("isReplacedBy") String dcIsReplacedBy,
+      @FormParam("language") String dcLanguage,
+      @FormParam("license") String dcLicense,
+      @FormParam("publisher") String dcPublisher,
+      @FormParam("relation") String dcRelation,
+      @FormParam("replaces") String dcReplaces,
+      @FormParam("rights") String dcRights,
+      @FormParam("rightsHolder") String dcRightsHolder,
+      @FormParam("source") String dcSource,
+      @FormParam("spatial") String dcSpatial,
+      @FormParam("subject") String dcSubject,
+      @FormParam("temporal") String dcTemporal,
+      @FormParam("title") String dcTitle,
+      @FormParam("type") String dcType,
       @DefaultValue("false") @FormParam("override") boolean override
   ) throws UnauthorizedException {
-    if (series == null) {
-      logger.warn("series that should be added is null");
-      return Response.status(BAD_REQUEST).build();
-    }
     DublinCoreCatalog dc;
-    try {
-      dc = this.dcService.load(new ByteArrayInputStream(series.getBytes("UTF-8")));
-    } catch (UnsupportedEncodingException e1) {
-      logger.error("Could not deserialize dublin core catalog: {}", e1);
-      throw new WebApplicationException(INTERNAL_SERVER_ERROR);
-    } catch (IOException e1) {
-      logger.warn("Could not deserialize dublin core catalog: {}", e1);
-      return Response.status(BAD_REQUEST).build();
+    if (StringUtils.isNotBlank(series)) {
+      try {
+        dc = this.dcService.load(new ByteArrayInputStream(series.getBytes(StandardCharsets.UTF_8)));
+      } catch (UnsupportedEncodingException e1) {
+        logger.error("Could not deserialize dublin core catalog", e1);
+        throw new WebApplicationException(INTERNAL_SERVER_ERROR);
+      } catch (IOException e1) {
+        logger.warn("Could not deserialize dublin core catalog", e1);
+        return Response.status(BAD_REQUEST).build();
+      }
+    } else if (StringUtils.isNotBlank(dcTitle)) {
+      dc = DublinCores.mkOpencastSeries().getCatalog();
+      addDcData(dc, "abstract", dcAbstract);
+      addDcData(dc, "accessRights", dcAccessRights);
+      addDcData(dc, "available", dcAvailable);
+      addDcData(dc, "contributor", dcContributor);
+      addDcData(dc, "coverage", dcCoverage);
+      addDcData(dc, "created", dcCreated);
+      addDcData(dc, "creator", dcCreator);
+      addDcData(dc, "date", dcDate);
+      addDcData(dc, "description", dcDescription);
+      addDcData(dc, "extent", dcExtent);
+      addDcData(dc, "format", dcFormat);
+      addDcData(dc, "identifier", dcIdentifier);
+      addDcData(dc, "isPartOf", dcIsPartOf);
+      addDcData(dc, "isReferencedBy", dcIsReferencedBy);
+      addDcData(dc, "isReplacedBy", dcIsReplacedBy);
+      addDcData(dc, "language", dcLanguage);
+      addDcData(dc, "license", dcLicense);
+      addDcData(dc, "publisher", dcPublisher);
+      addDcData(dc, "relation", dcRelation);
+      addDcData(dc, "replaces", dcReplaces);
+      addDcData(dc, "rights", dcRights);
+      addDcData(dc, "rightsHolder", dcRightsHolder);
+      addDcData(dc, "source", dcSource);
+      addDcData(dc, "spatial", dcSpatial);
+      addDcData(dc, "subject", dcSubject);
+      addDcData(dc, "temporal", dcTemporal);
+      addDcData(dc, "title", dcTitle);
+      addDcData(dc, "type", dcType);
+    } else {
+      return Response.status(BAD_REQUEST).entity("Required series metadata not provided").build();
     }
+    AccessControlList acl = null;
+    if (StringUtils.isNotBlank(accessControl)) {
+      try {
+        acl = AccessControlParser.parseAcl(accessControl);
+      } catch (Exception e) {
+        logger.debug("Could not parse ACL", e);
+        return Response.status(BAD_REQUEST).entity("Could not parse ACL").build();
+      }
+    }
+
     try {
       DublinCoreCatalog newSeries = seriesService.updateSeries(dc);
-      if (StringUtils.isNotBlank(accessControl)) {
-        AccessControlList acl;
-        try {
-          acl = AccessControlParser.parseAcl(accessControl);
-        } catch (Exception e) {
-          logger.warn("Could not parse ACL: {}", e.getMessage());
-          return Response.status(BAD_REQUEST).build();
-        }
+      if (acl != null) {
         seriesService.updateAccessControl(dc.getFirst(PROPERTY_IDENTIFIER), acl, override);
       }
       if (newSeries == null) {
@@ -446,14 +792,17 @@ public class SeriesRestService {
       }
       String id = newSeries.getFirst(PROPERTY_IDENTIFIER);
       logger.debug("Created series {} ", id);
-      return Response.status(CREATED).header("Location", getSeriesXmlUrl(id)).header("Location", getSeriesJsonUrl(id))
-              .entity(newSeries.toXmlString()).build();
+      return Response.status(CREATED)
+          .header("Location", getSeriesXmlUrl(id))
+          .header("Location", getSeriesJsonUrl(id))
+          .entity(newSeries.toXmlString())
+          .build();
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not add/update series: {}", e.getMessage());
+      logger.error("Could not add/update series", e);
     }
-    throw new WebApplicationException(INTERNAL_SERVER_ERROR);
+    return Response.serverError().build();
   }
 
   @POST

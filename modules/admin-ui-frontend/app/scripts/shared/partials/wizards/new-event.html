@@ -110,7 +110,7 @@
         </header>
         <div class="obj-container">
           <ul>
-            <li  ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter:{type:'track'}| orderBy: 'displayOrder' track by asset.id">
+            <li ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter: {showAs: 'source'} | orderBy: 'displayOrder' track by asset.id">
               <div class="file-upload">
                 <input
                   id="{{asset.id}}"
@@ -248,7 +248,7 @@
                 </select>
                 <span ng-bind="wizard.step.ud.SCHEDULE_SINGLE.end.date"
                       ng-show="wizard.step.ud.SCHEDULE_SINGLE.end.date !== wizard.step.ud.SCHEDULE_SINGLE.start.date"
-                      />
+                      ></span>
               </td>
             </tr>
             <tr>
@@ -267,8 +267,8 @@
                 </select>
               </td>
             </tr>
-            <tr>
-              <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
+            <tr ng-if="wizard.step.ud.SCHEDULE_SINGLE.device.inputs.length">
+              <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }}</td>
               <td>
                 <label ng-repeat="inputMethod in wizard.step.ud.SCHEDULE_SINGLE.device.inputs">
                   <input type="checkbox"
@@ -414,11 +414,12 @@
                 </select>
               </td>
             </tr>
-            <tr>
-              <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
+            <tr ng-if="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs.length">
+              <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }}</td>
               <td>
                 <label ng-repeat="inputMethod in wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs">
-                  <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputMethods[inputMethod.id]" tabindex="20">{{ inputMethod.id | translate }}</input>
+                  <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputMethods[inputMethod.id]" tabindex="20" />
+                  {{ inputMethod.id | translate }}
                 </label>
               </td>
             </tr>
@@ -474,7 +475,6 @@
           </select>
 		  <div class="collapsible-box" input="wizard.step.workflowDescription" maxheight=45></div>
           <div id="new-event-workflow-configuration"
-               class="checkbox-container"
                ng-click="wizard.step.save()"
                ng-bind-html="wizard.step.workflowConfiguration"
                class="obj-container">

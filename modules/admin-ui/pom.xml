@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -23,7 +23,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <!-- opencast -->
     <dependency>
@@ -47,7 +47,6 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-index-service</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -173,11 +172,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-urlsigning-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-admin-ui-index</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -350,12 +344,6 @@
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-index-rebuild</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -389,8 +377,6 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               net.fortuna.ical4j.*,
-              org.opencastproject.index.service.message,
-              org.opencastproject.adminui.index,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               *
@@ -410,21 +396,11 @@
               org.opencastproject.adminui.usersettings.persistence;version=${project.version},
               org.opencastproject.adminui.util;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/acl_endpoint.xml,
-              OSGI-INF/event_endpoint.xml,
-              OSGI-INF/groups_endpoint.xml,
-              OSGI-INF/index_endpoint.xml,
-              OSGI-INF/list_providers_endpoint.xml,
-              OSGI-INF/presets_endpoint.xml,
-              OSGI-INF/series_endpoint.xml,
-              OSGI-INF/statistics_endpoint.xml,
-              OSGI-INF/themes_endpoint.xml,
-              OSGI-INF/tools_endpoint.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>
+            <!-- Remove once the Admin UI backend uses OSGi annotations and generates capabilities -->
+            <_dsannotations-options>norequirements</_dsannotations-options>
           </instructions>
         </configuration>
       </plugin>

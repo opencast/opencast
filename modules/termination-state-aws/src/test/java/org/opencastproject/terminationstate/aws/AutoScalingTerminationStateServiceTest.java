@@ -99,9 +99,11 @@ public class AutoScalingTerminationStateServiceTest {
     EasyMock.expect(dasir.getAutoScalingInstances()).andReturn(instances).anyTimes();
     EasyMock.replay(dasir);
 
-    EasyMock.expect(autoScaling.describeAutoScalingInstances(EasyMock.anyObject(DescribeAutoScalingInstancesRequest.class)))
+    EasyMock.expect(autoScaling.describeAutoScalingInstances(
+        EasyMock.anyObject(DescribeAutoScalingInstancesRequest.class)))
             .andReturn(dasir).anyTimes();
-    EasyMock.expect(autoScaling.recordLifecycleActionHeartbeat(EasyMock.anyObject(RecordLifecycleActionHeartbeatRequest.class)))
+    EasyMock.expect(autoScaling.recordLifecycleActionHeartbeat(
+        EasyMock.anyObject(RecordLifecycleActionHeartbeatRequest.class)))
             .andReturn(null).anyTimes();
     EasyMock.expect(autoScaling.completeLifecycleAction(EasyMock.anyObject(CompleteLifecycleActionRequest.class)))
             .andReturn(null).once();

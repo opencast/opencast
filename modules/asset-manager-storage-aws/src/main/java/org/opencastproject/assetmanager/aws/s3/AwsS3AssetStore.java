@@ -21,13 +21,13 @@
 
 package org.opencastproject.assetmanager.aws.s3;
 
+import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.assetmanager.api.storage.AssetStoreException;
+import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.assetmanager.aws.AwsAbstractArchive;
 import org.opencastproject.assetmanager.aws.AwsUploadOperationResult;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
-import org.opencastproject.assetmanager.impl.storage.AssetStore;
-import org.opencastproject.assetmanager.impl.storage.AssetStoreException;
-import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
@@ -253,11 +253,11 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     // Use TransferManager to take advantage of multipart upload.
     // TransferManager processes all transfers asynchronously, so this call will return immediately.
     logger.info("Uploading {} to archive bucket {}...", objectName, bucketName);
-    Upload upload = s3TransferManager.upload(bucketName, objectName, origin);
-    long start = System.currentTimeMillis();
 
     S3Object obj = null;
     try {
+      Upload upload = s3TransferManager.upload(bucketName, objectName, origin);
+      long start = System.currentTimeMillis();
       // Block and wait for the upload to finish
       upload.waitForCompletion();
       logger.info("Upload of {} to archive bucket {} completed in {} seconds",
@@ -272,9 +272,13 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       return new AwsUploadOperationResult(objectName, versionId);
     } catch (InterruptedException e) {
       throw new AssetStoreException("Operation interrupted", e);
+    } catch (Exception e) {
+      throw new AssetStoreException("Upload failed", e);
     } finally {
       try {
-        obj.close();
+        if (obj != null) {
+          obj.close();
+        }
       } catch (IOException e) {
         //Swallow and ignore
       }
@@ -294,11 +298,6 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   */
   protected void deleteObject(AwsAssetMapping map) {
     s3.deleteObject(bucketName, map.getObjectKey());
-  }
-
-  // Used by restore service
-  public String getBucketName() {
-    return this.bucketName;
   }
 
   // For running tests

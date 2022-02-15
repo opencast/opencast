@@ -37,8 +37,10 @@
       "CURRENT_JOBS": "Heutige Jobs",
       "PRESENTER": "Vortragende(r)",
       "PRESENTER_DESCRIPTION": "Videodatei für die Vortragenden-Spur",
+      "VIDEOFILE": "Videodatei",
+      "VIDEOFILE_DESCRIPTION": "Videodatei zum Hochladen",
       "CAPTION": "Untertitel",
-      "CAPTION_DESCRIPTION": "Untertiteldatei; VTT-Dateiformat wird unterstützt",
+      "CAPTION_DESCRIPTION": "Untertiteldatei; VTT- oder dxfp-Dateiformat wird unterstützt",
       "UPLOAD": "Hochladen",
       "UPLOADING": "Lädt hoch",
       "EDIT": "Speichern",
@@ -126,7 +128,8 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Diese Serie enthält noch Videos. Das Löschen der Serie löscht nicht die Videos.",
-         "EVENT_WILL_BE_GONE": "Wenn Sie fortfahren, wird das Video unwiderruflich gelöscht."
+         "EVENT_WILL_BE_GONE": "Wenn Sie fortfahren, wird das Video unwiderruflich gelöscht.",
+         "UNSAVED_CHANGES": "Sie haben ungespeicherte Änderungen. Wenn Sie fortfahren, werden diese Änderungen verworfen. Sind Sie sicher, dass Sie fortfahren möchten?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Diese Serie enthält Videos und kann daher nicht gelöscht werden."
@@ -203,6 +206,7 @@
       "INVALID_ACL_RULES": "Regeln müssen eine gültige Rolle und Lese-/Schreibrechte enthalten.",
       "MISSING_ACL_RULES": "Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich!",
       "SAVED_ACL_RULES": "Die Zugriffsregeln wurden gespeichert.",
+      "SAVED_METADATA": "Die Metadaten wurden gespeichert.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Die vorhandenen Videos in dieser Serie müssen neu verarbeitet werden",
       "SERIES_ACL_LOCKED": "Das Editieren von Zugriffsrichtlinien ist nicht erlaubt, solange Videos verarbeitet werden, die Teil der Serie sind",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
@@ -426,12 +430,12 @@
             "LAST_NAME": "Nachname",
             "STREET": "Straße",
             "NUMBER": "Hausnummer",
-            "ADDITIONAL_ADRESS_INFO": "Adressinformationen hinzufügen",
+            "ADDITIONAL_ADDRESS_INFO": "Adressinformationen hinzufügen",
             "MAIL": "E-Mail-Adresse",
             "CONTACT_ME": "Kontaktiere mich für Aktualisierungen und Sicherheitsupdates",
             "WHICH_DATA_TO_SHARE": "Welche Daten möchtest du teilen?",
             "POLICY_HEADLINE": "Datenschutzerklärung und Nutzungsbedingungen",
-            "USAGE_STATISTICS": "Nutzungsstatistik",
+            "USAGE_STATISTICS": "Nutzungsstatistiken",
             "ERROR_REPORTS": "Fehlerberichte",
             "READ_TERMS_OF_USE_BEFORE": "Ich las und akzeptiere die",
             "READ_TERMS_OF_USE_LINK": "Datenschutzerklärung und Nutzungsbedingungen",
@@ -617,6 +621,7 @@
             "NOCONTENT": "Keine Daten verfügbar",
             "PUBLISHED": "Veröffentlicht",
             "WEEKDAY": "Wochentag",
+            "ADMINUI_NOTES": "Anmerkungen",
             "TOOLTIP": {
                "ASSETS": "Anlagedetails öffnen",
                "START": "Nach diesem Startdatum filtern",
@@ -644,7 +649,7 @@
             "PROCESSED": "Verarbeitet",
             "RECORDING_FAILURE": "Aufnahme-Fehler",
             "PROCESSING_FAILURE": "Verarbeitungs-Fehler",
-            "PROCESSING_CANCELED": "Verarbeitung abgebrochen"
+            "PROCESSING_CANCELLED": "Verarbeitung abgebrochen"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Wird zurückgezogen",
@@ -892,7 +897,7 @@
                   "REVIEW": "Überprüfung erforderlich",
                   "ASYNC": "A/V Spuren asynchron",
                   "AUDIO_ISSUE": "Fehlende oder beschädigte Audiospur",
-                  "CANCELED": "Abgebrochenes Video",
+                  "CANCELLED": "Abgebrochene Aufzeichnung",
                   "CONFLICTING_METADATA": "Widersprüchliche Metadaten",
                   "IMPROPER_POINT": "Unpassender Start- oder Endzeitpunkt",
                   "MISSING_AGREEMENT": "Fehlende Vereinbarung",
@@ -905,7 +910,8 @@
                   "WRONG_METADATA": "Metadaten benötigen Korrektur",
                   "WRONG_SERIES_PUBLICATION": "Falsche Serie oder falscher Publikations-Kanal",
                   "WRONG_WORKFLOW": "Falscher Workflow",
-                  "PROCESSING_FAILURE": "Verarbeitungs-Fehler"
+                  "PROCESSING_FAILURE": "Verarbeitungs-Fehler",
+                  "ADMINUI_NOTES": "Notizen in der Admin-Oberfläche"
                }
             },
             "STATISTICS": {
@@ -1607,7 +1613,7 @@
             "INSTANTIATED": "Instanziiert",
             "DISPATCHING": "Wird angesandt",
             "RESTART": "Neustart",
-            "CANCELED": "Abgebrochen",
+            "CANCELLED": "Abgebrochen",
             "WAITING": "Wartend"
          }
       },
@@ -1618,11 +1624,8 @@
             "HOST_NAME": "Hostname",
             "NODE_NAME": "Knotenname",
             "CORES": "Kerne",
-            "COMPLETED": "Jobs abgeschlossen",
             "RUNNING": "Jobs in Bearbeitung",
             "QUEUED": "Jobs in Warteschlange",
-            "MEAN_RUN_TIME": "Mittlere Laufzeit",
-            "MEAN_QUEUE_TIME": "Mittlere Wartezeit",
             "MAINTENANCE": "Wartungsarbeiten",
             "MAINTENANCE_OFF": "Wartungsmodus aktivieren",
             "MAINTENANCE_ON": "Wartungsmodus beenden"

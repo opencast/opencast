@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -38,6 +39,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
@@ -47,6 +49,8 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -68,6 +72,14 @@ import javax.xml.bind.JAXBException;
 /**
  * The workflow definition for converting a smil containing cut marks into a legal smil for cutting
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Cut Marks To Smil Operation Handler",
+        "workflow.operation=cut-marks-to-smil"
+    }
+)
 public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Workflow configuration keys */
@@ -92,6 +104,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -100,6 +113,8 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
    * The SMIL service to modify SMIL files.
    */
   private SmilService smilService;
+
+  @Reference(name = "smil-service")
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
@@ -136,7 +151,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
             getConfig(operation, TARGET_SMIL_FLAVOR));
 
     String flavorNames = operation.getConfiguration(SOURCE_MEDIA_FLAVORS);
-    final List<MediaPackageElementFlavor> flavors = new ArrayList<MediaPackageElementFlavor>();
+    final List<MediaPackageElementFlavor> flavors = new ArrayList<>();
     for (String flavorName : asList(flavorNames)) {
       flavors.add(MediaPackageElementFlavor.parseFlavor(flavorName));
     }
@@ -146,17 +161,23 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     List<String> targetTags = asList(targetTagsOption);
 
     // Is there a catalog?
-    Catalog[] catalogs = mediaPackage.getCatalogs(jsonFlavor);
-    if (catalogs.length < 1) {
-      logger.warn("No catalogs in the source flavor. Skipping...");
+    MediaPackageElement[] cutMarksElements = mediaPackage.getAttachments(jsonFlavor);
+    if (cutMarksElements.length < 1) {
+      logger.debug("No cut marks found as attachment. Falling back to catalogs…");
+      cutMarksElements = mediaPackage.getCatalogs(jsonFlavor);
+    }
+    if (cutMarksElements.length < 1) {
+      logger.warn("No cut marks with source flavor {} found. Skipping…", jsonFlavor);
       return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
-    } else if (catalogs.length > 1) {
-      throw new WorkflowOperationException("More than one catalog with source flavor! Make sure there is only one.");
+    } else if (cutMarksElements.length > 1) {
+      // Remember Highlander? There can be only one!
+      throw new WorkflowOperationException(String.format(
+          "More than one cut marks element with source flavor %s found! Make sure there is only one.", jsonFlavor));
     }
 
     // Parse JSON
     List<Times> cutMarks;
-    Catalog jsonWithTimes = catalogs[0];
+    MediaPackageElement jsonWithTimes = cutMarksElements[0];
     try (BufferedReader reader = new BufferedReader(new FileReader(getMediaPackageElementPath(jsonWithTimes)))) {
       cutMarks = gson.fromJson(reader, timesListType);
     } catch (Exception e) {
@@ -181,7 +202,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     logger.info("Get tracks from media package");
     ArrayList<Track> tracksFromFlavors = new ArrayList<>();
     for (MediaPackageElementFlavor flavor : flavors) {
-      logger.debug("Trying to get Tracks from Flavor {}", flavor);
+      logger.debug("Trying to get tracks with flavor {}", flavor);
       TrackSelector trackSelector = new TrackSelector();
       trackSelector.addFlavor(flavor);
       Collection<Track> tracks = trackSelector.select(mediaPackage, false);
@@ -191,7 +212,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
 
     // Are there actually any tracks?
     if (tracksFromFlavors.isEmpty()) {
-      logger.warn("None of the given flavors contained a track. Skipping...");
+      logger.warn("No track with given flavors. Skipping…");
       return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 
@@ -283,4 +304,11 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
 
     return mediaFile.getAbsolutePath();
   }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

@@ -52,11 +52,15 @@ import org.opencastproject.textextractor.api.TextExtractor;
 import org.opencastproject.textextractor.api.TextExtractorException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +76,14 @@ import java.util.List;
 /**
  * Media analysis service that takes takes an image and returns text as extracted from that image.
  */
+@Component(
+    immediate = true,
+    service = { TextAnalyzerService.class,ManagedService.class },
+    property = {
+        "service.description=Text Analysis Service",
+        "service.pid=org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl"
+    }
+)
 public class TextAnalyzerServiceImpl extends AbstractJobProducer implements TextAnalyzerService, ManagedService {
 
   /** The logging facility */
@@ -132,6 +144,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    *          the component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating Text analyser service");
     super.activate(cc);
@@ -310,6 +323,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -330,6 +344,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param textExtractor
    *          a text extractor implementation
    */
+  @Reference(name = "textExtractor")
   protected void setTextExtractor(TextExtractor textExtractor) {
     this.textExtractor = textExtractor;
   }
@@ -340,6 +355,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(name = "workspace")
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -350,6 +366,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param mpeg7CatalogService
    *          an instance of the mpeg7 catalog service
    */
+  @Reference(name = "mpeg7service")
   protected void setMpeg7CatalogService(Mpeg7CatalogService mpeg7CatalogService) {
     this.mpeg7CatalogService = mpeg7CatalogService;
   }
@@ -360,6 +377,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param dictionaryService
    *          an instance of the dicitonary service
    */
+  @Reference(name = "dictionaryService")
   protected void setDictionaryService(DictionaryService dictionaryService) {
     this.dictionaryService = dictionaryService;
   }
@@ -370,6 +388,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -380,6 +399,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -390,6 +410,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -428,5 +449,13 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     analysisJobLoad = LoadUtil.getConfiguredLoadValue(properties, ANALYSIS_JOB_LOAD_KEY, DEFAULT_ANALYSIS_JOB_LOAD,
             serviceRegistry);
+  }
+
+  @Reference(
+      name = "profilesReadyIndicator",
+      target = "(artifact=dictionary)"
+  )
+  public void setReadinessIndicator(ReadinessIndicator readinessIndicator) {
+    //Only activate service if ReadinessIndicator is registered.
   }
 }

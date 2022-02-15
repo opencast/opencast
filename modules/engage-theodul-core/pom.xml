@@ -8,13 +8,12 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <skipJasmineTests>true</skipJasmineTests>
   </properties>
   <dependencies>
     <dependency>
@@ -23,7 +22,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -193,11 +192,8 @@
             </Import-Package>
             <Export-Package>org.opencastproject.engage.theodul.manager.impl</Export-Package>
             <Private-Package>ui.*</Private-Package>
-            <Service-Component>
-              OSGI-INF/theodul-core-static-resources.xml,
-              OSGI-INF/theodul-pluginmanager-service.xml,
-              OSGI-INF/theodul-pluginmanager-service-rest.xml
-            </Service-Component>
+            <!-- Remove once the kernel uses OSGi annotations and generates capabilities -->
+            <_dsannotations-options>norequirements</_dsannotations-options>
           </instructions>
         </configuration>
       </plugin>

@@ -29,7 +29,10 @@ import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -37,6 +40,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -46,11 +51,16 @@ import org.w3c.dom.NodeList;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 /**
  * Proxies a set of remote composer services for use as a JVM-local service. Remote services are selected at random.
  */
+@Component(
+    immediate = true,
+    service = CaptionService.class,
+    property = {
+        "service.description=Caption Remote Service Proxy"
+    }
+)
 public class CaptionServiceRemoteImpl extends RemoteBase implements CaptionService {
 
   /** The logger */
@@ -127,7 +137,7 @@ public class CaptionServiceRemoteImpl extends RemoteBase implements CaptionServi
       response = getResponse(post);
       if (response != null) {
         List<String> langauges = new ArrayList<String>();
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder()
                 .parse(EntityUtils.toString(response.getEntity(), "UTF-8"));
         NodeList languages = doc.getElementsByTagName("languages");
         for (int i = 0; i < languages.getLength(); i++) {
@@ -144,6 +154,17 @@ public class CaptionServiceRemoteImpl extends RemoteBase implements CaptionServi
       closeConnection(response);
     }
     throw new CaptionConverterException("Unable to get catalog languages" + input + " using a remote caption service");
+  }
+
+  @Reference(name = "trustedHttpClient")
+  @Override
+  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
+    super.setTrustedHttpClient(trustedHttpClient);
+  }
+  @Reference(name = "remoteServiceManager")
+  @Override
+  public void setRemoteServiceManager(ServiceRegistry serviceRegistry) {
+    super.setRemoteServiceManager(serviceRegistry);
   }
 
 }

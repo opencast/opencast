@@ -20,8 +20,10 @@
  */
 package org.opencastproject.terminationstate.aws;
 
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.terminationstate.api.AbstractJobTerminationStateService;
+import org.opencastproject.terminationstate.api.TerminationStateService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
@@ -50,6 +52,10 @@ import com.amazonaws.util.EC2MetadataUtils;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -65,6 +71,16 @@ import org.slf4j.LoggerFactory;
 import java.util.Dictionary;
 import java.util.List;
 
+@Component(
+    immediate = true,
+    service = TerminationStateService.class,
+    property = {
+        "service.description=Termination State Service: AWS Auto Scaling",
+        "service.pid=org.opencastproject.terminationstate.aws.AutoScalingTerminationStateService",
+        "vendor.name=aws",
+        "vendor.service=autoscaling"
+    }
+)
 public final class AutoScalingTerminationStateService extends AbstractJobTerminationStateService {
   private static final Logger logger = LoggerFactory.getLogger(AutoScalingTerminationStateService.class);
 
@@ -106,6 +122,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   private Option<String> accessKeyIdOpt = Option.none();
   private Option<String> accessKeySecretOpt = Option.none();
 
+  @Activate
   protected void activate(ComponentContext componentContext) {
     try {
       configure(componentContext.getProperties());
@@ -164,8 +181,12 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
         stop();
         return;
       } else if (lifecycleHeartbeatPeriod > lifeCycleHook.getHeartbeatTimeout()) {
-        logger.warn("Lifecycle Heartbeat Period {} is greater than LifecycleHook's HeartbeatTimeout {}, see https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html",
-                lifecycleHeartbeatPeriod, lifeCycleHook.getHeartbeatTimeout());
+        logger.warn(
+            "Lifecycle Heartbeat Period {} is greater than LifecycleHook's HeartbeatTimeout {}, "
+                + "see https://docs.aws.amazon.com/autoscaling/ec2/userguide/lifecycle-hooks.html",
+            lifecycleHeartbeatPeriod,
+            lifeCycleHook.getHeartbeatTimeout()
+        );
       }
     } catch (AmazonServiceException e) {
       logger.error("EC2 Autoscaling returned an error", e);
@@ -232,9 +253,12 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
 
   protected void configure(Dictionary config) throws ConfigurationException {
     this.enabled = OsgiUtil.getOptCfgAsBoolean(config, CONFIG_ENABLE).getOrElse(DEFAULT_ENABLE);
-    this.lifecyclePolling = OsgiUtil.getOptCfgAsBoolean(config, CONFIG_LIFECYCLE_POLLING_ENABLE).getOrElse(DEFAULT_LIFECYCLE_POLLING_ENABLE);
-    this.lifecyclePollingPeriod = OsgiUtil.getOptCfgAsInt(config, CONFIG_LIFECYCLE_POLLING_PERIOD).getOrElse(DEFAULT_LIFECYCLE_POLLING_PERIOD);
-    this.lifecycleHeartbeatPeriod = OsgiUtil.getOptCfgAsInt(config, CONFIG_LIFECYCLE_HEARTBEAT_PERIOD).getOrElse(DEFAULT_LIFECYCLE_HEARTBEAT_PERIOD);
+    this.lifecyclePolling = OsgiUtil.getOptCfgAsBoolean(config, CONFIG_LIFECYCLE_POLLING_ENABLE)
+        .getOrElse(DEFAULT_LIFECYCLE_POLLING_ENABLE);
+    this.lifecyclePollingPeriod = OsgiUtil.getOptCfgAsInt(config, CONFIG_LIFECYCLE_POLLING_PERIOD)
+        .getOrElse(DEFAULT_LIFECYCLE_POLLING_PERIOD);
+    this.lifecycleHeartbeatPeriod = OsgiUtil.getOptCfgAsInt(config, CONFIG_LIFECYCLE_HEARTBEAT_PERIOD)
+        .getOrElse(DEFAULT_LIFECYCLE_HEARTBEAT_PERIOD);
     this.accessKeyIdOpt = OsgiUtil.getOptCfg(config, CONFIG_AWS_ACCESS_KEY_ID);
     this.accessKeySecretOpt = OsgiUtil.getOptCfg(config, CONFIG_AWS_SECRET_ACCESS_KEY);
   }
@@ -290,9 +314,11 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-      AutoScalingTerminationStateService parent = (AutoScalingTerminationStateService) context.getJobDetail().getJobDataMap().get(SCHEDULE_JOB_PARAM_PARENT);
+      AutoScalingTerminationStateService parent
+          = (AutoScalingTerminationStateService) context.getJobDetail().getJobDataMap().get(SCHEDULE_JOB_PARAM_PARENT);
       if (parent.autoScaling != null) {
-        DescribeAutoScalingInstancesRequest request = new DescribeAutoScalingInstancesRequest().withInstanceIds(parent.instanceId);
+        DescribeAutoScalingInstancesRequest request
+            = new DescribeAutoScalingInstancesRequest().withInstanceIds(parent.instanceId);
         DescribeAutoScalingInstancesResult result = parent.autoScaling.describeAutoScalingInstances(request);
         List<AutoScalingInstanceDetails> instances = result.getAutoScalingInstances();
 
@@ -314,7 +340,8 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   protected void startPollingTerminationState() {
     try {
       // create and set the job. To actually run it call schedule(..)
-      final JobDetail job = new JobDetail(SCHEDULE_GROUP, SCHEDULE_LIFECYCLE_HEARTBEAT_JOB, CheckTerminationState.class);
+      final JobDetail job = new JobDetail(
+          SCHEDULE_GROUP, SCHEDULE_LIFECYCLE_HEARTBEAT_JOB, CheckTerminationState.class);
       job.getJobDataMap().put(SCHEDULE_JOB_PARAM_PARENT, this);
       final Trigger trigger = TriggerUtils.makeSecondlyTrigger(lifecycleHeartbeatPeriod);
       trigger.setGroup(SCHEDULE_GROUP);
@@ -339,7 +366,8 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-      AutoScalingTerminationStateService parent = (AutoScalingTerminationStateService) context.getJobDetail().getJobDataMap().get(SCHEDULE_JOB_PARAM_PARENT);
+      AutoScalingTerminationStateService parent
+          = (AutoScalingTerminationStateService) context.getJobDetail().getJobDataMap().get(SCHEDULE_JOB_PARAM_PARENT);
 
       if (parent.readyToTerminate()) {
         // signal AWS node is ready to terminate
@@ -393,6 +421,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   /**
    * OSGI deactivate callback
    */
+  @Deactivate
   public void deactivate() {
     stop();
   }
@@ -414,4 +443,11 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   protected void setScheduler(Scheduler scheduler) {
     this.scheduler = scheduler;
   }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

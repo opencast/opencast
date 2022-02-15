@@ -25,6 +25,8 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,17 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Inspects request current job header and sets the current job for the request.
  */
+@Component(
+    immediate = true,
+    service = Filter.class,
+    property = {
+        "service.description=Current Job Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=4",
+        "urlPatterns=*"
+    }
+)
 public class CurrentJobFilter implements Filter {
 
   public static final String CURRENT_JOB_HEADER = "X-Opencast-Matterhorn-Current-Job-Id";
@@ -58,6 +71,7 @@ public class CurrentJobFilter implements Filter {
    * @param serviceRegistry
    *          the serviceRegistry to set
    */
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

@@ -24,6 +24,7 @@ package org.opencastproject.search.impl.solr;
 
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Collections.filter;
 import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Option.option;
@@ -40,6 +41,8 @@ import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchResultItem.SearchResultItemType;
 import org.opencastproject.search.api.SearchResultItemImpl;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -62,13 +65,16 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Class implementing <code>LookupRequester</code> to provide connection to solr indexing facility.
@@ -169,7 +175,7 @@ public class SolrRequester {
     final SearchResultImpl result = new SearchResultImpl(query.getQuery());
     result.setSearchTime(solrResponse.getQTime());
     result.setOffset(solrResponse.getResults().getStart());
-    result.setLimit(solrResponse.getResults().size());
+    result.setLimit(Optional.ofNullable(query.getRows()).map(i -> Long.valueOf(i)));
     result.setTotal(solrResponse.getResults().getNumFound());
 
     // Walk through response and create new items with title, creator, etc:
@@ -207,6 +213,18 @@ public class SolrRequester {
             }
           }
           return null;
+        }
+
+        @Override
+        public AccessControlList getAccessControlList() {
+          final List<AccessControlEntry> entries = Schema.getOcAcl(doc)
+              .stream()
+              .flatMap(field -> {
+                return Arrays.stream(field.getValue().strip().split("\\s+"))
+                    .map(role -> new AccessControlEntry(role, field.getSuffix(), true));
+              })
+              .collect(Collectors.toCollection(ArrayList::new));
+          return new AccessControlList(entries);
         }
 
         @Override
@@ -362,6 +380,11 @@ public class SolrRequester {
         @Override
         public Date getModified() {
           return Schema.getOcModified(doc);
+        }
+
+        @Override
+        public Date getDeletionDate() {
+          return Schema.getOcDeleted(doc);
         }
 
         @Override
@@ -618,7 +641,7 @@ public class SolrRequester {
       sb.append(Schema.ID);
       sb.append(":");
       sb.append(cleanSolrIdRequest);
-      if (q.isIncludeEpisodes() && q.isIncludeSeries()) {
+      if (q.willIncludeEpisodes() && q.willIncludeSeries()) {
         sb.append(" OR ");
         sb.append(Schema.DC_IS_PART_OF);
         sb.append(":");
@@ -712,17 +735,26 @@ public class SolrRequester {
         sb.append(" AND ");
       }
       sb.append(Schema.OC_DELETED + ":"
-              + SolrUtils.serializeDateRange(option(q.getDeletedDate()), Option.<Date> none()));
+              + SolrUtils.serializeDateRange(option(q.getDeletedDate()), Option.none()));
+    }
+
+    if (q.getUpdatedSince() != null) {
+      if (sb.length() > 0) {
+        sb.append(" AND ");
+      }
+      sb.append(Schema.OC_MODIFIED)
+          .append(":")
+          .append(SolrUtils.serializeDateRange(option(q.getUpdatedSince()), Option.none()));
     }
 
     if (sb.length() == 0) {
       sb.append("*:*");
     }
 
+    User user = securityService.getUser();
     if (applyPermissions) {
       sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":")
               .append(SolrUtils.clean(securityService.getOrganization().getId()));
-      User user = securityService.getUser();
       Set<Role> roles = user.getRoles();
       boolean userHasAnonymousRole = false;
       if (roles.size() > 0) {
@@ -750,21 +782,21 @@ public class SolrRequester {
       }
     }
 
-    if (!q.isIncludeEpisodes()) {
+    if (!q.willIncludeEpisodes()) {
       if (sb.length() > 0) {
         sb.append(" AND ");
       }
       sb.append("-" + Schema.OC_MEDIATYPE + ":" + SearchResultItemType.AudioVisual);
     }
 
-    if (!q.isIncludeSeries()) {
+    if (!q.willIncludeSeries()) {
       if (sb.length() > 0) {
         sb.append(" AND ");
       }
       sb.append("-" + Schema.OC_MEDIATYPE + ":" + SearchResultItemType.Series);
     }
 
-    if (q.getDeletedDate() == null) {
+    if (!q.willIncludeDeleted()) {
       if (sb.length() > 0) {
         sb.append(" AND ");
       }
@@ -773,10 +805,18 @@ public class SolrRequester {
 
     SolrQuery query = new SolrQuery(sb.toString());
 
-    if ((q.getLimit() > 0) && (q.getLimit() < QUERY_MAX_ROWS)) {
-      query.setRows(q.getLimit());
+    String orgAdminRole = user.getOrganization().getAdminRole();
+    boolean isAdmin = user.hasRole(GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
+    if (isAdmin) {
+      if (q.getLimit() > 0) {
+        query.setRows(q.getLimit());
+      }
     } else {
-      query.setRows(QUERY_MAX_ROWS);
+      if ((q.getLimit() > 0) && (q.getLimit() < QUERY_MAX_ROWS)) {
+        query.setRows(q.getLimit());
+      } else {
+        query.setRows(QUERY_MAX_ROWS);
+      }
     }
 
     if (q.getOffset() > 0) {
@@ -784,7 +824,7 @@ public class SolrRequester {
     }
 
     if (q.getSort() != null) {
-      ORDER order = q.isSortAscending() ? ORDER.asc : ORDER.desc;
+      ORDER order = q.willSortAscending() ? ORDER.asc : ORDER.desc;
       query.addSortField(getSortField(q.getSort()), order);
     }
 
@@ -806,7 +846,7 @@ public class SolrRequester {
    */
   public SearchResult getForAdministrativeRead(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, READ.toString(), false);
-    return createSearchResult(query, q.isSignURLs());
+    return createSearchResult(query, q.willSignURLs());
   }
 
   /**
@@ -819,7 +859,7 @@ public class SolrRequester {
    */
   public SearchResult getForRead(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, READ.toString(), true);
-    return createSearchResult(query, q.isSignURLs());
+    return createSearchResult(query, q.willSignURLs());
   }
 
   /**
@@ -832,7 +872,7 @@ public class SolrRequester {
    */
   public SearchResult getForWrite(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, WRITE.toString(), true);
-    return createSearchResult(query, q.isSignURLs());
+    return createSearchResult(query, q.willSignURLs());
   }
 
   /**
@@ -870,7 +910,7 @@ public class SolrRequester {
         return Schema.DC_CONTRIBUTOR_SORT;
       case DATE_CREATED:
         return Schema.DC_CREATED;
-      case DATE_PUBLISHED:
+      case DATE_MODIFIED:
         return Schema.OC_MODIFIED;
       case CREATOR:
         return Schema.DC_CREATOR_SORT;

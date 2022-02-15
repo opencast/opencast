@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -80,7 +80,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -131,10 +131,6 @@
             <Export-Package>
               org.opencastproject.event.handler;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/events/series-updated.xml,
-              OSGI-INF/events/episode-updated.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

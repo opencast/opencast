@@ -1,6 +1,6 @@
 name: Check ICLA
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
 
@@ -19,7 +19,7 @@ jobs:
 
       - name: Comment if no CLA has been filed
         if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@master
+        uses: thollander/actions-comment-pull-request@main
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: >

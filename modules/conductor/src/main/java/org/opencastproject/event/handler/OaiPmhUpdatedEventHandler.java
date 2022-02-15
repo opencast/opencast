@@ -28,7 +28,6 @@ import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
@@ -142,9 +141,9 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
     try {
       securityService.setUser(SecurityUtil.createSystemUser(systemAccount, prevOrg));
 
-      // The mediapackage from TakeSnapshot is in some cases from an workflow instance,
-      // that has already been finished. The URLs may be become stale.
-      // For that reason we will be save, querying the mediapackage from the asset manager.
+      // The mediapackage from TakeSnapshot is in some cases from a workflow instance,
+      // that has already been finished. The URLs may have become stale.
+      // For that reason we get the mediapackage from the asset manager.
       String versionStr = Long.toString(snapshotItem.getVersion());
       AQueryBuilder q = assetManager.createQuery();
       AResult snapshotQueryResult = q.select(q.snapshot())
@@ -175,8 +174,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
                 QueryBuilder.query().mediaPackageId(snapshotMp).isDeleted(false).build());
         for (SearchResultItem searchResultItem : result.getItems()) {
           try {
-            Job job = oaiPmhPublicationService
-                    .updateMetadata(snapshotMp, searchResultItem.getRepository(), flavors, tags, false);
+            oaiPmhPublicationService.updateMetadata(snapshotMp, searchResultItem.getRepository(), flavors, tags, false);
             // we don't want to wait for job completion here because it will block the message queue
           } catch (Exception e) {
             logger.error("Unable to update OAI-PMH publication for the media package {} in repository {}",

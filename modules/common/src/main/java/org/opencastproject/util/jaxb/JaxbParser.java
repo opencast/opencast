@@ -23,6 +23,8 @@ package org.opencastproject.util.jaxb;
 
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
+import org.opencastproject.util.XmlSafeParser;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -34,7 +36,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 /** Base class for JAXB parser classes. */
 public abstract class JaxbParser {
@@ -65,7 +66,7 @@ public abstract class JaxbParser {
   public <A> A unmarshal(Class<A> dtoClass, InputStream source) throws IOException {
     try {
       final Unmarshaller unmarshaller = ctx.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(source), dtoClass).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(source), dtoClass).getValue();
     } catch (Exception e) {
       throw new IOException(e);
     } finally {

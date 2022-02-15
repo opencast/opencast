@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -57,7 +57,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -167,6 +167,8 @@
               com.google.api.*
             </_exportcontents>
             <Import-Package>
+              !com.google.appengine*,
+              !com.google.apphosting*,
               !javax.annotation,
               !oracle.xml.parser.*,
               !org.jaxen.*,
@@ -179,9 +181,6 @@
               checker-qual,
               org.apache.felix.http.bundle;inline=true
             </Embed-Dependency>
-            <Service-Component>
-              OSGI-INF/publication-service-youtube.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

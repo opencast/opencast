@@ -23,6 +23,7 @@ package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
 import static org.opencastproject.authorization.xacml.manager.impl.persistence.ManagedAclEntity.findByIdAndOrg;
 import static org.opencastproject.util.data.functions.Misc.chuck;
+import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
 import static org.opencastproject.util.persistence.PersistenceUtil.equip2;
 import static org.opencastproject.util.persistence.PersistenceUtil.persist;
 
@@ -37,27 +38,45 @@ import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceEnv2;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.RollbackException;
 
 /** JPA based impl of an {@link org.opencastproject.authorization.xacml.manager.impl.AclDb}. */
+@Component(
+        property = {
+                "service.description=JPA based ACL Provider"
+        },
+        immediate = true,
+        service = { AclDb.class }
+)
 public final class JpaAclDb implements AclDb {
-  private final PersistenceEnv penv;
-  private final PersistenceEnv2<Void> penvf;
+  private PersistenceEnv penv;
+  private PersistenceEnv2<Void> penvf;
 
-  public JpaAclDb(PersistenceEnv penv) {
-    this.penv = penv;
+  @Deactivate
+  public synchronized void deactivate() {
+    penv.close();
+  }
+
+  @Reference(target = "(osgi.unit.name=org.opencastproject.authorization.xacml.manager)")
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.penv = persistenceEnvironment(emf);
     this.penvf = equip2(penv, uniqueConstraintViolationHandler);
   }
 
   @Override public List<ManagedAcl> getAcls(Organization org) {
-    return Misc.<ManagedAcl>widen(Monadics.mlist(penv.tx(ManagedAclEntity.findByOrg(org.getId()))).value());
+    return Misc.widen(Monadics.mlist(penv.tx(ManagedAclEntity.findByOrg(org.getId()))).value());
   }
 
   @Override public Option<ManagedAcl> getAcl(Organization org, long id) {
-    return Misc.<ManagedAcl>widen(penv.tx(findByIdAndOrg(org.getId(), id)));
+    return Misc.widen(penv.tx(findByIdAndOrg(org.getId(), id)));
   }
 
   @Override public boolean updateAcl(final ManagedAcl acl) {

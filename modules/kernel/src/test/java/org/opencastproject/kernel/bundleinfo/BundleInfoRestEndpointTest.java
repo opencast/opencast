@@ -31,7 +31,6 @@ import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.kernel.bundleinfo.BundleInfoImpl.bundleInfo;
 import static org.opencastproject.kernel.bundleinfo.BundleInfoRestEndpoint.bundleInfoJson;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 import static org.opencastproject.util.ReflectionUtil.run;
 import static org.opencastproject.util.data.Option.none;
@@ -55,8 +54,7 @@ import io.restassured.path.json.JsonPath;
  * the number and the string.
  */
 public class BundleInfoRestEndpointTest {
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(),
-          TestBundleInfoRestEndpoint.class);
+  private static final RestServiceTestEnv rt = testEnvForClasses(TestBundleInfoRestEndpoint.class);
 
   private static PersistenceEnv penv;
 

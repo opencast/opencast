@@ -20,6 +20,7 @@
  */
 package org.opencastproject.liveschedule.message;
 
+import org.opencastproject.liveschedule.api.LiveScheduleService;
 import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
@@ -31,11 +32,22 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = UpdateHandler.class,
+    property = {
+        "service.description=Scheduler Update Listener for Live Schedule Service"
+    }
+)
 public class SchedulerUpdateHandler extends UpdateHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerUpdateHandler.class);
@@ -46,6 +58,12 @@ public class SchedulerUpdateHandler extends UpdateHandler {
 
   public SchedulerUpdateHandler() {
     super(DESTINATION_SCHEDULER);
+  }
+
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
   }
 
   protected void execute(MessageItem messageItem) {
@@ -62,24 +80,27 @@ public class SchedulerUpdateHandler extends UpdateHandler {
 
       switch (schedulerItem.getType()) {
         case UpdateCatalog:
-          if (isLive(mpId))
+          if (isLive(mpId)) {
             liveScheduleService.createOrUpdateLiveEvent(mpId, schedulerItem.getEvent());
+          }
           break;
         case UpdateAcl:
-          if (isLive(mpId))
+          if (isLive(mpId)) {
             liveScheduleService.updateLiveEventAcl(mpId, schedulerItem.getAcl());
+          }
           break;
         case UpdateProperties:
           // Workflow properties may have been updated (publishLive configuration)
           String publishLive = schedulerItem.getProperties().get(PUBLISH_LIVE_PROPERTY);
-          if (publishLive == null)
+          if (publishLive == null) {
             // Not specified so we do nothing. We don't want to delete if we got incomplete props.
             return;
-          else if (BooleanUtils.toBoolean(publishLive)) {
+          } else if (BooleanUtils.toBoolean(publishLive)) {
             DublinCoreCatalog episodeDC = schedulerService.getDublinCore(mpId);
             liveScheduleService.createOrUpdateLiveEvent(mpId, episodeDC);
-          } else
+          } else {
             liveScheduleService.deleteLiveEvent(mpId);
+          }
           break;
         case Delete:
         case DeleteRecordingStatus:
@@ -99,9 +120,11 @@ public class SchedulerUpdateHandler extends UpdateHandler {
           String state = schedulerItem.getRecordingState();
           if (RecordingState.CAPTURE_FINISHED.equals(state) || RecordingState.UPLOADING.equals(state)
                   || RecordingState.UPLOADING.equals(state) || RecordingState.CAPTURE_ERROR.equals(state)
-                  || RecordingState.UPLOAD_ERROR.equals(state))
-            if (isLive(mpId))
+                  || RecordingState.UPLOAD_ERROR.equals(state)) {
+            if (isLive(mpId)) {
               liveScheduleService.deleteLiveEvent(mpId);
+            }
+          }
           break;
         case UpdatePresenters:
           break;
@@ -127,8 +150,15 @@ public class SchedulerUpdateHandler extends UpdateHandler {
   }
 
   // === Set by OSGI begin
+  @Reference(name = "schedulerService")
   public void setSchedulerService(SchedulerService service) {
     this.schedulerService = service;
+  }
+
+  @Reference(name = "liveScheduleService")
+  @Override
+  public void setLiveScheduleService(LiveScheduleService liveScheduleService) {
+    super.setLiveScheduleService(liveScheduleService);
   }
   // === Set by OSGI end
 

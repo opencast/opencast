@@ -22,7 +22,6 @@ package org.opencastproject.oaipmh.server;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -33,7 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class AbstractOaiPmhServerInfoRestEndpointTest {
-  private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(), TestRestService.class);
+  private static final RestServiceTestEnv env = testEnvForClasses(TestRestService.class);
 
   @Test
   public void testHasRepo() throws Exception {
