@@ -57,7 +57,7 @@ public class CachedJWT {
    * @return Boolean indicating whether the cached JWT has expired.
    */
   public boolean hasExpired() {
-    return !this.expiresAt.after(new Date());
+    return this.expiresAt != null && !this.expiresAt.after(new Date());
   }
 
   /**

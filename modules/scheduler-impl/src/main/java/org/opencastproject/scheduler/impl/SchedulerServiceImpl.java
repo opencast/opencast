@@ -47,12 +47,13 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventIndexUtils;
-import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexRebuildException;
-import org.opencastproject.index.rebuild.IndexRebuildService;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
+import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -125,6 +126,11 @@ import org.joda.time.DateTimeZone;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,6 +164,13 @@ import java.util.stream.Collectors;
 /**
  * Implementation of {@link SchedulerService}.
  */
+@Component(
+    immediate = true,
+    service = { ManagedService.class, SchedulerService.class, IndexProducer.class },
+    property = {
+        "service.description=Scheduler Service"
+    }
+)
 public class SchedulerServiceImpl extends AbstractIndexProducer implements SchedulerService, ManagedService {
 
   /** The logger */
@@ -224,8 +237,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private OrganizationDirectoryService orgDirectoryService;
 
   /** The Elasticsearch indices */
-  private AbstractSearchIndex adminUiIndex;
-  private AbstractSearchIndex externalApiIndex;
+  private ElasticsearchIndex index;
 
   /** The list of registered event catalog UI adapters */
   private List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
@@ -240,6 +252,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param messageSender
    */
+  @Reference(name = "message-broker-sender")
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
@@ -249,6 +262,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param persistence
    */
+  @Reference(name = "scheduler-persistence")
   public void setPersistence(SchedulerServiceDatabase persistence) {
     this.persistence = persistence;
   }
@@ -258,6 +272,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param seriesService
    */
+  @Reference(name = "series-service")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -267,6 +282,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param securityService
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -276,6 +292,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param assetManager
    */
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -285,6 +302,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param workspace
    */
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -294,6 +312,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param authorizationService
    */
+  @Reference(name = "authorization-service")
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -314,31 +333,29 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param orgDirectoryService
    */
+  @Reference(name = "org-directory-service")
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
   }
 
   /**
-   * OSgi callback to set the Admin UI index.
+   * OSgi callback to set the API index.
    *
    * @param index
-   *          the admin UI index.
+   *          the API index.
    */
-  public void setAdminUiIndex(AbstractSearchIndex index) {
-    this.adminUiIndex = index;
-  }
-
-  /**
-   * OSGi callback to set the External API index
-   *
-   * @param index
-   *          the external API index.
-   */
-  public void setExternalApiIndex(AbstractSearchIndex index) {
-    this.externalApiIndex = index;
+  @Reference(name = "elasticsearch-index")
+  public void setIndex(ElasticsearchIndex index) {
+    this.index = index;
   }
 
   /** OSGi callback to add {@link EventCatalogUIAdapter} instance. */
+  @Reference(
+      name = "event-catalog-ui-adapter",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     eventCatalogUIAdapters.add(catalogUIAdapter);
   }
@@ -355,6 +372,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *          ComponentContext
    * @throws Exception
    */
+  @Activate
   public void activate(ComponentContext cc) throws Exception {
     this.componentContext = cc;
     systemUserName = SecurityUtil.getSystemUserName(cc);
@@ -449,11 +467,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       updateLiveEvent(mediaPackageId, Opt.some(acl), dublinCore, Opt.some(startDateTime),
               Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(finalCaProperties));
 
-      // Update Elasticsearch indices
-      updateEventInIndex(mediaPackageId, adminUiIndex, Opt.some(acl), dublinCore, Opt.some(startDateTime),
-              Opt.some(endDateTime), Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties),
-              Opt.none());
-      updateEventInIndex(mediaPackageId, externalApiIndex, Opt.some(acl), dublinCore, Opt.some(startDateTime),
+      // Update API index
+      updateEventInIndex(mediaPackageId, index, Opt.some(acl), dublinCore, Opt.some(startDateTime),
               Opt.some(endDateTime), Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties),
               Opt.none());
 
@@ -598,10 +613,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         // Update live event
         updateLiveEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                 Opt.some(captureAgentId), Opt.some(finalCaProperties));
-        // Update Elasticsearch indices
-        updateEventInIndex(mediaPackageId, adminUiIndex, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
-                Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.none());
-        updateEventInIndex(mediaPackageId, externalApiIndex, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
+
+        // Update API index
+        updateEventInIndex(mediaPackageId, index, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                 Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.none());
 
         scheduledEvents.put(mediaPackageId, event);
@@ -682,8 +696,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       final ExtendedEventDto extendedEventDto = optExtEvent.get();
       Date start = extendedEventDto.getStartDate();
       Date end = extendedEventDto.getEndDate();
-
-      verifyActive(mpId, end);
 
       if ((startDateTime.isSome() || endDateTime.isSome()) && endDateTime.getOr(end).before(startDateTime.getOr(start)))
         throw new SchedulerException("The end date is before the start date");
@@ -795,10 +807,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       updateLiveEvent(mpId, acl, dublinCore, startDateTime, endDateTime, Opt.some(agentId),
               finalCaProperties);
 
-      // Update Elasticsearch indices
-      updateEventInIndex(mpId, adminUiIndex, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
-              finalCaProperties, Opt.none());
-      updateEventInIndex(mpId, externalApiIndex, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
+      // Update API index
+      updateEventInIndex(mpId, index, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
               finalCaProperties, Opt.none());
 
       // Update last modified
@@ -845,19 +855,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
-  private void verifyActive(String eventId, Date end) throws SchedulerException {
-    if (end == null) {
-      throw new IllegalArgumentException("Start and/or end date for event ID " + eventId + " is not set");
-    }
-    // TODO: Assumption of no TimeZone adjustment because catalog temporal is local to server
-    if (new Date().after(end)) {
-      logger.info("Event ID {} has already ended as its end time was {} and current time is {}", eventId,
-          DateTimeSupport.toUTC(end.getTime()), DateTimeSupport.toUTC(new Date().getTime()));
-      throw new SchedulerException("Event ID " + eventId + " has already ended at "
-              + DateTimeSupport.toUTC(end.getTime()) + " and now is " + DateTimeSupport.toUTC(new Date().getTime()));
-    }
-  }
-
   @Override
   public synchronized void removeEvent(String mediaPackageId)
           throws NotFoundException, SchedulerException {
@@ -886,9 +883,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       sendSchedulerMessage(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
 
-      // Update Elasticsearch indices
-      removeSchedulingFromIndex(mediaPackageId, adminUiIndex);
-      removeSchedulingFromIndex(mediaPackageId, externalApiIndex);
+      // Update API index
+      removeSchedulingFromIndex(mediaPackageId, index);
 
     } catch (NotFoundException | SchedulerException e) {
       throw e;
@@ -1048,12 +1044,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       final Organization organization = securityService.getOrganization();
       final User user = SecurityUtil.createSystemUser(systemUserName, organization);
-      List<MediaPackage> conflictingEvents = new ArrayList();
+      List<MediaPackage> conflictingEvents = new ArrayList<>();
 
       SecurityUtil.runAs(securityService, organization, user, () -> {
         try {
-          conflictingEvents.addAll(persistence.getEvents(captureDeviceID, startDate, endDate, Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS)
-            .stream().map(this::getEventMediaPackage).collect(Collectors.toList()));
+          persistence.getEvents(captureDeviceID, startDate, endDate, Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS)
+                  .stream()
+                  .map(id -> getEventMediaPackage(id, false))
+                  .forEach(conflictingEvents::add);
         } catch (SchedulerServiceDatabaseException e) {
           logger.error("Failed to get conflicting events", e);
         }
@@ -1279,10 +1277,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         sendSchedulerMessage(new SchedulerItemList(r.getID(), Collections.singletonList(SchedulerItem
                 .updateRecordingStatus(r.getState(), r.getLastCheckinTime()))));
 
-        // Update Elasticsearch indices
-        updateEventInIndex(r.getID(), adminUiIndex, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
-                Opt.none(), Opt.none(), Opt.some(r.getState()));
-        updateEventInIndex(r.getID(), externalApiIndex, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
+        // Update API index
+        updateEventInIndex(r.getID(), index, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
                 Opt.none(), Opt.none(), Opt.some(r.getState()));
       } else {
         logger.debug("Recording state not changed");
@@ -1341,9 +1337,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       sendSchedulerMessage(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
 
-      // Update Elasticsearch indices
-      removeRecordingStatusFromIndex(id, adminUiIndex);
-      removeRecordingStatusFromIndex(id, externalApiIndex);
+      // Update API index
+      removeRecordingStatusFromIndex(id, index);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1393,7 +1388,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Update the event in the Elasticsearch index. Fields will only be updated of the corresponding Opt is not none.
+   * Update the event in the API index. Fields will only be updated of the corresponding Opt is not none.
    *
    * @param mediaPackageId
    * @param index
@@ -1406,7 +1401,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param properties
    * @param recordingStatus
    */
-  private void updateEventInIndex(String mediaPackageId, AbstractSearchIndex index, Opt<AccessControlList> acl,
+  private void updateEventInIndex(String mediaPackageId, ElasticsearchIndex index, Opt<AccessControlList> acl,
           Opt<DublinCoreCatalog> dublinCore, Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters,
           Opt<String> agentId, Opt<Map<String, String>> properties, Opt<String> recordingStatus) {
 
@@ -1465,12 +1460,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Set recording status to null for this event in the Elasticsearch index.
+   * Set recording status to null for this event in the API index.
    *
    * @param mediaPackageId
    * @param index
    */
-  private void removeRecordingStatusFromIndex(String mediaPackageId, AbstractSearchIndex index) {
+  private void removeRecordingStatusFromIndex(String mediaPackageId, ElasticsearchIndex index) {
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
 
@@ -1490,12 +1485,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Remove scheduling information for this event from the Elasticsearch index.
+   * Remove scheduling information for this event from the API index.
    *
    * @param mediaPackageId
    * @param index
    */
-  private void removeSchedulingFromIndex(String mediaPackageId, AbstractSearchIndex index) {
+  private void removeSchedulingFromIndex(String mediaPackageId, ElasticsearchIndex index) {
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
     try {
@@ -1603,17 +1598,24 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return wfPropertiesString.toString();
   }
 
-  private MediaPackage getEventMediaPackage(String mediaPackageId) {
+  private MediaPackage getEventMediaPackage(final String mediaPackageId, boolean checkOwner) {
     AQueryBuilder query = assetManager.createQuery();
-    AResult result = query.select(query.snapshot())
-            .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query))
-            .and(query.version().isLatest()))
-            .run();
-    Opt<ARecord> record = result.getRecords().head();
+    var predicate = withOrganization(query)
+            .and(query.mediaPackageId(mediaPackageId))
+            .and(query.version().isLatest());
+    if (checkOwner) {
+      predicate = predicate.and(withOwner(query));
+    }
+
+    Opt<ARecord> record = query.select(query.snapshot()).where(predicate).run().getRecords().head();
     if (record.isNone())
       throw new RuntimeNotFoundException(new NotFoundException());
 
     return record.bind(recordToMp).get();
+  }
+
+  private MediaPackage getEventMediaPackage(final String mediaPackageId) {
+    return getEventMediaPackage(mediaPackageId, true);
   }
 
   /**
@@ -1686,7 +1688,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
+  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
     final int[] current = {0};
     final int total;
     try {

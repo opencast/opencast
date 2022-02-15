@@ -3,9 +3,9 @@
   "private": true,
   "devDependencies": {
     "autoprefixer": "^9.8.8",
-    "bower": "^1.8.12",
-    "chromedriver": "^95.0.0",
-    "eslint": "^8.1.0",
+    "bower": "^1.8.13",
+    "chromedriver": "^98.0.0",
+    "eslint": "^8.9.0",
     "eslint-plugin-header": "^3.1.1",
     "grunt": "^1.4.1",
     "grunt-cli": "^1.4.3",
@@ -33,23 +33,23 @@
     "grunt-usemin": "^3.1.1",
     "grunt-wiredep": "^3.0.1",
     "html-linter": "^1.1.1",
-    "html-validate": "^6.1.0",
-    "jasmine-core": "^3.10.1",
+    "html-validate": "^6.3.1",
+    "jasmine-core": "^4.0.0",
     "jit-grunt": "^0.10.0",
     "jshint-stylish": "^2.2.1",
-    "karma": "^6.3.6",
+    "karma": "^6.3.16",
     "karma-chrome-launcher": "^3.1.0",
-    "karma-coverage": "^2.0.3",
+    "karma-coverage": "^2.2.0",
     "karma-detect-browsers": "^2.0",
-    "karma-firefox-launcher": "^2.1.1",
+    "karma-firefox-launcher": "^2.1.2",
     "karma-jasmine": "^4.0.1",
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "request": "^2.88.2",
     "request-digest": "^1.0.13",
     "selenium-server-standalone-jar": "3.141.59",
-    "serve-static": "^1.14.1",
+    "serve-static": "^1.14.2",
     "time-grunt": "^2.0.0",
-    "url-parse": "^1.5.3"
+    "url-parse": "^1.5.4"
   },
   "engines": {
     "node": "8.9.4",
@@ -66,6 +66,6 @@
   },
   "dependencies": {
     "coffeescript": "^2.6.1",
-    "node-sass": "^6.0.1"
+    "node-sass": "^7.0.1"
   }
 }

@@ -28,11 +28,11 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchQuery;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
@@ -56,6 +56,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +80,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
+@Component(
+    immediate = true,
+    service = { ManagedService.class,StatisticsExportService.class },
+    property = {
+        "service.description=Statistics Export Service"
+    }
+)
 public class StatisticsExportServiceImpl implements StatisticsExportService, ManagedService {
 
   /** Logging utility */
@@ -127,26 +138,32 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
         ));
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating Statistics Service");
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating Statistics Service");
   }
 
+  @Reference(name = "IndexService")
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
+  @Reference(name = "StatisticsService")
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
 
+  @Reference(name = "SecurityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(name = "AssetManager")
   public void setAssetManager(final AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -183,7 +200,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      AbstractSearchIndex index,
+      ElasticsearchIndex index,
       ZoneId zoneId
   ) throws SearchIndexException, UnauthorizedException, NotFoundException {
     if (!(provider instanceof TimeSeriesProvider)) {
@@ -229,7 +246,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
 
   @Override
   public String getCSV(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution
-          dataResolution, AbstractSearchIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel,
+          dataResolution, ElasticsearchIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel,
           int limit, int offset, Map<String, String> filters)
           throws SearchIndexException, UnauthorizedException, NotFoundException {
     if (!(provider instanceof TimeSeriesProvider)) {
@@ -286,7 +303,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      AbstractSearchIndex index,
+      ElasticsearchIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetaData,
@@ -310,7 +327,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   }
 
   private void printSeries(StatisticsProvider provider, String resourceId, Instant from, Instant to,
-                           DataResolution dataResolution, AbstractSearchIndex index, ZoneId zoneId, CSVPrinter printer,
+                           DataResolution dataResolution, ElasticsearchIndex index, ZoneId zoneId, CSVPrinter printer,
                            boolean fullMetadata, int limit, int offset)
           throws SearchIndexException, NotFoundException, IOException {
     if (offset != 0) {
@@ -335,7 +352,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      AbstractSearchIndex index,
+      ElasticsearchIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetadata,
@@ -398,7 +415,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      AbstractSearchIndex index,
+      ElasticsearchIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetadata,
@@ -444,7 +461,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      AbstractSearchIndex index,
+      ElasticsearchIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetadata,
@@ -667,6 +684,5 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       throw new IllegalArgumentException("Unknown filter :" + name);
     }
   }
-
 
 }

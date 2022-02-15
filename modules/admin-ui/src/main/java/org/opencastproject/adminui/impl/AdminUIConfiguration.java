@@ -26,6 +26,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
@@ -266,6 +267,7 @@ public class AdminUIConfiguration {
     return retractWorkflowId;
   }
 
+  @Activate
   @Modified
   public void modified(Map<String, Object> properties) {
     if (properties == null) {

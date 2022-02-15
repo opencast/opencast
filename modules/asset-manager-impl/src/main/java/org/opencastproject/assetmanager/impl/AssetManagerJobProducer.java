@@ -39,16 +39,29 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
 
 import com.entwinemedia.fn.data.Opt;
+import com.google.gson.Gson;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
+@Component(
+    immediate = true,
+    service = AssetManagerJobProducer.class,
+    property = {
+        "service.description=Opencast Asset Manager Job Producer"
+    }
+)
 public class AssetManagerJobProducer extends AbstractJobProducer {
 
   /** The logging facility */
@@ -59,7 +72,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
   public static final Float NONTERMINAL_JOB_LOAD = 0.1f;
 
   public enum Operation {
-    MoveById, MoveByIdAndVersion, MoveByIdAndDate, MoveByDate
+    MoveById, MoveByIdAndVersion, MoveByIdAndDate, MoveByDate, MoveRecords
   }
 
   private static final String OK = "OK";
@@ -81,8 +94,9 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    *          the component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
-    logger.info("Activating tiered storage assetmanager job service");
+    logger.info("Activating assetmanager job service");
     super.activate(cc);
   }
 
@@ -90,6 +104,42 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     Opt<AssetStore> store = tsam.getAssetStore(storeId);
     return store.isSome();
   }
+
+  /** Utility class to collect RecordInformation for moving larger 
+   * groups of mediapackages in combined jobs.
+   */
+  private class MoveRecordInfo {
+    private final Gson gson = new Gson();
+    private int success = 0;
+    private int failed = 0;
+    private String currentMpId = "";
+    public void addSuccess() {
+      success++;
+    };
+    public void addFailed() {
+      failed ++;
+    }
+
+    public boolean isNewMpId(String mpId) {
+      if (currentMpId.equals(mpId)) {
+        return false;
+      }
+      currentMpId = mpId;
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      Map<String,Integer> result = new HashMap<>();
+      if (success > 0) {
+        result.put("OK", success);
+      }
+      if (failed > 0) {
+        result.put("FAIL", failed);
+      }
+      return gson.toJson(result);
+    }
+  };
 
   @Override
   protected String process(Job job) throws ServiceRegistryException {
@@ -145,7 +195,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     RequireUtil.notNull(version, "version");
     RequireUtil.notEmpty(mpId, "mpId");
     RequireUtil.notEmpty(targetStorage, "targetStorage");
-    List<String> args = new LinkedList<String>();
+    List<String> args = new LinkedList<>();
     args.add(targetStorage);
     args.add(mpId);
     args.add(version.toString());
@@ -171,7 +221,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    * @throws NotFoundException
    */
   protected String internalMoveByIdAndVersion(
-      final VersionImpl version,
+      final Version version,
       final String mpId,
       final String targetStorage
   ) throws NotFoundException {
@@ -192,7 +242,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
   public Job moveById(final String mpId, final String targetStorage) {
     RequireUtil.notEmpty(mpId, "mpId");
     RequireUtil.notEmpty(targetStorage, "targetStorage");
-    List<String> args = new LinkedList<String>();
+    List<String> args = new LinkedList<>();
     args.add(targetStorage);
     args.add(mpId);
 
@@ -204,19 +254,20 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
   }
 
   /**
-   * Spawns subjobs on a per-snapshot level to move the appropriate snapshots to their new home
+   * Moves all the appropriate snapshots to their new home
    *
    * @param mpId
    *  The mediapackage ID of the snapshot to move
    * @param targetStorage
    *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
-   *  The number of subjobs spawned
+   *  The String containing the number of successful and failed moves
+   *  [0 OK ][0 FAILED ]
    */
   protected String internalMoveById(final String mpId, final String targetStorage) {
-    RichAResult results = tsam.getSnapshotsById(mpId);
-    List<Job> subjobs = spawnSubjobs(results, targetStorage);
-    return Integer.toString(subjobs.size());
+    RichAResult results = tsam.getSnapshotsByIdOrderedByVersion(mpId, true);
+    MoveRecordInfo result = moveSnapshots(results, targetStorage);
+    return result.toString();
   }
 
 
@@ -237,7 +288,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     RequireUtil.notNull(start, "start");
     RequireUtil.notNull(end, "end");
     RequireUtil.notNull(targetStorage, "targetStorage");
-    List<String> args = new LinkedList<String>();
+    List<String> args = new LinkedList<>();
     args.add(targetStorage);
     args.add(Long.toString(start.getTime()));
     args.add(Long.toString(end.getTime()));
@@ -252,6 +303,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
 
   /**
    * Spawns subjobs on a per-snapshot level to move the appropriate snapshots to their new home
+   * Moves all the appropriate snapshots to their new home
    *
    * @param start
    *  The start {@link Date}
@@ -263,8 +315,8 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    *  The number of subjobs spawned
    */
   protected String internalMoveByDate(final Date start, final Date end, final String targetStorage) {
-    RichAResult results = tsam.getSnapshotsByDate(start, end);
-    List<Job> subjobs = spawnSubjobs(results, targetStorage);
+    RichAResult results = tsam.getSnapshotsByDateOrderedById(start, end);
+    List<Job> subjobs = spawnSubjobs(results, start, end, targetStorage);
     return Integer.toString(subjobs.size());
   }
 
@@ -288,7 +340,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     RequireUtil.notNull(start, "start");
     RequireUtil.notNull(end, "end");
     RequireUtil.notNull(targetStorage, "targetStorage");
-    List<String> args = new LinkedList<String>();
+    List<String> args = new LinkedList<>();
     args.add(targetStorage);
     args.add(mpId);
     args.add(Long.toString(start.getTime()));
@@ -303,7 +355,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
   }
 
   /**
-   * Spawns subjobs on a per-snapshot level to move the appropriate snapshots to their new home
+   * Moves all the appropriate snapshots to their new home
    *
    * @param mpId
    *  The mediapackage ID of the snapshot to move
@@ -314,7 +366,8 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    * @param targetStorage
    *  The {@link RemoteAssetStore} ID where the snapshot should be moved
    * @return
-   *  The number of subjobs spawned
+   *  The JSON String containing the number of successful and failed moves
+   *  {"OK": 0,"FAIL": 0}
    */
   protected String internalMoveByIdAndDate(
       final String mpId,
@@ -322,9 +375,9 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
       final Date end,
       final String targetStorage
   ) {
-    RichAResult results = tsam.getSnapshotsByIdAndDate(mpId, start, end);
-    List<Job> subjobs = spawnSubjobs(results, targetStorage);
-    return Integer.toString(subjobs.size());
+    RichAResult results = tsam.getSnapshotsByIdAndDateOrderedByVersion(mpId, start, end, true);
+    MoveRecordInfo result = moveSnapshots(results, targetStorage);
+    return result.toString();
   }
 
   /**
@@ -337,22 +390,66 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    * @return
    *  The set of subjobs
    */
-  private List<Job> spawnSubjobs(final RichAResult records, final String targetStorage) {
+
+  private List<Job> spawnSubjobs(
+      final RichAResult records,
+      final Date start,
+      final Date end,
+      final String targetStorage
+  ) {
     List<Job> jobs = new LinkedList<>();
+    MoveRecordInfo recordInfo = new MoveRecordInfo();
     records.forEach(new Consumer<ARecord>() {
       @Override
       public void accept(ARecord record) {
         Snapshot snap = record.getSnapshot().get();
-        jobs.add(moveByIdAndVersion(
-            snap.getVersion(),
-            snap.getMediaPackage().getIdentifier().toString(),
-            targetStorage
-        ));
+        String mediaPackageId = snap.getMediaPackage().getIdentifier().toString();
+        if (recordInfo.isNewMpId(mediaPackageId)) {
+          jobs.add(moveByIdAndDate(mediaPackageId,start,end,targetStorage));
+        }
       }
     });
     return jobs;
   }
 
+  /**
+   * Moves all snapshot based on the stream of records from its current storage to a new target storage location
+   *
+   * @param records
+   *  The stream of records containing the snapshots to move to the new target storage
+   * @param targetStorage
+   *  The {@link RemoteAssetStore} ID where the snapshot should be moved
+   * @return
+   *  The {@link MoveRecordInfo}
+   */
+  private MoveRecordInfo moveSnapshots(final RichAResult records, final String targetStorage) {
+    final MoveRecordInfo result = new MoveRecordInfo();
+    records.forEach(new Consumer<ARecord>() {
+      @Override
+      public void accept(ARecord record) {
+        Snapshot snap = record.getSnapshot().get();
+          try {
+            logger.debug("moving Mediapackage {} Version {} from {} to {}",
+                snap.getMediaPackage().getIdentifier().toString(),
+                snap.getVersion().toString(),
+                snap.getStorageId(),
+                targetStorage
+            );
+            internalMoveByIdAndVersion(snap.getVersion(),
+                snap.getMediaPackage().getIdentifier().toString(),
+                targetStorage
+            );
+            result.addSuccess();
+          } catch (NotFoundException e) {
+            result.addFailed();
+            logger.warn(e.getMessage());
+          }
+      }
+    });
+    return result;
+  }
+
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -362,10 +459,12 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.serviceRegistry;
   }
 
+  @Reference(name = "assetManager")
   protected void setAssetManager(AssetManager assetManager) {
     this.tsam = assetManager;
   }
 
+  @Reference(name = "security-service")
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -375,6 +474,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.securityService;
   }
 
+  @Reference(name = "user-directory")
   protected void setUserDirectoryService(UserDirectoryService uds) {
     this.userDirectoryService = uds;
   }
@@ -384,7 +484,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.userDirectoryService;
   }
 
-
+  @Reference(name = "orgDirectory")
   protected void setOrganizationDirectoryService(OrganizationDirectoryService os) {
     this.organizationDirectoryService = os;
   }

@@ -22,11 +22,11 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -39,6 +39,7 @@ import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
@@ -70,7 +71,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
 
   private AclServiceFactory aclServiceFactory;
   private AssetManager assetManager;
-  private AdminUISearchIndex index;
+  private ElasticsearchIndex index;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
   private EventCommentService eventCommentService;
@@ -224,13 +225,13 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public AdminUISearchIndex getIndex() {
+  public ElasticsearchIndex getIndex() {
     return index;
   }
 
   /** OSGi DI. */
   @Reference
-  public void setIndex(AdminUISearchIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 
@@ -245,6 +246,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
     this.urlSigningService = urlSigningService;
   }
 
+  @Activate
   @Modified
   public void modified(ComponentContext cc) {
     Dictionary<String, Object> properties = cc.getProperties();

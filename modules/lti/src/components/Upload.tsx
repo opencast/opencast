@@ -1,5 +1,4 @@
-import { ValueType } from "react-select/src/types"; // tslint:disable-line no-submodule-imports
-import Select from "react-select";
+import Select, { OnChangeValue } from "react-select";
 import { Loading } from "./Loading";
 import Helmet from "react-helmet";
 import React from "react";
@@ -328,7 +327,7 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
                                 options={this.seriesItems()}
                                 isSearchable={true}
                                 value={this.state.copySeries}
-                                onChange={(value: ValueType<OptionType, false>) =>
+                                onChange={(value: OnChangeValue<OptionType, false>) =>
                                     this.onChangeCopyTarget(value as OptionType)}
                                 placeholder={this.props.t("LTI.SELECT_COPY_TARGET")} />
                         </div>

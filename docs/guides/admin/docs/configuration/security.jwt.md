@@ -1,6 +1,10 @@
 Configuration for JWT-based Authentication and Authorization
 ============================================================
 
+<div class=warn>
+The JWT authentication and authorization is still <b>beta</b>.
+</div>
+
 This page describes how to configure Opencast to enable authentication and authorization based on
 [JSON Web Tokens (JWTs)](https://datatracker.ietf.org/doc/html/rfc7519). With this feature, a login-mechanism based
 on the [OpenID Connect (OIDC)](https://openid.net/connect/) protocol can be configured, since OIDC uses JWTs.
@@ -11,6 +15,26 @@ Prerequisites
 This guide assumes that a JWT provider is already setup and Opencast receives the JWT within an HTTP request header. 
 In order to integrate Opencast with an OIDC provider you could use the
 [oauth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy).
+
+Enable Karaf Feature
+--------------------
+
+The JWT authentication and authorization is disabled by default and needs to be enabled before it can be used.
+For this, make sure the Karaf feature `opencast-security-jwt` boots when starting Opencast.
+
+For this, edit the configuration file `etc/org.apache.karaf.features.cfg` and add the feature:
+
+```
+  …
+  http-whiteboard/4.2.9, \
+  opencast-admin/{{ opencast_major_version() }}.0.0, \
+  opencast-security-jwt/{{ opencast_major_version() }}.0.0, \
+  bundle/4.2.9, \
+  …
+```
+
+Make sure to specify the correct version.
+The version should always be identical to the one from the main Opencast feature.
 
 Spring Security Configuration
 -----------------------------

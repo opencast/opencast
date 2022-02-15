@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -66,6 +66,11 @@
       <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -89,10 +94,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.sox;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/operations/analyze-audio.xml,
-              OSGI-INF/operations/normalize-audio.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

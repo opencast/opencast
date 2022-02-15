@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -51,6 +51,7 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Private-Package>opencast-studio.*</Private-Package>
             <Http-Alias>/studio</Http-Alias>
+            <Http-Spa-Redirect>true</Http-Spa-Redirect>
             <Http-Classpath>/opencast-studio</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>
           </instructions>

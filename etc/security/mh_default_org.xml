@@ -154,7 +154,6 @@
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/reply" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/groups" method="POST" access="ROLE_ADMIN, ROLE_UI_GROUPS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/index/*" method="POST" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/admin-ng/series/deleteSeries" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/series/new" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_CREATE" />
     <sec:intercept-url pattern="/admin-ng/series/*/access" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_ACL_EDIT" />
@@ -294,7 +293,7 @@
     <sec:intercept-url pattern="/studio/**" access="ROLE_ADMIN, ROLE_STUDIO" />
 
     <!-- Enable access to Opencast Editor -->
-    <sec:intercept-url pattern="/editor/**" access="ROLE_USER" />
+    <sec:intercept-url pattern="/editor/**" access="ROLE_ADMIN, ROLE_USER" />
     <sec:intercept-url pattern="/editor-ui/**" access="ROLE_USER" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->

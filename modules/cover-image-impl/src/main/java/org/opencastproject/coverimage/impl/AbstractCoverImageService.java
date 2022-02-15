@@ -44,7 +44,6 @@ import org.apache.batik.apps.rasterizer.DestinationType;
 import org.apache.batik.apps.rasterizer.SVGConverter;
 import org.apache.batik.apps.rasterizer.SVGConverterException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,6 @@ import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
@@ -154,9 +152,8 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
     URI result;
     File tempSvg = null;
     File tempPng = null;
-    StringReader xmlReader = null;
 
-    try {
+    try (StringReader xmlReader =  new StringReader(xml)) {
       Document xslDoc = parseXsl(xsl);
 
       // Create temp SVG file for transformation result
@@ -164,7 +161,6 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
       Result svg = new StreamResult(tempSvg);
 
       // Load Metadata (from resources)
-      xmlReader = new StringReader(xml);
       InputSource xmlSource = new InputSource(xmlReader);
 
       // Transform XML metadata with stylesheet to SVG
@@ -174,27 +170,18 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
       tempPng = createTempFile(job, ".png");
       rasterizeSvg(tempSvg, tempPng);
 
-      FileInputStream in = null;
-      try {
-        in = new FileInputStream(tempPng);
+      try (FileInputStream in = new FileInputStream(tempPng)) {
         result = workspace.putInCollection(COVERIMAGE_WORKSPACE_COLLECTION, job.getId() + "_coverimage.png", in);
         log.debug("Put the cover image into the workspace ({})", result);
-      } catch (FileNotFoundException e) {
-        // should never happen...
-        throw new CoverImageException(e);
       } catch (IOException e) {
         log.warn("Error while putting resulting image into workspace collection '{}': {}",
                 COVERIMAGE_WORKSPACE_COLLECTION, e);
         throw new CoverImageException("Error while putting resulting image into workspace collection", e);
-      } finally {
-        IOUtils.closeQuietly(in);
       }
     } finally {
       FileUtils.deleteQuietly(tempSvg);
       FileUtils.deleteQuietly(tempPng);
       log.debug("Removed temporary files");
-
-      IOUtils.closeQuietly(xmlReader);
     }
 
     return (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
@@ -233,32 +220,32 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
       throw new IllegalArgumentException("Neither svg nor xmlSource nor xslDoc must be null");
     }
 
-    Transformer transformer;
-    try {
-      // CHECKSTYLE:OFF
-      // Xalan Transformer can't be configured safely
-      // xslDoc is an already parsed Document
-      transformer = TransformerFactory.newInstance()
-              .newTransformer(new DOMSource(xslDoc));
-      // CHECKSTYLE:ON
-    } catch (TransformerConfigurationException e) {
-      // this should never happen...
-      throw new CoverImageException("The XSL transformer factory has serious configuration errors", e);
-    }
-    transformer.setParameter("width", width);
-    transformer.setParameter("height", height);
-    if (isNotBlank(posterImage)) {
-      transformer.setParameter("posterimage", posterImage);
-    }
-
     Thread thread = Thread.currentThread();
     ClassLoader loader = thread.getContextClassLoader();
     thread.setContextClassLoader(AbstractCoverImageService.class.getClassLoader());
     try {
+      Transformer transformer;
+      // CHECKSTYLE:OFF
+      // Xalan Transformer can't be configured safely
+      // xslDoc is an already parsed Document
+      transformer = TransformerFactory
+          .newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null)
+          .newTransformer(new DOMSource(xslDoc));
+      // CHECKSTYLE:ON
+
+      transformer.setParameter("width", width);
+      transformer.setParameter("height", height);
+      if (isNotBlank(posterImage)) {
+        transformer.setParameter("posterimage", posterImage);
+      }
+
       log.debug("Transform XML source to SVG");
       // Xalan Transformer can't be configured safely
       // Preparsing the XML with a safe parser
       transformer.transform(new DOMSource(XmlSafeParser.parse(xmlSource)), svg);
+    } catch (TransformerConfigurationException e) {
+      // this should never happen...
+      throw new CoverImageException("The XSL transformer factory has serious configuration errors", e);
     } catch (TransformerException | IOException | SAXException e) {
       log.warn("Error while transforming SVG to image: {}", e.getMessage());
       throw new CoverImageException("Error while transforming SVG to image", e);

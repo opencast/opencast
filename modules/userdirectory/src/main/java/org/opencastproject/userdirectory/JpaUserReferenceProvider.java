@@ -389,8 +389,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
     groupRoleProvider.updateGroupMembershipFromRoles(
         user.getUsername(),
         user.getOrganization().getId(),
-        internalGroupRoles,
-        "ROLE_GROUP_AAI_"
+        internalGroupRoles
     );
   }
 

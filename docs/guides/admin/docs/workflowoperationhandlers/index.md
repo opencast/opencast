@@ -26,6 +26,7 @@ The following table contains the workflow operations that are available in an ou
 |add-catalog         |Add a catalog to the media package                             |[Documentation](add-catalog-woh.md)|
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
+|analyze-mediapackage |Analyze media package                                         |[Documentation](analyze-mediapackage-woh.md)|
 |animate             |Create animated video sequence                                 |[Documentation](animate-woh.md)|
 |amberscript-start-transcription|Start AmberScript Transcription                     |[Documentation](amberscript-start-transcription-woh.md)|
 |amberscript-attach-transcription|Attach AmberScript Transcription                   |[Documentation](amberscript-attach-transcription-woh.md)|
@@ -73,25 +74,32 @@ The following table contains the workflow operations that are available in an ou
 |prepare-av          |Preparing audio and video work versions                        |[Documentation](prepareav-woh.md)|
 |probe-resolution    |Set workflow instance variables based on video resolution      |[Documentation](probe-resolution-woh.md)|
 |process-smil        |Edit and Encode media defined by a SMIL file                   |[Documentation](process-smil-woh.md)|
-|publish-aws         |Distribute and publish media to Amazon S3 and Cloudfront       |[Documentation](publish-aws-woh.md)|
+|publish-configure-aws|Distribute and publish media to the configured publication using Amazon S3 and Cloudfront|[Documentation](publish-configure-aws-woh.md)|
 |publish-configure   |Distribute and publish media to the configured publication     |[Documentation](publish-configure-woh.md)|
+|publish-engage-aws  |Distribute and publish media to the engage player using Amazon S3 and Cloudfront|[Documentation](publish-engage-aws-woh.md)|
 |publish-engage      |Distribute and publish media to the engage player              |[Documentation](publish-engage-woh.md)|
 |publish-oaipmh      |Distribute and publish media to a OAI-PMH repository           |[Documentation](publish-oaipmh-woh.md)|
 |publish-youtube     |Distribute and publish media to YouTube                        |[Documentation](publish-youtube-woh.md)|
+|rename-files        |Rename media files using metadata                              |[Documentation](rename-files-woh.md)|
 |republish-oaipmh    |Update media in a OAI-PMH repository                           |[Documentation](republish-oaipmh-woh.md)|
-|retract-aws         |Retracts media from AWS S3 and Cloudfront publication          |[Documentation](retract-aws-woh.md)|
+|retract-configure-aws|Retracts media from configured publication in AWS S3 and Cloudfront|[Documentation](retract-configure-aws-woh.md)|
 |retract-configure   |Retracts media from configured publication                     |[Documentation](retract-configure-woh.md)|
+|retract-engage-aws  |Retracts media from AWS S3 and Cloudfront publication          |[Documentation](retract-engage-aws-woh.md)|
 |retract-engage      |Retracts media from Opencast Media Module publication          |[Documentation](retract-engage-woh.md)|
+|retract-partial-aws |Retract a subset of the mediapackage from a publication in Amazon S3 and Cloudfront|[Documentation](retract-partial-aws-woh.md)|
+|retract-partial     |Retract a subset of the mediapackage from a publication        |[Documentation](retract-partial-woh.md)|
 |retract-oaipmh      |Retracts media from a OAI-PMH repository                       |[Documentation](retract-oaipmh-woh.md)
 |retract-partial     |Retract a subset of the mediapackage from a publication        |[Documentation](retract-partial-woh.md)|
 |retract-youtube     |Retracts media from YouTube                                    |[Documentation](retract-youtube-woh.md)|
 |segment-video       |Extracting segments from presentation                          |[Documentation](segmentvideo-woh.md)|
 |segmentpreviews     |Extract segment images from a video using FFmpeg               |[Documentation](segmentpreviews-woh.md)|
-|select-streams       |Select streams for further processing                           |[Documentation](select-streams-woh.md)|
+|select-streams      |Select streams for further processing                          |[Documentation](select-streams-woh.md)|
+|select-version      |Select a version of the media package to run the current workflow with|[Documentation](select-version-woh.md)|
 |send-email          |Sends email notifications at any part of a workflow            |[Documentation](send-email-woh.md)|
 |series              |Apply series to the mediapackage                               |[Documentation](series-woh.md)|
 |silence             |Silence detection on audio of the mediapackage                 |[Documentation](silence-woh.md)|
 |snapshot            |Archive the current state of the mediapackage                  |[Documentation](snapshot-woh.md)|
+|speech-to-text      |Create subtitles for video and audio sources                   |[Documentation](speech-to-text-woh.md)|
 |start-watson-transcription|Starts automated transcription provided by IBM Watson    |[Documentation](start-watson-transcription-woh.md)|
 |start-workflow      |Start a new workflow for given media package ID                |[Documentation](start-workflow-woh.md)|
 |statistics-writer   |Log statistical data about the video                           |[Documentation](statistics-writer.md)|

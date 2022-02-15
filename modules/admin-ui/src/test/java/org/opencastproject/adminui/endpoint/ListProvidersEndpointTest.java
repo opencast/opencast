@@ -25,7 +25,6 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasValue;
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -44,7 +43,7 @@ import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 
 public class ListProvidersEndpointTest {
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestListProvidersEndpoint.class);
+  private static final RestServiceTestEnv rt = testEnvForClasses(TestListProvidersEndpoint.class);
 
   private JSONParser parser;
 

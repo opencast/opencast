@@ -51,7 +51,6 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
-import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -60,15 +59,17 @@ import org.opencastproject.authorization.xacml.manager.util.AccessInformationUti
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesIndexSchema;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.theme.IndexTheme;
-import org.opencastproject.elasticsearch.index.theme.ThemeSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
+import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.resources.list.provider.SeriesListProvider;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.ListProviderException;
@@ -186,7 +187,7 @@ public class SeriesEndpoint {
   private AclServiceFactory aclServiceFactory;
   private IndexService indexService;
   private ListProvidersService listProvidersService;
-  private AdminUISearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
   /** Default server URL */
   private String serverUrl = "http://localhost:8080";
@@ -199,7 +200,7 @@ public class SeriesEndpoint {
 
   /** OSGi callback for the search index. */
   @Reference
-  public void setIndex(AdminUISearchIndex index) {
+  public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }
 
@@ -232,12 +233,14 @@ public class SeriesEndpoint {
   }
 
   @Activate
-  protected void activate(ComponentContext cc) {
+  protected void activate(ComponentContext cc, Map<String, Object> properties) {
     if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl != null)
         this.serverUrl = ccServerUrl;
+
+      modified(properties);
     }
     logger.info("Activate series endpoint");
   }
@@ -716,15 +719,6 @@ public class SeriesEndpoint {
    *         depending on the parameter
    */
   public Map<String, String> getUserSeriesByAccess(boolean writeAccess) {
-    String listProviderName = null;
-    MetadataField seriesMetadataField = indexService.getCommonEventCatalogUIAdapter().getRawFields().getOutputFields()
-        .get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-    if (seriesMetadataField != null && StringUtils.isNotEmpty(seriesMetadataField.getListprovider())) {
-      listProviderName = seriesMetadataField.getListprovider();
-    }
-    if (StringUtils.isEmpty(listProviderName)) {
-      listProviderName = "SERIES";
-    }
     SeriesListQuery query = new SeriesListQuery();
     if (writeAccess) {
       query.withoutPermissions();
@@ -732,7 +726,7 @@ public class SeriesEndpoint {
       query.withWritePermission(true);
     }
     try {
-      return listProvidersService.getList(listProviderName, query, true);
+      return listProvidersService.getList(SeriesListProvider.PROVIDER_PREFIX, query, true);
     } catch (ListProviderException e) {
       logger.warn("Could not perform search query.", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);

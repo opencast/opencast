@@ -128,7 +128,8 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "此系列包含事件。删除此系列将不会删除其中的事件。",
-         "EVENT_WILL_BE_GONE": "如果您继续，该事件将彻底丢失。"
+         "EVENT_WILL_BE_GONE": "如果您继续，该事件将彻底丢失。",
+         "UNSAVED_CHANGES": "您有未保存的更改。如果您继续，这些更改将被丢弃。您确定要继续吗？"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "此系列无法删除，因为它仍然包含事件。"
@@ -205,6 +206,7 @@
       "INVALID_ACL_RULES": "规则必须含有一个拥有读或写权限的有效角色。",
       "MISSING_ACL_RULES": "至少有一个角色必须具有读取和写入权限。",
       "SAVED_ACL_RULES": "访问权限已保存",
+      "SAVED_METADATA": "元数据已保存。",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "这个系列中已有的事件需要重新处理",
       "SERIES_ACL_LOCKED": "当系列中的事件正在处理时，无法编辑访问权限",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "访问策略需要至少一个具有读写权限的角色。",

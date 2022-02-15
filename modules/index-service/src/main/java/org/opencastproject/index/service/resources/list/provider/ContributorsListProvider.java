@@ -21,19 +21,22 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesIndexSchema;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +54,14 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Contributors list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.ContributorsListProvider"
+    }
+)
 public class ContributorsListProvider implements ResourceListProvider {
 
   private static final String CONFIGURATION_KEY_EXCLUDE_USER_PROVIDER = "exclude.user.provider";
@@ -68,13 +79,15 @@ public class ContributorsListProvider implements ResourceListProvider {
 
   private final Set<String> excludeUserProvider = new HashSet<>();
   private UserDirectoryService userDirectoryService;
-  private AbstractSearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
+  @Activate
   protected void activate(Map<String, Object> properties) {
     modified(properties);
     logger.info("Contributors list provider activated!");
   }
 
+  @Modified
   public void modified(Map<String, Object> properties) {
     Object excludeUserProviderValue = properties.get(CONFIGURATION_KEY_EXCLUDE_USER_PROVIDER);
     excludeUserProvider.clear();
@@ -89,12 +102,14 @@ public class ContributorsListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for users services. */
+  @Reference(name = "userDirectoryService")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
   /** OSGi callback for the search index. */
-  public void setIndex(AbstractSearchIndex index) {
+  @Reference(name = "ElasticsearchIndex")
+  public void setIndex(ElasticsearchIndex index) {
     this.searchIndex = index;
   }
 
@@ -142,17 +157,17 @@ public class ContributorsListProvider implements ResourceListProvider {
     }
 
     contributorsList.addAll(searchIndex.getTermsForField(EventIndexSchema.CONTRIBUTOR,
-            Option.some(new String[] { Event.DOCUMENT_TYPE })));
+            Event.DOCUMENT_TYPE));
     contributorsList.addAll(searchIndex.getTermsForField(EventIndexSchema.PRESENTER,
-            Option.some(new String[] { Event.DOCUMENT_TYPE })));
+            Event.DOCUMENT_TYPE));
     contributorsList.addAll(searchIndex.getTermsForField(EventIndexSchema.PUBLISHER,
-            Option.some(new String[] { Event.DOCUMENT_TYPE })));
+            Event.DOCUMENT_TYPE));
     contributorsList.addAll(searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS,
-            Option.some(new String[] { Series.DOCUMENT_TYPE })));
+            Series.DOCUMENT_TYPE));
     contributorsList.addAll(searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS,
-            Option.some(new String[] { Series.DOCUMENT_TYPE })));
+            Series.DOCUMENT_TYPE));
     contributorsList.addAll(searchIndex.getTermsForField(SeriesIndexSchema.PUBLISHERS,
-            Option.some(new String[] { Series.DOCUMENT_TYPE })));
+            Series.DOCUMENT_TYPE));
 
     // TODO: TThis is not a good idea.
     // TODO: The search index can handle limit and offset.
@@ -209,15 +224,15 @@ public class ContributorsListProvider implements ResourceListProvider {
     }
 
     addIndexNamesToMap(labels, contributorsList, searchIndex
-            .getTermsForField(EventIndexSchema.PRESENTER, Option.some(new String[] { Event.DOCUMENT_TYPE })));
+            .getTermsForField(EventIndexSchema.PRESENTER, Event.DOCUMENT_TYPE));
     addIndexNamesToMap(labels, contributorsList, searchIndex
-            .getTermsForField(EventIndexSchema.CONTRIBUTOR, Option.some(new String[] { Event.DOCUMENT_TYPE })));
+            .getTermsForField(EventIndexSchema.CONTRIBUTOR, Event.DOCUMENT_TYPE));
     addIndexNamesToMap(labels, contributorsList, searchIndex
-            .getTermsForField(SeriesIndexSchema.CONTRIBUTORS, Option.some(new String[] { Event.DOCUMENT_TYPE })));
+            .getTermsForField(SeriesIndexSchema.CONTRIBUTORS, Event.DOCUMENT_TYPE));
     addIndexNamesToMap(labels, contributorsList, searchIndex
-            .getTermsForField(SeriesIndexSchema.ORGANIZERS, Option.some(new String[] { Event.DOCUMENT_TYPE })));
+            .getTermsForField(SeriesIndexSchema.ORGANIZERS, Event.DOCUMENT_TYPE));
     addIndexNamesToMap(labels, contributorsList, searchIndex
-            .getTermsForField(SeriesIndexSchema.PUBLISHERS, Option.some(new String[] { Event.DOCUMENT_TYPE })));
+            .getTermsForField(SeriesIndexSchema.PUBLISHERS, Event.DOCUMENT_TYPE));
 
     Collections.sort(contributorsList, new Comparator<Contributor>() {
       @Override

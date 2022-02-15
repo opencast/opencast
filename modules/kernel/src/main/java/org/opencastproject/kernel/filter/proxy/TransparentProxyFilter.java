@@ -22,6 +22,7 @@
 package org.opencastproject.kernel.filter.proxy;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,17 @@ import javax.servlet.http.HttpServletRequest;
  * This filter is looking for <code>X-FORWARDED-FOR</code> headers in the HTTP request and if found sets it as the
  * original IP.
  */
+@Component(
+    immediate = true,
+    service = Filter.class,
+    property = {
+        "service.description=Transparent Proxy Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=9",
+        "urlPatterns=*"
+    }
+)
 public class TransparentProxyFilter implements Filter {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(TransparentProxyFilter.class);

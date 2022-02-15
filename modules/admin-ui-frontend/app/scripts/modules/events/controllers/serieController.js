@@ -24,11 +24,11 @@
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource',
   'SeriesThemeResource', 'ResourcesListResource', 'RolesResource', 'Notifications', 'AuthService',
-  'StatisticsReusable', '$http',
+  'StatisticsReusable', '$http', 'Modal', '$translate',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    ResourcesListResource, RolesResource, Notifications, AuthService, StatisticsReusable, $http) {
+    ResourcesListResource, RolesResource, Notifications, AuthService, StatisticsReusable, $http, Modal, $translate) {
 
-    var saveFns = {}, aclNotification,
+    var metadataChangedFns = {}, aclNotification,
         me = this,
         NOTIFICATION_CONTEXT = 'series-acl',
         mainCatalog = 'dublincore/series', fetchChildResources,
@@ -133,35 +133,46 @@ angular.module('adminNg.controllers')
         previousProviderData);
 
       $scope.metadata = SeriesMetadataResource.get({ id: id }, function (metadata) {
-        var seriesCatalogIndex, keepGoing = true;
+        $scope.extendedMetadataCatalogs = [];
         angular.forEach(metadata.entries, function (catalog, index) {
+          // common metadata
           if (catalog.flavor === mainCatalog) {
-            $scope.seriesCatalog = catalog;
-            seriesCatalogIndex = index;
-            var tabindex = 2;
-            angular.forEach(catalog.fields, function (entry) {
-              if (entry.id === 'title' && angular.isString(entry.value)) {
-                $scope.titleParams = { resourceId: entry.value.substring(0,70) };
-              }
-              if (keepGoing && entry.locked) {
-                metadata.locked = entry.locked;
-                keepGoing = false;
-              }
-              entry.tabindex = tabindex++;
-            });
+            $scope.commonMetadataCatalog = catalog;
+          // extended metadata
+          } else {
+            $scope.extendedMetadataCatalogs.push(catalog);
           }
-        });
 
-        if (angular.isDefined(seriesCatalogIndex)) {
-          metadata.entries.splice(seriesCatalogIndex, 1);
-        }
+          // hook up tab index
+          var tabindex = 2;
+          angular.forEach(catalog.fields, function (entry) {
+            entry.tabindex = tabindex++;
+
+            // find title
+            if (catalog.flavor === mainCatalog && entry.id === 'title' && angular.isString(entry.value)) {
+              $scope.titleParams = { resourceId: entry.value.substring(0,70) };
+            }
+
+            // metadata locked?
+            if (entry.locked) {
+              metadata.locked = entry.locked;
+            }
+
+            // save original values
+            if (entry.value instanceof Array) {
+              entry.oldValue = entry.value.slice(0);
+            } else {
+              entry.oldValue = entry.value;
+            }
+          });
+        });
 
         $http.get('/admin-ng/feeds/feeds')
         .then( function(response) {
           $scope.feedContent = response.data;
-          for (var i = 0; i < $scope.seriesCatalog.fields.length; i++) {
-            if($scope.seriesCatalog.fields[i].id === 'identifier'){
-              $scope.uid = $scope.seriesCatalog.fields[i].value;
+          for (var i = 0; i < $scope.commonMetadataCatalog.fields.length; i++) {
+            if($scope.commonMetadataCatalog.fields[i].id === 'identifier'){
+              $scope.uid = $scope.commonMetadataCatalog.fields[i].value;
             }
           }
           for (var j = 0; j < response.data.length; j++) {
@@ -269,26 +280,22 @@ angular.module('adminNg.controllers')
 
     // Generate proxy function for the save metadata function based on the given flavor
     // Do not generate it
-    $scope.getSaveFunction = function (flavor) {
-      var fn = saveFns[flavor],
-          catalog;
+    $scope.getMetadataChangedFunction = function (flavor) {
+      var fn = metadataChangedFns[flavor];
+      var catalog;
 
       if (angular.isUndefined(fn)) {
-        if ($scope.seriesCatalog.flavor === flavor) {
-          catalog = $scope.seriesCatalog;
-        } else {
-          angular.forEach($scope.metadata.entries, function (c) {
-            if (flavor === c.flavor) {
-              catalog = c;
-            }
-          });
-        }
+        angular.forEach($scope.metadata.entries, function (c) {
+          if (flavor === c.flavor) {
+            catalog = c;
+          }
+        });
 
         fn = function (id, callback) {
-          $scope.metadataSave(id, callback, catalog);
+          $scope.metadataChanged(id, callback, catalog);
         };
 
-        saveFns[flavor] = fn;
+        metadataChangedFns[flavor] = fn;
       }
       return fn;
     };
@@ -306,29 +313,109 @@ angular.module('adminNg.controllers')
       return 'export_series_' + $scope.resourceId + '_' + sanitizedStatsTitle + '.csv';
     };
 
-    $scope.metadataSave = function (id, callback, catalog) {
-      catalog.attributeToSend = id;
+    $translate('CONFIRMATIONS.WARNINGS.UNSAVED_CHANGES').then(function (translation) {
+      window.unloadConfirmMsg = translation;
+    }).catch(angular.noop);
 
-      if (Object.prototype.hasOwnProperty.call(catalog, 'fields')) {
-        for (var fieldNo in catalog.fields) {
-          var field = catalog.fields[fieldNo];
+    var confirmUnsaved = function() {
+      // eslint-disable-next-line
+      return confirm(window.unloadConfirmMsg);
+    };
 
+    $scope.close = function() {
+      if (($scope.unsavedChanges([$scope.commonMetadataCatalog]) === false
+           && $scope.unsavedChanges($scope.extendedMetadataCatalogs) === false)
+          || confirmUnsaved()) {
+        Modal.$scope.close();
+      }
+    };
+
+    $scope.unsavedChanges = function(catalogs) {
+      if (angular.isDefined(catalogs)) {
+        return catalogs.some(function(catalog) {
+          if (angular.isDefined(catalog)) {
+            return catalog.fields.some(function(field) {
+              return field.dirty === true;
+            });
+          }
+          return false;
+        });
+      }
+      return false;
+    };
+
+    $scope.metadataChanged = function (id, callback, catalog) {
+      // Mark the saved attribute as dirty
+      angular.forEach(catalog.fields, function (entry) {
+        if (entry.id === id) {
+          if (differentValue(entry)) {
+            entry.dirty = true;
+          } else {
+            entry.dirty = false;
+          }
+        }
+      });
+
+      if (angular.isDefined(callback)) {
+        callback();
+      }
+    };
+
+    var differentValue = function(entry) {
+      if (!entry.value && !entry.oldValue) {
+        return false;
+      }
+
+      if ((!entry.value && entry.oldValue) || (entry.value && !entry.oldValue)) {
+        return true;
+      }
+
+      if (entry.value instanceof Array) {
+        if (entry.value.length != entry.oldValue.length) {
+          return true;
+        }
+
+        for (var i = 0; i < entry.value.length; i++) {
+          if (entry.value[i] !== entry.oldValue[i]) {
+            return true;
+          }
+        }
+        return false;
+      } else {
+        return (entry.value !== entry.oldValue);
+      }
+    };
+
+    $scope.metadataSave = function (catalogs) {
+      var catalogsWithUnsavedChanges = catalogs.filter(function(catalog) {
+        return catalog.fields.some(function(field) {
+          return field.dirty === true;
+        });
+      });
+
+      catalogsWithUnsavedChanges.forEach(function(catalog) {
+        // don't send collections
+        catalog.fields.forEach(function(field) {
           if (Object.prototype.hasOwnProperty.call(field, 'collection')) {
             field.collection = [];
           }
-        }
-      }
+        });
 
-      SeriesMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
-        if (angular.isDefined(callback)) {
-          callback();
-        }
+        SeriesMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
+          var notificationContext = catalog === $scope.commonMetadataCatalog ? 'series-metadata-common'
+            : 'series-metadata-extended';
+          Notifications.add('info', 'SAVED_METADATA', notificationContext, 1200);
 
-        // Mark the saved attribute as saved
-        angular.forEach(catalog.fields, function (entry) {
-          if (entry.id === id) {
-            entry.saved = true;
-          }
+          // Unmark entries
+          angular.forEach(catalog.fields, function (entry) {
+            entry.dirty = false;
+            // new original value
+            if (entry.value instanceof Array) {
+              entry.oldValue = entry.value.slice(0);
+            } else {
+              entry.oldValue = entry.value;
+            }
+          });
         });
       });
     };

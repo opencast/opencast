@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -39,6 +39,11 @@
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -63,9 +68,6 @@
             <Export-Package>
               org.opencastproject.metadata;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/static-metadata-service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

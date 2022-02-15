@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -41,7 +41,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.apache.felix</groupId>
-          <artifactId>org.osgi.compendium</artifactId>
+          <artifactId>osgi.cmpn</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -51,7 +51,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -76,9 +76,6 @@
               org.opencastproject.feed.impl;version=${project.version},
               *
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/feed-scanner.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

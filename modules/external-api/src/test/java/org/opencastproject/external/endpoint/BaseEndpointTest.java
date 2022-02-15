@@ -24,7 +24,6 @@ import static io.restassured.RestAssured.given;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -40,7 +39,7 @@ import org.junit.Test;
 public class BaseEndpointTest {
 
   /** The REST test environment */
-  private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(), TestBaseEndpoint.class);
+  private static final RestServiceTestEnv env = testEnvForClasses(TestBaseEndpoint.class);
 
   private static final JSONParser parser = new JSONParser();
 
@@ -142,12 +141,6 @@ public class BaseEndpointTest {
 
     JSONObject json = (JSONObject) parser.parse(response);
     assertEquals("v1.7.0", json.get("default"));
-  }
-
-  /** Test case for {@link BaseEndpoint#recreateIndex()} */
-  @Test
-  public void testRecreateIndex() throws Exception {
-    given().log().all().expect().statusCode(SC_OK).when().post(env.host("/recreateIndex"));
   }
 
 }

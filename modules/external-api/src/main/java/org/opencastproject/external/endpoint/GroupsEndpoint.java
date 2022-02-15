@@ -37,10 +37,10 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_6_0;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.SecurityService;
@@ -60,6 +60,9 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.collections4.ComparatorUtils;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,32 +95,45 @@ import javax.ws.rs.core.Response;
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0 })
 @RestService(name = "externalapigroups", title = "External API Groups Service", notes = {}, abstractText = "Provides resources and operations related to the groups")
+@Component(
+    immediate = true,
+    service = GroupsEndpoint.class,
+    property = {
+        "service.description=External API - Groups Endpoint",
+        "opencast.service.type=org.opencastproject.external.groups",
+        "opencast.service.path=/api/groups"
+    }
+)
 public class GroupsEndpoint {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(GroupsEndpoint.class);
 
   /* OSGi service references */
-  private ExternalIndex externalIndex;
+  private ElasticsearchIndex elasticsearchIndex;
   private JpaGroupRoleProvider jpaGroupRoleProvider;
   private SecurityService securityService;
 
   /** OSGi DI */
-  void setExternalIndex(ExternalIndex externalIndex) {
-    this.externalIndex = externalIndex;
+  @Reference(name = "ElasticsearchIndex")
+  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI. */
+  @Reference(name = "SecurityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
+  @Reference(name = "groupRoleProvider")
   public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
   /** OSGi activation method */
+  @Activate
   void activate() {
     logger.info("Activating External API - Groups Endpoint");
   }

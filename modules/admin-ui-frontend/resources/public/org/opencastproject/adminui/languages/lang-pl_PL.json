@@ -128,7 +128,8 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Ta seria zawiera wydarzenia. Usunięcie tej serii nie spowoduje ich usunięcia.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone.",
+         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Nie można usunąć tej serii, ponieważ nadal zawiera wydarzenia."
@@ -205,6 +206,7 @@
       "INVALID_ACL_RULES": "Reguły dostępu muszą zawierać poprawne role użytkownika z określonymi zasadami odczytu i/lub zapisu.",
       "MISSING_ACL_RULES": "Przynajmniej jedna rola, z uprawnieniem do zapisu lub odczytu jest wymagana!",
       "SAVED_ACL_RULES": "Reguły dostępu zostały zapisane.",
+      "SAVED_METADATA": "The metadata has been saved.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Wydarzenia w tej serii będą musiały być przetworzone ponownie",
       "SERIES_ACL_LOCKED": "Edytowanie zasad dostępu jest niedozwolone, jeśli wykonywane są operacje dotyczące zdarzenia, które jest częścią serii",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Zasada dostępu musi zawierać przynajmniej jedną rolę użytkownika z uprawnieniem do zapisu lub odczytu.",

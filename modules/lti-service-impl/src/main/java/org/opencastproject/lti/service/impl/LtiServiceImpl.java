@@ -29,9 +29,9 @@ import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -81,6 +81,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,6 +107,13 @@ import java.util.stream.Collectors;
 /**
  * The LTI service implementation
  */
+@Component(
+    immediate = true,
+    service = { LtiService.class,ManagedService.class },
+    property = {
+        "service.description=LTI Service"
+    }
+)
 public class LtiServiceImpl implements LtiService, ManagedService {
   private static final Logger logger = LoggerFactory.getLogger(LtiServiceImpl.class);
 
@@ -114,7 +125,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private WorkflowService workflowService;
   private AssetManager assetManager;
   private Workspace workspace;
-  private AbstractSearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
   private AuthorizationService authorizationService;
   private SeriesService seriesService;
   private String workflow;
@@ -124,51 +135,66 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
 
   /** OSGi DI */
+  @Reference(name = "authorization-service")
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
   /** OSGI DI */
+  @Reference(name = "series-service")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi DI */
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
   /** OSGi DI */
+  @Reference(name = "workflow-service")
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi DI */
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
   /** OSGi DI */
-  public void setSearchIndex(AbstractSearchIndex searchIndex) {
+  @Reference(name = "search-index")
+  public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
   /** OSGi DI */
+  @Reference(name = "IndexService")
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
+  @Reference(name = "IngestService")
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI */
+  @Reference(name = "SecurityService")
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI. */
+  @Reference(
+      name = "EventCatalogUIAdapter",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     catalogUIAdapters.add(catalogUIAdapter);
   }

@@ -32,6 +32,9 @@ import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +55,13 @@ import java.util.stream.Collectors;
 /**
  * Implements {@link StatisticsService}. Uses influxdb for permanent storage.
  */
+@Component(
+    immediate = true,
+    service = { StatisticsService.class,StatisticsCoordinator.class },
+    property = {
+        "service.description=Statistics Service"
+    }
+)
 public class StatisticsServiceImpl implements StatisticsService, StatisticsCoordinator {
 
   /** Logging utility */
@@ -62,10 +72,12 @@ public class StatisticsServiceImpl implements StatisticsService, StatisticsCoord
   private final Map<String, StatisticsWriter> writers = new HashMap<>();
 
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating Statistics Service");
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating Statistics Service");
   }

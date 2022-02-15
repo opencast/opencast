@@ -23,6 +23,7 @@
 package org.opencastproject.search.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.AccessControlList;
 
 import java.util.Date;
 
@@ -58,6 +59,11 @@ public interface SearchResultItem {
    * @return the organization identifier
    */
   String getOrganization();
+
+  /**
+   * Returns the access control list of this event that is stored in the index.
+   */
+  AccessControlList getAccessControlList();
 
   /**
    * @return the dcExtent
