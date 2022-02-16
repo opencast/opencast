@@ -41,7 +41,27 @@ import {
     LOAD_EVENT_PUBLICATIONS_FAILURE,
     LOAD_EVENT_METADATA_IN_PROGRESS,
     LOAD_EVENT_METADATA_SUCCESS,
-    LOAD_EVENT_METADATA_FAILURE, SET_EVENT_METADATA,
+    LOAD_EVENT_METADATA_FAILURE,
+    SET_EVENT_METADATA,
+    LOAD_EVENT_ASSETS_IN_PROGRESS,
+    LOAD_EVENT_ASSETS_SUCCESS,
+    LOAD_EVENT_ASSETS_FAILURE,
+    LOAD_EVENT_ASSET_ATTACHMENTS_SUCCESS,
+    LOAD_EVENT_ASSET_ATTACHMENTS_FAILURE,
+    LOAD_EVENT_ASSET_CATALOGS_SUCCESS,
+    LOAD_EVENT_ASSET_CATALOGS_FAILURE,
+    LOAD_EVENT_ASSET_MEDIA_SUCCESS,
+    LOAD_EVENT_ASSET_MEDIA_FAILURE,
+    LOAD_EVENT_ASSET_PUBLICATIONS_SUCCESS,
+    LOAD_EVENT_ASSET_PUBLICATIONS_FAILURE,
+    LOAD_EVENT_ASSET_ATTACHMENT_DETAILS_SUCCESS,
+    LOAD_EVENT_ASSET_ATTACHMENT_DETAILS_FAILURE,
+    LOAD_EVENT_ASSET_PUBLICATION_DETAILS_FAILURE,
+    LOAD_EVENT_ASSET_PUBLICATION_DETAILS_SUCCESS,
+    LOAD_EVENT_ASSET_MEDIA_DETAILS_FAILURE,
+    LOAD_EVENT_ASSET_MEDIA_DETAILS_SUCCESS,
+    LOAD_EVENT_ASSET_CATALOG_DETAILS_FAILURE,
+    LOAD_EVENT_ASSET_CATALOG_DETAILS_SUCCESS,
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
@@ -49,6 +69,63 @@ const initialState = {
     eventId: "",
     metadata: {},
     fetchingMetadataInProgress: false,
+    assets: {
+        attachments: null,
+        catalogs: null,
+        media: null,
+        publications: null
+    },
+    transactionsReadOnly: false,
+    uploadAssetOptions: [],
+    assetAttachments: [],
+    assetAttachmentDetails: {
+        id: "",
+        type: "",
+        mimetype: "",
+        size: null,
+        checksum: null,
+        reference: "",
+        tags: [],
+        url: ""
+    },
+    assetCatalogs: [],
+    assetCatalogDetails: {
+        id: "",
+        type: "",
+        mimetype: "",
+        size: null,
+        checksum: null,
+        reference: "",
+        tags: [],
+        url: ""
+    },
+    assetMedia: [],
+    assetMediaDetails: {
+        id: "",
+        type: "",
+        mimetype: "",
+        tags: [],
+        duration: null,
+        size: null,
+        url: "",
+        streams: {
+            audio: [],
+            video: []
+        },
+        video: ""
+    },
+    assetPublications: [],
+    assetPublicationDetails: {
+        id: "",
+        type: "",
+        mimetype: "",
+        size: null,
+        channel: "",
+        reference: "",
+        tags: [],
+        url: ""
+    },
+    fetchingAssetsInProgress: false,
     policies: [],
     fetchingPoliciesInProgress: false,
     savingCommentReplyInProgress: false,
@@ -115,6 +192,215 @@ const eventDetails = (state=initialState, action) => {
             return {
                 ...state,
                 metadata: metadata
+            };
+        }
+        case LOAD_EVENT_ASSETS_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingAssetsInProgress: true
+            };
+        }
+        case LOAD_EVENT_ASSETS_SUCCESS: {
+            const { assets, transactionsReadOnly, uploadAssetOptions } = payload;
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assets: assets,
+                transactionsReadOnly: transactionsReadOnly,
+                uploadAssetOptions: uploadAssetOptions
+            };
+        }
+        case LOAD_EVENT_ASSETS_FAILURE: {
+            const emptyAssets = {
+                attachments: null,
+                catalogs: null,
+                media: null,
+                publications: null
+            };
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assets: emptyAssets,
+                transactionsReadOnly: false,
+                uploadAssetOptions: []
+            };
+        }
+        case LOAD_EVENT_ASSET_ATTACHMENTS_SUCCESS: {
+            const { attachments } = payload;
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetAttachments: attachments
+            };
+        }
+        case LOAD_EVENT_ASSET_ATTACHMENTS_FAILURE: {
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetAttachments: []
+            };
+        }
+        case LOAD_EVENT_ASSET_ATTACHMENT_DETAILS_SUCCESS: {
+            const { attachmentDetails } = payload;
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetAttachmentDetails: attachmentDetails
+            };
+        }
+        case LOAD_EVENT_ASSET_ATTACHMENT_DETAILS_FAILURE: {
+            const emptyAssetAttachmentDetails = {
+                id: "",
+                type: "",
+                mimetype: "",
+                size: null,
+                checksum: null,
+                reference: "",
+                tags: [],
+                url: ""
+            };
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetAttachmentDetails: emptyAssetAttachmentDetails
+            };
+        }
+        case LOAD_EVENT_ASSET_CATALOGS_SUCCESS: {
+            const { catalogs } = payload;
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetCatalogs: catalogs
+            };
+        }
+        case LOAD_EVENT_ASSET_CATALOGS_FAILURE: {
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetCatalogs: []
+            };
+        }
+        case LOAD_EVENT_ASSET_CATALOG_DETAILS_SUCCESS: {
+            const { catalogDetails } = payload;
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetCatalogDetails: catalogDetails
+            };
+        }
+        case LOAD_EVENT_ASSET_CATALOG_DETAILS_FAILURE: {
+            const emptyAssetCatalogDetails = {
+                id: "",
+                type: "",
+                mimetype: "",
+                size: null,
+                checksum: null,
+                reference: "",
+                tags: [],
+                url: ""
+            };
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetCatalogDetails: emptyAssetCatalogDetails
+            };
+        }
+        case LOAD_EVENT_ASSET_MEDIA_SUCCESS: {
+            const { media } = payload;
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetMedia: media
+            };
+        }
+        case LOAD_EVENT_ASSET_MEDIA_FAILURE: {
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetMedia: []
+            };
+        }
+        case LOAD_EVENT_ASSET_MEDIA_DETAILS_SUCCESS: {
+            const { mediaDetails } = payload;
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetMediaDetails: mediaDetails
+            };
+        }
+        case LOAD_EVENT_ASSET_MEDIA_DETAILS_FAILURE: {
+            const emptyAssetMediaDetails = {
+                id: "",
+                type: "",
+                mimetype: "",
+                tags: [],
+                duration: null,
+                size: null,
+                url: "",
+                streams: {
+                    audio: [],
+                    video: []
+                },
+                video: ""
+            };
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetMediaDetails: emptyAssetMediaDetails
+            };
+        }
+        case LOAD_EVENT_ASSET_PUBLICATIONS_SUCCESS: {
+            const { publications } = payload;
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetPublications: publications
+            };
+        }
+        case LOAD_EVENT_ASSET_PUBLICATIONS_FAILURE: {
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetPublications: []
+            };
+        }
+        case LOAD_EVENT_ASSET_PUBLICATION_DETAILS_SUCCESS: {
+            const { publicationDetails } = payload;
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetPublicationDetails: publicationDetails
+            };
+        }
+        case LOAD_EVENT_ASSET_PUBLICATION_DETAILS_FAILURE: {
+            const emptyAssetPublicationDetails = {
+                id: "",
+                type: "",
+                mimetype: "",
+                size: null,
+                channel: "",
+                reference: "",
+                tags: [],
+                url: ""
+            }
+
+            return {
+                ...state,
+                fetchingAssetsInProgress: false,
+                assetPublicationDetails: emptyAssetPublicationDetails
             };
         }
         case LOAD_EVENT_POLICIES_IN_PROGRESS: {

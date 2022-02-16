@@ -3,9 +3,9 @@ import {connect} from "react-redux";
 import Notifications from "../../../shared/Notifications";
 import {getWorkflow, isFetchingWorkflowDetails} from "../../../../selectors/eventDetailsSelectors";
 import {fetchWorkflowErrors, fetchWorkflowOperations} from "../../../../thunks/eventDetailsThunks";
-import {formatDuration} from "../../../../utils/workflowDetailsUtils";
+import {formatDuration} from "../../../../utils/eventDetailsUtils";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
-import EventDetailsWorkflowDetailsHierarchyNavigation from "./EventDetailsWorkflowDetailsHierarchyNavigation";
+import EventDetailsTabHierarchyNavigation from "./EventDetailsTabHierarchyNavigation";
 
 
 /**
@@ -15,8 +15,6 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                         workflowData, isFetching,
                                         fetchOperations, fetchErrors
                                        }) => {
-
-    const humanDuration = "5h"  //todo dont't know, where the old version gets this value, couldn't find it!
 
     const openSubTab = (tabType) => {
         removeNotificationWizardForm();
@@ -31,9 +29,11 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
     return (
         <div className="modal-content">
             {/* Hierarchy navigation */}
-            <EventDetailsWorkflowDetailsHierarchyNavigation
+            <EventDetailsTabHierarchyNavigation
                 openSubTab={openSubTab}
                 hierarchyDepth={0}
+                translationKey0={"EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE"}
+                subTabArgument0={'workflow-details'}
             />
 
             <div className="modal-body">
@@ -82,7 +82,7 @@ const EventDetailsWorkflowDetails =  ({ eventId, t, setHierarchy,
                                             {(workflowData.status !== 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.RUNNING') && (
                                             <tr>
                                                 <td>{t("EVENTS.EVENTS.DETAILS.WORKFLOWS.EXECUTION_TIME") /* Execution time */ }</td>
-                                                <td>{formatDuration(workflowData.executionTime) || humanDuration}</td>
+                                                <td>{formatDuration(workflowData.executionTime)}</td>
                                             </tr>
                                             )}
                                             <tr with-role="ROLE_ADMIN">
