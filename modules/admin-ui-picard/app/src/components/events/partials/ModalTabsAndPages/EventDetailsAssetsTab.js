@@ -5,8 +5,10 @@ import {removeNotificationWizardForm} from "../../../../actions/notificationActi
 import {
     fetchAssetAttachments,
     fetchAssetCatalogs,
-    fetchAssetMedia, fetchAssetPublications,
-    fetchAssets, fetchWorkflows
+    fetchAssetMedia,
+    fetchAssetPublications,
+    fetchAssets,
+    fetchWorkflows
 } from "../../../../thunks/eventDetailsThunks";
 import {
     getAssets,

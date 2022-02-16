@@ -61,7 +61,8 @@ import {
     loadEventAssetCatalogDetailsFailure,
     loadEventAssetMediaDetailsSuccess,
     loadEventAssetMediaDetailsFailure,
-    loadEventAssetPublicationDetailsSuccess, loadEventAssetPublicationDetailsFailure,
+    loadEventAssetPublicationDetailsSuccess,
+    loadEventAssetPublicationDetailsFailure,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {createPolicy, transformMetadataCollection} from "../utils/resourceUtils";
@@ -155,9 +156,7 @@ export const fetchAssets = (eventId) => async (dispatch) => {
         dispatch(loadEventAssetsInProgress());
 
         const assetsRequest = await axios.get(`/admin-ng/event/${eventId}/asset/assets.json`);
-        const assetsResponse = await assetsRequest.data;
-
-        const assets = assetsResponse;
+        const assets = await assetsRequest.data;
 
         let transactionsReadOnly = true;
         const fetchTransactionResult = await dispatch(fetchHasActiveTransactions(eventId));
