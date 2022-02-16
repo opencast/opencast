@@ -84,6 +84,13 @@
     - etc/security/mh_default_org.xml
     - bin/setenv
 
+- name: User Interface Configuration
+  copy:
+    dest: /opt/opencast/etc/ui-config/mh_default_org/{{ item }}
+    src: '{{ item }}'
+  loop:
+    - studio/settings.toml
+
 - name: start and enable opencast service
   systemd:
     name: opencast.service

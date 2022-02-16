@@ -1,0 +1,6 @@
+[opencast]
+serverUrl = "/"
+loginProvided = true
+
+[return]
+allowedDomains = ["tobira.ethz.ch", "tobira.opencast.org", "localhost"]
