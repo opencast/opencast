@@ -18,11 +18,13 @@ import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
 import Footer from "../Footer";
+import {getUserInformation} from "../../selectors/userInfoSelectors";
+import {hasAccess} from "../../utils/utils";
 
 /**
  * This component renders the table view of recordings
  */
-const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings, loadingFilters, resetTextFilter }) => {
+const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings, loadingFilters, resetTextFilter, user }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -59,12 +61,13 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
                          toggleMenu={toggleNavigation}/>
 
                 <nav>
-                    {/*todo: with role*/}
-                   <Link to="/recordings/recordings"
-                         className={cn({active: true})}
-                         onClick={() => loadRecordings()} >
-                       {t('RECORDINGS.NAVIGATION.LOCATIONS')}
-                   </Link>
+                    {hasAccess("ROLE_UI_LOCATIONS_VIEW", user) && (
+                        <Link to="/recordings/recordings"
+                              className={cn({active: true})}
+                              onClick={() => loadRecordings()} >
+                            {t('RECORDINGS.NAVIGATION.LOCATIONS')}
+                        </Link>
+                    )}
                 </nav>
             </section>
 
@@ -91,7 +94,8 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    recordings: getTotalRecordings(state)
+    recordings: getTotalRecordings(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

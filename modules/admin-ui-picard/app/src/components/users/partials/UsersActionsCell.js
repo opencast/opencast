@@ -5,11 +5,13 @@ import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteUser} from "../../../thunks/userThunks";
 import UserDetailsModal from "./modal/UserDetailsModal";
 import {fetchUserDetails} from "../../../thunks/userDetailsThunks";
+import {getUserInformation} from "../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../utils/utils";
 
 /**
  * This component renders the action cells of users in the table view
  */
-const UsersActionCell = ({ row, deleteUser, fetchUserDetails }) => {
+const UsersActionCell = ({ row, deleteUser, fetchUserDetails, user }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
@@ -35,18 +37,19 @@ const UsersActionCell = ({ row, deleteUser, fetchUserDetails }) => {
 
     return (
         <>
-            {/*TODO: with-Role */}
-            <a onClick={() => showUserDetails()}
-               className="more"
-               title={t('USERS.USERS.TABLE.TOOLTIP.DETAILS')}/>
+            {/* edit/show user details */}
+            {hasAccess("ROLE_UI_USERS_EDIT", user) && (
+                <a onClick={() => showUserDetails()}
+                   className="more"
+                   title={t('USERS.USERS.TABLE.TOOLTIP.DETAILS')}/>
+            )}
 
             {displayUserDetails && (
                 <UserDetailsModal close={hideUserDetails}
                                   username={row.username} />
             )}
 
-            {row.manageable ? (
-                // TODO: with-Role
+            {(row.manageable && hasAccess("ROLE_UI_USERS_DELETE", user)) && (
                 <>
                     <a onClick={() => setDeleteConfirmation(true)}
                        className="remove"
@@ -61,10 +64,15 @@ const UsersActionCell = ({ row, deleteUser, fetchUserDetails }) => {
                                       deleteMethod={deletingUser}/>
                     )}
                 </>
-            ) : null }
+            )}
         </>
     );
 }
+
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
@@ -72,4 +80,4 @@ const mapDispatchToProps = dispatch => ({
     fetchUserDetails: username => dispatch(fetchUserDetails(username))
 });
 
-export default connect(null, mapDispatchToProps)(UsersActionCell);
+export default connect(mapStateToProps, mapDispatchToProps)(UsersActionCell);

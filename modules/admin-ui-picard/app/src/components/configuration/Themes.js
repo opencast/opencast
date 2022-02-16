@@ -19,11 +19,13 @@ import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
 import Footer from "../Footer";
+import {getUserInformation} from "../../selectors/userInfoSelectors";
+import {hasAccess} from "../../utils/utils";
 
 /**
  * This component renders the table view of events
  */
-const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters, resetTextFilter }) => {
+const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters, resetTextFilter, user }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewThemesModal, setNewThemesModal] = useState(false);
@@ -70,11 +72,12 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
             <section className="action-nav-bar">
                 {/* Add theme button */}
                 <div className="btn-group">
-                    {/*todo: implement onClick and with role*/}
-                    <button className="add" onClick={() => showNewThemesModal()}>
-                        <i className="fa fa-plus"/>
-                        <span>{t('CONFIGURATION.ACTIONS.ADD_THEME')}</span>
-                    </button>
+                    {hasAccess("ROLE_UI_THEMES_CREATE", user) && (
+                        <button className="add" onClick={() => showNewThemesModal()}>
+                            <i className="fa fa-plus"/>
+                            <span>{t('CONFIGURATION.ACTIONS.ADD_THEME')}</span>
+                        </button>
+                    )}
                 </div>
 
                 {/* Display modal for new series if add series button is clicked */}
@@ -87,12 +90,13 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
                          toggleMenu={toggleNavigation}/>
 
                 <nav>
-                    {/* todo: with roles */}
-                    <Link to="/configuration/themes"
-                          className={cn({active: true})}
-                          onClick={() => loadThemes()}>
-                        {t('CONFIGURATION.NAVIGATION.THEMES')}
-                    </Link>
+                    {hasAccess("ROLE_UI_THEMES_VIEW", user) && (
+                        <Link to="/configuration/themes"
+                              className={cn({active: true})}
+                              onClick={() => loadThemes()}>
+                            {t('CONFIGURATION.NAVIGATION.THEMES')}
+                        </Link>
+                    )}
                 </nav>
             </section>
 
@@ -118,7 +122,8 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    themes: getTotalThemes(state)
+    themes: getTotalThemes(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

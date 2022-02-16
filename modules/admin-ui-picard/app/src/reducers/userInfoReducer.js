@@ -10,6 +10,8 @@ import {
 
 const initialState = {
     isLoading: false,
+    isAdmin: false,
+    isOrgAdmin: false,
     org: {},
     roles: [],
     userRole: '',
@@ -31,6 +33,8 @@ const userInfo = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isAdmin: userInfo.isAdmin,
+                isOrgAdmin: userInfo.isOrgAdmin,
                 org: userInfo.org,
                 roles: userInfo.roles,
                 userRole: userInfo.userRole,

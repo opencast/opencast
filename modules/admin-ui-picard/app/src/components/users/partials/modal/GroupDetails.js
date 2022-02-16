@@ -39,14 +39,17 @@ const GroupDetails = ({close, groupDetails, updateGroupDetails}) => {
     const tabs = [
         {
             tabTranslation: 'USERS.GROUPS.DETAILS.TABS.GROUP',
+            accessRole: 'ROLE_UI_GROUPS_EDIT',
             name: 'group'
         },
         {
             tabTranslation: 'USERS.GROUPS.DETAILS.TABS.ROLES',
+            accessRole: 'ROLE_UI_GROUPS_EDIT',
             name: 'roles'
         },
         {
             tabTranslation: 'USERS.GROUPS.DETAILS.TABS.USERS',
+            accessRole: 'ROLE_UI_GROUPS_EDIT',
             name: 'users'
         }
     ];

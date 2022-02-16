@@ -92,4 +92,12 @@ export const transformToObjectArray = data => {
     });
 }
 
+/*
+* checks if an user is admin or has the required role to access an ui element
+*/
+export const hasAccess = (role, userInfo) =>  {
+
+    return !!(userInfo.isAdmin || userInfo.roles.includes(role));
+}
+
 

@@ -11,7 +11,7 @@ import {useSelectionChanges} from "../../../../hooks/wizardHooks";
 const EditScheduledEventsGeneralPage = ({ nextPage, formik, selectedRows }) => {
     const { t } = useTranslation();
 
-    const [selectedEvents, allChecked, onChangeSelected, onChangeAllSelected] = useSelectionChanges(formik, "events", selectedRows);
+    const [selectedEvents, allChecked, onChangeSelected, onChangeAllSelected] = useSelectionChanges(formik, selectedRows);
 
     useEffect(() => {
         // Set field value for formik on mount, because initially all events are selected

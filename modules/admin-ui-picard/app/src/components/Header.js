@@ -6,9 +6,9 @@ import languages from "../i18n/languages";
 import opencastLogo from '../img/opencast-white.svg';
 import {fetchHealthStatus} from "../thunks/healthThunks";
 import {getHealthStatus} from "../selectors/healthSelectors";
-import {getCurrentLanguageInformation} from "../utils/utils";
+import {getCurrentLanguageInformation, hasAccess} from "../utils/utils";
 import {logger} from "../utils/logger";
-import {getUserBasicInfo} from "../selectors/userInfoSelectors";
+import {getUserInformation} from "../selectors/userInfoSelectors";
 import axios from "axios";
 
 
@@ -133,25 +133,27 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
                 )}
 
                 {/* Opencast Studio */}
-                {/* Todo: before with 'with Role="ROLE_STUDIO": What is this? implement React equivalent */}
-                <div className="nav-dd" title="Studio">
-                    <a href={studio}>
-                        <span className="fa fa-video-camera"/>
-                    </a>
-                </div>
+                {hasAccess("ROLE_STUDIO", user) && (
+                    <div className="nav-dd" title="Studio">
+                        <a href={studio}>
+                            <span className="fa fa-video-camera"/>
+                        </a>
+                    </div>
+                )}
 
                 {/* System warnings and notifications */}
-                {/* Todo: before with 'with Role="ROLE_ADMIN": What is this? implement React equivalent */}
-                <div className="nav-dd info-dd" id="info-dd" title={t('SYSTEM_NOTIFICATIONS')} ref={containerNotify}>
-                    <div onClick={() => setMenuNotify(!displayMenuNotify)}>
-                        <i className="fa fa-bell" aria-hidden="true"/>
-                        <span id="error-count" className="badge" >{healthStatus.numErr}</span>
-                        {/* Click on the bell icon, a dropdown menu with all services in serviceList and their status opens */}
-                        {displayMenuNotify && (
-                            <MenuNotify healthStatus={healthStatus}/>
-                        )}
+                {hasAccess("ROLE_ADMIN", user) && (
+                    <div className="nav-dd info-dd" id="info-dd" title={t('SYSTEM_NOTIFICATIONS')} ref={containerNotify}>
+                        <div onClick={() => setMenuNotify(!displayMenuNotify)}>
+                            <i className="fa fa-bell" aria-hidden="true"/>
+                            <span id="error-count" className="badge" >{healthStatus.numErr}</span>
+                            {/* Click on the bell icon, a dropdown menu with all services in serviceList and their status opens */}
+                            {displayMenuNotify && (
+                                <MenuNotify healthStatus={healthStatus}/>
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Help */}
                 {/* Show only if documentationUrl or restdocsUrl is set */}
@@ -160,14 +162,14 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
                         <div className="fa fa-question-circle" onClick={() => setMenuHelp(!displayMenuHelp)}/>
                         {/* Click on the help icon, a dropdown menu with documentation, REST-docs and shortcuts (if available) opens */}
                         {displayMenuHelp && (
-                            <MenuHelp />
+                            <MenuHelp user={user} />
                         )}
                     </div>
                 )}
 
                 {/* Username */}
                 <div className="nav-dd user-dd" id="user-dd" ref={containerUser}>
-                    <div className="h-nav" onClick={() => setMenuUser(!displayMenuUser)}>{user.name || user.username}<span className="dropdown-icon"/></div>
+                    <div className="h-nav" onClick={() => setMenuUser(!displayMenuUser)}>{user.user.name || user.user.username}<span className="dropdown-icon"/></div>
                     {/* Click on username, a dropdown menu with the option to logout opens */}
                     {displayMenuUser && (
                         <MenuUser />
@@ -219,7 +221,7 @@ const MenuNotify = ({ healthStatus }) => (
     </ul>
 );
 
-const MenuHelp = () => {
+const MenuHelp = ({ user }) => {
     const { t } = useTranslation();
     return(
         <ul className="dropdown-ul">
@@ -231,9 +233,8 @@ const MenuHelp = () => {
                     </a>
                 </li>
             )}
-            {/* Todo: only if restUrl is there and with-role="ROLE_ADMIN */}
             {/* Show only if restUrl is set */}
-            {!!restUrl && (
+            {(!!restUrl && hasAccess("ROLE_ADMIN", user)) && (
                 <li>
                     <a target="_self" href={restUrl}>
                         <span>{t('HELP.REST_DOC')}</span>
@@ -245,6 +246,7 @@ const MenuHelp = () => {
                     <span>{t('HELP.HOTKEY_CHEAT_SHEET')}</span>
                 </a>
             </li>
+            {/*todo: Adopter Registration Modal*/}
         </ul>
     )
 };
@@ -267,7 +269,7 @@ const MenuUser = () => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     healthStatus: getHealthStatus(state),
-    user: getUserBasicInfo(state)
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

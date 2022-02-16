@@ -20,7 +20,8 @@ const SeriesDetailsAccessTab = ({ seriesId, header, policies, fetchAccessPolicie
                                         descriptionText={t("EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION")}
                                         policies={policies}
                                         fetchAccessPolicies={fetchAccessPolicies}
-                                        saveNewAccessPolicies={saveNewAccessPolicies} />
+                                        saveNewAccessPolicies={saveNewAccessPolicies}
+                                        editAccessRole={'ROLE_UI_SERIES_DETAILS_ACL_EDIT'} />
     );
 };
 

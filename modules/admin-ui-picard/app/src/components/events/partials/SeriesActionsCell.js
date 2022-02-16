@@ -9,12 +9,14 @@ import {
     fetchSeriesDetailsAcls, fetchSeriesDetailsFeeds,
     fetchSeriesDetailsMetadata, fetchSeriesDetailsTheme
 } from "../../../thunks/seriesDetailsThunks";
+import {getUserInformation} from "../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../utils/utils";
 
 /**
  * This component renders the action cells of series in the table view
  */
 const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetchSeriesDetailsAcls,
-                               fetchSeriesDetailsFeeds, fetchSeriesDetailsTheme, fetchSeriesDetailsThemeNames }) => {
+                               fetchSeriesDetailsFeeds, fetchSeriesDetailsTheme, fetchSeriesDetailsThemeNames, user }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
@@ -44,12 +46,12 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetc
 
     return (
         <>
-
-            {/*TODO: with-Role ROLE_UI_SERIES_DETAILS_VIEW*/}
-            <a onClick={() => showSeriesDetailsModal()}
-               className="more-series"
-               title={t('EVENTS.SERIES.TABLE.TOOLTIP.DETAILS')}/>
-
+            {/* series details */}
+            {hasAccess("ROLE_UI_SERIES_DETAILS_VIEW", user) && (
+                <a onClick={() => showSeriesDetailsModal()}
+                   className="more-series"
+                   title={t('EVENTS.SERIES.TABLE.TOOLTIP.DETAILS')}/>
+            )}
 
             {displaySeriesDetailsModal && (
                 <SeriesDetailsModal handleClose={hideSeriesDetailsModal}
@@ -57,10 +59,12 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetc
                                     seriesTitle={row.title}/>
             )}
 
-            {/*TODO: with-Role ROLE_UI_SERIES_DELETE*/}
-            <a onClick={() => setDeleteConfirmation(true)}
-               className="remove"
-               title={t('EVENTS.SERIES.TABLE.TOOLTIP.DELETE')}/>
+            {/* delete series */}
+            {hasAccess("ROLE_UI_SERIES_DELETE", user) && (
+                <a onClick={() => setDeleteConfirmation(true)}
+                   className="remove"
+                   title={t('EVENTS.SERIES.TABLE.TOOLTIP.DELETE')}/>
+            )}
 
             {displayDeleteConfirmation && (
                 <ConfirmModal close={hideDeleteConfirmation}
@@ -73,6 +77,11 @@ const SeriesActionsCell = ({ row, deleteSeries, fetchSeriesDetailsMetadata, fetc
     )
 }
 
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
+
 const mapDispatchToProps = dispatch => ({
     deleteSeries: id => dispatch(deleteSeries(id)),
     fetchSeriesDetailsMetadata: id => dispatch(fetchSeriesDetailsMetadata(id)),
@@ -82,4 +91,4 @@ const mapDispatchToProps = dispatch => ({
     fetchSeriesDetailsThemeNames: () => dispatch(fetchNamesOfPossibleThemes())
 })
 
-export default connect(null, mapDispatchToProps)(SeriesActionsCell);
+export default connect(mapStateToProps, mapDispatchToProps)(SeriesActionsCell);
