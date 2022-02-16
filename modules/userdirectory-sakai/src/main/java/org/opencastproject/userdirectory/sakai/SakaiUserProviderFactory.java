@@ -33,6 +33,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,14 @@ import javax.management.ObjectName;
 /**
  * Sakai implementation of the spring UserDetailsService, taking configuration information from the component context.
  */
+@Component(
+    immediate = true,
+    service = ManagedServiceFactory.class,
+    property = {
+        "service.pid=org.opencastproject.userdirectory.sakai",
+        "service.description=Provides Sakai user directory instances"
+    }
+)
 public class SakaiUserProviderFactory implements ManagedServiceFactory {
 
   /** The logger */
@@ -86,7 +97,7 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
   private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.sakai.cache.expiration";
 
   /** A map of pid to sakai user provider instance */
-  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();;
+  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
 
   /** The OSGI bundle context */
   protected BundleContext bundleContext = null;
@@ -95,6 +106,7 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
   private OrganizationDirectoryService orgDirectory;
 
   /** OSGi callback for setting the organization directory service. */
+  @Reference(name = "orgDirectory")
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
@@ -105,6 +117,7 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("Activate SakaiUserProviderFactory");
     this.bundleContext = cc.getBundleContext();
@@ -131,10 +144,14 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
     logger.debug("updated SakaiUserProviderFactory");
 
     String organization = (String) properties.get(ORGANIZATION_KEY);
-    if (StringUtils.isBlank(organization)) throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
+    if (StringUtils.isBlank(organization)) {
+      throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
+    }
 
     String url = (String) properties.get(SAKAI_URL_KEY);
-    if (StringUtils.isBlank(url)) throw new ConfigurationException(SAKAI_URL_KEY, "is not set");
+    if (StringUtils.isBlank(url)) {
+      throw new ConfigurationException(SAKAI_URL_KEY, "is not set");
+    }
 
     String userDn = (String) properties.get(SAKAI_SEARCH_USER);
     String password = (String) properties.get(SEARCH_PASSWORD);

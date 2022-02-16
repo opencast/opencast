@@ -26,14 +26,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
@@ -70,7 +69,8 @@ import io.restassured.http.ContentType;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class AbstractEventEndpointTest {
-  private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestEventEndpoint.class,
+  private static final RestServiceTestEnv rt = testEnvForClasses(
+          TestEventEndpoint.class,
           NotFoundExceptionMapper.class);
 
   public static TestEnv testEnv() {
@@ -696,7 +696,7 @@ public class AbstractEventEndpointTest {
     private AuthorizationService authorizationService;
     private SchedulerService schedulerService;
     private CaptureAgentStateService captureAgentStateService;
-    private AdminUISearchIndex index;
+    private ElasticsearchIndex index;
     private UrlSigningService urlSigningService;
 
     public WorkflowService getWorkflowService() {
@@ -787,11 +787,11 @@ public class AbstractEventEndpointTest {
       this.captureAgentStateService = captureAgentStateService;
     }
 
-    public void setIndex(AdminUISearchIndex index) {
+    public void setIndex(ElasticsearchIndex index) {
       this.index = index;
     }
 
-    public AdminUISearchIndex getIndex() {
+    public ElasticsearchIndex getIndex() {
       return index;
     }
 

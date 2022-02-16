@@ -54,12 +54,14 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -68,6 +70,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +92,14 @@ import java.util.UUID;
 /**
  * This WOH duplicates an input event.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Duplicate Event Workflow Handler",
+        "workflow.operation=duplicate-event"
+    }
+)
 public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   /**
    * If a target series is given, bundle all the information about it in a class
@@ -157,6 +169,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * OSGi setter
    * @param authorizationService
    */
+  @Reference(name = "authorization-service")
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -165,6 +178,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * OSGi setter
    * @param seriesService
    */
+  @Reference(name = "series-service")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -175,6 +189,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * @param assetManager
    *          the asset manager
    */
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -185,6 +200,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * @param workspace
    *          the workspace
    */
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -195,6 +211,10 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * @param distributionService
    *          the distributionService to set
    */
+  @Reference(
+      name = "distributionService",
+      target = "(distribution.channel=download)"
+  )
   public void setDistributionService(DistributionService distributionService) {
     this.distributionService = distributionService;
   }
@@ -303,8 +323,9 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
           + originalEpisodeDc.length + " episode dublin cores while it is expected to have exactly 1. Aborting.");
     }
 
+    String mpIds = "";
+    String sep = "";
     Map<String, String> properties = new HashMap<>();
-
     for (int i = 0; i < numberOfEvents; i++) {
       final List<URI> temporaryFiles = new ArrayList<>();
       MediaPackage newMp = null;
@@ -365,12 +386,15 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
         // Store media package ID as workflow property
         properties.put("duplicate_media_package_" + (i + 1) + "_id", newMp.getIdentifier().toString());
+        mpIds += sep + newMp.getIdentifier().toString();
+        sep = ", ";
       } catch (IOException | MediaPackageException e) {
         throw new WorkflowOperationException(e);
       } finally {
         cleanup(temporaryFiles, Optional.ofNullable(newMp));
       }
     }
+    properties.put("duplicate_media_package_ids", mpIds);
     return createResult(mediaPackage, properties, Action.CONTINUE, 0);
   }
 
@@ -552,4 +576,11 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       assetManager.setProperty(Property.mk(newPropId, p.getValue()));
     }
   }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

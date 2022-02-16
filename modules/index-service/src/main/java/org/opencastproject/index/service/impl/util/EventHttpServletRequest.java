@@ -20,7 +20,7 @@
  */
 package org.opencastproject.index.service.impl.util;
 
-import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.ingest.api.IngestException;
@@ -170,7 +170,11 @@ public class EventHttpServletRequest {
           if (item.isFormField()) {
             setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName, startDatePattern, startTimePattern);
           } else {
-            ingestFile(ingestService, eventHttpServletRequest, item);
+            if (!item.getName().isBlank()) {
+              ingestFile(ingestService, eventHttpServletRequest, item);
+            } else {
+              logger.debug("Skipping field {} due to missing filename", item.getFieldName());
+            }
           }
         }
       } else {

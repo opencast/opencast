@@ -26,6 +26,7 @@ import static org.opencastproject.util.RequireUtil.notNull;
 import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
+import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.aws.s3.api.AwsS3DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.AdaptivePlaylist;
@@ -36,12 +37,17 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -60,11 +66,7 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketWebsiteConfiguration;
-import com.amazonaws.services.s3.model.DeleteVersionRequest;
-import com.amazonaws.services.s3.model.GetObjectMetadataRequest;
-import com.amazonaws.services.s3.model.ListVersionsRequest;
 import com.amazonaws.services.s3.model.SetBucketWebsiteConfigurationRequest;
-import com.amazonaws.services.s3.model.VersionListing;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.google.gson.Gson;
@@ -79,6 +81,10 @@ import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,6 +109,14 @@ import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
+@Component(
+    immediate = true,
+    service = { DistributionService.class, DownloadDistributionService.class, AwsS3DistributionService.class },
+    property = {
+        "service.description=Distribution Service (AWS S3)",
+        "distribution.channel=aws.s3"
+    }
+)
 public class AwsS3DistributionServiceImpl extends AbstractDistributionService
         implements AwsS3DistributionService, DistributionService {
 
@@ -114,8 +128,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   /** List of available operations on jobs */
   public enum Operation {
-    Distribute, Retract, Restore
-  };
+    Distribute, Retract
+  }
 
   // Service configuration
   public static final String AWS_S3_DISTRIBUTION_ENABLE = "org.opencastproject.distribution.aws.s3.distribution.enable";
@@ -137,10 +151,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   // job loads
   public static final String DISTRIBUTE_JOB_LOAD_KEY = "job.load.aws.s3.distribute";
   public static final String RETRACT_JOB_LOAD_KEY = "job.load.aws.s3.retract";
-  public static final String RESTORE_JOB_LOAD_KEY = "job.load.aws.s3.restore";
 
   // config.properties
-  public static final String OPENCAST_DOWNLOAD_URL = "org.opencastproject.download.url";
   public static final String OPENCAST_STORAGE_DIR = "org.opencastproject.storage.dir";
   public static final String DEFAULT_TEMP_DIR = "tmp/s3dist";
 
@@ -157,9 +169,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   /** The load on the system introduced by creating a retract job */
   public static final float DEFAULT_RETRACT_JOB_LOAD = 0.1f;
 
-  /** The load on the system introduced by creating a restore job */
-  public static final float DEFAULT_RESTORE_JOB_LOAD = 0.1f;
-
   /** Default expiration time for presigned URL in millis, 6 hours */
   public static final int DEFAULT_PRESIGNED_URL_EXPIRE_MILLIS = 6 * 60 * 60 * 1000;
 
@@ -171,9 +180,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   /** The load on the system introduced by creating a retract job */
   private float retractJobLoad = DEFAULT_RETRACT_JOB_LOAD;
-
-  /** The load on the system introduced by creating a restore job */
-  private float restoreJobLoad = DEFAULT_RESTORE_JOB_LOAD;
 
   /** Maximum number of tries for checking availability of distributed file */
   private static final int MAX_TRIES = 10;
@@ -222,6 +228,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   }
 
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
 
     // Get the configuration
@@ -232,13 +239,15 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
         return;
       }
 
-      tmpPath = Paths.get(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_TEMP_DIR);
+      tmpPath = Paths.get(cc.getBundleContext().getProperty(OPENCAST_STORAGE_DIR), DEFAULT_TEMP_DIR);
 
       // clean up old data and delete directory if it exists
-      try (Stream<Path> walk = Files.walk(tmpPath)) {
-        walk.map(Path::toFile).sorted(Comparator.reverseOrder()).forEach(File::delete);
-      } catch (IOException e) {
-        logger.warn("Unable to delete {}", tmpPath, e);
+      if (tmpPath.toFile().exists()) {
+        try (Stream<Path> walk = Files.walk(tmpPath)) {
+          walk.map(Path::toFile).sorted(Comparator.reverseOrder()).forEach(File::delete);
+        } catch (IOException e) {
+          logger.warn("Unable to delete {}", tmpPath, e);
+        }
       }
       logger.info("AWS S3 Distribution uses temp storage in {}", tmpPath);
       try { // create a new temp directory
@@ -290,8 +299,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
               DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
       retractJobLoad = LoadUtil.getConfiguredLoadValue(cc.getProperties(), RETRACT_JOB_LOAD_KEY,
               DEFAULT_RETRACT_JOB_LOAD, serviceRegistry);
-      restoreJobLoad = LoadUtil.getConfiguredLoadValue(cc.getProperties(), RESTORE_JOB_LOAD_KEY,
-              DEFAULT_RESTORE_JOB_LOAD, serviceRegistry);
 
       // Explicit credentials are optional.
       AWSCredentialsProvider provider = null;
@@ -347,6 +354,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     return distributionChannel;
   }
 
+  @Deactivate
   public void deactivate() {
     // Transfer manager is null if service disabled
     if (s3TransferManager != null) {
@@ -672,97 +680,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     return retractedElements.toArray(new MediaPackageElement[retractedElements.size()]);
   }
 
-  @Override
-  public Job restore(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
-    if (mediaPackage == null) {
-      throw new IllegalArgumentException("Media package must be specified");
-    }
-    if (elementId == null) {
-      throw new IllegalArgumentException("Element ID must be specified");
-    }
-    if (channelId == null) {
-      throw new IllegalArgumentException("Channel ID must be specified");
-    }
-
-    try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Restore.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), elementId), restoreJobLoad);
-    } catch (ServiceRegistryException e) {
-      throw new DistributionException("Unable to create a job", e);
-    }
-  }
-
-  @Override
-  public Job restore(String channelId, MediaPackage mediaPackage, String elementId, String fileName)
-          throws DistributionException {
-    if (mediaPackage == null) {
-      throw new IllegalArgumentException("Media package must be specified");
-    }
-    if (elementId == null) {
-      throw new IllegalArgumentException("Element ID must be specified");
-    }
-    if (channelId == null) {
-      throw new IllegalArgumentException("Channel ID must be specified");
-    }
-    if (fileName == null) {
-      throw new IllegalArgumentException("Filename must be specified");
-    }
-
-    try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Restore.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), elementId, fileName), restoreJobLoad);
-    } catch (ServiceRegistryException e) {
-      throw new DistributionException("Unable to create a job", e);
-    }
-  }
-
-  protected MediaPackageElement restoreElement(String channelId, MediaPackage mediaPackage, String elementId,
-          String fileName) throws DistributionException {
-    String objectName = null;
-    if (StringUtils.isNotBlank(fileName)) {
-      final String orgId = securityService.getOrganization().getId();
-      objectName = buildObjectName(orgId, channelId, mediaPackage.getIdentifier().toString(), elementId, fileName);
-    } else {
-      objectName = buildObjectName(channelId, mediaPackage.getIdentifier().toString(),
-              mediaPackage.getElementById(elementId));
-    }
-    // Get the latest version of the file
-    // Note that this should be the delete marker for the file. We'll check, but if there is more than one delete marker
-    // we'll have probs
-    ListVersionsRequest lv = new ListVersionsRequest().withBucketName(bucketName).withPrefix(objectName)
-            .withMaxResults(1);
-    VersionListing listing = s3.listVersions(lv);
-    if (listing.getVersionSummaries().size() < 1) {
-      throw new DistributionException("Object not found: " + objectName);
-    }
-    String versionId = listing.getVersionSummaries().get(0).getVersionId();
-    // Verify that this is in fact a delete marker
-    GetObjectMetadataRequest metadata = new GetObjectMetadataRequest(bucketName, objectName, versionId);
-    // Ok, so there's no way of asking AWS directly if the object is deleted in this version of the SDK
-    // So instead, we ask for its metadata
-    // If it's deleted, then there *isn't* any metadata and we get a 404, which throws the exception
-    // This, imo, is an incredibly boneheaded omission from the AWS SDK, and implies we should look for something which
-    // sucks less
-    // FIXME: This section should be refactored with a simple s3.doesObjectExist(bucketName, objectName) once we update
-    // the AWS SDK
-    boolean isDeleted = false;
-    try {
-      s3.getObjectMetadata(metadata);
-    } catch (AmazonServiceException e) {
-      // Note: This exception is actually a 405, not a 404.
-      // This is expected, but very confusing if you're thinking it should be a 'file not found', rather than a 'method
-      // not allowed on stuff that's deleted'
-      // It's unclear what the expected behaviour is for things which have never existed...
-      isDeleted = true;
-    }
-    if (isDeleted) {
-      // Delete the delete marker
-      DeleteVersionRequest delete = new DeleteVersionRequest(bucketName, objectName, versionId);
-      s3.deleteVersion(delete);
-    }
-    return mediaPackage.getElementById(elementId);
-  }
-
   /**
    * Builds the aws s3 object name.
    *
@@ -969,21 +886,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
           MediaPackageElement[] retractedElements = retractElements(channelId, mediaPackage, elementIds);
           return (retractedElements != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(retractedElements))
                   : null;
-        /*
-         * TODO
-         * Commented out due to changes in the way the element IDs are passed (ie, a list rather than individual ones
-         * per job). This code is still useful long term, but I don't have time to write the necessary wrapper code
-         * around it right now.
-         * case Restore:
-         * String fileName = arguments.get(3);
-         * MediaPackageElement restoredElement = null;
-         * if (StringUtils.isNotBlank(fileName)) {
-         * restoredElement = restoreElement(channelId, mediaPackage, elementIds, fileName);
-         * } else {
-         * restoredElement = restoreElement(channelId, mediaPackage, elementIds, null);
-         * }
-         * return (restoredElement != null) ? MediaPackageElementParser.getAsXml(restoredElement) : null;
-         */
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
@@ -1074,6 +976,36 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     } catch (IOException e) {
       logger.info("AWS S3 bucket cannot create {} ", tmpPath);
     }
+  }
+
+  @Reference(name = "workspace")
+  @Override
+  public void setWorkspace(Workspace workspace) {
+    super.setWorkspace(workspace);
+  }
+
+  @Reference(name = "serviceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Reference(name = "security-service")
+  @Override
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
+  }
+
+  @Reference(name = "user-directory")
+  @Override
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    super.setUserDirectoryService(userDirectoryService);
+  }
+
+  @Reference(name = "orgDirectory")
+  @Override
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    super.setOrganizationDirectoryService(organizationDirectoryService);
   }
 
 }

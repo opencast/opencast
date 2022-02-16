@@ -37,6 +37,9 @@ import org.opencastproject.oaipmh.OaiPmhConstants;
 import org.opencastproject.oaipmh.OaiPmhUtil;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseException;
+import org.opencastproject.oaipmh.persistence.OaiPmhSetDefinition;
+import org.opencastproject.oaipmh.persistence.OaiPmhSetDefinitionFilter;
+import org.opencastproject.oaipmh.persistence.OaiPmhSetDefinitionImpl;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
@@ -46,13 +49,22 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
 import org.opencastproject.util.data.Tuple;
 
+import org.apache.commons.collections4.EnumerationUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * An OAI-PMH protocol compliant repository.
@@ -75,9 +87,21 @@ import java.util.List;
  */
 // todo - malformed date parameter must produce a BadArgument error - if a date parameter has a finer granularity than
 //        supported by the repository this must produce a BadArgument error
-public abstract class OaiPmhRepository {
+public abstract class OaiPmhRepository implements ManagedService {
+  private static final Logger logger = LoggerFactory.getLogger(OaiPmhRepository.class);
   private static final OaiDcMetadataProvider OAI_DC_METADATA_PROVIDER = new OaiDcMetadataProvider();
   private static final String OAI_NS = OaiPmhConstants.OAI_2_0_XML_NS;
+
+  private static final String CONF_KEY_SET_PREFIX = "set.";
+  private static final String CONF_KEY_SET_SETSPEC_SUFFIX = ".setSpec";
+  private static final String CONF_KEY_SET_NAME_SUFFIX = ".name";
+  private static final String CONF_KEY_SET_DESCRIPTION_SUFFIX = ".description";
+  private static final String CONF_KEY_SET_FILTER_INFIX = ".filter.";
+  private static final String CONF_KEY_SET_FILTER_FLAVOR_SUFFIX = ".flavor";
+  private static final String CONF_KEY_SET_FILTER_CONTAINS_SUFFIX = ".contains";
+  private static final String CONF_KEY_SET_FILTER_CONTAINSNOT_SUFFIX = ".containsnot";
+  private static final String CONF_KEY_SET_FILTER_MATCH_SUFFIX = ".match";
+
 
   public abstract Granularity getRepositoryTimeGranularity();
 
@@ -90,6 +114,80 @@ public abstract class OaiPmhRepository {
   public abstract OaiPmhDatabase getPersistence();
 
   public abstract String getAdminEmail();
+
+  private List<OaiPmhSetDefinition> sets = new ArrayList<>();
+
+  /**
+   * Parse service configuration file.
+   *
+   * @param properties
+   *        Service configuration as dictionary
+   * @throws ConfigurationException
+   *        If there is a problem within get configuration
+   */
+  @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    if (properties == null) {
+      return;
+    }
+
+    // Wipe set configuration in case some got removed
+    sets = new ArrayList<>();
+    List<String> confKeys = EnumerationUtils.toList(properties.keys());
+    for (String confKey : confKeys) {
+      if (confKey.startsWith(CONF_KEY_SET_PREFIX) && confKey.endsWith(CONF_KEY_SET_SETSPEC_SUFFIX)) {
+        String confKeyPrefix = confKey.replace(CONF_KEY_SET_SETSPEC_SUFFIX, "");
+        String setSpec = (String) properties.get(confKey);
+        String setSpecName = (String) properties.get(confKeyPrefix + CONF_KEY_SET_NAME_SUFFIX);
+        String setDescription = null;
+        if (confKey.contains(confKeyPrefix + CONF_KEY_SET_DESCRIPTION_SUFFIX)) {
+          setDescription = (String) properties.get(confKeyPrefix + CONF_KEY_SET_DESCRIPTION_SUFFIX);
+        }
+        try {
+          OaiPmhSetDefinitionImpl setDefinition = OaiPmhSetDefinitionImpl.build(setSpec, setSpecName, setDescription);
+          List<String> confKeyFilterNames = confKeys.stream()
+              .filter(key -> key.startsWith(confKeyPrefix + CONF_KEY_SET_FILTER_INFIX)
+                  && key.endsWith(CONF_KEY_SET_FILTER_FLAVOR_SUFFIX))
+              .map(key -> key.replace(confKeyPrefix + CONF_KEY_SET_FILTER_INFIX, "")
+                  .replace(CONF_KEY_SET_FILTER_FLAVOR_SUFFIX, ""))
+              .distinct().collect(Collectors.toList());
+          for (String filterName : confKeyFilterNames) {
+            String setSpecFilterFlavor = (String) properties
+                .get(confKeyPrefix + CONF_KEY_SET_FILTER_INFIX + filterName + CONF_KEY_SET_FILTER_FLAVOR_SUFFIX);
+            List<String> confKeyCriteria = confKeys.stream()
+                .filter(key -> key.startsWith(confKeyPrefix + CONF_KEY_SET_FILTER_INFIX + filterName)
+                    && (key.endsWith(CONF_KEY_SET_FILTER_CONTAINS_SUFFIX)
+                    || key.endsWith(CONF_KEY_SET_FILTER_CONTAINSNOT_SUFFIX)
+                    || key.endsWith(CONF_KEY_SET_FILTER_MATCH_SUFFIX)))
+                .distinct().collect(Collectors.toList());
+            for (String confKeyCriterion : confKeyCriteria) {
+              String criterion = null;
+              if (confKeyCriterion.endsWith(CONF_KEY_SET_FILTER_CONTAINS_SUFFIX)) {
+                criterion = OaiPmhSetDefinitionFilter.CRITERION_CONTAINS;
+              } else if (confKeyCriterion.endsWith(CONF_KEY_SET_FILTER_CONTAINSNOT_SUFFIX)) {
+                criterion = OaiPmhSetDefinitionFilter.CRITERION_CONTAINSNOT;
+              } else if (confKeyCriterion.endsWith(CONF_KEY_SET_FILTER_MATCH_SUFFIX)) {
+                criterion = OaiPmhSetDefinitionFilter.CRITERION_MATCH;
+              } else {
+                logger.warn("Configuration key {} not valid.", confKeyCriterion);
+                continue;
+              }
+              setDefinition.addFilter(filterName, setSpecFilterFlavor, criterion,
+                  (String) properties.get(confKeyCriterion));
+            }
+          }
+          if (setDefinition.getFilters().isEmpty()) {
+            logger.warn("No filter criteria defined for OAI-PMH set definition {}.", setDefinition.getSetSpec());
+          } else {
+            sets.add(setDefinition);
+            logger.debug("OAI-PMH set difinition {} initialized.", setDefinition.getSetSpec());
+          }
+        } catch (IllegalArgumentException e) {
+          logger.warn("Unable to parse OAI-PMH set definition for setSpec {}.", setSpec, e);
+        }
+      }
+    }
+  }
 
   /**
    * Save a query.
@@ -175,8 +273,15 @@ public abstract class OaiPmhRepository {
       return createBadArgumentResponse(p);
     } else {
       for (final MetadataProvider metadataProvider : p.getMetadataPrefix().bind(getMetadataProvider)) {
+        if (p.getSet().isSome() && !sets.stream().anyMatch(
+            setDef -> StringUtils.equals(setDef.getSetSpec(), p.getSet().get()))) {
+          // If there is no set specification, immediately return a no result response
+          return createNoRecordsMatchResponse(p);
+        }
         final SearchResult res = getPersistence()
-                .search(queryRepo(getRepositoryId()).mediaPackageId(p.getIdentifier()).build());
+                .search(queryRepo(getRepositoryId()).mediaPackageId(p.getIdentifier())
+                                                    .setDefinitions(sets)
+                                                    .setSpec(p.getSet().getOrElseNull()).build());
         final List<SearchResultItem> items = res.getItems();
         switch (items.size()) {
           case 0:
@@ -259,6 +364,7 @@ public abstract class OaiPmhRepository {
             return mlist(params.getResult().getItems()).map(new Function<SearchResultItem, Node>() {
               @Override
               public Node apply(SearchResultItem item) {
+                logger.debug("Requested set: {}", set);
                 final Element metadata = params.getMetadataProvider().createMetadata(OaiPmhRepository.this, item, set);
                 return record(item, metadata);
               }
@@ -296,20 +402,22 @@ public abstract class OaiPmhRepository {
     return new OaiVerbXmlGen(this, p) {
       @Override
       public Element create() {
-        return createNoSetHierarchyResponse(p).create();
-        // leave to following code in place for the time sets are supported
-//        // define sets
-//        @SuppressWarnings("unchecked")
-//        final List<List<String>> sets = _();
-//        // map to nodes
-//        final List<Node> setNodes = mlist(sets).map(new Function<List<String>, Node>() {
-//          @Override
-//          public Node apply(List<String> strings) {
-//            return $e("set", $eTxt("setSpec", strings.get(0)), $eTxt("setName", strings.get(1)),
-//                    $e("setDescription", dc($eTxt("dc:description", strings.get(2)))));
-//          }
-//        }).value();
-//        return oai(request(), verb(setNodes));
+        if (sets.isEmpty()) {
+          return createNoSetHierarchyResponse(p).create();
+        }
+        List<Node> setNodes = new LinkedList<>();
+        sets.forEach(set -> {
+          String setSpec = set.getSetSpec();
+          String name = set.getName();
+          String description = set.getDescription();
+          if (StringUtils.isNotBlank(description)) {
+            setNodes.add($e("set", $eTxt("setSpec", setSpec), $eTxt("setName", name),
+                $e("setDescription", dc($eTxt("dc:description", description)))));
+          } else {
+            setNodes.add($e("set", $eTxt("setSpec", setSpec), $eTxt("setName", name)));
+          }
+        });
+        return oai(request(), verb(setNodes));
       }
     };
   }
@@ -436,6 +544,9 @@ public abstract class OaiPmhRepository {
     /** Call this method to create the XML. */
     public XmlGen apply(final Params p) {
       // check parameters
+      if (p.getSet().isSome() && sets.isEmpty()) {
+        return createNoSetHierarchyResponse(p);
+      }
       final boolean resumptionTokenExists = p.getResumptionToken().isSome();
       final boolean otherParamExists = p.getMetadataPrefix().isSome() || p.getFrom().isSome() || p.getUntil().isSome()
               || p.getSet().isSome();
@@ -470,8 +581,15 @@ public abstract class OaiPmhRepository {
           final Option<String>[] set = new Option[]{p.getSet()};
           if (!resumptionTokenExists) {
             // start a new query
+            if (p.getSet().isSome() && !sets.stream().anyMatch(
+                setDef -> StringUtils.equals(setDef.getSetSpec(), p.getSet().get()))) {
+              // If there is no set specification, immediately return a no result response
+              return createNoRecordsMatchResponse(p);
+            }
             result = getPersistence().search(
                     queryRepo(getRepositoryId())
+                            .setDefinitions(sets)
+                            .setSpec(p.getSet().getOrElseNull())
                             .modifiedAfter(from)
                             .modifiedBefore(until)
                             .limit(getResultLimit()).build());
@@ -483,6 +601,8 @@ public abstract class OaiPmhRepository {
                 set[0] = rq.getSet();
                 return getPersistence().search(
                         queryRepo(getRepositoryId())
+                                .setDefinitions(sets)
+                                .setSpec(rq.getSet().getOrElseNull())
                                 .modifiedAfter(rq.getLastResult())
                                 .modifiedBefore(rq.getUntil())
                                 .limit(getResultLimit())

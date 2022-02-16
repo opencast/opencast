@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -189,14 +189,6 @@
             <Http-Alias>/admin-ng</Http-Alias>
             <Http-Classpath>/webapp</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>
-<!--            <Import-Package>
-              net.fortuna.ical4j.*,
-              org.opencastproject.index.service.message,
-              org.opencastproject.adminui.index,
-              javax.ws.rs;version=2.0.1,
-              javax.ws.rs.core;version=2.0.1,
-              *
-            </Import-Package>-->
             <Private-Package>
               webapp.*
             </Private-Package>

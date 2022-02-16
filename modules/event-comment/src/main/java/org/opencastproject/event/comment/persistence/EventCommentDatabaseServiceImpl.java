@@ -23,12 +23,13 @@ package org.opencastproject.event.comment.persistence;
 import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.event.comment.EventComment;
-import org.opencastproject.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.index.rebuild.IndexRebuildException;
-import org.opencastproject.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -44,6 +45,9 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +69,13 @@ import javax.persistence.Query;
 /**
  * Implements permanent storage for event comments.
  */
+@Component(
+    immediate = true,
+    service = { EventCommentDatabaseService.class, IndexProducer.class },
+    property = {
+        "service.description=Event Comment Database Service"
+    }
+)
 public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer implements EventCommentDatabaseService {
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(EventCommentDatabaseServiceImpl.class);
@@ -90,16 +101,20 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   private ComponentContext cc;
 
   /** The elasticsearch indices */
-  private AbstractSearchIndex adminUiIndex;
-  private AbstractSearchIndex externalApiIndex;
+  private ElasticsearchIndex index;
 
   /** OSGi component activation callback */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for event comments");
     this.cc = cc;
   }
 
   /** OSGi DI */
+  @Reference(
+      name = "entityManagerFactory",
+      target = "(osgi.unit.name=org.opencastproject.event.comment)"
+  )
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
     this.env = PersistenceEnvs.mk(emf);
@@ -111,6 +126,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param securityService
    *          The security service
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -121,6 +137,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param userDirectoryService
    *          the user directory service
    */
+  @Reference(name = "userDirectory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -131,28 +148,20 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    * @param organizationDirectoryService
    *          the organization directory service
    */
+  @Reference(name = "organization-directory-service")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /**
-   * OSgi callback for the Admin UI index.
+   * OSgi callback for the API index.
    *
    * @param index
-   *          the admin UI index.
+   *          the API index.
    */
-  public void setAdminUiIndex(AbstractSearchIndex index) {
-    this.adminUiIndex = index;
-  }
-
-  /**
-   * OSGi callback for the External API index
-   *
-   * @param index
-   *          the external API index.
-   */
-  public void setExternalApiIndex(AbstractSearchIndex index) {
-    this.externalApiIndex = index;
+  @Reference(name = "elasticsearch-index")
+  public void setIndex(ElasticsearchIndex index) {
+    this.index = index;
   }
 
   @Override
@@ -167,8 +176,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logger.error("Could not get reasons", e);
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -177,8 +187,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     EntityManager em = emf.createEntityManager();
     try {
       EventCommentDto event = getEventComment(commentId, em);
-      if (event == null)
+      if (event == null) {
         throw new NotFoundException("Event comment with ID " + commentId + " does not exist");
+      }
 
       return event.toComment(userDirectoryService);
     } catch (NotFoundException e) {
@@ -187,8 +198,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logger.error("Could not get event comment {}", commentId, e);
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -199,8 +211,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     try {
       tx.begin();
       EventCommentDto event = getEventComment(commentId, em);
-      if (event == null)
+      if (event == null) {
         throw new NotFoundException("Event comment with ID " + commentId + " does not exist");
+      }
 
       em.remove(event);
       tx.commit();
@@ -209,13 +222,15 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       throw e;
     } catch (Exception e) {
       logger.error("Could not delete event comment", e);
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
 
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -235,8 +250,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       for (EventComment comment : comments) {
         long commentId = comment.getId().get().intValue();
         EventCommentDto event = getEventComment(commentId, em);
-        if (event == null)
+        if (event == null) {
           throw new NotFoundException("Event comment with ID " + commentId + " does not exist");
+        }
 
         em.remove(event);
       }
@@ -245,8 +261,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       throw e;
     } catch (Exception e) {
       logger.error("Could not delete event comments", e);
-      if (tx.isActive())
+      if (tx.isActive()) {
         tx.rollback();
+      }
 
       throw new EventCommentDatabaseException(e);
     } finally {
@@ -315,8 +332,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logger.error("Could not retreive comments for event {}", eventId, e);
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -330,8 +348,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       logger.error("Could not retreive event comments", e);
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -383,12 +402,11 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     String organization = securityService.getOrganization().getId();
     User user = securityService.getUser();
 
-    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user, adminUiIndex);
-    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user, externalApiIndex);
+    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, needsCutting, organization, user, index);
   }
 
   private void updateIndex(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting,
-          String organization, User user, AbstractSearchIndex index) {
+          String organization, User user, ElasticsearchIndex index) {
     logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
     if (!hasComments && hasOpenComments) {
       throw new IllegalStateException(
@@ -434,7 +452,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   };
 
   @Override
-  public void repopulate(final AbstractSearchIndex index) throws IndexRebuildException {
+  public void repopulate(final ElasticsearchIndex index) throws IndexRebuildException {
     try {
       final int total = countComments();
       final int[] current = new int[1];

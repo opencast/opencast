@@ -30,6 +30,7 @@ import org.opencastproject.job.api.JobContext;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
@@ -49,6 +50,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +62,14 @@ import java.util.List;
 /**
  * Workflow operation for notifying Mattermost about the status of the current workflow.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Mattermost Notification Operation Handler",
+        "workflow.operation=mattermost-notify"
+    }
+)
 public class MattermostNotificationWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   /**
    * Configuration key for the target URL of the notification request

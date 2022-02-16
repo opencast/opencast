@@ -37,6 +37,8 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -66,16 +68,26 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("/")
 @RestService(
-    name = "ltirestserviceendpoint",
+    name = "ltirestserviceguiendpoint",
     title = "LTI Service",
     notes = {},
     abstractText = "Provides operations to LTI clients"
+)
+@Component(
+    immediate = true,
+    service = LtiServiceGuiEndpoint.class,
+    property = {
+        "service.description=LTI Service GUI",
+        "opencast.service.type=org.opencastproject.lti.service.remote",
+        "opencast.service.path=/lti-service-gui"
+    }
 )
 public class LtiServiceGuiEndpoint {
   /* OSGi service references */
   private LtiService service;
 
   /** OSGi DI */
+  @Reference(name = "LtiService")
   public void setService(LtiService service) {
     this.service = service;
   }
@@ -199,6 +211,8 @@ public class LtiServiceGuiEndpoint {
     String seriesId = "";
     try {
       String captions = null;
+      String captionFormat = null;
+      String captionLanguage = null;
       String metadata = null;
       String eventId = null;
       for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
@@ -210,6 +224,10 @@ public class LtiServiceGuiEndpoint {
           metadata = Streams.asString(item.openStream());
         } else if ("captions".equals(fieldName)) {
           captions = Streams.asString(item.openStream());
+        } else if ("captionFormat".equals(fieldName)) {
+          captionFormat = Streams.asString(item.openStream());
+        } else if ("captionLanguage".equals(fieldName)) {
+          captionLanguage = Streams.asString(item.openStream());
         } else if ("seriesId".equals(fieldName)) {
           final String fieldValue = Streams.asString(item.openStream());
           if (!fieldValue.isEmpty()) {
@@ -219,6 +237,8 @@ public class LtiServiceGuiEndpoint {
           service.upsertEvent(
                   new LtiFileUpload(item.openStream(), item.getName()),
                   captions,
+                  captionFormat,
+                  captionLanguage,
                   eventId,
                   seriesId,
                   metadata);
@@ -228,6 +248,8 @@ public class LtiServiceGuiEndpoint {
       service.upsertEvent(
               null,
               captions,
+              captionFormat,
+              captionLanguage,
               eventId,
               seriesId,
               metadata);

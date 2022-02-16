@@ -57,7 +57,8 @@ public class BrightspaceClientImpl implements BrightspaceClient {
 
   private static final String GET_USER_BY_USERNAME = "/d2l/api/lp/1.0/users/?orgDefinedId=";
   private static final String GET_ALL_USERS = "/d2l/api/lp/1.0/users/";
-  private static final String GET_COURSES_BY_BRIGHTSPACE_USER_ID = "/d2l/api/lp/1.0/enrollments/users/{brightspace-userid}/orgUnits/";
+  private static final String GET_COURSES_BY_BRIGHTSPACE_USER_ID
+      = "/d2l/api/lp/1.0/enrollments/users/{brightspace-userid}/orgUnits/";
   private static final String UNEXPECTED_JSON_RESPONSE = "The brightspace API returned a unexpected json response";
   private static final String SUPER_ADMIN = "Super Administrator";
 

@@ -77,7 +77,7 @@ public class VideoGridWorkflowOperationHandlerTest {
 
   // Constant metadata values
   private static final String ENCODING_PROFILE = "concat-encoding-profile";
-  private static final String ENCODING_PROFILE_ID = "concat-samecodec.work";
+  private static final String ENCODING_PROFILE_ID = "concat.work";
   private static final String TARGET_FLAVOR_RETURN = "a/b";
   private static final String SOURCE_FLAVOR = "source-flavors";
   private static final String SOURCE_FLAVOR_KEY = "source/*";

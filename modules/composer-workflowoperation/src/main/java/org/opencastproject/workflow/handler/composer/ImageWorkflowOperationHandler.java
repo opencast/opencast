@@ -51,6 +51,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.PathSupport;
@@ -60,6 +61,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -70,7 +72,6 @@ import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Fx;
 import com.entwinemedia.fn.P2;
 import com.entwinemedia.fn.Prelude;
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.StreamFold;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
@@ -79,6 +80,8 @@ import com.entwinemedia.fn.parser.Parsers;
 import com.entwinemedia.fn.parser.Result;
 
 import org.apache.commons.io.FilenameUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +95,14 @@ import java.util.stream.Collectors;
 /**
  * The workflow definition for handling "image" operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Image Workflow Operation Handler",
+        "workflow.operation=image"
+    }
+)
 public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ImageWorkflowOperationHandler.class);
@@ -118,6 +129,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param composerService
    *          the composer service
    */
+  @Reference(name = "ComposerService")
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -129,6 +141,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -164,22 +177,16 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
         return handler.createResult(mp, Action.SKIP);
       }
       // start image extraction jobs
-      final List<Extraction> extractions = $(cfg.sourceTracks).bind(new Fn<Track, Stream<Extraction>>() {
-        @Override public Stream<Extraction> apply(final Track t) {
-          final List<MediaPosition> p = limit(t, cfg.positions);
-          if (p.size() != cfg.positions.size()) {
-            logger.warn("Could not apply all configured positions to track " + t);
-          } else {
-            logger.info("Extracting images from {} at position {}", t, $(p).mkString(", "));
+      final List<Extraction> extractions = cfg.sourceTracks.stream().flatMap(track -> {
+          final List<MediaPosition> positions = limit(track, cfg.positions);
+          if (positions.size() != cfg.positions.size()) {
+            logger.warn("Could not apply all configured positions to track {}", track);
           }
+          logger.info("Extracting images from {} at position {}", track, positions);
           // create one extraction per encoding profile
-          return $(cfg.profiles).map(new Fn<EncodingProfile, Extraction>() {
-            @Override public Extraction apply(EncodingProfile profile) {
-              return new Extraction(extractImages(t, profile, p), t, profile, p);
-            }
-          });
-        }
-      }).toList();
+          return cfg.profiles.stream()
+                  .map(profile -> new Extraction(extractImages(track, profile, positions), track, profile, positions));
+        }).collect(Collectors.toList());
       final List<Job> extractionJobs = concatJobs(extractions);
       final JobBarrier.Result extractionResult = JobUtil.waitForJobs(handler.serviceRegistry, extractionJobs);
       if (extractionResult.isSuccess()) {
@@ -613,5 +620,12 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
       return format("MediaPosition(%s, %s)", type, position);
     }
   }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }
 

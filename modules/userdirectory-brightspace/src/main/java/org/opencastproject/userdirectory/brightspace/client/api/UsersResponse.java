@@ -33,7 +33,10 @@ public class UsersResponse {
   private List<BrightspaceUser> items;
 
   @JsonCreator
-  public UsersResponse(@JsonProperty("PagingInfo") PagingInfo pagingInfo,@JsonProperty("Items") List<BrightspaceUser> items) {
+  public UsersResponse(
+      @JsonProperty("PagingInfo") PagingInfo pagingInfo,
+      @JsonProperty("Items") List<BrightspaceUser> items
+  ) {
     this.pagingInfo = pagingInfo;
     this.items = items;
   }

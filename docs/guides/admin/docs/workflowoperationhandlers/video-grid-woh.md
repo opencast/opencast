@@ -25,7 +25,7 @@ a single output file.
 |-------------------        |-----------------------------|---------------------------------------------------------------------|
 |**source-flavors**\*       | presenter/source            | Flavors containing all the video tracks to be combined.             |
 |**source-smil-flavor**\*   | smil/source+partial         | Flavor containing the SMIL specifying when each video track is active. The example shows the flavor used by partial ingest. |                          |
-|**concat-encoding-profile**\* | concat-samecodec.work  | Encoding profile used for the final concatenation.                  |
+|**concat-encoding-profile**\* | concat.work              | Encoding profile used for the final concatenation.                  |
 |resolution                 | 1280x720                    | Resolution of the output. Example value is the default.  |
 |background-color           | 0xFFFFFF                    | The color used to fill space not occupied by input videos in the output. Example value is the default.
 |**target-flavor**\*        | presenter/partial           | Flavor containing the output video tracks.                              |
@@ -63,4 +63,18 @@ Finally, the videos for each section are combined into one final, single video f
     <configuration key="concat-encoding-profile">concat-samecodec.work</configuration>
   </configurations>
 </operation>
+```
+
+## Encoding Profiles
+
+Although not necessary, it is recommended to use a concat encoding profile that makes use of concat demuxing. This helps with reducing working memory usage.
+```
+# Concat - lossless concat
+# Source files must be of the same dimension and codecs and they will be used in the target
+# It uses ffmpeg concat demuxer
+profile.concat-samecodec.work.name = concat-samecodec
+profile.concat-samecodec.work.input = visual
+profile.concat-samecodec.work.output = visual
+profile.concat-samecodec.work.suffix = -concatenated.#{in.video.suffix}
+profile.concat-samecodec.work.ffmpeg.command = #{concatCommand} -c copy #{out.dir}/#{out.name}#{out.suffix}
 ```

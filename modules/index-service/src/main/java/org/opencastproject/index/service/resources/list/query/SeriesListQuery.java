@@ -86,9 +86,7 @@ public class SeriesListQuery extends ResourceListQueryImpl {
 
   public SeriesListQuery() {
     super();
-    this.availableFilters.add(createContributorsFilter(Option.<String> none()));
     this.availableFilters.add(createCreationDateFilter(Option.<Tuple<Date, Date>> none()));
-    this.availableFilters.add(createOrganizersFilter(Option.<String> none()));
   }
 
   /**
@@ -344,7 +342,7 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<Tuple<Date, Date>> createCreationDateFilter(Option<Tuple<Date, Date>> period) {
     return FiltersUtils.generateFilter(period, FILTER_CREATIONDATE_NAME, FILTER_CREATIONDATE_LABEL, SourceType.PERIOD,
-            Option.some(SeriesListProvider.CREATION_DATE));
+            Option.none());
   }
 
   /**

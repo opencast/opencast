@@ -8,6 +8,27 @@ export const LOAD_EVENT_METADATA_FAILURE = 'LOAD_EVENT_METADATA_FAILURE';
 export const LOAD_EVENT_METADATA_IN_PROGRESS = 'LOAD_EVENT_METADATA_IN_PROGRESS';
 export const SET_EVENT_METADATA = 'SET_EVENT_METADATA';
 
+// Constants of actions types affecting the assets tab
+export const LOAD_EVENT_ASSETS_IN_PROGRESS = 'LOAD_EVENT_ASSETS_IN_PROGRESS';
+export const LOAD_EVENT_ASSETS_SUCCESS = 'LOAD_EVENT_ASSETS_SUCCESS';
+export const LOAD_EVENT_ASSETS_FAILURE = 'LOAD_EVENT_ASSETS_FAILURE';
+export const LOAD_EVENT_ASSET_ATTACHMENTS_SUCCESS = 'LOAD_EVENT_ASSET_ATTACHMENTS_SUCCESS';
+export const LOAD_EVENT_ASSET_ATTACHMENTS_FAILURE = 'LOAD_EVENT_ASSET_ATTACHMENTS_FAILURE';
+export const LOAD_EVENT_ASSET_ATTACHMENT_DETAILS_SUCCESS = 'LOAD_EVENT_ASSET_ATTACHMENT_DETAILS_SUCCESS';
+export const LOAD_EVENT_ASSET_ATTACHMENT_DETAILS_FAILURE = 'LOAD_EVENT_ASSET_ATTACHMENT_DETAILS_FAILURE';
+export const LOAD_EVENT_ASSET_CATALOGS_SUCCESS = 'LOAD_EVENT_ASSET_CATALOGS_SUCCESS';
+export const LOAD_EVENT_ASSET_CATALOGS_FAILURE = 'LOAD_EVENT_ASSET_CATALOGS_FAILURE';
+export const LOAD_EVENT_ASSET_CATALOG_DETAILS_SUCCESS = 'LOAD_EVENT_ASSET_CATALOG_DETAILS_SUCCESS';
+export const LOAD_EVENT_ASSET_CATALOG_DETAILS_FAILURE = 'LOAD_EVENT_ASSET_CATALOG_DETAILS_FAILURE';
+export const LOAD_EVENT_ASSET_MEDIA_SUCCESS = 'LOAD_EVENT_ASSET_MEDIA_SUCCESS';
+export const LOAD_EVENT_ASSET_MEDIA_FAILURE = 'LOAD_EVENT_ASSET_MEDIA_FAILURE';
+export const LOAD_EVENT_ASSET_MEDIA_DETAILS_SUCCESS = 'LOAD_EVENT_ASSET_MEDIA_DETAILS_SUCCESS';
+export const LOAD_EVENT_ASSET_MEDIA_DETAILS_FAILURE = 'LOAD_EVENT_ASSET_MEDIA_DETAILS_FAILURE';
+export const LOAD_EVENT_ASSET_PUBLICATIONS_SUCCESS = 'LOAD_EVENT_ASSET_PUBLICATIONS_SUCCESS';
+export const LOAD_EVENT_ASSET_PUBLICATIONS_FAILURE = 'LOAD_EVENT_ASSET_PUBLICATIONS_FAILURE';
+export const LOAD_EVENT_ASSET_PUBLICATION_DETAILS_SUCCESS = 'LOAD_EVENT_ASSET_PUBLICATION_DETAILS_SUCCESS';
+export const LOAD_EVENT_ASSET_PUBLICATION_DETAILS_FAILURE = 'LOAD_EVENT_ASSET_PUBLICATION_DETAILS_FAILURE';
+
 // Constants of actions types affecting the access policies tab
 export const LOAD_EVENT_POLICIES_SUCCESS = 'LOAD_EVENT_POLICIES_SUCCESS';
 export const LOAD_EVENT_POLICIES_FAILURE = 'LOAD_EVENT_POLICIES_FAILURE';
@@ -78,6 +99,112 @@ export const setEventMetadata = ( metadata ) => ({
     payload: {
         metadata
     }
+});
+
+// actions for assets
+export const loadEventAssetsInProgress = () => ({
+    type: LOAD_EVENT_ASSETS_IN_PROGRESS
+});
+
+export const loadEventAssetsSuccess = ( assets, transactionsReadOnly, uploadAssetOptions ) => ({
+    type: LOAD_EVENT_ASSETS_SUCCESS,
+    payload: {
+        assets,
+        transactionsReadOnly,
+        uploadAssetOptions
+    }
+});
+
+export const loadEventAssetsFailure = () => ({
+    type: LOAD_EVENT_ASSETS_FAILURE
+});
+
+export const loadEventAssetAttachmentsSuccess = ( attachments ) => ({
+    type: LOAD_EVENT_ASSET_ATTACHMENTS_SUCCESS,
+    payload: {
+        attachments
+    }
+});
+
+export const loadEventAssetAttachmentsFailure = () => ({
+    type: LOAD_EVENT_ASSET_ATTACHMENTS_FAILURE
+});
+
+export const loadEventAssetAttachmentDetailsSuccess = ( attachmentDetails ) => ({
+    type: LOAD_EVENT_ASSET_ATTACHMENT_DETAILS_SUCCESS,
+    payload: {
+        attachmentDetails
+    }
+});
+
+export const loadEventAssetAttachmentDetailsFailure = () => ({
+    type: LOAD_EVENT_ASSET_ATTACHMENT_DETAILS_FAILURE
+});
+
+export const loadEventAssetCatalogsSuccess = ( catalogs ) => ({
+    type: LOAD_EVENT_ASSET_CATALOGS_SUCCESS,
+    payload: {
+        catalogs
+    }
+});
+
+export const loadEventAssetCatalogsFailure = () => ({
+    type: LOAD_EVENT_ASSET_CATALOGS_FAILURE
+});
+
+export const loadEventAssetCatalogDetailsSuccess = (catalogDetails ) => ({
+    type: LOAD_EVENT_ASSET_CATALOG_DETAILS_SUCCESS,
+    payload: {
+        catalogDetails
+    }
+});
+
+export const loadEventAssetCatalogDetailsFailure = () => ({
+    type: LOAD_EVENT_ASSET_CATALOG_DETAILS_FAILURE
+});
+
+export const loadEventAssetMediaSuccess = ( media ) => ({
+    type: LOAD_EVENT_ASSET_MEDIA_SUCCESS,
+    payload: {
+        media
+    }
+});
+
+export const loadEventAssetMediaFailure = () => ({
+    type: LOAD_EVENT_ASSET_MEDIA_FAILURE
+});
+
+export const loadEventAssetMediaDetailsSuccess = (mediaDetails ) => ({
+    type: LOAD_EVENT_ASSET_MEDIA_DETAILS_SUCCESS,
+    payload: {
+        mediaDetails
+    }
+});
+
+export const loadEventAssetMediaDetailsFailure = () => ({
+    type: LOAD_EVENT_ASSET_MEDIA_DETAILS_FAILURE
+});
+
+export const loadEventAssetPublicationsSuccess = ( publications ) => ({
+    type: LOAD_EVENT_ASSET_PUBLICATIONS_SUCCESS,
+    payload: {
+        publications
+    }
+});
+
+export const loadEventAssetPublicationsFailure = () => ({
+    type: LOAD_EVENT_ASSET_PUBLICATIONS_FAILURE
+});
+
+export const loadEventAssetPublicationDetailsSuccess = (publicationDetails ) => ({
+    type: LOAD_EVENT_ASSET_PUBLICATION_DETAILS_SUCCESS,
+    payload: {
+        publicationDetails
+    }
+});
+
+export const loadEventAssetPublicationDetailsFailure = () => ({
+    type: LOAD_EVENT_ASSET_PUBLICATION_DETAILS_FAILURE
 });
 
 // actions for access policies

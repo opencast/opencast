@@ -41,6 +41,8 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,6 +75,15 @@ import javax.ws.rs.core.Response.Status;
     notes = {},
     abstractText = "Provides operations to LTI clients"
 )
+@Component(
+    immediate = true,
+    service = LtiServiceRestEndpoint.class,
+    property = {
+        "service.description=LTI Service",
+        "opencast.service.type=org.opencastproject.lti.service",
+        "opencast.service.path=/lti-service"
+    }
+)
 public class LtiServiceRestEndpoint {
   private static final Gson gson = new Gson();
 
@@ -80,6 +91,7 @@ public class LtiServiceRestEndpoint {
   private LtiService service;
 
   /** OSGi DI */
+  @Reference(name = "LtiService")
   public void setService(LtiService service) {
     this.service = service;
   }
@@ -136,6 +148,18 @@ public class LtiServiceRestEndpoint {
               type = STRING
           ),
           @RestParameter(
+            name = "captionFormat",
+            description = "Caption file format",
+            isRequired = false,
+            type = STRING
+          ),
+          @RestParameter(
+            name = "captionLanguage",
+            description = "Caption language",
+            isRequired = false,
+            type = STRING
+          ),
+          @RestParameter(
               name = "isPartOf",
               description = "Series id of the event",
               isRequired = false,
@@ -149,24 +173,26 @@ public class LtiServiceRestEndpoint {
           )
       },
       responses = {
-          @RestResponse(
-              description = "A new event is created or the event is updated",
-              responseCode = HttpServletResponse.SC_OK
-          ),
-          @RestResponse(
-              description = "No authorization to create or update events",
-              responseCode = HttpServletResponse.SC_UNAUTHORIZED
-          ),
-          @RestResponse(
-              description = "The event to be updated wasn't found",
-              responseCode = HttpServletResponse.SC_NOT_FOUND
-          )
+        @RestResponse(
+            description = "A new event is created or the event is updated",
+            responseCode = HttpServletResponse.SC_OK
+        ),
+        @RestResponse(
+            description = "No authorization to create or update events",
+            responseCode = HttpServletResponse.SC_UNAUTHORIZED
+        ),
+        @RestResponse(
+            description = "The event to be updated wasn't found",
+            responseCode = HttpServletResponse.SC_NOT_FOUND
+        )
       }
   )
   public Response createNewEvent(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request) {
     String seriesId = "";
     try {
       String captions = null;
+      String captionFormat = null;
+      String captionLanguage = null;
       String eventId = null;
       String metadataJson = null;
       for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
@@ -181,6 +207,10 @@ public class LtiServiceRestEndpoint {
           metadataJson = Streams.asString(item.openStream());
         } else if ("captions".equals(fieldName)) {
           captions = Streams.asString(item.openStream());
+        } else if ("captionFormat".equals(fieldName)) {
+          captionFormat = Streams.asString(item.openStream());
+        } else if ("captionLanguage".equals(fieldName)) {
+          captionLanguage = Streams.asString(item.openStream());
         } else if ("eventId".equals(fieldName)) {
           eventId = Streams.asString(item.openStream());
         } else {
@@ -189,6 +219,8 @@ public class LtiServiceRestEndpoint {
           service.upsertEvent(
                   new LtiFileUpload(stream, streamName),
                   captions,
+                  captionFormat,
+                  captionLanguage,
                   eventId,
                   seriesId,
                   metadataJson);
@@ -198,7 +230,7 @@ public class LtiServiceRestEndpoint {
       if (eventId == null) {
         return Response.status(Status.BAD_REQUEST).entity("No file given").build();
       }
-      service.upsertEvent(null, captions, eventId, seriesId, metadataJson);
+      service.upsertEvent(null, captions, captionFormat, captionLanguage, eventId, seriesId, metadataJson);
       return Response.ok().build();
     } catch (FileUploadException | IOException e) {
       return Response.status(Status.INTERNAL_SERVER_ERROR).entity("error while uploading").build();
@@ -220,8 +252,9 @@ public class LtiServiceRestEndpoint {
               name = "eventId",
               description = "The event (id) to copy",
               isRequired = true,
-              type = STRING
-          ),
+              type = STRING)
+      },
+      restParameters = {
           @RestParameter(
               name = "seriesId",
               description = "The series (id) to copy into",
@@ -255,6 +288,9 @@ public class LtiServiceRestEndpoint {
       returnDescription = "",
       pathParameters = {
           @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "metadataJson", description = "Event metadata", isRequired = true, type = STRING),
       },
       responses = {
           @RestResponse(

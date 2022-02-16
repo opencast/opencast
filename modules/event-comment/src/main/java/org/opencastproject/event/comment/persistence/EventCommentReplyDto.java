@@ -85,8 +85,9 @@ public class EventCommentReplyDto {
 
   public static EventCommentReplyDto from(EventCommentReply reply) {
     EventCommentReplyDto dto = new EventCommentReplyDto();
-    if (reply.getId().isSome())
+    if (reply.getId().isSome()) {
       dto.id = reply.getId().get().longValue();
+    }
     dto.text = reply.getText();
     dto.creationDate = reply.getCreationDate();
     dto.modificationDate = reply.getModificationDate();

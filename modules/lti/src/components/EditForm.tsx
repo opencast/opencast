@@ -6,9 +6,9 @@ import {
     EventMetadataCollection,
     collectionToPairs
 } from "../OpencastRest";
-import Select, { ValueType } from "react-select";
+import Select, { OnChangeValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import * as i18next from "i18next";
+import i18n, { TFunction } from "i18next";
 
 const allowedFields = ["title", "language", "license", "creator"];
 
@@ -23,9 +23,11 @@ interface EditFormProps extends WithTranslation {
     readonly onDataChange: (newData: EventMetadataContainer) => void;
     readonly onPresenterFileChange: (file: Blob) => void;
     readonly onCaptionFileChange: (file: Blob) => void;
+    readonly onCaptionLanguageChange: (language: string) => void;
     readonly onSubmit: () => void;
     readonly pending: boolean;
     readonly hasSubmit: boolean;
+    readonly captionFormat?: string;
 }
 
 interface MetadataFieldProps {
@@ -33,7 +35,7 @@ interface MetadataFieldProps {
     // ESlint false positive.
     // eslint-disable-next-line react/no-unused-prop-types
     readonly valueChange: (id: string, newValue: string | string[]) => void;
-    readonly t: i18next.TFunction;
+    readonly t: TFunction;
 }
 
 interface MetadataCollectionKey {
@@ -48,11 +50,25 @@ function parseMetadataCollectionKey(s: string): MetadataCollectionKey {
     return JSON.parse(s);
 }
 
-function collectionToOptions(collection: EventMetadataCollection, translatable: boolean, t: i18next.TFunction): OptionType[] {
-    return collectionToPairs(collection)
+function collectionToOptions(collection: EventMetadataCollection, translatable: boolean, t: TFunction): OptionType[] {
+    const pairs = collectionToPairs(collection);
+    //Check if we get a JSON object back, and that this contains the order field
+    //Use the order field in this case to determine to order of the items in the dropdown
+    if(pairs[0][0].startsWith("{") === true) {
+        if(Object.prototype.hasOwnProperty.call(JSON.parse(pairs[0][0]), "order") === true) {
+            return pairs
+                .sort((a,b)  => JSON.parse(a[0]).order - JSON.parse(b[0]).order)
+                .map(([k, v]) => [parseMetadataCollectionKey(k).label, v])
+                .map(([k, v]) => [translatable ? t(k) : k, v])
+                .map(([k, v]) => ({ value: v, label: k}));
+        }
+    }
+    //Otherwise just return an alphabetically sorted list
+    return pairs
         .map(([k, v]) => [parseMetadataCollectionKey(k).label, v])
         .map(([k, v]) => [translatable ? t(k) : k, v])
-        .map(([k, v]) => ({ value: v, label: k }));
+        .map(([k, v]) => ({ value: v, label: k}))
+        .sort((a,b) => a.label.localeCompare(b.label, i18n.language));
 }
 
 function MetadataFieldReadOnly(props: MetadataFieldProps) {
@@ -94,7 +110,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
             isClearable={true}
             id={field.id}
             value={(field.value as string[]).map((e) => ({ value: e, label: e }))}
-            onChange={(value: ValueType<OptionType, true>) =>
+            onChange={(value: OnChangeValue<OptionType, true>) =>
                 valueChange(field.id, value.map(v => v.value))}
             />;
     }
@@ -103,7 +119,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
         const currentValue = options.find((o: OptionType) => o.value === field.value);
         return <Select
             id={field.id}
-            onChange={(value: ValueType<OptionType, false>) =>
+            onChange={(value: OnChangeValue<OptionType, false>) =>
                 valueChange(field.id, value === null || Array.isArray(value) ? "" : value.value)}
             value={currentValue}
             options={options}
@@ -113,7 +129,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
 }
 
 function MetadataField(props: MetadataFieldProps) {
-    return <div className="form-group">
+    return <div className="form-group my-4">
         <label htmlFor={props.field.id}>{props.t(props.field.label)}</label>
         <MetadataFieldInner {...props} />
     </div>;
@@ -145,6 +161,11 @@ class TranslatedEditForm extends React.Component<EditFormProps> {
     }
 
     render() {
+        const languageField = this.props.data.fields.filter((field) => field.id === "language")[0];
+        let languageOptions: OptionType[] = [];
+        if(languageField.collection !== undefined){
+            languageOptions = collectionToOptions(languageField.collection, languageField.translatable, this.props.t);
+        }
         return <form>
             {this.props.data.fields
                 .filter((field) => allowedFields.includes(field.id))
@@ -154,18 +175,32 @@ class TranslatedEditForm extends React.Component<EditFormProps> {
                     field={field}
                     valueChange={this.fieldValueChange.bind(this)} />)}
             {this.props.withUpload === true &&
-                <div className="form-group">
-                    <label htmlFor="presenter">{this.props.t("LTI.PRESENTER")}</label>
-                    <input type="file" className="form-control-file" onChange={this.onChangePresenterFile.bind(this)} />
-                    <small className="form-text text-muted">{this.props.t("LTI.PRESENTER_DESCRIPTION")}</small>
+                <div className="form-group my-4">
+                    <label className="pr-3" htmlFor="presenter">{this.props.t("LTI.VIDEOFILE")}</label>
+                    <input type="file" className="form-control-file px-3" onChange={this.onChangePresenterFile.bind(this)} />
+                    <small className="form-text text-muted">{this.props.t("LTI.VIDEOFILE_DESCRIPTION")}</small>
                 </div>
             }
             {this.props.withUpload === true &&
-                <div className="form-group">
-                    <label htmlFor="caption">{this.props.t("LTI.CAPTION")}</label>
-                    <input type="file" className="form-control-file" onChange={this.onChangeCaptionFile.bind(this)} />
-                    <small className="form-text text-muted">{this.props.t("LTI.CAPTION_DESCRIPTION")}</small>
-                </div>
+                <>
+                    <div className="form-group my-4">
+                        <label className="pr-3" htmlFor="caption">{this.props.t("LTI.CAPTION")}</label>
+                        <input type="file" className="form-control-file px-3" onChange={this.onChangeCaptionFile.bind(this)} />
+                        <small className="form-text text-muted">{this.props.t("LTI.CAPTION_DESCRIPTION")}</small>
+                    </div>
+                    { this.props.captionFormat === "vtt" && languageOptions.length > 0 &&
+                        <div className="form-group my-4">
+                            <label className="pr-3" htmlFor="caption_language">{this.props.t("LTI.CAPTION")} {this.props.t("LTI.LANGUAGE")}</label>
+                            <Select
+                                id="caption_language"
+                                className="px-3"
+                                onChange={(value) => this.props.onCaptionLanguageChange((value as OptionType).value)}
+                                options={languageOptions}
+                                placeholder={this.props.t("LTI.SELECT_OPTION")}
+                            />
+                        </div>
+                    }
+                </>
             }
             {this.props.hasSubmit === true &&
                 <button

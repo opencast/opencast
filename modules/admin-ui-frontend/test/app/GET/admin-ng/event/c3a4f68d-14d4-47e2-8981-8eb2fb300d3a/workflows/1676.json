@@ -29,6 +29,11 @@
     "publishToApi": "true",
     "publishToAws": "false"
   },
+  "creator": {
+     "name": "Administrator",
+     "email": "admin@localhost",
+     "username": "admin"
+  },
   "series": "",
   "start": "2018-08-10T11:24:32Z",
   "description": "",

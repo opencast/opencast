@@ -29,9 +29,9 @@ import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -81,6 +81,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,6 +107,13 @@ import java.util.stream.Collectors;
 /**
  * The LTI service implementation
  */
+@Component(
+    immediate = true,
+    service = { LtiService.class,ManagedService.class },
+    property = {
+        "service.description=LTI Service"
+    }
+)
 public class LtiServiceImpl implements LtiService, ManagedService {
   private static final Logger logger = LoggerFactory.getLogger(LtiServiceImpl.class);
 
@@ -114,7 +125,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private WorkflowService workflowService;
   private AssetManager assetManager;
   private Workspace workspace;
-  private AbstractSearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
   private AuthorizationService authorizationService;
   private SeriesService seriesService;
   private String workflow;
@@ -124,51 +135,66 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
 
   /** OSGi DI */
+  @Reference(name = "authorization-service")
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
   /** OSGI DI */
+  @Reference(name = "series-service")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi DI */
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
   /** OSGi DI */
+  @Reference(name = "workflow-service")
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi DI */
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
   /** OSGi DI */
-  public void setSearchIndex(AbstractSearchIndex searchIndex) {
+  @Reference(name = "search-index")
+  public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
   /** OSGi DI */
+  @Reference(name = "IndexService")
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
+  @Reference(name = "IngestService")
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI */
+  @Reference(name = "SecurityService")
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI. */
+  @Reference(
+      name = "EventCatalogUIAdapter",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     catalogUIAdapters.add(catalogUIAdapter);
   }
@@ -235,6 +261,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   public void upsertEvent(
           final LtiFileUpload file,
           final String captions,
+          final String captionFormat,
+          final String captionLanguage,
           final String eventId,
           final String seriesId,
           final String metadataJson) throws UnauthorizedException, NotFoundException {
@@ -246,38 +274,46 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       throw new RuntimeException("No workflow configured, cannot upload");
     }
     try {
-      MediaPackage mp = ingestService.createMediaPackage();
-      if (mp == null) {
+      MediaPackage mediaPackage = ingestService.createMediaPackage();
+      if (mediaPackage == null) {
         throw new RuntimeException("Unable to create media package for event");
       }
+
       if (captions != null) {
-        final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor("captions", "vtt+en");
-        final MediaPackageElementBuilder elementBuilder
-            = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-        final MediaPackageElement captionsMpe = elementBuilder
+        final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor(
+            "captions", captionFormat + "+" + captionLanguage
+        );
+        final MediaPackageElementBuilder elementBuilder =
+            MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+        final MediaPackageElement captionsMediaPackage = elementBuilder
                 .newElement(MediaPackageElement.Type.Attachment, captionsFlavor);
-        captionsMpe.setMimeType(mimeType("text", "vtt"));
-        captionsMpe.addTag("lang:en");
-        mp.add(captionsMpe);
+        if ("dfxp".equals(captionFormat)) {
+          captionsMediaPackage.setMimeType(mimeType("application", "xml"));
+        } else {
+          captionsMediaPackage.setMimeType(mimeType("text", captionFormat));
+        }
+        captionsMediaPackage.addTag("lang:" + captionLanguage);
+        mediaPackage.add(captionsMediaPackage);
         final URI captionsUri = workspace
                 .put(
-                        mp.getIdentifier().toString(),
-                        captionsMpe.getIdentifier(),
-                        "captions.vtt",
+                        mediaPackage.getIdentifier().toString(),
+                        captionsMediaPackage.getIdentifier(),
+                        "captions." + captionFormat,
                         new ByteArrayInputStream(captions.getBytes(StandardCharsets.UTF_8)));
-        captionsMpe.setURI(captionsUri);
+        captionsMediaPackage.setURI(captionsUri);
       }
 
-      JSONArray metadataJsonArray = (JSONArray) new JSONParser().parse(metadataJson);
-
       final EventCatalogUIAdapter adapter = getEventCatalogUIAdapter();
+
       final DublinCoreMetadataCollection collection = adapter.getRawFields();
+
+      JSONArray metadataJsonArray = (JSONArray) new JSONParser().parse(metadataJson);
 
       JSONArray collectionJsonArray = MetadataJson.extractSingleCollectionfromListJson(metadataJsonArray);
       MetadataJson.fillCollectionFromJson(collection, collectionJsonArray);
 
       replaceField(collection, "isPartOf", seriesId);
-      adapter.storeFields(mp, collection);
+      adapter.storeFields(mediaPackage, collection);
 
       AccessControlList accessControlList = null;
 
@@ -290,16 +326,20 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         accessControlList = new AccessControlList(
           new AccessControlEntry("ROLE_ADMIN", "write", true),
           new AccessControlEntry("ROLE_ADMIN", "read", true),
-          new AccessControlEntry("ROLE_OAUTH_USER", "write", true),
-          new AccessControlEntry("ROLE_OAUTH_USER", "read", true));
+          new AccessControlEntry("ROLE_USER", "read", true));
       }
 
-      this.authorizationService.setAcl(mp, AclScope.Episode, accessControlList);
-      mp = ingestService.addTrack(file.getStream(), file.getSourceName(), MediaPackageElements.PRESENTER_SOURCE, mp);
+      this.authorizationService.setAcl(mediaPackage, AclScope.Episode, accessControlList);
+      mediaPackage = ingestService.addTrack(
+            file.getStream(),
+            file.getSourceName(),
+            MediaPackageElements.PRESENTER_SOURCE,
+            mediaPackage
+      );
 
       final Map<String, String> configuration = gson.fromJson(workflowConfiguration, Map.class);
       configuration.put("workflowDefinitionId", workflow);
-      ingestService.ingest(mp, workflow, configuration);
+      ingestService.ingest(mediaPackage, workflow, configuration);
     } catch (Exception e) {
       throw new RuntimeException("unable to create event", e);
     }
@@ -338,10 +378,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     final EventCatalogUIAdapter adapter = catalogUIAdapters.stream()
         .filter(e -> e.getFlavor().equals(flavor))
         .findAny()
-        .orElse(null);
-    if (adapter == null) {
-      throw new RuntimeException("no adapter found");
-    }
+        .orElseThrow(() -> new RuntimeException("no adapter found"));
     return adapter;
   }
 

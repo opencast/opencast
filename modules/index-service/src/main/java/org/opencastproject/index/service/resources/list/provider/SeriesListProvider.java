@@ -24,10 +24,10 @@ package org.opencastproject.index.service.resources.list.provider;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesIndexSchema;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListFilter;
@@ -35,12 +35,14 @@ import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +53,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Series list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.SeriesListProvider"
+    }
+)
 public class SeriesListProvider implements ResourceListProvider {
   private static final Logger logger = LoggerFactory.getLogger(SeriesListProvider.class);
 
@@ -62,30 +72,30 @@ public class SeriesListProvider implements ResourceListProvider {
   public static final String TITLE = PROVIDER_PREFIX + ".TITLE";
   public static final String TITLE_EXTENDED = PROVIDER_PREFIX + ".TITLE_EXTENDED";
   public static final String LANGUAGE = PROVIDER_PREFIX + ".LANGUAGE";
-  public static final String CREATOR = PROVIDER_PREFIX + ".CREATOR";
   public static final String ORGANIZERS = PROVIDER_PREFIX + ".ORGANIZERS";
   public static final String LICENSE = PROVIDER_PREFIX + ".LICENSE";
-  public static final String ACCESS_POLICY = PROVIDER_PREFIX + ".ACCESS_POLICY";
-  public static final String CREATION_DATE = PROVIDER_PREFIX + ".CREATION_DATE";
 
   private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, ORGANIZERS, TITLE_EXTENDED };
 
   /** The search index. */
-  private AbstractSearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
   /** The security service. */
   private SecurityService securityService;
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Series list provider activated!");
   }
 
   /** OSGi callback for series services. */
-  public void setSearchIndex(AbstractSearchIndex searchIndex) {
+  @Reference(name = "ElasticsearchIndex")
+  public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
   /** OSGi callback for security service */
+  @Reference(name = "SecurityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -102,20 +112,17 @@ public class SeriesListProvider implements ResourceListProvider {
     Map<String, String> result = new HashMap<>();
     if (TITLE.equals(listName)) {
       seriesQuery.sortByTitle(SortCriterion.Order.Ascending);
-      for (String title : searchIndex.getTermsForField(SeriesIndexSchema.TITLE,
-          Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
+      for (String title : searchIndex.getTermsForField(SeriesIndexSchema.TITLE, Series.DOCUMENT_TYPE)) {
         result.put(title, title);
       }
     } else if (CONTRIBUTORS.equals(listName)) {
       seriesQuery.sortByContributors(SortCriterion.Order.Ascending);
-      for (String contributor : searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS,
-          Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
+      for (String contributor : searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS, Series.DOCUMENT_TYPE)) {
         result.put(contributor, contributor);
       }
     } else if (ORGANIZERS.equals(listName)) {
       seriesQuery.sortByOrganizers(SortCriterion.Order.Ascending);
-      for (String organizer : searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS,
-          Option.some(new String[] { Series.DOCUMENT_TYPE }))) {
+      for (String organizer : searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS, Series.DOCUMENT_TYPE)) {
         result.put(organizer, organizer);
       }
     } else {

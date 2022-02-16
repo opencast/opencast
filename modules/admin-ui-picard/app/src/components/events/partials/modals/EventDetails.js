@@ -12,9 +12,19 @@ import EventDetailsWorkflowOperations from "../ModalTabsAndPages/EventDetailsWor
 import EventDetailsWorkflowOperationDetails from "../ModalTabsAndPages/EventDetailsWorkflowOperationDetails";
 import EventDetailsWorkflowErrors from "../ModalTabsAndPages/EventDetailsWorkflowErrors";
 import EventDetailsWorkflowErrorDetails from "../ModalTabsAndPages/EventDetailsWorkflowErrorDetails";
+import EventDetailsAssetsTab from "../ModalTabsAndPages/EventDetailsAssetsTab";
+import EventDetailsAssetAttachments from "../ModalTabsAndPages/EventDetailsAssetAttachments";
+import EventDetailsAssetCatalogs from "../ModalTabsAndPages/EventDetailsAssetCatalogs";
+import EventDetailsAssetMedia from "../ModalTabsAndPages/EventDetailsAssetMedia";
+import EventDetailsAssetPublications from "../ModalTabsAndPages/EventDetailsAssetPublications";
+import EventDetailsAssetAttachmentDetails from "../ModalTabsAndPages/EventDetailsAssetAttachmentDetails";
+import EventDetailsAssetCatalogDetails from "../ModalTabsAndPages/EventDetailsAssetCatalogDetails";
+import EventDetailsAssetMediaDetails from "../ModalTabsAndPages/EventDetailsAssetMediaDetails";
+import EventDetailsAssetPublicationDetails from "../ModalTabsAndPages/EventDetailsAssetPublicationDetails";
+import EventDetailsAssetsAddAsset from "../ModalTabsAndPages/EventDetailsAssetsAddAsset";
+import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
 import {getMetadata, isFetchingMetadata} from "../../../../selectors/eventDetailsSelectors";
 import {fetchMetadata, updateMetadata} from "../../../../thunks/eventDetailsThunks";
-import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 
@@ -38,6 +48,7 @@ const EventDetails = ({ tabIndex, eventId, close,
 
     const [page, setPage] = useState(tabIndex);
     const [workflowTabHierarchy, setWorkflowTabHierarchy] = useState("entry")
+    const [assetsTabHierarchy, setAssetsTabHierarchy] = useState("entry")
 
     const tabs = [
         {
@@ -102,6 +113,7 @@ const EventDetails = ({ tabIndex, eventId, close,
     const openTab = (tabNr) => {
         removeNotificationWizardForm();
         setWorkflowTabHierarchy("entry")
+        setAssetsTabHierarchy("entry")
         setPage(tabNr);
     }
 
@@ -168,11 +180,11 @@ const EventDetails = ({ tabIndex, eventId, close,
                 <div>
                     {page === 0 && (!isLoadingMetadata) && (
                         <DetailsMetadataTab metadataFields={metadata}
-                                            resourceId={eventId}
-                                            header={tabs[page].bodyHeaderTranslation}
-                                            buttonLabel='SAVE'
-                                            updateResource={updateMetadata}
-                                            editAccessRole='ROLE_UI_EVENTS_DETAILS_METADATA_EDIT'/>
+                            resourceId={eventId}
+                            header={tabs[page].bodyHeaderTranslation}
+                            buttonLabel='SAVE'
+                            updateResource={updateMetadata}
+                            editAccessRole='ROLE_UI_EVENTS_DETAILS_METADATA_EDIT'/>
                     )}
                     {page === 1 && (
                         <MockDataPage header={tabs[page].bodyHeaderTranslation}
@@ -182,8 +194,66 @@ const EventDetails = ({ tabIndex, eventId, close,
                         <EventDetailsPublicationTab eventId={eventId} />
                     )}
                     {page === 3  && (
-                        <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                         t={t}/>
+                        (assetsTabHierarchy === "entry" && (
+                            <EventDetailsAssetsTab
+                                 eventId={eventId}
+                                 t={t}
+                                 setHierarchy={setAssetsTabHierarchy}/>
+                        )) || (
+                        assetsTabHierarchy === "add-asset" && (
+                            <EventDetailsAssetsAddAsset
+                                 eventId={eventId}
+                                 t={t}
+                                 setHierarchy={setAssetsTabHierarchy}/>
+                        )) || (
+                        assetsTabHierarchy === "asset-attachments" && (
+                            <EventDetailsAssetAttachments
+                                 eventId={eventId}
+                                 t={t}
+                                 setHierarchy={setAssetsTabHierarchy}/>
+                        )) || (
+                        assetsTabHierarchy === "attachment-details" && (
+                            <EventDetailsAssetAttachmentDetails
+                                 eventId={eventId}
+                                 t={t}
+                                 setHierarchy={setAssetsTabHierarchy}/>
+                        )) || (
+                        assetsTabHierarchy === "asset-catalogs" && (
+                            <EventDetailsAssetCatalogs
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setAssetsTabHierarchy}/>
+                        )) || (
+                        assetsTabHierarchy === "catalog-details" && (
+                            <EventDetailsAssetCatalogDetails
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setAssetsTabHierarchy}/>
+                        )) || (
+                        assetsTabHierarchy === "asset-media" && (
+                            <EventDetailsAssetMedia
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setAssetsTabHierarchy}/>
+                        )) || (
+                        assetsTabHierarchy === "media-details" && (
+                            <EventDetailsAssetMediaDetails
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setAssetsTabHierarchy}/>
+                        )) || (
+                        assetsTabHierarchy === "asset-publications" && (
+                            <EventDetailsAssetPublications
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setAssetsTabHierarchy}/>
+                        )) || (
+                        assetsTabHierarchy === "publication-details" && (
+                            <EventDetailsAssetPublicationDetails
+                                eventId={eventId}
+                                t={t}
+                                setHierarchy={setAssetsTabHierarchy}/>
+                        ))
                     )}
                     {page === 4 && (
                         <MockDataPage header={tabs[page].bodyHeaderTranslation}
@@ -259,7 +329,6 @@ const MockDataPage = ({ header, t }) => {
                 <div className="full-col">
                     <div className="obj tbl-details">
                         <header>{t(header)}</header>
-                        {/* Table view containing input fields for metadata */}
                         <div className="obj-container">
                             <table className="main-tbl">
                                 <tbody>

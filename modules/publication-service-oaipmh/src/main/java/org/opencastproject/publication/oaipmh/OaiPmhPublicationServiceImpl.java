@@ -64,6 +64,8 @@ import com.entwinemedia.fn.data.Opt;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +85,13 @@ import java.util.stream.Stream;
 /**
  * Publishes a recording to an OAI-PMH publication repository.
  */
+@Component(
+    immediate = true,
+    service = OaiPmhPublicationService.class,
+    property = {
+        "service.description=Publication Service (OAI-PMH)"
+    }
+)
 public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements OaiPmhPublicationService {
 
   /** Logging facility */
@@ -751,10 +760,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     }
     MediaPackage publishedMp = merge(filteredMp, removeMatchingNonExistantElements(filteredMp,
             (MediaPackage) result.getItems().get(0).getMediaPackage().clone(), parsedFlavors, tags));
-    // Does the media package have a title and track?
-    if (!MediaPackageSupport.isPublishable(publishedMp)) {
-      throw new PublicationException("Media package does not meet criteria for publication");
-    }
     // Publish the media package to OAI-PMH
     try {
       logger.debug("Updating metadata of media package {} in {}",
@@ -935,7 +940,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       // Is the element referencing anything?
       MediaPackageReference reference = element.getReference();
       if (reference != null) {
-        Map<String, String> referenceProperties = reference.getProperties();
         MediaPackageElement referencedElement = mediaPackage.getElementByReference(reference);
 
         // if we are distributing the referenced element, everything is fine. Otherwise...
@@ -956,13 +960,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
           // Done. Let's cut the path but keep references to the mediapackage itself
           if (reference != null && reference.getType().equals(MediaPackageReference.TYPE_MEDIAPACKAGE)) {
             element.setReference(reference);
-          } else if (reference != null && (referenceProperties == null || referenceProperties.size() == 0)) {
-            element.clearReference();
           } else {
-            // Ok, there is more to that reference than just pointing at an element. Let's keep the original,
-            // you never know.
-            referencedElement.setURI(null);
-            referencedElement.setChecksum(null);
+            element.clearReference();
           }
         }
       }
@@ -1092,41 +1091,52 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   }
 
   /** OSGI DI */
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** OSGI DI */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGI DI */
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
   /** OSGI DI */
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** OSGI DI */
+  @Reference(
+      name = "downloadDistributionService",
+      target = "(distribution.channel=download)"
+  )
   public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
 
   /** OSGI DI */
+  @Reference(name = "streamingDistributionService")
   public void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
 
   /** OSGI DI */
+  @Reference(name = "oaiPmhServerInfo")
   public void setOaiPmhServerInfo(OaiPmhServerInfo oaiPmhServerInfo) {
     this.oaiPmhServerInfo = oaiPmhServerInfo;
   }
 
   /** OSGI DI */
+  @Reference(name = "persistence")
   public void setOaiPmhDatabase(OaiPmhDatabase oaiPmhDatabase) {
     this.oaiPmhDatabase = oaiPmhDatabase;
   }

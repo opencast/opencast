@@ -197,7 +197,8 @@ export async function searchEpisode(
         urlSuffix += "&sname=" + seriesName;
     if (episodeId !== undefined)
         urlSuffix += "&id=" + episodeId;
-    const response = await axios.get(`${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`);
+    const url = `${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`;
+    const response = await axios.get<any>(url);
     const resultsRaw = response.data["search-results"]["result"];
     const results = Array.isArray(resultsRaw) ? resultsRaw : resultsRaw !== undefined ? [resultsRaw] : [];
     return {
@@ -236,14 +237,14 @@ export async function deleteEvent(eventId: string): Promise<void> {
 }
 
 export async function getLti(): Promise<LtiData> {
-    const response = await axios.get(hostAndPort() + "/lti");
+    const response = await axios.get<any>(hostAndPort() + "/lti");
     return {
         roles: response.data.roles !== undefined ? response.data.roles.split(",") : [],
     }
 }
 
 export async function getJobs(seriesId: string): Promise<JobResult[]> {
-    const response = await axios.get(hostAndPort() + "/lti-service-gui/jobs?seriesId=" + seriesId);
+    const response = await axios.get<any>(hostAndPort() + "/lti-service-gui/jobs?seriesId=" + seriesId);
     return response.data.map((r: any) => ({ title: r.title, status: r.status }));
 }
 
@@ -253,6 +254,8 @@ export async function uploadFile(
     eventId?: string,
     presenterFile?: Blob,
     captionFile?: Blob,
+    captionFormat?: string,
+    captionLanguage?: string,
     setUploadPogress?: (progress: number) => void): Promise<{}> {
     const percentage = 100;
     const data = new FormData();
@@ -260,6 +263,10 @@ export async function uploadFile(
     if (eventId !== undefined)
         data.append("eventId", eventId);
     data.append("seriesId", seriesId);
+    if (captionFormat !== undefined)
+        data.append("captionFormat", captionFormat);
+    if (captionLanguage !== undefined)
+        data.append("captionLanguage", captionLanguage);
     if (captionFile !== undefined)
         data.append("captions", captionFile);
     if (presenterFile !== undefined)

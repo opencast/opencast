@@ -25,6 +25,7 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.XMLCatalogImpl;
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 import org.opencastproject.util.XmlNamespaceContext;
+import org.opencastproject.util.XmlSafeParser;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -57,7 +58,6 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 
@@ -210,7 +210,7 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
     // Create the DOM document
     final Document doc;
     {
-      final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+      final DocumentBuilderFactory docBuilderFactory = XmlSafeParser.newDocumentBuilderFactory();
       docBuilderFactory.setNamespaceAware(true);
       doc = docBuilderFactory.newDocumentBuilder().newDocument();
     }
@@ -230,7 +230,7 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
 
   private DublinCoreCatalog readImpl(Node node) throws TransformerException {
     final Result outputTarget = new SAXResult(this);
-    final Transformer t = TransformerFactory.newInstance().newTransformer();
+    final Transformer t = XmlSafeParser.newTransformerFactory().newTransformer();
     t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
     t.transform(new DOMSource(node), outputTarget);
     return dc;
@@ -238,7 +238,7 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
 
   private DublinCoreCatalog readImpl(InputSource in)
           throws ParserConfigurationException, SAXException, IOException {
-    final SAXParserFactory factory = SAXParserFactory.newInstance();
+    final SAXParserFactory factory = XmlSafeParser.newSAXParserFactory();
     // no DTD
     factory.setValidating(false);
     // namespaces!

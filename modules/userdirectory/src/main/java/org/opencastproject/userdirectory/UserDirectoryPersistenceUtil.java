@@ -95,8 +95,9 @@ public final class UserDirectoryPersistenceUtil {
       if (tx.isActive()) {
         tx.rollback();
       }
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -128,8 +129,9 @@ public final class UserDirectoryPersistenceUtil {
       if (tx.isActive()) {
         tx.rollback();
       }
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -162,8 +164,9 @@ public final class UserDirectoryPersistenceUtil {
       if (tx.isActive()) {
         tx.rollback();
       }
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -189,8 +192,9 @@ public final class UserDirectoryPersistenceUtil {
       query.setParameter("organization", organization);
       return query.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -223,8 +227,9 @@ public final class UserDirectoryPersistenceUtil {
       TypedQuery<Long> typedQuery = em.createQuery(query);
       return typedQuery.getSingleResult();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -348,8 +353,9 @@ public final class UserDirectoryPersistenceUtil {
       return typedQuery.getResultList();
 
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -375,8 +381,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", organization);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -406,8 +413,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", orgId);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -432,8 +440,9 @@ public final class UserDirectoryPersistenceUtil {
       query.setParameter("organization", orgId);
       return query.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -456,8 +465,9 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -468,7 +478,11 @@ public final class UserDirectoryPersistenceUtil {
    * @param emf the entity manager factory
    * @return the list of users that was found
    */
-  public static List<JpaUser> findUsersByUserName(Collection<String> userNames, String organizationId, EntityManagerFactory emf) {
+  public static List<JpaUser> findUsersByUserName(
+      Collection<String> userNames,
+      String organizationId,
+      EntityManagerFactory emf
+  ) {
     if (userNames.isEmpty()) {
       return Collections.<JpaUser>emptyList();
     }
@@ -480,8 +494,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", organizationId);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -507,8 +522,9 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -534,8 +550,9 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -556,8 +573,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", organizationId);
       return ((Number) q.getSingleResult()).longValue();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -574,8 +592,9 @@ public final class UserDirectoryPersistenceUtil {
       Query q = em.createNamedQuery("User.countAll");
       return ((Number) q.getSingleResult()).longValue();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -605,8 +624,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", orgId);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -632,8 +652,9 @@ public final class UserDirectoryPersistenceUtil {
       q.setParameter("org", orgId);
       return q.getResultList();
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -659,8 +680,9 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -686,8 +708,9 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
@@ -713,14 +736,15 @@ public final class UserDirectoryPersistenceUtil {
     } catch (NoResultException e) {
       return null;
     } finally {
-      if (em != null)
+      if (em != null) {
         em.close();
+      }
     }
   }
 
 
-  public static void removeGroup(String groupId, String orgId, EntityManagerFactory emf) throws NotFoundException,
-  Exception {
+  public static void removeGroup(String groupId, String orgId, EntityManagerFactory emf)
+          throws NotFoundException, Exception {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -758,7 +782,7 @@ public final class UserDirectoryPersistenceUtil {
    * @throws Exception
    */
   public static void deleteUser(String username, String orgId, EntityManagerFactory emf) throws NotFoundException,
-  Exception {
+          Exception {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {

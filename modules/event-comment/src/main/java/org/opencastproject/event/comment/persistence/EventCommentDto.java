@@ -52,13 +52,37 @@ import javax.persistence.TemporalType;
 @Table(name = "oc_event_comment", indexes = {
     @Index(name = "IX_oc_event_comment_event", columnList = "event, organization")
 })
-@NamedQueries({ @NamedQuery(name = "EventComment.countAll", query = "SELECT COUNT(e) FROM EventComment e"),
-    @NamedQuery(name = "EventComment.findAll", query = "SELECT e FROM EventComment e"),
-    @NamedQuery(name = "EventComment.findReasons", query = "SELECT e.reason FROM EventComment e WHERE e.organization = :org GROUP BY e.reason"),
-    @NamedQuery(name = "EventComment.findByEvent", query = "SELECT e FROM EventComment e WHERE e.eventId = :eventId AND e.organization = :org ORDER BY e.creationDate"),
-    @NamedQuery(name = "EventComment.findByCommentId", query = "SELECT e FROM EventComment e WHERE e.id = :commentId"),
-    @NamedQuery(name = "EventComment.findAllWIthOrg", query = "SELECT e.organization, e.eventId FROM EventComment e ORDER BY e.organization ASC"),
-    @NamedQuery(name = "EventComment.clear", query = "DELETE FROM EventComment e WHERE e.organization = :org") })
+@NamedQueries({
+    @NamedQuery(
+        name = "EventComment.countAll",
+        query = "SELECT COUNT(e) FROM EventComment e"
+    ),
+    @NamedQuery(
+        name = "EventComment.findAll",
+        query = "SELECT e FROM EventComment e"
+    ),
+    @NamedQuery(
+        name = "EventComment.findReasons",
+        query = "SELECT e.reason FROM EventComment e WHERE e.organization = :org GROUP BY e.reason"
+    ),
+    @NamedQuery(
+        name = "EventComment.findByEvent",
+        query = "SELECT e FROM EventComment e "
+            + "WHERE e.eventId = :eventId AND e.organization = :org ORDER BY e.creationDate"
+    ),
+    @NamedQuery(
+        name = "EventComment.findByCommentId",
+        query = "SELECT e FROM EventComment e WHERE e.id = :commentId"
+    ),
+    @NamedQuery(
+        name = "EventComment.findAllWIthOrg",
+        query = "SELECT e.organization, e.eventId FROM EventComment e ORDER BY e.organization ASC"
+    ),
+    @NamedQuery(
+        name = "EventComment.clear",
+        query = "DELETE FROM EventComment e WHERE e.organization = :org"
+    ),
+})
 public class EventCommentDto {
 
   @Id
@@ -93,8 +117,13 @@ public class EventCommentDto {
   @Column(name = "resolved_status", nullable = false)
   private boolean resolvedStatus = false;
 
-  @OneToMany(targetEntity = EventCommentReplyDto.class, fetch = FetchType.LAZY, cascade = {
-          CascadeType.REMOVE }, mappedBy = "eventComment", orphanRemoval = true)
+  @OneToMany(
+      targetEntity = EventCommentReplyDto.class,
+      fetch = FetchType.LAZY,
+      cascade = { CascadeType.REMOVE },
+      mappedBy = "eventComment",
+      orphanRemoval = true
+  )
   private List<EventCommentReplyDto> replies = new ArrayList<EventCommentReplyDto>();
 
   /**
@@ -106,8 +135,9 @@ public class EventCommentDto {
   public static EventCommentDto from(EventComment comment) {
     EventCommentDto dto = new EventCommentDto();
 
-    if (comment.getId().isSome())
+    if (comment.getId().isSome()) {
       dto.id = comment.getId().get().longValue();
+    }
     dto.organization = comment.getOrganization();
     dto.eventId = comment.getEventId();
     dto.text = comment.getText();

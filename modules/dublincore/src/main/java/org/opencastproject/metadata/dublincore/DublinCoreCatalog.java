@@ -35,6 +35,7 @@ import org.opencastproject.util.data.Function2;
 
 import com.entwinemedia.fn.Fns;
 import com.entwinemedia.fn.data.ImmutableSetWrapper;
+import com.google.gson.annotations.JsonAdapter;
 
 import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.CollectionUtils;
@@ -50,6 +51,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -63,6 +65,7 @@ import javax.xml.transform.TransformerException;
  * Attention: Encoding schemes are not preserved! See http://opencast.jira.com/browse/MH-8759
  */
 @ParametersAreNonnullByDefault
+@JsonAdapter(DublinCoreGsonAdapter.class)
 public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, MetadataCatalog, Cloneable {
   private static final long serialVersionUID = -4568663918115847488L;
 
@@ -124,7 +127,9 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
   @Override
   public List<DublinCoreValue> get(EName property) {
     RequireUtil.notNull(property, "property");
-    return mlist(getValuesAsList(property)).map(toDublinCoreValue).value();
+    return getValuesAsList(property).stream()
+            .map(this::toDublinCoreValue)
+            .collect(Collectors.toList());
   }
 
   private DublinCoreValue toDublinCoreValue(CatalogEntry e) {

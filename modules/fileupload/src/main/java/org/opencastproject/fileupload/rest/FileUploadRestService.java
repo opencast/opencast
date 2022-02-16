@@ -38,6 +38,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,16 +63,30 @@ import javax.ws.rs.core.Response;
  *
  */
 @Path("/")
-@RestService(name = "fileupload", title = "Big File Upload Service",
-  abstractText = "This service provides a facility to upload files that exceed the 2 GB boundry imposed by most "
-               + "browsers through chunked uploads via HTTP.",
-  notes = {
+@RestService(
+    name = "fileupload",
+    title = "Big File Upload Service",
+    abstractText = "This service provides a facility to upload files that exceed the 2 GB boundry "
+        + "imposed by most browsers through chunked uploads via HTTP.",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+        "If the service is down or not working it will return a status 503, this means the the "
+            + "underlying service is not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was "
+            + "not anticipated. In other words, there is a bug! You should file an error report "
+            + "with your server logs from the time when the error occurred: "
+            + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
+@Component(
+    immediate = true,
+    service = FileUploadRestService.class,
+    property = {
+        "service.description=File Upload REST Endpoint",
+        "opencast.service.type=org.opencastproject.fileupload",
+        "opencast.service.path=/upload"
+    }
+)
 public class FileUploadRestService {
 
   // message field names
@@ -89,6 +106,10 @@ public class FileUploadRestService {
   }
 
   // <editor-fold defaultstate="collapsed" desc="OSGi Service Stuff" >
+  @Reference(
+      name = "fileupload-service",
+      unbind = "unsetFileUploadService"
+  )
   protected void setFileUploadService(FileUploadService service) {
     uploadService = service;
   }
@@ -97,6 +118,7 @@ public class FileUploadRestService {
     uploadService = null;
   }
 
+  @Activate
   protected void activate(ComponentContext cc) {
     log.info("File Upload REST Endpoint activated");
   }
@@ -109,16 +131,53 @@ public class FileUploadRestService {
   @POST
   @Produces(MediaType.TEXT_PLAIN)
   @Path("newjob")
-  @RestQuery(name = "newjob", description = "Creates a new upload job and returns the jobs ID.", restParameters = {
-    @RestParameter(description = "The name of the file that will be uploaded", isRequired = false, name = REQUESTFIELD_FILENAME, type = RestParameter.Type.STRING),
-    @RestParameter(description = "The size of the file that will be uploaded", isRequired = false, name = REQUESTFIELD_FILESIZE, type = RestParameter.Type.STRING),
-    @RestParameter(description = "The size of the chunks that will be uploaded", isRequired = false, name = REQUESTFIELD_CHUNKSIZE, type = RestParameter.Type.STRING),
-    @RestParameter(description = "The flavor of this track", isRequired = false, name = REQUESTFIELD_FLAVOR, type = RestParameter.Type.STRING),
-    @RestParameter(description = "The mediapackage the file should belong to", isRequired = false, name = REQUESTFIELD_MEDIAPACKAGE, type = RestParameter.Type.TEXT)},
-  responses = {
-    @RestResponse(description = "job was successfully created", responseCode = HttpServletResponse.SC_OK),
-    @RestResponse(description = "upload service gave an error", responseCode = HttpServletResponse.SC_NO_CONTENT)
-  }, returnDescription = "The ID of the newly created upload job")
+  @RestQuery(
+      name = "newjob",
+      description = "Creates a new upload job and returns the jobs ID.",
+      restParameters = {
+          @RestParameter(
+              name = REQUESTFIELD_FILENAME,
+              description = "The name of the file that will be uploaded",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              name = REQUESTFIELD_FILESIZE,
+              description = "The size of the file that will be uploaded",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              name = REQUESTFIELD_CHUNKSIZE,
+              description = "The size of the chunks that will be uploaded",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              name = REQUESTFIELD_FLAVOR,
+              description = "The flavor of this track",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              name = REQUESTFIELD_MEDIAPACKAGE,
+              description = "The mediapackage the file should belong to",
+              isRequired = false,
+              type = RestParameter.Type.TEXT
+          ),
+      },
+      responses = {
+          @RestResponse(
+              description = "job was successfully created",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "upload service gave an error",
+              responseCode = HttpServletResponse.SC_NO_CONTENT
+          ),
+      },
+      returnDescription = "The ID of the newly created upload job"
+  )
   public Response getNewJob(
           @FormParam(REQUESTFIELD_FILENAME) String filename,
           @FormParam(REQUESTFIELD_FILESIZE) long filesize,
@@ -159,20 +218,41 @@ public class FileUploadRestService {
   @GET
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @Path("job/{jobID}.{format:xml|json}")
-  @RestQuery(name = "job", description = "Returns the XML or the JSON representation of an upload job.",
-  pathParameters = {
-    @RestParameter(description = "The ID of the upload job", isRequired = false, name = "jobID", type = RestParameter.Type.STRING),
-    @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING)
-  },
-  responses = {
-    @RestResponse(description = "the job was successfully retrieved.", responseCode = HttpServletResponse.SC_OK),
-    @RestResponse(description = "the job was not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
-  }, returnDescription = "The XML representation of the requested upload job.")
+  @RestQuery(
+      name = "job",
+      description = "Returns the XML or the JSON representation of an upload job.",
+      pathParameters = {
+          @RestParameter(
+              name = "jobID",
+              description = "The ID of the upload job",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              name = "format",
+              description = "The output format (json or xml) of the response body.",
+              isRequired = true,
+              type = RestParameter.Type.STRING
+          ),
+      },
+      responses = {
+          @RestResponse(
+              description = "the job was successfully retrieved.",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "the job was not found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND
+          ),
+      },
+      returnDescription = "The XML representation of the requested upload job."
+  )
   public Response getJob(@PathParam("jobID") String id,
           @PathParam("format") String format) {
     try {
       if (uploadService.hasJob(id)) {
-        FileUploadJob job = uploadService.getJob(id);                           // Return the results using the requested format
+        // Return the results using the requested format
+        FileUploadJob job = uploadService.getJob(id);
         final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
         return Response.ok().entity(job).type(type).build();
       } else {
@@ -187,23 +267,56 @@ public class FileUploadRestService {
   @POST
   @Produces(MediaType.APPLICATION_XML)
   @Path("job/{jobID}")
-  @RestQuery(name = "newjob", description = "Appends the next chunk of data to the file on the server.", pathParameters = {
-    @RestParameter(description = "The ID of the upload job", isRequired = false, name = "jobID", type = RestParameter.Type.STRING)
-  },
-  restParameters = {
-    @RestParameter(description = "The number of the current chunk", isRequired = false, name = "chunknumber", type = RestParameter.Type.STRING),
-    @RestParameter(description = "The payload", isRequired = false, name = "filedata", type = RestParameter.Type.FILE)},
-  responses = {
-    @RestResponse(description = "the chunk data was successfully appended to file on server", responseCode = HttpServletResponse.SC_OK),
-    @RestResponse(description = "the upload job was not found", responseCode = HttpServletResponse.SC_NOT_FOUND),
-    @RestResponse(description = "the request was malformed", responseCode = HttpServletResponse.SC_BAD_REQUEST)
-  }, returnDescription = "The XML representation of the updated upload job")
+  @RestQuery(
+      name = "newjob",
+      description = "Appends the next chunk of data to the file on the server.",
+      pathParameters = {
+          @RestParameter(
+              name = "jobID",
+              description = "The ID of the upload job",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+      },
+      restParameters = {
+          @RestParameter(
+              description = "The number of the current chunk",
+              isRequired = false,
+              name = "chunknumber",
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              description = "The payload",
+              isRequired = false,
+              name = "filedata",
+              type = RestParameter.Type.FILE
+          ),
+      },
+      responses = {
+          @RestResponse(
+              description = "the chunk data was successfully appended to file on server",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "the upload job was not found",
+              responseCode = HttpServletResponse.SC_NOT_FOUND
+          ),
+          @RestResponse(
+              description = "the request was malformed",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST
+          ),
+      },
+      returnDescription = "The XML representation of the updated upload job"
+  )
   public Response postPayload(@PathParam("jobID") String jobId, @Context HttpServletRequest request) {
     try {
-      if (!ServletFileUpload.isMultipartContent(request)) {                     // make sure request is "multipart/form-data"
+      // make sure request is "multipart/form-data"
+      if (!ServletFileUpload.isMultipartContent(request)) {
         throw new FileUploadException("Request is not of type multipart/form-data");
       }
-      if (uploadService.hasJob(jobId)) {                                        // testing for existence of job here already so we can generate a 404 early
+
+      // testing for existence of job here already so we can generate a 404 early
+      if (uploadService.hasJob(jobId)) {
         long chunkNum = 0;
         FileUploadJob job = uploadService.getJob(jobId);
         ServletFileUpload upload = new ServletFileUpload();
@@ -236,19 +349,42 @@ public class FileUploadRestService {
   @GET
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   @Path("job/{jobID}/{filename}")
-  @RestQuery(name = "payload", description = "Returns the payload of the upload job.", pathParameters = {
-    @RestParameter(description = "The ID of the upload job to retrieve the file from", isRequired = false, name = "jobID", type = RestParameter.Type.STRING),
-    @RestParameter(description = "The name of the payload file", isRequired = false, name = "filename", type = RestParameter.Type.STRING)},
-  responses = {
-    @RestResponse(description = "the job and file have been found.", responseCode = HttpServletResponse.SC_OK),
-    @RestResponse(description = "the job or file were not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
-  }, returnDescription = "The payload of the upload job")
+  @RestQuery(
+      name = "payload",
+      description = "Returns the payload of the upload job.",
+      pathParameters = {
+          @RestParameter(
+              name = "jobID",
+              description = "The ID of the upload job to retrieve the file from",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+          @RestParameter(
+              name = "filename",
+              description = "The name of the payload file",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+      },
+      responses = {
+        @RestResponse(
+            description = "the job and file have been found.",
+            responseCode = HttpServletResponse.SC_OK
+        ),
+        @RestResponse(
+            description = "the job or file were not found.",
+            responseCode = HttpServletResponse.SC_NOT_FOUND
+        ),
+      },
+      returnDescription = "The payload of the upload job"
+  )
   public Response getPayload(@PathParam("jobID") String id, @PathParam("filename") String filename) {
     try {
       if (uploadService.hasJob(id)) {
         FileUploadJob job = uploadService.getJob(id);
         InputStream payload = uploadService.getPayload(job);
-        return Response.ok(payload).build();                                    // TODO use AutoDetectParser to guess Content-Type header
+        // TODO use AutoDetectParser to guess Content-Type header
+        return Response.ok(payload).build();
       } else {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
@@ -261,12 +397,23 @@ public class FileUploadRestService {
   @DELETE
   @Produces(MediaType.TEXT_PLAIN)
   @Path("job/{jobID}")
-  @RestQuery(name = "job", description = "Deletes an upload job on the server.", pathParameters = {
-    @RestParameter(description = "The ID of the upload job to be deleted", isRequired = false, name = "jobID", type = RestParameter.Type.STRING)},
-  responses = {
-    @RestResponse(description = "the job was successfully deleted.", responseCode = HttpServletResponse.SC_OK),
-    @RestResponse(description = "the job was not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
-  }, returnDescription = "A success message that starts with OK")
+  @RestQuery(
+      name = "job",
+      description = "Deletes an upload job on the server.",
+      pathParameters = {
+          @RestParameter(
+              name = "jobID",
+              description = "The ID of the upload job to be deleted",
+              isRequired = false,
+              type = RestParameter.Type.STRING
+          ),
+      },
+      responses = {
+          @RestResponse(description = "the job was successfully deleted.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "the job was not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
+      },
+      returnDescription = "A success message that starts with OK"
+  )
   public Response deleteJob(@PathParam("jobID") String id) {
     try {
       if (uploadService.hasJob(id)) {

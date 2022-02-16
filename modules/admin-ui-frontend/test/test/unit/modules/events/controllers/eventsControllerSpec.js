@@ -38,6 +38,10 @@ describe('Events controller', function () {
             $httpBackend.expectGET('/admin-ng/resources/events/filters.json').respond('[]');
             $httpBackend.expectGET('/admin-ng/resources/PUBLICATION.CHANNELS.json').respond('{}');
             $httpBackend.expectDELETE('/admin-ng/event/12').respond('12');
+            $httpBackend.whenGET('/admin-ng/event/9cc888e8-cdf6-4974-bf18-effecdadfa94/comments').respond('[]')
+            $httpBackend.whenGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/comments').respond('[]')
+            $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comments').respond('[]')
+            $httpBackend.whenGET('/admin-ng/event/c990ea15-e5ed-4fcf-bc17-cb070091c343/comments').respond('[]')
             $httpBackend.whenGET('/admin-ng/event/events.json?limit=10&offset=0&sort=title:ASC').respond(JSON.stringify(getJSONFixture('admin-ng/event/events.json')));
 
             $scope.table.delete({'id': 12});

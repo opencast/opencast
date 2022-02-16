@@ -6,7 +6,13 @@ ID: `retract-partial`
 Description
 -----------
 
-The PartialRetractEngageWorkflowOperationHandler retracts a subset of the published elements from the local Opencast Media Module.  This is useful to remove incorrect captions without reprocessing the entire workflow.  Note: the elements selected for retraction match any combination of flavor or tag, and the resulting publication may be unusable if you accidentally retract one or more delivery files.  Use this operation with caution.
+The partial retract engage operation retracts a subset of the published elements from the search service.
+This is useful to e.g. remove incorrect captions without reprocessing the entire workflow.
+
+The elements selected for retraction match any combination of flavor or tag,
+and the resulting publication may become unusable if you accidentally retract one or more delivery files.
+Use this operation with caution.
+
 
 Parameter Table
 ---------------
@@ -23,8 +29,6 @@ Operation Example
 ```xml
 <operation
     id="retract-partial"
-    fail-on-error="true"
-    exception-handler-workflow="partial-error"
     description="Retracting elements flavored with presentation and tagged with preview from Engage">
   <configurations>
     <configuration key="retract-flavors">presentation/*</configuration>

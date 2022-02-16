@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -83,12 +83,13 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Bundle-Activator>org.opencastproject.db.Activator</Bundle-Activator>
             <Import-Package>
+              !com.ibm.*,
+              !com.sun.*,
               !com.vividsolutions.jts.*,
               !org.apache.lucene.*,
-              !org.jboss.resource.adapter.jdbc.*,
               !org.hibernate.*,
+              !org.jboss.resource.adapter.jdbc.*,
               !waffle.*,
-              !com.sun.jna.platform.win32,
               org.w3c.dom;version=0,
               *
             </Import-Package>

@@ -28,8 +28,6 @@ import org.opencastproject.composer.api.VideoClip;
 import org.opencastproject.mediapackage.AdaptivePlaylist;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -45,6 +43,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -84,7 +83,7 @@ public class EncoderEngine implements AutoCloseable {
 
   private final Pattern outputPattern = Pattern.compile("Output .* (\\S+) to '(.*)':");
   // ffmpeg4 generates HLS output files and may use a .tmp suffix while writing
-  private final Pattern outputPatternHLS = Pattern.compile("Opening \'([^\']+)\\.tmp\'|([^\']+)\' for writing");
+  private final Pattern outputPatternHLS = Pattern.compile("Opening '([^']+)\\.tmp'|([^']+)' for writing");
 
   // These are common video options that may be mapped in HLS streams. This will help catch some common mistakes
   private static List<String> mappableOptions = Stream.of("-bf", "-b_strategy", "-bitrate", "-bufsize", "-crf",
@@ -107,7 +106,7 @@ public class EncoderEngine implements AutoCloseable {
    */
   File encode(File mediaSource, EncodingProfile format, Map<String, String> properties)
           throws EncoderException {
-    List<File> output = process(Collections.map(Tuple.tuple("video", mediaSource)), format, properties);
+    List<File> output = process(Collections.singletonMap("video", mediaSource), format, properties);
     if (output.size() != 1) {
       throw new EncoderException(String.format("Encode expects one output file (%s found)", output.size()));
     }
@@ -457,25 +456,26 @@ public class EncoderEngine implements AutoCloseable {
                 && !StringUtils.equals("/dev/null", outputPath)
                 && !StringUtils.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
-          logger.info("Identified output file {}", outputFile);
-          if (!type.startsWith("hls"))
+          if (!type.startsWith("hls")) {
+            logger.info("Identified output file {}", outputFile);
             output.add(outputFile);
+          }
         }
       }
     } else if (StringUtils.startsWith(message, "[hls @ ")) {
       logger.debug(message);
       Matcher matcher = outputPatternHLS.matcher(message);
       if (matcher.find()) {
-        int i = 1; // matched group, ".tmp" suffix may have to be removed
-        if (matcher.group(i) == null) i = 2;
-        String outputPath = matcher.group(i);
+        final String outputPath = Objects.toString(matcher.group(1), matcher.group(2));
         if (!StringUtils.equals("NUL", outputPath) && !StringUtils.equals("/dev/null", outputPath)
                 && !StringUtils.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
           // HLS generates the filenames based on a template with %v and %d replaced
           // HLS writes into the same manifest file to add each segment
-          if (!output.contains(outputFile))
+          if (!output.contains(outputFile)) {
+            logger.info("Identified HLS output file {}", outputFile);
             output.add(outputFile);
+          }
         }
       }
 
@@ -559,12 +559,8 @@ public class EncoderEngine implements AutoCloseable {
     private String aInputPad = "";
     private String vsplit = "";
     private String asplit = "";
-    // Adaptive only - Each variant must have a bitrate
-    private ArrayList<String> vbitrate = null; // target video bitrate for variant
-    private ArrayList<String> abitrate = null; // target audio bitrate for variant
-    private final ArrayList<String> vstream; // target video bitrate for variant
-    private final ArrayList<String> astream; // target audio bitrate for variant
-    private String streamMap = "";
+    private final ArrayList<String> vstream; // output video name
+    private final ArrayList<String> astream; // output audio name
 
     public OutputAggregate(List<EncodingProfile> profiles,
             Map<String, String> params, String vInputPad, String aInputPad) throws EncoderException {
@@ -589,17 +585,14 @@ public class EncoderEngine implements AutoCloseable {
       if (vInputPad == null && aInputPad == null)
         throw new EncoderException("At least one of video or audio input must be specified");
       // Init
-      vfilter = new ArrayList<>(java.util.Collections.nCopies(size, null));
-      afilter = new ArrayList<>(java.util.Collections.nCopies(size, null));
+      vfilter = new ArrayList<>(Collections.nCopies(size, null));
+      afilter = new ArrayList<>(Collections.nCopies(size, null));
       // name of output pads to map to files
-      apads = new ArrayList<>(java.util.Collections.nCopies(size, null));
-      vpads = new ArrayList<>(java.util.Collections.nCopies(size, null));
+      apads = new ArrayList<>(Collections.nCopies(size, null));
+      vpads = new ArrayList<>(Collections.nCopies(size, null));
 
-      vbitrate = new ArrayList<>(java.util.Collections.nCopies(size, null));
-      abitrate = new ArrayList<>(java.util.Collections.nCopies(size, null));
-
-      vstream = new ArrayList<>(java.util.Collections.nCopies(size, null));
-      astream = new ArrayList<>(java.util.Collections.nCopies(size, null));
+      vstream = new ArrayList<>(Collections.nCopies(size, null));
+      astream = new ArrayList<>(Collections.nCopies(size, null));
 
       vsplit = (size > 1) ? (vInputPad + "split=" + size) : null; // number of splits
       asplit = (size > 1) ? (aInputPad + "asplit=" + size) : null;
@@ -804,8 +797,6 @@ public class EncoderEngine implements AutoCloseable {
         ffmpgCmd = ffmpgCmd.replace("#{space}", " ");
         List<String> cmdToken;
         try {
-          //arguments = CommandLineUtils.translateCommandline(ffmpgCmd);
-          //arguments = StringUtils.splitByWholeSeparator(ffmpgCmd,null);
           cmdToken = commandSplit(ffmpgCmd);
         } catch (Exception e) {
           throw new EncoderException("Could not parse encoding profile command line", e);
@@ -854,25 +845,11 @@ public class EncoderEngine implements AutoCloseable {
               cmd = cmd + " " + adjustABRVMaps("-c:a", indx);
             else
               cmd = cmd + " " + adjustABRVMaps(opt, indx);
-            // opt;
-            // if target bitrate - store it separately for doing adaptive
-          } else if (opt.startsWith("-b:v") || opt.startsWith("-vb") || opt.startsWith("-bitrate")) {
-            vbitrate.set(indx, cmdToken.get(i + 1));
-            i++;
-          } else if (opt.startsWith("-b:a") || opt.startsWith("-ab")) {
-            abitrate.set(indx, cmdToken.get(i + 1));
-            i++;
-          } else if (opt.startsWith("-maxrate")) {
-            cmd = cmd + " " + adjustABRVMaps(opt, indx) + " " + cmdToken.get(i + 1);
-            maxrate = cmdToken.get(i + 1); // keep maxrate as backup
-            i++;
           } else { // keep the rest
             cmd = cmd + " " + adjustABRVMaps(opt, indx);
           }
           i++;
         }
-        if (vbitrate.get(indx) == null) // use maxrate only if no video bitrate
-          vbitrate.set(indx, maxrate); // this may be null too
 
         /* Remove unused commandline parts */
         cmd = cmd.replaceAll("#\\{.*?\\}", "");
@@ -907,131 +884,42 @@ public class EncoderEngine implements AutoCloseable {
       }
       setVideoFilters();
       setAudioFilters();
-      setHLSAdaptive(groupProfile, ffmpgGCmd, vInputPad != null, aInputPad != null); // Only HLS is supported so far
+      setHLSVarStreamMap(ffmpgGCmd, vInputPad != null, aInputPad != null); // Only HLS is supported so far
     }
 
     /**
-     * Geometrically distribute bitrates from max to min. It serves as an estimate if no bitrates are given in encoding
-     * profile
+     * Sets the mapping of outputs to HLS streams.
      *
-     * @param n
-     *          - number of quality to generate
-     * @param min
-     * @param max
-     * @param unit
-     *          - add unit "k" or "m"
-     * @return
-     */
-    private String[] distributeBitrates(int n, int min, int max, String unit) {
-      float ratio = (float) (Math.log(max) / min);
-      String[] bitrates = new String[n];
-      float fac = (float) Math.exp(Math.log(ratio) / n);
-      for (int i = 0; i < n; i++) {
-        bitrates[i] = "" + (int) (max * java.lang.Math.pow(fac, i)) + unit;
-      }
-      return bitrates;
-    }
-
-    /**
-     * Got min and max bitrate from the HLS encoding profile
-     * @param profile - HLS encoding profile
-     * @param minSuffix - suffix to get min bitrate
-     * @param maxSuffix - suffix to get max bitrate
-     * @param n - number of variants required
-     * @param defaultMin - default min
-     * @param defaultMax - default max
-     * @param unit
-     * @return
-     */
-    private String[] getBitrates(EncodingProfile profile, String minSuffix, String maxSuffix, int n, int defaultMin, int defaultMax,
-            String unit) {
-      int min;
-      int max;
-      try {
-        min = Integer.parseInt(profile.getExtension(minSuffix));
-      } catch (Exception e) {
-        min = defaultMin;
-      }
-      try {
-        max = Integer.parseInt(profile.getExtension(maxSuffix));
-      } catch (Exception e) {
-        max = defaultMax;
-      }
-      return distributeBitrates(n, min, max, unit);
-    }
-
-    /**
-     * In HLS, all streams must have a bitrate to determine stream switching Map all the outputs to streams with bit
-     * rates. if they are defined in all targets or put in a default if any of them are missing. If different sizes are
-     * used, the first target is assumed to have the highest resolution and therefore bitrate
-     *
-     * @param prof
-     *          - encoding profile for HLS
      * @param ffmpgCmd
-     *          - ffmpeg command with subsitution from the encoding profile
+     *          - ffmpeg command with substitution from the encoding profile
      * @param hasVideo
      *          - use video stream
      * @param hasAudio
      *          - use audio stream
      */
-    private void setHLSAdaptive(EncodingProfile prof, String ffmpgCmd, boolean hasVideo, boolean hasAudio) {
-      final String videoMinBitrateSuffix = "video.bitrates.mink"; // HLS defaults
-      final String videoMaxBitrateSuffix = "video.bitrates.maxk"; // HLS defaults
-      final String audioMinBitrateSuffix = "audio.bitrates.mink"; // HLS defaults
-      final String audioMaxBitrateSuffix = "audio.bitrates.maxk"; // HLS defaults
-      // https://developer.apple.com/documentation/http_live_streaming/hls_authoring_specification_for_apple_devices
-      final int defaultVideoMinBitrate = 100; // average for 640 x 360 <= 30fps = 160
-      final int defaultVideoMaxBitrate = 4000; // average for 1280x720 <= 30fps = 3850
-      // stereo audio from 160k to 32k
-      final int defaultAudioMinBitrate = 32; // k
-      final int defaultAudioMaxBitrate = 160; // k
-      int np = pf.size();
-      // if any of the targets profiles lack a video bitrate, replace all with default
-      if (hasVideo)
-        for (int i = 0; i < pf.size(); i++) {
-          if (vbitrate.get(i) == null) {
-            String[] vbrs = getBitrates(prof, videoMinBitrateSuffix, videoMaxBitrateSuffix, np, defaultVideoMinBitrate,
-                    defaultVideoMaxBitrate, "k");
-            for (int j = 0; j < np; j++) {
-              vbitrate.set(j, vbrs[j]);
-            }
-            break;
-          }
-        }
-      if (hasAudio)
-        // if any of the targets lack a audio bitrate, replace all with default
-        for (int i = 0; i < np; i++) {
-          if (abitrate.get(i) == null) {
-            String[] abrs = getBitrates(prof, audioMinBitrateSuffix, audioMaxBitrateSuffix, np, defaultAudioMinBitrate,
-                    defaultAudioMaxBitrate, "k");
-            for (int j = 0; j < np; j++) {
-              abitrate.set(j, abrs[j]);
-            }
-            break;
-          }
-        }
-      streamMap = "";
-      String[] vStreamMap = new String[pf.size()];
-      // Sort out bitrates for each mapped output
-      String mapping = ""; // each mapping [av]:[i] is matched with bitrate
+    private void setHLSVarStreamMap(String ffmpgCmd, boolean hasVideo, boolean hasAudio) {
+      StringBuilder varStreamMap = new StringBuilder();
+      varStreamMap.append(" -var_stream_map '");
+
       for (int i = 0; i < pf.size(); i++) {
         int j = 0;
         String[] maps = new String[2];
         if (hasVideo && vstream.get(i) != null) { // Has video
-          mapping += " -b:v:" + i + " " + vbitrate.get(i);
           maps[j] = "v:" + i;
           ++j;
         }
         if (hasAudio && astream.get(i) != null) { // Has audio
-          mapping += " -b:a:" + i + " " + abitrate.get(i);
           maps[j] = "a:" + i;
         }
-        vStreamMap[i] = joinNonNullString(maps, ","); // each target delivery is v:i,a:i
+        // each target delivery is v:i,a:i
+        varStreamMap.append(joinNonNullString(maps, ","));
+        varStreamMap.append(" ");
       }
-      // Put all the streams together
-      String varStreamMap = "-var_stream_map '" + StringUtils.join(vStreamMap, " ") + "' ";
-      streamMap += " " + varStreamMap + " " + ffmpgCmd + " ";
-      outputs.add(mapping + streamMap); // treat as another output
+
+      varStreamMap.append("' ");
+      varStreamMap.append(ffmpgCmd);
+      varStreamMap.append(" ");
+      outputs.add(varStreamMap.toString()); // treat as another output
     }
 
     /**
@@ -1190,7 +1078,7 @@ public class EncoderEngine implements AutoCloseable {
         return edits;
       }
     }
-    java.util.Collections.sort(edits); // Sort clips if all clips are from the same src
+    Collections.sort(edits); // Sort clips if all clips are from the same src
     List<VideoClip> clips = new ArrayList<VideoClip>();
     it = edits.iterator();
     while (it.hasNext()) { // Check for legal durations

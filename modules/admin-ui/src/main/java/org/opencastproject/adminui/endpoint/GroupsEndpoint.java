@@ -38,7 +38,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
-import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
@@ -62,6 +62,9 @@ import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,13 +101,22 @@ import javax.ws.rs.core.Response.Status;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+        immediate = true,
+        service = GroupsEndpoint.class,
+        property = {
+                "service.description=Admin UI - Groups Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.GroupsEndpoint",
+                "opencast.service.path=/admin-ng/groups",
+        }
+)
 public class GroupsEndpoint {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(GroupsEndpoint.class);
 
   /** The admin UI search index */
-  private AdminUISearchIndex searchIndex;
+  private ElasticsearchIndex searchIndex;
 
   /** The security service */
   private SecurityService securityService;
@@ -119,31 +131,37 @@ public class GroupsEndpoint {
   private JpaGroupRoleProvider jpaGroupRoleProvider;
 
   /** OSGi callback for the security service. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback for the index service. */
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi callback for users services. */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
   /** OSGi callback for the search index. */
-  public void setSearchIndex(AdminUISearchIndex searchIndex) {
+  @Reference
+  public void setSearchIndex(ElasticsearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
   /** OSGi callback for the group provider. */
+  @Reference
   public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
   /** OSGi callback. */
+  @Activate
   protected void activate(ComponentContext cc) {
     logger.info("Activate the Admin ui - Groups facade endpoint");
   }

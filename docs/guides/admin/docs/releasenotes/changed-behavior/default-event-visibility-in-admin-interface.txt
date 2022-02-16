@@ -1,3 +1,0 @@
-- The default visibility of events and series in the admin interface has changed so that users will not only see
-  entities they have write access to. This obviously has no effect on admin users since they have write access to
-  everything anyway.
