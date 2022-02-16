@@ -4,6 +4,46 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.4
+
+*Released on February 16th, 2022*
+
+- [[#3457](https://github.com/opencast/opencast/pull/3457)] -
+  Update Opencast Studio to 2022-02-16
+- [[#3444](https://github.com/opencast/opencast/pull/3444)] -
+  Fix frontend-no-prebuilt profile
+- [[#3437](https://github.com/opencast/opencast/pull/3437)] -
+  Fix merge conflict
+- [[#3432](https://github.com/opencast/opencast/pull/3432)] -
+  Fix `pom.xml` Version
+- [[#3423](https://github.com/opencast/opencast/pull/3423)] -
+  Fixes OSGi error when shutting down Opencast
+- [[#3416](https://github.com/opencast/opencast/pull/3416)] -
+  Fixed Typo in Logging Statement
+- [[#3384](https://github.com/opencast/opencast/pull/3384)] -
+  Add DublinCore Catalog to Scheduler JSON
+- [[#3369](https://github.com/opencast/opencast/pull/3369)] -
+  Update slf4j
+- [[#3368](https://github.com/opencast/opencast/pull/3368)] -
+  Capture agent calendar as JSON
+- [[#3367](https://github.com/opencast/opencast/pull/3367)] -
+  Add release notes and changelog for OC 11.3
+- [[#3365](https://github.com/opencast/opencast/pull/3365)] -
+  Remove `mvn site` Test
+- [[#3344](https://github.com/opencast/opencast/pull/3344)] -
+  merge the ldap userdirectory behaviour from 9.x into the current module
+- [[#3342](https://github.com/opencast/opencast/pull/3342)] -
+  Allow metadata editting
+- [[#3340](https://github.com/opencast/opencast/pull/3340)] -
+  Match Inbox Events Against Schedule
+- [[#3327](https://github.com/opencast/opencast/pull/3327)] -
+  Extend Metadata Extraction in Inbox
+- [[#3203](https://github.com/opencast/opencast/pull/3203)] -
+  start-workflow-wfh allows to pass mediapackage id from previous WFH
+- [[#3155](https://github.com/opencast/opencast/pull/3155)] -
+  Allow the use of organization properties in workflows
+
+
 ### Opencast 11.3
 
 *Released on January 19th, 2022*

@@ -78,6 +78,15 @@ API changes
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
+Additional Notes about 11.4
+---------------------------
+
+* Improvements to the inbox behavior:
+  * Extract basic metadata from compressed files using regular expressions. (#3327)
+  * Match events sent to the inbox against the schedule (#3340)
+* The capture agent calendar now can be provided as a JSON calendar (#3368)
+* LDAP user directory behavior from 9.x is back (#3344)
+
 Additional Notes about 11.3
 ---------------------------
 
