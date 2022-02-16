@@ -383,7 +383,7 @@ public class TobiraApi {
             Jsons.p("description", event.getDcDescription()),
             Jsons.p("created", event.getDcCreated().getTime()),
             Jsons.p("creator", event.getDcCreator()),
-            Jsons.p("duration", Math.min(0, event.getDcExtent())),
+            Jsons.p("duration", Math.max(0, event.getDcExtent())),
             Jsons.p("thumbnail", thumbnail),
             Jsons.p("tracks", Jsons.arr(tracks)),
             Jsons.p("acl", acl),
