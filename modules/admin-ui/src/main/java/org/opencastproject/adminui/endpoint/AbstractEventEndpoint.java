@@ -1189,7 +1189,7 @@ public abstract class AbstractEventEndpoint {
 
     // Remove null keys
     Map<String, String> seriesCollection = seriesField.getCollection();
-    while (seriesCollection.remove(null) != null) { }
+    seriesCollection.remove(null);
     seriesField.setCollection(seriesCollection);
 
     return;
