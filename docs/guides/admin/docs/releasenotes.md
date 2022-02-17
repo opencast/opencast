@@ -43,6 +43,12 @@ API changes
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
 
+Additional Notes about 10.10
+----------------------------
+
+This release adds the Rename Files workflow operation handler, and resolves an issue in the admin UI's metadata display
+along with a number of other, minor bug fixes.
+
 Additional Notes about 10.9
 ---------------------------
 

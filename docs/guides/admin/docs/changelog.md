@@ -4,10 +4,45 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.10
+
+*Released on Feb 17th, 2022*
+
+- [[#3427](https://github.com/opencast/opencast/pull/3427)] -
+  Fix Typo in Opencast 10 Upgrade Guide
+- [[#3415](https://github.com/opencast/opencast/pull/3415)] -
+  Update pax logging from version 1.11.13 to 1.11.14
+- [[#3414](https://github.com/opencast/opencast/pull/3414)] -
+  Revert "update karaf from version 4.2.9 to 4.2.15"
+- [[#3390](https://github.com/opencast/opencast/pull/3390)] -
+  Endpoint to Remove Tracked Host Bundles
+- [[#3389](https://github.com/opencast/opencast/pull/3389)] -
+  Rename Files Workflow Operation Handler
+- [[#3386](https://github.com/opencast/opencast/pull/3386)] -
+  update karaf from version 4.2.9 to 4.2.15
+- [[#3373](https://github.com/opencast/opencast/pull/3373)] -
+  Adding Camtasia .trec support.
+- [[#3372](https://github.com/opencast/opencast/pull/3372)] -
+  Fix port checking
+- [[#3364](https://github.com/opencast/opencast/pull/3364)] -
+  Automatically Update Matrix Room
+- [[#3363](https://github.com/opencast/opencast/pull/3363)] -
+  Automated Release Title
+- [[#3362](https://github.com/opencast/opencast/pull/3362)] -
+  ConfigurableRetractWorkflowOperationHandle: fixed exception message
+- [[#3361](https://github.com/opencast/opencast/pull/3361)] -
+  Fix metadata for multitenancy
+- [[#3359](https://github.com/opencast/opencast/pull/3359)] -
+  Document Capture Agent Input Selection
+- [[#3345](https://github.com/opencast/opencast/pull/3345)] -
+  Fix Javadocs
+- [[#2811](https://github.com/opencast/opencast/pull/2811)] -
+  Add download artifacts in engage publication
+
 
 ### Opencast 10.9
 
-*Released on January 18th, 2021*
+*Released on January 18th, 2022*
 
 - [[#3341](https://github.com/opencast/opencast/pull/3341)] -
   Update Nexus related documentation
