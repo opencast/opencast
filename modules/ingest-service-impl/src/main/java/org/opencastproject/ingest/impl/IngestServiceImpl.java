@@ -69,6 +69,7 @@ import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ProgressInputStream;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -113,11 +114,14 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -125,6 +129,7 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -132,6 +137,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
 
@@ -219,6 +225,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The default is not to automatically skip attachments and catalogs from capture agent */
   public static final boolean DEFAULT_SKIP = false;
 
+  /** The maximum length of filenames ingested by Opencast */
+  public static final int FILENAME_LENGTH_MAX = 75;
+
   /** Managed Property key to allow Opencast series modification during ingest
    * Deprecated, the param potentially causes an update chain reaction for all
    * events associated to that series, for each ingest */
@@ -305,6 +314,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   private boolean skipCatalogs = DEFAULT_SKIP;
   private boolean skipAttachments = DEFAULT_SKIP;
+
+  protected boolean testMode = false;
 
   /**
    * Creates a new ingest service instance.
@@ -715,13 +726,18 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding track {} from input stream on mediapackage {}", elementId, mediaPackage);
+      if (fileName.length() > FILENAME_LENGTH_MAX) {
+        final String extension = "." + FilenameUtils.getExtension(fileName);
+        final int length = Math.max(0, FILENAME_LENGTH_MAX - extension.length());
+        fileName = fileName.substring(0, length) + extension;
+      }
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
       if (tags != null && tags.length > 0) {
         MediaPackageElement trackElement = mp.getTrack(elementId);
         for (String tag : tags) {
-          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          logger.debug("Adding tag `{}` to element {}", tag, elementId);
           trackElement.addTag(tag);
         }
       }
@@ -910,15 +926,39 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   @Override
   public MediaPackage addCatalog(InputStream in, String fileName, MediaPackageElementFlavor flavor, String[] tags,
-          MediaPackage mediaPackage) throws IOException, IngestException {
+          MediaPackage mediaPackage) throws IOException, IngestException, IllegalArgumentException {
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG, null, null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       job = serviceRegistry.updateJob(job);
-      String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding catalog {} from input stream on mediapackage {}", elementId, mediaPackage);
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+      final String elementId = UUID.randomUUID().toString();
+      final String mediaPackageId = mediaPackage.getIdentifier().toString();
+      logger.info("Start adding catalog {} from input stream on mediapackage {}", elementId, mediaPackageId);
+      final URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+
+      final boolean isJSON;
+      try (InputStream inputStream = workingFileRepository.get(mediaPackageId, elementId)) {
+        try (BufferedReader reader  = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+          // Exception for current BBB integration and Extron SMP351 which is ingesting a JSON array/object as catalog
+          int firstChar = reader.read();
+          isJSON = firstChar == '[' || firstChar == '{';
+        }
+      }
+
+      if (isJSON) {
+        logger.warn("Input catalog seems to be JSON. This is a mistake and will fail in future Opencast versions."
+            + "You will likely want to ingest this as a media package attachment instead.");
+      } else {
+        // Verify XML is not corrupted
+        try {
+          XmlSafeParser.parse(workingFileRepository.get(mediaPackageId, elementId));
+        } catch (SAXException e) {
+          workingFileRepository.delete(mediaPackageId, elementId);
+          throw new IllegalArgumentException("Catalog XML is invalid", e);
+        }
+      }
+
       if (MediaPackageElements.SERIES.equals(flavor)) {
         updateSeries(newUrl);
       }
@@ -927,7 +967,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (tags != null && tags.length > 0) {
         MediaPackageElement trackElement = mp.getCatalog(elementId);
         for (String tag : tags) {
-          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          logger.info("Adding tag {} to element {}", tag, elementId);
           trackElement.addTag(tag);
         }
       }
@@ -1528,18 +1568,34 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
+        List<String> clusterUrls = new LinkedList<>();
+        try {
+          // Note that we are not checking ports here.
+          clusterUrls = organizationDirectoryService.getOrganization(uri.toURL()).getServers()
+                          .keySet()
+                          .stream()
+                          .collect(Collectors.toUnmodifiableList());
+        } catch (NotFoundException e) {
+          logger.warn("Unable to determine cluster members, will not be able to authenticate any downloads from them", e);
+        }
 
-        if (uri.getHost().matches(downloadSource)) {
-          CredentialsProvider provider = new BasicCredentialsProvider();
-          provider.setCredentials(
-              new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
-              new UsernamePasswordCredentials(downloadUser, downloadPassword));
-           externalHttpClient = HttpClientBuilder.create()
-              .setDefaultCredentialsProvider(provider)
-              .build();
+        if (uri.toString().matches(downloadSource)) {
+          //NB: We're creating a new client here with *different* auth than the system auth creds
+          externalHttpClient = getAuthedHttpClient();
           response = externalHttpClient.execute(get);
-        } else {
+        } else if (clusterUrls.contains(uri.getScheme() + "://" + uri.getHost())) {
+          // Only using the system-level httpclient and digest credentials against our own servers
           response = httpClient.execute(get);
+        } else {
+          //NB: No auth here at all
+          externalHttpClient = getNoAuthHttpClient();
+          response = externalHttpClient.execute(get);
+        }
+
+        if (null == response) {
+          // If you get here then chances are you're using a mock httpClient which does not have appropriate
+          // mocking to respond to the URL you are feeding it.  Try adding that URL to the mock and see if that works.
+          throw new IOException("Null response object from the http client, refer to code for explanation");
         }
 
         int httpStatusCode = response.getStatusLine().getStatusCode();
@@ -1547,8 +1603,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           throw new IOException(uri + " returns http " + httpStatusCode);
         }
         in = response.getEntity().getContent();
-      } else {
+        //If it does not start with file, or we're in test mode (ie, to allow arbitrary file:// access)
+      } else if (!uri.toString().startsWith("file") || testMode) {
         in = uri.toURL().openStream();
+      } else {
+        throw new IOException("Refusing to fetch files from the local filesystem");
       }
       String fileName = FilenameUtils.getName(uri.getPath());
       if (isBlank(FilenameUtils.getExtension(fileName)))
@@ -1722,6 +1781,20 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
+  }
+
+  //Used in testing
+  protected CloseableHttpClient getNoAuthHttpClient() {
+    return HttpClientBuilder.create().build();
+  }
+
+  protected CloseableHttpClient getAuthedHttpClient() {
+    HttpClientBuilder cb = HttpClientBuilder.create();
+    CredentialsProvider provider = new BasicCredentialsProvider();
+    provider.setCredentials(
+      new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
+      new UsernamePasswordCredentials(downloadUser, downloadPassword));
+    return cb.build();
   }
 
   private MediaPackage createSmil(MediaPackage mediaPackage) throws IOException, IngestException {

@@ -27,12 +27,13 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,15 @@ import javax.ws.rs.Path;
     abstractText = "This service creates, edits, retrieves and helps managing access policies (ACL templates).",
     notes = {}
 )
+@Component(
+    name = "org.opencastproject.authorization.xacml.manager.endpoint.ACLManagerRestService",
+    service = OsgiAclServiceRestEndpoint.class,
+    property = {
+        "service.description=ACL Manager REST endpoint",
+        "opencast.service.type=org.opencastproject.authorization.xacml.manager",
+        "opencast.service.path=/acl-manager"
+    }
+)
 public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndpoint {
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(OsgiAclServiceRestEndpoint.class);
@@ -55,7 +65,6 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   private AuthorizationService authorizationService;
   private String endpointBaseUrl;
   private AssetManager assetManager;
-  private SeriesService seriesService;
 
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
@@ -70,28 +79,27 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   }
 
   /** OSGi callback for setting persistence. */
+  @Reference(name = "acl-service-factory")
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
   /** OSGi callback for setting security service. */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI callback. */
+  @Reference(name = "authorization-service")
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
   /** OSGi DI callback. */
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
-  }
-
-  /** OSGi DI callback. */
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
   }
 
   @Override
@@ -100,27 +108,17 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   }
 
   @Override
-  protected String getEndpointBaseUrl() {
-    return endpointBaseUrl;
-  }
-
-  @Override
   protected SecurityService getSecurityService() {
     return securityService;
   }
 
   @Override
+  protected AssetManager getAssetManager() {
+    return assetManager;
+  }
+
+  @Override
   protected AuthorizationService getAuthorizationService() {
     return authorizationService;
-  }
-
-  @Override
-  protected SeriesService getSeriesService() {
-    return seriesService;
-  }
-
-  @Override
-  public AssetManager getAssetManager() {
-    return assetManager;
   }
 }

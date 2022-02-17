@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -37,7 +37,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -57,7 +57,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.apache.felix</groupId>
-          <artifactId>org.osgi.compendium</artifactId>
+          <artifactId>osgi.cmpn</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -91,11 +91,14 @@
             <Import-Package>
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
-              !org.msgpack.*,
               !android.*,
-              !kotlin.*,
+              !com.android.org.*,
+              !dalvik.*,
               !javax.annotation.meta,
+              !kotlin.*,
               !org.conscrypt,
+              !org.msgpack.*,
+              !sun.*,
               *
             </Import-Package>
             <Private-Package>
@@ -106,9 +109,6 @@
               org.influxdb.*,
               javax.annotation
             </Private-Package>
-            <Service-Component>
-              OSGI-INF/statistics-provider-influx-service.xml,
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

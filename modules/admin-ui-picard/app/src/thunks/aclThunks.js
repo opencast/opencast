@@ -41,7 +41,11 @@ export const fetchAclActions = async () => {
 
     const response = await data.data;
 
-    return transformToIdValueArray(response);
+    const actions = transformToIdValueArray(response);
+
+    console.log(actions);
+
+    return actions;
 
 };
 

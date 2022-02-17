@@ -24,7 +24,6 @@ import static io.restassured.RestAssured.given;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -40,7 +39,7 @@ import org.junit.Test;
 public class BaseEndpointTest {
 
   /** The REST test environment */
-  private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(), TestBaseEndpoint.class);
+  private static final RestServiceTestEnv env = testEnvForClasses(TestBaseEndpoint.class);
 
   private static final JSONParser parser = new JSONParser();
 
@@ -61,7 +60,7 @@ public class BaseEndpointTest {
 
     JSONObject json = (JSONObject) parser.parse(response);
     assertEquals("https://api.opencast.org", json.get("url"));
-    assertEquals("v1.6.0", json.get("version"));
+    assertEquals("v1.7.0", json.get("version"));
   }
 
   /** Test case for {@link BaseEndpoint#getUserInfo()} */
@@ -122,7 +121,7 @@ public class BaseEndpointTest {
 
     JSONObject json = (JSONObject) parser.parse(response);
     JSONArray version = (JSONArray) json.get("versions");
-    assertEquals("v1.6.0", json.get("default"));
+    assertEquals("v1.7.0", json.get("default"));
     assertTrue(version.contains("v1.0.0"));
     assertTrue(version.contains("v1.1.0"));
     assertTrue(version.contains("v1.2.0"));
@@ -130,7 +129,8 @@ public class BaseEndpointTest {
     assertTrue(version.contains("v1.4.0"));
     assertTrue(version.contains("v1.5.0"));
     assertTrue(version.contains("v1.6.0"));
-    assertEquals(7, version.size());
+    assertTrue(version.contains("v1.7.0"));
+    assertEquals(8, version.size());
   }
 
   /** Test case for {@link BaseEndpoint#getVersionDefault()} */
@@ -140,13 +140,7 @@ public class BaseEndpointTest {
             .asString();
 
     JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("v1.6.0", json.get("default"));
-  }
-
-  /** Test case for {@link BaseEndpoint#recreateIndex()} */
-  @Test
-  public void testRecreateIndex() throws Exception {
-    given().log().all().expect().statusCode(SC_OK).when().post(env.host("/recreateIndex"));
+    assertEquals("v1.7.0", json.get("default"));
   }
 
 }

@@ -78,6 +78,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +98,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Component(
+    immediate = true,
+    service = { TranscriptionService.class,AmberscriptTranscriptionService.class },
+    property = {
+        "service.description=AmberScript Transcription Service",
+        "provider=amberscript"
+    }
+)
 public class AmberscriptTranscriptionService extends AbstractJobProducer implements TranscriptionService {
 
   private static final Logger logger = LoggerFactory.getLogger(AmberscriptTranscriptionService.class);
@@ -159,6 +171,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     super(JOB_TYPE);
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
 
     Option<Boolean> enabledOpt = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), ENABLED_CONFIG);
@@ -243,9 +256,10 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
     scheduledExecutor.scheduleWithFixedDelay(new ResultsFileCleanup(), 1, 1, TimeUnit.DAYS);
 
-   logger.info("Activated.");
+    logger.info("Activated.");
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     if (scheduledExecutor != null) {
       scheduledExecutor.shutdown();
@@ -262,7 +276,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return startTranscription(mpId, track, language, getAmberscriptJobType());
   }
 
-  public Job startTranscription(String mpId, Track track, String language, String jobtype) throws TranscriptionServiceException {
+  public Job startTranscription(String mpId, Track track, String language, String jobtype)
+          throws TranscriptionServiceException {
     if (StringUtils.isBlank(language)) {
       language = getLanguage();
     }
@@ -292,12 +307,12 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
   private void transcriptionDone(String mpId, String jobId) {
     try {
-        logger.info("Transcription done for mpId '{}'.", mpId);
-        if (getAndSaveJobResult(jobId)) {
-          database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
-        } else {
-          logger.debug("Unable to get and save the transcription result for mpId '{}'.", mpId);
-        }
+      logger.info("Transcription done for mpId '{}'.", mpId);
+      if (getAndSaveJobResult(jobId)) {
+        database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
+      } else {
+        logger.debug("Unable to get and save the transcription result for mpId '{}'.", mpId);
+      }
     } catch (IOException e) {
       logger.warn("Could not save transcription results file for mpId '{}': {}", mpId, e.toString());
     } catch (TranscriptionServiceException e) {
@@ -357,8 +372,10 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return result;
   }
 
-  void createRecognitionsJob(String mpId, Track track, String languageCode, String jobtype) throws TranscriptionServiceException, IOException {
-    // Timeout 3 hours (needs to include the time for the remote service to fetch the media URL before sending final response)
+  void createRecognitionsJob(String mpId, Track track, String languageCode, String jobtype)
+          throws TranscriptionServiceException, IOException {
+    // Timeout 3 hours (needs to include the time for the remote service to
+    // fetch the media URL before sending final response)
     CloseableHttpClient httpClient = makeHttpClient(CONNECTION_TIMEOUT, 3 * 3600 * 1000, CONNECTION_TIMEOUT);
     CloseableHttpResponse response = null;
 
@@ -567,9 +584,9 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
         workspace.get(uri);
         logger.info("Found captions at URI: {}", uri);
       } catch (Exception e) {
-          logger.info("Results not saved: getting from service for jobId {}", jobId);
-          // Not saved yet so call the transcription service to get the results
-          checkJobResults(jobId);
+        logger.info("Results not saved: getting from service for jobId {}", jobId);
+        // Not saved yet so call the transcription service to get the results
+        checkJobResults(jobId);
       }
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       logger.debug("Returning MPE with results file URI: {}", uri);
@@ -640,38 +657,47 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return PathSupport.toSafeName(jobId + "." + extension);
   }
 
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(name = "userDirectoryService")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference(name = "organizationDirectoryService")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace ws) {
     this.workspace = ws;
   }
 
+  @Reference(name = "workingFileRepository")
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }
 
+  @Reference(name = "database")
   public void setDatabase(TranscriptionDatabase service) {
     this.database = service;
   }
 
+  @Reference(name = "assetManager")
   public void setAssetManager(AssetManager service) {
     this.assetManager = service;
   }
 
+  @Reference(name = "workflowService")
   public void setWorkflowService(WorkflowService service) {
     this.workflowService = service;
   }
@@ -757,7 +783,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
                 } catch (TranscriptionDatabaseException ex) {
                   logger.warn("Could not cancel job '{}'.", jobId);
                 }
-            }
+              }
             } else {
               continue; // Not time to check yet
             }

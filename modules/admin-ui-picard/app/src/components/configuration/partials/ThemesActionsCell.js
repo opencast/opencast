@@ -5,12 +5,14 @@ import ConfirmModal from "../../shared/ConfirmModal";
 import ThemeDetailsModal from "./wizard/ThemeDetailsModal";
 import {deleteTheme} from "../../../thunks/themeThunks";
 import {fetchThemeDetails, fetchUsage} from "../../../thunks/themeDetailsThunks";
+import {getUserInformation} from "../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../utils/utils";
 
 
 /**
  * This component renders the action cells of themes in the table view
  */
-const ThemesActionsCell = ({ row, deleteTheme, fetchThemeDetails, fetchUsage }) => {
+const ThemesActionsCell = ({ row, deleteTheme, fetchThemeDetails, fetchUsage, user }) => {
     const { t } = useTranslation();
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
@@ -37,10 +39,12 @@ const ThemesActionsCell = ({ row, deleteTheme, fetchThemeDetails, fetchUsage }) 
 
     return (
         <>
-            {/*TODO: with-Role */}
-            <a onClick={() => showThemeDetails()}
-               className="more"
-               title={t('CONFIGURATION.THEMES.TABLE.TOOLTIP.DETAILS')}/>
+            {/* edit themes */}
+            {hasAccess("ROLE_UI_THEMES_EDIT", user) && (
+                <a onClick={() => showThemeDetails()}
+                   className="more"
+                   title={t('CONFIGURATION.THEMES.TABLE.TOOLTIP.DETAILS')}/>
+            )}
 
             {displayThemeDetails && (
                 <ThemeDetailsModal handleClose={hideThemeDetails}
@@ -48,10 +52,12 @@ const ThemesActionsCell = ({ row, deleteTheme, fetchThemeDetails, fetchUsage }) 
                                    themeName={row.name}/>
             )}
 
-            {/*// TODO: with-Role*/}
-            <a onClick={() => setDeleteConfirmation(true)}
-               className="remove ng-scope ng-isolate-scope"
-               title={t('CONFIGURATION.THEMES.TABLE.TOOLTIP.DELETE')}/>
+            {/* delete themes */}
+            {hasAccess("ROLE_UI_THEMES_DELETE", user) && (
+                <a onClick={() => setDeleteConfirmation(true)}
+                   className="remove ng-scope ng-isolate-scope"
+                   title={t('CONFIGURATION.THEMES.TABLE.TOOLTIP.DELETE')}/>
+            )}
 
             {displayDeleteConfirmation && (
                 <ConfirmModal close={hideDeleteConfirmation}
@@ -65,6 +71,11 @@ const ThemesActionsCell = ({ row, deleteTheme, fetchThemeDetails, fetchUsage }) 
     );
 };
 
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
+
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     deleteTheme: id => dispatch(deleteTheme(id)),
@@ -72,4 +83,4 @@ const mapDispatchToProps = dispatch => ({
     fetchUsage: id => dispatch(fetchUsage(id))
 });
 
-export default connect(null, mapDispatchToProps)(ThemesActionsCell);
+export default connect(mapStateToProps, mapDispatchToProps)(ThemesActionsCell);

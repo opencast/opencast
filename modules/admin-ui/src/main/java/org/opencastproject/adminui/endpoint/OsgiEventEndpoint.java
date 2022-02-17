@@ -22,10 +22,11 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -33,11 +34,15 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
+import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.Dictionary;
 import java.util.Objects;
@@ -46,10 +51,27 @@ import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
 @Path("/")
-public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedService {
+@RestService(name = "eventservice", title = "Event Service",
+        abstractText = "Provides resources and operations related to the events",
+        notes = { "This service offers the event CRUD Operations for the admin UI.",
+                "<strong>Important:</strong> "
+                        + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                        + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                        + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+        immediate = true,
+        service = OsgiEventEndpoint.class,
+        property = {
+                "service.description=Admin UI - Event facade Endpoint",
+                "opencast.service.type=org.opencastproject.adminui.OsgiEventEndpoint",
+                "opencast.service.path=/admin-ng/event",
+        }
+)
+public class OsgiEventEndpoint extends AbstractEventEndpoint {
 
   private AclServiceFactory aclServiceFactory;
-  private AdminUISearchIndex index;
+  private AssetManager assetManager;
+  private ElasticsearchIndex index;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
   private EventCommentService eventCommentService;
@@ -76,6 +98,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
     this.adminUIConfiguration = adminUIConfiguration;
   }
@@ -86,6 +109,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setJobService(JobEndpoint jobService) {
     this.jobService = jobService;
   }
@@ -96,6 +120,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setSeriesEndpoint(SeriesEndpoint seriesEndpoint) {
     this.seriesEndpoint = seriesEndpoint;
   }
@@ -106,6 +131,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
@@ -116,6 +142,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
@@ -126,6 +153,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }
@@ -136,6 +164,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -146,6 +175,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
@@ -156,8 +186,20 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
+  }
+
+  @Override
+  public AssetManager getAssetManager() {
+    return assetManager;
+  }
+
+  /** OSGi DI. */
+  @Reference
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
   @Override
@@ -166,6 +208,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
@@ -176,17 +219,19 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setCaptureAgentStateService(CaptureAgentStateService captureAgentStateService) {
     this.captureAgentStateService = captureAgentStateService;
   }
 
   @Override
-  public AdminUISearchIndex getIndex() {
+  public ElasticsearchIndex getIndex() {
     return index;
   }
 
   /** OSGi DI. */
-  public void setIndex(AdminUISearchIndex index) {
+  @Reference
+  public void setIndex(ElasticsearchIndex index) {
     this.index = index;
   }
 
@@ -196,12 +241,15 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   /** OSGi DI. */
+  @Reference
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Activate
+  @Modified
+  public void modified(ComponentContext cc) {
+    Dictionary<String, Object> properties = cc.getProperties();
     if (properties == null) {
       logger.info("No configuration available, using defaults");
       return;
@@ -216,6 +264,8 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
 
     dictionaryValue = properties.get(EVENTSTAB_ONLYEVENTSWITHWRITEACCESS_KEY);
     onlyEventsWithWriteAccessEventsTab = BooleanUtils.toBoolean(Objects.toString(dictionaryValue, "true"));
+
+    logger.info("Configuration updated");
   }
 
   @Override

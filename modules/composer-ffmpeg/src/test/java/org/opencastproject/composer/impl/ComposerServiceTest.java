@@ -216,8 +216,12 @@ public class ComposerServiceTest {
     // Create and populate the composer service
     composerService = new ComposerServiceImpl() {
       @Override
-      protected Track inspect(Job job, URI workspaceURI) throws EncoderException {
-        return inspectedTrack;
+      protected List<Track> inspect(Job job, List<URI> uris) throws EncoderException {
+        final var result = new ArrayList<Track>(uris.size());
+        for (URI uri: uris) {
+          result.add(inspectedTrack);
+        }
+        return result;
       }
     };
 
@@ -274,7 +278,7 @@ public class ComposerServiceTest {
     composerService.setWorkspace(workspace);
     EasyMock.replay(workspace);
 
-    Job job = composerService.encode(sourceVideoTrack, "av.work");
+    Job job = composerService.encode(sourceVideoTrack, "av.copy");
     MediaPackageElementParser.getFromXml(job.getPayload());
   }
 
@@ -325,7 +329,7 @@ public class ComposerServiceTest {
     composerService.setWorkspace(workspace);
     EasyMock.replay(workspace);
 
-    Job job = composerService.mux(sourceVideoTrack, sourceAudioTrack, "mux-av.work");
+    Job job = composerService.mux(sourceVideoTrack, sourceAudioTrack, "mux-av.copy");
     MediaPackageElementParser.getFromXml(job.getPayload());
   }
 

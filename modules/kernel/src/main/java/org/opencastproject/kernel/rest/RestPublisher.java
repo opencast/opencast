@@ -58,6 +58,9 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -93,6 +96,13 @@ import javax.xml.stream.XMLStreamWriter;
 /**
  * Listens for JAX-RS annotated services and publishes them to the global URL space using a single shared HttpContext.
  */
+@Component(
+    immediate = true,
+    service = RestPublisher.class,
+    property = {
+        "service.description=Opencast REST Endpoint Publisher"
+    }
+)
 public class RestPublisher implements RestConstants {
 
   /** The logger **/
@@ -156,6 +166,7 @@ public class RestPublisher implements RestConstants {
 
   /** Activates this rest publisher */
   @SuppressWarnings("unchecked")
+  @Activate
   protected void activate(ComponentContext componentContext) {
     logger.debug("activate()");
     baseServerUri = componentContext.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
@@ -202,6 +213,7 @@ public class RestPublisher implements RestConstants {
   /**
    * Deactivates the rest publisher
    */
+  @Deactivate
   protected void deactivate() {
     logger.debug("deactivate()");
     jaxRsTracker.close();
@@ -477,15 +489,16 @@ public class RestPublisher implements RestConstants {
       String classpath = bundle.getHeaders().get(RestConstants.HTTP_CLASSPATH);
       String alias = bundle.getHeaders().get(RestConstants.HTTP_ALIAS);
       String welcomeFile = bundle.getHeaders().get(RestConstants.HTTP_WELCOME);
+      // Always false if not set to true
+      boolean spaRedirect = Boolean.parseBoolean(bundle.getHeaders().get(RestConstants.HTTP_SPA_REDIRECT));
 
       if (classpath != null && alias != null) {
         Dictionary<String, String> props = new Hashtable<>();
         props.put(SharedHttpContext.ALIAS, alias);
         props.put(SharedHttpContext.CONTEXT_ID, RestConstants.HTTP_CONTEXT_ID);
         props.put(SharedHttpContext.SHARED, "true");
-
         StaticResource servlet = new StaticResource(new StaticResourceClassLoader(bundle), classpath, alias,
-                welcomeFile);
+                welcomeFile, spaRedirect);
 
         // We use the newly added bundle's context to register this service, so when that bundle shuts down, it brings
         // down this servlet with it

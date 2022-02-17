@@ -16,13 +16,15 @@ import {
 } from "../../../../selectors/eventDetailsSelectors";
 import Notifications from "../../../shared/Notifications";
 import {logger} from "../../../../utils/logger";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../../utils/utils";
 
 /**
  * This component manages the comment tab of the event details modal
  */
 const EventDetailsCommentsTab = ({ eventId, header, t,
                                      loadComments, saveNewComment, saveNewCommentReply, deleteOneComment, deleteCommentReply,
-                                     comments, isSavingComment, isSavingCommentReply, commentReasons }) => {
+                                     comments, isSavingComment, isSavingCommentReply, commentReasons,  user}) => {
 
     useEffect( () => {
         loadComments(eventId).then(r => logger.info(r));
@@ -115,14 +117,18 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                             <p>{ comment.text }</p>
 
                                             {/* links with performable actions for the comment */}
-                                            <a onClick={() => deleteComment(comment)}
-                                               className="delete">
-                                                {t('EVENTS.EVENTS.DETAILS.COMMENTS.DELETE')}
-                                            </a>
-                                            <a onClick={() => replyTo(comment, key) /* enters reply mode */}
-                                               className="reply">{/* with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY" */}
-                                                {t('EVENTS.EVENTS.DETAILS.COMMENTS.REPLY')}
-                                            </a>
+                                            {hasAccess("ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE", user) && (
+                                                <a onClick={() => deleteComment(comment)}
+                                                   className="delete">
+                                                    {t('EVENTS.EVENTS.DETAILS.COMMENTS.DELETE')}
+                                                </a>
+                                            )}
+                                            {hasAccess("ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY", user) && (
+                                                <a onClick={() => replyTo(comment, key) /* enters reply mode */}
+                                                   className="reply">
+                                                    {t('EVENTS.EVENTS.DETAILS.COMMENTS.REPLY')}
+                                                </a>
+                                            )}
                                             <span className="resolve" ng-class="{ resolved : comment.resolvedStatus }">
                                                 { t('EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED') }
                                             </span>
@@ -146,11 +152,13 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                                         </p>
 
                                                         {/* link for deleting the reply */}
-                                                        <a onClick={ () => deleteReply(comment, reply, replyKey)}
-                                                           className="delete">{/* with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE" */}
-                                                            <i className="fa fa-times-circle"/>
-                                                            { t('EVENTS.EVENTS.DETAILS.COMMENTS.DELETE') }
-                                                        </a>
+                                                        {hasAccess("ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE", user) && (
+                                                            <a onClick={ () => deleteReply(comment, reply, replyKey)}
+                                                               className="delete">
+                                                                <i className="fa fa-times-circle"/>
+                                                                { t('EVENTS.EVENTS.DETAILS.COMMENTS.DELETE') }
+                                                            </a>
+                                                        )}
                                                     </div>
                                                 ))
                                             }
@@ -161,49 +169,51 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                         </div>
 
                         { /* form for writing a comment (not shown, while replying to a comment is active) */
-                            replyToComment || (<form
-                                className="add-comment">{/* with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE">*/}
+                            replyToComment || (
+                                hasAccess("ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE", user) && (
+                                    <form className="add-comment">
 
-                                {/* text field */}
-                                <textarea
-                                    value={newCommentText}
-                                    onChange={ (comment) => setNewCommentText(comment.target.value)}
-                                    placeholder={t('EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER')}>
+                                        {/* text field */}
+                                        <textarea
+                                            value={newCommentText}
+                                            onChange={ (comment) => setNewCommentText(comment.target.value)}
+                                            placeholder={t('EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER')}>
                                 </textarea>
 
-                                {/* drop-down for selecting a reason for the comment */}
-                                <div className="chosen-container chosen-container-single">
-                                    <select className="chosen-single chosen-default"
-                                            chosen
-                                            value={commentReason}
-                                            onChange={(newReason) =>
-                                                setCommentReason(newReason.target.value)}
-                                            pre-select-from="components.eventCommentReasons"
-                                            data-width="'200px'"
-                                    >
-                                        <option value="" disabled selected hidden>
-                                            {t('EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER')}
-                                        </option>
-                                        {Object.entries(commentReasons).map( (reason, key) =>
-                                            <option value={reason[0]} key={key}>{t(reason[1])}</option>
-                                        )}
-                                    </select>
-                                </div>
+                                        {/* drop-down for selecting a reason for the comment */}
+                                        <div className="chosen-container chosen-container-single">
+                                            <select className="chosen-single chosen-default"
+                                                    chosen
+                                                    value={commentReason}
+                                                    onChange={(newReason) =>
+                                                        setCommentReason(newReason.target.value)}
+                                                    pre-select-from="components.eventCommentReasons"
+                                                    data-width="'200px'"
+                                            >
+                                                <option value="" disabled selected hidden>
+                                                    {t('EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER')}
+                                                </option>
+                                                {Object.entries(commentReasons).map( (reason, key) =>
+                                                    <option value={reason[0]} key={key}>{t(reason[1])}</option>
+                                                )}
+                                            </select>
+                                        </div>
 
-                                {/* submit button for comment (only active, if text has been written and a reason has been selected) */}
-                                <button
-                                    disabled={ !!(!newCommentText.length || newCommentText.length <= 0 ||
-                                        !commentReason.length || commentReason.length <= 0 ||
-                                        isSavingComment)}
-                                    className={`save green  ${(!newCommentText.length || newCommentText.length <= 0 ||
-                                        !commentReason.length || commentReason.length <= 0 ||
-                                        isSavingComment ) ?
-                                        "disabled" : "false"}`}
-                                    onClick={() => saveComment(newCommentText, commentReason)}
-                                >
-                                    {t("SUBMIT") /* Submit */}
-                                </button>
-                            </form>)
+                                        {/* submit button for comment (only active, if text has been written and a reason has been selected) */}
+                                        <button
+                                            disabled={ !!(!newCommentText.length || newCommentText.length <= 0 ||
+                                                !commentReason.length || commentReason.length <= 0 ||
+                                                isSavingComment)}
+                                            className={`save green  ${(!newCommentText.length || newCommentText.length <= 0 ||
+                                                !commentReason.length || commentReason.length <= 0 ||
+                                                isSavingComment ) ?
+                                                "disabled" : "false"}`}
+                                            onClick={() => saveComment(newCommentText, commentReason)}
+                                        >
+                                            {t("SUBMIT") /* Submit */}
+                                        </button>
+                                    </form>
+                                ))
                         }
 
                         { /* form for writing a reply to a comment (only shown, while replying to a comment is active) */
@@ -235,15 +245,19 @@ const EventDetailsCommentsTab = ({ eventId, header, t,
                                 </button>
 
                                 {/* 'resolved' checkbox */}
-                                <input type="checkbox"
-                                       id="resolved-checkbox"
-                                       className="ios"
-                                       onChange={ () =>
-                                           setCommentReplyIsResolved(!commentReplyIsResolved)}
-                                />{/* with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" */}
-                                <label> {/* with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" */}
-                                    { t("EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED") /* Resolved */}
-                                </label>
+                                {hasAccess("ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE", user) && (
+                                    <>
+                                        <input type="checkbox"
+                                               id="resolved-checkbox"
+                                               className="ios"
+                                               onChange={ () =>
+                                                   setCommentReplyIsResolved(!commentReplyIsResolved)}
+                                        />
+                                        <label>
+                                            { t("EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED") /* Resolved */}
+                                        </label>
+                                    </>
+                                )}
                             </form>)
                         }
                     </div>
@@ -260,6 +274,7 @@ const mapStateToProps = state => ({
     isFetchingComments: isFetchingComments(state),
     isSavingComment: isSavingComment(state),
     isSavingCommentReply: isSavingCommentReply(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

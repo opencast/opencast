@@ -40,11 +40,13 @@ import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
 import org.opencastproject.publication.api.PublicationException;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
@@ -52,6 +54,9 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +69,14 @@ import java.util.UUID;
 /**
  * The workflow definition for handling "publish" operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=OAI-PMH Publication Workflow Handler",
+        "workflow.operation=publish-oaipmh"
+    }
+)
 public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -92,6 +105,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param publicationService
    *          the publication service
    */
+  @Reference(name = "PublicationService")
   public void setPublicationService(OaiPmhPublicationService publicationService) {
     this.publicationService = publicationService;
   }
@@ -102,12 +116,23 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param streamingDistributionService
    *          the streaming distribution service
    */
+  @Reference(
+      name = "StreamingDistributionService",
+      target = "(distribution.channel=streaming)"
+  )
   protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
 
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
   /** OSGi component activation. */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
   }
 
@@ -161,7 +186,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
     final Collection<MediaPackageElement> downloadElements = downloadElementSelector.select(mediaPackage, false);
 
     final Collection<MediaPackageElement> streamingElements;
-    if (streamingDistributionService.publishToStreaming()) {
+    if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()) {
       final SimpleElementSelector streamingElementSelector = new SimpleElementSelector();
       for (String flavor : sourceStreamingFlavors) {
         streamingElementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
@@ -257,4 +282,5 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
     }
     return createResult(mediaPackage, Action.CONTINUE);
   }
+
 }

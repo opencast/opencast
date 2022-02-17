@@ -45,7 +45,6 @@ public class ThemesListQuery extends ResourceListQueryImpl {
 
   public ThemesListQuery() {
     super();
-    this.availableFilters.add(createCreatorFilter(Option.<String> none()));
   }
 
   /**

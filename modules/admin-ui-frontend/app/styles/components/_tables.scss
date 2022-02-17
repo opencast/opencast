@@ -307,6 +307,35 @@
             }
         }
 
+        .comment-container {
+            overflow-y: auto;
+
+            .comment {
+                &:first-child h4 {
+                    margin-top: 0;
+                }
+
+                // Hide first HR
+                &:first-child > hr {
+                    display: none;
+                }
+
+                > hr {
+                    background: lighten($main-border-color, 10%);
+                    height: 1px;
+                    border: none;
+                }
+            }
+
+            .textarea {
+               font-size: 11px;
+               line-height: 15px;
+               width: 100%;
+               resize: none;
+               padding: 5px 10px;
+            }
+        }
+
         &.nowrap {
             white-space: nowrap;
         }

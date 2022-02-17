@@ -35,74 +35,74 @@ import java.util.List;
 public interface GroupRoleProvider extends GroupProvider, RoleProvider {
 
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
-     */
-    List<Role> getRolesForUser(String userName);
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
+   */
+  List<Role> getRolesForUser(String userName);
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
-     */
-    List<Role> getRolesForGroup(String groupName);
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
+   */
+  List<Role> getRolesForGroup(String groupName);
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.opencastproject.security.api.RoleProvider#getOrganization()
-     */
-    String getOrganization();
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.security.api.RoleProvider#getOrganization()
+   */
+  String getOrganization();
 
-    /**
-     * Updates a user's group membership
-     *
-     * @param userName
-     *          the username
-     * @param orgId
-     *          the user's organization
-     * @param roleList
-     *          the list of group role names
-     */
-    void updateGroupMembershipFromRoles(String userName,
+  /**
+   * Updates a user's group membership
+   *
+   * @param userName
+   *          the username
+   * @param orgId
+   *          the user's organization
+   * @param roleList
+   *          the list of group role names
+   */
+  void updateGroupMembershipFromRoles(String userName,
             String orgId, List<String> roleList);
 
     /**
-     * Adds or updates a group to the persistence.
-     *
-     * @param group
-     *          the group to add
-     */
-    void addGroup(JpaGroup group) throws UnauthorizedException;
+   * Adds or updates a group to the persistence.
+   *
+   * @param group
+   *          the group to add
+   */
+  void addGroup(JpaGroup group) throws UnauthorizedException;
 
-    /**
-     * Getting all groups
-     *
-     * @return Iterator&lt;Group&gt; persisted groups
-     */
-    Iterator<Group> getGroups();
+  /**
+   * Getting all groups
+   *
+   * @return Iterator&lt;Group&gt; persisted groups
+   */
+  Iterator<Group> getGroups();
 
-    /**
-     * Update a group
-     *
-     * @param groupId
-     *          the id of the group to update
-     * @param name
-     *          the name to update
-     * @param description
-     *          the description to update
-     * @param roles
-     *          the roles to update
-     * @param users
-     *          the users to update
-     * @throws NotFoundException
-     *           if the group is not found
-     * @throws UnauthorizedException
-     *           if the user does not have rights to update the group
-     */
-    void updateGroup(String groupId, String name,
+  /**
+   * Update a group
+   *
+   * @param groupId
+   *          the id of the group to update
+   * @param name
+   *          the name to update
+   * @param description
+   *          the description to update
+   * @param roles
+   *          the roles to update
+   * @param users
+   *          the users to update
+   * @throws NotFoundException
+   *           if the group is not found
+   * @throws UnauthorizedException
+   *           if the user does not have rights to update the group
+   */
+  void updateGroup(String groupId, String name,
             String description, String roles, String users)
             throws NotFoundException, UnauthorizedException;
 

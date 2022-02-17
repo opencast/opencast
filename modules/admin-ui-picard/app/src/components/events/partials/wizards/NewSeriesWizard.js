@@ -97,7 +97,8 @@ const NewSeriesWizard = ({ metadataFields, close, postNewSeries }) => {
                         {page === 2 && (
                             <NewAccessPage nextPage={nextPage}
                                            previousPage={previousPage}
-                                           formik={formik}/>
+                                           formik={formik}
+                                           editAccessRole="ROLE_UI_SERIES_DETAILS_ACL_EDIT"/>
                         )}
                         {page === 3 && (
                             <NewThemePage nextPage={nextPage}

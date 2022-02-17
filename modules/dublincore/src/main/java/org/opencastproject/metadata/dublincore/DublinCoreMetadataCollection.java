@@ -23,6 +23,7 @@ package org.opencastproject.metadata.dublincore;
 
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
 
 import com.google.common.collect.Iterables;
@@ -38,6 +39,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class DublinCoreMetadataCollection {
@@ -119,11 +121,22 @@ public class DublinCoreMetadataCollection {
   }
 
   public void addEmptyField(final MetadataField metadataField, final ListProvidersService listProvidersService) {
-    addField(metadataField, Collections.emptyList(), listProvidersService);
+    addField(metadataField, Collections.emptyList(), Optional.empty(), listProvidersService);
   }
 
-  public void addField(final MetadataField metadataField, final String value, final ListProvidersService listProvidersService) {
-    addField(metadataField, Collections.singletonList(value), listProvidersService);
+  public void addField(final MetadataField metadataField, final String value, final ListProvidersService
+          listProvidersService) {
+    addField(metadataField, Collections.singletonList(value), Optional.empty(), listProvidersService);
+  }
+
+  public void addField(final MetadataField metadataField, final Optional<String> valueOpt, final
+    Optional<ResourceListQuery> collectionQueryOverrideOpt, final ListProvidersService listProvidersService) {
+    if (valueOpt.isPresent()) {
+      addField(metadataField, Collections.singletonList(valueOpt.get()), collectionQueryOverrideOpt,
+              listProvidersService);
+    } else {
+      addField(metadataField, Collections.emptyList(), collectionQueryOverrideOpt, listProvidersService);
+    }
   }
 
   /**
@@ -184,8 +197,13 @@ public class DublinCoreMetadataCollection {
     }
   }
 
+  public void addField(final MetadataField metadataField, final List<String> values, final ListProvidersService
+          listProvidersService) {
+    addField(metadataField, values, Optional.empty(), listProvidersService);
+  }
 
-  public void addField(final MetadataField metadataField, final List<String> values, final ListProvidersService listProvidersService) {
+  public void addField(final MetadataField metadataField, final List<String> values, final Optional<ResourceListQuery>
+          collectionQueryOverrideOpt, final ListProvidersService listProvidersService) {
     final List<String> filteredValues = values.stream().filter(StringUtils::isNotBlank).collect(Collectors.toList());
 
     if (!filteredValues.isEmpty()) {
@@ -193,7 +211,7 @@ public class DublinCoreMetadataCollection {
     }
 
     metadataField.setIsTranslatable(getCollectionIsTranslatable(metadataField, listProvidersService));
-    metadataField.setCollection(getCollection(metadataField, listProvidersService));
+    metadataField.setCollection(getCollection(metadataField, listProvidersService, collectionQueryOverrideOpt));
 
     addField(metadataField);
   }
@@ -212,13 +230,20 @@ public class DublinCoreMetadataCollection {
     return null;
   }
 
-  private static Map<String, String> getCollection(
-          final MetadataField metadataField,
-          final ListProvidersService listProvidersService) {
+  private static Map<String, String> getCollection(final MetadataField metadataField, final ListProvidersService
+          listProvidersService, final Optional<ResourceListQuery> collectionQueryOverrideOpt) {
     try {
       if (listProvidersService != null && metadataField.getListprovider() != null) {
-        return listProvidersService.getList(metadataField.getListprovider(),
-                new ResourceListQueryImpl(), true);
+
+        // use collection query override?
+        ResourceListQuery resourceListQuery;
+        if (collectionQueryOverrideOpt.isPresent()) {
+          resourceListQuery = collectionQueryOverrideOpt.get();
+        } else {
+          resourceListQuery = new ResourceListQueryImpl();
+        }
+
+        return listProvidersService.getList(metadataField.getListprovider(), resourceListQuery, true);
       }
       return null;
     } catch (final ListProviderException e) {

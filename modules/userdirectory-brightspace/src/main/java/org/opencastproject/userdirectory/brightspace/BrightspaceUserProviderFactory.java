@@ -37,6 +37,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+@Component(
+    immediate = true,
+    service = ManagedServiceFactory.class,
+    property = {
+        "service.pid=org.opencastproject.userdirectory.brightspace",
+        "service.description=Provides Brightspace user directory instances"
+    }
+)
 public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(BrightspaceUserProviderFactory.class);
@@ -86,6 +97,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   /**
    * OSGi callback for setting the organization directory service.
    */
+  @Reference(name = "orgDirectory")
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
@@ -95,6 +107,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
    *
    * @param cc the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("Activate BrightspaceUserProviderFactory");
     this.bundleContext = cc.getBundleContext();
@@ -118,7 +131,8 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   @Override
   public void updated(String pid, Dictionary properties) throws ConfigurationException {
     logger.debug("updated BrightspaceUserProviderFactory");
-    String adminUserName = StringUtils.trimToNull(bundleContext.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
+    String adminUserName = StringUtils.trimToNull(
+        bundleContext.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
     String organization = (String) properties.get(ORGANIZATION_KEY);
     String urlStr = (String) properties.get(BRIGHTSPACE_URL);
     String systemUserId = (String) properties.get(BRIGHTSPACE_USER_ID);
@@ -151,14 +165,14 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
 
     logger.debug("creating new brightspace user provider for pid={}", pid);
 
-
-    BrightspaceUserProviderInstance provider = new BrightspaceUserProviderInstance(pid,
-            new BrightspaceClientImpl(urlStr, applicationId, applicationKey, systemUserId, systemUserKey), org, cacheSize,
-            cacheExpiration, adminUserName);
+    BrightspaceClientImpl clientImpl
+        = new BrightspaceClientImpl(urlStr, applicationId, applicationKey, systemUserId, systemUserKey);
+    BrightspaceUserProviderInstance provider
+        = new BrightspaceUserProviderInstance(pid, clientImpl, org, cacheSize, cacheExpiration, adminUserName);
     this.providerRegistrations
-            .put(pid, this.bundleContext.registerService(UserProvider.class.getName(), provider, null));
+        .put(pid, this.bundleContext.registerService(UserProvider.class.getName(), provider, null));
     this.providerRegistrations
-            .put(pid, this.bundleContext.registerService(RoleProvider.class.getName(), provider, null));
+        .put(pid, this.bundleContext.registerService(RoleProvider.class.getName(), provider, null));
   }
 
   /**

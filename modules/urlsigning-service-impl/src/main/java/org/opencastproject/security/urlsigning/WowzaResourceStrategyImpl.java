@@ -39,17 +39,33 @@ public class WowzaResourceStrategyImpl implements ResourceStrategy {
   private static final String FIND_STREAM_FORMAT = ".{3}[:].*$";
   /** The URI scheme that an RTMP address uses. */
   private static final String RTMP_SCHEME = "rtmp";
+  /** The URI scheme that an http address uses. */
+  private static final String ADAPTIVESTREAMING_HTTP_SCHEME = "http";
+  /** The URI scheme that an https address uses. */
+  private static final String ADAPTIVESTREAMING_HTTPS_SCHEME = "https";
   /** The possible delimiter between the server & application and the stream path and file. */
   private static final String WOWZA_STREAM_DELIMITER = "_definst_";
 
+  /**
+   * Transform a base URI into a proper stream location without the host and application name.
+   *
+   * @param baseUri
+   *          The full URI to the resource including the host and application.
+   * @return A safe standard RTMP or HTTP resource location.
+   */
   @Override
   public String getResource(String baseUri) {
     try {
       URI uri = new URI(baseUri);
       String scheme = uri.getScheme();
-      if (RTMP_SCHEME.equals(scheme)) {
+
+      if (ADAPTIVESTREAMING_HTTP_SCHEME.equals(scheme)
+          || ADAPTIVESTREAMING_HTTPS_SCHEME.equals(scheme)) {
+        return getHTTPResource(uri);
+      } else if (RTMP_SCHEME.equals(scheme)) {
         return getRTMPResource(uri);
       } else {
+        //return getHTTPResource(uri);
         throw new IllegalArgumentException(WowzaResourceStrategyImpl.class.getSimpleName()
                 + " is unable to sign urls with scheme " + scheme);
       }
@@ -87,5 +103,15 @@ public class WowzaResourceStrategyImpl implements ResourceStrategy {
     return baseUri.getPath().substring(baseUri.getPath().indexOf("/", 1) + 1)
             + (StringUtils.isNotBlank(baseUri.getQuery()) ? "?" + baseUri.getQuery() : "");
   }
-
+  /**
+   * Transform a base URI into a proper stream location without the host.
+   *
+   * @param baseUri
+   *          The full URI to the resource including the host and application.
+   * @return A safe standard RTMP resource location.
+   */
+  protected static String getHTTPResource(URI baseUri) {
+    // There are no special delimiters so assume the first value between two forward slashes (/.../) is the application.
+    return baseUri.getPath().substring(baseUri.getPath().indexOf("/") + 1, baseUri.getPath().lastIndexOf("/"));
+  }
 }

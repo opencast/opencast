@@ -23,7 +23,6 @@ package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.nul;
-import static com.entwinemedia.fn.data.Opt.some;
 import static com.entwinemedia.fn.data.json.Jsons.BLANK;
 import static com.entwinemedia.fn.data.json.Jsons.NULL;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
@@ -60,21 +59,22 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.adminui.exception.JobEndpointException;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.BulkUpdateUtil;
 import org.opencastproject.adminui.util.QueryPreprocessor;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
-import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventIndexSchema;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentReply;
@@ -86,9 +86,10 @@ import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
-import org.opencastproject.index.service.util.AccessInformationUtil;
+import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
@@ -138,7 +139,6 @@ import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
-import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -214,14 +214,6 @@ import javax.ws.rs.core.Response.Status;
  * This first implementation uses the {@link org.opencastproject.assetmanager.api.AssetManager}. In a later iteration
  * the endpoint may abstract over the concrete archive.
  */
-@Path("/")
-@RestService(name = "eventservice", title = "Event Service",
-  abstractText = "Provides resources and operations related to the events",
-  notes = { "This service offers the event CRUD Operations for the admin UI.",
-            "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-              + "DO NOT use this for integration of third-party applications.<em>"})
 public abstract class AbstractEventEndpoint {
 
   /**
@@ -244,9 +236,11 @@ public abstract class AbstractEventEndpoint {
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
 
+  public abstract AssetManager getAssetManager();
+
   public abstract WorkflowService getWorkflowService();
 
-  public abstract AdminUISearchIndex getIndex();
+  public abstract ElasticsearchIndex getIndex();
 
   public abstract JobEndpoint getJobService();
 
@@ -381,7 +375,7 @@ public abstract class AbstractEventEndpoint {
   public Response getEventResponse(@PathParam("eventId") String id) throws Exception {
     for (final Event event : getIndexService().getEvent(id, getIndex())) {
       event.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
-      return okJson(eventToJSON(event));
+      return okJson(eventToJSON(event, Optional.empty()));
     }
     return notFound("Cannot find an event with id '%s'.", id);
   }
@@ -545,6 +539,51 @@ public abstract class AbstractEventEndpoint {
       pubJSON.add(json);
     }
     return pubJSON;
+  }
+
+  private List<JObject> eventCommentsToJson(List<EventComment> comments) {
+    List<JObject> commentArr = new ArrayList<>();
+    for (EventComment c : comments) {
+      JObject thing = obj(
+              f("reason", v(c.getReason())),
+              f("resolvedStatus", v(c.isResolvedStatus())),
+              f("modificationDate", v(c.getModificationDate().toInstant().toString())),
+              f("replies", arr(eventCommentRepliesToJson(c.getReplies()))),
+              f("author", obj(
+                      f("name", c.getAuthor().getName()),
+                      // email field of the digest user is always null
+                      f("email", v(c.getAuthor().getEmail(), NULL)),
+                      f("username", c.getAuthor().getUsername())
+              )),
+              f("id", v(c.getId().get())),
+              f("text", v(c.getText())),
+              f("creationDate", v(c.getCreationDate().toInstant().toString()))
+      );
+      commentArr.add(thing);
+    }
+
+    return commentArr;
+  }
+
+  private List<JObject> eventCommentRepliesToJson(List<EventCommentReply> replies) {
+    List<JObject> repliesArr = new ArrayList<>();
+    for (EventCommentReply r : replies) {
+      JObject thing = obj(
+              f("id", v(r.getId().get())),
+              f("text", v(r.getText())),
+              f("creationDate", v(r.getCreationDate().toInstant().toString())),
+              f("modificationDate", v(r.getModificationDate().toInstant().toString())),
+              f("author", obj(
+                      f("name", r.getAuthor().getName()),
+                      // email field of the digest user is always null
+                      f("email", v(r.getAuthor().getEmail(), NULL)),
+                      f("username", r.getAuthor().getUsername())
+              ))
+      );
+      repliesArr.add(thing);
+    }
+
+    return repliesArr;
   }
 
   @GET
@@ -843,12 +882,37 @@ public abstract class AbstractEventEndpoint {
 
       Source eventSource = getIndexService().getEventSource(optEvent.get());
       if (eventSource == Source.ARCHIVE) {
-        if (getAclService().applyAclToEpisode(eventId, accessControlList)) {
+        Opt<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(eventId);
+        Option<AccessControlList> aclOpt = Option.option(accessControlList);
+        // the episode service is the source of authority for the retrieval of media packages
+        if (mediaPackage.isSome()) {
+          MediaPackage episodeSvcMp = mediaPackage.get();
+          aclOpt.fold(new Option.EMatch<AccessControlList>() {
+            // set the new episode ACL
+            @Override
+            public void esome(final AccessControlList acl) {
+              // update in episode service
+              try {
+                MediaPackage mp = getAuthorizationService().setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
+                getAssetManager().takeSnapshot(mp);
+              } catch (MediaPackageException e) {
+                logger.error("Error getting ACL from media package", e);
+              }
+            }
+
+            // if none EpisodeACLTransition#isDelete returns true so delete the episode ACL
+            @Override
+            public void enone() {
+              // update in episode service
+              MediaPackage mp = getAuthorizationService().removeAcl(episodeSvcMp, AclScope.Episode);
+              getAssetManager().takeSnapshot(mp);
+            }
+
+          });
           return ok();
-        } else {
-          logger.warn("Unable to find the event '{}'", eventId);
-          return notFound();
         }
+        logger.warn("Unable to find the event '{}'", eventId);
+        return notFound();
       } else if (eventSource == Source.WORKFLOW) {
         logger.warn("An ACL cannot be edited while an event is part of a current workflow because it might"
                 + " lead to inconsistent ACLs i.e. changed after distribution so that the old ACL is still "
@@ -860,12 +924,11 @@ public abstract class AbstractEventEndpoint {
         MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
         mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();
         // We could check agent access here if we want to forbid updating ACLs for users without access.
-        getSchedulerService().updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-                Opt.<Set<String>> none(), some(mediaPackage), Opt.<Map<String, String>> none(),
-                Opt.<Map<String, String>> none());
+        getSchedulerService().updateEvent(eventId, Opt.none(), Opt.none(), Opt.none(), Opt.none(),
+                Opt.some(mediaPackage), Opt.none(), Opt.none());
         return ok();
       }
-    } catch (AclServiceException | MediaPackageException e) {
+    } catch (MediaPackageException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         return forbidden();
       }
@@ -1121,39 +1184,60 @@ public abstract class AbstractEventEndpoint {
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
     Event event = optEvent.get();
-
     MetadataList metadataList = new MetadataList();
-    List<EventCatalogUIAdapter> catalogUIAdapters = getIndexService().getEventCatalogUIAdapters();
-    catalogUIAdapters.remove(getIndexService().getCommonEventCatalogUIAdapter());
-    MediaPackage mediaPackage;
-    try {
-      mediaPackage = getIndexService().getEventMediapackage(event);
-    } catch (IndexServiceException e) {
-      if (e.getCause() instanceof NotFoundException) {
-        return notFound("Cannot find data for event %s", eventId);
-      } else if (e.getCause() instanceof UnauthorizedException) {
-        return Response.status(Status.FORBIDDEN).entity("Not authorized to access " + eventId).build();
-      }
-      logger.error("Internal error when trying to access metadata for " + eventId, e);
-      return serverError();
-    }
-    for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
-      metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
-    }
-    DublinCoreMetadataCollection metadataCollection = EventUtils.getEventMetadata(event, getIndexService().getCommonEventCatalogUIAdapter());
-    if (getOnlySeriesWithWriteAccessEventModal()) {
-      MetadataField seriesField = metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-      if (seriesField != null) {
-        seriesField.setCollection(getSeriesEndpoint().getUserSeriesByAccess(true));
-      }
-    }
-    metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), metadataCollection);
 
+    // Load extended metadata
+    List<EventCatalogUIAdapter> extendedCatalogUIAdapters = getIndexService().getExtendedEventCatalogUIAdapters();
+    if (!extendedCatalogUIAdapters.isEmpty()) {
+      MediaPackage mediaPackage;
+      try {
+        mediaPackage = getIndexService().getEventMediapackage(event);
+      } catch (IndexServiceException e) {
+        if (e.getCause() instanceof NotFoundException) {
+          return notFound("Cannot find data for event %s", eventId);
+        } else if (e.getCause() instanceof UnauthorizedException) {
+          return Response.status(Status.FORBIDDEN).entity("Not authorized to access " + eventId).build();
+        }
+        logger.error("Internal error when trying to access metadata for " + eventId, e);
+        return serverError();
+      }
+
+      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedCatalogUIAdapters) {
+        metadataList.add(extendedCatalogUIAdapter, extendedCatalogUIAdapter.getFields(mediaPackage));
+      }
+    }
+
+    // Load common metadata
+    // We do this after extended metadata because we want to overwrite any extended metadata adapters with the same
+    // flavor instead of the other way around.
+    EventCatalogUIAdapter eventCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
+    DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
+    EventUtils.setEventMetadataValues(event, metadataCollection);
+    metadataList.add(eventCatalogUiAdapter, metadataCollection);
+
+    // lock metadata?
     final String wfState = event.getWorkflowState();
     if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState)))
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
     return okJson(MetadataJson.listToJson(metadataList, true));
+  }
+
+  /**
+   * If we only want to show series with write access, create a special query to fill the collection of the series
+   * metadata field
+   *
+   * @return a map with resource list queries belonging to metadata fields
+   */
+  private Map getCollectionQueryOverrides() {
+    HashMap<String, ResourceListQuery> collectionQueryOverrides = new HashMap();
+    if (getOnlySeriesWithWriteAccessEventModal()) {
+      SeriesListQuery seriesListQuery = new SeriesListQuery();
+      seriesListQuery.withReadPermission(true);
+      seriesListQuery.withWritePermission(true);
+      collectionQueryOverrides.put(DublinCore.PROPERTY_IS_PART_OF.getLocalName(), seriesListQuery);
+    }
+    return collectionQueryOverrides;
   }
 
   @POST  // use POST instead of GET because of a possibly long list of ids
@@ -1173,7 +1257,6 @@ public abstract class AbstractEventEndpoint {
                              responseCode = HttpServletResponse.SC_NOT_FOUND)
              })
   public Response getEventsMetadata(@FormParam("eventIds") String eventIds) throws Exception {
-
     if (StringUtils.isBlank(eventIds)) {
       return badRequest("Event ids can't be empty");
     }
@@ -1193,12 +1276,6 @@ public abstract class AbstractEventEndpoint {
     Set<String> eventsNotFound = new HashSet();
     Set<String> eventsWithRunningWorkflow = new HashSet();
     Set<String> eventsMerged = new HashSet();
-
-    //get once instead of for each event
-    Map<String, String> seriesWithWriteAccess = null;
-    if (getOnlySeriesWithWriteAccessEventModal()) {
-      seriesWithWriteAccess = getSeriesEndpoint().getUserSeriesByAccess(true);
-    }
 
     // collect the metadata of all events
     List<DublinCoreMetadataCollection> collectedMetadata = new ArrayList();
@@ -1220,16 +1297,11 @@ public abstract class AbstractEventEndpoint {
       }
 
       // collect metadata
-      DublinCoreMetadataCollection metadataCollection =
-        EventUtils.getEventMetadata(event, getIndexService().getCommonEventCatalogUIAdapter());
+      EventCatalogUIAdapter eventCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
+      DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(
+              getCollectionQueryOverrides());
+      EventUtils.setEventMetadataValues(event, metadataCollection);
       collectedMetadata.add(metadataCollection);
-
-      // in case we want only series with write access
-      if (getOnlySeriesWithWriteAccessEventModal()) {
-        MetadataField seriesField =
-          metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-        seriesField.setCollection(seriesWithWriteAccess);
-      }
 
       eventsMerged.add(eventId);
     }
@@ -1724,7 +1796,7 @@ public abstract class AbstractEventEndpoint {
         return okJson(obj(f("workflowId", v(agentConfiguration.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION), Jsons.BLANK)),
                 f("configuration", obj(fields))));
       } else {
-        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withMediaPackage(id)));
+        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withCount(999999).withMediaPackage(id)));
       }
     } catch (NotFoundException e) {
       return notFound("Cannot find workflows for event %s", id);
@@ -2029,47 +2101,51 @@ public abstract class AbstractEventEndpoint {
   @RestQuery(name = "getNewMetadata", description = "Returns all the data related to the metadata tab in the new event modal as JSON", returnDescription = "All the data related to the event metadata tab as JSON", responses = {
           @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the event metadata tab as JSON") })
   public Response getNewMetadata() {
-    MetadataList metadataList = getIndexService().getMetadataListWithAllEventCatalogUIAdapters();
-    DublinCoreMetadataCollection collection = metadataList
-            .getMetadataByAdapter(getIndexService().getCommonEventCatalogUIAdapter());
-    if (collection != null) {
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
-        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
-      if (collection.getOutputFields().containsKey("duration"))
-        collection.removeField(collection.getOutputFields().get("duration"));
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName()))
-        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName()));
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName()))
-        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName()));
-      if (collection.getOutputFields().containsKey("startDate"))
-        collection.removeField(collection.getOutputFields().get("startDate"));
-      if (collection.getOutputFields().containsKey("startTime"))
-        collection.removeField(collection.getOutputFields().get("startTime"));
-      if (collection.getOutputFields().containsKey("location"))
-        collection.removeField(collection.getOutputFields().get("location"));
+    MetadataList metadataList = new MetadataList();
 
-      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
-        MetadataField publisher = collection.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
-        Map<String, String> users = new HashMap<String, String>();
-        if (publisher.getCollection() != null) {
-          users = publisher.getCollection();
-        }
-        String loggedInUser = getSecurityService().getUser().getName();
-        if (!users.containsKey(loggedInUser)) {
-          users.put(loggedInUser, loggedInUser);
-        }
-        publisher.setValue(loggedInUser);
-      }
-
-      if (getOnlySeriesWithWriteAccessEventModal()) {
-        MetadataField seriesField = collection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-        if (seriesField != null) {
-          seriesField.setCollection(getSeriesEndpoint().getUserSeriesByAccess(true));
-        }
-      }
-
-      metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
+    // Extended metadata
+    List<EventCatalogUIAdapter> extendedCatalogUIAdapters = getIndexService().getExtendedEventCatalogUIAdapters();
+    for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedCatalogUIAdapters) {
+      metadataList.add(extendedCatalogUIAdapter, extendedCatalogUIAdapter.getRawFields());
     }
+
+    // Common metadata
+    // We do this after extended metadata because we want to overwrite any extended metadata adapters with the same
+    // flavor instead of the other way around.
+    EventCatalogUIAdapter commonCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
+    DublinCoreMetadataCollection commonMetadata = commonCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
+
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
+    if (commonMetadata.getOutputFields().containsKey("duration"))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get("duration"));
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName()))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName()));
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName()))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName()));
+    if (commonMetadata.getOutputFields().containsKey("startDate"))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get("startDate"));
+    if (commonMetadata.getOutputFields().containsKey("startTime"))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get("startTime"));
+    if (commonMetadata.getOutputFields().containsKey("location"))
+      commonMetadata.removeField(commonMetadata.getOutputFields().get("location"));
+
+    // Set publisher to user
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
+      MetadataField publisher = commonMetadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
+      Map<String, String> users = new HashMap<>();
+      if (publisher.getCollection() != null) {
+        users = publisher.getCollection();
+      }
+      String loggedInUser = getSecurityService().getUser().getName();
+      if (!users.containsKey(loggedInUser)) {
+        users.put(loggedInUser, loggedInUser);
+      }
+      publisher.setValue(loggedInUser);
+    }
+
+    metadataList.add(commonCatalogUiAdapter, commonMetadata);
+
     return okJson(MetadataJson.listToJson(metadataList, true));
   }
 
@@ -2276,15 +2352,18 @@ public abstract class AbstractEventEndpoint {
           @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
           @RestParameter(name = "sort", description = "The order instructions used to sort the query result. Must be in the form '<field name>:(ASC|DESC)'", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of items to return per page.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The page number.", isRequired = false, type = RestParameter.Type.INTEGER) }, responses = {
+          @RestParameter(name = "offset", description = "The page number.", isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "getComments", description = "If comments should be fetched", isRequired = false, type = RestParameter.Type.BOOLEAN) }, responses = {
                   @RestResponse(description = "Returns all events as JSON", responseCode = HttpServletResponse.SC_OK) })
   public Response getEvents(@QueryParam("id") String id, @QueryParam("commentReason") String reasonFilter,
           @QueryParam("commentResolution") String resolutionFilter, @QueryParam("filter") String filter,
-          @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
+          @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit,
+          @QueryParam("getComments") Boolean getComments) {
 
     Option<Integer> optLimit = Option.option(limit);
     Option<Integer> optOffset = Option.option(offset);
     Option<String> optSort = Option.option(trimToNull(sort));
+    Option<Boolean> optGetComments = Option.option(getComments);
     ArrayList<JValue> eventsList = new ArrayList<>();
     final Organization organization = getSecurityService().getOrganization();
     final User user = getSecurityService().getUser();
@@ -2420,7 +2499,16 @@ public abstract class AbstractEventEndpoint {
     for (SearchResultItem<Event> item : results.getItems()) {
       Event source = item.getSource();
       source.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
-      eventsList.add(eventToJSON(source));
+      List<EventComment> comments = null;
+      if (optGetComments.isSome() && optGetComments.get()) {
+        try {
+          comments = getEventCommentService().getComments(source.getIdentifier());
+        } catch (EventCommentException e) {
+          logger.error("Unable to get comments from event {}", source.getIdentifier(), e);
+          throw new WebApplicationException(e);
+        }
+      }
+      eventsList.add(eventToJSON(source, Optional.ofNullable(comments)));
     }
 
     return okJsonList(eventsList, nul(offset).getOr(0), nul(limit).getOr(0), results.getHitCount());
@@ -2440,7 +2528,7 @@ public abstract class AbstractEventEndpoint {
     return UrlSupport.uri(serverUrl, eventId, "comment", Long.toString(commentId));
   }
 
-  private JValue eventToJSON(Event event) {
+  private JValue eventToJSON(Event event, Optional<List<EventComment>> comments) {
     List<Field> fields = new ArrayList<>();
 
     fields.add(f("id", v(event.getIdentifier())));
@@ -2470,6 +2558,9 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("technical_end", v(event.getTechnicalEndTime(), BLANK)));
     fields.add(f("technical_presenters", arr($(event.getTechnicalPresenters()).map(Functions.stringToJValue))));
     fields.add(f("publications", arr(eventPublicationsToJson(event))));
+    if (comments.isPresent()) {
+      fields.add(f("comments", arr(eventCommentsToJson(comments.get()))));
+    }
     return obj(fields);
   }
 

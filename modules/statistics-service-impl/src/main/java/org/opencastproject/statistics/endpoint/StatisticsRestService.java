@@ -39,6 +39,9 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,13 +65,29 @@ import javax.ws.rs.core.Response;
  *
  */
 @Path("/")
-@RestService(name = "statisticsservice", title = "Statistics Service", abstractText = "This service provides statistics.", notes = {
-    "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-    "If the service is down or not working it will return a status 503, this means the the underlying service is "
-        + "not working and is either restarting or has failed",
-    "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"})
+@RestService(
+    name = "statisticsservice",
+    title = "Statistics Service",
+    abstractText = "This service provides statistics.",
+    notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "If the service is down or not working it will return a status 503, this means the the "
+            + "underlying service is not working and is either restarting or has failed",
+        "A status code 500 means a general failure has occurred which is not recoverable and was "
+            + "not anticipated. In other words, there is a bug! You should file an error report "
+            + "with your server logs from the time when the error occurred: "
+            + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
+@Component(
+    immediate = true,
+    service = StatisticsRestService.class,
+    property = {
+        "service.description=Statistics REST Endpoint",
+        "opencast.service.type=org.opencastproject.statistics",
+        "opencast.service.path=/statistics"
+    }
+)
 public class StatisticsRestService {
 
   /** Logging utility */
@@ -82,6 +101,7 @@ public class StatisticsRestService {
    *
    * @param statisticsService
    */
+  @Reference(name = "service-impl")
   public void setService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
   }
@@ -92,24 +112,29 @@ public class StatisticsRestService {
    * @param cc
    *          ComponentContext
    */
+  @Activate
   public void activate(ComponentContext cc) {
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("writeDuration")
-  @RestQuery(name = "writeDuration", description = "Writes a duration", returnDescription = "",
-          responses = {
-                  @RestResponse(responseCode = SC_NO_CONTENT, description = "Writing worked")
-          })
+  @RestQuery(
+      name = "writeDuration",
+      description = "Writes a duration",
+      returnDescription = "",
+      responses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Writing worked")
+      }
+  )
   public Response writeDuration(
-          @QueryParam("organizationId") final String organizationId,
-          @QueryParam("measurementName") final String measurementName,
-          @QueryParam("retentionPolicy") final String retentionPolicy,
-          @QueryParam("organizationIdResourceName") final String organizationIdResourceName,
-          @QueryParam("fieldName") final String fieldName,
-          @QueryParam("temporalResolution") final String temporalResolution,
-          @QueryParam("duration") final String duration) {
+      @QueryParam("organizationId") final String organizationId,
+      @QueryParam("measurementName") final String measurementName,
+      @QueryParam("retentionPolicy") final String retentionPolicy,
+      @QueryParam("organizationIdResourceName") final String organizationIdResourceName,
+      @QueryParam("fieldName") final String fieldName,
+      @QueryParam("temporalResolution") final String temporalResolution,
+      @QueryParam("duration") final String duration) {
     try {
       statisticsService
               .writeDuration(organizationId, measurementName, retentionPolicy, organizationIdResourceName, fieldName,
@@ -124,10 +149,14 @@ public class StatisticsRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("providers.json")
-  @RestQuery(name = "getAllAsJson", description = "Returns active providers", returnDescription = "Returns the active providers JSON document",
+  @RestQuery(
+      name = "getAllAsJson",
+      description = "Returns active providers",
+      returnDescription = "Returns the active providers JSON document",
       responses = {
           @RestResponse(responseCode = SC_OK, description = "The active providers.")
-      })
+      }
+  )
   public Response getProviders() {
     try {
       return Response.ok(providersToJson(statisticsService.getProviders()).toJSONString()).build();
@@ -140,18 +169,49 @@ public class StatisticsRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("timeseries/{providerId:.+}.json")
-  @RestQuery(name = "getTimeSeriesAsJson", description = "Returns the time series data for the given providerId", returnDescription = "Returns the time series data JSON document",
-      pathParameters = {@RestParameter(name = "providerId", isRequired = true, description = "The provider identifier", type = STRING)},
+  @RestQuery(
+      name = "getTimeSeriesAsJson",
+      description = "Returns the time series data for the given providerId",
+      returnDescription = "Returns the time series data JSON document",
+      pathParameters = {
+          @RestParameter(name = "providerId", isRequired = true, description = "The provider identifier", type = STRING)
+      },
       restParameters = {
-          @RestParameter(name = "resourceId", description = "The id of the resource to get the data for. E.g. episode id.", isRequired = true, type = STRING),
-          @RestParameter(name = "from", description = "Start of the time series as ISO 8601 UTC date string", isRequired = true, type = STRING),
-          @RestParameter(name = "to", description = "End of the time series as ISO 8601 UTC date string", isRequired = true, type = STRING),
-          @RestParameter(name = "resolution", description = "Data aggregation level. Must be one of 'daily', 'weekly', 'monthly', 'yearly'", isRequired = true, type = STRING),
-          @RestParameter(name = "zoneId", description = "The time zone id to use for calculations", isRequired = true, type = STRING),
+          @RestParameter(
+              name = "resourceId",
+              description = "The id of the resource to get the data for. E.g. episode id.",
+              isRequired = true,
+              type = STRING
+          ),
+          @RestParameter(
+              name = "from",
+              description = "Start of the time series as ISO 8601 UTC date string",
+              isRequired = true,
+              type = STRING
+          ),
+          @RestParameter(
+              name = "to",
+              description = "End of the time series as ISO 8601 UTC date string",
+              isRequired = true,
+              type = STRING
+          ),
+          @RestParameter(
+              name = "resolution",
+              description = "Data aggregation level. Must be one of 'daily', 'weekly', 'monthly', 'yearly'",
+              isRequired = true,
+              type = STRING
+          ),
+          @RestParameter(
+              name = "zoneId",
+              description = "The time zone id to use for calculations",
+              isRequired = true,
+              type = STRING
+          ),
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "The time series data.")
-      })
+      }
+  )
   public Response getTimeSeriesData(
       @PathParam("providerId") final String providerId,
       @QueryParam("resourceId") final String resourceId,

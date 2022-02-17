@@ -34,11 +34,11 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.index.event.Event;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -73,6 +73,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,9 +105,19 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
-            ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0 })
+            ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
+            ApiMediaType.VERSION_1_7_0 })
 @RestService(name = "externalapiworkflowinstances", title = "External API Workflow Instances Service", notes = {},
              abstractText = "Provides resources and operations related to the workflow instances")
+@Component(
+    immediate = true,
+    service = WorkflowsEndpoint.class,
+    property = {
+        "service.description=External API - Workflow Instances Endpoint",
+        "opencast.service.type=org.opencastproject.external.workflows.instances",
+        "opencast.service.path=/api/workflows"
+    }
+)
 public class WorkflowsEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WorkflowsEndpoint.class);
@@ -114,20 +127,23 @@ public class WorkflowsEndpoint {
 
   /* OSGi service references */
   private WorkflowService workflowService;
-  private ExternalIndex externalIndex;
+  private ElasticsearchIndex elasticsearchIndex;
   private IndexService indexService;
 
   /** OSGi DI */
+  @Reference(name = "workflowService")
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi DI */
-  public void setExternalIndex(ExternalIndex externalIndex) {
-    this.externalIndex = externalIndex;
+  @Reference(name = "ElasticsearchIndex")
+  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
+  @Reference(name = "IndexService")
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
@@ -135,6 +151,7 @@ public class WorkflowsEndpoint {
   /**
    * OSGi activation method
    */
+  @Activate
   void activate(ComponentContext cc) {
     logger.info("Activating External API - Workflow Instances Endpoint");
 
@@ -342,7 +359,7 @@ public class WorkflowsEndpoint {
 
     try {
       // Media Package
-      Opt<Event> event = indexService.getEvent(eventId, externalIndex);
+      Opt<Event> event = indexService.getEvent(eventId, elasticsearchIndex);
       if (event.isNone()) {
         return ApiResponses.notFound("Cannot find an event with id '%s'.", eventId);
       }

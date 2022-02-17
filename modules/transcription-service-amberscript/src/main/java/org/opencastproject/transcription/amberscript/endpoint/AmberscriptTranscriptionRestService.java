@@ -28,6 +28,9 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +38,25 @@ import javax.ws.rs.Path;
 
 
 @Path("/")
-@RestService(name = "AmberscriptTranscriptionRestService", title = "Transcription Service REST Endpoint (uses Amberscript services)", abstractText = "Uses external service to generate transcriptions of recordings.", notes = {
-  "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)"})
+@RestService(
+    name = "AmberscriptTranscriptionRestService",
+    title = "Transcription Service REST Endpoint (uses Amberscript services)",
+    abstractText = "Uses external service to generate transcriptions of recordings.",
+    notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)",
+    }
+)
 
+@Component(
+    immediate = true,
+    service = AmberscriptTranscriptionRestService.class,
+    property = {
+        "service.description=AmberScript Transcription REST Endpoint",
+        "opencast.service.type=org.opencastproject.transcription.amberscript",
+        "opencast.service.path=/transcripts/amberscript",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class AmberscriptTranscriptionRestService extends AbstractJobProducerEndpoint {
 
   /**
@@ -60,18 +79,22 @@ public class AmberscriptTranscriptionRestService extends AbstractJobProducerEndp
    */
   protected WorkingFileRepository wfr;
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("activate()");
   }
 
+  @Reference(name = "transcriptionService")
   public void setTranscriptionService(AmberscriptTranscriptionService service) {
     this.service = service;
   }
 
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry service) {
     this.serviceRegistry = service;
   }
 
+  @Reference(name = "workingFileRepository")
   public void setWorkingFileRepository(WorkingFileRepository wfr) {
     this.wfr = wfr;
   }

@@ -33,7 +33,7 @@
       "has_comments": false,
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
-      "start_date": "2013-03-20T04:00:00Z",
+      "start_date": "2013-03-20T04:00:00Z"
     },
     {
       "technical_end": "2013-03-20T05:00:00Z",
@@ -65,7 +65,7 @@
       "has_comments": false,
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
-      "start_date": "2013-03-20T04:00:00Z",
+      "start_date": "2013-03-20T04:00:00Z"
     },
     {
       "technical_end": "2013-03-20T05:00:00Z",
@@ -97,7 +97,7 @@
       "has_comments": false,
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
-      "start_date": "2013-03-20T04:00:00Z",
+      "start_date": "2013-03-20T04:00:00Z"
     }
   ],
   "offset": 0

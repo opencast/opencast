@@ -13,12 +13,12 @@
           <p><a ng-href="{{file.url}}" target="_blank">{{file.name}}</a></p>
           <div class="button-container">
             <button id="remove-bumper-file-1" class="remove-file-button" ng-click="remove()">
-              <div class="remove-icon"></div>
+              <span class="remove-icon"></span>
             </button>
           </div>
         </div>
         <button ng-show="!file.id" class="upload-button" ng-file-select="" ng-model="files" ng-multiple="false"
-                                                                                            ng-multiple="false" allow-dir="false" accept="{{acceptableTypes}}" ng-file-change="upload(files)">
+                                                                                            allow-dir="false" accept="{{acceptableTypes}}" ng-file-change="upload(files)">
           {{buttonKey | translate}}
         </button>
       </div>

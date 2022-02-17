@@ -179,10 +179,10 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
     // Determine which collections should be garbage collected
     List<String> collectionsToCleanUp = null;
-    String[] cleanupCollections = StringUtils.split(StringUtils.trimToNull(
-            cc.getBundleContext().getProperty(WORKING_FILE_REPOSITORY_CLEANUP_COLLECTIONS_KEY)));
-    if (cleanupCollections != null) {
-      collectionsToCleanUp = Arrays.asList(cleanupCollections);
+    String collectionsToCleanUpStr = StringUtils.trimToNull(
+            cc.getBundleContext().getProperty(WORKING_FILE_REPOSITORY_CLEANUP_COLLECTIONS_KEY));
+    if (collectionsToCleanUpStr != null) {
+      collectionsToCleanUp = Arrays.asList(collectionsToCleanUpStr.split("\\s*,\\s*"));
     }
 
     // Start cleanup scheduler if we have sensible cleanup values:

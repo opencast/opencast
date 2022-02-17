@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import {Field, FieldArray} from "formik";
 import Notifications from "../../../shared/Notifications";
 import RenderField from "../../../shared/wizard/RenderField";
-import {getTimezoneOffset} from "../../../../utils/utils";
+import {getTimezoneOffset, hasAccess} from "../../../../utils/utils";
 import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/modalConfig";
 import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../../../thunks/recordingThunks";
@@ -13,13 +13,14 @@ import {checkForSchedulingConflicts, fetchScheduling} from "../../../../thunks/e
 import {fetchSeriesOptions} from "../../../../thunks/seriesThunks";
 import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 
 /**
  * This component renders the edit page for scheduled events of the corresponding bulk action
  */
 const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, loadingInputDevices, inputDevices,
                                          checkForSchedulingConflicts, addNotification,
-                                         removeNotificationWizardForm }) => {
+                                         removeNotificationWizardForm, user }) => {
     const { t } = useTranslation();
 
     // conflicts with other events
@@ -147,133 +148,141 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, loadingIn
                                                     <table className="main-tbl">
                                                         <tbody>
                                                             {/* Repeat for all metadata rows*/}
-                                                            <tr>
-                                                                <td>
-                                                                    <span>{t('EVENTS.EVENTS.DETAILS.METADATA.TITLE')}</span>
-                                                                </td>
-                                                                <td className="editable ng-isolated-scope">
-                                                                    <Field name={`editedEvents.${key}.changedTitle`}
-                                                                           metadataField={{
-                                                                               type: 'text'
-                                                                           }}
-                                                                           component={RenderField}/>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <span>{t('EVENTS.EVENTS.DETAILS.METADATA.SERIES')}</span>
-                                                                </td>
-                                                                <td className="editable ng-isolated-scope">
-                                                                    <Field name={`editedEvents.${key}.changedSeries`}
-                                                                           metadataField={{
-                                                                               type: 'text',
-                                                                               collection: seriesOptions
-                                                                           }}
-                                                                           component={RenderField}/>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.TIMEZONE')}</td>
-                                                                <td>{'UTC' + getTimezoneOffset()}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME')}</td>
-                                                                <td>
-                                                                    {/* One option for each entry in hours*/}
-                                                                    <Field tabIndex="5"
-                                                                           as="select"
-                                                                           name={`editedEvents.${key}.changedStartTimeHour`}
-                                                                           placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
-                                                                        {hours.map((i, key) => (
-                                                                            <option key={key}
-                                                                                    value={i.value}>
-                                                                                {i.value}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                    {/* One option for each entry in minutes*/}
-                                                                    <Field tabIndex="5"
-                                                                           as="select"
-                                                                           name={`editedEvents.${key}.changedStartTimeMinutes`}
-                                                                           placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
-                                                                        {minutes.map((i, key) => (
-                                                                            <option key={key}
-                                                                                    value={i.value}>
-                                                                                {i.value}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME')}</td>
-                                                                <td>
-                                                                    {/* One option for each entry in hours*/}
-                                                                    <Field tabIndex="7"
-                                                                           as="select"
-                                                                           name={`editedEvents.${key}.changedEndTimeHour`}
-                                                                           placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
-                                                                        {hours.map((i, key) => (
-                                                                            <option key={key}
-                                                                                    value={i.value}>
-                                                                                {i.value}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                    {/* One option for each entry in minutes*/}
-                                                                    <Field tabIndex="8"
-                                                                           as="select"
-                                                                           name={`editedEvents.${key}.changedEndTimeMinutes`}
-                                                                           placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
-                                                                        {minutes.map((i, key) => (
-                                                                            <option key={key}
-                                                                                    value={i.value}>
-                                                                                {i.value}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Field>
-                                                                </td>
-                                                            </tr>
-                                                            {/* Dropdown for location/input device */}
-                                                            <tr>
-                                                                <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}</td>
-                                                                <td>
-                                                                    <select tabIndex="11"
-                                                                            defaultValue="default"
-                                                                            onChange={e => {
-                                                                                formik.setFieldValue(`editedEvents.${key}.changedLocation`, e.target.value);
-                                                                                formik.setFieldValue(`editedEvents.${key}.changedDeviceInputs`, []);
-                                                                            }}>
-                                                                        <option
-                                                                            value="default">{formik.values.editedEvents[key].changedLocation}</option>
-                                                                        {inputDevices.map((inputDevices, key) => (
-                                                                            <option key={key}
-                                                                                    value={inputDevices.Name}>{inputDevices.Name}</option>
-                                                                        ))}
-                                                                    </select>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS')}</td>
-                                                                <td>
-                                                                    {/* Render checkbox for each input option of the selected input device*/}
-                                                                    {renderInputDeviceOptions(key)}
-                                                                </td>
-                                                            </tr>
-                                                            {/* Radio buttons for weekdays */}
-                                                            <tr>
-                                                                <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAY')}</td>
-                                                                <td className="weekdays">
-                                                                    {weekdays.map((day, index) => (
-                                                                        <label key={index}>
-                                                                            <Field type="radio"
-                                                                                   name={`editedEvents.${key}.changedWeekday`}
-                                                                                   value={day.name}/>
-                                                                            {t(day.label)}
-                                                                        </label>
-                                                                    ))}
-                                                                </td>
-                                                            </tr>
+                                                            {hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user) && (
+                                                                <>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <span>{t('EVENTS.EVENTS.DETAILS.METADATA.TITLE')}</span>
+                                                                        </td>
+                                                                        <td className="editable ng-isolated-scope">
+                                                                            <Field name={`editedEvents.${key}.changedTitle`}
+                                                                                   metadataField={{
+                                                                                       type: 'text'
+                                                                                   }}
+                                                                                   component={RenderField}/>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <span>{t('EVENTS.EVENTS.DETAILS.METADATA.SERIES')}</span>
+                                                                        </td>
+                                                                        <td className="editable ng-isolated-scope">
+                                                                            <Field name={`editedEvents.${key}.changedSeries`}
+                                                                                   metadataField={{
+                                                                                       type: 'text',
+                                                                                       collection: seriesOptions
+                                                                                   }}
+                                                                                   component={RenderField}/>
+                                                                        </td>
+                                                                    </tr>
+                                                                </>
+                                                            )}
+                                                            {hasAccess("ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT", user) && (
+                                                                <>
+                                                                    <tr>
+                                                                        <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.TIMEZONE')}</td>
+                                                                        <td>{'UTC' + getTimezoneOffset()}</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME')}</td>
+                                                                        <td>
+                                                                            {/* One option for each entry in hours*/}
+                                                                            <Field tabIndex="5"
+                                                                                   as="select"
+                                                                                   name={`editedEvents.${key}.changedStartTimeHour`}
+                                                                                   placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
+                                                                                {hours.map((i, key) => (
+                                                                                    <option key={key}
+                                                                                            value={i.value}>
+                                                                                        {i.value}
+                                                                                    </option>
+                                                                                ))}
+                                                                            </Field>
+                                                                            {/* One option for each entry in minutes*/}
+                                                                            <Field tabIndex="5"
+                                                                                   as="select"
+                                                                                   name={`editedEvents.${key}.changedStartTimeMinutes`}
+                                                                                   placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
+                                                                                {minutes.map((i, key) => (
+                                                                                    <option key={key}
+                                                                                            value={i.value}>
+                                                                                        {i.value}
+                                                                                    </option>
+                                                                                ))}
+                                                                            </Field>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME')}</td>
+                                                                        <td>
+                                                                            {/* One option for each entry in hours*/}
+                                                                            <Field tabIndex="7"
+                                                                                   as="select"
+                                                                                   name={`editedEvents.${key}.changedEndTimeHour`}
+                                                                                   placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR')}>
+                                                                                {hours.map((i, key) => (
+                                                                                    <option key={key}
+                                                                                            value={i.value}>
+                                                                                        {i.value}
+                                                                                    </option>
+                                                                                ))}
+                                                                            </Field>
+                                                                            {/* One option for each entry in minutes*/}
+                                                                            <Field tabIndex="8"
+                                                                                   as="select"
+                                                                                   name={`editedEvents.${key}.changedEndTimeMinutes`}
+                                                                                   placeholder={t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE')}>
+                                                                                {minutes.map((i, key) => (
+                                                                                    <option key={key}
+                                                                                            value={i.value}>
+                                                                                        {i.value}
+                                                                                    </option>
+                                                                                ))}
+                                                                            </Field>
+                                                                        </td>
+                                                                    </tr>
+                                                                    {/* Dropdown for location/input device */}
+                                                                    <tr>
+                                                                        <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION')}</td>
+                                                                        <td>
+                                                                            <select tabIndex="11"
+                                                                                    defaultValue="default"
+                                                                                    onChange={e => {
+                                                                                        formik.setFieldValue(`editedEvents.${key}.changedLocation`, e.target.value);
+                                                                                        formik.setFieldValue(`editedEvents.${key}.changedDeviceInputs`, []);
+                                                                                    }}>
+                                                                                <option
+                                                                                    value="default">{formik.values.editedEvents[key].changedLocation}</option>
+                                                                                {inputDevices.map((inputDevices, key) => (
+                                                                                    <option key={key}
+                                                                                            value={inputDevices.Name}>{inputDevices.Name}</option>
+                                                                                ))}
+                                                                            </select>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>{t('EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS')}</td>
+                                                                        <td>
+                                                                            {/* Render checkbox for each input option of the selected input device*/}
+                                                                            {renderInputDeviceOptions(key)}
+                                                                        </td>
+                                                                    </tr>
+                                                                    {/* Radio buttons for weekdays */}
+                                                                    <tr>
+                                                                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAY')}</td>
+                                                                        <td className="weekdays">
+                                                                            {weekdays.map((day, index) => (
+                                                                                <label key={index}>
+                                                                                    <Field type="radio"
+                                                                                           name={`editedEvents.${key}.changedWeekday`}
+                                                                                           value={day.name}/>
+                                                                                    {t(day.label)}
+                                                                                </label>
+                                                                            ))}
+                                                                        </td>
+                                                                    </tr>
+                                                                </>
+                                                            )}
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -316,6 +325,7 @@ const EditScheduledEventsEditPage = ({ previousPage, nextPage, formik, loadingIn
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     inputDevices: getRecordings(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

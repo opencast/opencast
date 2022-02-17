@@ -37,8 +37,10 @@
       "CURRENT_JOBS": "Trabajos de hoy",
       "PRESENTER": "Ponente",
       "PRESENTER_DESCRIPTION": "Archivo de vídeo para presenter track",
+      "VIDEOFILE": "Archivo de vídeo",
+      "VIDEOFILE_DESCRIPTION": "Archivo de vídeo para subir",
       "CAPTION": "Subtítulos",
-      "CAPTION_DESCRIPTION": "Archivo de subtítulos; Compatible con formato VTT ",
+      "CAPTION_DESCRIPTION": "Archivo de subtítulos; formatos VTT o dfxp son soportados",
       "UPLOAD": "Subir",
       "UPLOADING": "Subiendo",
       "EDIT": "Guardar",
@@ -126,7 +128,8 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Esta serie contiene eventos. Eliminar la serie no eliminará los acontecimientos.",
-         "EVENT_WILL_BE_GONE": "Si continúa, el evento se eliminará permanentemente."
+         "EVENT_WILL_BE_GONE": "Si continúa, el evento se eliminará permanentemente.",
+         "UNSAVED_CHANGES": "Tiene cambios sin guardar. Si continúa, esos cambios serán descartados. ¿Está seguro que desea continuar?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Esta serie no se puede eliminar ya que todavía contiene eventos."
@@ -203,6 +206,7 @@
       "INVALID_ACL_RULES": "Las reglas deben contener un nombre de rol válido y permiso(s) de lectura y/o escritura.",
       "MISSING_ACL_RULES": "¡Se requiere al menos un rol con permisos de Lectura y Escritura!",
       "SAVED_ACL_RULES": "Se han guardado las reglas de acceso.",
+      "SAVED_METADATA": "Los metadatos han sido guardados.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Los eventos que contiene esta serie deberán ser reprocesados",
       "SERIES_ACL_LOCKED": "No es posible editar las Políticas de Acceso cuando existen operaciones activas en algún evento de la serie",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
@@ -426,7 +430,7 @@
             "LAST_NAME": "Apellido(s)",
             "STREET": "Calle",
             "NUMBER": "Número",
-            "ADDITIONAL_ADRESS_INFO": "Dirección",
+            "ADDITIONAL_ADDRESS_INFO": "Agregar información Adicional de la dirección ",
             "MAIL": "E-Mail",
             "CONTACT_ME": "Contactar conmigo para actualizaciones y problemas de seguridad",
             "WHICH_DATA_TO_SHARE": "¿Qué quieres compartir?",
@@ -617,6 +621,7 @@
             "NOCONTENT": "No hay información disponible",
             "PUBLISHED": "Publicado",
             "WEEKDAY": "Día de la semana",
+            "ADMINUI_NOTES": "Notas",
             "TOOLTIP": {
                "ASSETS": "Abrir los detalles del recurso",
                "START": "Filtrar para esta fecha de inicio",
@@ -641,10 +646,10 @@
             "PENDING": "Pendiente",
             "PROCESSING": "Procesando",
             "PAUSED": "En pausa",
-            "PROCESSED": "Procesado",
+            "PROCESSED": "Finalizado",
             "RECORDING_FAILURE": "Fallo en la grabación",
             "PROCESSING_FAILURE": "Fallo en el procesamiento",
-            "PROCESSING_CANCELED": "Procesamiento cancelado"
+            "PROCESSING_CANCELLED": "Procesamiento cancelado"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retirando",
@@ -892,7 +897,7 @@
                   "REVIEW": "Pendiente de revisar",
                   "ASYNC": "Pistas de A/V asíncronas",
                   "AUDIO_ISSUE": "Pista de audio no disponible o defectuosa",
-                  "CANCELED": "Evento cancelado",
+                  "CANCELLED": "Evento cancelado",
                   "CONFLICTING_METADATA": "Conflicto de metadatos",
                   "IMPROPER_POINT": "Punto inicial o final incorrecto",
                   "MISSING_AGREEMENT": "Acuerdo no disponible",
@@ -905,7 +910,8 @@
                   "WRONG_METADATA": "Necesario corregir los metadatos",
                   "WRONG_SERIES_PUBLICATION": "Serie o canal de publicación incorrectos",
                   "WRONG_WORKFLOW": "Flujo de trabajo incorrecto",
-                  "PROCESSING_FAILURE": "Fallo en el procesamiento"
+                  "PROCESSING_FAILURE": "Fallo en el procesamiento",
+                  "ADMINUI_NOTES": "Notas en la interfaz de usuario del administrador"
                }
             },
             "STATISTICS": {
@@ -1011,7 +1017,7 @@
                   "JOB": "Trabajo",
                   "TIME_IN_QUEUE": "Tiempo en cola",
                   "STARTED": "Iniciado",
-                  "FINISHED": "Procesado",
+                  "FINISHED": "Finalizado",
                   "RETRY_STRATEGY": "Estrategia de reintento",
                   "FAILED_ATTEMPTS": "Intentos fallidos",
                   "MAX_ATTEMPTS": "Máx",
@@ -1601,13 +1607,13 @@
             "QUEUED": "En cola",
             "PAUSED": "En pausa",
             "RUNNING": "Procesando",
-            "FINISHED": "Procesado",
+            "FINISHED": "Finalizado",
             "FAILED": "Error",
             "DELETED": "Eliminado",
             "INSTANTIATED": "Instanciado",
             "DISPATCHING": "Asignando",
             "RESTART": "Reiniciar",
-            "CANCELED": "Cancelado",
+            "CANCELLED": "Cancelado",
             "WAITING": "Esperando"
          }
       },
@@ -1618,11 +1624,8 @@
             "HOST_NAME": "Nombre del equipo",
             "NODE_NAME": "Nombre del nodo",
             "CORES": "Núcleos",
-            "COMPLETED": "Trabajos completados",
             "RUNNING": "Trabajos en ejecución",
             "QUEUED": "Trabajos en cola",
-            "MEAN_RUN_TIME": "Tiempo medio de ejecución",
-            "MEAN_QUEUE_TIME": "Tiempo medio de espera en cola",
             "MAINTENANCE": "Mantenimiento",
             "MAINTENANCE_OFF": "Activar el modo de mantenimiento",
             "MAINTENANCE_ON": "Desactivar el modo de mantenimiento"
@@ -2032,7 +2035,7 @@
    "TABLE_EDIT": "Modificar",
    "DASHBOARD": {
       "RUNNING": "Procesando",
-      "FINISHED": "Procesado",
+      "FINISHED": "Finalizado",
       "PAUSED": "En pausa",
       "FAILED": "Error",
       "FINISHED_WITH_COMMENTS": "Pendiente",

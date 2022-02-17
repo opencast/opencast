@@ -143,7 +143,7 @@ the second workflow can retrieve it from the Asset Manager to attach the caption
 <!-- Extract audio from one of the presenter videos -->
 
 <operation
-  id="compose"
+  id="encode"
   fail-on-error="true"
   exception-handler-workflow="partial-error"
   description="Extract audio for transcript generation">

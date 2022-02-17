@@ -6,9 +6,9 @@ import languages from "../i18n/languages";
 import opencastLogo from '../img/opencast-white.svg';
 import {fetchHealthStatus} from "../thunks/healthThunks";
 import {getHealthStatus} from "../selectors/healthSelectors";
-import {getCurrentLanguageInformation} from "../utils/utils";
+import {getCurrentLanguageInformation, hasAccess} from "../utils/utils";
 import {logger} from "../utils/logger";
-import {getUserBasicInfo} from "../selectors/userInfoSelectors";
+import {getUserInformation} from "../selectors/userInfoSelectors";
 import axios from "axios";
 import RegistrationModal from "./shared/RegistrationModal";
 
@@ -147,16 +147,17 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
                         </div>
                     )}
 
-                    {/* Opencast Studio */}
-                    {/* Todo: before with 'with Role="ROLE_STUDIO": What is this? implement React equivalent */}
+                {/* Opencast Studio */}
+                {hasAccess("ROLE_STUDIO", user) && (
                     <div className="nav-dd" title="Studio">
                         <a href={studio}>
                             <span className="fa fa-video-camera"/>
                         </a>
                     </div>
+                )}
 
-                    {/* System warnings and notifications */}
-                    {/* Todo: before with 'with Role="ROLE_ADMIN": What is this? implement React equivalent */}
+                {/* System warnings and notifications */}
+                {hasAccess("ROLE_ADMIN", user) && (
                     <div className="nav-dd info-dd" id="info-dd" title={t('SYSTEM_NOTIFICATIONS')} ref={containerNotify}>
                         <div onClick={() => setMenuNotify(!displayMenuNotify)}>
                             <i className="fa fa-bell" aria-hidden="true"/>
@@ -167,6 +168,8 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
                             )}
                         </div>
                     </div>
+                )}
+
 
                     {/* Help */}
                     {/* Show only if documentationUrl or restdocsUrl is set */}
@@ -176,20 +179,20 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
                             {/* Click on the help icon, a dropdown menu with documentation, REST-docs and shortcuts (if available) opens */}
                             {displayMenuHelp && (
                                 <MenuHelp hideMenuHelp={hideMenuHelp}
-                                          showRegistrationModal={showRegistrationModal}/>
+                                          showRegistrationModal={showRegistrationModal}
+                    user={user}/>
                             )}
                         </div>
                     )}
 
-                    {/* Username */}
+                {/* Username */}
                     <div className="nav-dd user-dd" id="user-dd" ref={containerUser}>
-                        <div className="h-nav" onClick={() => setMenuUser(!displayMenuUser)}>{user.name || user.username}<span className="dropdown-icon"/></div>
-                        {/* Click on username, a dropdown menu with the option to logout opens */}
-                        {displayMenuUser && (
-                            <MenuUser />
-                        )}
+                    <div className="h-nav" onClick={() => setMenuUser(!displayMenuUser)}>{user.user.name || user.user.username}<span className="dropdown-icon"/></div>
+                {/* Click on username, a dropdown menu with the option to logout opens */}
+                {displayMenuUser && (
+                    <MenuUser />
+                    )}
                     </div>
-
                 </nav>
             </header>
 
@@ -242,7 +245,8 @@ const MenuNotify = ({ healthStatus }) => (
     </ul>
 );
 
-const MenuHelp = ({ hideMenuHelp, showRegistrationModal }) => {
+
+const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user }) => {
     const { t } = useTranslation();
 
     // show Adopter Registration Modal and hide drop down
@@ -251,7 +255,7 @@ const MenuHelp = ({ hideMenuHelp, showRegistrationModal }) => {
         hideMenuHelp();
     }
 
-    return(
+    return (
         <>
             <ul className="dropdown-ul">
                 {/* Show only if documentationUrl is set */}
@@ -264,7 +268,7 @@ const MenuHelp = ({ hideMenuHelp, showRegistrationModal }) => {
                 )}
                 {/* Todo: only if restUrl is there and with-role="ROLE_ADMIN */}
                 {/* Show only if restUrl is set */}
-                {!!restUrl && (
+                {(!!restUrl && hasAccess("ROLE_ADMIN", user)) && (
                     <li>
                         <a target="_self" href={restUrl}>
                             <span>{t('HELP.REST_DOC')}</span>
@@ -276,15 +280,18 @@ const MenuHelp = ({ hideMenuHelp, showRegistrationModal }) => {
                         <span>{t('HELP.HOTKEY_CHEAT_SHEET')}</span>
                     </a>
                 </li>
-                {/*todo: show only if ROLE_ADMIN */}
+            {/* Adoter registration Modal */}
+            {hasAccess("ROLE_ADMIN", user) && (
                 <li>
                     <a onClick={() => showAdoptersRegistrationModal()}>
                         <span>{t('HELP.ADOPTER_REGISTRATION')}</span>
                     </a>
                 </li>
+            )}
             </ul>
         </>
     )
+
 };
 
 const MenuUser = () => {
@@ -305,7 +312,7 @@ const MenuUser = () => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     healthStatus: getHealthStatus(state),
-    user: getUserBasicInfo(state)
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

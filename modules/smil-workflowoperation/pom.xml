@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -75,6 +75,11 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -101,9 +106,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.smil;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/operations/cut-marks-to-smil.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -86,11 +87,11 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   /** The managed property that specifies the organization server name */
   public static final String ORG_SERVER_PREFIX = "prop.org.opencastproject.host.";
 
-  /** The default in case no server is configured */
-  public static final String DEFAULT_SERVER = "localhost";
+  /** The default host in case no server is configured */
+  public static final String DEFAULT_SERVER_HOST = "localhost";
 
-  /** The managed property that specifies the server port */
-  public static final String ORG_PORT_KEY = "port";
+  /** The default port in case no server is configured */
+  public static final int DEFAULT_SERVER_PORT = 8080;
 
   /** The managed property that specifies the organization administrative role */
   public static final String ORG_ADMIN_ROLE_KEY = "admin_role";
@@ -108,7 +109,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   private OrganizationDatabase persistence = null;
 
   /** The list of directory listeners */
-  private final List<OrganizationDirectoryListener> listeners = new ArrayList<OrganizationDirectoryListener>();
+  private final List<OrganizationDirectoryListener> listeners = new ArrayList<>();
 
   private OrgCache cache;
 
@@ -183,14 +184,12 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     if (StringUtils.isBlank(id))
       throw new ConfigurationException(ORG_ID_KEY, ORG_ID_KEY + " must be set");
 
-    final String portAsString = StringUtils.trimToNull((String) properties.get(ORG_PORT_KEY));
-    final int port = portAsString != null ? Integer.parseInt(portAsString) : 80;
     final String adminRole = (String) properties.get(ORG_ADMIN_ROLE_KEY);
     final String anonRole = (String) properties.get(ORG_ANONYMOUS_ROLE_KEY);
 
     // Build the properties map
-    final Map<String, String> orgProperties = new HashMap<String, String>();
-    ArrayList<String> serverUrls = new ArrayList();
+    final Map<String, String> orgProperties = new HashMap<>();
+    HashMap<String, Integer> servers = new HashMap<>();
 
     for (Enumeration<?> e = properties.keys(); e.hasMoreElements();) {
       final String key = (String) e.nextElement();
@@ -201,15 +200,22 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
       if (key.startsWith(ORG_SERVER_PREFIX)) {
         String tenantSpecificHost = StringUtils.trimToNull((String) properties.get(key));
-        serverUrls.add(tenantSpecificHost);
+        if (tenantSpecificHost != null) {
+          try {
+            Tuple<String, Integer> hostPort = hostAndPort(new URL(tenantSpecificHost));
+            servers.put(hostPort.getA(), hostPort.getB());
+          } catch (MalformedURLException malformedURLException) {
+            logger.error("{} is not a URL", tenantSpecificHost);
+          }
+        }
       }
 
       orgProperties.put(key.substring(ORG_PROPERTY_PREFIX.length()), (String) properties.get(key));
     }
 
-    if (serverUrls.isEmpty()) {
-      logger.debug("No server URL configured for organization " + name + ", setting default localhost");
-      serverUrls.add(DEFAULT_SERVER);
+    if (servers.isEmpty()) {
+      logger.debug("No server URL configured for organization {}, setting default {}:{}", name, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
+      servers.put(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
     }
 
     // Load the existing organization or create a new one
@@ -218,10 +224,9 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
       try {
         org = (JpaOrganization) persistence.getOrganization(id);
         org.setName(name);
-        for (String serverUrl : serverUrls) {
-          if (StringUtils.isNotBlank(serverUrl)) {
-            org.addServer(serverUrl, port);
-          }
+        // TODO: should this really be append only?
+        for (Map.Entry<String, Integer> server : servers.entrySet()) {
+          org.addServer(server.getKey(), server.getValue());
         }
         org.setAdminRole(adminRole);
         org.setAnonymousRole(anonRole);
@@ -230,12 +235,6 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
         persistence.storeOrganization(org);
         fireOrganizationUpdated(org);
       } catch (NotFoundException e) {
-        HashMap<String, Integer> servers = new HashMap<String, Integer>();
-        for (String serverUrl : serverUrls) {
-          if (StringUtils.isNotBlank(serverUrl)) {
-            servers.put(serverUrl, port);
-          }
-        }
         org = new JpaOrganization(id, name, servers, adminRole, anonRole, orgProperties);
         logger.info("Creating organization '{}'", id);
         persistence.storeOrganization(org);
@@ -281,13 +280,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    *          the organization
    */
   private void fireOrganizationRegistered(final Organization organization) {
-    executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        for (OrganizationDirectoryListener listener : listeners) {
-          logger.debug("Notifying {} about newly registered organization '{}'", listener, organization);
-          listener.organizationRegistered(organization);
-        }
+    executor.submit(() -> {
+      for (OrganizationDirectoryListener listener : listeners) {
+        logger.debug("Notifying {} about newly registered organization '{}'", listener, organization);
+        listener.organizationRegistered(organization);
       }
     });
   }
@@ -299,13 +295,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    *          the organization
    */
   private void fireOrganizationUnregistered(final Organization organization) {
-    executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        for (OrganizationDirectoryListener listener : listeners) {
-          logger.debug("Notifying {} about unregistered organization '{}'", listener, organization);
-          listener.organizationUnregistered(organization);
-        }
+    executor.submit(() -> {
+      for (OrganizationDirectoryListener listener : listeners) {
+        logger.debug("Notifying {} about unregistered organization '{}'", listener, organization);
+        listener.organizationUnregistered(organization);
       }
     });
   }
@@ -317,13 +310,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    *          the organization
    */
   private void fireOrganizationUpdated(final Organization organization) {
-    executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        for (OrganizationDirectoryListener listener : listeners) {
-          logger.debug("Notifying {} about updated organization '{}'", listener, organization);
-          listener.organizationUpdated(organization);
-        }
+    executor.submit(() -> {
+      for (OrganizationDirectoryListener listener : listeners) {
+        logger.debug("Notifying {} about updated organization '{}'", listener, organization);
+        listener.organizationUpdated(organization);
       }
     });
   }

@@ -38,7 +38,9 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.JobDispatcher;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.JobProducerHeartbeat;
@@ -75,8 +77,11 @@ import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -327,7 +332,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.activate(null);
     logger.info("Undispatachable job 1 " + undispatchableJob1.getId());
     undispatchableJob1 = serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
-    assertEquals(Status.CANCELED, undispatchableJob1.getStatus());
+    assertEquals(Status.CANCELLED, undispatchableJob1.getStatus());
     logger.info("Undispatachable job 1 " + undispatchableJob2.getId());
     undispatchableJob2 = serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
@@ -480,6 +485,108 @@ public class ServiceRegistryJpaImplTest {
     Job updatedJob = serviceRegistryJpaImpl.updateJob(job);
     Assert.assertNotNull(updatedJob.getDateCompleted());
     Assert.assertNotNull(updatedJob.getRunTime());
+  }
+
+  @Test
+  public void testErrorState() throws Exception {
+    // set max attempts to 1
+    Dictionary<String, String> properties = new Hashtable<>();
+    properties.put(ServiceRegistryJpaImpl.MAX_ATTEMPTS_CONFIG_KEY, "1");
+    serviceRegistryJpaImpl.updated(properties);
+
+    serviceRegistryJpaImpl.sanitize(TEST_SERVICE, TEST_HOST);
+
+    // first job pushes service into warning state
+    Job job = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, new ArrayList(
+            Arrays.asList("a", "b")), null, true, null, 1.0f);
+    job.setStatus(Job.Status.FAILED);
+    job.setProcessingHost(TEST_HOST);
+    serviceRegistryJpaImpl.updateJob(job);
+    ServiceRegistration service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
+    Assert.assertEquals(ServiceState.WARNING, service.getServiceState());
+
+    // second job takes service to error state
+    Job job2 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, new ArrayList(
+            Arrays.asList("a", "b", "c")), null, true, null, 1.0f);
+    job2.setStatus(Job.Status.FAILED);
+    job2.setProcessingHost(TEST_HOST);
+    serviceRegistryJpaImpl.updateJob(job2);
+    service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
+    Assert.assertEquals(ServiceState.ERROR, service.getServiceState());
+  }
+
+  @Test
+  public void testDisablingErrorState() throws Exception {
+    // disable error states
+    Dictionary<String, String> properties = new Hashtable<>();
+    properties.put(ServiceRegistryJpaImpl.MAX_ATTEMPTS_CONFIG_KEY, "-1");
+    serviceRegistryJpaImpl.updated(properties);
+
+    serviceRegistryJpaImpl.sanitize(TEST_SERVICE, TEST_HOST);
+
+    // warning state still works
+    Job job = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, new ArrayList(
+            Arrays.asList("a", "b")), null, true, null, 1.0f);
+    job.setStatus(Job.Status.FAILED);
+    job.setProcessingHost(TEST_HOST);
+    serviceRegistryJpaImpl.updateJob(job);
+    ServiceRegistration service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
+    Assert.assertEquals(ServiceState.WARNING, service.getServiceState());
+
+    // error state isn't entered
+    Job job2 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, new ArrayList(
+            Arrays.asList("a", "b", "c")), null, true, null, 1.0f);
+    job2.setStatus(Job.Status.FAILED);
+    job2.setProcessingHost(TEST_HOST);
+    serviceRegistryJpaImpl.updateJob(job2);
+    service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
+    Assert.assertEquals(ServiceState.WARNING, service.getServiceState());
+  }
+
+  @Test
+  public void testDisablingErrorStateForService() throws Exception {
+    // disable error states for one service
+    Dictionary<String, String> properties = new Hashtable<>();
+    properties.put(ServiceRegistryJpaImpl.MAX_ATTEMPTS_CONFIG_KEY, "1");
+    properties.put(ServiceRegistryJpaImpl.NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY, TEST_SERVICE_2 + ", " + TEST_SERVICE_3);
+    serviceRegistryJpaImpl.updated(properties);
+
+    serviceRegistryJpaImpl.sanitize(TEST_SERVICE, TEST_HOST);
+    serviceRegistryJpaImpl.sanitize(TEST_SERVICE_2, TEST_HOST);
+
+    // error states still work for other services
+    Job job = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, new ArrayList(
+            Arrays.asList("a", "b")), null, true, null, 1.0f);
+    job.setStatus(Job.Status.FAILED);
+    job.setProcessingHost(TEST_HOST);
+    serviceRegistryJpaImpl.updateJob(job);
+    ServiceRegistration service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
+    Assert.assertEquals(ServiceState.WARNING, service.getServiceState());
+
+    Job job2 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, new ArrayList(
+            Arrays.asList("a", "b", "c")), null, true, null, 1.0f);
+    job2.setStatus(Job.Status.FAILED);
+    job2.setProcessingHost(TEST_HOST);
+    serviceRegistryJpaImpl.updateJob(job2);
+    service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
+    Assert.assertEquals(ServiceState.ERROR, service.getServiceState());
+
+    // but not for the configured service
+    Job job3 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_2, TEST_PATH, new ArrayList(
+            Arrays.asList("a", "b")), null, true, null, 1.0f);
+    job3.setStatus(Job.Status.FAILED);
+    job3.setProcessingHost(TEST_HOST);
+    serviceRegistryJpaImpl.updateJob(job3);
+    ServiceRegistration service2 = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE_2, TEST_HOST);
+    Assert.assertEquals(ServiceState.WARNING, service2.getServiceState());
+
+    Job job4 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_2, TEST_PATH, new ArrayList(
+            Arrays.asList("a", "b", "c")), null, true, null, 1.0f);
+    job4.setStatus(Job.Status.FAILED);
+    job4.setProcessingHost(TEST_HOST);
+    serviceRegistryJpaImpl.updateJob(job4);
+    service2 = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE_2, TEST_HOST);
+    Assert.assertEquals(ServiceState.WARNING, service2.getServiceState());
   }
 
   @Test

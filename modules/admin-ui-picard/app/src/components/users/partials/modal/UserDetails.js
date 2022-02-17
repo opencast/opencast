@@ -29,14 +29,17 @@ const UserDetails = ({close, userDetails, updateUserDetails }) => {
     const tabs = [
         {
             tabTranslation: 'USERS.USERS.DETAILS.TABS.USER',
+            accessRole: 'ROLE_UI_USERS_EDIT',
             name: 'general'
         },
         {
             tabTranslation: 'USERS.USERS.DETAILS.TABS.ROLES',
+            accessRole: 'ROLE_UI_USERS_EDIT',
             name: 'roles'
         },
         {
             tabTranslation: 'USERS.USERS.DETAILS.TABS.EFFECTIVEROLES',
+            accessRole: 'ROLE_UI_USERS_EDIT',
             name: 'effectiveRoles'
         }
     ];

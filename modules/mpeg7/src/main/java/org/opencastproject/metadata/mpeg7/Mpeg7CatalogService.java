@@ -22,26 +22,34 @@
 package org.opencastproject.metadata.mpeg7;
 
 import org.opencastproject.metadata.api.CatalogService;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.osgi.service.component.annotations.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 /**
  * Loads {@link Mpeg7Catalog}s
  */
+@Component(
+    immediate = true,
+    service = { Mpeg7CatalogService.class,CatalogService.class },
+    property = {
+        "service.description=Mpeg7 Catalog Service"
+    }
+)
 public class Mpeg7CatalogService implements CatalogService<Mpeg7Catalog> {
 
   public InputStream serialize(Mpeg7Catalog catalog) throws IOException {
     try {
-      Transformer tf = TransformerFactory.newInstance().newTransformer();
+      Transformer tf = XmlSafeParser.newTransformerFactory().newTransformer();
       DOMSource xmlSource = new DOMSource(catalog.toXml());
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       tf.transform(xmlSource, new StreamResult(out));

@@ -21,6 +21,9 @@
 package org.opencastproject.transcription.persistence;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +34,14 @@ import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.spi.PersistenceProvider;
 
+@Component(
+    immediate = true,
+    name = "org.opencastproject.transcription.persistence.TranscriptionDatabase",
+    service = TranscriptionDatabase.class,
+    property = {
+        "service.description=Transcription Persistence"
+    }
+)
 public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
 
   /**
@@ -53,10 +64,15 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
   /**
    * OSGi callback.
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for transcription service");
   }
 
+  @Reference(
+      name = "entityManagerFactory",
+      target = "(osgi.unit.name=org.opencastproject.transcription.persistence)"
+  )
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -83,7 +99,8 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
 
   @Override
   public TranscriptionProviderControl storeProviderControl(String provider) throws TranscriptionDatabaseException {
-    TranscriptionProviderControlDto dto = TranscriptionProviderControlDto.storeProvider(emf.createEntityManager(), provider);
+    TranscriptionProviderControlDto dto
+        = TranscriptionProviderControlDto.storeProvider(emf.createEntityManager(), provider);
     if (dto != null) {
       logger.info("Transcription provider '{}' stored", provider);
       return dto.toTranscriptionProviderControl();
@@ -146,7 +163,8 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
 
   @Override
   public TranscriptionProviderControl findIdByProvider(String provider) throws TranscriptionDatabaseException {
-    TranscriptionProviderControlDto dtoProvider = TranscriptionProviderControlDto.findIdByProvider(emf.createEntityManager(), provider);
+    TranscriptionProviderControlDto dtoProvider
+        = TranscriptionProviderControlDto.findIdByProvider(emf.createEntityManager(), provider);
     if (dtoProvider != null) {
       return dtoProvider.toTranscriptionProviderControl();
     } else {
@@ -162,7 +180,8 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
 
   @Override
   public TranscriptionProviderControl findProviderById(Long id) throws TranscriptionDatabaseException {
-    TranscriptionProviderControlDto dtoProvider = TranscriptionProviderControlDto.findProviderById(emf.createEntityManager(), id);
+    TranscriptionProviderControlDto dtoProvider
+        = TranscriptionProviderControlDto.findProviderById(emf.createEntityManager(), id);
     if (dtoProvider != null) {
       return dtoProvider.toTranscriptionProviderControl();
     }

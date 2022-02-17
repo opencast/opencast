@@ -30,10 +30,11 @@ import org.opencastproject.util.ReadinessIndicator;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -45,6 +46,14 @@ import java.util.regex.Pattern;
  * to an input string - as many times as it matches - and
  * returns the matches, separated by a space character.
  */
+@Component(
+    immediate = true,
+    service = { DictionaryService.class,ManagedService.class },
+    property = {
+        "service.description=Dictionary Service (Regular Expressions)",
+        "service.pid=org.opencastproject.dictionary.regexp.DictionaryServiceImpl"
+    }
+)
 public class DictionaryServiceImpl implements DictionaryService, ManagedService {
 
   /** The logging facility */
@@ -79,12 +88,6 @@ public class DictionaryServiceImpl implements DictionaryService, ManagedService 
   public synchronized void updated(Dictionary<String, ?> properties) {
     if (properties != null && properties.get(PATTERN_CONFIG_KEY) != null) {
       String pattern = properties.get(PATTERN_CONFIG_KEY).toString();
-      /* Fix special characters */
-      try {
-        pattern = new String(pattern.getBytes("ISO-8859-1"), "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        logger.warn("Error decoding pattern string");
-      }
       logger.info("Setting pattern for regexp based DictionaryService to '{}'", pattern);
       setPattern(pattern);
     }
@@ -95,6 +98,7 @@ public class DictionaryServiceImpl implements DictionaryService, ManagedService 
    *
    * @param  ctx  the bundle context
    */
+  @Activate
   void activate(BundleContext ctx) {
     logger.info("Activating regexp based DictionaryService");
     Dictionary<String, String> properties = new Hashtable<String, String>();

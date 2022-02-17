@@ -30,6 +30,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -37,6 +38,11 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -52,9 +58,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -69,6 +73,16 @@ import javax.xml.transform.stream.StreamResult;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+    immediate = true,
+    service = CaptionServiceRestEndpoint.class,
+    property = {
+        "service.description=Caption REST Endpoint",
+        "opencast.service.type=org.opencastproject.caption",
+        "opencast.service.path=/caption",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -86,6 +100,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    * @param cc
    *          OSGi component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     // String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
@@ -96,6 +111,12 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    * @param service
    *          the caption service to set
    */
+  @Reference(
+      name = "service-impl",
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetCaptionService"
+  )
   protected void setCaptionService(CaptionService service) {
     this.service = service;
   }
@@ -116,6 +137,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -192,7 +214,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
       String[] languageArray = service.getLanguageList((Catalog) element, inputType);
 
       // build response
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
       Document doc = docBuilder.newDocument();
       Element root = doc.createElement("languages");
       root.setAttribute("type", inputType);
@@ -206,8 +228,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
       DOMSource domSource = new DOMSource(root);
       StringWriter writer = new StringWriter();
       StreamResult result = new StreamResult(writer);
-      Transformer transformer;
-      transformer = TransformerFactory.newInstance().newTransformer();
+      Transformer transformer = XmlSafeParser.newTransformerFactory().newTransformer();
       transformer.transform(domSource, result);
 
       return Response.status(Response.Status.OK).entity(writer.toString()).build();

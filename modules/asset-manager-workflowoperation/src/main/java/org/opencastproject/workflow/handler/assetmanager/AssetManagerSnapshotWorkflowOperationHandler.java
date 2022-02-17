@@ -31,14 +31,20 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,20 +52,35 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Workflow operation for taking a snapshot of a media package.
  *
  * @see AssetManager#takeSnapshot(String, MediaPackage)
  */
+@Component(
+    immediate = true,
+    name = "org.opencastproject.workflow.handler.assetmanager.AssetManagerAddWorkflowOperationHandler",
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Asset Manager Take Snapshot Workflow Operation Handler",
+        "workflow.operation=snapshot"
+    }
+)
 public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerSnapshotWorkflowOperationHandler.class);
 
   /** The asset manager. */
   private AssetManager assetManager;
 
+  @Activate
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+  }
+
   /** OSGi DI */
+  @Reference(name = "asset-manager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -148,7 +169,6 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
       // Is the element referencing anything?
       MediaPackageReference reference = element.getReference();
       if (reference != null) {
-        Map<String, String> referenceProperties = reference.getProperties();
         MediaPackageElement referencedElement = mp.getElementByReference(reference);
 
         // if we are distributing the referenced element, everything is fine. Otherwise...
@@ -169,14 +189,8 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
           // Done. Let's cut the path but keep references to the mediapackage itself
           if (reference != null && reference.getType().equals(MediaPackageReference.TYPE_MEDIAPACKAGE)) {
             element.setReference(reference);
-          } else if (reference != null && (referenceProperties == null || referenceProperties.size() == 0)) {
-            element.clearReference();
           } else {
-            // Ok, there is more to that reference than just pointing at an element. Let's keep the original,
-            // you never know.
-            removals.remove(referencedElement);
-            referencedElement.setURI(null);
-            referencedElement.setChecksum(null);
+            element.clearReference();
           }
         }
       }
@@ -188,4 +202,11 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
     }
     return mp;
   }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

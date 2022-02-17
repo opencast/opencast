@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -16,6 +16,10 @@
   </properties>
   <dependencies>
     <!-- Third Party -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -42,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <!-- Opencast -->
     <dependency>
@@ -101,12 +105,6 @@
               org.opencastproject.security.urlsigning.provider.impl,
               org.opencastproject.security.urlsigning.service.impl
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/generic-signing-provider.xml,
-              OSGI-INF/mediapackage-serializer.xml,
-              OSGI-INF/signing-endpoint.xml,
-              OSGI-INF/wowza-signing-provider.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

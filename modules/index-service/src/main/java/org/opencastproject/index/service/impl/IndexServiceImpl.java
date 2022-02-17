@@ -24,6 +24,7 @@ package org.opencastproject.index.service.impl;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
+import static org.opencastproject.security.api.DefaultOrganization.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -39,11 +40,11 @@ import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentParser;
@@ -122,8 +123,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 import com.google.common.net.MediaType;
 
@@ -143,6 +142,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,6 +167,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -170,9 +176,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Component(
+    immediate = true,
+    service = IndexService.class,
+    property = {
+        "service.description=Index Services Implementation"
+    }
+)
 public class IndexServiceImpl implements IndexService {
 
   private static final String WORKFLOW_CONFIG_PREFIX = "org.opencastproject.workflow.config.";
@@ -199,9 +213,6 @@ public class IndexServiceImpl implements IndexService {
   private Pattern patternTrack = Pattern.compile(trackRegex);
   private Pattern patternNumberedAsset = Pattern.compile(numberedAssetRegex);
 
-  private EventCatalogUIAdapter eventCatalogUIAdapter;
-  private SeriesCatalogUIAdapter seriesCatalogUIAdapter;
-
   private AclServiceFactory aclServiceFactory;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
@@ -227,6 +238,7 @@ public class IndexServiceImpl implements IndexService {
    * @param aclServiceFactory
    *          the factory to set
    */
+  @Reference(name = "AclServiceFactory")
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
@@ -237,6 +249,7 @@ public class IndexServiceImpl implements IndexService {
    * @param authorizationService
    *          the service to set
    */
+  @Reference(name = "AuthorizationService")
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -247,6 +260,7 @@ public class IndexServiceImpl implements IndexService {
    * @param captureAgentStateService
    *          the service to set
    */
+  @Reference(name = "CaptureAgentStateService")
   public void setCaptureAgentStateService(CaptureAgentStateService captureAgentStateService) {
     this.captureAgentStateService = captureAgentStateService;
   }
@@ -257,28 +271,9 @@ public class IndexServiceImpl implements IndexService {
    * @param eventCommentService
    *          the service to set
    */
+  @Reference(name = "EventCommentService")
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
-  }
-
-  /**
-   * OSGi callback to add the event dublincore {@link EventCatalogUIAdapter} instance.
-   *
-   * @param eventCatalogUIAdapter
-   *          the adapter to set
-   */
-  public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
-    this.eventCatalogUIAdapter = eventCatalogUIAdapter;
-  }
-
-  /**
-   * OSGi callback to add the series dublincore {@link SeriesCatalogUIAdapter} instance.
-   *
-   * @param seriesCatalogUIAdapter
-   *          the adapter to set
-   */
-  public void setCommonSeriesCatalogUIAdapter(CommonSeriesCatalogUIAdapter seriesCatalogUIAdapter) {
-    this.seriesCatalogUIAdapter = seriesCatalogUIAdapter;
   }
 
   /**
@@ -287,6 +282,12 @@ public class IndexServiceImpl implements IndexService {
    * @param catalogUIAdapter
    *          the adapter to add
    */
+  @Reference(
+      name = "EventCatalogUIAdapter",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     eventCatalogUIAdapters.add(catalogUIAdapter);
   }
@@ -307,6 +308,12 @@ public class IndexServiceImpl implements IndexService {
    * @param catalogUIAdapter
    *          the adapter to add
    */
+  @Reference(
+      name = "SeriesCatalogUIAdapter",
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeCatalogUIAdapter"
+  )
   public void addCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
     seriesCatalogUIAdapters.add(catalogUIAdapter);
   }
@@ -327,6 +334,7 @@ public class IndexServiceImpl implements IndexService {
    * @param ingestService
    *          the service to set
    */
+  @Reference(name = "IngestService")
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
@@ -337,6 +345,7 @@ public class IndexServiceImpl implements IndexService {
    * @param listProvidersService
    *          the service to set
    */
+  @Reference(name = "ListProvidersService")
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
@@ -347,6 +356,7 @@ public class IndexServiceImpl implements IndexService {
    * @param assetManager
    *          the manager to set
    */
+  @Reference(name = "AssetManager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -357,6 +367,7 @@ public class IndexServiceImpl implements IndexService {
    * @param schedulerService
    *          the service to set
    */
+  @Reference(name = "SchedulerService")
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
@@ -367,6 +378,7 @@ public class IndexServiceImpl implements IndexService {
    * @param securityService
    *          the service to set
    */
+  @Reference(name = "SecurityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -377,6 +389,7 @@ public class IndexServiceImpl implements IndexService {
    * @param seriesService
    *          the service to set
    */
+  @Reference(name = "SeriesService")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -387,6 +400,7 @@ public class IndexServiceImpl implements IndexService {
    * @param workflowService
    *          the service to set
    */
+  @Reference(name = "workflowService")
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
@@ -397,6 +411,7 @@ public class IndexServiceImpl implements IndexService {
    * @param workspace
    *          the workspace to set
    */
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -407,6 +422,7 @@ public class IndexServiceImpl implements IndexService {
    * @param userDirectoryService
    *          the service to set
    */
+  @Reference(name = "userDirectoryService")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -419,22 +435,9 @@ public class IndexServiceImpl implements IndexService {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
-  private static final Fn2<EventCatalogUIAdapter, String, Boolean> eventOrganizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean apply(EventCatalogUIAdapter catalogUIAdapter, String organization) {
-      return organization.equals(catalogUIAdapter.getOrganization());
-    }
-  };
-
-  private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> seriesOrganizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean apply(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
-      return catalogUIAdapter.getOrganization().equals(organization);
-    }
-  };
-
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
-    return Stream.$(eventCatalogUIAdapters).filter(eventOrganizationFilter._2(organization)).toList();
+    return eventCatalogUIAdapters.stream().filter(a -> organization.equals(a.getOrganization()))
+            .collect(Collectors.toList());
   }
 
   /**
@@ -443,12 +446,52 @@ public class IndexServiceImpl implements IndexService {
    * @return A {@link List} of {@link SeriesCatalogUIAdapter} that provide the metadata to the front end.
    */
   public List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters(String organization) {
-    return Stream.$(seriesCatalogUIAdapters).filter(seriesOrganizationFilter._2(organization)).toList();
+    return seriesCatalogUIAdapters.stream().filter(a -> organization.equals(a.getOrganization()))
+            .collect(Collectors.toList());
+  }
+
+  public EventCatalogUIAdapter getCommonEventCatalogUIAdapter(String organization) {
+    Optional<EventCatalogUIAdapter> orgEventCatalogUIAdapter = eventCatalogUIAdapters.stream()
+            .filter(a -> a instanceof CommonEventCatalogUIAdapter)
+            .filter(a -> organization.equals(a.getOrganization()))
+            .findFirst();
+
+    if (orgEventCatalogUIAdapter.isPresent()) {
+      return orgEventCatalogUIAdapter.get();
+    } else if (organization != DEFAULT_ORGANIZATION_ID) {
+      return getCommonEventCatalogUIAdapter(DEFAULT_ORGANIZATION_ID);
+    } else {
+       throw new IllegalStateException("Common event metadata for " + DEFAULT_ORGANIZATION_ID + " needs to be "
+               + "configured!");
+    }
+  }
+
+  public SeriesCatalogUIAdapter getCommonSeriesCatalogUIAdapter(String organization) {
+    Optional<SeriesCatalogUIAdapter> orgSeriesCatalogUIAdapter = seriesCatalogUIAdapters.stream()
+            .filter(a -> a instanceof CommonSeriesCatalogUIAdapter)
+            .filter(a -> organization.equals(a.getOrganization()))
+            .findFirst();
+
+    if (orgSeriesCatalogUIAdapter.isPresent()) {
+      return orgSeriesCatalogUIAdapter.get();
+    } else if (organization != DEFAULT_ORGANIZATION_ID) {
+      return getCommonSeriesCatalogUIAdapter(DEFAULT_ORGANIZATION_ID);
+    } else {
+      throw new IllegalStateException("Common series metadata for " + DEFAULT_ORGANIZATION_ID + " needs to be "
+              + "configured!");
+    }
   }
 
   @Override
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters() {
     return new ArrayList<>(getEventCatalogUIAdapters(securityService.getOrganization().getId()));
+  }
+
+  @Override
+  public List<EventCatalogUIAdapter> getExtendedEventCatalogUIAdapters() {
+    String organization = securityService.getOrganization().getId();
+    return eventCatalogUIAdapters.stream().filter(a -> !(a instanceof CommonEventCatalogUIAdapter))
+            .filter(a -> organization.equals(a.getOrganization())).collect(Collectors.toList());
   }
 
   @Override
@@ -458,18 +501,20 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public EventCatalogUIAdapter getCommonEventCatalogUIAdapter() {
-    return eventCatalogUIAdapter;
+    return getCommonEventCatalogUIAdapter(securityService.getOrganization().getId());
   }
 
   @Override
   public SeriesCatalogUIAdapter getCommonSeriesCatalogUIAdapter() {
-    return seriesCatalogUIAdapter;
+    return getCommonSeriesCatalogUIAdapter(securityService.getOrganization().getId());
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     workflowService.addWorkflowListener(new RetractionListener(this, securityService, retractions));
   }
 
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     executorService.shutdown();
   }
@@ -544,7 +589,7 @@ public class IndexServiceImpl implements IndexService {
               assetList.add(item.getFieldName());
               mp = ingestService.addTrack(item.openStream(), item.getName(),
                       new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
-              } else {
+            } else {
               logger.warn("Unknown field name found {}", item.getFieldName());
             }
           }
@@ -626,11 +671,15 @@ public class IndexServiceImpl implements IndexService {
             mp =  ingestService.addAttachment(item.openStream(), item.getName(),
                     new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
           } else if (item.getFieldName().toLowerCase().matches(catalogRegex)) {
-
             assetList.add(item.getFieldName());
             // Add catalog with field name as temporary flavor
-            mp =  ingestService.addCatalog(item.openStream(), item.getName(),
-                    new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
+            mp = ingestService.addCatalog(item.openStream(), item.getName(),
+                new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
+          } else if (item.getFieldName().toLowerCase().matches(trackRegex)) {
+            // Cannot get flavor at this point, so saving with temporary flavor
+            assetList.add(item.getFieldName());
+            mp = ingestService.addTrack(item.openStream(), item.getName(),
+                new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
           } else {
             logger.warn("Unknown field name found {}", item.getFieldName());
           }
@@ -852,7 +901,7 @@ public class IndexServiceImpl implements IndexService {
     SourceType type = getSourceType(eventHttpServletRequest.getSource().get());
 
     DublinCoreMetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
-            .getMetadataByAdapter(eventCatalogUIAdapter);
+            .getMetadataByAdapter(getCommonEventCatalogUIAdapter());
 
     Date currentStartDate = null;
     JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
@@ -905,7 +954,7 @@ public class IndexServiceImpl implements IndexService {
       presenterUsernames = technicalPresenters.get();
     }
 
-    eventHttpServletRequest.getMetadataList().get().add(eventCatalogUIAdapter, eventMetadata);
+    eventHttpServletRequest.getMetadataList().get().add(getCommonEventCatalogUIAdapter(), eventMetadata);
     updateMediaPackageMetadata(eventHttpServletRequest.getMediaPackage().get(),
             eventHttpServletRequest.getMetadataList().get());
 
@@ -1161,8 +1210,14 @@ public class IndexServiceImpl implements IndexService {
             catArray[0].setFlavor(newElemflavor);
             logger.info("Update asset {} {}", type, newElemflavor);
           } else if (patternTrack.matcher(type).matches()) {
-            // Overwriting of existing tracks of same flavor is currently not allowed.
-            // TODO: allow overwriting of existing tracks of same flavor
+            if (overwriteExisting) {
+              // remove existing catalogs of the new flavor
+              Track[] existing = mp.getTracks(newElemflavor);
+              for (int i = 0; i < existing.length; i++) {
+                mp.remove(existing[i]);
+                logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+              }
+            }
             Track[]  trackArray = mp.getTracks(new MediaPackageElementFlavor(assetOrig, "*"));
             if (trackArray.length > 1) {
               throw new IllegalArgumentException("More than one " + asset + " found, only one expected.");
@@ -1184,7 +1239,7 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public MetadataList updateAllEventMetadata(
-          final String id, final String metadataJSON, final AbstractSearchIndex index)
+          final String id, final String metadataJSON, final ElasticsearchIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, SearchIndexException,
           UnauthorizedException {
     final MetadataList metadataList;
@@ -1192,7 +1247,6 @@ public class IndexServiceImpl implements IndexService {
       metadataList = getMetadataListWithAllEventCatalogUIAdapters();
       MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadataJSON));
     } catch (final org.json.simple.parser.ParseException e) {
-      logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
     return updateEventMetadata(id, metadataList, index);
@@ -1271,7 +1325,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public MetadataList updateEventMetadata(String id, MetadataList metadataList, AbstractSearchIndex index)
+  public MetadataList updateEventMetadata(String id, MetadataList metadataList, ElasticsearchIndex index)
           throws IndexServiceException, SearchIndexException, NotFoundException, UnauthorizedException {
     Opt<Event> optEvent = getEvent(id, index);
     if (optEvent.isNone())
@@ -1349,7 +1403,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public AccessControlList updateEventAcl(String id, AccessControlList acl, AbstractSearchIndex index)
+  public AccessControlList updateEventAcl(String id, AccessControlList acl, ElasticsearchIndex index)
           throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
           UnauthorizedException {
     Opt<Event> optEvent = getEvent(id, index);
@@ -1397,7 +1451,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Opt<Event> getEvent(String id, AbstractSearchIndex index) throws SearchIndexException {
+  public Opt<Event> getEvent(String id, ElasticsearchIndex index) throws SearchIndexException {
     SearchResult<Event> result = index
             .getByQuery(new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
                     .withIdentifier(id));
@@ -1865,7 +1919,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Opt<Series> getSeries(String seriesId, AbstractSearchIndex searchIndex) throws SearchIndexException {
+  public Opt<Series> getSeries(String seriesId, ElasticsearchIndex searchIndex) throws SearchIndexException {
     SearchResult<Series> result = searchIndex
             .getByQuery(new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
                     .withIdentifier(seriesId));
@@ -1883,14 +1937,14 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public MetadataList updateAllSeriesMetadata(String id, String metadataJSON, AbstractSearchIndex index)
+  public MetadataList updateAllSeriesMetadata(String id, String metadataJSON, ElasticsearchIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
     MetadataList metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
     return updateSeriesMetadata(id, metadataJSON, index, metadataList);
   }
 
   @Override
-  public MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, AbstractSearchIndex index)
+  public MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, ElasticsearchIndex index)
           throws IndexServiceException, NotFoundException, UnauthorizedException {
     checkSeriesExists(id, index);
     updateSeriesMetadata(id, metadataList);
@@ -1989,7 +2043,7 @@ public class IndexServiceImpl implements IndexService {
    * @throws IndexServiceException
    *           Thrown if unable to access the index to get the series.
    */
-  private void checkSeriesExists(String seriesID, AbstractSearchIndex index)
+  private void checkSeriesExists(String seriesID, ElasticsearchIndex index)
           throws NotFoundException, IndexServiceException {
     try {
       Opt<Series> optSeries = getSeries(seriesID, index);
@@ -2004,7 +2058,7 @@ public class IndexServiceImpl implements IndexService {
   private MetadataList updateSeriesMetadata(
           final String seriesID,
           final String metadataJSON,
-          final AbstractSearchIndex index,
+          final ElasticsearchIndex index,
           final MetadataList metadataList)
           throws IllegalArgumentException, IndexServiceException, NotFoundException {
     checkSeriesExists(seriesID, index);
@@ -2020,17 +2074,6 @@ public class IndexServiceImpl implements IndexService {
   }
 
   /**
-   * @return A {@link MetadataList} with only the common SeriesCatalogUIAdapter's empty {@link DublinCoreMetadataCollection}
-   *         available
-   */
-  private MetadataList getMetadataListWithCommonSeriesCatalogUIAdapters() {
-    MetadataList metadataList = new MetadataList();
-    metadataList.add(seriesCatalogUIAdapter.getFlavor().toString(), seriesCatalogUIAdapter.getUITitle(),
-            seriesCatalogUIAdapter.getRawFields());
-    return metadataList;
-  }
-
-  /**
    * @return A {@link MetadataList} with all of the available CatalogUIAdapters empty {@link DublinCoreMetadataCollection}
    *         available
    */
@@ -2040,12 +2083,6 @@ public class IndexServiceImpl implements IndexService {
     for (SeriesCatalogUIAdapter adapter : getSeriesCatalogUIAdapters()) {
       metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), adapter.getRawFields());
     }
-    return metadataList;
-  }
-
-  private MetadataList getMetadataListWithCommonEventCatalogUIAdapter() {
-    MetadataList metadataList = new MetadataList();
-    metadataList.add(eventCatalogUIAdapter, eventCatalogUIAdapter.getRawFields());
     return metadataList;
   }
 

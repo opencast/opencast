@@ -34,12 +34,14 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -47,6 +49,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +71,14 @@ import java.util.UUID;
  * to the media package.
  */
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Configurable Publication Workflow Handler",
+        "workflow.operation=publish-configure"
+    }
+)
 public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWorkflowOperationHandlerBase {
 
   /** The logging facility */
@@ -118,15 +130,24 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   static final boolean RETRACT_STREAMING_DEFAULT = false;
 
   /** OSGi DI */
+  @Reference(
+      name = "DownloadDistributionService",
+      target = "(distribution.channel=download)"
+  )
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
     this.downloadDistributionService = distributionService;
   }
 
+  @Reference(
+      name = "StreamingDistributionService",
+      target = "(distribution.channel=streaming)"
+  )
   void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
 
   /** OSGi DI */
+  @Reference(name = "SecurityService")
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -279,7 +300,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     boolean streamingElementsDistributed = false;
     boolean downloadElementsDistributed = false;
 
-    if (streamingDistributionService.publishToStreaming()
+    if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()
             && (streamingSourceFlavors.length > 0 || streamingSourceTags.length > 0)) {
       streamingElementsDistributed = distributeElements(streamingSelector, mp, publication, channelId, mode,
               withPublishedElements, checkAvailability, true);
@@ -290,7 +311,10 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
               withPublishedElements, checkAvailability, false);
     }
 
-    if (!downloadElementsDistributed && !streamingElementsDistributed) {
+    if (!downloadElementsDistributed && !streamingElementsDistributed
+        && (downloadSourceFlavors.length > 0 || downloadSourceTags.length > 0
+        || streamingSourceFlavors.length > 0 || streamingSourceTags.length > 0)) {
+      // skip publication if no elements was distributed but should be
       return createResult(mp, Action.SKIP);
     }
 
@@ -434,4 +458,11 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     logger.error("There is already a Published Media, fail Stragy for Mediapackage {}", mp.getIdentifier());
     throw new WorkflowOperationException("There is already a Published Media, fail Stragy for Mediapackage ");
   }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
 }

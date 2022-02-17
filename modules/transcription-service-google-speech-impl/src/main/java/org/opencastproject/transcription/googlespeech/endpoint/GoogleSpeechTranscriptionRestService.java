@@ -32,6 +32,9 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +51,24 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "GoogleSpeechTranscriptionRestService", title = "Transcription Service REST Endpoint (uses Google Speech services)", abstractText = "Uses external service to generate transcriptions of recordings.", notes = {
-  "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)"})
+@RestService(
+    name = "GoogleSpeechTranscriptionRestService",
+    title = "Transcription Service REST Endpoint (uses Google Speech services)",
+    abstractText = "Uses external service to generate transcriptions of recordings.",
+    notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)"
+    }
+)
+@Component(
+    immediate = true,
+    service = GoogleSpeechTranscriptionRestService.class,
+    property = {
+        "service.description=Google Speech Transcription REST Endpoint",
+        "opencast.service.type=org.opencastproject.transcription.googlespeech",
+        "opencast.service.path=/transcripts/googlespeech",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class GoogleSpeechTranscriptionRestService extends AbstractJobProducerEndpoint {
 
   /**
@@ -67,13 +86,16 @@ public class GoogleSpeechTranscriptionRestService extends AbstractJobProducerEnd
    */
   protected ServiceRegistry serviceRegistry = null;
 
+  @Activate
   public void activate(ComponentContext cc) {
   }
 
+  @Reference(name = "transcriptionService")
   public void setTranscriptionService(GoogleSpeechTranscriptionService service) {
     this.service = service;
   }
 
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry service) {
     this.serviceRegistry = service;
   }
@@ -91,10 +113,23 @@ public class GoogleSpeechTranscriptionRestService extends AbstractJobProducerEnd
   @GET
   @Path("results")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "results", description = "Get JSON result of a submitted transcription job", returnDescription = "Returns a JSON representation of the transcription result", restParameters = {
-    @RestParameter(name = "jobId", description = "job id of the submitted transcription (can be found in Google Speech database table)", isRequired = true, type = Type.STRING)}, responses = {
-    @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "If no errors"),
-    @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "An error occurred")})
+  @RestQuery(
+      name = "results",
+      description = "Get JSON result of a submitted transcription job",
+      returnDescription = "Returns a JSON representation of the transcription result",
+      restParameters = {
+          @RestParameter(
+              name = "jobId",
+              description = "job id of the submitted transcription (can be found in Google Speech database table)",
+              isRequired = true,
+              type = Type.STRING
+          ),
+      },
+      responses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "If no errors"),
+          @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "An error occurred"),
+      }
+  )
   // GET v1/operations/7022084740052439959
   public Response getTranscriptionResult(@QueryParam("jobId") String jobId,
           @Context HttpServletRequest request) throws TranscriptionServiceException, IOException {
@@ -112,10 +147,23 @@ public class GoogleSpeechTranscriptionRestService extends AbstractJobProducerEnd
   @GET
   @Path("status")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "status", description = "Get mediapackage transcription status", returnDescription = "Returns transcription status", restParameters = {
-    @RestParameter(name = "mediaPackageID", description = "the mediapackage identifier", isRequired = true, type = Type.STRING)}, responses = {
-    @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "If no errors"),
-    @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "An error occurred")})
+  @RestQuery(
+      name = "status",
+      description = "Get mediapackage transcription status",
+      returnDescription = "Returns transcription status",
+      restParameters = {
+          @RestParameter(
+              name = "mediaPackageID",
+              description = "The mediapackage identifier",
+              isRequired = true,
+              type = Type.STRING
+          ),
+      },
+      responses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "If no errors"),
+          @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "An error occurred"),
+      }
+  )
   public Response getTranscriptionStatus(@QueryParam("mediaPackageID") String mpId,
           @Context HttpServletRequest request) throws TranscriptionServiceException {
     logger.debug("REST endpoint getTranscriptionStatus called with mediapackage id '{}'", mpId);

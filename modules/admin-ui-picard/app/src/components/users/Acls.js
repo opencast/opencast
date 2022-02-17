@@ -22,13 +22,15 @@ import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
 import Footer from "../Footer";
+import {hasAccess} from "../../utils/utils";
+import {getUserInformation} from "../../selectors/userInfoSelectors";
 
 /**
  * This component renders the table view of acls
  */
 const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                   loadingUsers, loadingUsersIntoTable, loadingGroups,
-                  loadingGroupsIntoTable, resetTextFilter, resetOffset }) => {
+                  loadingGroupsIntoTable, resetTextFilter, resetOffset, user }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
     const [displayNewAclModal, setNewAclModal] = useState(false);
@@ -98,11 +100,12 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
 
                 {/* Add acl button */}
                 <div className="btn-group">
-                    {/*todo: implement onClick and with role*/}
-                    <button className="add" onClick={() => showNewAclModal()}>
-                        <i className="fa fa-plus"/>
-                        <span>{t('USERS.ACTIONS.ADD_ACL')}</span>
-                    </button>
+                    {hasAccess("ROLE_UI_ACLS_CREATE", user) && (
+                        <button className="add" onClick={() => showNewAclModal()}>
+                            <i className="fa fa-plus"/>
+                            <span>{t('USERS.ACTIONS.ADD_ACL')}</span>
+                        </button>
+                    )}
                 </div>
 
                 {/* Display modal for new acl if add acl button is clicked */}
@@ -115,22 +118,27 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                          toggleMenu={toggleNavigation} />
 
                 <nav>
-                    {/*todo: with role*/}
-                    <Link to="/users/users"
-                          className={cn({active: false})}
-                          onClick={() => loadUsers()}>
-                        {t('USERS.NAVIGATION.USERS')}
-                    </Link>
-                    <Link to="/users/groups"
-                          className={cn({active: false})}
-                          onClick={() => loadGroups()}>
-                        {t('USERS.NAVIGATION.GROUPS')}
-                    </Link>
-                    <Link to="/users/acls"
-                          className={cn({active: true})}
-                          onClick={() => loadAcls()}>
-                        {t('USERS.NAVIGATION.PERMISSIONS')}
-                    </Link>
+                    {hasAccess("ROLE_UI_USERS_VIEW", user) && (
+                        <Link to="/users/users"
+                              className={cn({active: false})}
+                              onClick={() => loadUsers()}>
+                            {t('USERS.NAVIGATION.USERS')}
+                        </Link>
+                    )}
+                    {hasAccess("ROLE_UI_GROUPS_VIEW", user) && (
+                        <Link to="/users/groups"
+                              className={cn({active: false})}
+                              onClick={() => loadGroups()}>
+                            {t('USERS.NAVIGATION.GROUPS')}
+                        </Link>
+                    )}
+                    {hasAccess("ROLE_UI_ACLS_VIEW", user) && (
+                        <Link to="/users/acls"
+                              className={cn({active: true})}
+                              onClick={() => loadAcls()}>
+                            {t('USERS.NAVIGATION.PERMISSIONS')}
+                        </Link>
+                    )}
                 </nav>
             </section>
 
@@ -156,7 +164,8 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    acls: getTotalAcls(state)
+    acls: getTotalAcls(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch
