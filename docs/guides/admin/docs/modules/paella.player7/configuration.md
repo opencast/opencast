@@ -17,12 +17,6 @@ Paella 7 will be a complete rewrite of Paella, aiming several issues
 Have a look at the paella 7 [repository](https://github.com/polimediaupv/paella-core)
 or [documentation page](https://github.com/polimediaupv/paella-core/blob/main/doc/index.md).
 
-Warning
--------
-
-Paella 7 is still in beta and this module should not be used in production. 
-It is intended to test the new features of paella 7.
-
 
 Configuration
 -------------
