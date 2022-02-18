@@ -61,13 +61,14 @@ import {
     LOAD_EVENT_ASSET_MEDIA_DETAILS_FAILURE,
     LOAD_EVENT_ASSET_MEDIA_DETAILS_SUCCESS,
     LOAD_EVENT_ASSET_CATALOG_DETAILS_FAILURE,
-    LOAD_EVENT_ASSET_CATALOG_DETAILS_SUCCESS,
+    LOAD_EVENT_ASSET_CATALOG_DETAILS_SUCCESS, SET_EXTENDED_EVENT_METADATA,
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
 const initialState = {
     eventId: "",
     metadata: {},
+    extendedMetadata: [],
     fetchingMetadataInProgress: false,
     assets: {
         attachments: null,
@@ -174,17 +175,20 @@ const eventDetails = (state=initialState, action) => {
             };
         }
         case LOAD_EVENT_METADATA_SUCCESS: {
-            const { metadata } = payload;
+            const { metadata, extendedMetadata } = payload;
             return {
                 ...state,
                 fetchingMetadataInProgress: false,
-                metadata: metadata
+                metadata: metadata,
+                extendedMetadata: extendedMetadata
             };
         }
         case LOAD_EVENT_METADATA_FAILURE: {
             return {
                 ...state,
                 fetchingMetadataInProgress: false,
+                metadata: {},
+                extendedMetadata: []
             };
         }
         case SET_EVENT_METADATA: {
@@ -192,6 +196,25 @@ const eventDetails = (state=initialState, action) => {
             return {
                 ...state,
                 metadata: metadata
+            };
+        }
+        case SET_EXTENDED_EVENT_METADATA: {
+            const { metadata } = payload;
+
+            const oldExtendedMetadata = state.extendedMetadata;
+            let newExtendedMetadata = [];
+
+            for(const catalog of oldExtendedMetadata){
+                if((catalog.flavor === metadata.flavor) && (catalog.title === metadata.title)){
+                    newExtendedMetadata.push(metadata);
+                } else {
+                    newExtendedMetadata.push(catalog);
+                }
+            }
+
+            return {
+                ...state,
+                extendedMetadata: newExtendedMetadata
             };
         }
         case LOAD_EVENT_ASSETS_IN_PROGRESS: {

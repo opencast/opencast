@@ -5,6 +5,14 @@ import {getPageLimit, getPageOffset, getTableDirection, getTableSorting} from ".
  * This file contains methods that are needed in more than one resource thunk
  */
 
+// prepare http headers for posting to resources
+export const getHttpHeaders = () => {
+    return {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    };
+}
 
 // prepare URL params for getting resources
 export const getURLParams = state => {
@@ -111,6 +119,34 @@ export const transformMetadataCollection = (metadata, noField) => {
     }
 
     return metadata;
+}
+
+// transform metadata catalog for update via post request
+export const transformMetadataForUpdate = (catalog, values) => {
+    let fields = [];
+    let updatedFields = [];
+
+    catalog.fields.forEach(field => {
+        if (field.value !== values[field.id]) {
+            let updatedField = {
+                ...field,
+                value: values[field.id]
+            }
+            updatedFields.push(updatedField);
+            fields.push(updatedField);
+        } else {
+            fields.push({...field});
+        }
+    });
+    let data = new URLSearchParams();
+    data.append("metadata", JSON.stringify([{
+        flavor: catalog.flavor,
+        title: catalog.title,
+        fields: updatedFields
+    }]));
+    const headers = getHttpHeaders();
+
+    return {fields, data, headers};
 }
 
 // Prepare metadata for post of new events or series

@@ -62,10 +62,15 @@ import {
     loadEventAssetMediaDetailsSuccess,
     loadEventAssetMediaDetailsFailure,
     loadEventAssetPublicationDetailsSuccess,
-    loadEventAssetPublicationDetailsFailure,
+    loadEventAssetPublicationDetailsFailure, setExtendedEventMetadata,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
-import {createPolicy, transformMetadataCollection} from "../utils/resourceUtils";
+import {
+    createPolicy,
+    getHttpHeaders,
+    transformMetadataCollection,
+    transformMetadataForUpdate
+} from "../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
 import {
     getBaseWorkflow,
@@ -78,15 +83,6 @@ import {fetchWorkflowDef} from "./workflowThunks";
 import {getWorkflowDef} from "../selectors/workflowSelectors";
 import {logger} from "../utils/logger";
 
-// prepare http headers for posting to resources
-const getHttpHeaders = () => {
-    return {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-    };
-}
-
 
 // thunks for metadata
 
@@ -97,9 +93,36 @@ export const fetchMetadata = (eventId) => async (dispatch) => {
         const metadataRequest = await axios.get(`/admin-ng/event/${eventId}/metadata.json`);
         const metadataResponse = await metadataRequest.data;
 
-        const metadata = transformMetadataCollection(metadataResponse[0]);
+        const mainCatalog = 'dublincore/episode';
+        let usualMetadata = {};
+        let extendedMetadata = [];
 
-        dispatch(loadEventMetadataSuccess(metadata));
+        for(const catalog of metadataResponse) {
+            let transformedCatalog = {...catalog};
+
+            if(catalog.locked !== undefined){
+                let fields = [];
+
+                for(const field in catalog.fields) {
+                    fields.push({
+                        ...field,
+                        locked: catalog.locked,
+                        readOnly: true
+                    })
+                }
+                transformedCatalog = {
+                    ...catalog,
+                    fields: fields
+                }
+            }
+            if(catalog.flavor === mainCatalog){
+                usualMetadata = transformMetadataCollection({...transformedCatalog});
+            } else {
+                extendedMetadata.push(transformMetadataCollection({...transformedCatalog}));
+            }
+        }
+
+        dispatch(loadEventMetadataSuccess(usualMetadata, extendedMetadata));
     } catch (e) {
         logger.error(e);
         dispatch(loadEventMetadataFailure());
@@ -110,29 +133,7 @@ export const updateMetadata = (eventId, values) => async (dispatch, getState) =>
     try {
         let metadataInfos = getMetadata(getState());
 
-        let fields = [];
-        let updatedFields = [];
-
-        metadataInfos.fields.forEach(field => {
-            if (field.value !== values[field.id]) {
-                let updatedField = {
-                    ...field,
-                    value: values[field.id]
-                }
-                updatedFields.push(updatedField);
-                fields.push(updatedField);
-            } else {
-                fields.push({...field});
-            }
-        });
-
-        const headers = getHttpHeaders();
-        let data = new URLSearchParams();
-        data.append("metadata",JSON.stringify([{
-            flavor: metadataInfos.flavor,
-            title: metadataInfos.title,
-            fields: updatedFields
-        }]));
+        const {fields, data, headers} = transformMetadataForUpdate(metadataInfos, values);
 
         await axios.put(`/admin-ng/event/${eventId}/metadata`, data, headers);
 
@@ -143,6 +144,23 @@ export const updateMetadata = (eventId, values) => async (dispatch, getState) =>
             fields: fields
         };
         dispatch(setEventMetadata(eventMetadata));
+    } catch (e) {
+        logger.error(e);
+    }
+}
+
+export const updateExtendedMetadata = (eventId, values, catalog) => async (dispatch) => {
+    try {
+        const {fields, data, headers} = transformMetadataForUpdate(catalog, values);
+
+        await axios.put(`/admin-ng/event/${eventId}/metadata`, data, headers);
+
+        // updated extended metadata in event details redux store
+        let eventMetadata = {
+            ...catalog,
+            fields: fields
+        };
+        dispatch(setExtendedEventMetadata(eventMetadata));
     } catch (e) {
         logger.error(e);
     }

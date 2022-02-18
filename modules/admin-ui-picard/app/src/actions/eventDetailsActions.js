@@ -7,6 +7,7 @@ export const LOAD_EVENT_METADATA_SUCCESS = 'LOAD_EVENT_METADATA_SUCCESS';
 export const LOAD_EVENT_METADATA_FAILURE = 'LOAD_EVENT_METADATA_FAILURE';
 export const LOAD_EVENT_METADATA_IN_PROGRESS = 'LOAD_EVENT_METADATA_IN_PROGRESS';
 export const SET_EVENT_METADATA = 'SET_EVENT_METADATA';
+export const SET_EXTENDED_EVENT_METADATA = 'SET_EXTENDED_EVENT_METADATA';
 
 // Constants of actions types affecting the assets tab
 export const LOAD_EVENT_ASSETS_IN_PROGRESS = 'LOAD_EVENT_ASSETS_IN_PROGRESS';
@@ -83,10 +84,11 @@ export const loadEventMetadataInProgress = () => ({
     type: LOAD_EVENT_METADATA_IN_PROGRESS
 });
 
-export const loadEventMetadataSuccess = ( metadata ) => ({
+export const loadEventMetadataSuccess = ( metadata, extendedMetadata ) => ({
     type: LOAD_EVENT_METADATA_SUCCESS,
     payload: {
-        metadata
+        metadata,
+        extendedMetadata
     }
 });
 
@@ -96,6 +98,13 @@ export const loadEventMetadataFailure = () => ({
 
 export const setEventMetadata = ( metadata ) => ({
     type: SET_EVENT_METADATA,
+    payload: {
+        metadata
+    }
+});
+
+export const setExtendedEventMetadata = ( metadata ) => ({
+    type: SET_EXTENDED_EVENT_METADATA,
     payload: {
         metadata
     }
