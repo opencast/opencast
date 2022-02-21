@@ -19,7 +19,6 @@
  *
  */
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 
@@ -122,16 +121,11 @@ module.exports = function (env) {
       new webpack.SourceMapDevToolPlugin({
         filename: '[file].js.map[query]'
       }),
-
-      new HtmlWebpackPlugin({
-        template: './src/watch.html',
-        filename: 'watch.html',
-        inject: true
-      }),
       new CopyWebpackPlugin({
         patterns: [
           { from: './src/style.css', to: '' },
-          { from: './src/auth.html', to: '' }
+          { from: './src/auth.html', to: '' },
+          { from: './src/watch.html', to: '' }
         ]
       })
     ],
