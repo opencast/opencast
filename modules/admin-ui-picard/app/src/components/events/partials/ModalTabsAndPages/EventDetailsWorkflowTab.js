@@ -20,7 +20,7 @@ import {hasAccess} from "../../../../utils/utils";
 /**
  * This component manages the workflows tab of the event details modal
  */
-const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
+const EventDetailsWorkflowTab = ({ eventId, t, close, setHierarchy,
                                    workflow, workflows, isLoading, workflowDefinitions, workflowConfiguration, performingWorkflowAction, deletingWorkflow,
                                    loadWorkflows, updateWorkflow, loadWorkflowDetails, performWorkflowAction, deleteWf, user}) => {
     const isRoleWorkflowEdit = hasAccess("ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT", user);

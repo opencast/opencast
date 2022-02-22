@@ -7,12 +7,23 @@ import {
     loadSeriesDetailsThemeNamesFailure,
     loadSeriesDetailsThemeNamesInProgress,
     loadSeriesDetailsThemeNamesSuccess,
-    loadSeriesDetailsThemeSuccess, setSeriesDetailsMetadata, setSeriesDetailsTheme
+    loadSeriesDetailsThemeSuccess,
+    setSeriesDetailsExtendedMetadata,
+    setSeriesDetailsMetadata,
+    setSeriesDetailsTheme
 } from "../actions/seriesDetailsActions";
 import axios from "axios";
 import _ from 'lodash';
-import {createPolicy, transformMetadataCollection} from "../utils/resourceUtils";
-import {getSeriesDetailsMetadata, getSeriesDetailsThemeNames} from "../selectors/seriesDetailsSelectors";
+import {
+    createPolicy,
+    transformMetadataCollection,
+    transformMetadataForUpdate
+} from "../utils/resourceUtils";
+import {
+    getSeriesDetailsExtendedMetadata,
+    getSeriesDetailsMetadata,
+    getSeriesDetailsThemeNames
+} from "../selectors/seriesDetailsSelectors";
 import {transformToIdValueArray} from "../utils/utils";
 import {addNotification} from "./notificationThunks";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
@@ -28,9 +39,19 @@ export const fetchSeriesDetailsMetadata = id => async dispatch => {
 
         const metadataResponse = await data.data;
 
-        const seriesMetadata = transformMetadataCollection(metadataResponse[0]);
+        const mainCatalog = 'dublincore/series';
+        let seriesMetadata = {};
+        let extendedMetadata = [];
 
-        dispatch(loadSeriesDetailsMetadataSuccess(seriesMetadata));
+        for(const catalog of metadataResponse) {
+            if(catalog.flavor === mainCatalog){
+                seriesMetadata = transformMetadataCollection({...catalog});
+            } else {
+                extendedMetadata.push(transformMetadataCollection({...catalog}));
+            }
+        }
+
+        dispatch(loadSeriesDetailsMetadataSuccess(seriesMetadata, extendedMetadata));
 
     } catch (e) {
         dispatch(loadSeriesDetailsFailure());
@@ -168,30 +189,9 @@ export const updateSeriesMetadata = (id, values) => async (dispatch, getState) =
     try {
         let metadataInfos = getSeriesDetailsMetadata(getState());
 
-        let fields = [];
-        let updatedFields = [];
+        const {fields, data, headers} = transformMetadataForUpdate(metadataInfos, values);
 
-        metadataInfos.fields.forEach(field => {
-            if (field.value !== values[field.id]) {
-                let updatedField = {
-                    ...field,
-                    value: values[field.id]
-                }
-                updatedFields.push(updatedField);
-                fields.push(updatedField);
-            } else {
-                fields.push({...field});
-            }
-        });
-
-        let data = new URLSearchParams();
-        data.append("metadata",JSON.stringify([{
-            flavor: metadataInfos.flavor,
-            title: metadataInfos.title,
-            fields: updatedFields
-        }]));
-
-        await axios.put(`/admin-ng/series/${id}/metadata`, data);
+        await axios.put(`/admin-ng/series/${id}/metadata`, data, headers);
 
         // updated metadata in series details redux store
         let seriesMetadata = {
@@ -200,6 +200,37 @@ export const updateSeriesMetadata = (id, values) => async (dispatch, getState) =
             fields: fields
         };
         dispatch(setSeriesDetailsMetadata(seriesMetadata));
+    } catch (e) {
+        logger.error(e);
+    }
+}
+
+// update series with new metadata
+export const updateExtendedSeriesMetadata = (id, values, catalog) => async (dispatch, getState) => {
+    try {
+        const {fields, data, headers} = transformMetadataForUpdate(catalog, values);
+
+        await axios.put(`/admin-ng/series/${id}/metadata`, data, headers);
+
+        // updated metadata in series details redux store
+        let seriesMetadata = {
+            flavor: catalog.flavor,
+            title: catalog.title,
+            fields: fields
+        };
+
+        const oldExtendedMetadata = getSeriesDetailsExtendedMetadata(getState());
+        let newExtendedMetadata = [];
+
+        for(const catalog of oldExtendedMetadata){
+            if((catalog.flavor === seriesMetadata.flavor) && (catalog.title === seriesMetadata.title)){
+                newExtendedMetadata.push(seriesMetadata);
+            } else {
+                newExtendedMetadata.push(catalog);
+            }
+        }
+
+        dispatch(setSeriesDetailsExtendedMetadata(newExtendedMetadata));
     } catch (e) {
         logger.error(e);
     }

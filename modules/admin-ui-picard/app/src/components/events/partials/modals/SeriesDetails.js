@@ -2,12 +2,13 @@ import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 import {
+    getSeriesDetailsExtendedMetadata,
     getSeriesDetailsFeeds,
     getSeriesDetailsMetadata,
     getSeriesDetailsTheme, getSeriesDetailsThemeNames
 } from "../../../../selectors/seriesDetailsSelectors";
 import {connect} from "react-redux";
-import {updateSeriesMetadata} from "../../../../thunks/seriesDetailsThunks";
+import {updateExtendedSeriesMetadata, updateSeriesMetadata} from "../../../../thunks/seriesDetailsThunks";
 import SeriesDetailsExtendedMetadataTab from "../ModalTabsAndPages/SeriesDetailsExtendedMetadataTab";
 import SeriesDetailsAccessTab from "../ModalTabsAndPages/SeriesDetailsAccessTab";
 import SeriesDetailsThemeTab from "../ModalTabsAndPages/SeriesDetailsThemeTab";
@@ -16,11 +17,12 @@ import SeriesDetailsFeedsTab from "../ModalTabsAndPages/SeriesDetailsFeedsTab";
 import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
 import {hasAccess} from "../../../../utils/utils";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import DetailsExtendedMetadataTab from "../ModalTabsAndPages/DetailsExtendedMetadataTab";
 
 /**
  * This component manages the tabs of the series details modal
  */
-const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, updateSeries, user }) => {
+const SeriesDetails = ({ seriesId, metadataFields, extendedMetadata, feeds, theme, themeNames, updateSeries, updateExtendedMetadata, user }) => {
     const { t } = useTranslation();
 
     const [page, setPage] = useState(0);
@@ -36,7 +38,7 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, upd
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA',
             accessRole: 'ROLE_UI_SERIES_DETAILS_METADATA_VIEW',
             name: 'extended-metadata',
-            hidden: true
+            hidden: !(extendedMetadata.length > 0)
         },
         {
             tabNameTranslation: 'EVENTS.SERIES.DETAILS.TABS.PERMISSIONS',
@@ -117,7 +119,12 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, upd
                                         editAccessRole='ROLE_UI_SERIES_DETAILS_METADATA_EDIT'/>
                 )}
                 {page === 1 && (
-                    <SeriesDetailsExtendedMetadataTab />
+                    <DetailsExtendedMetadataTab
+                            resourceId={seriesId}
+                            metadata={extendedMetadata}
+                            updateResource={updateExtendedMetadata}
+                            buttonLabel='EVENTS.SERIES.DETAILS.METADATA.REPLACE_SERIES_METADATA'
+                            editAccessRole='ROLE_UI_SERIES_DETAILS_METADATA_EDIT'/>
                 )}
                 {page === 2 && (
                     <SeriesDetailsAccessTab seriesId={seriesId}
@@ -141,6 +148,7 @@ const SeriesDetails = ({ seriesId, metadataFields, feeds, theme, themeNames, upd
 
 const mapStateToProps = state => ({
     metadataFields: getSeriesDetailsMetadata(state),
+    extendedMetadata: getSeriesDetailsExtendedMetadata(state),
     feeds: getSeriesDetailsFeeds(state),
     theme: getSeriesDetailsTheme(state),
     themeNames: getSeriesDetailsThemeNames(state),
@@ -149,7 +157,8 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    updateSeries: (id, values) => dispatch(updateSeriesMetadata(id, values))
+    updateSeries: (id, values) => dispatch(updateSeriesMetadata(id, values)),
+    updateExtendedMetadata: (id, values, catalog) => dispatch(updateExtendedSeriesMetadata(id, values, catalog))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SeriesDetails);

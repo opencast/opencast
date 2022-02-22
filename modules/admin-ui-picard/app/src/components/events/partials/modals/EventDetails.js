@@ -23,10 +23,11 @@ import EventDetailsAssetMediaDetails from "../ModalTabsAndPages/EventDetailsAsse
 import EventDetailsAssetPublicationDetails from "../ModalTabsAndPages/EventDetailsAssetPublicationDetails";
 import EventDetailsAssetsAddAsset from "../ModalTabsAndPages/EventDetailsAssetsAddAsset";
 import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
-import {getMetadata, isFetchingMetadata} from "../../../../selectors/eventDetailsSelectors";
-import {fetchMetadata, updateMetadata} from "../../../../thunks/eventDetailsThunks";
+import {getExtendedMetadata, getMetadata, isFetchingMetadata} from "../../../../selectors/eventDetailsSelectors";
+import {fetchMetadata, updateExtendedMetadata, updateMetadata} from "../../../../thunks/eventDetailsThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import DetailsExtendedMetadataTab from "../ModalTabsAndPages/DetailsExtendedMetadataTab";
 
 
 // Get info about the current language and its date locale
@@ -36,8 +37,8 @@ const currentLanguage = getCurrentLanguageInformation();
  * This component manages the pages of the event details
  */
 const EventDetails = ({ tabIndex, eventId, close,
-                          metadata, isLoadingMetadata,
-                          loadMetadata, updateMetadata, removeNotificationWizardForm, user }) => {
+                          metadata, extendedMetadata, isLoadingMetadata,
+                          loadMetadata, updateMetadata, updateExtendedMetadata, removeNotificationWizardForm, user }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -59,10 +60,9 @@ const EventDetails = ({ tabIndex, eventId, close,
         },
         {
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA',
-            bodyHeaderTranslation: 'EVENTS.EVENTS.DETAILS.METADATA.CAPTION', //todo: here {{ catalog.title | translate }}
             accessRole: 'ROLE_UI_EVENTS_DETAILS_METADATA_VIEW',
             name: 'metadata-extended',
-            hidden: true
+            hidden: !(extendedMetadata.length > 0)
         },
         {
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.PUBLICATIONS',
@@ -85,7 +85,6 @@ const EventDetails = ({ tabIndex, eventId, close,
         },
         {
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS',
-            bodyHeaderTranslation: 'EVENTS.EVENTS.DETAILS.WORKFLOW_INSTANCES.TITLE', // todo: not quite right, has 2 top-level captions
             accessRole: 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW',
             name: 'workflows'
         },
@@ -186,9 +185,13 @@ const EventDetails = ({ tabIndex, eventId, close,
                             updateResource={updateMetadata}
                             editAccessRole='ROLE_UI_EVENTS_DETAILS_METADATA_EDIT'/>
                     )}
-                    {page === 1 && (
-                        <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                         t={t}/>
+                    {page === 1 && (!isLoadingMetadata) && (
+                        <DetailsExtendedMetadataTab
+                            resourceId={eventId}
+                            metadata={extendedMetadata}
+                            updateResource={updateExtendedMetadata}
+                            buttonLabel='SAVE'
+                            editAccessRole='ROLE_UI_EVENTS_DETAILS_METADATA_EDIT'/>
                     )}
                     {page === 2 && (
                         <EventDetailsPublicationTab eventId={eventId} />
@@ -263,7 +266,6 @@ const EventDetails = ({ tabIndex, eventId, close,
                         (workflowTabHierarchy === "entry" && (
                             <EventDetailsWorkflowTab
                                 eventId={eventId}
-                                header={tabs[page].bodyHeaderTranslation}
                                 t={t}
                                 close={close}
                                 setHierarchy={setWorkflowTabHierarchy}/>
@@ -350,6 +352,7 @@ const MockDataPage = ({ header, t }) => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     metadata: getMetadata(state),
+    extendedMetadata: getExtendedMetadata(state),
     isLoadingMetadata: isFetchingMetadata(state),
     user: getUserInformation(state)
 });
@@ -358,6 +361,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     loadMetadata: (id) => dispatch(fetchMetadata(id)),
     updateMetadata: (id, values) => dispatch(updateMetadata(id, values)),
+    updateExtendedMetadata: (id, values, catalog) => dispatch(updateExtendedMetadata(id, values, catalog)),
     removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
 });
 
