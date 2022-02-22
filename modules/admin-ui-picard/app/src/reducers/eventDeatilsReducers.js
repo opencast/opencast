@@ -61,7 +61,8 @@ import {
     LOAD_EVENT_ASSET_MEDIA_DETAILS_FAILURE,
     LOAD_EVENT_ASSET_MEDIA_DETAILS_SUCCESS,
     LOAD_EVENT_ASSET_CATALOG_DETAILS_FAILURE,
-    LOAD_EVENT_ASSET_CATALOG_DETAILS_SUCCESS, SET_EXTENDED_EVENT_METADATA,
+    LOAD_EVENT_ASSET_CATALOG_DETAILS_SUCCESS,
+    SET_EXTENDED_EVENT_METADATA,
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
@@ -201,20 +202,9 @@ const eventDetails = (state=initialState, action) => {
         case SET_EXTENDED_EVENT_METADATA: {
             const { metadata } = payload;
 
-            const oldExtendedMetadata = state.extendedMetadata;
-            let newExtendedMetadata = [];
-
-            for(const catalog of oldExtendedMetadata){
-                if((catalog.flavor === metadata.flavor) && (catalog.title === metadata.title)){
-                    newExtendedMetadata.push(metadata);
-                } else {
-                    newExtendedMetadata.push(catalog);
-                }
-            }
-
             return {
                 ...state,
-                extendedMetadata: newExtendedMetadata
+                extendedMetadata: metadata
             };
         }
         case LOAD_EVENT_ASSETS_IN_PROGRESS: {

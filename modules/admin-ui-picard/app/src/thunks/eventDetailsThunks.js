@@ -62,7 +62,8 @@ import {
     loadEventAssetMediaDetailsSuccess,
     loadEventAssetMediaDetailsFailure,
     loadEventAssetPublicationDetailsSuccess,
-    loadEventAssetPublicationDetailsFailure, setExtendedEventMetadata,
+    loadEventAssetPublicationDetailsFailure,
+    setExtendedEventMetadata,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {
@@ -74,6 +75,7 @@ import {
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
 import {
     getBaseWorkflow,
+    getExtendedMetadata,
     getMetadata,
     getWorkflow,
     getWorkflowDefinitions,
@@ -149,7 +151,7 @@ export const updateMetadata = (eventId, values) => async (dispatch, getState) =>
     }
 }
 
-export const updateExtendedMetadata = (eventId, values, catalog) => async (dispatch) => {
+export const updateExtendedMetadata = (eventId, values, catalog) => async (dispatch, getState) => {
     try {
         const {fields, data, headers} = transformMetadataForUpdate(catalog, values);
 
@@ -160,7 +162,20 @@ export const updateExtendedMetadata = (eventId, values, catalog) => async (dispa
             ...catalog,
             fields: fields
         };
-        dispatch(setExtendedEventMetadata(eventMetadata));
+
+
+        const oldExtendedMetadata = getExtendedMetadata(getState());
+        let newExtendedMetadata = [];
+
+        for(const catalog of oldExtendedMetadata){
+            if((catalog.flavor === eventMetadata.flavor) && (catalog.title === eventMetadata.title)){
+                newExtendedMetadata.push(eventMetadata);
+            } else {
+                newExtendedMetadata.push(catalog);
+            }
+        }
+
+        dispatch(setExtendedEventMetadata(newExtendedMetadata));
     } catch (e) {
         logger.error(e);
     }

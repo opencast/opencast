@@ -113,20 +113,9 @@ const seriesDetails = (state=initialState, action) => {
         case SET_SERIES_DETAILS_EXTENDED_METADATA: {
             const { seriesMetadata } = payload;
 
-            const oldExtendedMetadata = state.extendedMetadata;
-            let newExtendedMetadata = [];
-
-            for(const catalog of oldExtendedMetadata){
-                if((catalog.flavor === seriesMetadata.flavor) && (catalog.title === seriesMetadata.title)){
-                    newExtendedMetadata.push(seriesMetadata);
-                } else {
-                    newExtendedMetadata.push(catalog);
-                }
-            }
-
             return {
                 ...state,
-                extendedMetadata: newExtendedMetadata
+                extendedMetadata: seriesMetadata
             }
         }
         default:
