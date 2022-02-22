@@ -32,7 +32,21 @@
     <dependency>
       <groupId>com.mchange</groupId>
       <artifactId>mchange-commons-java</artifactId>
-      <version>0.2.11</version>
+      <version>0.2.20</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.mchange</groupId>
@@ -95,6 +109,7 @@
               !com.sun.*,
               !com.vividsolutions.jts.*,
               !org.apache.lucene.*,
+              !org.apache.logging.*,
               !org.hibernate.*,
               !org.jboss.resource.adapter.jdbc.*,
               !software.amazon.awssdk.*,
