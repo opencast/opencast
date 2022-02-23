@@ -1172,6 +1172,29 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
+  /**
+   * Removes emtpy series titles from the collection of the isPartOf Field
+   * @param ml the list to modify
+   */
+  private void removeSeriesWithNullTitlesFromFieldCollection(MetadataList ml) {
+    // get Series MetadataField from MetadataList
+    MetadataField seriesField = Optional.ofNullable(ml.getMetadataList().get("dublincore/episode"))
+            .flatMap(titledMetadataCollection -> Optional.ofNullable(titledMetadataCollection.getCollection()))
+            .flatMap(dcMetadataCollection -> Optional.ofNullable(dcMetadataCollection.getOutputFields()))
+            .flatMap(metadataFields -> Optional.ofNullable(metadataFields.get("isPartOf")))
+            .orElse(null);
+    if (seriesField == null || seriesField.getCollection() == null) {
+      return;
+    }
+
+    // Remove null keys
+    Map<String, String> seriesCollection = seriesField.getCollection();
+    seriesCollection.remove(null);
+    seriesField.setCollection(seriesCollection);
+
+    return;
+  }
+
   @GET
   @Path("{eventId}/metadata.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -1214,6 +1237,9 @@ public abstract class AbstractEventEndpoint {
     DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
     EventUtils.setEventMetadataValues(event, metadataCollection);
     metadataList.add(eventCatalogUiAdapter, metadataCollection);
+
+    // remove series with empty titles from the collection of the isPartOf field as these can't be converted to json
+    removeSeriesWithNullTitlesFromFieldCollection(metadataList);
 
     // lock metadata?
     final String wfState = event.getWorkflowState();
@@ -2145,6 +2171,9 @@ public abstract class AbstractEventEndpoint {
     }
 
     metadataList.add(commonCatalogUiAdapter, commonMetadata);
+
+    // remove series with empty titles from the collection of the isPartOf field as these can't be converted to json
+    removeSeriesWithNullTitlesFromFieldCollection(metadataList);
 
     return okJson(MetadataJson.listToJson(metadataList, true));
   }
