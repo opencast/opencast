@@ -3,6 +3,9 @@ import {useTranslation} from "react-i18next";
 import axios from "axios";
 
 
+/**
+ * This component renders the embedding code modal
+ */
 const EmbeddingCodeModal = ({ close, eventId }) => {
     const { t } = useTranslation();
 
@@ -12,6 +15,7 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
     const [showCopySuccess, setCopySuccess] = useState(false);
 
     useEffect(() => {
+        // get source url
         axios.get("/api/info/organization/properties/engageuiurl")
             .then(res => {
             let url = res.data["org.opencastproject.engage.ui.url"];
@@ -34,11 +38,13 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
     };
 
     const updateTextArea = e => {
+        // chosen frame size
         let frameSize = e.target ? e.target.textContent : e.toElement.textContent;
 
+        // buttons containing possible frame sizes
         let embedSizeButtons = document.getElementsByClassName("embedSizeButton");
 
-
+        // iterate through embedSizeButtons and mark the chosen size
         if (frameSize) {
             for (let i = 0; i < embedSizeButtons.length; i++) {
                 console.log(embedSizeButtons[i]);
@@ -50,13 +56,17 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
                 }
             }
         }
+        // split frameSize to be used in iFrameString
         let size = frameSize.split("x");
 
+        // build whole url
         let url = sourceURL + "/play/" + eventId
+        // code displayed in text area containing the iFrame to copy
         let iFrameString = '<iframe allowfullscreen src="' + url
             + '" style="border:0px #FFFFFF none;" name="Player" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" width="'
             + size[0] + '" height="' + size[1] + '"></iframe>';
 
+        // set state with new inputs
         setTextAreaContent(iFrameString);
         setCurrentSize(frameSize);
     };
@@ -70,6 +80,7 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
                     <h2>{t('CONFIRMATIONS.ACTIONS.SHOW.EMBEDDING_CODE')}</h2>
                 </header>
 
+                {/* embed size buttons */}
                 <div className="embedded-code-boxes">
                     <div id="620x349"
                          className="embedSizeButton size_620x349"
@@ -100,6 +111,7 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
 
                 <span id="id_video" className="embedded-code-no-visible">{eventId}</span>
 
+                {/* text area containing current iFrame code to copy*/}
                 <div className="embedded-code-video">
                 <textarea id="social_embed-textarea"
                           className="social_embed-textarea embedded-code-textarea"
@@ -108,6 +120,7 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
                           cols="1"/>
                 </div>
 
+                {/* copy confirmation */}
                 {showCopySuccess && (
                     <div className="copyConfirm">
                         <span id="copy_confirm_pre">{t('CONFIRMATIONS.EMBEDDING_CODE')}</span>
@@ -115,6 +128,7 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
                     </div>
                 )}
 
+                {/* copy button */}
                 <div className="embedded-code-copy-to-clipboard">
                     <div className="btn-container" style={{marginButton: "20px"}}>
                         <button className="cancel-btn"

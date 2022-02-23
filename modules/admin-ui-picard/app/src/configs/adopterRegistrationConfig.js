@@ -16,8 +16,8 @@ export const states = {
     },
     'form': {
         'nextState': {
-            0: 'close',
-            1: 'save',
+            0: 'thank_you',
+            1: 'error',
             2: 'legal_info',
             3: 'update',
             4: 'delete_submit',
@@ -60,8 +60,8 @@ export const states = {
     },
     'delete_submit': {
         'nextState': {
-            0: 'close',
-            1: 'delete',
+            0: 'thank_you',
+            1: 'error',
             5: 'form'
         },
         'buttons': {

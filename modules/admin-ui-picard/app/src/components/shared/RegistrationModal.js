@@ -4,11 +4,18 @@ import {Field, Formik} from "formik";
 import TermsOfUsePage from "./modals/TermsOfUsePage";
 import {countries, states} from "../../configs/adopterRegistrationConfig";
 import axios from "axios";
+import cn from "classnames";
+import {AdopterRegistrationSchema} from "../../utils/validate";
 
+/**
+ * This component renders the adopter registration modal. This modal has various states.
+ */
 const RegistrationModal = ({ close }) => {
     const { t } = useTranslation();
 
+    // current state of the modal that is shown
     const [state, setState] = useState('form');
+    // initial values for Formik
     const [initialValues, setInitialValues] = useState({});
 
     const handleClose = () => {
@@ -19,17 +26,80 @@ const RegistrationModal = ({ close }) => {
         fetchRegistrationInfos().then(r => console.log(r));
     }, []);
 
+    const onClickContinue = () => {
+        // if state is delete_submit then delete infos about adaptor else show next state
+        if(state === "delete_submit") {
+            resetRegistrationData();
+        } else {
+            setState(states[state].nextState[1]);
+        }
+    }
+
     const fetchRegistrationInfos = async () => {
+        // fetch current information about adopter
         const response = await axios.get('/admin-ng/adopter/registration');
         let registrationInfo = await response.data;
 
+        // set response as initial values for formik
         setInitialValues(registrationInfo);
     }
 
     const handleSubmit = values => {
-        setState(states[state].nextState[1]);
-        console.log("submitting");
-    }
+
+        // build body
+        let body = new URLSearchParams();
+        body.append('contactMe', values.contactMe);
+        body.append('allowsStatistics', values.allowsStatistics);
+        body.append('allowsErrorReports', values.allowsErrorReports);
+        body.append('organisationName', values.organisationName);
+        body.append('departmentName', values.departmentName);
+        body.append('country', values.country);
+        body.append('postalCode', values.postalCode);
+        body.append('city', values.city);
+        body.append('firstName', values.firstName);
+        body.append('lastName', values.lastName);
+        body.append('street', values.street);
+        body.append('streetNo', values.streetNo);
+        body.append('email', values.email);
+        body.append('registered', 'true');
+
+        // save adopter information
+        axios.post('/admin-ng/adopter/registration', body, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then(r => {
+            // show thank you state
+            return setState(states[state].nextState[0]);
+        }).catch(r => {
+            // show error state
+            return setState(states[state].nextState[1]);
+        });
+    };
+
+    const resetRegistrationData = () => {
+
+        // delete adopter information
+        axios.delete('/admin-ng/adopter/registration', {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then(r => {
+            // show thank you state
+            return setState(states[state].nextState[0]);
+        }).catch( r => {
+            // show error state
+            return setState(states[state].nextState[1]);
+        });
+    };
+
+    // style of label when input has content
+    const styleWithContent = {
+        fontSize: '70%',
+        fontWeight: '700',
+        transform: 'translate3d(0, -35%, 0)',
+        opacity: 1
+    };
 
     return (
         <>
@@ -37,11 +107,11 @@ const RegistrationModal = ({ close }) => {
             <section id="registration-modal"
                      className="modal active modal-open modal-animation">
                 <header>
-                    {/*todo: Buttons can be different depending on the state of buttons (see old UI)*/}
                     <a onClick={() => handleClose()} className="fa fa-times close-modal"/>
                     <h2>{t('ADOPTER_REGISTRATION.MODAL.CAPTION')}</h2>
                 </header>
 
+                {/* shows information about the registration*/}
                 {state === "information" && (
                     <div className="modal-content"
                          style={{display: "block"}}>
@@ -61,6 +131,7 @@ const RegistrationModal = ({ close }) => {
                     </div>
                 )}
 
+                {/* shows terms of use */}
                 {state === "legal_info" && (
                     <div className="modal-content" style={{display: "block"}}>
                         <div className="modal-body">
@@ -75,6 +146,7 @@ const RegistrationModal = ({ close }) => {
                     </div>
                 )}
 
+                {/* shows state after skipping the registration */}
                 {state === "skip" && (
                     <div className="modal-content"
                          style={{display: "block"}}>
@@ -94,6 +166,7 @@ const RegistrationModal = ({ close }) => {
                     </div>
                 )}
 
+                {/* shows delete confirmation */}
                 {state === "delete_submit" && (
                     <div className="modal-content"
                          style={{display: "block"}}>
@@ -105,6 +178,7 @@ const RegistrationModal = ({ close }) => {
                     </div>
                 )}
 
+                {/* shows spinner while API requests are processed */}
                 {(state === "save" || state === "delete" || state === "update") && (
                     <div className="modal-content"
                          style={{display: "block"}}>
@@ -118,6 +192,7 @@ const RegistrationModal = ({ close }) => {
                     </div>
                 )}
 
+                {/* shows thank you after registration */}
                 {state === "thank_you" && (
                     <div className="modal-content"
                          style={{display: "block"}}>
@@ -137,7 +212,7 @@ const RegistrationModal = ({ close }) => {
                                             >
                                             <span>{t('HELP.ADOPTER_REGISTRATION')}</span>
                                         </b>
-                                        <span>{t('ADOPTER_REGISTRATION.MODAL.THANK_YOU_STATE.TEXT_LEADING_AFTER_PATH')}</span>
+                                        <span> {t('ADOPTER_REGISTRATION.MODAL.THANK_YOU_STATE.TEXT_LEADING_AFTER_PATH')}</span>
                                     </p>
                                 </div>
                             </div>
@@ -145,6 +220,7 @@ const RegistrationModal = ({ close }) => {
                     </div>
                 )}
 
+                {/* shows error */}
                 {state === "error" && (
                     <div className="modal-content"
                          style={{display: "block"}}>
@@ -164,7 +240,10 @@ const RegistrationModal = ({ close }) => {
                 )}
 
 
+                {/* shows registration form containing adaptor information */}
                 <Formik initialValues={initialValues}
+                        enableReinitialize
+                        validationSchema={AdopterRegistrationSchema}
                         onSubmit={values => handleSubmit(values)}>
                     {formik => (
                         <>
@@ -183,7 +262,8 @@ const RegistrationModal = ({ close }) => {
                                                                    id="adopter_organisation"
                                                                    className="form-control"/>
                                                             <label className="form-control-placeholder"
-                                                                   htmlFor="adopter_organisation">
+                                                                   htmlFor="adopter_organisation"
+                                                                   style={formik.values.organisationName ? styleWithContent : {}}>
                                                                 {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.ORGANISATION')}
                                                             </label>
                                                         </div>
@@ -195,7 +275,8 @@ const RegistrationModal = ({ close }) => {
                                                                    id="adopter_department"
                                                                    className="form-control"/>
                                                             <label className="form-control-placeholder"
-                                                                   for="adopter_department">
+                                                                   htmlFor="adopter_department"
+                                                                   style={formik.values.departmentName ? styleWithContent : {}}>
                                                                 {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.DEPARTMENT')}
                                                             </label>
                                                         </div>
@@ -218,7 +299,8 @@ const RegistrationModal = ({ close }) => {
                                                                 ))}
                                                             </Field>
                                                             <label className="form-control-placeholder"
-                                                                   for="adopter_country">
+                                                                   htmlFor="adopter_country"
+                                                                   style={formik.values.country ? styleWithContent : {}}>
                                                                 {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.COUNTRY')}
                                                             </label>
                                                         </div>
@@ -231,7 +313,8 @@ const RegistrationModal = ({ close }) => {
                                                                        id="adopter_postalcode"
                                                                        className="form-control"/>
                                                                 <label className="form-control-placeholder"
-                                                                       for="adopter_postalcode">
+                                                                       htmlFor="adopter_postalcode"
+                                                                       style={formik.values.postalCode ? styleWithContent : {}}>
                                                                     {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.POSTAL_CODE')}
                                                                 </label>
                                                             </div>
@@ -241,7 +324,8 @@ const RegistrationModal = ({ close }) => {
                                                                        id="adopter_city"
                                                                        className="form-control"/>
                                                                 <label className="form-control-placeholder"
-                                                                       for="adopter_city">
+                                                                       htmlFor="adopter_city"
+                                                                       style={formik.values.city ? styleWithContent : {}}>
                                                                     {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.CITY')}
                                                                 </label>
                                                             </div>
@@ -259,7 +343,8 @@ const RegistrationModal = ({ close }) => {
                                                                    id="adopter_firstname"
                                                                    className="form-control"/>
                                                             <label className="form-control-placeholder"
-                                                                   for="adopter_firstname">
+                                                                   htmlFor="adopter_firstname"
+                                                                   style={formik.values.firstName ? styleWithContent : {}}>
                                                                 {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.FIRST_NAME')}
                                                             </label>
                                                         </div>
@@ -271,7 +356,8 @@ const RegistrationModal = ({ close }) => {
                                                                    id="adopter_lastname"
                                                                    className="form-control"/>
                                                             <label className="form-control-placeholder"
-                                                                   for="adopter_lastname">
+                                                                   htmlFor="adopter_lastname"
+                                                                   style={formik.values.lastName ? styleWithContent : {}}>
                                                                 {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.LAST_NAME')}
                                                             </label>
                                                         </div>
@@ -285,7 +371,8 @@ const RegistrationModal = ({ close }) => {
                                                                    id="adopter_street"
                                                                    className="form-control"/>
                                                             <label className="form-control-placeholder"
-                                                                   for="adopter_street">
+                                                                   htmlFor="adopter_street"
+                                                                   style={formik.values.street ? styleWithContent : {}}>
                                                                 {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.STREET')}
                                                             </label>
                                                         </div>
@@ -297,7 +384,8 @@ const RegistrationModal = ({ close }) => {
                                                                    id="adopter_streetnumber"
                                                                    className="form-control"/>
                                                             <label className="form-control-placeholder"
-                                                                   for="adopter_streetnumber">
+                                                                   htmlFor="adopter_streetnumber"
+                                                                   style={formik.values.streetNo ? styleWithContent : {}}>
                                                                 {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.NUMBER')}
                                                             </label>
                                                         </div>
@@ -310,8 +398,9 @@ const RegistrationModal = ({ close }) => {
                                                                    name="email"
                                                                    type="email"
                                                                    className="form-control"/>
-                                                            <label className="from-control-placeholder"
-                                                                   for="adopter_emailadr">
+                                                            <label className="form-control-placeholder"
+                                                                   htmlFor="adopter_emailadr"
+                                                                   style={formik.values.email ? styleWithContent : {}}>
                                                                 {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.MAIL')}
                                                             </label>
                                                         </div>
@@ -322,7 +411,7 @@ const RegistrationModal = ({ close }) => {
                                                                    name="contactme"
                                                                    id="adopter_contactme"
                                                                    className="form-control"/>
-                                                            <label for="adopter_contactme">
+                                                            <label htmlFor="adopter_contactme">
                                                                 {t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.CONTACT_ME')}
                                                             </label>
                                                         </div>
@@ -336,14 +425,14 @@ const RegistrationModal = ({ close }) => {
                                                            name="allowsStatistics"
                                                            id="adopter_allows_statistics"
                                                            className="form-control"/>
-                                                    <label for="adopter_allows_statistics">{t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.USAGE_STATISTICS')}</label>
+                                                    <label htmlFor="adopter_allows_statistics">{t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.USAGE_STATISTICS')}</label>
                                                 </div>
                                                 <div className="form-group form-group-checkbox">
                                                     <Field type="checkbox"
                                                            name="allowsErrorReports"
                                                            id="adopter_allows_err_reports"
                                                            className="form-control"/>
-                                                    <label for="adopter_allows_err_reports">{t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.ERROR_REPORTS')}</label>
+                                                    <label htmlFor="adopter_allows_err_reports">{t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.ERROR_REPORTS')}</label>
                                                 </div>
                                             </fieldset>
                                             <fieldset>
@@ -353,7 +442,7 @@ const RegistrationModal = ({ close }) => {
                                                            name="agreedToPolicy"
                                                            id="agreedToPolicy"
                                                            className="form-control"/>
-                                                    <label for="agreedToPolicy">
+                                                    <label htmlFor="agreedToPolicy">
                                                         <span>{t('ADOPTER_REGISTRATION.MODAL.FORM_STATE.READ_TERMS_OF_USE_BEFORE')}</span>
                                                         <span className="link"
                                                               onClick={() => setState(states[state].nextState[2])}>
@@ -368,32 +457,39 @@ const RegistrationModal = ({ close }) => {
                                 </div>
                             )}
 
+                            {/* navigation buttons depending on state of modal */}
                             <footer>
                                 {states[state].buttons.submit && (
                                     <div className="pull-right">
+                                        {/* submit of form content */}
                                         {state === "form" ? (
-                                            // todo: style={{inactive: !adopter.agreedToPolicy}}
-                                            <button className="submit inactive"
+                                            <button className={cn("submit", {
+                                                active: (formik.isValid && formik.values.agreedToPolicy),
+                                                inactive: !(formik.isValid && formik.values.agreedToPolicy)
+                                            })}
+                                                    disabled={!formik.values.agreedToPolicy}
                                                     onClick={() => formik.handleSubmit()}>
-                                                {states[state].buttons.submitButtonText}
+                                                {t(states[state].buttons.submitButtonText)}
                                             </button>
                                         ) : (
+                                            // continue button or confirm button (depending on state)
                                             <button className="continue-registration"
-                                                    onClick={() => setState(states[state].nextState[1])}>
-                                                {states[state].buttons.submitButtonText}
+                                                    onClick={() => onClickContinue()}>
+                                                {t(states[state].buttons.submitButtonText)}
                                             </button>
                                         )}
                                     </div>
                                 )}
 
+                                {/* back, delete or cancel button depending on state */}
                                 <div className="pull-left">
-                                    {states[state].buttons.back && (
+                                    {(state !== "form" && states[state].buttons.back) && (
                                         <button className="cancel"
                                                 onClick={() => setState(states[state].nextState[5])}>
                                             {t('ADOPTER_REGISTRATION.MODAL.BACK')}
                                         </button>
                                     )}
-                                    {state === "form" /* todo && registered */ && (
+                                    {state === "form" && formik.values.registered && (
                                         <button className="danger"
                                                 onClick={() => setState(states[state].nextState[4])}>
                                             {t('WIZARD.DELETE')}

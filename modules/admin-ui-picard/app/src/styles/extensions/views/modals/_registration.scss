@@ -122,8 +122,7 @@
       opacity: 0.5;
     }
 
-    .form-control:focus + .form-control-placeholder,
-    .form-control:not(:empty) + .form-control-placeholder {
+    .form-control:focus + .form-control-placeholder {
       font-size: 70%;
       font-weight: 700;
       transform: translate3d(0, -35%, 0);
@@ -207,7 +206,7 @@
 
     footer {
 
-        a {
+        button {
             margin: 15px 5px 15px 25px;
             &.inactive {
               opacity: 0.5;
