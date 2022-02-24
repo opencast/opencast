@@ -996,6 +996,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           MediaPackageException {
     try {
       final EncodingProfile profile = profileScanner.getProfile(profileId);
+      if (profile == null) {
+        throw new MediaPackageException(String.format("Encoding profile %s not found", profileId));
+      }
       return serviceRegistry.createJob(JOB_TYPE, Operation.ImageToVideo.toString(), Arrays.asList(
               profileId, MediaPackageElementParser.getAsXml(sourceImageAttachment), Double.toString(time)),
               profile.getJobLoad());
