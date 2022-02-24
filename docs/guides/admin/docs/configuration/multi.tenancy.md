@@ -77,6 +77,10 @@ do not support multitenancy.
 Note that if you are running Apache httpd with mod\_proxy in front of the Opencast installation, the port number will be
 -1 in both files.
 
+It is not supported for Opencast tenants to be hosted in a subpath.
+Opencast tenants needs to be served from the root path element.
+The RFC 3986 URI path component needs to be empty.
+
 ### Step 2: Security Configuration
 
 Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual URLs that specify
