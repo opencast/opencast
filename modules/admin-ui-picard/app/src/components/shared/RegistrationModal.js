@@ -3,9 +3,13 @@ import {useTranslation} from "react-i18next";
 import {Field, Formik} from "formik";
 import TermsOfUsePage from "./modals/TermsOfUsePage";
 import {countries, states} from "../../configs/adopterRegistrationConfig";
-import axios from "axios";
 import cn from "classnames";
 import {AdopterRegistrationSchema} from "../../utils/validate";
+import {
+    deleteAdopterRegistration,
+    fetchAdopterRegistration,
+    postRegistration
+} from "../../utils/adopterRegistrationUtils";
 
 /**
  * This component renders the adopter registration modal. This modal has various states.
@@ -26,71 +30,45 @@ const RegistrationModal = ({ close }) => {
         fetchRegistrationInfos().then(r => console.log(r));
     }, []);
 
-    const onClickContinue = () => {
+    const onClickContinue = async () => {
         // if state is delete_submit then delete infos about adaptor else show next state
         if(state === "delete_submit") {
-            resetRegistrationData();
+            await resetRegistrationData();
         } else {
             setState(states[state].nextState[1]);
         }
     }
 
     const fetchRegistrationInfos = async () => {
-        // fetch current information about adopter
-        const response = await axios.get('/admin-ng/adopter/registration');
-        let registrationInfo = await response.data;
+
+        let registrationInfo = await fetchAdopterRegistration();
 
         // set response as initial values for formik
         setInitialValues(registrationInfo);
     }
 
     const handleSubmit = values => {
-
-        // build body
-        let body = new URLSearchParams();
-        body.append('contactMe', values.contactMe);
-        body.append('allowsStatistics', values.allowsStatistics);
-        body.append('allowsErrorReports', values.allowsErrorReports);
-        body.append('organisationName', values.organisationName);
-        body.append('departmentName', values.departmentName);
-        body.append('country', values.country);
-        body.append('postalCode', values.postalCode);
-        body.append('city', values.city);
-        body.append('firstName', values.firstName);
-        body.append('lastName', values.lastName);
-        body.append('street', values.street);
-        body.append('streetNo', values.streetNo);
-        body.append('email', values.email);
-        body.append('registered', 'true');
-
-        // save adopter information
-        axios.post('/admin-ng/adopter/registration', body, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        }).then(r => {
+        // post request for adopter information
+        postRegistration(values).then(() => {
             // show thank you state
             return setState(states[state].nextState[0]);
-        }).catch(r => {
+        }).catch(() => {
             // show error state
             return setState(states[state].nextState[1]);
         });
+
     };
 
-    const resetRegistrationData = () => {
-
+    const resetRegistrationData =  () => {
         // delete adopter information
-        axios.delete('/admin-ng/adopter/registration', {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        }).then(r => {
+        deleteAdopterRegistration().then(() => {
             // show thank you state
             return setState(states[state].nextState[0]);
-        }).catch( r => {
+        }).catch(() => {
             // show error state
             return setState(states[state].nextState[1]);
         });
+
     };
 
     // style of label when input has content
@@ -463,12 +441,12 @@ const RegistrationModal = ({ close }) => {
                                     <div className="pull-right">
                                         {/* submit of form content */}
                                         {state === "form" ? (
-                                            <button className={cn("submit", {
-                                                active: (formik.isValid && formik.values.agreedToPolicy),
-                                                inactive: !(formik.isValid && formik.values.agreedToPolicy)
-                                            })}
-                                                    disabled={!formik.values.agreedToPolicy}
-                                                    onClick={() => formik.handleSubmit()}>
+                                            <button disabled={!(formik.isValid && formik.values.agreedToPolicy)}
+                                                    onClick={() => formik.handleSubmit()}
+                                                    className={cn("submit", {
+                                                        active: (formik.isValid && formik.values.agreedToPolicy),
+                                                        inactive: !(formik.isValid && formik.values.agreedToPolicy)
+                                                })}>
                                                 {t(states[state].buttons.submitButtonText)}
                                             </button>
                                         ) : (

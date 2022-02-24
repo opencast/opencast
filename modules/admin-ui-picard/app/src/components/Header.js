@@ -180,7 +180,7 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
                             {displayMenuHelp && (
                                 <MenuHelp hideMenuHelp={hideMenuHelp}
                                           showRegistrationModal={showRegistrationModal}
-                    user={user}/>
+                                          user={user}/>
                             )}
                         </div>
                     )}
@@ -266,7 +266,6 @@ const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user }) => {
                         </a>
                     </li>
                 )}
-                {/* Todo: only if restUrl is there and with-role="ROLE_ADMIN */}
                 {/* Show only if restUrl is set */}
                 {(!!restUrl && hasAccess("ROLE_ADMIN", user)) && (
                     <li>
@@ -280,14 +279,14 @@ const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user }) => {
                         <span>{t('HELP.HOTKEY_CHEAT_SHEET')}</span>
                     </a>
                 </li>
-            {/* Adoter registration Modal */}
-            {hasAccess("ROLE_ADMIN", user) && (
-                <li>
-                    <a onClick={() => showAdoptersRegistrationModal()}>
-                        <span>{t('HELP.ADOPTER_REGISTRATION')}</span>
-                    </a>
-                </li>
-            )}
+                {/* Adoter registration Modal */}
+                {hasAccess("ROLE_ADMIN", user) && (
+                    <li>
+                        <a onClick={() => showAdoptersRegistrationModal()}>
+                            <span>{t('HELP.ADOPTER_REGISTRATION')}</span>
+                        </a>
+                    </li>
+                )}
             </ul>
         </>
     )

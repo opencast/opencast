@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import axios from "axios";
+import {getSourceURL} from "../../../../utils/embeddedCodeUtils";
 
 
 /**
@@ -15,15 +16,15 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
     const [showCopySuccess, setCopySuccess] = useState(false);
 
     useEffect(() => {
-        // get source url
-        axios.get("/api/info/organization/properties/engageuiurl")
-            .then(res => {
-            let url = res.data["org.opencastproject.engage.ui.url"];
-            setSourceURL(url);
-        }).catch(res => {
-            setSourceURL("<SERVER_URL>");
-        });
-    });
+        const fetchData = async () => {
+            // get source url
+            let sourceURL = await getSourceURL();
+
+            console.log(sourceURL);
+            setSourceURL(sourceURL);
+        };
+        fetchData();
+    }, []);
 
     const handleClose = () => {
         close();
@@ -47,8 +48,6 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
         // iterate through embedSizeButtons and mark the chosen size
         if (frameSize) {
             for (let i = 0; i < embedSizeButtons.length; i++) {
-                console.log(embedSizeButtons[i]);
-                console.log(embedSizeButtons[i].id)
                 if (frameSize === embedSizeButtons[i].id) {
                     embedSizeButtons[i].classList.add("embedSizeButtonSelected");
                 } else {
