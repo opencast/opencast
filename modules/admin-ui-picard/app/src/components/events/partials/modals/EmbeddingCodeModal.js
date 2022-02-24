@@ -20,7 +20,6 @@ const EmbeddingCodeModal = ({ close, eventId }) => {
             // get source url
             let sourceURL = await getSourceURL();
 
-            console.log(sourceURL);
             setSourceURL(sourceURL);
         };
         fetchData();
