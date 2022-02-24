@@ -1,5 +1,6 @@
 {
   "roles": [
+    "ROLE_ADMIN",
     "ROLE_STUDIO",
     "ROLE_ANONYMOUS",
     "ROLE_GROUP_ADMIN",

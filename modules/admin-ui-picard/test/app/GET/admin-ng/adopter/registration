@@ -1,0 +1,21 @@
+{
+   "adopterKey":"29f54986-1988-4e2e-b190-242ec539283f",
+   "statisticKey":"ed83897c-bc76-4b89-9dc4-a9c42a71d12b",
+   "organisationName":"",
+   "departmentName":"",
+   "firstName":"",
+   "lastName":"",
+   "email":"",
+   "country":"",
+   "postalCode":"",
+   "city":"",
+   "street":"",
+   "streetNo":"",
+   "contactMe":false,
+   "allowsStatistics":false,
+   "allowsErrorReports":false,
+   "dateCreated":"Feb 18, 2022, 3:57:41 AM",
+   "dateModified":"Feb 18, 2022, 3:57:41 AM",
+   "agreedToPolicy":false,
+   "registered":false
+}

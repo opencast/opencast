@@ -122,8 +122,7 @@
       opacity: 0.5;
     }
 
-    .form-control:focus + .form-control-placeholder,
-    .form-control.ng-not-empty + .form-control-placeholder {
+    .form-control:focus + .form-control-placeholder {
       font-size: 70%;
       font-weight: 700;
       transform: translate3d(0, -35%, 0);
@@ -135,7 +134,7 @@
       color: #378dd4;
     }
 
-    .form-control.ng-invalid.ng-dirty + .form-control-placeholder{
+    .form-control:invalid + .form-control-placeholder {
       color: red;
     }
 
@@ -207,7 +206,7 @@
 
     footer {
 
-        a {
+        button {
             margin: 15px 5px 15px 25px;
             &.inactive {
               opacity: 0.5;
