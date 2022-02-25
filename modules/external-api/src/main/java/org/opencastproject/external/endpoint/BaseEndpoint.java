@@ -101,7 +101,7 @@ public class BaseEndpoint {
   private SecurityService securityService;
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

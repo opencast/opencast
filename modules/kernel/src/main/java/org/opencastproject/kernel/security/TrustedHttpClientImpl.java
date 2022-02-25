@@ -217,7 +217,6 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    *         the serviceRegistry to set
    */
   @Reference(
-      name = "serviceRegistry",
       cardinality = ReferenceCardinality.OPTIONAL,
       policy =  ReferencePolicy.DYNAMIC,
       unbind = "unsetServiceRegistry")
@@ -241,7 +240,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @param securityService
    *         the security service
    */
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -252,7 +251,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @param urlSigningService
    *        The signing service to sign urls with.
    */
-  @Reference(name = "urlSigningService")
+  @Reference
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }

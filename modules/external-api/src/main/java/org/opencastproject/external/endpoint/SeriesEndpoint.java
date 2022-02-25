@@ -158,25 +158,25 @@ public class SeriesEndpoint {
   private SeriesService seriesService;
 
   /** OSGi DI */
-  @Reference(name = "ElasticsearchIndex")
+  @Reference
   void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
   }
 
   /** OSGi DI */
-  @Reference(name = "IndexService")
+  @Reference
   void setIndexService(IndexService indexService) {
     this.indexService = indexService;
   }
 
   /** OSGi DI */
-  @Reference(name = "SecurityService")
+  @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi DI */
-  @Reference(name = "SeriesService")
+  @Reference
   void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }

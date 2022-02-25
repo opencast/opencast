@@ -98,10 +98,7 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   /** OSGi DI */
 
   /** OSGi DI */
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.usertracking)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.usertracking)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }

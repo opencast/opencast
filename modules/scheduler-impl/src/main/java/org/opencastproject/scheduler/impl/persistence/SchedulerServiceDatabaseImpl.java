@@ -72,16 +72,13 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   private static final Gson gson = new Gson();
 
   /** OSGi DI */
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.scheduler.impl.persistence)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.scheduler.impl.persistence)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
 
   /** OSGi DI */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

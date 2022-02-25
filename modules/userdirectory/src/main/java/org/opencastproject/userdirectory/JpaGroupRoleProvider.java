@@ -97,7 +97,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
   private ComponentContext cc;
 
   /** OSGi DI */
-  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
+  @Reference(target = "(osgi.unit.name=org.opencastproject.common)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -108,7 +108,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "userDirectoryService")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -117,7 +117,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -126,7 +126,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @param organizationDirectoryService
    *          the organizationDirectoryService to set
    */
-  @Reference(name = "organization-directory-service")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }

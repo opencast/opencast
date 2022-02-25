@@ -91,7 +91,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    * @param client
    */
   @Override
-  @Reference(name = "trustedHttpClient")
+  @Reference
   public void setTrustedHttpClient(TrustedHttpClient client) {
     this.client = client;
   }
@@ -102,7 +102,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    * @param remoteServiceManager
    */
   @Override
-  @Reference(name = "remoteServiceManager")
+  @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     this.remoteServiceManager = remoteServiceManager;
   }

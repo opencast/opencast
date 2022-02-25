@@ -99,7 +99,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -110,7 +110,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
    * @param videoSegmenter
    *          the segmenter
    */
-  @Reference(name = "segmenter")
+  @Reference
   protected void setVideoSegmenter(VideoSegmenterService videoSegmenter) {
     this.service = videoSegmenter;
   }

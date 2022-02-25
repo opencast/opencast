@@ -325,7 +325,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
    * @param workspace
    *          the workspace to set
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -336,7 +336,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
    * @param securityService
    *          the security service
    */
-  @Reference(name = "security")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

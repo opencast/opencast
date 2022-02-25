@@ -104,7 +104,7 @@ public class AssetManagerUpdateHandler extends UpdateHandler {
     }
   }
 
-  @Reference(name = "liveScheduleService")
+  @Reference
   @Override
   public void setLiveScheduleService(LiveScheduleService liveScheduleService) {
     super.setLiveScheduleService(liveScheduleService);

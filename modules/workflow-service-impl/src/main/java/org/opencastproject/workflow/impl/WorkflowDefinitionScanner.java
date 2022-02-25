@@ -90,7 +90,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   private OrganizationDirectoryService organizationDirectoryService;
 
-  @Reference(name = "index")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }

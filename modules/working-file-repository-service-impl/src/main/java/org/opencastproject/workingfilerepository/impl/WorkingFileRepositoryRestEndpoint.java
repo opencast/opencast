@@ -128,13 +128,13 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
    * @param remoteServiceManager
    */
   @Override
-  @Reference(name = "remoteServiceManager")
+  @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     super.setRemoteServiceManager(remoteServiceManager);
   }
 
   @Override
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     super.setSecurityService(securityService);
   }

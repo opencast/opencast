@@ -1107,7 +1107,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param registry
    *          the service registry
    */
-  @Reference(name = "serviceregistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry registry) {
     this.serviceRegistry = registry;
   }
@@ -1118,7 +1118,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param orgDirectory
    *          the organization directory service
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   protected void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
@@ -1129,7 +1129,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param authorizationService
    *          the authorizationService to set
    */
-  @Reference(name = "authorization")
+  @Reference
   protected void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -1140,7 +1140,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security")
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -1151,7 +1151,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param assetManager
    *          the asset manager
    */
-  @Reference(name = "assetManager")
+  @Reference
   protected void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }

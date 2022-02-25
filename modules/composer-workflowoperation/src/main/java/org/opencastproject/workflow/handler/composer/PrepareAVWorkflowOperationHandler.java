@@ -101,7 +101,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
    * @param composerService
    *          the local composer service
    */
-  @Reference(name = "ComposerService")
+  @Reference
   protected void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -113,7 +113,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
    * @param workspace
    *          an instance of the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -380,7 +380,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     return null;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

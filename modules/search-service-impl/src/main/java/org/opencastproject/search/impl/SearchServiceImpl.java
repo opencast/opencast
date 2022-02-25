@@ -736,7 +736,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /** Dynamic reference. */
   @Reference(
-      name = "staticMetadata",
       cardinality = ReferenceCardinality.AT_LEAST_ONE,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetStaticMetadataService"
@@ -760,27 +759,27 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     this.mpeg7CatalogService = mpeg7CatalogService;
   }
 
-  @Reference(name = "search-persistence")
+  @Reference
   public void setPersistence(SearchServiceDatabase persistence) {
     this.persistence = persistence;
   }
 
-  @Reference(name = "series")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  @Reference(name = "authorization")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -791,7 +790,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -802,7 +801,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
-  @Reference(name = "user-directory")
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -813,7 +812,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param organizationDirectory
    *          the organization directory
    */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectory = organizationDirectory;
   }
@@ -857,7 +856,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    *          the serializer
    */
   @Reference(
-      name = "url-rewriter",
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetMediaPackageSerializer"

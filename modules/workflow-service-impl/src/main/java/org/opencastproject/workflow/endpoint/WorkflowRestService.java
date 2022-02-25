@@ -159,7 +159,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -170,7 +170,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
    * @param service
    *          the workflow service instance
    */
-  @Reference(name = "service-impl")
+  @Reference
   public void setService(WorkflowService service) {
     this.service = service;
   }
@@ -181,7 +181,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

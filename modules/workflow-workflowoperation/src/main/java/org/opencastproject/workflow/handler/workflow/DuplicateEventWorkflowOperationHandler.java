@@ -169,7 +169,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * OSGi setter
    * @param authorizationService
    */
-  @Reference(name = "authorization-service")
+  @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -178,7 +178,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * OSGi setter
    * @param seriesService
    */
-  @Reference(name = "series-service")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -189,7 +189,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * @param assetManager
    *          the asset manager
    */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -200,7 +200,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -211,10 +211,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
    * @param distributionService
    *          the distributionService to set
    */
-  @Reference(
-      name = "distributionService",
-      target = "(distribution.channel=download)"
-  )
+  @Reference(target = "(distribution.channel=download)")
   public void setDistributionService(DistributionService distributionService) {
     this.distributionService = distributionService;
   }
@@ -577,7 +574,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

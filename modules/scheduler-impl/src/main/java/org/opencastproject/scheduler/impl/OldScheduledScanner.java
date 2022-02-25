@@ -99,24 +99,24 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
    *
    * @param service
    */
-  @Reference(name = "SchedulerService")
+  @Reference
   public void setService(SchedulerService service) {
     this.service = service;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void bindServiceRegistry(ServiceRegistry serviceRegistry) {
     super.bindServiceRegistry(serviceRegistry);
   }
 
-  @Reference(name = "OrganizationDirectoryService")
+  @Reference
   @Override
   public void bindOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.bindOrganizationDirectoryService(organizationDirectoryService);
   }
 
-  @Reference(name = "SecurityService")
+  @Reference
   @Override
   public void bindSecurityService(SecurityService securityService) {
     super.bindSecurityService(securityService);

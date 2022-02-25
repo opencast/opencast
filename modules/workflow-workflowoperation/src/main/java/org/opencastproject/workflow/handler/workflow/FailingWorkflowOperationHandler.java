@@ -57,7 +57,7 @@ public class FailingWorkflowOperationHandler extends AbstractWorkflowOperationHa
     throw new WorkflowOperationException("Test operation for failed ");
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -225,31 +225,25 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
     return hasTitle && hasTracks;
   }
 
-  @Reference(
-      name = "DownloadDistributionService",
-      target = "(distribution.channel=download)"
-  )
+  @Reference(target = "(distribution.channel=download)")
   @Override
   public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     super.setDownloadDistributionService(downloadDistributionService);
   }
 
-  @Reference(name = "SearchService")
+  @Reference
   @Override
   public void setSearchService(SearchService searchService) {
     super.setSearchService(searchService);
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }
 
-  @Reference(
-      name = "StreamingDistributionService",
-      target = "(distribution.channel=streaming)"
-  )
+  @Reference(target = "(distribution.channel=streaming)")
   @Override
   public void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     super.setStreamingDistributionService(streamingDistributionService);

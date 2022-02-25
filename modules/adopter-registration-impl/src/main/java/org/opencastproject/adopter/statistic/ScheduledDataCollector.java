@@ -218,37 +218,37 @@ public class ScheduledDataCollector extends TimerTask {
   //================================================================================
 
   /** OSGi setter for the adopter form service. */
-  @Reference(name = "adopter-registration-service")
+  @Reference
   public void setAdopterFormService(Service adopterFormService) {
     this.adopterFormService = adopterFormService;
   }
 
   /** OSGi setter for the service registry. */
-  @Reference(name = "service-registry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** OSGi setter for the asset manager. */
-  @Reference(name = "asset-manager")
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
   /** OSGi setter for the series service. */
-  @Reference(name = "series-service")
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
   /** OSGi setter for the user provider. */
-  @Reference(name = "user-and-role-rrovider")
+  @Reference
   public void setUserAndRoleProvider(JpaUserAndRoleProvider userAndRoleProvider) {
     this.userAndRoleProvider = userAndRoleProvider;
   }
 
   /** OSGi callback for setting the security service. */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

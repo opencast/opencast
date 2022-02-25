@@ -60,7 +60,7 @@ public class WorkflowsListProvider implements ResourceListProvider {
   }
 
   /** OSGi callback for the workflow service. */
-  @Reference(name = "workflowService")
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }

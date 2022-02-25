@@ -100,7 +100,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param workspace
    *          the workspace
    */
-  @Reference(name = "Workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -111,7 +111,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param client
    *          the trusted http client
    */
-  @Reference(name = "trustedHttpClient")
+  @Reference
   public void setTrustedHttpClient(TrustedHttpClient client) {
     this.client = client;
   }
@@ -313,7 +313,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
     }
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

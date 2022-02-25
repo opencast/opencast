@@ -444,7 +444,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
     this.scheduler = scheduler;
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

@@ -185,7 +185,7 @@ public final class TerminationStateServiceImpl extends AbstractJobTerminationSta
     this.scheduler = scheduler;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);

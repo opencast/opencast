@@ -171,19 +171,19 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   private SecurityService securityService;
 
   /** OSGi callback for setting the organization directory service. */
-  @Reference(name = "orgDirectory")
+  @Reference
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
 
   /** OSGi callback for setting the role group service. */
-  @Reference(name = "groupRoleProvider")
+  @Reference
   public void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
 
   /** OSGi callback for setting the security service. */
-  @Reference(name = "securityService")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

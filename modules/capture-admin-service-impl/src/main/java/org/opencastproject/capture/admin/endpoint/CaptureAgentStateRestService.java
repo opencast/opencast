@@ -119,7 +119,6 @@ public class CaptureAgentStateRestService {
   }
 
   @Reference(
-      name = "service-impl",
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetService"
@@ -132,7 +131,7 @@ public class CaptureAgentStateRestService {
     this.service = null;
   }
 
-  @Reference(name = "scheduler-service")
+  @Reference
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }

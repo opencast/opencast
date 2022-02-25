@@ -449,7 +449,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return result;
   }
 
-  @Reference(name = "serviceRegistry")
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -459,12 +459,12 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.serviceRegistry;
   }
 
-  @Reference(name = "assetManager")
+  @Reference
   protected void setAssetManager(AssetManager assetManager) {
     this.tsam = assetManager;
   }
 
-  @Reference(name = "security-service")
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -474,7 +474,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.securityService;
   }
 
-  @Reference(name = "user-directory")
+  @Reference
   protected void setUserDirectoryService(UserDirectoryService uds) {
     this.userDirectoryService = uds;
   }
@@ -484,7 +484,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return this.userDirectoryService;
   }
 
-  @Reference(name = "orgDirectory")
+  @Reference
   protected void setOrganizationDirectoryService(OrganizationDirectoryService os) {
     this.organizationDirectoryService = os;
   }

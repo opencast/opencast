@@ -544,7 +544,7 @@ public class SmilServiceRest {
    *
    * @param smilService {@link SmilService} to set
    */
-  @Reference(name = "smil-service")
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }

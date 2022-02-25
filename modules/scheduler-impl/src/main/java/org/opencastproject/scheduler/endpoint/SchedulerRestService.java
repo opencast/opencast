@@ -189,7 +189,6 @@ public class SchedulerRestService {
    * @param service
    */
   @Reference(
-      name = "service-impl",
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetService"
   )
@@ -212,7 +211,6 @@ public class SchedulerRestService {
    * @param prolongingService
    */
   @Reference(
-      name = "prolonging-service",
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetProlongingService"
   )
@@ -235,7 +233,6 @@ public class SchedulerRestService {
    * @param agentService
    */
   @Reference(
-      name = "agentService",
       cardinality = ReferenceCardinality.OPTIONAL,
       policy = ReferencePolicy.DYNAMIC,
       unbind = "unsetCaptureAgentStateService"
@@ -258,7 +255,7 @@ public class SchedulerRestService {
    *
    * @param workspace
    */
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

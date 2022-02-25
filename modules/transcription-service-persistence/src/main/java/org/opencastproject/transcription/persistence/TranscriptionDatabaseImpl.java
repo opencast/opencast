@@ -69,10 +69,7 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
     logger.info("Activating persistence manager for transcription service");
   }
 
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.transcription.persistence)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.transcription.persistence)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }

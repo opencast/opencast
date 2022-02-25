@@ -187,7 +187,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
    * @param userDirectory
    *          the user directory
    */
-  @Reference(name = "userDirectory", cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC, unbind = "removeUserDirectory")
+  @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC, unbind = "removeUserDirectory")
   void setUserDirectory(UserDirectoryService userDirectory) {
     this.userDirectory = userDirectory;
   }

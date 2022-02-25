@@ -71,7 +71,7 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
 
   protected Workspace workspace = null;
 
-  @Reference(name = "workspace")
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }

@@ -124,17 +124,17 @@ public class VideoEditorServiceEndpoint extends AbstractJobProducerEndpoint {
     return serviceRegistry;
   }
 
-  @Reference(name = "videoeditor-service")
+  @Reference
   public void setVideoEditorService(VideoEditorService videoEditorService) {
     this.videoEditorService = videoEditorService;
   }
 
-  @Reference(name = "service-registry")
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
-  @Reference(name = "smil-service")
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }

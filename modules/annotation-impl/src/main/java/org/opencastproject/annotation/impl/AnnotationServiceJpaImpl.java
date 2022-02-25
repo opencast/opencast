@@ -62,10 +62,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
   protected SecurityService securityService;
 
   /** OSGi DI */
-  @Reference(
-      name = "entityManagerFactory",
-      target = "(osgi.unit.name=org.opencastproject.annotation)"
-  )
+  @Reference(target = "(osgi.unit.name=org.opencastproject.annotation)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -76,7 +73,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
    * @param securityService
    *          the securityService to set
    */
-  @Reference(name = "security-service")
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

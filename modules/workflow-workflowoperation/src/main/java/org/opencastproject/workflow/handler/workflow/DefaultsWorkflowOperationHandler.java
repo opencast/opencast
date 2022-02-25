@@ -62,7 +62,7 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   private PresetProvider presetProvider;
 
-  @Reference(name = "PresetProvider")
+  @Reference
   void setPresetProvider(PresetProvider presetProvider) {
     this.presetProvider = presetProvider;
   }
@@ -127,7 +127,7 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
     return createResult(workflowInstance.getMediaPackage(), properties, Action.CONTINUE, 0);
   }
 
-  @Reference(name = "ServiceRegistry")
+  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
