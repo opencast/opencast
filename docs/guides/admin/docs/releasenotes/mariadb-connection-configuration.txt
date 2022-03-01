@@ -1,0 +1,9 @@
+MariaDB Connection Configuration
+--------------------------------
+
+The syntax oof the JDBC coonnection configuration for MariaDB has slightly changed to an update of the MariaDB
+Connector/J. in `etc/custom.properties`, please use `jdbc:mariadb:` instead of `jdbc:mysql:`:
+
+```properties
+org.opencastproject.db.jdbc.url=jdbc:mariadb://localhost/opencast?useMysqlMetadata=true
+```
