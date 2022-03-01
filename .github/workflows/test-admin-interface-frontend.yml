@@ -17,14 +17,14 @@ jobs:
         browser:
           - chrome
           - firefox
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
 
     - name: use node.js
       uses: actions/setup-node@v1
       with:
-        node-version: 14.x
+        node-version: 16.x
 
     - name: install dependencies
       run: |
