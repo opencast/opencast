@@ -40,6 +40,7 @@ interface DeeplinkState {
     readonly seriesFilter?: string;
     readonly searchEpisodeResults?: SearchEpisodeResults;
     readonly searchSeriesResults?: SearchEpisodeResults;
+    readonly activeTab?: string | null,
     readonly showEpisodeTemplate: boolean;
     readonly populatedData?: string;
 }
@@ -54,6 +55,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
         this.state = {
             httpErrors: [],
             currentPage: 1,
+            activeTab: 'episodes',
             showEpisodeTemplate: true
         };
     }
@@ -137,7 +139,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
             currentPage: pageNumber
         });
 
-        if(this.state.showEpisodeTemplate){
+        if(this.state.activeTab === 'episodes'){
             this.loadEpisodesTab(pageNumber, this.state.episodesFilter);
         } else {
             this.loadSeriesTab(pageNumber, this.state.seriesFilter);
@@ -248,7 +250,9 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
             <h2>Deep Linking</h2>
             {/* Use InnerHTML to render dynamic html and execute any scripts tag within it. */}
             {this.state.populatedData !== undefined && <InnerHTML html={this.state.populatedData} />}
-            <Tabs defaultActiveKey="episodes">
+            <Tabs
+                activeKey={this.state.activeTab as string}
+                onSelect={(eventKey: string | null) => this.setState({...this.state, activeTab: eventKey})}>
                 <Tab eventKey="episodes" title="Episodes">
                     <Row id="episodes-searchfield" className="searchfield">
                         <Col>
