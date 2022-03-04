@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {connect} from "react-redux";
-import {HashRouter, Route, Switch} from "react-router-dom";
+import {BrowserRouter, HashRouter, Route, Switch} from "react-router-dom";
 import './App.scss';
 import Events from "./components/events/Events";
 import Recordings from "./components/recordings/Recordings";
@@ -16,12 +16,14 @@ import Acls from "./components/users/Acls";
 import {fetchUserInfo} from "./thunks/userInfoThunks";
 
 function App({loadingUserInfo}) {
+
     useEffect(() => {
        // Load information about current user on mount
        loadingUserInfo();
     });
+
   return (
-          <HashRouter>
+          <BrowserRouter basename={"/admin-ui"}>
               <Switch>
                   {/*Todo: When user is logged in then redirect to Events*/}
                   <Route exact path={"/"}>
@@ -61,7 +63,7 @@ function App({loadingUserInfo}) {
                       <Statistics />
                   </Route>
               </Switch>
-          </HashRouter>
+          </BrowserRouter>
   );
 }
 

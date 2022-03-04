@@ -44,6 +44,9 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
     // Size options for pagination
     const sizeOptions = [10, 20, 50, 100];
 
+    console.log("Template Map");
+    console.log(templateMap);
+
     const lengthDivStyle = {
         position: "absolute",
         visibility: "hidden",

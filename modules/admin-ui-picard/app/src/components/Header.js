@@ -11,6 +11,9 @@ import {logger} from "../utils/logger";
 import {getUserInformation} from "../selectors/userInfoSelectors";
 import axios from "axios";
 import RegistrationModal from "./shared/RegistrationModal";
+import HotKeyCheatSheet from "./shared/HotKeyCheatSheet";
+import {GlobalHotKeys} from "react-hotkeys";
+import {availableHotkeys} from "../configs/hotkeysConfig";
 
 
 // Todo: Find suitable place to define them and get these links out of config-file or whatever
@@ -38,11 +41,6 @@ function changeLanguage(code) {
     window.location.reload();
 }
 
-function showHotkeyCheatSheet() {
-    //todo: Implement method
-    console.log('Show Hot Keys');
-}
-
 function logout() {
     axios.get('/j_spring_security_logout')
         .then(response => {
@@ -64,6 +62,7 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
     const [displayMenuNotify, setMenuNotify] = useState(false);
     const [displayMenuHelp, setMenuHelp] = useState(false);
     const [displayRegistrationModal, setRegistrationModal] = useState(false);
+    const [displayHotKeyCheatSheet, setHotKeyCheatSheet] = useState(false);
 
     const loadHealthStatus = async () => {
         await loadingHealthStatus();
@@ -79,6 +78,18 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
 
     const hideRegistrationModal = () => {
         setRegistrationModal(false);
+    }
+
+    const showHotKeyCheatSheet = () => {
+        setHotKeyCheatSheet(true);
+    }
+
+    const hideHotKeyCheatSheet = () => {
+        setHotKeyCheatSheet(false);
+    }
+
+    const hotKeyHandlers = {
+        HOTKEY_CHEATSHEET: showHotKeyCheatSheet
     }
 
     useEffect(() => {
@@ -116,6 +127,7 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
 
     return(
         <>
+            <GlobalHotKeys keyMap={availableHotkeys.general} handlers={hotKeyHandlers} />
             <header className="primary-header">
                 {/* Opencast logo in upper left corner */}
                 <div className="header-branding">
@@ -180,6 +192,7 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
                             {displayMenuHelp && (
                                 <MenuHelp hideMenuHelp={hideMenuHelp}
                                           showRegistrationModal={showRegistrationModal}
+                                          showHotKeyCheatSheet={showHotKeyCheatSheet}
                                           user={user}/>
                             )}
                         </div>
@@ -199,6 +212,11 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
             {/* Adopters Registration Modal */}
             {displayRegistrationModal && (
                 <RegistrationModal close={hideRegistrationModal}/>
+            )}
+
+            {/* Hotkey Cheat Sheet */}
+            {displayHotKeyCheatSheet && (
+                <HotKeyCheatSheet close={hideHotKeyCheatSheet}/>
             )}
         </>
 
@@ -246,12 +264,18 @@ const MenuNotify = ({ healthStatus }) => (
 );
 
 
-const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user }) => {
+const MenuHelp = ({ hideMenuHelp, showRegistrationModal, showHotKeyCheatSheet, user }) => {
     const { t } = useTranslation();
 
     // show Adopter Registration Modal and hide drop down
     const showAdoptersRegistrationModal = () => {
         showRegistrationModal();
+        hideMenuHelp();
+    }
+
+    // show Hotkeys Cheat Sheet and hide drop down
+    const showHotKeys = () => {
+        showHotKeyCheatSheet();
         hideMenuHelp();
     }
 
@@ -275,7 +299,7 @@ const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user }) => {
                     </li>
                 )}
                 <li>
-                    <a onClick={() => showHotkeyCheatSheet}>
+                    <a onClick={() => showHotKeys()}>
                         <span>{t('HELP.HOTKEY_CHEAT_SHEET')}</span>
                     </a>
                 </li>
