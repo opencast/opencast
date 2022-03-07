@@ -51,10 +51,7 @@
     "time-grunt": "^2.0.0",
     "url-parse": "^1.5.1"
   },
-  "engines": {
-    "node": "8.9.4",
-    "npm": "5.6.0"
-  },
+  "engines": {},
   "scripts": {
     "test": "karma start test/karma.conf.js --single-run=true",
     "test-chrome": "karma start test/karma.conf.js --browsers=ChromeHeadless --single-run=true",
@@ -66,6 +63,6 @@
   },
   "dependencies": {
     "coffeescript": "^2.5.1",
-    "node-sass": "^6.0.0"
+    "sass": "^1.49.9"
   }
 }
