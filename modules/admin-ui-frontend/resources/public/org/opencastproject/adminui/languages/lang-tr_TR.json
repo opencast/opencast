@@ -1301,6 +1301,14 @@
                "RIGHT": "Seçilen roller",
                "REMOVE": "Rolü sil",
                "ADD": "Rol ekle"
+            },
+            "STRENGTH": {
+               "BAD": "Bad password",
+               "VERYWEAK": "Very weak password",
+               "WEAK": "Weak password",
+               "GOOD": "Good password",
+               "STRONG": "Strong password",
+               "VERYSTRONG": "Very strong password"
             }
          }
       },

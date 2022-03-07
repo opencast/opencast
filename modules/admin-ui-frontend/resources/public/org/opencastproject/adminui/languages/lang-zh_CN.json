@@ -1301,6 +1301,14 @@
                "RIGHT": "选定角色",
                "REMOVE": "移除角色",
                "ADD": "添加角色"
+            },
+            "STRENGTH": {
+               "BAD": "Bad password",
+               "VERYWEAK": "Very weak password",
+               "WEAK": "Weak password",
+               "GOOD": "Good password",
+               "STRONG": "Strong password",
+               "VERYSTRONG": "Very strong password"
             }
          }
       },

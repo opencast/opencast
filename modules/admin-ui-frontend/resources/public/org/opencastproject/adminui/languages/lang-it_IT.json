@@ -1301,6 +1301,14 @@
                "RIGHT": "Seleziona ruoli",
                "REMOVE": "Cancella ruolo",
                "ADD": "Aggiungi ruolo"
+            },
+            "STRENGTH": {
+               "BAD": "Bad password",
+               "VERYWEAK": "Very weak password",
+               "WEAK": "Weak password",
+               "GOOD": "Good password",
+               "STRONG": "Strong password",
+               "VERYSTRONG": "Very strong password"
             }
          }
       },

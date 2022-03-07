@@ -1301,6 +1301,14 @@
                "RIGHT": "תפקידים שנבחרו",
                "REMOVE": "הסר תפקיד",
                "ADD": "הוסף תפקיד"
+            },
+            "STRENGTH": {
+               "BAD": "Bad password",
+               "VERYWEAK": "Very weak password",
+               "WEAK": "Weak password",
+               "GOOD": "Good password",
+               "STRONG": "Strong password",
+               "VERYSTRONG": "Very strong password"
             }
          }
       },
