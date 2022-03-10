@@ -65,7 +65,7 @@ angular.module('adminNg.services')
 
     this.getRoles = function () {
       return me.user.roles;
-    }
+    };
 
     this.getUserRole = function () {
       return userRole;

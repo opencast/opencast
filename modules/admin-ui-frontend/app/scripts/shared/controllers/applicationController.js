@@ -134,7 +134,7 @@ angular.module('adminNg.controllers')
     const checkPermission = (rolesWithPermission) => {
       let roles = AuthService.getRoles();
       return rolesWithPermission.some(i => roles.includes(i));
-    }
+    };
 
     HotkeysService.activateUniversalHotkey('general.event_view', function (event) {
       event.preventDefault();
@@ -147,7 +147,7 @@ angular.module('adminNg.controllers')
     });
 
     HotkeysService.activateUniversalHotkey('general.new_event', function (event) {
-      let rolesWithPermission = ["ROLE_UI_EVENTS_CREATE", "ROLE_ADMIN"];
+      let rolesWithPermission = ['ROLE_UI_EVENTS_CREATE', 'ROLE_ADMIN'];
       if (checkPermission(rolesWithPermission)) {
         event.preventDefault();
         ResourceModal.show('new-event-modal');
@@ -155,7 +155,7 @@ angular.module('adminNg.controllers')
     });
 
     HotkeysService.activateUniversalHotkey('general.new_series', function (event) {
-      let rolesWithPermission = ["ROLE_UI_SERIES_CREATE", "ROLE_ADMIN"];
+      let rolesWithPermission = ['ROLE_UI_SERIES_CREATE', 'ROLE_ADMIN'];
       if (checkPermission(rolesWithPermission)) {
         event.preventDefault();
         ResourceModal.show('new-series-modal');
