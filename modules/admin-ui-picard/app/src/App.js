@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {connect} from "react-redux";
-import {BrowserRouter, HashRouter, Route, Switch} from "react-router-dom";
+import {HashRouter, Route, Switch} from "react-router-dom";
 import './App.scss';
 import Events from "./components/events/Events";
 import Recordings from "./components/recordings/Recordings";
@@ -23,7 +23,7 @@ function App({loadingUserInfo}) {
     });
 
   return (
-          <BrowserRouter basename={"/admin-ui"}>
+          <HashRouter>
               <Switch>
                   {/*Todo: When user is logged in then redirect to Events*/}
                   <Route exact path={"/"}>
@@ -63,7 +63,7 @@ function App({loadingUserInfo}) {
                       <Statistics />
                   </Route>
               </Switch>
-          </BrowserRouter>
+          </HashRouter>
   );
 }
 

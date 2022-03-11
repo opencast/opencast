@@ -24,6 +24,8 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import {availableHotkeys} from "../../configs/hotkeysConfig";
+import {GlobalHotKeys} from "react-hotkeys";
 
 
 
@@ -117,8 +119,13 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
         setDeleteSeriesModal(false);
     };
 
+    const hotKeyHandlers = {
+        NEW_SERIES: showNewSeriesModal
+    };
+
     return (
         <>
+            <GlobalHotKeys keyMap={availableHotkeys.general} handlers={hotKeyHandlers} />
             <Header />
             <section className="action-nav-bar">
                 <div className="btn-group">

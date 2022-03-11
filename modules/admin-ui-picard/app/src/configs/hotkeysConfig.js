@@ -37,7 +37,7 @@ export const availableHotkeys = {
             name: 'new_series',
             description: 'HOTKEYS.DESCRIPTIONS.GENERAL.NEW_SERIES',
             combo: ['N'],
-            sequence: 'N',
+            sequence: 'shift+n',
             action: 'keyup',
             allowIn: ['INPUT', 'SELECT', 'TEXTAREA']
         },
@@ -49,7 +49,7 @@ export const availableHotkeys = {
             action: 'keyup',
             allowIn: ['INPUT', 'SELECT', 'TEXTAREA']
         },
-        NEXT_DASHBOARD_FILTER: {
+        /*NEXT_DASHBOARD_FILTER: {
             name: 'select_next_dashboard_filter',
             description: 'HOTKEYS.DESCRIPTIONS.GENERAL.SELECT_NEXT_DASHBOARD_FILTER',
             combo: ['f'],
@@ -64,7 +64,7 @@ export const availableHotkeys = {
             sequence: 'F',
             action: 'keyup',
             allowIn: ['INPUT', 'SELECT', 'TEXTAREA']
-        },
+        },*/
         REMOVE_FILTERS: {
             name: 'remove_filters',
             description: 'HOTKEYS.DESCRIPTIONS.GENERAL.REMOVE_FILTERS',
