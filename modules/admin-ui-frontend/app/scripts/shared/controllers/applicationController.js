@@ -148,6 +148,7 @@ angular.module('adminNg.controllers')
 
     HotkeysService.activateUniversalHotkey('general.new_event', function (event) {
       let rolesWithPermission = ['ROLE_UI_EVENTS_CREATE', 'ROLE_ADMIN'];
+      // only useres with above roles can trigger the modal
       if (checkPermission(rolesWithPermission)) {
         event.preventDefault();
         ResourceModal.show('new-event-modal');
@@ -156,6 +157,7 @@ angular.module('adminNg.controllers')
 
     HotkeysService.activateUniversalHotkey('general.new_series', function (event) {
       let rolesWithPermission = ['ROLE_UI_SERIES_CREATE', 'ROLE_ADMIN'];
+      // only useres with above roles can trigger the modal
       if (checkPermission(rolesWithPermission)) {
         event.preventDefault();
         ResourceModal.show('new-series-modal');
