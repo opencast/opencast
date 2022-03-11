@@ -23,10 +23,16 @@ import EventDetailsAssetMediaDetails from "../ModalTabsAndPages/EventDetailsAsse
 import EventDetailsAssetPublicationDetails from "../ModalTabsAndPages/EventDetailsAssetPublicationDetails";
 import EventDetailsAssetsAddAsset from "../ModalTabsAndPages/EventDetailsAssetsAddAsset";
 import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
-import {getMetadata, isFetchingMetadata} from "../../../../selectors/eventDetailsSelectors";
-import {fetchMetadata, updateMetadata} from "../../../../thunks/eventDetailsThunks";
+import {
+    getMetadata,
+    getSchedulingProperties,
+    isFetchingMetadata,
+    isFetchingScheduling
+} from "../../../../selectors/eventDetailsSelectors";
+import {fetchMetadata, fetchSchedulingInfo, updateMetadata} from "../../../../thunks/eventDetailsThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import EventDetailsSchedulingTab from "../ModalTabsAndPages/EventDetailsSchedulingTab";
 
 
 // Get info about the current language and its date locale
@@ -36,14 +42,14 @@ const currentLanguage = getCurrentLanguageInformation();
  * This component manages the pages of the event details
  */
 const EventDetails = ({ tabIndex, eventId, close,
-                          metadata, isLoadingMetadata,
-                          loadMetadata, updateMetadata, removeNotificationWizardForm, user }) => {
+                          metadata, isLoadingMetadata, hasSchedulingProperties, isLoadingScheduling,
+                          loadMetadata, updateMetadata, loadScheduling, removeNotificationWizardForm, user }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
         removeNotificationWizardForm();
         loadMetadata(eventId).then(r => {});
-
+        loadScheduling(eventId).then(r => {});
     }, []);
 
     const [page, setPage] = useState(tabIndex);
@@ -81,7 +87,7 @@ const EventDetails = ({ tabIndex, eventId, close,
             bodyHeaderTranslation: 'EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION',
             accessRole: 'ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW',
             name: 'scheduling',
-            hidden: true
+            hidden: !hasSchedulingProperties
         },
         {
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS',
@@ -144,12 +150,12 @@ const EventDetails = ({ tabIndex, eventId, close,
                         {t(tabs[3].tabNameTranslation)}
                     </a>
                 )}
-                {(tabs[4].hidden && hasAccess(tabs[4].accessRole, user)) &&
+                {(!tabs[4].hidden && hasAccess(tabs[4].accessRole, user)) && (
                     <a className={cn({active: page === 4})}
                           onClick={() => openTab(4)}>
                         {t(tabs[4].tabNameTranslation)}
                     </a>
-                }
+                )}
                 {hasAccess(tabs[5].accessRole, user) && (
                     <a className={cn({active: page === 5})}
                        onClick={() => openTab(5)}>
@@ -255,9 +261,10 @@ const EventDetails = ({ tabIndex, eventId, close,
                                 setHierarchy={setAssetsTabHierarchy}/>
                         ))
                     )}
-                    {page === 4 && (
-                        <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                         t={t}/>
+                    {page === 4 && (!isLoadingScheduling) && (
+                        <EventDetailsSchedulingTab
+                            eventId={eventId}
+                            t={t}/>
                     )}
                     {page === 5 && (
                         (workflowTabHierarchy === "entry" && (
@@ -351,6 +358,8 @@ const MockDataPage = ({ header, t }) => {
 const mapStateToProps = state => ({
     metadata: getMetadata(state),
     isLoadingMetadata: isFetchingMetadata(state),
+    hasSchedulingProperties: getSchedulingProperties(state),
+    isLoadingScheduling: isFetchingScheduling(state),
     user: getUserInformation(state)
 });
 
@@ -358,6 +367,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     loadMetadata: (id) => dispatch(fetchMetadata(id)),
     updateMetadata: (id, values) => dispatch(updateMetadata(id, values)),
+    loadScheduling: (id) => dispatch(fetchSchedulingInfo(id)),
     removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
 });
 

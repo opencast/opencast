@@ -26,6 +26,8 @@ export const getCurrentLanguageInformation = () => {
     return currentLang;
 }
 
+export const padLeadingZeros = (number, placesToPad) => String(number).padStart(placesToPad, '0');
+
 // fills an array from 00 to number of elements specified
 export const initArray = numberOfElements => {
     let i, result = [];

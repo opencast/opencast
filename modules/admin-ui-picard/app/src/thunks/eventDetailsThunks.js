@@ -63,13 +63,22 @@ import {
     loadEventAssetMediaDetailsFailure,
     loadEventAssetPublicationDetailsSuccess,
     loadEventAssetPublicationDetailsFailure,
+    loadEventSchedulingInProgress,
+    loadEventSchedulingSuccess,
+    loadEventSchedulingFailure,
+    checkConflictsFailure,
+    checkConflictsSuccess,
+    checkConflictsInProgress,
+    saveEventSchedulingFailure,
+    saveEventSchedulingSuccess,
+    saveEventSchedulingInProgress,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {createPolicy, transformMetadataCollection} from "../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
 import {
-    getBaseWorkflow,
-    getMetadata,
+    getBaseWorkflow, getCaptureAgents,
+    getMetadata, getSchedulingSource,
     getWorkflow,
     getWorkflowDefinitions,
     getWorkflows
@@ -77,6 +86,7 @@ import {
 import {fetchWorkflowDef} from "./workflowThunks";
 import {getWorkflowDef} from "../selectors/workflowSelectors";
 import {logger} from "../utils/logger";
+import {removeNotificationWizardForm} from "../actions/notificationActions";
 
 // prepare http headers for posting to resources
 const getHttpHeaders = () => {
@@ -542,6 +552,219 @@ export const deleteCommentReply = (eventId, commentId, replyId) => async () => {
         logger.error(e);
         return false;
     }
+}
+
+
+// thunks for scheduling
+
+export const fetchSchedulingInfo = (eventId) => async (dispatch) => {
+    try {
+        dispatch(loadEventSchedulingInProgress())
+
+        // get data from API about event scheduling
+        const schedulingRequest = await axios.get(`/admin-ng/event/${eventId}/scheduling.json`);
+        const schedulingResponse = await schedulingRequest.data;
+
+        // get data from API about capture agents
+        const captureAgentsRequest = await axios.get(`/admin-ng/capture-agents/agents.json`);
+        const captureAgentsResponse = await captureAgentsRequest.data;
+
+        const startDate = new Date(schedulingResponse.start);
+        const endDate = new Date(schedulingResponse.end);
+        const duration = (endDate - startDate) / 1000;
+        const durationHours = (duration - (duration % 3600)) / 3600;
+        const durationMinutes = (duration % 3600) / 60;
+
+        let captureAgents = [];
+        let device = {
+            id: '',
+            name: '',
+            inputs: []
+        };
+
+        for(const agent of captureAgentsResponse.results){
+            const transformedAgent = {
+                id: agent.Name,
+                name: agent.Name,
+                status: agent.Status,
+                updated: agent.Update,
+                inputs: agent.inputs,
+                roomId: agent.roomId,
+                type: "LOCATION",
+                removable: ('AGENTS.STATUS.OFFLINE' === agent.Status || 'AGENTS.STATUS.UNKNOWN' === agent.Status)
+            };
+
+            captureAgents.push(transformedAgent);
+
+            if(transformedAgent.id === schedulingResponse.agentId){
+                let inputMethods = [];
+
+                if (schedulingResponse.agentConfiguration['capture.device.names'] !== undefined) {
+                    const inputs = schedulingResponse.agentConfiguration['capture.device.names'].split(',');
+                    for(const input of inputs) {
+                        inputMethods.push(input);
+                    }
+                }
+                device = {
+                    ...transformedAgent,
+                    inputMethods: inputMethods
+                };
+            }
+        }
+
+        const source = {
+            ...schedulingResponse,
+            start: {
+                date: startDate,
+                hour: startDate.getHours(),
+                minute: startDate.getMinutes()
+            },
+            end: {
+                date: endDate,
+                hour: endDate.getHours(),
+                minute: endDate.getMinutes()
+            },
+            duration: {
+                hour: durationHours,
+                minute: durationMinutes
+            },
+            presenters: schedulingResponse.presenters.join(", "),
+            device: {...device}
+        }
+
+        dispatch(loadEventSchedulingSuccess(source, captureAgents));
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventSchedulingFailure());
+    }
+}
+
+export const checkConflicts = (eventId, startDate, endDate, deviceId) => async (dispatch) => {
+    dispatch(checkConflictsInProgress());
+
+    const conflicts = [];
+
+    const now = new Date();
+    if(endDate < now){
+        dispatch(removeNotificationWizardForm());
+        dispatch(addNotification('error', 'CONFLICT_IN_THE_PAST', -1, null, NOTIFICATION_CONTEXT));
+        dispatch(checkConflictsSuccess(conflicts));
+        return false;
+    } else {
+        dispatch(removeNotificationWizardForm());
+        let headers = getHttpHeaders();
+
+        const conflictTimeFrame = {
+            id: eventId,
+            start: startDate.toISOString(),
+            duration: endDate - startDate,
+            device: deviceId,
+            end: endDate.toISOString()
+        };
+
+        let data = new URLSearchParams();
+        data.append("metadata", JSON.stringify(conflictTimeFrame));
+
+        await axios.post(`/admin-ng/event/new/conflicts`, data, headers )
+            .then(response => {
+                logger.info(response);
+                const responseStatus = response.status;
+                if(responseStatus === 409){
+                    //conflict detected, add notification and get conflict specifics
+                    dispatch(addNotification('error', 'CONFLICT_DETECTED', -1, null, NOTIFICATION_CONTEXT));
+                    const conflictsResponse =  response.data;
+
+                    for(const conflict of conflictsResponse){
+                        conflicts.push({
+                            title: conflict.title,
+                            start: conflict.start,
+                            end: conflict.end
+                        });
+                    }
+                } else if(204){
+                    //no conflicts detected
+                }
+
+                dispatch(checkConflictsSuccess(conflicts));
+            })
+            .catch(response => {
+                logger.error(response);
+                dispatch(checkConflictsFailure());
+            });
+
+        return true;
+    }
+}
+
+export const saveSchedulingInfo = (eventId, values, startDate, endDate) => async (dispatch, getState) => {
+    dispatch(saveEventSchedulingInProgress());
+
+    const state = getState();
+    const oldSource = getSchedulingSource(state);
+    const captureAgents = getCaptureAgents(state);
+    let device = {};
+
+    for(const agent of captureAgents){
+        if(agent.id === values.captureAgent){
+            device = {
+                ...agent,
+                inputMethods: values.inputs
+            };
+        }
+    }
+
+    const source = {
+        ...oldSource,
+        agentId: device.id,
+        start: {
+            date: startDate,
+            hour: parseInt(values.scheduleStartHour),
+            minute: parseInt(values.scheduleStartMinute)
+        },
+        end: {
+            date: endDate,
+            hour: parseInt(values.scheduleEndHour),
+            minute: parseInt(values.scheduleEndMinute)
+        },
+        duration: {
+            hour: parseInt(values.scheduleDurationHours),
+            minute: parseInt(values.scheduleDurationMinutes)
+        },
+        device: {...device},
+        agentConfiguration: {
+            ...oldSource.agentConfiguration,
+            'capture.device.names': values.inputs.join(','),
+            'event.location': device.id
+        }
+    }
+
+    const start = startDate.toISOString();
+    const end = endDate.toISOString();
+
+    const headers = getHttpHeaders();
+    let data = new URLSearchParams();
+    data.append(
+        "scheduling", JSON.stringify({
+            agentId: source.agentId,
+            start: start,
+            end: end,
+            agentConfiguration: source.agentConfiguration
+        })
+    );
+
+    // save new scheduling information
+    await axios.put(`/admin-ng/event/${eventId}/scheduling`, data, headers)
+        .then( response => {
+            dispatch(removeNotificationWizardForm());
+            dispatch(saveEventSchedulingSuccess(source));
+            // todo: should I use this here?: dispatch(fetchSchedulingInfo(eventId));
+
+        })
+        .catch( response => {
+            logger.error(response);
+            dispatch(addNotification('error', 'EVENTS_NOT_UPDATED', -1, null, NOTIFICATION_CONTEXT));
+            dispatch(saveEventSchedulingFailure());
+        });
 }
 
 

@@ -17,7 +17,7 @@
     "org.opencastproject.workflow.config.flagQuality360p": "false",
     "org.opencastproject.workflow.config.publishToEngage": "true",
     "org.opencastproject.workflow.config.flagQuality2160p": "false",
-    "capture.device.names": "",
+    "capture.device.names": "video,audio",
     "org.opencastproject.workflow.config.straightToPublishing": "true",
     "org.opencastproject.workflow.config.publishToOaiPmh": "true",
     "event.title": "Mock Event Planned"

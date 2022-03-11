@@ -62,6 +62,13 @@ import {
     LOAD_EVENT_ASSET_MEDIA_DETAILS_SUCCESS,
     LOAD_EVENT_ASSET_CATALOG_DETAILS_FAILURE,
     LOAD_EVENT_ASSET_CATALOG_DETAILS_SUCCESS,
+    LOAD_EVENT_SCHEDULING_IN_PROGRESS,
+    LOAD_EVENT_SCHEDULING_SUCCESS,
+    LOAD_EVENT_SCHEDULING_FAILURE,
+    CHECK_CONFLICTS_FAILURE,
+    CHECK_CONFLICTS_SUCCESS,
+    CHECK_CONFLICTS_IN_PROGRESS,
+    SAVE_EVENT_SCHEDULING_IN_PROGRESS, SAVE_EVENT_SCHEDULING_SUCCESS, SAVE_EVENT_SCHEDULING_FAILURE,
 } from '../actions/eventDetailsActions';
 
 // Initial state of event details in redux store
@@ -133,6 +140,35 @@ const initialState = {
     fetchingCommentsInProgress: false,
     comments: [],
     commentReasons: [],
+    fetchingSchedulingInProgress: false,
+    savingSchedulingInProgress: false,
+    scheduling: {
+        hasProperties: false
+    },
+    schedulingSource: {
+        start: {
+            date: "",
+            hour: null,
+            minute: null
+        },
+        duration: {
+            hour: null,
+            minute: null
+        },
+        end: {
+            date: "",
+            hour: null,
+            minute: null
+        },
+        device: {
+            name: "",
+            inputs: [],
+            inputMethods: []
+        }
+    },
+    captureAgents: [],
+    checkingConflicts: false,
+    schedulingConflicts: [],
     fetchingWorkflowsInProgress: false,
     fetchingWorkflowDetailsInProgress: false,
     workflows: {
@@ -486,6 +522,100 @@ const eventDetails = (state=initialState, action) => {
             return {
                 ...state,
                 savingCommentReplyInProgress: false
+            };
+        }
+        case LOAD_EVENT_SCHEDULING_IN_PROGRESS: {
+            return {
+                ...state,
+                fetchingSchedulingInProgress: true
+            };
+        }
+        case LOAD_EVENT_SCHEDULING_SUCCESS: {
+            const { source, captureAgents } = payload;
+            return {
+                ...state,
+                fetchingSchedulingInProgress: false,
+                schedulingSource: source,
+                scheduling: {
+                    ...state.scheduling,
+                    hasProperties: true
+                },
+                captureAgents: captureAgents
+            };
+        }
+        case LOAD_EVENT_SCHEDULING_FAILURE: {
+            const emptySchedulingSource = {
+                start: {
+                    date: "",
+                    hour: null,
+                    minute: null
+                },
+                duration: {
+                    hour: null,
+                    minute: null
+                },
+                end: {
+                    date: "",
+                    hour: null,
+                    minute: null
+                },
+                device: {
+                    name: "",
+                    inputs: [],
+                    inputMethods: []
+                }
+            };
+
+            return {
+                ...state,
+                fetchingSchedulingInProgress: false,
+                schedulingSource: emptySchedulingSource,
+                scheduling: {
+                    ...state.scheduling,
+                    hasProperties: false
+                },
+                captureAgents: []
+            };
+        }
+        case SAVE_EVENT_SCHEDULING_IN_PROGRESS: {
+            return {
+                ...state,
+                savingSchedulingInProgress: true
+            };
+        }
+        case SAVE_EVENT_SCHEDULING_SUCCESS: {
+            const { source } = payload;
+            return {
+                ...state,
+                savingSchedulingInProgress: false,
+                schedulingSource: source
+            };
+        }
+        case SAVE_EVENT_SCHEDULING_FAILURE: {
+            return {
+                ...state,
+                savingSchedulingInProgress: false,
+            };
+        }
+        case CHECK_CONFLICTS_IN_PROGRESS: {
+            return {
+                ...state,
+                checkingConflicts: true
+            };
+        }
+        case CHECK_CONFLICTS_SUCCESS: {
+            const { conflicts } = payload;
+            return {
+                ...state,
+                checkingConflicts: false,
+                schedulingConflicts: conflicts
+            };
+        }
+        case CHECK_CONFLICTS_FAILURE: {
+            return {
+                ...state,
+                checkingConflicts: false,
+                schedulingConflicts: []
             };
         }
         case LOAD_EVENT_WORKFLOW_DETAILS_IN_PROGRESS: {
