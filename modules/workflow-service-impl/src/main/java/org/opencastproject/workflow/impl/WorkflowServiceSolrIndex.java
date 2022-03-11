@@ -49,7 +49,6 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.QueryTerm;
@@ -59,6 +58,8 @@ import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport.OperationReport;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
+
 
 import com.entwinemedia.fn.Fn;
 
@@ -315,7 +316,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
         current++;
         WorkflowInstance instance = null;
         try {
-          instance = WorkflowParser.parseWorkflowInstance(payload);
+          instance = XmlWorkflowParser.parseWorkflowInstance(payload);
           Organization organization = orgDirectory.getOrganization(instance.getOrganizationId());
           securityService.setOrganization(organization);
           securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
@@ -446,7 +447,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     doc.addField(ID_KEY, instance.getId());
     doc.addField(WORKFLOW_DEFINITION_KEY, instance.getTemplate());
     doc.addField(STATE_KEY, instance.getState().toString());
-    String xml = WorkflowParser.toXml(instance);
+    String xml = XmlWorkflowParser.toXml(instance);
     doc.addField(XML_KEY, xml);
 
     // index the current operation if there is one. If the workflow is finished, there is no current operation, so use a
@@ -1047,7 +1048,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       for (SolrDocument doc : items) {
         String xml = (String) doc.get(XML_KEY);
         try {
-          set.addItem(WorkflowParser.parseWorkflowInstance(xml));
+          set.addItem(XmlWorkflowParser.parseWorkflowInstance(xml));
         } catch (Exception e) {
           throw new IllegalStateException("can not parse workflow xml", e);
         }

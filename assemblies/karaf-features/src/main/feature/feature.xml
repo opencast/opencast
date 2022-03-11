@@ -81,6 +81,9 @@
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${jackson.version}</bundle>
+    <bundle>mvn:org.yaml/snakeyaml/1.30</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aws-java-sdk/${aws.version}</bundle>
 
     <!-- Spring Framework / Security -->

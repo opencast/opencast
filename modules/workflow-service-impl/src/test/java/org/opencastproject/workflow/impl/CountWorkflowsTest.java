@@ -63,8 +63,8 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowStateListener;
+import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 
 import com.entwinemedia.fn.Stream;
@@ -233,7 +233,7 @@ public class CountWorkflowsTest {
     service.setServiceRegistry(serviceRegistry);
 
     is = CountWorkflowsTest.class.getResourceAsStream("/workflow-definition-holdstate.xml");
-    def = WorkflowParser.parseWorkflowDefinition(is);
+    def = XmlWorkflowParser.parseWorkflowDefinition(is);
     IOUtils.closeQuietly(is);
 
     serviceRegistry.registerService(service);
