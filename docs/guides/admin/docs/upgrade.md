@@ -52,6 +52,11 @@ Configuration Changes
 Note that this section will only highlight a few important changes.
 Please make sure to compare your configuration against the current configuration files.
 
+### ActiveMQ
+
+An updated ActiveMQ configuration file was included as part of Opencast 10.3.  Make sure to upgrade your config
+by following the [message broker](configuration/message-broker.md) configuration steps.
+
 ### LDAP
 
 A new configuration option `org.opencastproject.userdirectory.ldap.groupcheckprefix` was added.
