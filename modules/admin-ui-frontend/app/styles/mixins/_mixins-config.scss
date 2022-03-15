@@ -98,7 +98,7 @@
     // Base styles
     position: absolute;
     top: 52px;
-    left: -($width / 2 - 20);
+    left: -1 * (calc($width / 2) - 20px);
     z-index: $max-z - 9;
     visibility: hidden;
     opacity: 0;
