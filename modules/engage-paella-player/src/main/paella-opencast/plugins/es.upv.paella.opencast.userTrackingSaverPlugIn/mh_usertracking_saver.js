@@ -23,7 +23,7 @@ paella.addPlugin(function() {
     getName() { return 'es.upv.paella.opencast.userTrackingSaverPlugIn'; }
 
     checkEnabled(onSuccess) {
-      paella.utils.ajax.get({url:'/usertracking/detailenabled'},
+      paella.ajax.get({url:'/usertracking/detailenabled'},
         function(data, contentType, returnCode) {
           if (data == 'true') {
             onSuccess(true);
@@ -83,7 +83,7 @@ paella.addPlugin(function() {
           break;
         }
         opencastLog.type = opencastLog.type.substr(0, 128);
-        paella.utils.ajax.put( {url: '/usertracking/', params: opencastLog});
+        paella.ajax.put( {url: '/usertracking/', params: opencastLog});
       });
     }
   };
