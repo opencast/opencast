@@ -61,7 +61,7 @@
             font-weight: 600;
 
             $size: 8px;
-            $position-from-right: ($width/2) - $size;
+            $position-from-right: calc($width/2) - $size;
 
             @include triangle-point(bottom, $size, $size, $position-from-right, $off-white, 1px, $modal-nav-border-color, -8px);
         }

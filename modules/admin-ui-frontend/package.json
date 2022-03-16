@@ -51,10 +51,6 @@
     "time-grunt": "^2.0.0",
     "url-parse": "^1.5.10"
   },
-  "engines": {
-    "node": "8.9.4",
-    "npm": "5.6.0"
-  },
   "scripts": {
     "test": "karma start test/karma.conf.js --single-run=true",
     "test-chrome": "karma start test/karma.conf.js --browsers=ChromeHeadless --single-run=true",
@@ -66,6 +62,9 @@
   },
   "dependencies": {
     "coffeescript": "^2.6.1",
-    "node-sass": "^7.0.1"
+    "sass": "^1.49.9"
+  },
+  "optionalDependencies": {
+    "fsevents": "^2.3.2"
   }
 }
