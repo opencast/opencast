@@ -170,6 +170,12 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
             DEFAULT_RETRY_WAITING_PERIOD_UPDATE);
     logger.info("Max retry attempts for update requests set to {}, timeout set to {} ms.", maxRetryAttemptsUpdate,
             retryWaitingPeriodUpdate);
+
+    if (maxRetryAttemptsGet < 0 || maxRetryAttemptsUpdate < 0 || retryWaitingPeriodGet < 0
+            || retryWaitingPeriodUpdate < 0) {
+      logger.warn("You have configured negative values for max attempts or retry periods. Is this intended? This is "
+              + "equivalent to setting those values to 0.");
+    }
   }
 
   /**
