@@ -1,0 +1,43 @@
+name: Auto-update npm libraries
+
+# Be carefuly for which modules you activate auto-updates.
+# Braking changes *MUST* be caught in the CI or they will cause errors.
+# Updating test libraries like eslint should be safe however.
+
+on:
+  schedule:
+  - cron: "0 5 * * *"
+
+jobs:
+  update-npm-libs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: prepare git
+        run: |
+          git config --global user.email 'update-bot@opencast.org'
+          git config --global user.name 'Update Bot'
+
+      - name: use node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: update all engage-theodul-core libraries (has only tests)
+        working-directory: modules/engage-theodul-core
+        run: |
+          rm package-lock.json
+          npm update --dev
+          npm audit fix
+          git add package.json package-lock.json
+
+      - name: make sure tests still work
+        working-directory: modules/engage-theodul-core
+        run: |
+          npm run eslint
+
+      - name: push changes
+        run: |
+          git commit -m 'Auto-update npm packages'
+          git push
