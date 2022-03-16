@@ -88,7 +88,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * A search index implementation based on ElasticSearch.
@@ -128,9 +127,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /** Identifier of the root entry */
   private static final String ROOT_ID = "root";
 
-  /** Type of the document containing the index version information */
-  private static final String VERSION_TYPE = "version";
-
   /** The index identifier */
   private String indexIdentifier = null;
 
@@ -139,9 +135,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
   /** The high level client */
   private RestHighLevelClient client = null;
-
-  /** List of sites with prepared index */
-  private final List<String> preparedIndices = new ArrayList<>();
 
   /** The version number */
   private int indexVersion = -1;
@@ -212,9 +205,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       if (!delete.isAcknowledged()) {
         logger.error("Index '{}' could not be deleted", getIndexName());
       }
-      preparedIndices
-              .removeAll(Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier)
-                      .collect(Collectors.toList()));
       createIndex();
     } catch (ElasticsearchException exception) {
       if (exception.status() == RestStatus.NOT_FOUND) {
@@ -378,8 +368,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       logger.debug("Index version of site '{}' is {}", idxName, indexVersion);
       client.index(indexRequest, RequestOptions.DEFAULT);
     }
-
-    preparedIndices.add(idxName);
   }
 
   /**
