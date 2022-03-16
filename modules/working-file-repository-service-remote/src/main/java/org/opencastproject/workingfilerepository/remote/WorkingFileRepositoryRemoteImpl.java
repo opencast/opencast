@@ -239,7 +239,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
   }
 
   @Override
-  public boolean cleanupOldFilesFromMediapackage(long days) throws IOException {
+  public boolean cleanupOldFilesFromMediaPackage(long days) throws IOException {
     String url = UrlSupport.concat(new String[] { MEDIAPACKAGE_PATH_PREFIX, Long.toString(days) });
     HttpDelete del = new HttpDelete(url);
     HttpResponse response = getResponse(del, SC_NO_CONTENT);

@@ -145,7 +145,7 @@ public class WorkingFileRepositoryCleaner {
       }
     }
     try {
-      workingFileRepository.cleanupOldFilesFromMediapackage(maxAge);
+      workingFileRepository.cleanupOldFilesFromMediaPackage(maxAge);
     } catch (IOException e) {
       logger.error("Cleaning of mediapackages failed");
     }

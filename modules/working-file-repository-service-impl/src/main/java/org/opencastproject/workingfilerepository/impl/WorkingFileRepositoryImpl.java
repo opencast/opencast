@@ -951,7 +951,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   }
 
   @Override
-  public boolean cleanupOldFilesFromMediapackage(long days) throws IOException {
+  public boolean cleanupOldFilesFromMediaPackage(long days) throws IOException {
     return RecursiveDirectoryCleaner.cleanDirectory(
             Paths.get(rootDirectory, MEDIAPACKAGE_PATH_PREFIX),
             Duration.ofDays(days));
