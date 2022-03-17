@@ -2697,6 +2697,9 @@ public abstract class AbstractEventEndpoint {
   }
 
   private URI signUrl(URI url) {
+    if (url == null) {
+      return null;
+    }
     if (getUrlSigningService().accepts(url.toString())) {
       try {
         String clientIP = null;
