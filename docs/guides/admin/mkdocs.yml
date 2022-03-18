@@ -216,6 +216,7 @@ nav:
    - Prepare A/V: 'workflowoperationhandlers/prepareav-woh.md'
    - Probe Resolution: 'workflowoperationhandlers/probe-resolution-woh.md'
    - Process Smil: 'workflowoperationhandlers/process-smil-woh.md'
+   - Publication Workspace: 'workflowoperationhandlers/publication-to-workspace-woh.md'
    - Publish Configure AWS: 'workflowoperationhandlers/publish-configure-aws-woh.md'
    - Publish Configure: 'workflowoperationhandlers/publish-configure-woh.md'
    - Publish Engage AWS: 'workflowoperationhandlers/publish-engage-aws-woh.md'
