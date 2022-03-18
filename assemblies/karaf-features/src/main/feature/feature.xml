@@ -101,10 +101,6 @@
     <bundle>mvn:org.springframework/spring-expression/${spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-tx/${spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-web/${spring.version}</bundle>
-
-    <!-- get updated Loog4J; REMOOVE WITH NEXT KARAF UPDATE! -->
-    <bundle>mvn:org.ops4j.pax.logging/pax-logging-api/1.11.14</bundle>
-    <bundle>mvn:org.ops4j.pax.logging/pax-logging-log4j2/1.11.14</bundle>
   </feature>
 
   <feature name="opencast-core" version="${project.version}">
