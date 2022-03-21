@@ -142,6 +142,7 @@ A good source for these flags are the national flag articles of Wikipedia.<br/>E
   <img src="../../../../img/lang/pl_PL.svg" alt="pl_PL"/>
   <img src="../../../../img/lang/sv_SE.svg" alt="sv_SE"/>
   <img src="../../../../img/lang/zh_CN.svg" alt="zh_CN"/>
+  <img src="../../../../img/lang/zh_TW.svg" alt="zh_TW"/>
 </div>
 
 ```css
