@@ -335,6 +335,27 @@
                 }
             },
             "displayLanguage": "\u4e2d\u6587"
+        },
+        {
+            "code": "zh_TW",
+            "dateFormats": {
+                "dateTime": {
+                    "short": "yyyy/M/d a h:mm",
+                    "medium": "yyyy/M/d a hh:mm:ss",
+                    "full": "yyyy'\u5e74'M'\u6708'd'\u65e5' EEEE ahh'\u6642'mm'\u5206'ss'\u79d2' z"
+                },
+                "date": {
+                    "short": "yyyy/M/d",
+                    "medium": "yyyy/M/d",
+                    "full": "yyyy'\u5e74'M'\u6708'd'\u65e5' EEEE"
+                },
+                "time": {
+                    "short": "a h:mm",
+                    "medium": "a hh:mm:ss",
+                    "full": "ahh'\u6642'mm'\u5206'ss'\u79d2' z"
+                }
+            },
+            "displayLanguage": "\u4e2d\u6587"
         }
     ],
     "fallbackLanguage": {
