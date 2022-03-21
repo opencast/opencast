@@ -3,73 +3,73 @@
    "NAV_HOME": "開始",
    "NAV_ABOUT": "關於",
    "BUILD": {
-      "BUILT_ON": "built on",
-      "DATE_DESC": "Date this system's kernel module was built on.",
-      "COMMIT": "Git commit this version was built from.",
-      "VERSION": "Common bundle version"
+      "BUILT_ON": "建立於",
+      "DATE_DESC": "構建此系統的核心模組的日期。",
+      "COMMIT": "構建此版本的 Git 版本。",
+      "VERSION": "共同綁定版本"
    },
    "NO": "否",
    "SUBMIT": "送出",
    "UPDATE": {
-      "MINOR": "Minor update available",
-      "MAJOR": "Major update available",
-      "UNSUPPORTED": "Version {{ version }} no longer supported",
-      "UNDETERMINED": "Indeterminable version"
+      "MINOR": "有小更新版可使用",
+      "MAJOR": "有主要更新版本可使用",
+      "UNSUPPORTED": "版本 {{ version }} 已不再受支持",
+      "UNDETERMINED": "不確定版本"
    },
    "CANCEL": "取消",
    "CONFIRM": "確定",
    "SAVE": "儲存",
-   "CONTINUE": "Continue",
-   "CLOSE": "Close",
+   "CONTINUE": "繼續",
+   "CLOSE": "關閉",
    "LOGOUT": "登出",
    "RESET": "重設",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "未選擇任何選項",
+   "SELECT_NO_OPTIONS_AVAILABLE": "沒有可用的選項",
    "YES": "是",
-   "COPY": "Copy to clipboard",
+   "COPY": "複製到剪貼簿",
    "LTI": {
-      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
-      "SERIES_TITLE": "View Series",
-      "UPLOAD_TITLE": "Upload event",
-      "LOADING": "Loading…",
-      "NEW_UPLOAD": "Upload new event",
-      "EDIT_UPLOAD": "Edit event",
-      "CURRENT_JOBS": "Today's jobs",
-      "PRESENTER": "Presenter",
-      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
-      "VIDEOFILE": "Videofile",
-      "VIDEOFILE_DESCRIPTION": "Video file for upload",
-      "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
-      "UPLOAD": "Upload",
-      "UPLOADING": "Uploading",
-      "EDIT": "Save",
-      "EDIT_TITLE": "Edit event",
-      "NO_OPTION_SELECTED": "No option selected",
-      "EDITING": "Saving…",
-      "SELECT_OPTION": "Select option",
-      "JOB_TITLE": "Title",
-      "JOB_STATUS": "Status",
-      "UPLOAD_SUCCESS": "Upload succeeded!",
-      "UPLOAD_FAILURE": "Upload failed!",
-      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
-      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
-      "EDIT_FAILURE": "Edit failed!",
-      "COPY_SUCCESS": "Copying started…",
-      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
-      "GENERIC_ERROR": "Error: {{message}}",
-      "DELETION_SUCCESS": "Event deletion successful",
-      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
-      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
-      "DELETION_FAILURE": "Event deletion failed",
-      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
-      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
-      "CONFIRM_DELETION": "Really delete this event?",
-      "COPY_TO_SERIES": "Copy event to series",
-      "SELECT_COPY_TARGET": "Select destination series",
-      "COPY": "Copy",
-      "COPY_IN_PROGRESS": "Starting copy…",
-      "CREATOR": "by {{creator}}"
+      "ERROR_LOADING_METADATA": "載入事件後設資料時發生錯誤。請稍後再試。",
+      "SERIES_TITLE": "瀏覽系列",
+      "UPLOAD_TITLE": "上傳事件",
+      "LOADING": "載入中...",
+      "NEW_UPLOAD": "上傳新事件",
+      "EDIT_UPLOAD": "編輯事件",
+      "CURRENT_JOBS": "今天的工作",
+      "PRESENTER": "簡報者",
+      "PRESENTER_DESCRIPTION": "簡報者軌道的影片檔案",
+      "VIDEOFILE": "影片檔案",
+      "VIDEOFILE_DESCRIPTION": "選擇要上傳的影片檔案",
+      "CAPTION": "字幕",
+      "CAPTION_DESCRIPTION": "字幕檔案； 支援 VTT 或 dfxp 格式",
+      "UPLOAD": "上傳",
+      "UPLOADING": "上傳中",
+      "EDIT": "儲存",
+      "EDIT_TITLE": "編輯事件",
+      "NO_OPTION_SELECTED": "未選擇任何選項",
+      "EDITING": "儲存中…",
+      "SELECT_OPTION": "請選擇以下選項",
+      "JOB_TITLE": "標題",
+      "JOB_STATUS": "狀態",
+      "UPLOAD_SUCCESS": "上傳成功",
+      "UPLOAD_FAILURE": "上傳失敗",
+      "UPLOAD_FAILURE_DESCRIPTION": "請稍後重試。",
+      "EDIT_SUCCESS": "編輯成功，開始重新發佈",
+      "EDIT_FAILURE": "編輯失敗",
+      "COPY_SUCCESS": "複製開始...",
+      "COPY_SUCCESS_DESCRIPTION": "請稍候。",
+      "GENERIC_ERROR": "錯誤訊息: {{message}}",
+      "DELETION_SUCCESS": "事件刪除成功",
+      "DELETION_SUCCESS_DESCRIPTION": "稍後該事件將從列表中刪除…",
+      "EVENT_LOCKED": "該事件目前正在進行中。 請稍等以便進行下一步的更改...",
+      "DELETION_FAILURE": "事件刪除失敗",
+      "DELETION_FAILURE_DESCRIPTION": "請稍後重試。",
+      "RESULT_HEADING": "結果 {{range.begin}}-{{range.end}} 於 {{total}}",
+      "CONFIRM_DELETION": "確定要刪除這個事件",
+      "COPY_TO_SERIES": "將事件複製到系列",
+      "SELECT_COPY_TARGET": "選取目標系列",
+      "COPY": "複製",
+      "COPY_IN_PROGRESS": "開始複製...",
+      "CREATOR": "由 {{creator}}"
    },
    "LANGUAGES": {
       "ARABIC": "阿拉伯文",
@@ -105,7 +105,7 @@
       }
    },
    "CONFIRMATIONS": {
-      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+      "EMBEDDING_CODE": "嵌入代碼已複製到剪貼簿：",
       "CONTINUE_ACTION": "你確定要繼續嗎?",
       "METADATA": {
          "NOTICE": {
@@ -121,17 +121,17 @@
          "NAME": "名稱"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Confirmation",
+         "CONFIRMATION": "確認",
          "SHOW": {
-            "EMBEDDING_CODE": "Embedding code"
+            "EMBEDDING_CODE": "内嵌代码"
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "SERIES_HAS_EVENTS": "這個系列中包含事件。 刪除系列不會刪除事件。",
+         "EVENT_WILL_BE_GONE": "如果您繼續，該事件將永久消失無法恢復。"
       },
       "ERRORS": {
-         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
+         "SERIES_HAS_EVENTS": "此系列無法刪除，因為它仍然包含事件。"
       }
    },
    "MEDIAMODULE": "媒體模組",
@@ -142,8 +142,8 @@
       "USERS_GUIDE": "使用說明",
       "DOCUMENTATION": "文件檔案",
       "REST_DOC": "REST API 文檔",
-      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts",
-      "ADOPTER_REGISTRATION": "Adopter Registration"
+      "HOTKEY_CHEAT_SHEET": "鍵盤快捷鍵",
+      "ADOPTER_REGISTRATION": "使用者註冊"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "存取權限已新增",
@@ -187,21 +187,21 @@
       "SERIES_NOT_UPDATED": "該系列無法儲存",
       "SERIES_NOT_UPDATED_ID": "無法儲存系列 {{ id }}",
       "SERIES_NOT_UPDATED_ALL": "無可儲存的系列",
-      "EVENT_DELETED": "The event has been deleted.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
-      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "EVENT_DELETED": "事件已刪除",
+      "EVENT_WILL_BE_DELETED": "此事件已刪除",
+      "EVENTS_DELETED": "事件已刪除",
+      "EVENTS_NOT_DELETED": "事件無法刪除",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "無法刪除該事件，因為您沒有足夠權限。",
       "SERIES_DELETED": "該系列已被刪除",
       "SERIES_NOT_DELETED": "該系列無法刪除",
       "LOCATION_DELETED": "位置已被刪除",
       "LOCATION_NOT_DELETED": "無法刪除位置",
-      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "無法刪除該位置，因為您沒有足夠的權限。",
       "CONFLICT_DETECTED": "預約程序有衝突 ︰ 新的事件與現有的事件重疊。請更改位置、 日期或時間。",
-      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "排程衝突：改變事件會導致衝突。 請更改地點、日期或時間。",
       "CONFLICT_ALREADY_ENDED": "排程有誤，此一事件已經結束。",
       "CONFLICT_END_BEFORE_START": "排程有誤: 排程結束的時間，必須晚於開始時間。",
-      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
+      "CONFLICT_IN_THE_PAST": "無法更新排程：您不能將事件安排在過去。",
       "INVALID_ACL_RULES": "規則必須包含一個有效的角色，讀 或/和 寫的權利。",
       "MISSING_ACL_RULES": "至少有一個角色必須具有讀取和寫入權限。",
       "SAVED_ACL_RULES": "存取權限已儲存",
@@ -212,12 +212,12 @@
       "THEME_NAME_ALREADY_TAKEN": "這個名稱已被使用",
       "THEME_NAME_EMPTY": "這個名稱不能為空白",
       "BUMPER_UPLOAD_ERROR": "上傳時發生錯誤",
-      "BUMPER_REQUIRED": "You must upload a bumper",
+      "BUMPER_REQUIRED": "您必須上傳導引介紹影片",
       "TRAILER_UPLOAD_ERROR": "上傳時發生錯誤",
       "TITLE_UPLOAD_ERROR": "上傳時發生錯誤",
       "LICENSE_UPLOAD_ERROR": "上傳時發生錯誤",
       "WATERMARK_UPLOAD_ERROR": "上傳時發生錯誤",
-      "WATERMARK_REQUIRED": "You must upload a watermark",
+      "WATERMARK_REQUIRED": "您必須上傳浮水印",
       "THEME_UPLOAD_STARTED": "正在上載媒體......",
       "THEME_CREATED": "主題已創建",
       "THEME_NOT_CREATED": "主題無法創建",
@@ -225,25 +225,25 @@
       "THEME_NOT_DELETED": "主題無法刪除",
       "TASK_CREATED": "任務已創建",
       "TASK_NOT_CREATED": "任務無法創建",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_NOT_SAVED": "這些更改無法被儲存",
+      "VIDEO_CUT_SAVED": "您的變更已被儲存",
       "VIDEO_CUT_PROCESSING": "正在處理的視頻...",
-      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
-      "VIDEO_SOURCE_TRACKS_INVALID": "You have selected no video tracks to process",
-      "VIDEO_TOO_MANY_AUDIOS": "You cannot have more than one audio stream on a single video stream",
+      "THUMBNAIL_CHANGE_FAILED": "更改縮圖失敗。",
+      "VIDEO_SOURCE_TRACKS_INVALID": "您尚未選擇要處理的影片軌道",
+      "VIDEO_TOO_MANY_AUDIOS": "一個影片串流上不能有多個聲音串流",
       "SERVER_UNRESPONSIVE": "伺服器沒有回應，請稍後再試。",
       "SERVICE_UNAVAILABLE": "哎呀! 伺服器似乎沒有反應。請稍後再試。",
       "ACTIVE_TRANSACTION": "現有事件正在程序轉換中，無法編輯。",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
-         "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+         "UNEXPECTED_ERROR": "更新時出現意外錯誤。 某些事件可能已更新。",
+         "ALL_EVENTS_UPDATED": "已成功更新所有事件",
+         "NO_EVENTS_UPDATED": "所有更新都失敗",
+         "SOME_EVENTS_NOT_UPDATED": "部份事件無法被更新。"
       },
-      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
-      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
-      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
+      "ADOPTER_PROFILE_UPDATED": "成功更新概要資訊。",
+      "ADOPTER_PROFILE_NOT_UPDATED": "無法更新概要資訊，請稍後再試一次!",
+      "ADOPTER_PROFILE_DELETED": "概要資訊已被成功移除",
+      "ADOPTER_PROFILE_NOT_DELETED": "哎呀！ 無法刪除概要資訊。 請再試一次！"
    },
    "BULK_ACTIONS": {
       "CAPTION": "操作",
@@ -251,12 +251,12 @@
          "SERIES": {
             "CAPTION": "刪除",
             "BUTTON": "刪除",
-            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
+            "CANNOT_DELETE": "已被強調顯示的系列無法刪除，因為它們仍然包含事件。"
          },
          "EVENTS": {
             "CAPTION": "刪除",
             "DELETE_EVENTS": "删除事件",
-            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
+            "UNAUTHORIZED": "您無權刪除已被強調顯示的事件。 請取消選擇它們以繼續。"
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "一旦刪除, 所有的事件中繼資料, 音訊和視頻檔將被刪除和不可恢復。",
@@ -283,63 +283,63 @@
          }
       },
       "EDIT_EVENTS": {
-         "CAPTION": "Edit scheduled events",
-         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
+         "CAPTION": "編輯預定事件",
+         "CONFLICT_CHECK_RUNNING": "衝突檢查正在運行...",
          "GENERAL": {
             "CAPTION": "一般",
-            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
-            "NOCHANGES": "No changes to the events detected!",
-            "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict",
-            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
+            "CANNOTSTART": "無法處理已強調顯示的事件，僅支持預定事件。",
+            "NOCHANGES": "檢測到的事件沒有變化！",
+            "CONFLICT_FIRST_EVENT": "已更改事件",
+            "CONFLICT_SECOND_EVENT": "衝突事件",
+            "CANNOTEDITSCHEDULE": "對於已被強調顯示的事件，您無權編輯時程安排資訊。 您可以繼續，但您根本無法編輯任何事件的時程安排資訊。"
          },
          "METADATA": {
-            "EDIT": "Edit metadata"
+            "EDIT": "編輯後設資料"
          },
          "SUMMARY": {
             "CAPTION": "摘要",
-            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
+            "SINGLE_EVENT_CAPTION": "事件“{{ title }}”",
             "TYPE": "類型",
-            "PREVIOUS": "Old value",
-            "NEXT": "New value"
+            "PREVIOUS": "舊值",
+            "NEXT": "新值"
          },
          "EDIT": {
             "CAPTION": "編輯",
-            "EVENT": "event",
-            "EVENTS": "events",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "EVENT": "事件",
+            "EVENTS": "事件",
+            "HEADER": "此頁面允許您編輯按平日分組的預定事件。 輸入欄位是預先填寫的，以防所有已排程的事件對於特定欄位具有相同的值。 否則，輸入欄位將留空。 將輸入欄位留空意味著不應更改相對應的欄位值。",
             "METADATA": "後設資料",
-            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})\n"
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occurred: {{ fatalError }}",
+         "CAPTION": "編輯多個事件的後設資料",
+         "FATAL_ERROR": "發生嚴重錯誤：{{ fatalError }}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
-            "NOT_FOUND": "Not found",
-            "RUNNING_WORKFLOW": "Running workflow",
+            "CANNOT_EDIT_SOME": "無法編輯已被強調顯示的事件。",
+            "NOTHING_TO_EDIT": "無法編輯此事件。",
+            "NOT_FOUND": "未發現",
+            "RUNNING_WORKFLOW": "工作流執行中",
             "TABLE": {
-               "CAPTION": "Selected events",
-               "ERRORS": "Errors"
+               "CAPTION": "已被選取的事件",
+               "ERRORS": "錯誤"
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "編輯和/或選擇要更新的後設資料欄位。 如果這不會導致至少一個事件的值發生更改，或者該欄位是無效（例如，必填欄位不能為空）則無法選擇該欄位。 已被強調顯示的後設資料欄位對於所選事件具有許多不同的值。",
             "TABLE": {
-               "CAPTION": "Metadata of selected events",
-               "FIELDS": "Metadata",
-               "VALUES": "Values"
+               "CAPTION": "選定事件的後設資料",
+               "FIELDS": "後設資料",
+               "VALUES": "值"
             }
          },
          "UPDATE_FAILURES": {
             "TABLE": {
-               "CAPTION": "Update Failures"
+               "CAPTION": "更新失敗"
             },
-            "UPDATE_FAILED": "Update failed",
-            "NO_EVENTS_UPDATED": "All updates failed.",
-            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+            "UPDATE_FAILED": "更新失敗",
+            "NO_EVENTS_UPDATED": "所有更新都失敗",
+            "SOME_EVENTS_NOT_UPDATED": "無法更新已被強調顯示的事件。"
          }
       }
    },
@@ -347,9 +347,9 @@
       "TODAY": "今天",
       "TOMORROW": "明天",
       "YESTERDAY": "昨天",
-      "THIS_WEEK": "This week",
-      "THIS_MONTH": "This month",
-      "THIS_YEAR": "This year"
+      "THIS_WEEK": "這週",
+      "THIS_MONTH": "這個月",
+      "THIS_YEAR": "今年"
    },
    "DATETIMES": {
       "TODAY": "今天在 {{ time }}",
@@ -397,63 +397,63 @@
          "TITLE": "設定"
       },
       "STATISTICS": {
-         "TITLE": "Statistics"
+         "TITLE": "統計數據"
       }
    },
    "ADOPTER_REGISTRATION": {
       "MODAL": {
-         "CAPTION": "Registration",
-         "SKIP": "Not now",
-         "CONTINUE": "Continue",
-         "BACK": "Back",
+         "CAPTION": "註冊",
+         "SKIP": "暫不",
+         "CONTINUE": "繼續",
+         "BACK": "返回",
          "LEGAL_INFO_STATE": {
-            "HEADER": "Terms of Service and Privacy Policy"
+            "HEADER": "服務和隱私協議"
          },
          "INFORMATION_STATE": {
-            "HEADER": "Thank you for using Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
-            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+            "HEADER": "謝謝您使用 Opencast!",
+            "INFORMATION_PARAGRAPH_1": "我們的開發人員一直在努力為您提供最佳的用戶體驗。 為此，我們需要更多地了解誰在使用 Opencast 以及如何使用它。 您可以快速註冊來幫助我們。",
+            "INFORMATION_PARAGRAPH_2": "我們非常感謝任何反饋，因為即使是我們收集的有關 Opencast 使用情況的一些資訊也將幫助我們創建更好的軟體，有更好的機會獲得額外資金並吸引更多公司採用 Opencast 提供服務。"
          },
          "FORM_STATE": {
-            "ORGANISATION": "Organisation",
-            "DEPARTMENT": "Department",
-            "COUNTRY": "Country",
-            "POSTAL_CODE": "Postal code",
-            "CITY": "City",
-            "CONTACT_INFO": "Contact information",
-            "GENDER": "Gender",
-            "GENDER_MALE": "male",
-            "GENDER_FEMALE": "female",
-            "FIRST_NAME": "First name",
-            "LAST_NAME": "Last name",
-            "STREET": "Street",
-            "NUMBER": "Number",
-            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
-            "MAIL": "Email",
-            "CONTACT_ME": "Contact me for updates and security issues",
-            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
-            "POLICY_HEADLINE": "Privacy policy and terms of use",
-            "USAGE_STATISTICS": "Usage statistics",
-            "ERROR_REPORTS": "Error reports",
-            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
-            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "ORGANISATION": "組織",
+            "DEPARTMENT": "部門",
+            "COUNTRY": "國家",
+            "POSTAL_CODE": "郵政編號",
+            "CITY": "城市",
+            "CONTACT_INFO": "聯絡資訊",
+            "GENDER": "性別",
+            "GENDER_MALE": "男性",
+            "GENDER_FEMALE": "女性",
+            "FIRST_NAME": "名",
+            "LAST_NAME": "姓氏",
+            "STREET": "街",
+            "NUMBER": "號碼",
+            "ADDITIONAL_ADDRESS_INFO": "添加。 地址資訊",
+            "MAIL": "郵件信箱",
+            "CONTACT_ME": "聯繫我獲取更新和安全相關問題",
+            "WHICH_DATA_TO_SHARE": "您要分享哪些資料？",
+            "POLICY_HEADLINE": "隱私權政策和服務條款",
+            "USAGE_STATISTICS": "使用情形統計資料",
+            "ERROR_REPORTS": "錯誤報告",
+            "READ_TERMS_OF_USE_BEFORE": "我已經閱讀並且同意",
+            "READ_TERMS_OF_USE_LINK": "隱私權政策和使用條款",
             "READ_TERMS_OF_USE_AFTER": ""
          },
          "SKIP_STATE": {
-            "HEADER": "Maybe next time!",
-            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+            "HEADER": "下次吧!",
+            "TEXT": "如果您想稍後註冊，可以通過按右上角的幫助按鈕來完成。"
          },
          "THANK_YOU_STATE": {
-            "HEADER": "Thank you for your registration!",
-            "TEXT_LEADING_TO_PATH": "You can change your data at ",
-            "TEXT_LEADING_AFTER_PATH": "at any time."
+            "HEADER": "感謝您的註冊！",
+            "TEXT_LEADING_TO_PATH": "您可以在以下位置更改您的資料",
+            "TEXT_LEADING_AFTER_PATH": "任何時候"
          },
          "ERROR": {
-            "HEADER": "Error",
-            "TEXT": "An error occurred while processing your request."
+            "HEADER": "錯誤",
+            "TEXT": "處理您的請求時出錯。"
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Are you sure you want to delete your registration data?"
+            "TEXT": "你確定想要刪除您的註冊資料？"
          }
       }
    },
@@ -536,7 +536,7 @@
                   "REPEATS": "重複",
                   "REPEAT_ON": "重複的",
                   "WEEKDAYS": "平日",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "平日"
                },
                "NO_SOURCE_AVAILABLE": "沒有可定時錄製的製播器可用"
             },
@@ -550,7 +550,7 @@
                "CAPTION": "資源上傳",
                "SELECT_TYPE": "選擇資源類型",
                "ADD": "添加資源",
-               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
+               "NO_OPTIONS": "網頁的此部分未提供資源選項列表！",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "類別講義備註",
                   "CAPTIONS_DFXP": "字幕 DFXP",
@@ -568,7 +568,7 @@
             "SUMMARY": {
                "CAPTION": "摘要",
                "SOURCE": {
-                  "INPUT": "Input"
+                  "INPUT": "輸入"
                }
             },
             "WEEKDAYS": {
@@ -581,13 +581,13 @@
                "SU": "星期日"
             },
             "WEEKDAYSLONG": {
-               "MO": "Monday",
-               "TU": "Tuesday",
-               "WE": "Wednesday",
-               "TH": "Thursday",
-               "FR": "Friday",
-               "SA": "Saturday",
-               "SU": "Sunday"
+               "MO": "週一",
+               "TU": "週二",
+               "WE": "週三",
+               "TH": "週四",
+               "FR": "週五",
+               "SA": "週六",
+               "SU": "週日"
             }
          },
          "NAVIGATION": {
@@ -605,7 +605,7 @@
             "SERIES": "系列",
             "DATE": "日期",
             "START": "開始",
-            "END": "End",
+            "END": "結束",
             "STOP": "結束",
             "STATUS": "狀態",
             "LOCATION": "位置",
@@ -618,22 +618,22 @@
             "PREVIOUS": "前一項",
             "NOCONTENT": "無可用數據",
             "PUBLISHED": "已發佈",
-            "WEEKDAY": "Weekday",
-            "ADMINUI_NOTES": "Notes",
+            "WEEKDAY": "平日",
+            "ADMINUI_NOTES": "備註",
             "TOOLTIP": {
-               "ASSETS": "Open asset details",
+               "ASSETS": "開啟資源詳細資料",
                "START": "篩選此開始日期",
                "SERIES": "此系列的篩選器",
                "STATUS": "篩選此事件狀態",
                "LOCATION": "此位置的篩選器",
                "DETAILS": "檢視事件詳細內容",
                "DELETE": "刪除事件",
-               "EMBEDDING_CODE": "Embedding code",
+               "EMBEDDING_CODE": "内嵌代码",
                "EDITOR": "打開視頻編輯器",
-               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
+               "EDITOR_NEEDS_CUTTING": "打開影片編輯器（評論中已請求裁剪影片）",
                "COMMENTS": "檢視註解",
                "PAUSED_WORKFLOW": "查看暫停的工作流",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "篩選此簡報者"
             }
          },
          "STATUS": {
@@ -647,16 +647,16 @@
             "PROCESSED": "已完成",
             "RECORDING_FAILURE": "錄製失敗",
             "PROCESSING_FAILURE": "處理程序失敗",
-            "PROCESSING_CANCELLED": "Processing cancelled"
+            "PROCESSING_CANCELLED": "處理程序已取消"
          },
          "STATE_MAPPING": {
-            "RETRACTING": "Retracting",
-            "DELETING": "Deleting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
-            "REPUBLISHING_METADATA": "Republishing metadata",
-            "UPDATING_PREVIEWS": "Updating previews"
+            "RETRACTING": "撤銷中",
+            "DELETING": "刪除中",
+            "DUPLICATING": "複製中",
+            "PUBLISHING": "發布中",
+            "IMPORTING": "匯入中",
+            "REPUBLISHING_METADATA": "重新發布後設(詮釋)資料",
+            "UPDATING_PREVIEWS": "更新預覽"
          },
          "DETAILS": {
             "HEADER": "事件的細節 - {{resourceId}}",
@@ -669,7 +669,7 @@
                "WORKFLOWS": "工作流程",
                "ACCESS": "存取權限",
                "COMMENTS": "意見",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "統計數據"
             },
             "PUBLICATIONS": {
                "CAPTION": "出版",
@@ -681,7 +681,7 @@
                "ENGAGE_LIVE": "即時轉播",
                "EXTERNAL_API": "外部 API 出版物",
                "YOUTUBE": "YouTube 的影音視訊",
-               "OAIPMH": "OAI-PMH",
+               "OAIPMH": "聯合資料與服務目錄協定(OAI-PMH)",
                "SELECT_WORKFLOW": "選擇工作流程",
                "SELECT_WORKFLOW_EMPTY": "沒有可用的工作流程"
             },
@@ -754,8 +754,8 @@
                "TYPE": "類型",
                "SIZE": "檔案大小",
                "DETAILS": "詳細信息",
-               "STREAMS": "Streams",
-               "PREVIEW": "Preview",
+               "STREAMS": "串流",
+               "PREVIEW": "預覽",
                "ATTACHMENTS": {
                   "TITLE": "附件",
                   "CAPTION": "附件",
@@ -895,7 +895,7 @@
                   "REVIEW": "需要審查",
                   "ASYNC": "音訊與視訊不同步",
                   "AUDIO_ISSUE": "不存在或有缺陷的音軌",
-                  "CANCELLED": "Cancelled event",
+                  "CANCELLED": "已取消的事件",
                   "CONFLICTING_METADATA": "有衝突的後設資料",
                   "IMPROPER_POINT": "不當的進出點",
                   "MISSING_AGREEMENT": "消失的協定",
@@ -909,11 +909,11 @@
                   "WRONG_SERIES_PUBLICATION": "錯誤的系列或發行頻道",
                   "WRONG_WORKFLOW": "錯誤的工作流程",
                   "PROCESSING_FAILURE": "處理程序失敗",
-                  "ADMINUI_NOTES": "Notes in Admin UI"
+                  "ADMINUI_NOTES": "管理者介面的備註欄"
                }
             },
             "STATISTICS": {
-               "CAPTION": "Statistics"
+               "CAPTION": "統計數據"
             },
             "METADATA": {
                "CAPTION": "事件詳細資訊",
@@ -930,7 +930,7 @@
                "SOURCE": "來源",
                "CREATED": "創建",
                "CREATED_BY": "創建者",
-               "PUBLISHER": "Publisher",
+               "PUBLISHER": "發行人",
                "LICENSE": "許可證",
                "CONTRIBUTORS": "貢獻者",
                "RIGHTS": "權利",
@@ -954,7 +954,7 @@
                "ACTIONS": "操作",
                "DETAILS": "詳細信息",
                "DESCRIPTION": "說明",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "更多資訊",
                "ID": "ID",
                "TYPE": "類型",
                "TITLE": "標題",
@@ -962,8 +962,8 @@
                "STARTED": "已啟動",
                "SERIES": "系列",
                "SUBMITTED": "已提出",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "提交者",
+               "EXECUTION_TIME": "執行時間",
                "WDID": "工作流程定義",
                "MIMETYPE": "Mime 型態",
                "URL": "網址",
@@ -971,22 +971,22 @@
                "NO_CONFIGURATION": "選定的工作流程，不存在設定參數。",
                "WORKFLOW": "工作流程",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "停止工作流",
+                  "ABORT": "中止工作流的執行（不要再次重試失敗的操作）",
+                  "RETRY": "重新執行工作流",
+                  "DELETE": "刪除工作流",
+                  "DETAILS": "開啟工作流詳細資料"
                },
                "OPERATION_STATUS": {
-                  "INSTANTIATED": "Instantiated",
+                  "INSTANTIATED": "已實例化",
                   "RUNNING": "運行中",
                   "PAUSED": "暫停",
-                  "SUCCEEDED": "Succeeded",
+                  "SUCCEEDED": "成功",
                   "FAILED": "失敗",
-                  "FAILING": "Failing",
-                  "SKIPPED": "Skipped",
-                  "STOPPED": "Stopped",
-                  "RETRY": "Retry"
+                  "FAILING": "失敗",
+                  "SKIPPED": "已略過",
+                  "STOPPED": "已停止",
+                  "RETRY": "重試"
                }
             },
             "WORKFLOW_INSTANCES": {
@@ -1011,16 +1011,16 @@
                   "TITLE": "標題",
                   "STATE": "狀態",
                   "DESCRIPTION": "說明",
-                  "EXECUTION_HOST": "Execution Host",
-                  "JOB": "Job",
-                  "TIME_IN_QUEUE": "Time in Queue",
+                  "EXECUTION_HOST": "執行主機",
+                  "JOB": "工作",
+                  "TIME_IN_QUEUE": "佇列時間",
                   "STARTED": "已啟動",
                   "FINISHED": "已完成",
-                  "RETRY_STRATEGY": "Retry Strategy",
-                  "FAILED_ATTEMPTS": "Failed Attempts",
-                  "MAX_ATTEMPTS": "Max",
-                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
-                  "FAIL_ON_ERROR": "Fail on Error"
+                  "RETRY_STRATEGY": "重試策略",
+                  "FAILED_ATTEMPTS": "嘗試失敗",
+                  "MAX_ATTEMPTS": "最大",
+                  "EXCEPTION_HANDLER_WORKFLOW": "異常處理程序工作流",
+                  "FAIL_ON_ERROR": "發生錯誤後失敗"
                }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
@@ -1118,7 +1118,7 @@
          "TABLE": {
             "CAPTION": "系列",
             "TITLE": "系列",
-            "HAS_EVENTS": "Contains events",
+            "HAS_EVENTS": "包含事件",
             "ORGANIZERS": "主辦單位",
             "CONTRIBUTORS": "貢獻者",
             "CREATED": "建立於",
@@ -1139,7 +1139,7 @@
                "EVENTS": "事件",
                "PERMISSIONS": "存取權限",
                "THEME": "主題",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "統計數據"
             },
             "ACCESS": {
                "CAPTION": "存取權限",
@@ -1159,10 +1159,10 @@
                   "ACTION": "操作",
                   "NEW": "新政策",
                   "DETAILS": "詳細信息",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
-                  "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "REPLACE_EVENT_ACLS": "更新事件權限",
+                  "REPLACE_EVENT_ACLS_HINT": "確保本系列的所有事件都具有這些權限",
+                  "LOAD_MORE_LIMIT": "顯示的政策。",
+                  "LOAD_MORE_LINK": "載入更多"
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",
@@ -1270,12 +1270,12 @@
             "ACTION": "操作",
             "TOOLTIP": {
                "DELETE": "刪除使用者",
-               "DETAILS": "Open user details"
+               "DETAILS": "開啟用戶詳細資料"
             }
          },
          "DETAILS": {
             "NEWCAPTION": "建立使用者",
-            "EDITCAPTION": "User details - {{username}}",
+            "EDITCAPTION": "用戶詳細資料 - {{username}}",
             "TABS": {
                "USER": "使用者",
                "ROLES": "角色",
@@ -1313,13 +1313,13 @@
             "ROLE": "角色",
             "ACTION": "操作",
             "TOOLTIP": {
-               "DETAILS": "Open group details",
-               "DELETE": "Delete group"
+               "DETAILS": "開啟群組詳細資料",
+               "DELETE": "刪除群組"
             }
          },
          "DETAILS": {
             "NEWCAPTION": "建立群組",
-            "EDITCAPTION": "Group details - {{name}}",
+            "EDITCAPTION": "群組詳細資料 - {{name}}",
             "TABS": {
                "GROUP": "群組",
                "ROLES": "角色",
@@ -1357,8 +1357,8 @@
             "IN_USE": "使用中",
             "ACTION": "操作",
             "TOOLTIP": {
-               "DELETE": "Delete access policy",
-               "DETAILS": "Open access policy details"
+               "DELETE": "刪除存取政策",
+               "DETAILS": "開啟存取政策詳細資料"
             }
          },
          "NEW": {
@@ -1400,7 +1400,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Access policy details  - {{name}}",
+            "HEADER": "存取政策的詳細資訊- {{name}}",
             "TABS": {
                "SUMMARY": "摘要",
                "METADATA": "後設資料",
@@ -1507,13 +1507,13 @@
             "USAGE": "用法",
             "ACTION": "操作",
             "TOOLTIP": {
-               "DELETE": "Delete theme",
-               "DETAILS": "Open theme details"
+               "DELETE": "刪除主題",
+               "DETAILS": "開啟主題詳細資料"
             }
          },
          "DETAILS": {
             "NEWCAPTION": "創建主題",
-            "EDITCAPTION": "Theme details - {{name}}",
+            "EDITCAPTION": "主題詳細資料- {{name}}",
             "GENERAL": {
                "CAPTION": "常規",
                "NAME": "姓名",
@@ -1594,7 +1594,7 @@
             "CREATED": "創建",
             "CREATOR": "建立者",
             "HOST_NAME": "主機名稱",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "節點名稱",
             "OPERATION": "運作",
             "STARTED": "已啟動",
             "STATUS": "狀態",
@@ -1607,10 +1607,10 @@
             "RUNNING": "運行中",
             "FINISHED": "已完成",
             "FAILED": "失敗",
-            "DELETED": "Deleted",
-            "INSTANTIATED": "Instantiated",
-            "DISPATCHING": "Dispatching",
-            "RESTART": "Restart",
+            "DELETED": "已刪除",
+            "INSTANTIATED": "已實例化",
+            "DISPATCHING": "派送中",
+            "RESTART": "重新啟動",
             "CANCELLED": "已取消",
             "WAITING": "等待中"
          }
@@ -1620,7 +1620,7 @@
             "CAPTION": "伺服器",
             "STATUS": "狀態",
             "HOST_NAME": "主機名稱",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "節點名稱",
             "CORES": "核心",
             "COMPLETED": "工作已完成",
             "RUNNING": "工作運行中",
@@ -1638,7 +1638,7 @@
             "STATUS": "狀態",
             "NAME": "服務名稱",
             "HOST_NAME": "主機名稱",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "節點名稱",
             "COMPLETED": "工作已完成",
             "RUNNING": "工作運行中",
             "QUEUED": "工作排序中",
@@ -1647,7 +1647,7 @@
             "SANITIZE": "清除失敗的服務",
             "ACTION": "操作",
             "TOOLTIP": {
-               "SANITIZE": "Sanitize service (set service back to state normal)"
+               "SANITIZE": "清空服務設定(將服務恢復成正常狀態)"
             }
          },
          "STATUS": {
@@ -1658,11 +1658,11 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
+      "WARNING_UNSAVED": "警告：您的某些更改未儲存。 如果您離開影片編輯器，這些更改將會遺失。 你真的要繼續嗎？",
       "TIMELINE": "時間軸",
       "ZOOMLEVEL": "縮放級別",
-      "PREVIEW_MODE": "Preview Mode",
-      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
+      "PREVIEW_MODE": "預覽模式",
+      "PREVIEW_MODE_TOOLTIP": "只播放選定的影片片段",
       "ZOOM": "縮放",
       "BUTTONS": {
          "CLOSE": "關閉",
@@ -1677,97 +1677,97 @@
       },
       "AREAS": {
          "METADATA": "後設資料",
-         "THUMBNAIL": "Thumbnail",
+         "THUMBNAIL": "縮圖",
          "COMMENTS": "評論",
          "SEGMENTS": "區段",
-         "TRACKS": "Tracks"
+         "TRACKS": "軌道"
       },
       "ACTIONS": {
          "SPLIT": "分割",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
-         "REPLAY_SEGMENT": "Play Start of Segment",
-         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
-         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
-         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
-         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "SPLIT_TOOLTIP": "在目前游標位置拆分影片片段。",
+         "CUT": "隱藏/顯示",
+         "CUT_TOOLTIP": "隱藏或顯示影片被選定的部分。",
+         "REPLAY_SEGMENT": "播放影片片段的開頭",
+         "REPLAY_SEGMENT_TOOLTIP": "從頭開始播放目前影片片段。",
+         "REPLAY_END_OF_SEGMENT": "播放影片片段的結尾",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "在目前影片片段的結尾處播放幾秒鐘。",
+         "REPLAY_SEGMENT_WITH_PREROLL": "播放轉場",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "播放幾秒鐘，包含上一段的結尾和下一段的開頭。",
          "UNDO": "還原",
          "REDO": "重做",
-         "CLEAR_SEGMENTS": "Clear All Segments",
-         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+         "CLEAR_SEGMENTS": "清除所有片段",
+         "CLEAR_SEGMENTS_TOOLTIP": "清除所有片段，留下一大段。"
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "刪除區段",
-         "SHOW_SEGMENT": "Show this Segment",
-         "HIDE_SEGMENT": "Hide this Segment",
+         "SHOW_SEGMENT": "顯示此片段",
+         "HIDE_SEGMENT": "隱藏此片段",
          "START": "開始",
-         "END": "End"
+         "END": "結束"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "DESCRIPTION": "用於呈現事件的預設縮圖是自動生成的。 如果您想使用不同的縮圖，您可以從目前播放位置的影片中截取縮圖或上傳縮圖圖像。",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
-                  "LABEL": "Extract from video",
-                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+                  "LABEL": "從影片截取",
+                  "TOOLTIP": "從目前播放位置的影片中截取縮圖"
                },
                "FROM_LEFT_VIDEO": {
-                  "LABEL": "Extract from left video",
-                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+                  "LABEL": "從左側影片中截出縮圖",
+                  "TOOLTIP": "從目前播放位置的左側影片中截取縮圖"
                },
                "FROM_RIGHT_VIDEO": {
-                  "LABEL": "Extract from right video",
-                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+                  "LABEL": "從右側影片中截取",
+                  "TOOLTIP": "從目前播放位置的右側影片中截取縮圖"
                }
             },
             "UPLOAD": {
                "LABEL": "上傳圖片",
-               "TOOLTIP": "Upload a thumbnail image"
+               "TOOLTIP": "上傳縮圖的圖檔"
             },
             "USE_DEFAULT": {
-               "LABEL": "Use default thumbnail",
-               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+               "LABEL": "使用預設的縮圖",
+               "TOOLTIP": "使用自動生成的預設縮圖"
             }
          },
          "PREVIEW": {
-            "NOT_AVAILABLE": "No preview available",
-            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+            "NOT_AVAILABLE": "無法預覽",
+            "OUTDATED": "由於影片片段已更改，因此此預覽已過時。 儲存更改後它將立即更新。"
          },
          "CURRENT": {
-            "DEFAULT": "You are currently using the default thumbnail.",
-            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
-            "UPLOAD": "You are currently using an uploaded thumbnail."
+            "DEFAULT": "您目前正在使用預設縮圖。",
+            "SNAPSHOT": "目前縮圖是從影片中截出。",
+            "UPLOAD": "您目前正在使用先前上傳的縮圖。"
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
+         "DESCRIPTION": "您可以取消選擇軌道以將它們排除在進一步處理之外。 請注意，您需要（重新）發布事件才能實際套用更改。",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+            "NO_VIDEO_TRACK_SELECTED": "您必須至少啟用一個影片軌道",
+            "NO_AUDIO_TRACK_SELECTED": "您必須至少啟用一個聲音軌道"
          },
          "TRACK": {
-            "HEADER": "Track"
+            "HEADER": "軌道"
          },
          "VIDEO": {
-            "HEADER": "Video track",
-            "NOT_AVAILABLE": "No video tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No video track selected",
+            "HEADER": "影片軌道",
+            "NOT_AVAILABLE": "沒有可顯示的影片",
+            "NO_PREVIEW_AVAILABLE": "找不到可預覽的圖像",
+            "NO_TRACK_SELECTED": "尚未選取影片軌道",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "此影片軌道目前已啟用。 請點擊後停用",
+               "UNHIDE": "此影片軌道目前已停用用。 請點擊後啟"
             }
          },
          "AUDIO": {
-            "HEADER": "Audio track",
-            "NOT_AVAILABLE": "No audio tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No audio track selected",
+            "HEADER": "音軌",
+            "NOT_AVAILABLE": "沒有可取得的音軌",
+            "NO_PREVIEW_AVAILABLE": "找不到可預覽的圖像",
+            "NO_TRACK_SELECTED": "尚未選取聲音軌道",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "此聲音軌道目前已啟用。 請點擊後停用",
+               "UNHIDE": "此聲音軌道目前已停用。 請點擊後啟用"
             }
          }
       },
@@ -1805,8 +1805,8 @@
       "PLACEHOLDER": "搜索...",
       "PROFILES": {
          "FILTERS_HEADER": "儲存的過濾器設定",
-         "EDIT": "Edit filter set",
-         "REMOVE": "Remove saved filter",
+         "EDIT": "編輯篩選集合",
+         "REMOVE": "移除已儲存的篩選集",
          "EMPTY": "還沒有儲存的過濾器設定",
          "SAVE_FILTERS": "儲存",
          "FILTER_HEADER": "儲存過濾器設定",
@@ -1839,8 +1839,8 @@
          },
          "COMMENTS": {
             "LABEL": "評論",
-            "NONE": "None",
-            "OPEN": "Open",
+            "NONE": "無",
+            "OPEN": "開啟",
             "RESOLVED": "已解決"
          },
          "CONTRIBUTORS": {
@@ -1850,7 +1850,7 @@
             "LABEL": "建立者"
          },
          "PUBLISHER": {
-            "LABEL": "Publisher"
+            "LABEL": "發行人"
          },
          "HOSTNAME": {
             "LABEL": "主機名稱"
@@ -1920,7 +1920,7 @@
             "LABEL": "主機名稱"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "節點名稱"
          },
          "STATUS": {
             "LABEL": "狀態",
@@ -1964,7 +1964,7 @@
             "LABEL": "主機名稱"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "節點名稱"
          },
          "STATUS": {
             "LABEL": "狀態",
@@ -1981,7 +1981,7 @@
             "LABEL": "主機名稱"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "節點名稱"
          },
          "NAME": {
             "LABEL": "姓名"
@@ -2045,14 +2045,14 @@
    },
    "HOTKEYS": {
       "CHEAT_SHEET": {
-         "TITLE": "Keyboard shortcuts",
-         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+         "TITLE": "鍵盤快捷鍵",
+         "HINT": "此頁面列出了當前可用的鍵盤快捷鍵。 請注意，這些可能會根據您當前訪問的頁面而改變。"
       },
       "KEYS": {
          "CTRL": "Ctrl",
          "ALT": "Alt",
          "OPTION": "⌥",
-         "SPACE": "Space",
+         "SPACE": "空格鍵",
          "BACKSPACE": "⌫",
          "LEFT": "←",
          "RIGHT": "→",
@@ -2076,80 +2076,80 @@
       },
       "GROUPS": {
          "GENERAL": "一般",
-         "PLAYER": "Player",
+         "PLAYER": "播放器",
          "EDITOR": "編輯"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
-            "MAIN_MENU": "Main menu",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
-            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "MAIN_MENU": "主選單",
+            "SELECT_NEXT_DASHBOARD_FILTER": "選擇下一個儀表板過濾器",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "選擇上一個儀表板過濾器",
             "REMOVE_FILTERS": "清除所有搜尋過濾器",
             "EVENT_VIEW": "事件",
             "SERIES_VIEW": "系列",
             "NEW_EVENT": "增加事件",
             "NEW_SERIES": "增加系列",
-            "CHEAT_SHEET": "Keyboard shortcuts"
+            "CHEAT_SHEET": "鍵盤快捷鍵"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Play/pause",
+            "PLAY_PAUSE": "播放/暫停",
             "PREVIOUS_FRAME": "上一格",
             "NEXT_FRAME": "下一格",
-            "STEP_BACKWARD": "Jump 10s back",
-            "STEP_FORWARD": "Jump 10s forward",
-            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
-            "NEXT_SEGMENT": "Next segment/jump to end",
-            "VOLUME_UP": "Volume up",
-            "VOLUME_DOWN": "Volume down",
-            "MUTE": "Mute/unmute"
+            "STEP_BACKWARD": "向後跳 10 秒",
+            "STEP_FORWARD": "向前跳 10 秒",
+            "PREVIOUS_SEGMENT": "上一段/跳到開始",
+            "NEXT_SEGMENT": "下一段/跳到結尾",
+            "VOLUME_UP": "提高音量",
+            "VOLUME_DOWN": "降低音量",
+            "MUTE": "靜音/取消靜音"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "分割",
             "CUT_SELECTED_SEGMENT": "切段",
-            "PLAY_CURRENT_SEGMENT": "Play current segment",
-            "CLEAR_LIST": "Clear segment",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_CURRENT_SEGMENT": "播放目前片段",
+            "CLEAR_LIST": "清除片段",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "重播包含預告片的影片片段",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "區段結束"
          }
       }
    },
    "AGENTS": {
       "STATUS": {
-         "CAPTURING": "Capturing",
+         "CAPTURING": "錄影",
          "ERROR": "錯誤",
-         "IDLE": "Idle",
+         "IDLE": "閒置",
          "OFFLINE": "離線",
-         "SHUTTING_DOWN": "Shutting down",
-         "UNKNOWN": "Unknown",
+         "SHUTTING_DOWN": "關閉",
+         "UNKNOWN": "未知",
          "UPLOADING": "正在上傳"
       }
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "要插入多個值，請在中間按 Enter"
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "NOT_AVAILABLE": "暫時無法顯示統計數據。 請稍後再試。",
+      "UNSUPPORTED_TYPE": "抱歉，Opencast 無法呈現此類統計數據。",
       "FROM": "從",
-      "TO": "To",
-      "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
+      "TO": "至",
+      "TOTAL": "總共",
+      "GRANULARITY": "精細度",
       "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
+         "ORGANIZATION": "組織"
       },
       "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views",
-         "PUBLISHEDHOURS": "Published Hours of Video"
+         "RANDOM": "隨機資料",
+         "VIEWS_SUM": "總共觀看次數",
+         "VIEWS_AVG": "平均觀看次數",
+         "PUBLISHEDHOURS": "已發行的影片時數"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time unit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the published hours of video"
+         "RANDOM": "這顯示隨機數據作為展示。 您可以通過從 etc/providers 中刪除相對應的統計提供者的 json 定義值來停用此圖表",
+         "VIEWS_SUM": "這將顯示每個時間單位的總觀看次數。",
+         "VIEWS_AVG": "這顯示了每個時間單位的平均觀看次數。",
+         "PUBLISHEDHOURS": "這將顯示已發布的影片時數"
       }
    }
 }
