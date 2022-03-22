@@ -35,7 +35,7 @@ class Opencast {
         resolve(self._me);
       }
       else {
-        paella.utils.ajax.get({url:'/info/me.json'},
+        base.ajax.get({url:'/info/me.json'},
           function(data,contentType,code) {
             self._me = data;
             resolve(data);
@@ -54,7 +54,7 @@ class Opencast {
       }
       else {
         var episodeId = paella.utils.parameters.get('id');
-        paella.utils.ajax.get({url:'/search/episode.json', params:{'id': episodeId}},
+        base.ajax.get({url:'/search/episode.json', params:{'id': episodeId}},
           function(data, contentType, code) {
             if (data['search-results'].result) {
               self._episode = data['search-results'].result;
@@ -84,7 +84,7 @@ class Opencast {
         else {
           var serie = episode.mediapackage.series;
           if (serie != undefined) {
-            paella.utils.ajax.get({url:'/search/series.json', params:{'id': serie}},
+            base.ajax.get({url:'/search/series.json', params:{'id': serie}},
               function(data, contentType, code) {
                 if (data['search-results'].result) {
                   self._series = data['search-results'].result;
@@ -114,7 +114,7 @@ class Opencast {
       return new Promise((resolve, reject)=>{
         var serie = episode.mediapackage.series;
         if (serie != undefined) {
-          paella.utils.ajax.get({url:'/series/' + serie + '/acl.json'},
+          base.ajax.get({url:'/series/' + serie + '/acl.json'},
             function(data,contentType,code) {
               self._acl = data;
               resolve(self._acl);
@@ -133,7 +133,7 @@ class Opencast {
 }
 
 // Patch to work with MH jetty server.
-paella.utils.ajax.send = function(type,params,onSuccess,onFail) {
+base.ajax.send = function(type,params,onSuccess,onFail) {
   this.assertParams(params);
 
   var ajaxObj = jQuery.ajax({
