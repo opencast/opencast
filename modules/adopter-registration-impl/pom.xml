@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -62,7 +62,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -75,7 +75,7 @@
           <ignoredUnusedDeclaredDependencies>
             <!-- runtime tests -->
             <ignoredUnusedDeclaredDependency>com.sun.jersey:jersey-bundle</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.compendium</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.osgi:osgi.cmpn</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -93,12 +93,6 @@
             <Export-Package>
               org.opencastproject.adopter;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/adopter-registration-repository.xml,
-              OSGI-INF/adopter-registration-rest.xml,
-              OSGI-INF/adopter-registration-service.xml,
-              OSGI-INF/adopter-scheduler.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

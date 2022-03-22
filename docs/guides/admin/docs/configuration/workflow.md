@@ -155,7 +155,7 @@ The next operations will encode the media to the Mp4 format:
 
         <!-- encode: mp4 -->
         <operation
-          id="compose"
+          id="encode"
           fail-on-error="true"
           exception-handler-workflow="error"
           description="Encode camera to mp4">
@@ -168,7 +168,7 @@ The next operations will encode the media to the Mp4 format:
         </operation>
 
         <operation
-          id="compose"
+          id="encode"
           fail-on-error="true"
           exception-handler-workflow="error"
           description="Encode screen to mp4">
@@ -298,6 +298,13 @@ selection will be used to replace the `${someaction}` variable in the workflow.
 This input can also be sent by capture agents, using the ingest endpoints. Please note that capture agents usually do
 not load the configuration panel. Hence defaults set in the user interface will not apply to ingests. To circumvent
 this, the [defaults operation](../workflowoperationhandlers/defaults-woh.md) can be used.
+
+## Organisation Properties
+
+Workflows can access organisation properties stored as `prop.*` in the organisation configuration
+(`etc/org.opencastproject.organization-mh_default_org.cfg` for the default organisation `mh_default_org`). This allows
+for organisation specific configuration of your workflow. To access the property use the `org_` prefix, e.g.
+`prop.my.var` can be access using `${org_my.var}`.
 
 ## Conditional Execution
 

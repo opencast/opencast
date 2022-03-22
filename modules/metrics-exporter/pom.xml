@@ -7,13 +7,13 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <prometheus.version>0.11.0</prometheus.version>
+    <prometheus.version>0.15.0</prometheus.version>
   </properties>
   <dependencies>
     <!-- Opencast dependencies -->
@@ -42,7 +42,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <dependency>
       <groupId>io.prometheus</groupId>
@@ -52,6 +52,11 @@
     <dependency>
       <groupId>io.prometheus</groupId>
       <artifactId>simpleclient_common</artifactId>
+      <version>${prometheus.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_hotspot</artifactId>
       <version>${prometheus.version}</version>
     </dependency>
     <!-- Testing -->
@@ -96,6 +101,7 @@
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               !io.opentelemetry.*,
+              !com.sun.management.*,
               *
             </Import-Package>
             <Embed-Dependency>

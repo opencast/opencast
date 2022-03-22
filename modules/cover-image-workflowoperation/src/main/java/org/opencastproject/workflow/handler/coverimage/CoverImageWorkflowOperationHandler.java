@@ -24,11 +24,24 @@ package org.opencastproject.workflow.handler.coverimage;
 import org.opencastproject.coverimage.CoverImageService;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Implementation of {@link CoverImageWorkflowOperationHandlerBase} for usage in an OSGi context
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Cover Image Workflow Operation Handler",
+        "workflow.operation=cover-image"
+    }
+)
 public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperationHandlerBase {
 
   /** The cover image service */
@@ -49,6 +62,7 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param coverImageService
    *          an instance of the cover image service
    */
+  @Reference(name = "CoverImageService")
   protected void setCoverImageService(CoverImageService coverImageService) {
     this.coverImageService = coverImageService;
   }
@@ -59,6 +73,7 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param workspace
    *          an instance of the workspace service
    */
+  @Reference(name = "Workspace")
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -69,6 +84,10 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param srv
    *          an instance of the static metadata service
    */
+  @Reference(
+      name = "MetadataService",
+      target = "(metadata.source=dublincore)"
+  )
   protected void setStaticMetadataService(StaticMetadataService srv) {
     this.metadataService = srv;
   }
@@ -79,8 +98,15 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
    * @param dcService
    *          an instance of the dublin core catalog service
    */
+  @Reference(name = "DublinCoreCatalogService")
   protected void setDublinCoreCatalogService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
+  }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   @Override
@@ -102,4 +128,5 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
   protected DublinCoreCatalogService getDublinCoreCatalogService() {
     return dcService;
   }
+
 }

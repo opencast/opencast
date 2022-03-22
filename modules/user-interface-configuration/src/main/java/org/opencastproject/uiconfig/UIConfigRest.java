@@ -33,7 +33,11 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +47,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -69,26 +74,37 @@ import javax.ws.rs.core.Response;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@Component(
+    property = {
+        "service.description=UI Config REST Endpoint",
+        "opencast.service.type=org.opencastproject.uiconfig",
+        "opencast.service.path=/ui/config"
+    },
+    immediate = true,
+    service = UIConfigRest.class
+)
 public class UIConfigRest {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(UIConfigRest.class);
 
   /** Configuration key for the ui config folder */
   static final String UI_CONFIG_FOLDER_PROPERTY = "org.opencastproject.uiconfig.folder";
+  static final String X_ACCEL_REDIRECT_PROPERTY = "X-Accel-Redirect";
 
   /** Default Path for the ui configuration folder (relative to ${karaf.etc}) */
   private static final String UI_CONFIG_FOLDER_DEFAULT = "ui-config";
 
   /** The currently used path to the configuration folder */
-  private String uiConfigFolder = "";
+  private String uiConfigFolder = null;
+  private String xAccelRedirect = null;
 
   /** The used SecurityService */
   private SecurityService securityService;
 
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
-
 
   /**
    * OSGI callback for activating this component
@@ -96,21 +112,27 @@ public class UIConfigRest {
    * @param cc
    *          the osgi component context
    */
-  public void activate(ComponentContext cc) throws ConfigurationException {
-    uiConfigFolder = cc.getBundleContext().getProperty(UI_CONFIG_FOLDER_PROPERTY);
-
-    if (StringUtils.isEmpty(uiConfigFolder)) {
-      String karafetc = cc.getBundleContext().getProperty("karaf.etc");
-
-      if (StringUtils.isBlank(karafetc)) {
-        throw new ConfigurationException(UI_CONFIG_FOLDER_PROPERTY + " not set and unable to"
-                                         + " fall back to default location based on ${karaf.etc}");
+  @Activate
+  @Modified
+  public void activate(BundleContext context, Map<String, String> properties)
+          throws ConfigurationException, IOException {
+    uiConfigFolder = properties.get(UI_CONFIG_FOLDER_PROPERTY);
+    logger.debug("UI configuration folder configured as '{}'", uiConfigFolder);
+    if (StringUtils.isNotEmpty(uiConfigFolder)) {
+      uiConfigFolder = new File(uiConfigFolder).getCanonicalPath();
+    } else {
+      final String karafEtc = context.getProperty("karaf.etc");
+      if (StringUtils.isBlank(karafEtc)) {
+        throw new ConfigurationException(String.format(
+            "%s not set and unable to fall back to default location based on ${karaf.etc}",
+            UI_CONFIG_FOLDER_PROPERTY));
       }
-
-      uiConfigFolder = new File(karafetc, UI_CONFIG_FOLDER_DEFAULT).getAbsolutePath();
+      uiConfigFolder = new File(karafEtc, UI_CONFIG_FOLDER_DEFAULT).getCanonicalPath();
     }
+    logger.debug("UI configuration folder set to '{}'", uiConfigFolder);
 
-    logger.info("UI configuration folder is '{}'", uiConfigFolder);
+    xAccelRedirect = properties.get(X_ACCEL_REDIRECT_PROPERTY);
+    logger.debug("X-Accel-Redirect path set to {}", xAccelRedirect);
   }
 
   @GET
@@ -151,10 +173,17 @@ public class UIConfigRest {
         throw new AccessDeniedException(configFileCanPath);
       }
 
-      // Falling back to default organization if files does not exist
+      // Falling back to default organization if file does not exist
       if (!configFile.exists()) {
         logger.debug("Falling back to default organization");
         configFile = Paths.get(uiConfigFolder, DEFAULT_ORGANIZATION_ID, component, filename).toFile();
+      }
+
+      if (xAccelRedirect != null) {
+        final String relative = Paths.get(uiConfigFolder).relativize(configFile.toPath()).toString();
+        return Response.noContent()
+            .header("X-Accel-Redirect", Paths.get(xAccelRedirect, relative).toString())
+            .build();
       }
 
       // It is safe to pass the InputStream without closing it, JAX-RS takes care of that

@@ -31,7 +31,12 @@ public class OrgUnit {
   private String code;
 
   @JsonCreator
-  public OrgUnit(@JsonProperty("Id") Long id, @JsonProperty("Type") Type type, @JsonProperty("Name") String name, @JsonProperty("Code") String code) {
+  public OrgUnit(
+      @JsonProperty("Id") Long id,
+      @JsonProperty("Type") Type type,
+      @JsonProperty("Name") String name,
+      @JsonProperty("Code") String code
+  ) {
     this.id = id;
     this.type = type;
     this.name = name;

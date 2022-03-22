@@ -22,10 +22,10 @@
 package org.opencastproject.workflow.api;
 
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -36,7 +36,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Provides a mechanism to un/marshall workflow instances and definitions to/from xml.
@@ -69,7 +68,7 @@ public final class WorkflowParser {
   public static List<WorkflowDefinition> parseWorkflowDefinitions(InputStream in) throws WorkflowParsingException {
     try {
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      WorkflowDefinitionImpl[] impls = unmarshaller.unmarshal(new StreamSource(in), WorkflowDefinitionImpl[].class)
+      WorkflowDefinitionImpl[] impls = unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowDefinitionImpl[].class)
               .getValue();
       List<WorkflowDefinition> list = new ArrayList<WorkflowDefinition>();
       for (WorkflowDefinitionImpl impl : impls) {
@@ -95,7 +94,7 @@ public final class WorkflowParser {
   public static WorkflowDefinition parseWorkflowDefinition(InputStream in) throws WorkflowParsingException {
     try {
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), WorkflowDefinitionImpl.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowDefinitionImpl.class).getValue();
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
     } finally {
@@ -113,11 +112,7 @@ public final class WorkflowParser {
    *           if creating the workflow definition fails
    */
   public static WorkflowDefinition parseWorkflowDefinition(String in) throws WorkflowParsingException {
-    try {
-      return parseWorkflowDefinition(IOUtils.toInputStream(in, "UTF8"));
-    } catch (IOException e) {
-      throw new WorkflowParsingException(e);
-    }
+    return parseWorkflowDefinition(IOUtils.toInputStream(in, "UTF8"));
   }
 
   /**
@@ -132,7 +127,7 @@ public final class WorkflowParser {
   public static WorkflowInstanceImpl parseWorkflowInstance(InputStream in) throws WorkflowParsingException {
     try {
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      WorkflowInstanceImpl workflow = unmarshaller.unmarshal(new StreamSource(in), WorkflowInstanceImpl.class)
+      WorkflowInstanceImpl workflow = unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowInstanceImpl.class)
               .getValue();
       workflow.init();
       return workflow;
@@ -153,11 +148,7 @@ public final class WorkflowParser {
    *           if creating the workflow instance fails
    */
   public static WorkflowInstanceImpl parseWorkflowInstance(String in) throws WorkflowParsingException {
-    try {
-      return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
-    } catch (IOException e) {
-      throw new WorkflowParsingException(e);
-    }
+    return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
   }
 
   /**
@@ -172,7 +163,7 @@ public final class WorkflowParser {
   public static WorkflowStatistics parseWorkflowStatistics(InputStream in) throws WorkflowParsingException {
     try {
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), WorkflowStatistics.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowStatistics.class).getValue();
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
     } finally {
@@ -192,7 +183,7 @@ public final class WorkflowParser {
   public static WorkflowSet parseWorkflowSet(InputStream in) throws WorkflowParsingException {
     try {
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), WorkflowSetImpl.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), WorkflowSetImpl.class).getValue();
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
     } finally {

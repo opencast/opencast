@@ -2,11 +2,13 @@ import React from "react";
 import {connect} from "react-redux";
 import {fetchServers, setServerMaintenance} from "../../../thunks/serverThunks";
 import {loadServersIntoTable} from "../../../thunks/tableThunks";
+import {getUserInformation} from "../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../utils/utils";
 
 /**
  * This component renders the maintenance cells of servers in the table view
  */
-const ServersMaintenanceCell = ({ row, loadServers, loadServersIntoTable }) => {
+const ServersMaintenanceCell = ({ row, loadServers, loadServersIntoTable, user }) => {
 
     const onClickCheckbox = async e => {
         await setServerMaintenance(row.hostname, e.target.checked);
@@ -16,14 +18,20 @@ const ServersMaintenanceCell = ({ row, loadServers, loadServersIntoTable }) => {
 
     return (
         <>
-            {/*Todo: With role*/}
-            <input type="checkbox"
-                   onChange={e => onClickCheckbox(e)}
-                   name="maintenanceStatus"
-                   checked={row.maintenance}/>
+            {hasAccess("ROLE_UI_SERVERS_MAINTENANCE_EDIT", user) && (
+                <input type="checkbox"
+                       onChange={e => onClickCheckbox(e)}
+                       name="maintenanceStatus"
+                       checked={row.maintenance}/>
+            )}
         </>
     );
 }
+
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
 
 // mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
@@ -31,4 +39,4 @@ const mapDispatchToProps = dispatch => ({
     loadServersIntoTable: () => dispatch(loadServersIntoTable())
 });
 
-export default connect(null, mapDispatchToProps)(ServersMaintenanceCell);
+export default connect(mapStateToProps, mapDispatchToProps)(ServersMaintenanceCell);

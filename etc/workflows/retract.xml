@@ -8,66 +8,39 @@
   </tags>
   <description>Retract a recording</description>
   <displayOrder>100</displayOrder>
-  <configuration_panel>
-    <![CDATA[
-      <div id="workflow-configuration">
-        <fieldset>
-          <legend>Retract the recording from:</legend>
-          <ul>
-            <li>
-              <input id="retractFromEngage" type="checkbox" checked="checked" class="configField" value="true" />
-              <label for="retractFromEngage">Opencast Media Module</label>
-            </li>
-            <li>
-              <input id="retractFromAws" type="checkbox" class="configField" value="true" disabled="disabled" />
-              <label for="retractFromAws">AWS</label>
-            </li>
-            <li>
-              <input id="retractFromApi" type="checkbox" checked="checked" class="configField" value="true" />
-              <label for="retractFromApi">External Applications</label>
-            </li>
-            <li>
-              <input id="retractPreview" type="checkbox" checked="checked" class="configField" value="true" />
-              <label for="retractPreview">Preview and Editing Media</label>
-            </li>
-            <li>
-              <input id="retractFromYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
-              <label for="retractFromYouTube">YouTube</label>
-            </li>
-          </ul>
-        </fieldset>
-      </div>
-    ]]>
-  </configuration_panel>
-  <operations>
-
-    <!-- Make sure the workflow contains at least a default configuration -->
-
-    <operation
-      id="defaults"
-      description="Applying default configuration values">
-      <configurations>
-        <configuration key="retractFromEngage">true</configuration>
-        <configuration key="retractFromAws">true</configuration>
-        <configuration key="retractFromApi">true</configuration>
-        <configuration key="retractPreview">true</configuration>
-        <configuration key="retractFromYouTube">false</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="include"
-      description="Retract the recording">
-      <configurations>
-        <configuration key="workflow-id">partial-retract</configuration>
-      </configurations>
-    </operation>
-
-  </operations>
-
   <state-mappings>
     <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.RETRACTING</state-mapping>
     <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.RETRACTING</state-mapping>
   </state-mappings>
+  <configuration_panel/>
+  <operations>
 
+    <operation
+      id="retract-engage"
+      exception-handler-workflow="partial-error"
+      description="Retract recording from Engage">
+    </operation>
+
+    <!-- Here you can place operations to retract publication from your publication channels -->
+
+    <operation
+      id="snapshot"
+      exception-handler-workflow="partial-error"
+      description="Archiving state of retracted recording">
+    </operation>
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Remove temporary processing artifacts">
+      <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
+        <configuration key="delete-external">true</configuration>
+        <!-- ACLs are required again when working through ActiveMQ messages -->
+        <configuration key="preserve-flavors">security/*</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
 </definition>

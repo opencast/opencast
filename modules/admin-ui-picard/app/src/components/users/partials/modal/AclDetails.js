@@ -30,10 +30,12 @@ const AclDetails = ({close, aclDetails, updateAclDetails}) => {
     const tabs = [
         {
             tabTranslation: 'USERS.ACLS.DETAILS.TABS.METADATA',
+            accessRole: 'ROLE_UI_ACLS_EDIT',
             name: 'metadata'
         },
         {
             tabTranslation: 'USERS.ACLS.DETAILS.TABS.ACCESS',
+            accessRole: 'ROLE_UI_ACLS_EDIT',
             name: 'access'
         }
     ];
@@ -66,7 +68,8 @@ const AclDetails = ({close, aclDetails, updateAclDetails}) => {
                         )}
                         {page === 1 && (
                             <AclAccessPage formik={formik}
-                                           isEdit />
+                                           isEdit
+                                           accessRole={"ROLE_UI_SERIES_DETAILS_ACL_EDIT"} />
                         )}
 
                         {/* Navigation buttons and validation */}

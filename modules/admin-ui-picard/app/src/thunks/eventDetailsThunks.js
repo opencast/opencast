@@ -42,13 +42,40 @@ import {
     loadEventWorkflowErrorDetailsFailure,
     loadEventMetadataInProgress,
     loadEventMetadataSuccess,
-    loadEventMetadataFailure, setEventMetadata,
+    loadEventMetadataFailure,
+    setEventMetadata,
+    loadEventAssetsInProgress,
+    loadEventAssetsSuccess,
+    loadEventAssetsFailure,
+    loadEventAssetAttachmentsSuccess,
+    loadEventAssetAttachmentsFailure,
+    loadEventAssetCatalogsFailure,
+    loadEventAssetCatalogsSuccess,
+    loadEventAssetMediaSuccess,
+    loadEventAssetMediaFailure,
+    loadEventAssetPublicationsFailure,
+    loadEventAssetPublicationsSuccess,
+    loadEventAssetAttachmentDetailsSuccess,
+    loadEventAssetAttachmentDetailsFailure,
+    loadEventAssetCatalogDetailsSuccess,
+    loadEventAssetCatalogDetailsFailure,
+    loadEventAssetMediaDetailsSuccess,
+    loadEventAssetMediaDetailsFailure,
+    loadEventAssetPublicationDetailsSuccess,
+    loadEventAssetPublicationDetailsFailure,
+    setExtendedEventMetadata,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
-import {createPolicy, transformMetadataCollection} from "../utils/resourceUtils";
+import {
+    createPolicy,
+    getHttpHeaders,
+    transformMetadataCollection,
+    transformMetadataForUpdate
+} from "../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
 import {
     getBaseWorkflow,
+    getExtendedMetadata,
     getMetadata,
     getWorkflow,
     getWorkflowDefinitions,
@@ -57,15 +84,6 @@ import {
 import {fetchWorkflowDef} from "./workflowThunks";
 import {getWorkflowDef} from "../selectors/workflowSelectors";
 import {logger} from "../utils/logger";
-
-// prepare http headers for posting to resources
-const getHttpHeaders = () => {
-    return {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-    };
-}
 
 
 // thunks for metadata
@@ -77,9 +95,36 @@ export const fetchMetadata = (eventId) => async (dispatch) => {
         const metadataRequest = await axios.get(`/admin-ng/event/${eventId}/metadata.json`);
         const metadataResponse = await metadataRequest.data;
 
-        const metadata = transformMetadataCollection(metadataResponse[0]);
+        const mainCatalog = 'dublincore/episode';
+        let usualMetadata = {};
+        let extendedMetadata = [];
 
-        dispatch(loadEventMetadataSuccess(metadata));
+        for(const catalog of metadataResponse) {
+            let transformedCatalog = {...catalog};
+
+            if(catalog.locked !== undefined){
+                let fields = [];
+
+                for(const field in catalog.fields) {
+                    fields.push({
+                        ...field,
+                        locked: catalog.locked,
+                        readOnly: true
+                    })
+                }
+                transformedCatalog = {
+                    ...catalog,
+                    fields: fields
+                }
+            }
+            if(catalog.flavor === mainCatalog){
+                usualMetadata = transformMetadataCollection({...transformedCatalog});
+            } else {
+                extendedMetadata.push(transformMetadataCollection({...transformedCatalog}));
+            }
+        }
+
+        dispatch(loadEventMetadataSuccess(usualMetadata, extendedMetadata));
     } catch (e) {
         logger.error(e);
         dispatch(loadEventMetadataFailure());
@@ -90,29 +135,7 @@ export const updateMetadata = (eventId, values) => async (dispatch, getState) =>
     try {
         let metadataInfos = getMetadata(getState());
 
-        let fields = [];
-        let updatedFields = [];
-
-        metadataInfos.fields.forEach(field => {
-            if (field.value !== values[field.id]) {
-                let updatedField = {
-                    ...field,
-                    value: values[field.id]
-                }
-                updatedFields.push(updatedField);
-                fields.push(updatedField);
-            } else {
-                fields.push({...field});
-            }
-        });
-
-        const headers = getHttpHeaders();
-        let data = new URLSearchParams();
-        data.append("metadata",JSON.stringify([{
-            flavor: metadataInfos.flavor,
-            title: metadataInfos.title,
-            fields: updatedFields
-        }]));
+        const {fields, data, headers} = transformMetadataForUpdate(metadataInfos, values);
 
         await axios.put(`/admin-ng/event/${eventId}/metadata`, data, headers);
 
@@ -125,6 +148,274 @@ export const updateMetadata = (eventId, values) => async (dispatch, getState) =>
         dispatch(setEventMetadata(eventMetadata));
     } catch (e) {
         logger.error(e);
+    }
+}
+
+export const updateExtendedMetadata = (eventId, values, catalog) => async (dispatch, getState) => {
+    try {
+        const {fields, data, headers} = transformMetadataForUpdate(catalog, values);
+
+        await axios.put(`/admin-ng/event/${eventId}/metadata`, data, headers);
+
+        // updated extended metadata in event details redux store
+        let eventMetadata = {
+            ...catalog,
+            fields: fields
+        };
+
+
+        const oldExtendedMetadata = getExtendedMetadata(getState());
+        let newExtendedMetadata = [];
+
+        for(const catalog of oldExtendedMetadata){
+            if((catalog.flavor === eventMetadata.flavor) && (catalog.title === eventMetadata.title)){
+                newExtendedMetadata.push(eventMetadata);
+            } else {
+                newExtendedMetadata.push(catalog);
+            }
+        }
+
+        dispatch(setExtendedEventMetadata(newExtendedMetadata));
+    } catch (e) {
+        logger.error(e);
+    }
+}
+
+
+//thunks for assets
+
+export const fetchAssets = (eventId) => async (dispatch) => {
+    try {
+        dispatch(loadEventAssetsInProgress());
+
+        const assetsRequest = await axios.get(`/admin-ng/event/${eventId}/asset/assets.json`);
+        const assets = await assetsRequest.data;
+
+        let transactionsReadOnly = true;
+        const fetchTransactionResult = await dispatch(fetchHasActiveTransactions(eventId));
+        if(fetchTransactionResult.active !== undefined){
+            transactionsReadOnly = fetchTransactionResult.active
+        }
+
+        const resourceOptionsListRequest = await axios.get(`/admin-ng/resources/eventUploadAssetOptions.json`);
+        const resourceOptionsListResponse = await resourceOptionsListRequest.data;
+
+        let uploadAssetOptions = [];
+        const optionsData = formatUploadAssetOptions(resourceOptionsListResponse);
+
+        for(const option of optionsData.options){
+            if (option.type !== 'track') {
+                uploadAssetOptions.push({...option});
+            }
+        }
+
+        // if no asset options, undefine the option variable
+        uploadAssetOptions = uploadAssetOptions.length > 0 ? uploadAssetOptions : undefined;
+
+        dispatch(loadEventAssetsSuccess(assets, transactionsReadOnly, uploadAssetOptions));
+        if(transactionsReadOnly) {
+            dispatch(addNotification('warning', 'ACTIVE_TRANSACTION', -1, null, NOTIFICATION_CONTEXT));
+        }
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventAssetsFailure());
+    }
+}
+
+const formatUploadAssetOptions = (optionsData) => {
+    const optionPrefixSource = 'EVENTS.EVENTS.NEW.SOURCE.UPLOAD';
+    const optionPrefixAsset = 'EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION';
+    const workflowPrefix = 'EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID';
+
+    let optionsResult = {};
+    let uploadOptions = [];
+
+    for(const [key, value] of Object.entries(optionsData)){
+        if (key.charAt(0) !== '$') {
+            if ((key.indexOf(optionPrefixAsset) >= 0) || (key.indexOf(optionPrefixSource) >= 0)) {
+                // parse upload asset options
+                let options = JSON.parse(value);
+                if (!options['title']) {
+                  options['title'] = key;
+                }
+                uploadOptions.push({...options});
+            } else if (key.indexOf(workflowPrefix) >= 0) {
+                // parse upload workflow definition id
+                optionsResult['workflow'] = value;
+            }
+        }
+    }
+    optionsResult['options'] = uploadOptions;
+
+    return optionsResult;
+}
+
+export const fetchAssetAttachments = (eventId) => async (dispatch) => {
+    try {
+        dispatch(loadEventAssetsInProgress());
+
+        let params = new URLSearchParams();
+        params.append("id1", 'attachment');
+
+        const attachmentsRequest = await axios.get(`/admin-ng/event/${eventId}/asset/attachment/attachments.json`,
+            {params});
+        const attachmentsResponse = await attachmentsRequest.data;
+
+        dispatch(loadEventAssetAttachmentsSuccess(attachmentsResponse));
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventAssetAttachmentsFailure());
+    }
+}
+
+export const fetchAssetAttachmentDetails = (eventId, attachmentId) => async (dispatch) => {
+    try {
+        dispatch(loadEventAssetsInProgress());
+
+        let params = new URLSearchParams();
+        params.append("id1", 'attachment');
+
+        const attachmentDetailsRequest = await axios.get(`/admin-ng/event/${eventId}/asset/attachment/${attachmentId}.json`,
+            {params});
+        const attachmentDetailsResponse = await attachmentDetailsRequest.data;
+
+        dispatch(loadEventAssetAttachmentDetailsSuccess(attachmentDetailsResponse));
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventAssetAttachmentDetailsFailure());
+    }
+}
+
+export const fetchAssetCatalogs = (eventId) => async (dispatch) => {
+    try {
+        dispatch(loadEventAssetsInProgress());
+
+        let params = new URLSearchParams();
+        params.append("id1", 'catalog');
+
+        const catalogsRequest = await axios.get(`/admin-ng/event/${eventId}/asset/catalog/catalogs.json`,
+            {params});
+        const catalogsResponse = await catalogsRequest.data;
+
+        dispatch(loadEventAssetCatalogsSuccess(catalogsResponse));
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventAssetCatalogsFailure());
+    }
+}
+
+export const fetchAssetCatalogDetails = (eventId, catalogId) => async (dispatch) => {
+    try {
+        dispatch(loadEventAssetsInProgress());
+
+        let params = new URLSearchParams();
+        params.append("id1", 'catalog');
+
+        const catalogDetailsRequest = await axios.get(`/admin-ng/event/${eventId}/asset/catalog/${catalogId}.json`,
+            {params});
+        const catalogDetailsResponse = await catalogDetailsRequest.data;
+
+        dispatch(loadEventAssetCatalogDetailsSuccess(catalogDetailsResponse));
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventAssetCatalogDetailsFailure());
+    }
+}
+
+export const fetchAssetMedia = (eventId) => async (dispatch) => {
+    try {
+        dispatch(loadEventAssetsInProgress());
+
+        let params = new URLSearchParams();
+        params.append("id1", 'media');
+
+        const mediaRequest = await axios.get(`/admin-ng/event/${eventId}/asset/media/media.json`,
+            {params});
+        const mediaResponse = await mediaRequest.data;
+
+        let media = [];
+
+        //for every media file item we define the filename
+        for(let i = 0; i < mediaResponse.length; i++){
+            let item = mediaResponse[i];
+            const url = item.url;
+            item.mediaFileName = url.substring(url.lastIndexOf('/') + 1).split('?')[0];
+            media.push(item);
+        }
+
+        dispatch(loadEventAssetMediaSuccess(media));
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventAssetMediaFailure());
+    }
+}
+
+export const fetchAssetMediaDetails = (eventId, mediaId) => async (dispatch) => {
+    try {
+        dispatch(loadEventAssetsInProgress());
+
+        let params = new URLSearchParams();
+        params.append("id1", 'media');
+
+        const mediaDetailsRequest = await axios.get(`/admin-ng/event/${eventId}/asset/media/${mediaId}.json`,
+            {params});
+        const mediaDetailsResponse = await mediaDetailsRequest.data;
+
+        let mediaDetails;
+
+        if (typeof mediaDetailsResponse === 'string') {
+            mediaDetails = JSON.parse(mediaDetailsResponse);
+        } else {
+            mediaDetails = mediaDetailsResponse;
+        }
+
+        mediaDetails.video = { ...mediaDetails,
+            video: {
+                previews: [{uri: mediaDetails.url}]
+            },
+            url: mediaDetails.url.split('?')[0]
+        };
+
+        dispatch(loadEventAssetMediaDetailsSuccess(mediaDetails));
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventAssetMediaDetailsFailure());
+    }
+}
+
+export const fetchAssetPublications = (eventId) => async (dispatch) => {
+    try {
+        dispatch(loadEventAssetsInProgress());
+
+        let params = new URLSearchParams();
+        params.append("id1", 'publication');
+
+        const publicationsRequest = await axios.get(`/admin-ng/event/${eventId}/asset/publication/publications.json`,
+            {params});
+        const publicationsResponse = await publicationsRequest.data;
+
+        dispatch(loadEventAssetPublicationsSuccess(publicationsResponse));
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventAssetPublicationsFailure());
+    }
+}
+
+export const fetchAssetPublicationDetails = (eventId, publicationId) => async (dispatch) => {
+    try {
+        dispatch(loadEventAssetsInProgress());
+
+        let params = new URLSearchParams();
+        params.append("id1", 'publication');
+
+        const publicationDetailsRequest = await axios.get(`/admin-ng/event/${eventId}/asset/publication/${publicationId}.json`,
+            {params});
+        const publicationDetailsResponse = await publicationDetailsRequest.data;
+
+        dispatch(loadEventAssetPublicationDetailsSuccess(publicationDetailsResponse));
+    } catch (e) {
+        logger.error(e);
+        dispatch(loadEventAssetPublicationDetailsFailure());
     }
 }
 

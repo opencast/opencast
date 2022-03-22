@@ -6,7 +6,7 @@ import {
     getWorkflowOperations, isFetchingWorkflowOperationDetails
 } from "../../../../selectors/eventDetailsSelectors";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
-import EventDetailsWorkflowDetailsHierarchyNavigation from "./EventDetailsWorkflowDetailsHierarchyNavigation";
+import EventDetailsTabHierarchyNavigation from "./EventDetailsTabHierarchyNavigation";
 
 
 /**
@@ -24,9 +24,11 @@ const EventDetailsWorkflowOperationDetails =  ({ eventId, t, setHierarchy,
     return (
         <div className="modal-content">
             {/* Hierarchy navigation */}
-            <EventDetailsWorkflowDetailsHierarchyNavigation
+            <EventDetailsTabHierarchyNavigation
                 openSubTab={openSubTab}
                 hierarchyDepth={2}
+                translationKey0={"EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE"}
+                subTabArgument0={'workflow-details'}
                 translationKey1={"EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE"}
                 subTabArgument1={'workflow-operations'}
                 translationKey2={"EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE"}

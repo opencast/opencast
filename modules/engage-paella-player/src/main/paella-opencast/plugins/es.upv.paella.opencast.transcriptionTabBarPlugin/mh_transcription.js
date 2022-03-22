@@ -56,9 +56,9 @@ paella.addPlugin(function() {
 
     getSubclass() { return 'searchTabBar'; }
     getName() { return 'es.upv.paella.opencast.transcriptionTabBarPlugin'; }
-    getTabName() { return paella.dictionary.translate('Transcription'); }
+    getTabName() { return paella.utils.dictionary.translate('Transcription'); }
     getIndex() { return 20; }
-    getDefaultToolTip() { return paella.dictionary.translate('Transcription'); }
+    getDefaultToolTip() { return paella.utils.dictionary.translate('Transcription'); }
 
 
     checkEnabled(onSuccess) {
@@ -133,7 +133,7 @@ paella.addPlugin(function() {
       // -------  Left
       var inputElement = document.createElement('input');
       inputElement.type = 'text';
-      inputElement.value = paella.dictionary.translate('Search in this event');
+      inputElement.value = paella.utils.dictionary.translate('Search in this event');
       inputElement.setAttribute('size', '30');
       inputElement.setAttribute('dir','lrt');
       inputElement.setAttribute('spellcheck','true');
@@ -154,7 +154,7 @@ paella.addPlugin(function() {
       r3.className = 'lt70';
       r4.className = 'gt70';
 
-      r1.innerText = paella.dictionary.translate('Search relevance:');
+      r1.innerText = paella.utils.dictionary.translate('Search relevance:');
       r2.innerHTML = '&lt; 30%';
       r3.innerHTML = '&lt; 70%';
       r4.innerHTML = '&gt; 70%';
@@ -174,7 +174,7 @@ paella.addPlugin(function() {
       this.divResults.innerText = '';
 
       if (self._episode.segments === undefined) {
-        paella.debug.log('Segment Text data not available');
+        paella.log.debug('Segment Text data not available');
       }
       else {
         var segments = self._episode.segments;
@@ -233,9 +233,9 @@ paella.addPlugin(function() {
 
 
       var segmentsAvailable = false;
-      paella.ajax.get({url:'/search/episode.json', params:{id:thisClass._episode.id, q:value, limit:1000}},
+      paella.utils.ajax.get({url:'/search/episode.json', params:{id:thisClass._episode.id, q:value, limit:1000}},
         function(data, contentType, returnCode) {
-          paella.debug.log('Searching episode=' + thisClass._episode.id + ' q=' + value);
+          paella.log.debug('Searching episode=' + thisClass._episode.id + ' q=' + value);
 
           segmentsAvailable = (data !== undefined) && (data['search-results'] !== undefined) &&
                       (data['search-results'].result !== undefined) &&
@@ -260,7 +260,7 @@ paella.addPlugin(function() {
                 maxRelevance = parseInt(segment.relevance);
               }
             }
-            paella.debug.log('Search Max Revelance ' + maxRelevance);
+            paella.log.debug('Search Max Revelance ' + maxRelevance);
 
 
             for (i = 0; i < segments.segment.length; ++i){
@@ -290,7 +290,7 @@ paella.addPlugin(function() {
             thisClass.lastHit = value;
           }
           else {
-            paella.debug.log('No Revelance');
+            paella.log.debug('No Revelance');
             if (thisClass.foundAlready){
               thisClass.setNoActualResultAvailable(value);
             }
@@ -305,13 +305,14 @@ paella.addPlugin(function() {
 
 
     setNoActualResultAvailable(searchValue) {
-      this.divSearch.innerText = paella.dictionary
+      this.divSearch.innerText = paella.utils.dictionary
         .translate('Results for \'{0}\' (no actual results for \'{1}\' found)')
         .replace(/\{0\}/g,this.lastHit).replace(/\{1\}/g,searchValue);
     }
 
     setResultAvailable(searchValue) {
-      this.divSearch.innerText =  paella.dictionary.translate('Results for \'{0}\'').replace(/\{0\}/g,searchValue);
+      this.divSearch.innerText =
+        paella.utils.dictionary.translate('Results for \'{0}\'').replace(/\{0\}/g,searchValue);
     }
 
     setNotSearch() {

@@ -135,3 +135,8 @@ export const EditUserSchema = Yup.object().shape({
 export const EditGroupSchema = Yup.object().shape({
     name: Yup.string().required('Required')
 });
+
+// Validation Schema used in adopter registration modal
+export const AdopterRegistrationSchema = Yup.object().shape({
+    email: Yup.string().email()
+});

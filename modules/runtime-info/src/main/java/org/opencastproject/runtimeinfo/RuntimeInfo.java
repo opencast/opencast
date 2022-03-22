@@ -46,6 +46,10 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,11 +83,21 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("/")
 @RestService(
-  name = "RuntimeInfo",
-  title = "Runtime Information",
-  abstractText = "This service provides information about the runtime environment, including the services that are "
-    + "deployed and the current user context.",
-  notes = {})
+    name = "RuntimeInfo",
+    title = "Runtime Information",
+    abstractText = "This service provides information about the runtime environment, including the services that are "
+      + "deployed and the current user context.",
+    notes = {}
+)
+@Component(
+    immediate = true,
+    service = RuntimeInfo.class,
+    property = {
+        "service.description=Runtime Information REST Endpoint",
+        "opencast.service.type=org.opencastproject.info",
+        "opencast.service.path=/info"
+    }
+)
 public class RuntimeInfo {
 
   private static final Logger logger = LoggerFactory.getLogger(RuntimeInfo.class);
@@ -112,14 +126,28 @@ public class RuntimeInfo {
   private BundleContext bundleContext;
   private URL serverUrl;
 
+  @Reference(
+      name = "userid-role-provider",
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "unsetUserIdRoleProvider"
+  )
   protected void setUserIdRoleProvider(UserIdRoleProvider userIdRoleProvider) {
     this.userIdRoleProvider = userIdRoleProvider;
   }
 
+  protected void unsetUserIdRoleProvider(UserIdRoleProvider userIdRoleProvider) {
+    if (this.userIdRoleProvider == userIdRoleProvider) {
+      this.userIdRoleProvider = null;
+    }
+  }
+
+  @Reference(name = "security-service")
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference(name = "service-registry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -141,7 +169,14 @@ public class RuntimeInfo {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("components.json")
-  @RestQuery(name = "services", description = "List the REST services and user interfaces running on this host", responses = { @RestResponse(description = "The components running on this host", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+      name = "services",
+      description = "List the REST services and user interfaces running on this host",
+      responses = {
+          @RestResponse(description = "The components running on this host", responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = ""
+  )
   public String getRuntimeInfo(@Context HttpServletRequest request) throws MalformedURLException,
           InvalidSyntaxException {
     final Organization organization = securityService.getOrganization();
@@ -162,8 +197,9 @@ public class RuntimeInfo {
 
     if (targetEngageBaseUrl == null) {
       logger.debug(
-              "Using 'org.opencastproject.server.url' as a fallback for the non-existing organization level key '{}' for the components.json response",
-              ENGAGE_URL_PROPERTY);
+          "Using 'org.opencastproject.server.url' as a fallback for the non-existing organization "
+              + "level key '{}' for the components.json response",
+          ENGAGE_URL_PROPERTY);
       targetEngageBaseUrl = new URL(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
     }
 
@@ -180,8 +216,9 @@ public class RuntimeInfo {
 
     if (targetAdminBaseUrl == null) {
       logger.debug(
-              "Using 'org.opencastproject.server.url' as a fallback for the non-existing organization level key '{}' for the components.json response",
-              ADMIN_URL_PROPERTY);
+          "Using 'org.opencastproject.server.url' as a fallback for the non-existing "
+              + "organization level key '{}' for the components.json response",
+          ADMIN_URL_PROPERTY);
       targetAdminBaseUrl = new URL(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
     }
 
@@ -197,7 +234,17 @@ public class RuntimeInfo {
   @GET
   @Path("me.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "me", description = "Information about the curent user", responses = { @RestResponse(description = "Returns information about the current user", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+      name = "me",
+      description = "Information about the curent user",
+      responses = {
+          @RestResponse(
+              description = "Returns information about the current user",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+      },
+      returnDescription = ""
+  )
   public String getMyInfo() {
     Map<String, Object> result = new HashMap<>();
 
@@ -234,12 +281,22 @@ public class RuntimeInfo {
   @GET
   @Path("health")
   @Produces("application/health+json")
-  @RestQuery(name = "health", description = "Opencast node health check. Implements this internet-draft health check api https://inadarei.github.io/rfc-healthcheck",
-          responses = {
-            @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Node is running, check reponse for details"),
-            @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "Node is offline or unresponsive, check response for details")},
-          returnDescription = "Details of the Opencast node's health status")
-
+  @RestQuery(
+      name = "health",
+      description = "Opencast node health check. Implements this internet-draft health check api "
+          + "https://inadarei.github.io/rfc-healthcheck",
+      responses = {
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_OK,
+              description = "Node is running, check reponse for details"
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+              description = "Node is offline or unresponsive, check response for details"
+          ),
+      },
+      returnDescription = "Details of the Opencast node's health status"
+  )
   public String getHealth(@Context HttpServletResponse response) {
     /* Response implements https://inadarei.github.io/rfc-healthcheck
      * Example reponse

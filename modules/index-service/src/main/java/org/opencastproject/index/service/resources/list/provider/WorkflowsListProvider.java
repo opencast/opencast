@@ -30,12 +30,23 @@ import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Component(
+    immediate = true,
+    service = ResourceListProvider.class,
+    property = {
+        "service.description=Users list provider",
+        "opencast.service.type=org.opencastproject.index.service.resources.list.provider.WorkflowsListProvider"
+    }
+)
 public class WorkflowsListProvider implements ResourceListProvider {
 
   private static final String[] NAMES = { "workflows" };
@@ -43,11 +54,13 @@ public class WorkflowsListProvider implements ResourceListProvider {
 
   private WorkflowService workflowService;
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Workflow instances list provider activated!");
   }
 
   /** OSGi callback for the workflow service. */
+  @Reference(name = "workflowService")
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }

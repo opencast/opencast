@@ -32,6 +32,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,13 @@ import java.util.List;
 /**
  * Commandline wrapper around tesseract' <code>tesseract</code> command.
  */
+@Component(
+    immediate = true,
+    service = { TextExtractor.class,ManagedService.class },
+    property = {
+        "service.description=Tesseract Text Extractor"
+    }
+)
 public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
   /** The logging facility */

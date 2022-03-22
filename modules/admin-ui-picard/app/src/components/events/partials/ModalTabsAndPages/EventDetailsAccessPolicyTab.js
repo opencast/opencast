@@ -24,7 +24,8 @@ const EventDetailsAccessPolicyTab = ({ eventId, header, t,
                                         fetchAccessPolicies={fetchAccessPolicies}
                                         fetchHasActiveTransactions={fetchHasActiveTransactions}
                                         saveNewAccessPolicies={saveNewAccessPolicies}
-                                        descriptionText={t("EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION")} />
+                                        descriptionText={t("EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION")}
+                                        editAccessRole={'ROLE_UI_EVENTS_DETAILS_ACL_EDIT'} />
     );
 };
 

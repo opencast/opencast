@@ -5,12 +5,13 @@ import {getSelectedRows} from "../../../../selectors/tableSelectors";
 import {connect} from "react-redux";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import {getCurrentLanguageInformation} from "../../../../utils/utils";
+import {getCurrentLanguageInformation, hasAccess} from "../../../../utils/utils";
 import cn from "classnames";
 import RenderField from "../../../shared/wizard/RenderField";
 import {postEditMetadata, updateBulkMetadata} from "../../../../thunks/eventThunks";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
 import {logger} from "../../../../utils/logger";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 
 
 // Get info about the current language and its date locale
@@ -19,7 +20,7 @@ const currentLanguage = getCurrentLanguageInformation();
 /**
  * This component manges the edit metadata bulk action
  */
-const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata}) => {
+const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata, user }) => {
     const { t } = useTranslation();
 
     const [selectedEvents, setSelectedEvents] = useState(selectedRows);
@@ -217,8 +218,8 @@ const EditMetadataEventsModal = ({ close, selectedRows, updateBulkMetadata}) => 
                                                 disabled={!(formik.dirty && formik.isValid)}
                                                 className={cn("submit",
                                                     {
-                                                        active: (formik.dirty && formik.isValid),
-                                                        inactive: !(formik.dirty && formik.isValid)
+                                                        active: (formik.dirty && formik.isValid && hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user)),
+                                                        inactive: !(formik.dirty && formik.isValid && hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user))
                                                     }
                                                 )}>
                                             {t('WIZARD.UPDATE')}
@@ -253,7 +254,8 @@ const getInitialValues = metadataFields => {
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    selectedRows: getSelectedRows(state)
+    selectedRows: getSelectedRows(state),
+    user: getUserInformation(state)
 });
 
 const mapDispatchToProps = dispatch => ({

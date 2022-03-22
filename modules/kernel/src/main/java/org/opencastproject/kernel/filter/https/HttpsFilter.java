@@ -21,6 +21,7 @@
 
 package org.opencastproject.kernel.filter.https;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,17 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * This filter is wrapping <code>HttpServletRequest</code>s in such a way that they feature the https scheme.
  */
+@Component(
+    immediate = true,
+    service = Filter.class,
+    property = {
+        "service.description=Https Filter",
+        "httpContext.id=opencast.httpcontext",
+        "httpContext.shared=true",
+        "service.ranking=2",
+        "urlPatterns=*"
+    }
+)
 public class HttpsFilter implements Filter {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(HttpsFilter.class);

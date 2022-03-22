@@ -44,6 +44,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.selector.TrackSelector;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.smil.api.util.SmilUtil;
 import org.opencastproject.util.JobUtil;
@@ -54,6 +55,7 @@ import org.opencastproject.util.data.VCell;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -67,6 +69,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -92,6 +96,14 @@ import java.util.UUID;
 /**
  * The workflow definition for handling partial import operations
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Partial import Workflow Operation Handler",
+        "workflow.operation=partial-import"
+    }
+)
 public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Workflow configuration keys */
@@ -109,7 +121,6 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String PREENCODE_ENCODING_PROFILE = "preencode-encoding-profile";
 
   private static final String FORCE_ENCODING = "force-encoding";
-  private static final String PREENCODE_ENCODING = "preencode-encoding";
   private static final String REQUIRED_EXTENSIONS = "required-extensions";
   private static final String ENFORCE_DIVISIBLE_BY_TWO = "enforce-divisible-by-two";
 
@@ -145,6 +156,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param composerService
    *          the local composer service
    */
+  @Reference(name = "ComposerService")
   public void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
@@ -156,8 +168,15 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   /**
@@ -209,7 +228,6 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).getOr("false"));
     final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).getOr("false"));
     final List<String> requiredExtensions = getRequiredExtensions(operation);
-    final boolean preencodeEncoding = BooleanUtils.toBoolean(getOptConfig(operation, PREENCODE_ENCODING).getOr("false"));
     final String preencodeEncodingProfile = getConfig(operation, PREENCODE_ENCODING_PROFILE);
 
     //
@@ -219,6 +237,12 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       logger.warn("No presenter and presentation flavor has been set.");
       return createResult(mediaPackage, Action.SKIP);
     }
+
+    final EncodingProfile preencodeProfile = composerService.getProfile(preencodeEncodingProfile);
+    if (preencodeProfile == null) {
+      throw new WorkflowOperationException("Preencode encoding profile '" + preencodeEncodingProfile + "' was not found");
+    }
+
     final EncodingProfile concatProfile = composerService.getProfile(concatEncodingProfile);
     if (concatProfile == null) {
       throw new WorkflowOperationException("Concat encoding profile '" + concatEncodingProfile + "' was not found");
@@ -255,15 +279,9 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       originalTracks.add(t);
     }
 
-    // Optionally encode all tracks to avoid any errors later on
-    if (preencodeEncoding) {
-      final EncodingProfile preencodeProfile = composerService.getProfile(preencodeEncodingProfile);
-      if (preencodeProfile == null) {
-        throw new WorkflowOperationException("Preencode encoding profile '" + preencodeEncodingProfile + "' was not found");
-      }
-      logger.info("Starting preencoding");
-      originalTracks = preencode(preencodeProfile, originalTracks);
-    }
+    // Encode all tracks to same format to enable use of ffmpeg concat-demuxer
+    logger.info("Starting preencoding");
+    originalTracks = preencode(preencodeProfile, originalTracks);
 
 
     // flavor_type -> job
@@ -544,10 +562,9 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
           throws MediaPackageException, EncoderException {
     final Dimension dim = determineDimension(tracks, forceDivisible);
     if (outputFramerate > 0.0) {
-      return composerService.concat(profile.getIdentifier(), dim, outputFramerate, false, Collections.toArray(Track.class, tracks));
+      return composerService.concat(profile.getIdentifier(), dim, outputFramerate, true, Collections.toArray(Track.class, tracks));
     } else {
-      return composerService.concat(profile.getIdentifier(), dim, false, Collections.toArray(Track.class, tracks));
-    }
+      return composerService.concat(profile.getIdentifier(), dim, true, Collections.toArray(Track.class, tracks));    }
   }
 
   /**

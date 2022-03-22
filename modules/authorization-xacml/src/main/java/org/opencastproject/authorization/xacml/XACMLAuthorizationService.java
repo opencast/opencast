@@ -38,7 +38,6 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
@@ -46,7 +45,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -61,8 +59,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -71,12 +67,12 @@ import javax.xml.bind.JAXBException;
  * A XACML implementation of the {@link AuthorizationService}.
  */
 @Component(
-  property = {
-    "service.description=Provides translation between access control entries and xacml documents"
-  },
-  service = { AuthorizationService.class, ManagedService.class }
+    property = {
+        "service.description=Provides translation between access control entries and xacml documents"
+    },
+    service = { AuthorizationService.class }
 )
-public class XACMLAuthorizationService implements AuthorizationService, ManagedService {
+public class XACMLAuthorizationService implements AuthorizationService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(XACMLAuthorizationService.class);
@@ -89,9 +85,6 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
 
   /** The security service */
   protected SecurityService securityService;
-
-  /** The series service */
-  protected SeriesService seriesService;
 
   /** The serializer for media pacakge */
   private MediaPackageSerializer serializer;
@@ -106,30 +99,17 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   }
 
   @Activate
-  public void activate(ComponentContext cc) {
-    updated(cc.getProperties());
-  }
-
   @Modified
-  public void modified(Map<String, Object> config) {
-    // this prevents the service from restarting on configuration updated.
-    // updated() will handle the configuration update.
-  }
+  public void activate(ComponentContext cc) {
+    var properties = cc.getProperties();
 
-  @Reference(cardinality = ReferenceCardinality.OPTIONAL)
-  public void setMediaPackageSerializer(MediaPackageSerializer serializer) {
-    this.serializer = serializer;
-  }
-
-  @Override
-  public synchronized void updated(Dictionary<String, ?> properties) {
     if (properties == null) {
       mergeMode = MergeMode.OVERRIDE;
       logger.debug("Merge mode set to {}", mergeMode);
       return;
     }
     final String mode = StringUtils.defaultIfBlank((String) properties.get(CONFIG_MERGE_MODE),
-            MergeMode.OVERRIDE.toString());
+        MergeMode.OVERRIDE.toString());
     try {
       mergeMode = MergeMode.valueOf(mode.toUpperCase());
     } catch (IllegalArgumentException e) {
@@ -137,6 +117,11 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
       mergeMode = MergeMode.OVERRIDE;
     }
     logger.debug("Merge mode set to {}", mergeMode);
+  }
+
+  @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+  public void setMediaPackageSerializer(MediaPackageSerializer serializer) {
+    this.serializer = serializer;
   }
 
   @Override
@@ -153,26 +138,10 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     // Start with the requested scope but fall back to the less specific scope if it does not exist.
     // The order is: episode -> series -> general (deprecated) -> global
     if (AclScope.Episode.equals(scope) || AclScope.Merged.equals(scope)) {
-      for (Attachment xacml : mp.getAttachments(XACML_POLICY_EPISODE)) {
-        URI uri = xacml.getURI();
-        try {
-          if (serializer != null) uri = serializer.decodeURI(uri);
-        } catch (URISyntaxException e) {
-          logger.warn("URI {} syntax error, skip decoding", uri);
-        }
-        episode = loadAcl(uri);
-      }
+      episode = getAclByFlavor(mp, XACML_POLICY_EPISODE);
     }
     if (Arrays.asList(AclScope.Episode, AclScope.Series, AclScope.Merged).contains(scope)) {
-      for (Attachment xacml : mp.getAttachments(XACML_POLICY_SERIES)) {
-        URI uri = xacml.getURI();
-        try {
-          if (serializer != null) uri = serializer.decodeURI(uri);
-        } catch (URISyntaxException e) {
-          logger.warn("URI {} syntax error, skip decoding", uri);
-        }
-        series = loadAcl(uri);
-      }
+      series = getAclByFlavor(mp, XACML_POLICY_SERIES);
     }
 
     if (episode.isPresent() && series.isPresent()) {
@@ -202,9 +171,28 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     return tuple(new AccessControlList(), AclScope.Global);
   }
 
+  private Optional<AccessControlList> getAclByFlavor(MediaPackage mp, MediaPackageElementFlavor xacmlPolicyFlavor) {
+    Optional<AccessControlList> acl = Optional.empty();
+    for (Attachment xacml : mp.getAttachments(xacmlPolicyFlavor)) {
+      URI uri = xacml.getURI();
+      try {
+        if (serializer != null) {
+          uri = serializer.decodeURI(uri);
+        }
+      } catch (URISyntaxException e) {
+        logger.warn("URI {} syntax error, skip decoding", uri);
+      }
+      acl = loadAcl(uri);
+    }
+    return acl;
+  }
+
   @Override
-  public Tuple<MediaPackage, Attachment> setAcl(final MediaPackage mp, final AclScope scope, final AccessControlList acl)
-          throws MediaPackageException {
+  public Tuple<MediaPackage, Attachment> setAcl(
+      final MediaPackage mp,
+      final AclScope scope,
+      final AccessControlList acl
+  ) throws MediaPackageException {
     // Get XACML representation of these role + action tuples
     String xacmlContent;
     try {
@@ -296,9 +284,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     logger.debug("Load Acl from {}", uri);
     try (InputStream is = workspace.read(uri)) {
       AccessControlList acl = XACMLUtils.parseXacml(is);
-      if (acl != null) {
-        return Optional.of(acl);
-      }
+      return Optional.of(acl);
     } catch (NotFoundException e) {
       logger.debug("URI {} not found", uri);
     } catch (Exception e) {
@@ -353,17 +339,6 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   @Reference(name = "security")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  /**
-   * Declarative services callback to set the series service.
-   *
-   * @param seriesService
-   *          the series service
-   */
-  @Reference(name = "series")
-  protected void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
   }
 
 }

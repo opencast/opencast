@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -42,7 +42,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-index-rebuild</artifactId>
+      <artifactId>opencast-elasticsearch-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -51,8 +51,17 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-authorization-manager</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -61,10 +70,6 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
@@ -76,7 +81,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -102,22 +107,12 @@
       <artifactId>jakarta.persistence</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>org.eclipse.persistence.core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>org.eclipse.persistence.jpa</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
@@ -141,10 +136,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>de.empulse.eclipselink</groupId>
-        <artifactId>staticweave-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -163,9 +154,6 @@
               org.opencastproject.series.impl;version=${project.version},
               org.opencastproject.series.endpoint;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/series-service-rest.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

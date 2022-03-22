@@ -22,6 +22,7 @@
 // Button mixin
 @mixin btn($color) {
     font-family: $font-stack;
+    text-align: center;
     border-radius: $main-border-radius;
     color: #fff;
     padding: 5px 10px;

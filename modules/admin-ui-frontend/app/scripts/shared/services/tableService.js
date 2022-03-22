@@ -169,7 +169,11 @@ angular.module('adminNg.services')
           // configure them from scratch
           me.columns = options.columns;
           angular.forEach(me.columns, function (column) {
-            column.deactivated = column.name === 'technical_end';
+            if (column.name === 'technical_end') {
+              column.deactivated = true;
+            } else if (column.deactivated === undefined) {
+              column.deactivated = false;
+            }
           });
         }
 
@@ -314,6 +318,17 @@ angular.module('adminNg.services')
 
         query.limit = me.pagination.limit;
         query.offset = me.pagination.offset * me.pagination.limit;
+
+        // If the notes column is being displayed, fetch comments
+        if (me.columns) {
+          let commentsColumn = me.columns.find(obj => {
+          // Fixme: Can we avoid using a string literal here?
+            return obj.label === 'EVENTS.EVENTS.TABLE.ADMINUI_NOTES';
+          });
+          if (commentsColumn && !commentsColumn.deactivated) {
+            query.getComments = true;
+          }
+        }
 
         (function(resource){
 

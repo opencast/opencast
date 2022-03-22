@@ -138,7 +138,8 @@ const NewEventWizard = ({ metadataFields, close, postNewEvent }) => {
                             {page === 5 && (
                                 <NewAccessPage previousPage={previousPage}
                                                nextPage={nextPage}
-                                               formik={formik} />
+                                               formik={formik}
+                                               editAccessRole='ROLE_UI_SERIES_DETAILS_ACL_EDIT' />
                             )}
                             {page === 6 && (
                                 <NewEventSummary previousPage={previousPage}

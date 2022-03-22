@@ -32,6 +32,16 @@ angular.module('adminNg.resources')
         }
         return $.param(data);
       }
+    },
+    update: {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      transformRequest: function (data) {
+        if (angular.isUndefined(data)) {
+          return data;
+        }
+        return $.param(data);
+      }
     }
   });
 }]);

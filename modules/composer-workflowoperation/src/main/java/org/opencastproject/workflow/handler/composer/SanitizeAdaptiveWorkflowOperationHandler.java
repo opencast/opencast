@@ -29,17 +29,21 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,9 +61,17 @@ import java.util.TreeMap;
 import java.util.function.Function;
 
 /**
- * The <tt></tt> operation will make sure that media where hls playlists and video track come in separate files
+ * The <code></code> operation will make sure that media where hls playlists and video track come in separate files
  * will have appropriately references prior to further processing such as inspection.
  */
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Sanitize Adaptive Workflow Operation Handler",
+        "workflow.operation=sanitize-adaptive"
+    }
+)
 public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
@@ -87,8 +99,15 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(name = "Workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   public SortedMap<String, String> getConfigurationOptions() {

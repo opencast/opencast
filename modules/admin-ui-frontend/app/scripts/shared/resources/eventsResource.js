@@ -101,6 +101,7 @@ angular.module('adminNg.resources')
         row.agent_id = r.agent_id;
         row.managed_acl = r.managedAcl;
         row.type = 'EVENT';
+        row.comments = r.comments;
         return row;
       });
 

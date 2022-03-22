@@ -218,6 +218,81 @@
       <property name="severity" value="error" />
     </module>
 
+    <!-- Check for use of unsecured xml parsing           -->
+    <module name="Regexp">
+      <property name="format" value="TransformerFactory[.\s]+(?:newInstance|newDefaultInstance|newTransformer|newTemplates)" />
+      <property name="message"
+        value="Use the methods provided by the XmlSafeParser class for creating xml parsers, which are guarded against xxe and other attacks." />
+      <property name="illegalPattern" value="true" />
+      <property name="ignoreComments" value="true" />
+      <property name="severity" value="error" />
+    </module>
+    <module name="Regexp">
+      <property name="format" value="DocumentBuilderFactory[.\s]+(?:newInstance|newDefaultInstance)" />
+      <property name="message"
+        value="Use the methods provided by the XmlSafeParser class for creating xml parsers, which are guarded against xxe and other attacks." />
+      <property name="illegalPattern" value="true" />
+      <property name="ignoreComments" value="true" />
+      <property name="severity" value="error" />
+    </module>
+    <module name="Regexp">
+      <property name="format" value="SAXParserFactory[.\s]+(?:newInstance|newDefaultInstance)" />
+      <property name="message"
+        value="Use the methods provided by the XmlSafeParser class for creating xml parsers, which are guarded against xxe and other attacks." />
+      <property name="illegalPattern" value="true" />
+      <property name="ignoreComments" value="true" />
+      <property name="severity" value="error" />
+    </module>
+    <module name="Regexp">
+      <property name="format" value="new\s+SAXBuilder" />
+      <property name="message"
+        value="Use the methods provided by the XmlSafeParser class for creating xml parsers, which are guarded against xxe and other attacks." />
+      <property name="illegalPattern" value="true" />
+      <property name="ignoreComments" value="true" />
+      <property name="severity" value="error" />
+    </module>
+    <module name="Regexp">
+      <property name="format" value="\.\s*unmarshal\s*\(\s*(?!XmlSafeParser)" />
+      <property name="message"
+        value="Use the parse method provided by the XmlSafeParser class to guard against xxe, e.g.: .unmarshal(XmlSafeParser.parse(input))." />
+      <property name="illegalPattern" value="true" />
+      <property name="ignoreComments" value="true" />
+      <property name="severity" value="error" />
+    </module>
+    <!-- Additional parser                               -->
+    <module name="Regexp">
+      <property name="format" value="(?:XMLInputFactory|SAXReader|XPathExpressionFactory|XMLDecoder|ParserAdapter|XMLReaderAdapter|DOMParser|SAXTransformerFactory|XMLReaderFactory)" />
+      <property name="message"
+        value="It seems like an XmlParser has been added that is not protected against xxe by default. Please consider using one of the pre-existing secured parsers provided by the XmlSafeParser class in the common module, or add a securely configured version of your parser to this class." />
+      <property name="illegalPattern" value="true" />
+      <property name="ignoreComments" value="true" />
+      <property name="severity" value="error" />
+    </module>
+    <module name="Regexp">
+      <property name="format" value="new\s+SAXParser" />
+      <property name="message"
+        value="It seems like an XmlParser has been added that is not protected against xxe by default. Please consider using one of the pre-existing secured parsers provided by the XmlSafeParser class in the common module, or add a securely configured version of your parser to this class." />
+      <property name="illegalPattern" value="true" />
+      <property name="ignoreComments" value="true" />
+      <property name="severity" value="error" />
+    </module>
+    <module name="Regexp">
+      <property name="format" value="SchemaFactory[.\s]+newInstance" />
+      <property name="message"
+        value="It seems like an XmlParser has been added that is not protected against xxe by default. Please consider using one of the pre-existing secured parsers provided by the XmlSafeParser class in the common module, or add a securely configured version of your parser to this class." />
+      <property name="illegalPattern" value="true" />
+      <property name="ignoreComments" value="true" />
+      <property name="severity" value="error" />
+    </module>
+    <module name="Regexp">
+      <property name="format" value="createLSParser" />
+      <property name="message"
+        value="It seems like an XmlParser has been added that is not protected against xxe by default. Please consider using one of the pre-existing secured parsers provided by the XmlSafeParser class in the common module, or add a securely configured version of your parser to this class." />
+      <property name="illegalPattern" value="true" />
+      <property name="ignoreComments" value="true" />
+      <property name="severity" value="error" />
+    </module>
+
     <!-- Miscellaneous other checks.                   -->
     <!-- See http://checkstyle.sf.net/config_misc.html -->
     <module name="ArrayTypeStyle">

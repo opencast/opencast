@@ -30,6 +30,8 @@ import org.opencastproject.util.ReadinessIndicator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +48,13 @@ import java.util.LinkedList;
  * This dictionary service implementation passes the input text
  * to the hunspell spell checker and returns its results.
  */
+@Component(
+    immediate = true,
+    service = DictionaryService.class,
+    property = {
+        "service.description=Dictionary Service"
+    }
+)
 public class DictionaryServiceImpl implements DictionaryService {
 
   /** The logging facility */
@@ -85,6 +94,7 @@ public class DictionaryServiceImpl implements DictionaryService {
    *
    * @param  ctx  the bundle context
    */
+  @Activate
   void activate(BundleContext ctx) throws UnsupportedEncodingException {
     Dictionary<String, String> properties = new Hashtable<String, String>();
     properties.put(ARTIFACT, "dictionary");
@@ -92,19 +102,15 @@ public class DictionaryServiceImpl implements DictionaryService {
         new ReadinessIndicator(), properties);
 
     /* Get hunspell binary from config file */
-    String binary = (String) ctx.getProperty(HUNSPELL_BINARY_CONFIG_KEY);
+    String binary = ctx.getProperty(HUNSPELL_BINARY_CONFIG_KEY);
     if (binary != null) {
-      /* Fix special characters */
-      binary = new String(binary.getBytes("ISO-8859-1"), "UTF-8");
       logger.info("Setting hunspell binary to '{}'", binary);
       this.binary = binary;
     }
 
     /* Get hunspell command line options from config file */
-    String command = (String) ctx.getProperty(HUNSPELL_COMMAND_CONFIG_KEY);
+    String command = ctx.getProperty(HUNSPELL_COMMAND_CONFIG_KEY);
     if (command != null) {
-      /* Fix special characters */
-      command = new String(command.getBytes("ISO-8859-1"), "UTF-8");
       logger.info("Setting hunspell command line options to '{}'", command);
       this.command = command;
     }

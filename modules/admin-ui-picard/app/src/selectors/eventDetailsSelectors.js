@@ -1,6 +1,21 @@
 /* selectors for metadata */
 export const getMetadata = state => state.eventDetails.metadata;
+export const getExtendedMetadata = state => state.eventDetails.extendedMetadata;
 export const isFetchingMetadata = state => state.eventDetails.fetchingMetadataInProgress;
+
+/* selectors for assets */
+export const getAssets = state => state.eventDetails.assets;
+export const isFetchingAssets = state => state.eventDetails.fetchingAssetsInProgress;
+export const isTransactionReadOnly = state => state.eventDetails.transactionsReadOnly;
+export const getUploadAssetOptions = state => state.eventDetails.uploadAssetOptions;
+export const getAssetAttachments = state => state.eventDetails.assetAttachments;
+export const getAssetAttachmentDetails = state => state.eventDetails.assetAttachmentDetails;
+export const getAssetCatalogs = state => state.eventDetails.assetCatalogs;
+export const getAssetCatalogDetails = state => state.eventDetails.assetCatalogDetails;
+export const getAssetMedia = state => state.eventDetails.assetMedia;
+export const getAssetMediaDetails = state => state.eventDetails.assetMediaDetails;
+export const getAssetPublications = state => state.eventDetails.assetPublications;
+export const getAssetPublicationDetails = state => state.eventDetails.assetPublicationDetails;
 
 /* selectors for policies */
 export const getPolicies = state => state.eventDetails.policies;

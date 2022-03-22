@@ -18,22 +18,24 @@ const GeneralDetailsTab = ({ agent }) => {
                         <div className="obj-container">
                             {/* Render table containing general information */}
                             <table className="main-tbl">
-                                <tr>
-                                    <td>{t('RECORDINGS.RECORDINGS.DETAILS.GENERAL.NAME')}</td>
-                                    <td>{agent.name}</td>
-                                </tr>
-                                <tr>
-                                    <td>{t('RECORDINGS.RECORDINGS.DETAILS.GENERAL.URL')}</td>
-                                    <td><a href={agent.url} target="_blank">{agent.url}</a></td>
-                                </tr>
-                                <tr>
-                                    <td>{t('RECORDINGS.RECORDINGS.DETAILS.GENERAL.STATUS')}</td>
-                                    <td>{t(agent.status)}</td>
-                                </tr>
-                                <tr>
-                                    <td>{t('RECORDINGS.RECORDINGS.DETAILS.GENERAL.UPDATE')}</td>
-                                    <td>{agent.update}</td>
-                                </tr>
+                                <tbody>
+                                    <tr>
+                                        <td>{t('RECORDINGS.RECORDINGS.DETAILS.GENERAL.NAME')}</td>
+                                        <td>{agent.name}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{t('RECORDINGS.RECORDINGS.DETAILS.GENERAL.URL')}</td>
+                                        <td><a href={agent.url} target="_blank">{agent.url}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>{t('RECORDINGS.RECORDINGS.DETAILS.GENERAL.STATUS')}</td>
+                                        <td>{t(agent.status)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{t('RECORDINGS.RECORDINGS.DETAILS.GENERAL.UPDATE')}</td>
+                                        <td>{agent.update}</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>

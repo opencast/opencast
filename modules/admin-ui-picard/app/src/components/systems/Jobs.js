@@ -21,13 +21,15 @@ import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
 import Footer from "../Footer";
+import {getUserInformation} from "../../selectors/userInfoSelectors";
+import {hasAccess} from "../../utils/utils";
 
 /**
  * This component renders the table view of jobs
  */
 const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
                   loadingServers, loadingServersIntoTable, loadingServices,
-                  loadingServicesIntoTable, resetTextFilter, resetOffset }) => {
+                  loadingServicesIntoTable, resetTextFilter, resetOffset, user }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -92,21 +94,27 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
 
                 <nav>
                     {/*todo: with role*/}
-                    <Link to="/systems/jobs"
-                          className={cn({active: true})}
-                          onClick={() => loadJobs()}>
-                        {t('SYSTEMS.NAVIGATION.JOBS')}
-                    </Link>
-                    <Link to="/systems/servers"
-                          className={cn({active: false})}
-                          onClick={() => loadServers()}>
-                        {t('SYSTEMS.NAVIGATION.SERVERS')}
-                    </Link>
-                    <Link to="/systems/services"
-                          className={cn({active: false})}
-                          onClick={() => loadServices()}>
-                        {t('SYSTEMS.NAVIGATION.SERVICES')}
-                    </Link>
+                    {hasAccess("ROLE_UI_JOBS_VIEW", user) && (
+                        <Link to="/systems/jobs"
+                              className={cn({active: true})}
+                              onClick={() => loadJobs()}>
+                            {t('SYSTEMS.NAVIGATION.JOBS')}
+                        </Link>
+                    )}
+                    {hasAccess("ROLE_UI_SERVERS_VIEW", user) && (
+                        <Link to="/systems/servers"
+                              className={cn({active: false})}
+                              onClick={() => loadServers()}>
+                            {t('SYSTEMS.NAVIGATION.SERVERS')}
+                        </Link>
+                    )}
+                    {hasAccess("ROLE_UI_SERVICES_VIEW", user) && (
+                        <Link to="/systems/services"
+                              className={cn({active: false})}
+                              onClick={() => loadServices()}>
+                            {t('SYSTEMS.NAVIGATION.SERVICES')}
+                        </Link>
+                    )}
                 </nav>
             </section>
 
@@ -133,7 +141,8 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    jobs: getTotalJobs(state)
+    jobs: getTotalJobs(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

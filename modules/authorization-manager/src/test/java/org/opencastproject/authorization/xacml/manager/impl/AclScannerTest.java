@@ -33,11 +33,11 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.impl.SearchResultImpl;
-import org.opencastproject.elasticsearch.index.AbstractSearchIndex;
-import org.opencastproject.elasticsearch.index.event.Event;
-import org.opencastproject.elasticsearch.index.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.series.Series;
-import org.opencastproject.elasticsearch.index.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -50,13 +50,12 @@ import org.opencastproject.util.data.Option;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXParseException;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.xml.bind.UnmarshalException;
 
 public class AclScannerTest {
 
@@ -95,7 +94,7 @@ public class AclScannerTest {
     SearchResultImpl<Series> seriesSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
     EasyMock.expect(seriesSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
 
-    final AbstractSearchIndex index = EasyMock.createNiceMock(AbstractSearchIndex.class);
+    final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(eventSearchResult)
             .anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(seriesSearchResult)
@@ -106,8 +105,7 @@ public class AclScannerTest {
     AclServiceFactory aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
-        return new AclServiceImpl(new DefaultOrganization(), aclDb, null, null, null,
-                index, index, securityService);
+        return new AclServiceImpl(new DefaultOrganization(), aclDb, index, securityService);
       }
     };
 
@@ -141,7 +139,7 @@ public class AclScannerTest {
       aclScanner.install(file);
       fail("Should not be parsed.");
     } catch (XACMLParsingException e) {
-      assertTrue("The file can not be parsed.", e.getCause() instanceof UnmarshalException);
+      assertTrue("The file can not be parsed.", e.getCause() instanceof SAXParseException);
     }
   }
 
@@ -192,7 +190,7 @@ public class AclScannerTest {
       aclScanner.update(file);
       fail("Should not be parsed.");
     } catch (XACMLParsingException e) {
-      assertTrue("The file can not be parsed.", e.getCause() instanceof UnmarshalException);
+      assertTrue("The file can not be parsed.", e.getCause() instanceof SAXParseException);
     }
   }
 

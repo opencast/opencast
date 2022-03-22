@@ -14,15 +14,17 @@ import {
 import Notifications from "../../../shared/Notifications";
 import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../../utils/utils";
 
 /**
  * This component manages the workflows tab of the event details modal
  */
-const EventDetailsWorkflowTab = ({ eventId, header, t, close, setHierarchy,
+const EventDetailsWorkflowTab = ({ eventId, t, close, setHierarchy,
                                    workflow, workflows, isLoading, workflowDefinitions, workflowConfiguration, performingWorkflowAction, deletingWorkflow,
-                                   loadWorkflows, updateWorkflow, loadWorkflowDetails, performWorkflowAction, deleteWf}) => {
-    const isRoleWorkflowEdit = true; /*todo: if: "$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"*/
-    const isRoleWorkflowDelete = true; /*todo: if: "$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE')"*/
+                                   loadWorkflows, updateWorkflow, loadWorkflowDetails, performWorkflowAction, deleteWf, user}) => {
+    const isRoleWorkflowEdit = hasAccess("ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT", user);
+    const isRoleWorkflowDelete = hasAccess("ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE", user);
 
 
     useEffect(() => {
@@ -329,6 +331,7 @@ const mapStateToProps = state => ({
     workflowConfiguration: getWorkflowConfiguration(state),
     performingWorkflowAction: performingWorkflowAction(state),
     deletingWorkflow: deletingWorkflow(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

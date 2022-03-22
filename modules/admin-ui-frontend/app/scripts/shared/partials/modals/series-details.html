@@ -19,7 +19,7 @@
        with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">
       <!-- Metadata -->
     </a>
-    <a ng-if="metadata.entries.length > 0"
+    <a ng-if="extendedMetadataCatalogs.length > 0"
        ng-click="openTab('extended-metadata')"
        data-modal-tab="extended-metadata"
        ng-class="{ active: tab == 'extended-metadata' }"
@@ -73,20 +73,21 @@
   <!-- Metadata view -->
   <div class="modal-content" data-modal-tab-content="metadata">
     <div class="modal-body">
+      <div data-admin-ng-notifications="" context="series-metadata-common"></div>
       <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
       <div class="full-col">
         <div class="obj tbl-list">
           <header class="no-expand" translate="EVENTS.SERIES.DETAILS.TABS.METADATA"><!-- Metadata --></header>
           <div class="obj-container">
             <table class="main-tbl">
-              <tr ng-repeat="row in seriesCatalog.fields">
+              <tr ng-repeat="row in commonMetadataCatalog.fields">
                 <td>
                   <span translate="{{ row.label }}"></span>
                   <i ng-show="row.required" class="required">*</i>
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(seriesCatalog.flavor)"
+                    params="row" save="getMetadataChangedFunction(commonMetadataCatalog.flavor)"
                     sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
@@ -95,25 +96,34 @@
         </div>
       </div>
     </div>
+    <footer>
+      <a
+        class="submit"
+        ng-class="{disabled: metadata.locked || !unsavedChanges([commonMetadataCatalog])}"
+        ng-click="metadataSave([commonMetadataCatalog])">
+        {{ "SAVE" | translate}}
+      </a>
+    </footer>
   </div>
 
   <!-- Extended metadata view -->
-  <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="metadata.entries.length > 0">
+  <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="extendedMetadataCatalogs.length > 0">
     <div class="modal-body">
+      <div data-admin-ng-notifications="" context="series-metadata-extended"></div>
       <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
       <div class="full-col">
-        <div class="obj tbl-list" ng-repeat="catalog in metadata.entries">
-          <header>{{ catalog.title }}</header>
+        <div class="obj tbl-list" ng-repeat="extendedMetadataCatalog in extendedMetadataCatalogs">
+          <header>{{ extendedMetadataCatalog.title }}</header>
           <div class="obj-container">
             <table class="main-tbl">
-              <tr ng-repeat="row in catalog.fields">
+              <tr ng-repeat="row in extendedMetadataCatalog.fields">
                 <td>
                   <span translate="{{ row.label }}"></span>
                   <i ng-show="row.required" class="required">*</i>
                 </td>
                 <td admin-ng-editable
                     required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
-                    params="row" save="getSaveFunction(catalog.flavor)"
+                    params="row" save="getMetadataChangedFunction(extendedMetadataCatalog.flavor)"
                     sanitize-xml="row.value" ng-model="row.value">
                 </td>
               </tr>
@@ -122,6 +132,14 @@
         </div>
       </div>
     </div>
+    <footer>
+      <a
+        class="submit"
+        ng-class="{disabled: metadata.locked || !unsavedChanges(extendedMetadataCatalogs)}"
+        ng-click="metadataSave(extendedMetadataCatalogs)">
+        {{ "SAVE" | translate}}
+      </a>
+    </footer>
   </div>
 
   <!-- Permission view -->
@@ -163,7 +181,7 @@
                                     ng-options="id as name for (id, name) in acls"
                                     placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                     no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                    />
+                                    ></select>
                           </div>
                         </td>
                       </tr>
@@ -214,21 +232,19 @@
                                     call-on-search="getMatchingRoles"
                                     placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                     no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
-                                    />
+                                    ></select>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
-                                   ng-disabled="::aclLocked"
                                    ng-model="policy.read"
                                    ng-change="accessSave()"
-                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked"/>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
-                                   ng-disabled="::aclLocked"
                                    ng-model="policy.write"
                                    ng-change="accessSave()"
-                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked"/>
                           </td>
                           <td class="fit editable" ng-if="hasActions">
                             <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"

@@ -26,6 +26,8 @@ import {styleNavClosed, styleNavOpen} from "../../utils/componentsUtils";
 import {logger} from "../../utils/logger";
 import Header from "../Header";
 import Footer from "../Footer";
+import {getUserInformation} from "../../selectors/userInfoSelectors";
+import {hasAccess} from "../../utils/utils";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -36,7 +38,7 @@ const containerAction = React.createRef();
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
                         loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter,
-                    resetOffset }) => {
+                    resetOffset, user }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -138,12 +140,13 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         <>
             <Header />
             <section className="action-nav-bar">
-                {/*TODO: include with role things */}
                 <div className="btn-group">
-                    <button className="add" onClick={() => showNewEventModal()}>
-                        <i className="fa fa-plus" />
-                        <span>{t('EVENTS.EVENTS.ADD_EVENT')}</span>
-                    </button>
+                    {hasAccess("ROLE_UI_EVENTS_CREATE", user) && (
+                        <button className="add" onClick={() => showNewEventModal()}>
+                            <i className="fa fa-plus" />
+                            <span>{t('EVENTS.EVENTS.ADD_EVENT')}</span>
+                        </button>
+                    )}
                 </div>
 
                 {/* Display modal for new event if add event button is clicked */}
@@ -173,23 +176,29 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                           toggleMenu={toggleNavigation}/>
 
                 <nav>
-                    {/*Todo: Show only if user has ROLE_UI_EVENTS_VIEW*/}
-                    <Link to="/events/events"
-                          className={cn({active: true})}
-                          onClick={() => loadEvents()}>
-                        {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
-                    </Link>
-                    <Link to="/events/series"
-                          className={cn({active: false})}
-                          onClick={() => loadSeries()}>
-                        {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
-                    </Link>
+                    {hasAccess("ROLE_UI_EVENTS_VIEW", user) && (
+                        <Link to="/events/events"
+                              className={cn({active: true})}
+                              onClick={() => loadEvents()}>
+                            {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
+                        </Link>
+                    )}
+                    {hasAccess("ROLE_UI_SERIES_VIEW", user) && (
+                        <Link to="/events/series"
+                              className={cn({active: false})}
+                              onClick={() => loadSeries()}>
+                            {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
+                        </Link>
+                    )}
                 </nav>
 
-                <div className="stats-container">
-                    {/* Include status bar component*/}
-                    <Stats />
-                </div>
+                {/* Include status bar component*/}
+                {hasAccess("ROLE_UI_EVENTS_COUNTERS_VIEW", user) && (
+                    <div className="stats-container">
+                        <Stats />
+                    </div>
+                )}
+
             </section>
 
             <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
@@ -205,31 +214,35 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                             {/* show dropdown if actions is clicked*/}
                             { displayActionMenu && (
                                 <ul className="dropdown-ul">
-                                    {/*todo: show only if user has right to delete resource (with-role ROLE_UI_{{ table.resource }}_DELETE*/}
-                                    <li>
-                                        <a onClick={() => setDeleteModal(true)}>
-                                            {t('BULK_ACTIONS.DELETE.EVENTS.CAPTION')}
-                                        </a>
-                                    </li>
-                                    {/*todo: show only  with-Role ROLE_UI_TASKS_CREATE*/}
-                                    <li>
-                                        <a onClick={() => setStartTaskModal(true)}>
-                                            {t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}
-                                        </a>
-                                    </li>
-                                    {/*todo: show only if  user is admin with roles
-                                    ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT and ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT */}
-                                    <li>
-                                        <a onClick={() => setEditScheduledEventsModal(true)}>
-                                            {t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}
-                                        </a>
-                                    </li>
-                                    {/*todo: show  user is admin with roles ROLE_UI_EVENTS_DETAILS_METADATA_EDIT*/}
-                                    <li>
-                                        <a onClick={() => setEditMetadataEventsModal(true)}>
-                                            {t('BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION')}
-                                        </a>
-                                    </li>
+                                    {hasAccess("ROLE_UI_EVENTS_DELETE", user) && (
+                                        <li>
+                                            <a onClick={() => setDeleteModal(true)}>
+                                                {t('BULK_ACTIONS.DELETE.EVENTS.CAPTION')}
+                                            </a>
+                                        </li>
+                                    )}
+                                    {hasAccess("ROLE_UI_TASKS_CREATE", user) && (
+                                        <li>
+                                            <a onClick={() => setStartTaskModal(true)}>
+                                                {t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}
+                                            </a>
+                                        </li>
+                                    )}
+                                    {(hasAccess("ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT", user)
+                                        && hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user)) && (
+                                        <li>
+                                            <a onClick={() => setEditScheduledEventsModal(true)}>
+                                                {t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}
+                                            </a>
+                                        </li>
+                                    )}
+                                    {hasAccess("ROLE_UI_EVENTS_DETAILS_METADATA_EDIT", user) && (
+                                        <li>
+                                            <a onClick={() => setEditMetadataEventsModal(true)}>
+                                                {t('BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION')}
+                                            </a>
+                                        </li>
+                                    )}
                                 </ul>
                             )}
                         </div>
@@ -254,7 +267,8 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 const mapStateToProps = state => ({
     events: getTotalEvents(state),
     showActions: isShowActions(state),
-    isLoadingEvents: isLoading(state)
+    isLoadingEvents: isLoading(state),
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

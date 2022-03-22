@@ -37,8 +37,10 @@
       "CURRENT_JOBS": "Today's jobs",
       "PRESENTER": "Presenter",
       "PRESENTER_DESCRIPTION": "Video file for the presenter track",
+      "VIDEOFILE": "Videofile",
+      "VIDEOFILE_DESCRIPTION": "Video file for upload",
       "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
       "UPLOAD": "Upload",
       "UPLOADING": "Uploading",
       "EDIT": "Save",
@@ -126,7 +128,8 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone.",
+         "UNSAVED_CHANGES": "You have unsaved changes. If you continue, those changes will be discarded. Are you sure that you want to continue?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
@@ -203,6 +206,7 @@
       "INVALID_ACL_RULES": "Rules have to contain a valid role and read or/and write right(s).",
       "MISSING_ACL_RULES": "At least one role with Read and Write permissions is required!",
       "SAVED_ACL_RULES": "The access rules have been saved.",
+      "SAVED_METADATA": "The metadata has been saved.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
       "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
@@ -233,7 +237,7 @@
       "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
       "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
          "ALL_EVENTS_UPDATED": "All events were successfully updated.",
          "NO_EVENTS_UPDATED": "All updates failed.",
          "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
@@ -312,7 +316,7 @@
       },
       "EDIT_EVENTS_METADATA": {
          "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "FATAL_ERROR": "A fatal error occurred: {{ fatalError }}",
          "REQUEST_ERRORS": {
             "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
             "NOTHING_TO_EDIT": "The events cannot be edited.",
@@ -386,7 +390,7 @@
          "TITLE": "Capture"
       },
       "USERS": {
-         "TITLE": "Organization"
+         "TITLE": "Organisation"
       },
       "INTEGRATIONS": {
          "TITLE": "Integrations"
@@ -409,8 +413,8 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "Thank you for using Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
-            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you with the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding, and attract more companies to provide services around Opencast."
          },
          "FORM_STATE": {
             "ORGANISATION": "Organisation",
@@ -426,12 +430,12 @@
             "LAST_NAME": "Last name",
             "STREET": "Street",
             "NUMBER": "Number",
-            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "ADDITIONAL_ADDRESS_INFO": "Add. address information",
             "MAIL": "Email",
-            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "CONTACT_ME": "Contact me for updates and security issues",
             "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
             "POLICY_HEADLINE": "Privacy policy and terms of use",
-            "USAGE_STATISTICS": "Usage statistcs",
+            "USAGE_STATISTICS": "Usage statistics",
             "ERROR_REPORTS": "Error reports",
             "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
             "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
@@ -617,6 +621,7 @@
             "NOCONTENT": "No data available",
             "PUBLISHED": "Published",
             "WEEKDAY": "Weekday",
+            "ADMINUI_NOTES": "Notes",
             "TOOLTIP": {
                "ASSETS": "Open asset details",
                "START": "Filter for this start date",
@@ -644,7 +649,7 @@
             "PROCESSED": "Finished",
             "RECORDING_FAILURE": "Recording failure",
             "PROCESSING_FAILURE": "Processing failure",
-            "PROCESSING_CANCELED": "Processing canceled"
+            "PROCESSING_CANCELLED": "Processing cancelled"
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
@@ -892,7 +897,7 @@
                   "REVIEW": "Review required",
                   "ASYNC": "A/V tracks asynchronous",
                   "AUDIO_ISSUE": "Missing or defective audio track",
-                  "CANCELED": "Canceled event",
+                  "CANCELLED": "Cancelled event",
                   "CONFLICTING_METADATA": "Conflicting metadata",
                   "IMPROPER_POINT": "Improper in or out point",
                   "MISSING_AGREEMENT": "Missing agreement",
@@ -905,7 +910,8 @@
                   "WRONG_METADATA": "Metadata needs correction",
                   "WRONG_SERIES_PUBLICATION": "Wrong series or publication channel",
                   "WRONG_WORKFLOW": "Wrong workflow",
-                  "PROCESSING_FAILURE": "Processing failure"
+                  "PROCESSING_FAILURE": "Processing failure",
+                  "ADMINUI_NOTES": "Notes in Admin UI"
                }
             },
             "STATISTICS": {
@@ -1521,7 +1527,7 @@
             "BUMPER": {
                "CAPTION": "Bumper (begin)",
                "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined video that is appended to the beginning of a recording.",
+               "DESCRIPTION": "Predefined video prepended to a recording.",
                "ACTIVE": "Active",
                "ENABLE": "Enable bumper",
                "SELECT": "Select",
@@ -1531,7 +1537,7 @@
             "TRAILER": {
                "CAPTION": "Bumper (end)",
                "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined video that is appended to the end of a recording.",
+               "DESCRIPTION": "Predefined video appended to a recording.",
                "ACTIVE": "Active",
                "ENABLE": "Enable bumper",
                "UPLOAD_LABEL": "Upload video",
@@ -1541,7 +1547,7 @@
             "TITLE": {
                "CAPTION": "Title",
                "FILE_UPLOADED": "File uploaded: ",
-               "DESCRIPTION": "Predefined slide including descriptive metadata appended to the beginning or end of a recording.",
+               "DESCRIPTION": "Predefined slide (including descriptive metadata) affixed to the beginning or end of a recording.",
                "ACTIVE": "Active",
                "ENABLE": "Enable title slide",
                "BACKGROUND": "Background",
@@ -1607,7 +1613,7 @@
             "INSTANTIATED": "Instantiated",
             "DISPATCHING": "Dispatching",
             "RESTART": "Restart",
-            "CANCELED": "Canceled",
+            "CANCELLED": "Cancelled",
             "WAITING": "Waiting"
          }
       },
@@ -1618,11 +1624,8 @@
             "HOST_NAME": "Host name",
             "NODE_NAME": "Node name",
             "CORES": "Cores",
-            "COMPLETED": "Jobs completed",
             "RUNNING": "Jobs running",
             "QUEUED": "Jobs queued",
-            "MEAN_RUN_TIME": "Mean run time",
-            "MEAN_QUEUE_TIME": "Mean queue time",
             "MAINTENANCE": "Maintenance",
             "MAINTENANCE_OFF": "Enter maintenance mode",
             "MAINTENANCE_ON": "Leave maintenance mode"

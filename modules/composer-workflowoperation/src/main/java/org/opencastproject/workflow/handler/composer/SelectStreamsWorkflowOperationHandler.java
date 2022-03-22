@@ -31,17 +31,21 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationTagUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,17 +60,25 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Hide/unhide specific tracks in a media package",
+        "workflow.operation=select-tracks"
+    }
+)
 public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   private static final Logger logger = LoggerFactory.getLogger(SelectStreamsWorkflowOperationHandler.class);
 
   /** Name of the 'encode to video only work copy' encoding profile */
-  private static final String PREPARE_VIDEO_ONLY_PROFILE = "video-only.work";
+  private static final String PREPARE_VIDEO_ONLY_PROFILE = "video-only.copy";
 
   /** Name of the 'encode to video only work copy' encoding profile */
-  private static final String PREPARE_AUDIO_ONLY_PROFILE = "audio-only.work";
+  private static final String PREPARE_AUDIO_ONLY_PROFILE = "audio-only.copy";
 
   /** Name of the muxing encoding profile */
-  private static final String MUX_AV_PROFILE = "mux-av.work";
+  private static final String MUX_AV_PROFILE = "mux-av.copy";
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -99,8 +111,15 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param composerService
    *          the local composer service
    */
+  @Reference(name = "ComposerService")
   protected void setComposerService(final ComposerService composerService) {
     this.composerService = composerService;
+  }
+
+  @Reference(name = "ServiceRegistry")
+  @Override
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
   }
 
   /**
@@ -110,6 +129,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(name = "Workspace")
   public void setWorkspace(final Workspace workspace) {
     this.workspace = workspace;
   }
@@ -224,10 +244,11 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
-        Configuration.none, Configuration.one, Configuration.none, Configuration.one);
+        Configuration.none, Configuration.one, Configuration.many, Configuration.one);
 
     final MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
     final MediaPackageElementFlavor targetTrackFlavor = tagsAndFlavors.getSingleTargetFlavor();
+    final List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
 
     final Track[] tracks = mediaPackage.getTracks(sourceFlavor);
 
@@ -341,10 +362,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     });
 
     // Update Tags here
-    getConfiguration(workflowInstance, "target-tags").ifPresent(tags -> {
-      final WorkflowOperationTagUtil.TagDiff tagDiff = WorkflowOperationTagUtil.createTagDiff(tags);
-      result.forEachTrack(t -> WorkflowOperationTagUtil.applyTagDiff(tagDiff, t));
-    });
+    final WorkflowOperationTagUtil.TagDiff tagDiff = WorkflowOperationTagUtil.createTagDiff(targetTrackTags);
+    result.forEachTrack(t -> WorkflowOperationTagUtil.applyTagDiff(tagDiff, t));
 
     return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE, result.queueTime);
   }

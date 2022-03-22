@@ -24,8 +24,9 @@
 angular.module('adminNg.controllers')
 .controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource',
   'ResourcesListResource', 'Notifications', 'ConfirmationModal', 'RelativeDatesService', 'AuthService',
+  'CommentResource','IdentityResource',
   function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications,
-    ConfirmationModal, RelativeDatesService, AuthService) {
+    ConfirmationModal, RelativeDatesService, AuthService, CommentResource, IdentityResource) {
 
     $scope.stats = Stats;
 
@@ -97,6 +98,10 @@ angular.module('adminNg.controllers')
       }, {
         template: 'modules/events/partials/eventActionsCell.html',
         label:    'EVENTS.EVENTS.TABLE.ACTION'
+      }, {
+        template: 'modules/events/partials/eventsNotesCell.html',
+        label: 'EVENTS.EVENTS.TABLE.ADMINUI_NOTES',
+        deactivated: true,
       }],
       caption:    'EVENTS.EVENTS.TABLE.CAPTION',
       resource:   'events',
@@ -123,6 +128,7 @@ angular.module('adminNg.controllers')
         row.embeddingCode = function() {
           ConfirmationModal.show('embedding-code',Table.fullScreenUrl,row);
         };
+
         row.editorUrl = $scope.editorUrl.replace('$id', row.id);
       }
     });
@@ -153,5 +159,95 @@ angular.module('adminNg.controllers')
         }
       });
     };
+    $scope.embedCode = '';
+
+    $scope.getEmbedCode = function (size, id) {
+      const identity = IdentityResource.get();
+      identity.$promise.then(function (info) {
+
+        // check if the engage URL is configured
+        let engageUrl = window.location.origin;
+        if (info && info.org && info.org.properties && info.org.properties) {
+          engageUrl = info.org.properties['org.opencastproject.engage.ui.url'] || engageUrl;
+        }
+
+        const url = engageUrl + '/play/' + id;
+        const sizeArray = size.split('x'),
+              width = sizeArray[0],
+              height = sizeArray[1];
+        $scope.selectedBox = size;
+        $scope.embedCode = '<iframe allowfullscreen src="' + url +
+          '" style="border: none;" name="Player" scrolling="no"' +
+          ' frameborder="0" marginheight="0px" marginwidth="0px" width="' +
+          width + '" height="' + height + '"></iframe>';
+      });
+    };
+
+    $scope.copyToClipboard = function(toCopy) {
+      // create temp element
+      var copyElement = document.createElement('span');
+      copyElement.appendChild(document.createTextNode(toCopy));
+      copyElement.id = 'tempCopyToClipboard';
+      angular.element(document.body.append(copyElement));
+
+      // select the text
+      var range = document.createRange();
+      range.selectNode(copyElement);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+
+      // copy & cleanup
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      copyElement.remove();
+
+      //update & show confirmation message
+      $scope.copiedBox = $scope.selectedBox;
+      $scope.confirmMsgVisibility = {'visibility': 'visible'};
+    };
+
+    // Type of comments in the notes column
+    $scope.table.notesCommentReason = 'EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ADMINUI_NOTES';
+
+    $scope.table.createComment = function(commentText, eventId) {
+      if (!commentText || !eventId) {
+        return;
+      }
+      CommentResource.save(
+        { resource: 'event', resourceId: eventId, type: 'comment' },
+        { text: commentText, reason: $scope.table.notesCommentReason }
+      );
+    };
+
+    $scope.table.updateComment = function(comment, eventId) {
+      if (!comment || !eventId) {
+        return;
+      }
+      CommentResource.update(
+        { resource: 'event', resourceId: eventId, id: comment.id, type: 'comment' },
+        { text: comment.text, reason: comment.reason, resolved: comment.resolvedStatus }
+      );
+    };
+
+    $scope.table.deleteComment = function(comment, eventId) {
+      if (!comment || !eventId) {
+        return;
+      }
+      CommentResource.delete(
+        { resource: 'event', resourceId: eventId, id: comment.id, type: 'comment' }
+      );
+    };
+
+    // Stop automatic table refresh while performing an action in the table
+    $scope.table.stopRefresh = function() {
+      $scope.table.refreshScheduler.on = false;
+      $scope.table.refreshScheduler.cancel();
+    };
+
+    $scope.table.startRefresh = function() {
+      $scope.table.refreshScheduler.on = true;
+      $scope.table.refreshScheduler.newSchedule();
+    };
+
   }
 ]);

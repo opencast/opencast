@@ -3,11 +3,13 @@ import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import {fetchServices, restartService} from "../../../thunks/serviceThunks";
 import {loadServicesIntoTable} from "../../../thunks/tableThunks";
+import {getUserInformation} from "../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../utils/utils";
 
 /**
  * This component renders the action cells of services in the table view
  */
-const ServicesActionCell = ({ row, loadServices, loadServicesIntoTable }) => {
+const ServicesActionCell = ({ row, loadServices, loadServicesIntoTable, user }) => {
     const { t } = useTranslation();
 
     const onClickRestart = async () => {
@@ -17,14 +19,19 @@ const ServicesActionCell = ({ row, loadServices, loadServicesIntoTable }) => {
     }
 
     return (
-        row.status !== 'SYSTEMS.SERVICES.STATUS.NORMAL' ? (
-            // todo: with-role
+        (row.status !== 'SYSTEMS.SERVICES.STATUS.NORMAL'
+            && hasAccess("ROLE_UI_SERVICES_STATUS_EDIT", user)) && (
             <a className="sanitize fa fa-undo"
                onClick={() => onClickRestart()}
                title={t('SYSTEMS.SERVICES.TABLE.SANITIZE')}/>
-        ) : null
+        )
     );
 }
+
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
 
 // mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
@@ -32,4 +39,4 @@ const mapDispatchToProps = dispatch => ({
     loadServicesIntoTable: () => dispatch(loadServicesIntoTable())
 });
 
-export default connect(null, mapDispatchToProps)(ServicesActionCell);
+export default connect(mapStateToProps, mapDispatchToProps)(ServicesActionCell);

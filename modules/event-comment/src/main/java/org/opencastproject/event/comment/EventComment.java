@@ -108,9 +108,20 @@ public final class EventComment {
    * @throws IllegalArgumentException
    *           if id, text, or author is not set
    */
-  public static EventComment create(Option<Long> id, String eventId, String organization, String text, User author, String reason, boolean resolvedStatus) {
+  public static EventComment create(
+      Option<Long> id,
+      String eventId,
+      String organization,
+      String text,
+      User author,
+      String reason,
+      boolean resolvedStatus
+  ) {
     Date creationDate = new Date();
-    return create(id, eventId, organization, text, author, reason, resolvedStatus, creationDate, creationDate, new ArrayList<EventCommentReply>());
+    return create(
+        id, eventId, organization, text, author, reason, resolvedStatus,
+        creationDate, creationDate, new ArrayList<EventCommentReply>()
+    );
   }
 
   /**
@@ -135,10 +146,20 @@ public final class EventComment {
    * @throws IllegalArgumentException
    *           if id, text, author, creation date or modification date is not set
    */
-  public static EventComment create(Option<Long> id, String eventId, String organization, String text, User author, String reason, boolean resolvedStatus,
-          Date creationDate, Date modificationDate) {
-    return new EventComment(id, eventId, organization, text, author, reason, resolvedStatus, creationDate, modificationDate,
-            new ArrayList<EventCommentReply>());
+  public static EventComment create(
+      Option<Long> id,
+      String eventId,
+      String organization,
+      String text,
+      User author,
+      String reason,
+      boolean resolvedStatus,
+      Date creationDate,
+      Date modificationDate
+  ) {
+    return new EventComment(
+        id, eventId, organization, text, author, reason, resolvedStatus,
+        creationDate, modificationDate, new ArrayList<EventCommentReply>());
   }
 
   /**
@@ -165,13 +186,34 @@ public final class EventComment {
    * @throws IllegalArgumentException
    *           if id, text, author, creation date, modification date or replies is not set
    */
-  public static EventComment create(Option<Long> id, String eventId, String organization, String text, User author, String reason, boolean resolvedStatus,
-          Date creationDate, Date modificationDate, List<EventCommentReply> replies) {
-    return new EventComment(id, eventId, organization, text, author, reason, resolvedStatus, creationDate, modificationDate, replies);
+  public static EventComment create(
+      Option<Long> id,
+      String eventId,
+      String organization,
+      String text,
+      User author,
+      String reason,
+      boolean resolvedStatus,
+      Date creationDate,
+      Date modificationDate,
+      List<EventCommentReply> replies
+  ) {
+    return new EventComment(id, eventId, organization, text, author, reason,
+        resolvedStatus, creationDate, modificationDate, replies);
   }
 
-  private EventComment(Option<Long> id, String eventId, String organization, String text, User author, String reason, boolean resolvedStatus, Date creationDate,
-          Date modificationDate, List<EventCommentReply> replies) {
+  private EventComment(
+      Option<Long> id,
+      String eventId,
+      String organization,
+      String text,
+      User author,
+      String reason,
+      boolean resolvedStatus,
+      Date creationDate,
+      Date modificationDate,
+      List<EventCommentReply> replies
+  ) {
     this.id = notNull(id, "id");
     this.eventId = notEmpty(eventId, "eventId");
     this.organization = notEmpty(organization, "organization");
@@ -298,16 +340,18 @@ public final class EventComment {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || getClass() != o.getClass()) {
       return false;
+    }
     EventComment comment = (EventComment) o;
 
     return text.equals(comment.getText()) && creationDate.equals(comment.getCreationDate())
-            && modificationDate.equals(comment.getModificationDate()) && author.equals(comment.getAuthor())
-            && (reason == null ? comment.getReason() == null : reason.equals(comment.getReason()))
-            && resolvedStatus == comment.isResolvedStatus();
+        && modificationDate.equals(comment.getModificationDate()) && author.equals(comment.getAuthor())
+        && (reason == null ? comment.getReason() == null : reason.equals(comment.getReason()))
+        && resolvedStatus == comment.isResolvedStatus();
   }
 
   @Override
@@ -330,14 +374,18 @@ public final class EventComment {
     }
 
     Val idValue = Jsons.ZERO_VAL;
-    if (id.isSome())
+    if (id.isSome()) {
       idValue = Jsons.v(id.get());
+    }
 
-    return Jsons.obj(Jsons.p("id", idValue), Jsons.p("text", text),
-            Jsons.p("creationDate", DateTimeSupport.toUTC(creationDate.getTime())),
-            Jsons.p("modificationDate", DateTimeSupport.toUTC(modificationDate.getTime())),
-            Jsons.p("author", authorObj), Jsons.p("reason", reason), Jsons.p("resolvedStatus", resolvedStatus),
-            Jsons.p("replies", Jsons.arr(replyArr)));
+    return Jsons.obj(
+        Jsons.p("id", idValue),
+        Jsons.p("text", text),
+        Jsons.p("creationDate", DateTimeSupport.toUTC(creationDate.getTime())),
+        Jsons.p("modificationDate", DateTimeSupport.toUTC(modificationDate.getTime())),
+        Jsons.p("author", authorObj), Jsons.p("reason", reason), Jsons.p("resolvedStatus", resolvedStatus),
+        Jsons.p("replies", Jsons.arr(replyArr))
+    );
   }
 
 }

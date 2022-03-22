@@ -80,19 +80,19 @@ import javax.ws.rs.core.Response;
  */
 @Path("/")
 @RestService(
-  name = "UsersUtils",
-  title = "User utils",
-  notes = "This service offers the default CRUD Operations for the internal Opencast users.",
-  abstractText = "Provides operations for internal Opencast users")
+    name = "UsersUtils",
+    title = "User utils",
+    notes = "This service offers the default CRUD Operations for the internal Opencast users.",
+    abstractText = "Provides operations for internal Opencast users")
 @Component(
-  property = {
-    "service.description=User REST endpoint",
-    "opencast.service.type=org.opencastproject.userdirectory.endpoint.UserEndpoint",
-    "opencast.service.path=/user-utils",
-    "opencast.service.jobproducer=false"
-  },
-  immediate = true,
-  service = { UserEndpoint.class }
+    property = {
+        "service.description=User REST endpoint",
+        "opencast.service.type=org.opencastproject.userdirectory.endpoint.UserEndpoint",
+        "opencast.service.path=/user-utils",
+        "opencast.service.jobproducer=false"
+    },
+    immediate = true,
+    service = { UserEndpoint.class }
 )
 public class UserEndpoint {
 
@@ -134,10 +134,10 @@ public class UserEndpoint {
   @Path("users.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
-    name = "allusersasjson",
-    description = "Returns a list of users",
-    returnDescription = "Returns a JSON representation of the list of user accounts",
-    restParameters = {
+      name = "allusersasjson",
+      description = "Returns a list of users",
+      returnDescription = "Returns a JSON representation of the list of user accounts",
+      restParameters = {
       @RestParameter(
         name = "limit",
         defaultValue = "100",
@@ -150,7 +150,7 @@ public class UserEndpoint {
         description = "The page number.",
         isRequired = false,
         type = RestParameter.Type.STRING)
-    }, responses = {
+      }, responses = {
       @RestResponse(
         responseCode = SC_OK,
         description = "The user accounts.")
@@ -174,16 +174,16 @@ public class UserEndpoint {
   @Path("{username}.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
-    name = "user",
-    description = "Returns a user",
-    returnDescription = "Returns a JSON representation of a user",
-    pathParameters = {
+      name = "user",
+      description = "Returns a user",
+      returnDescription = "Returns a JSON representation of a user",
+      pathParameters = {
       @RestParameter(
         name = "username",
         description = "The username.",
         isRequired = true,
         type = STRING)
-    }, responses = {
+      }, responses = {
       @RestResponse(
         responseCode = SC_OK,
         description = "The user account."),
@@ -223,10 +223,10 @@ public class UserEndpoint {
   @POST
   @Path("/")
   @RestQuery(
-    name = "createUser",
-    description = "Create a new  user",
-    returnDescription = "Location of the new ressource",
-    restParameters = {
+      name = "createUser",
+      description = "Create a new  user",
+      returnDescription = "Location of the new ressource",
+      restParameters = {
       @RestParameter(
         name = "username",
         description = "The username.",
@@ -252,7 +252,7 @@ public class UserEndpoint {
         description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]",
         isRequired = false,
         type = STRING)
-    }, responses = {
+      }, responses = {
       @RestResponse(
         responseCode = SC_BAD_REQUEST,
         description = "Malformed request syntax."),
@@ -282,12 +282,12 @@ public class UserEndpoint {
       JpaUser user = new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider.getName(), true,
               rolesSet);
       try {
-      jpaUserAndRoleProvider.addUser(user);
-      return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
-    } catch (UnauthorizedException ex) {
-      logger.debug("Create user failed", ex);
-      return Response.status(Response.Status.FORBIDDEN).build();
-    }
+        jpaUserAndRoleProvider.addUser(user);
+        return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
+      } catch (UnauthorizedException ex) {
+        logger.debug("Create user failed", ex);
+        return Response.status(Response.Status.FORBIDDEN).build();
+      }
 
     } catch (IllegalArgumentException e) {
       logger.debug("Request with malformed ROLE data: {}", roles);
@@ -298,10 +298,10 @@ public class UserEndpoint {
   @PUT
   @Path("{username}.json")
   @RestQuery(
-    name = "updateUser",
-    description = "Update an user",
-    returnDescription = "Status ok",
-    restParameters = {
+      name = "updateUser",
+      description = "Update an user",
+      returnDescription = "Status ok",
+      restParameters = {
       @RestParameter(
         name = "password",
         description = "The password.",
@@ -322,12 +322,12 @@ public class UserEndpoint {
         description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]",
         isRequired = false,
         type = STRING)
-    }, pathParameters = @RestParameter(
+      }, pathParameters = @RestParameter(
       name = "username",
       description = "The username",
       isRequired = true,
       type = STRING),
-    responses = {
+      responses = {
       @RestResponse(
         responseCode = SC_BAD_REQUEST,
         description = "Malformed request syntax."),
@@ -368,15 +368,15 @@ public class UserEndpoint {
   @DELETE
   @Path("{username}.json")
   @RestQuery(
-    name = "deleteUser",
-    description = "Delete a new  user",
-    returnDescription = "Status ok",
-    pathParameters = @RestParameter(
+      name = "deleteUser",
+      description = "Delete a new  user",
+      returnDescription = "Status ok",
+      pathParameters = @RestParameter(
       name = "username",
       type = STRING,
       isRequired = true,
       description = "The username"),
-    responses = {
+      responses = {
       @RestResponse(
         responseCode = SC_OK,
         description = "User has been deleted."),

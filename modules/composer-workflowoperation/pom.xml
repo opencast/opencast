@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -15,6 +15,10 @@
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.cmpn</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
@@ -109,22 +113,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.composer;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/operations/composite.xml,
-              OSGI-INF/operations/concat.xml,
-              OSGI-INF/operations/demux.xml,
-              OSGI-INF/operations/encode.xml,
-              OSGI-INF/operations/image-convert.xml,
-              OSGI-INF/operations/image-to-video.xml,
-              OSGI-INF/operations/image.xml,
-              OSGI-INF/operations/multiencode.xml,
-              OSGI-INF/operations/partial-import.xml,
-              OSGI-INF/operations/prepare-av.xml,
-              OSGI-INF/operations/process-smil.xml,
-              OSGI-INF/operations/sanitize-adaptive.xml,
-              OSGI-INF/operations/segmentpreviews.xml,
-              OSGI-INF/operations/select-tracks.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

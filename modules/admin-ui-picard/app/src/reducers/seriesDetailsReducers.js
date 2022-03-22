@@ -7,15 +7,20 @@ import {
     LOAD_SERIES_DETAILS_FEEDS_SUCCESS,
     LOAD_SERIES_DETAILS_IN_PROGRESS,
     LOAD_SERIES_DETAILS_METADATA_SUCCESS,
-    LOAD_SERIES_DETAILS_THEME_NAMES_FAILURE, LOAD_SERIES_DETAILS_THEME_NAMES_IN_PROGRESS,
+    LOAD_SERIES_DETAILS_THEME_NAMES_FAILURE,
+    LOAD_SERIES_DETAILS_THEME_NAMES_IN_PROGRESS,
     LOAD_SERIES_DETAILS_THEME_NAMES_SUCCESS,
-    LOAD_SERIES_DETAILS_THEME_SUCCESS, SET_SERIES_DETAILS_METADATA, SET_SERIES_DETAILS_THEME,
+    LOAD_SERIES_DETAILS_THEME_SUCCESS,
+    SET_SERIES_DETAILS_EXTENDED_METADATA,
+    SET_SERIES_DETAILS_METADATA,
+    SET_SERIES_DETAILS_THEME,
 } from "../actions/seriesDetailsActions";
 
 // Initial state of series details in redux store
 const initialState = {
     isLoading: false,
     metadata: {},
+    extendedMetadata: [],
     feeds: {},
     acl: {},
     theme: '',
@@ -33,11 +38,12 @@ const seriesDetails = (state=initialState, action) => {
             }
         }
         case LOAD_SERIES_DETAILS_METADATA_SUCCESS: {
-            const { seriesMetadata } = payload;
+            const { seriesMetadata, extendedMetadata } = payload;
             return {
                 ...state,
                 isLoading: false,
-                metadata: seriesMetadata
+                metadata: seriesMetadata,
+                extendedMetadata: extendedMetadata
             }
         }
         case LOAD_SERIES_DETAILS_FAILURE: {
@@ -102,6 +108,14 @@ const seriesDetails = (state=initialState, action) => {
             return {
                 ...state,
                 metadata: seriesMetadata
+            }
+        }
+        case SET_SERIES_DETAILS_EXTENDED_METADATA: {
+            const { seriesMetadata } = payload;
+
+            return {
+                ...state,
+                extendedMetadata: seriesMetadata
             }
         }
         default:

@@ -24,13 +24,12 @@ package org.opencastproject.authorization.xacml.manager.endpoint;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForCustomConfig;
+import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 import org.opencastproject.util.UrlSupport;
 
-import org.glassfish.jersey.server.ResourceConfig;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
@@ -262,8 +261,7 @@ public class OsgiAclServiceRestEndpointTest {
 
   // --
 
-  private static final RestServiceTestEnv env = testEnvForCustomConfig(TestRestService.BASE_URL,
-          new ResourceConfig(TestRestService.class, NotFoundExceptionMapper.class));
+  private static final RestServiceTestEnv env = testEnvForClasses(TestRestService.class, NotFoundExceptionMapper.class);
 
   @BeforeClass
   public static void oneTimeSetUp() {

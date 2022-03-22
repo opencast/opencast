@@ -519,18 +519,23 @@ table.main-tbl {
   td{
     .fa-check {
       float: right;
-      color: $green;
       margin-top: 3px;
       font-size: 18px;
       opacity: 0;
       visibility: hidden;
       @include transition(all .2s);
 
-      &.active {
+      &.saved {
         opacity: 1;
         visibility: visible;
+        color: $green;
       }
 
+      &.dirty {
+        opacity: 1;
+        visibility: visible;
+        color: $red;
+      }
     } // fa-check
   }
 }

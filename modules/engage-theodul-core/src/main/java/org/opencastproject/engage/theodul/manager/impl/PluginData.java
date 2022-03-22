@@ -80,11 +80,11 @@ public class PluginData {
   }
 
   public String getStaticResourcesPath() {
-    return Integer.toString(id) + "/" + EngagePlugin.STATIC_RESOURCES_PATH;
+    return name + "/" + EngagePlugin.STATIC_RESOURCES_PATH;
   }
 
   public String getRestPath() {
-    return Integer.toString(id) + "/" + EngagePlugin.REST_ENDPOINT_PATH;
+    return name + "/" + EngagePlugin.REST_ENDPOINT_PATH;
   }
 
   public String getName() {

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -78,7 +78,7 @@
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <artifactId>osgi.cmpn</artifactId>
     </dependency>
     <!-- Persistence -->
     <dependency>
@@ -109,7 +109,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <scope>provided</scope>
     </dependency>
     <!-- REST test environment -->
     <dependency>
@@ -135,6 +134,12 @@
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>Saxon-HE</artifactId>
+      <version>9.6.0-4</version>
       <scope>test</scope>
     </dependency>
     <!--
@@ -289,9 +294,6 @@
             <Provide-Capability>
               osgi.service;objectClass="org.opencastproject.util.ReadinessIndicator"
             </Provide-Capability>
-            <Service-Component>
-              OSGI-INF/chaining-mp-serializer.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

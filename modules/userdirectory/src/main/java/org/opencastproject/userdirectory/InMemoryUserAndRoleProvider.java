@@ -62,11 +62,11 @@ import java.util.stream.Collectors;
  * An in-memory user directory containing the users and roles used by the system.
  */
 @Component(
-  property = {
-    "service.description=A user and role provider"
-  },
-  immediate = true,
-  service = { UserProvider.class, RoleProvider.class, ManagedService.class }
+    property = {
+        "service.description=A user and role provider"
+    },
+    immediate = true,
+    service = { UserProvider.class, RoleProvider.class, ManagedService.class }
 )
 public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider, ManagedService {
 

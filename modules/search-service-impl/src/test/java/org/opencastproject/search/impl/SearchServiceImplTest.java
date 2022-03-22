@@ -82,6 +82,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -165,7 +166,7 @@ public class SearchServiceImplTest {
     // workspace
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
-        .andAnswer(() -> getClass().getResourceAsStream("/" + EasyMock.getCurrentArguments()[0].toString()))
+        .andAnswer(() -> new FileInputStream(((URI)EasyMock.getCurrentArguments()[0]).getPath()))
         .anyTimes();
     EasyMock.replay(workspace);
 
@@ -422,10 +423,10 @@ public class SearchServiceImplTest {
     assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
     query.withSort(SearchQuery.Sort.DATE_CREATED, false);
     assertEquals(newerTitle, service.getByQuery(query).getItems()[0].getDcTitle());
-    // FYI: DATE_PUBLISHED is the time of Search update, not DC modified (MH-10573)
-    query.withSort(SearchQuery.Sort.DATE_PUBLISHED);
+    // FYI: DATE_MODIFIED is the time of Search update, not DC modified (MH-10573)
+    query.withSort(SearchQuery.Sort.DATE_MODIFIED);
     assertEquals(newerTitle, service.getByQuery(query).getItems()[0].getDcTitle());
-    query.withSort(SearchQuery.Sort.DATE_PUBLISHED, false);
+    query.withSort(SearchQuery.Sort.DATE_MODIFIED, false);
     assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
     SearchQuery q = new SearchQuery();
     q.withSort(SearchQuery.Sort.TITLE);

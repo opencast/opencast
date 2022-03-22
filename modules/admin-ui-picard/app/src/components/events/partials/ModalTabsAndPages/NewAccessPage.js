@@ -14,11 +14,14 @@ import {addNotification} from "../../../../thunks/notificationThunks";
 import {removeNotificationWizardAccess} from "../../../../actions/notificationActions";
 import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/modalConfig";
 import RenderMultiField from "../../../shared/wizard/RenderMultiField";
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../../utils/utils";
 
 /**
  * This component renders the access page for new events and series in the wizards.
  */
-const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess }) => {
+const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, removeNotificationWizardAccess,
+                           editAccessRole, user }) => {
     const { t } = useTranslation();
 
     // States containing response from server concerning acl templates, actions and roles
@@ -243,22 +246,24 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
                                                                         )}
 
                                                                         {/*Todo: show only if user has role ROLE_UI_SERIES_DETAILS_ACL_EDIT */}
-                                                                        <tr>
-                                                                            {/*Add additional policy row*/}
-                                                                            <td colSpan="5">
-                                                                                <a onClick={() => {
-                                                                                    push({
-                                                                                        role: '',
-                                                                                        read: false,
-                                                                                        write: false,
-                                                                                        actions: []
-                                                                                    });
-                                                                                    checkPolicies();
-                                                                                }}>
-                                                                                    + {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.NEW')}
-                                                                                </a>
-                                                                            </td>
-                                                                        </tr>
+                                                                        {hasAccess(editAccessRole, user) && (
+                                                                            <tr>
+                                                                                {/*Add additional policy row*/}
+                                                                                <td colSpan="5">
+                                                                                    <a onClick={() => {
+                                                                                        push({
+                                                                                            role: '',
+                                                                                            read: false,
+                                                                                            write: false,
+                                                                                            actions: []
+                                                                                        });
+                                                                                        checkPolicies();
+                                                                                    }}>
+                                                                                        + {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.NEW')}
+                                                                                    </a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        )}
                                                                     </>
                                                                 )}
                                                             </FieldArray>
@@ -299,10 +304,14 @@ const NewAccessPage = ({ previousPage, nextPage, formik, addNotification, remove
     )
 }
 
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    user: getUserInformation(state)
+});
 
 const mapDispatchToProps = dispatch => ({
     addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
     removeNotificationWizardAccess: () => dispatch(removeNotificationWizardAccess())
 });
 
-export default connect(null, mapDispatchToProps)(NewAccessPage);
+export default connect(mapStateToProps, mapDispatchToProps)(NewAccessPage);

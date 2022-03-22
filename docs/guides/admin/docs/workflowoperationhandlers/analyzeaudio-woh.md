@@ -64,3 +64,19 @@ Example result track:
   </configurations>
 </operation>
 ```
+
+## Missing Encoding Profiles
+
+Some of the encoding profiles necessary for this operation are not included
+in Opencast per default, but the operation will not work without them.
+You need to include the following encoding profiles by copy and pasting them in
+a `.properties` file in the `etc/encoding` folder of your installation.
+
+```xml
+# SoX Audio only (strip video)
+profile.sox-audio-only.work.name = sox audio only
+profile.sox-audio-only.work.input = visual
+profile.sox-audio-only.work.output = audio
+profile.sox-audio-only.work.suffix = -work.flac
+profile.sox-audio-only.work.ffmpeg.command = -i #{in.video.path} -vn -c:a flac #{out.dir}/#{out.name}#{out.suffix}
+```
