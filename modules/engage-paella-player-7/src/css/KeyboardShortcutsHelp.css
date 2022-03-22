@@ -1,0 +1,23 @@
+
+.keyboardshortcutshelp-plugin {
+    font-family: Helvetica, Arial, sans-serif;
+    padding: 1px;
+    color: #f0f0f0;
+    min-width: 300px
+}
+
+.keyboardshortcutshelp-plugin .row {
+    display: flex;
+    min-width: 100px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    border-bottom: 1px #d3a84c dotted;
+}
+
+.keyboardshortcutshelp-plugin .row .description {
+    max-width: 80%;
+}
+
+.keyboardshortcutshelp-plugin .row .key {
+    margin-left: auto;
+}

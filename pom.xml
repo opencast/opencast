@@ -118,6 +118,7 @@
     <module>modules/email-template-service-impl</module>
     <module>modules/event-comment</module>
     <module>modules/engage-paella-player</module>
+    <module>modules/engage-paella-player-7</module>
     <module>modules/engage-theodul-api</module>
     <module>modules/engage-theodul-core</module>
     <module>modules/engage-theodul-plugin-archetype</module>
