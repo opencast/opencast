@@ -4,6 +4,24 @@ Changelog
 Opencast 10
 ----------
 
+### Opencast 10.11
+
+*Released on Mar 22nd, 2022*
+
+- [[#3533](https://github.com/opencast/opencast/pull/3533)] -
+  Add activemq upgrade note to 10.x upgrade guide
+- [[#3531](https://github.com/opencast/opencast/pull/3531)] -
+  Revert "Update paella player to paella 6.5.5 (#3142)" since HLS videos do not load on slow connections
+- [[#3517](https://github.com/opencast/opencast/pull/3517)] -
+  Admin-ui-frontend migrate node-sass to sass
+- [[#3512](https://github.com/opencast/opencast/pull/3512)] -
+  Improve Tooltips in Documentation
+- [[#3490](https://github.com/opencast/opencast/pull/3490)] -
+  Document that you cannot run Opencast in a sub-path
+- [[#3467](https://github.com/opencast/opencast/pull/3467)] -
+  Opencast 10.10 release notes and changelog
+
+
 ### Opencast 10.10
 
 *Released on Feb 17th, 2022*

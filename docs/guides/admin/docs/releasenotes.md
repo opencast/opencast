@@ -43,6 +43,11 @@ API changes
 - [[#2644](https://github.com/opencast/opencast/pull/2644)]: Use millisecond precision in Solr date range queries
 
 
+Additional Notes about 10.11
+----------------------------
+
+This release downgrades Paella from 6.5.5 to 6.4.4 to HLS videos not loading on slow connections.
+
 Additional Notes about 10.10
 ----------------------------
 
