@@ -145,6 +145,7 @@ class PaellaOpencast extends Paella {
 let paella = new PaellaOpencast('player-container', initParams);
 
 paella.loadManifest()
+    .then(()=>{ return utils.loadStyle('/ui/config/paella7/custom_theme.css');})
     .then(() => paella.log.info('Paella player load done'))
     .catch(e => paella.log.error(e));
 

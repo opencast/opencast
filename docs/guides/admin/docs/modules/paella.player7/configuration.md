@@ -26,6 +26,11 @@ The configurations for the player are done for each tenant. So the configuration
 
 The default tenant for opencast is `mh_default_org`
 
+Change the default colors
+-------------------------
+
+To customize the theme modify the `.../etc/ui-config/<tenant>/paella7/custom_theme.css` file.
+
 Select the Opencast Player
 ------------------------------
 
