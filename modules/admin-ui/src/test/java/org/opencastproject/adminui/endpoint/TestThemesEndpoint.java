@@ -76,7 +76,7 @@ public class TestThemesEndpoint extends ThemesEndpoint {
   }
 
   private void addData() throws ThemesServiceDatabaseException {
-    Theme theme = new Theme(Option.some(theme1Id), creationDate, true, user, "The Theme name", "The Theme description",
+    Theme theme = new Theme(Option.none(), creationDate, true, user, "The Theme name", "The Theme description",
             true, "bumper-file", true, "trailer-file", true, "title,room,date", "title-background-file", true,
             "license-background-file", "The license description", true, "watermark-file", "top-left");
     themesServiceDatabaseImpl.updateTheme(theme);
