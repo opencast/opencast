@@ -8,17 +8,12 @@ import {fetchHealthStatus} from "../thunks/healthThunks";
 import {getHealthStatus} from "../selectors/healthSelectors";
 import {getCurrentLanguageInformation, hasAccess} from "../utils/utils";
 import {logger} from "../utils/logger";
-import {getUserInformation} from "../selectors/userInfoSelectors";
+import {getOrgProperties, getUserInformation} from "../selectors/userInfoSelectors";
 import axios from "axios";
 import RegistrationModal from "./shared/RegistrationModal";
 
-
 // Todo: Find suitable place to define them and get these links out of config-file or whatever
-const mediaModuleUrl = "http://localhost:8080/engage/ui/index.html";
 const studio = "https://opencast.org/";
-const documentationUrl = "https://opencast.org/";
-const restUrl = "https://opencast.org/";
-
 
 // Get code, flag and name of the current language
 const currentLanguage = getCurrentLanguageInformation();
@@ -56,7 +51,7 @@ function logout() {
 /**
  * Component that renders the header and the navigation in the upper right corner.
  */
-const Header = ({ loadingHealthStatus, healthStatus, user }) => {
+const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties }) => {
     const { t } = useTranslation();
     // State for opening (true) and closing (false) the dropdown menus for language, notification, help and user
     const [displayMenuLang, setMenuLang] = useState(false);
@@ -139,12 +134,16 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
 
                     {/* Media Module */}
                     {/* Show icon only if mediaModuleUrl is set*/}
-                    {!!mediaModuleUrl && (
-                        <div className="nav-dd" title={t('MEDIAMODULE')}>
-                            <a href={mediaModuleUrl}>
-                                <span className="fa fa-play-circle"/>
-                            </a>
-                        </div>
+                    {/* The seperated if clauses are intentional because on start up orgProperties are not filled yet,
+                    otherwise the app crashes */}
+                    {!!orgProperties && (
+                        !!orgProperties["org.opencastproject.admin.mediamodule.url"] && (
+                            <div className="nav-dd" title={t('MEDIAMODULE')}>
+                                <a href={orgProperties["org.opencastproject.admin.mediamodule.url"]}>
+                                    <span className="fa fa-play-circle"/>
+                                </a>
+                            </div>
+                        )
                     )}
 
                 {/* Opencast Studio */}
@@ -173,16 +172,21 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
 
                     {/* Help */}
                     {/* Show only if documentationUrl or restdocsUrl is set */}
-                    {(!!documentationUrl || !!restUrl) && (
-                        <div title="Help" className="nav-dd" id="help-dd" ref={containerHelp} >
-                            <div className="fa fa-question-circle" onClick={() => setMenuHelp(!displayMenuHelp)}/>
-                            {/* Click on the help icon, a dropdown menu with documentation, REST-docs and shortcuts (if available) opens */}
-                            {displayMenuHelp && (
-                                <MenuHelp hideMenuHelp={hideMenuHelp}
-                                          showRegistrationModal={showRegistrationModal}
-                                          user={user}/>
-                            )}
-                        </div>
+                    {/* The seperated if clauses are intentional because on start up orgProperties are not filled yet,
+                    otherwise the app crashes */}
+                    {!!orgProperties && (
+                        (!!orgProperties["org.opencastproject.admin.help.documentation.url"] || !!orgProperties["org.opencastproject.admin.help.restdocs.url"]) && (
+                            <div title="Help" className="nav-dd" id="help-dd" ref={containerHelp} >
+                                <div className="fa fa-question-circle" onClick={() => setMenuHelp(!displayMenuHelp)}/>
+                                {/* Click on the help icon, a dropdown menu with documentation, REST-docs and shortcuts (if available) opens */}
+                                {displayMenuHelp && (
+                                    <MenuHelp hideMenuHelp={hideMenuHelp}
+                                              showRegistrationModal={showRegistrationModal}
+                                              orgProperties={orgProperties}
+                                              user={user}/>
+                                )}
+                            </div>
+                        )
                     )}
 
                 {/* Username */}
@@ -246,7 +250,7 @@ const MenuNotify = ({ healthStatus }) => (
 );
 
 
-const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user }) => {
+const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user, orgProperties }) => {
     const { t } = useTranslation();
 
     // show Adopter Registration Modal and hide drop down
@@ -259,17 +263,17 @@ const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user }) => {
         <>
             <ul className="dropdown-ul">
                 {/* Show only if documentationUrl is set */}
-                {!!documentationUrl && (
+                {!!orgProperties["org.opencastproject.admin.help.documentation.url"] && (
                     <li>
-                        <a href={documentationUrl}>
+                        <a href={orgProperties["org.opencastproject.admin.help.documentation.url"]}>
                             <span>{t('HELP.DOCUMENTATION')}</span>
                         </a>
                     </li>
                 )}
                 {/* Show only if restUrl is set */}
-                {(!!restUrl && hasAccess("ROLE_ADMIN", user)) && (
+                {(!!orgProperties["org.opencastproject.admin.help.restdocs.url"] && hasAccess("ROLE_ADMIN", user)) && (
                     <li>
-                        <a target="_self" href={restUrl}>
+                        <a target="_self" href={orgProperties["org.opencastproject.admin.help.restdocs.url"]}>
                             <span>{t('HELP.REST_DOC')}</span>
                         </a>
                     </li>
@@ -311,7 +315,8 @@ const MenuUser = () => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     healthStatus: getHealthStatus(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    orgProperties: getOrgProperties(state)
 });
 
 // Mapping actions to dispatch

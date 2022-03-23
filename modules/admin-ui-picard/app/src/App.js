@@ -19,7 +19,8 @@ function App({loadingUserInfo}) {
     useEffect(() => {
        // Load information about current user on mount
        loadingUserInfo();
-    });
+    }, []);
+
   return (
           <HashRouter>
               <Switch>
