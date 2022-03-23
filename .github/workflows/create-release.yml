@@ -41,6 +41,14 @@ jobs:
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 
+      - name: Get the major version
+        id: get_major_version
+        run: echo ::set-output name=MAJOR_VERSION::${VERSION//.*/}
+
+      - name: Get the minor version
+        id: get_minor_version
+        run: echo ::set-output name=MINOR_VERSION::${VERSION//*./}
+
       - name: create new release
         uses: softprops/action-gh-release@v1
         with:
@@ -52,5 +60,5 @@ jobs:
             This release …
             For further information, please take a look at:
 
-            - [Release notes](#)
-            - [Changelog](#)
+            - [Release notes](https://docs.opencast.org/r/${{ steps.get_major_version.outputs.MAJOR_VERSION }}.x/admin/#releasenotes/#additional-notes-about-${{ steps.get_major_version.outputs.MAJOR_VERSION }}${{ steps.get_minor_version.outputs.MINOR_VERSION }})
+            - [Changelog](https://docs.opencast.org/r/${{ steps.get_major_version.outputs.MAJOR_VERSION }}.x/admin/#changelog/#opencast-${{ steps.get_major_version.outputs.MAJOR_VERSION }}${{ steps.get_minor_version.outputs.MINOR_VERSION }})
