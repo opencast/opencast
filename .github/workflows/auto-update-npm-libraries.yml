@@ -24,18 +24,30 @@ jobs:
         with:
           node-version: 16.x
 
-      - name: update all engage-theodul-core libraries (has only tests)
-        working-directory: modules/engage-theodul-core
+      - name: update all engage-theodul-* libraries (they only have tests)
+        working-directory: modules/
         run: |
-          rm package-lock.json
-          npm update --dev
-          npm audit fix
-          git add package.json package-lock.json
+          set -ue
+          for module in $(ls -1 engage-theodul-*/package.json | sed 's_/package.json__')
+          do
+            cd "${module}"
+            rm package-lock.json
+            npm update --dev
+            npm audit fix
+            git add package.json package-lock.json
+            cd -
+          done
 
       - name: make sure tests still work
         working-directory: modules/engage-theodul-core
         run: |
-          npm run eslint
+          set -ue
+          for module in $(ls -1 engage-theodul-*/package.json | sed 's_/package.json__')
+          do
+            cd "${module}"
+            npm run eslint
+            cd -
+          done
 
       - name: push changes
         run: |
