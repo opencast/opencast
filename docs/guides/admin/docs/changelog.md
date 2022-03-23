@@ -4,6 +4,41 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.5
+
+*Released on March 23rd, 2022*
+
+- [[#3544](https://github.com/opencast/opencast/pull/3544)] -
+  Fix bug: Editor sometimes doesn't skip deactivated sections on Safari Browser
+- [[#3547](https://github.com/opencast/opencast/pull/3547)] -
+  Redowngrade Paella to 6.4.4
+- [[#3546](https://github.com/opencast/opencast/pull/3546)] -
+  Update Editor to 2022-03-22
+- [[#3545](https://github.com/opencast/opencast/pull/3545)] -
+  Update 11.x translations, restore zh_TW translations
+- [[#3541](https://github.com/opencast/opencast/pull/3541)] -
+  Downgrade commons-io
+- [[#3540](https://github.com/opencast/opencast/pull/3540)] -
+  Fix NPE when signing publication URLs
+- [[#3534](https://github.com/opencast/opencast/pull/3534)] -
+  Fix Admin UI builds due to missing SASS
+- [[#3532](https://github.com/opencast/opencast/pull/3532)] -
+  Fix wrong name of admin UI configuration file
+- [[#3520](https://github.com/opencast/opencast/pull/3520)] -
+  Docs: Force same sample rate for audio files in PartialImport WOH encoding
+- [[#3474](https://github.com/opencast/opencast/pull/3474)] -
+  Fix OC 11.4 release notes layout issues
+- [[#3466](https://github.com/opencast/opencast/pull/3466)] -
+  Check if encoding profile exist for imageToVideo Operation
+- [[#3460](https://github.com/opencast/opencast/pull/3460)] -
+  fix admin-ui endpoint crash, when a series without title exists
+- [[#3459](https://github.com/opencast/opencast/pull/3459)] -
+  Add release notes and changelog for OC 11.4
+- [[#3343](https://github.com/opencast/opencast/pull/3343)] -
+  Password strength indicator
+- [[#3197](https://github.com/opencast/opencast/pull/3197)] -
+  Elasticsearch Retry Config
+
 ### Opencast 11.4
 
 *Released on February 16th, 2022*

@@ -78,6 +78,26 @@ API changes
 - [[#3002](https://github.com/opencast/opencast/pull/3002)] - Sign publication URL of events in External API
 - [[#3148](https://github.com/opencast/opencast/pull/3148)] - Allow empty track duration
 
+Additional Notes about 11.5
+---------------------------
+
+This release downgrades Paella from 6.5.5 to 6.4.4 to fix HLS videos not loading on slow connections (forward merged
+from 10.11 to this release). Additional fixes concern issues with the admin UI configuration (cf.
+[[#3532](https://github.com/opencast/opencast/pull/3532)]), exceptions when signing publication URLs (cf.
+[[#3540](https://github.com/opencast/opencast/pull/3540)]), problems in the admin UI when creating a series with
+an empty title (cf. [[#3460](https://github.com/opencast/opencast/pull/3460)]) and issues with Safari when using the
+editor (cf. [[#3544](https://github.com/opencast/opencast/pull/3544)]). A notable new feature is the password
+strength indicator in the user modal. Also, the stand-alone editor was updated  to version 2022-03-22 (for details on
+the changes, see the corresponding [release notes](https://github.com/opencast/opencast-editor/releases/tag/2022-03-22)
+for the editor). Furthermore, configuration options for Elasticsearch have been added. In case a request to
+Elasticsearch fails because of an `ElasticsearchStatusException`, you can now configure Opencast to try again. For this,
+set `max.retry.attempts` in `org.opencastproject.elasticsearch.index.ElasticsearchIndex.cfg` to  something higher than
+0. Set `retry.waiting.period` to a time period in ms to wait between retries (default: 1 second) so  you don't overwhelm
+Elasticsearch. Both parameters can be configured separately for read-only actions and those that also update or delete,
+since arguably the success of the latter is more important. Changing this config does not require  a restart of
+Opencast. See the [Elasticsearch docs](configuration/elasticsearch.md) for more details. Lastly, traditional chinese
+translations are back (cf. [[#3545](https://github.com/opencast/opencast/pull/3545)]).
+
 Additional Notes about 11.4
 ---------------------------
 
