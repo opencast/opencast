@@ -44,13 +44,14 @@ public class YamlWorkflowConfigurationDeserializer extends StdDeserializer<Workf
           throws IOException, JacksonException {
     ObjectNode jn = jsonParser.getCodec().readTree(jsonParser);
     var fields = jn.fields();
+
     if (fields.hasNext()) {
       var entry = fields.next();
+      // only parse first key value pair
       return new WorkflowConfigurationImpl(entry.getKey(), entry.getValue().asText());
     } else {
       return null;
     }
-
   }
 
 }

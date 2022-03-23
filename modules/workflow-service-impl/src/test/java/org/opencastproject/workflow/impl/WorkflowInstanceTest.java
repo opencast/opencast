@@ -33,12 +33,14 @@ import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
+import org.opencastproject.workflow.api.YamlWorkflowParser;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,6 +102,22 @@ public class WorkflowInstanceTest {
     Assert.assertEquals(2, def.getOperations().size());
     Assert.assertEquals("definition-1", def.getId());
     Assert.assertEquals("Unit testing workflow", def.getDescription());
+  }
+
+  @Test
+  public void testWorkflowDefinitionYamlDeserialization() throws Exception {
+    InputStream in = getClass().getResourceAsStream("/workflow-definition-1.yaml");
+    WorkflowDefinition def = YamlWorkflowParser.parseWorkflowDefinition(in);
+    IOUtils.closeQuietly(in);
+    Assert.assertEquals("The First Workflow Definition", def.getTitle());
+    Assert.assertEquals(2, def.getOperations().size());
+    Assert.assertEquals("definition-1", def.getId());
+    Assert.assertEquals("Unit testing workflow", def.getDescription());
+    Assert.assertEquals("partial-error", def.getOperations().get(1).getExceptionHandlingWorkflow());
+    Assert.assertEquals("value1", def.getOperations().get(1).getConfiguration("key1"));
+    Assert.assertEquals("value2", def.getOperations().get(1).getConfiguration("key2"));
+    Assert.assertTrue(Arrays.asList(def.getTags()).contains("tag1"));
+    Assert.assertEquals(100, def.getDisplayOrder());
   }
 
   @Test

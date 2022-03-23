@@ -423,5 +423,5 @@ As an alternative to XML workflow configuration files, it is possible to use YAM
       exception-handler-workflow:
       description:
       configurations:
-        key1: value1
-        key2: value2
+        - key1: value1
+        - key2: value2

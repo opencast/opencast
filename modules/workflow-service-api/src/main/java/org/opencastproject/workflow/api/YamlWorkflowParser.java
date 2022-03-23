@@ -25,14 +25,8 @@ import static com.fasterxml.jackson.databind.MapperFeature.USE_WRAPPER_NAME_AS_P
 
 import org.opencastproject.util.IoSupport;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
@@ -41,7 +35,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -56,17 +49,7 @@ public final class YamlWorkflowParser {
     om.registerModule(new JaxbAnnotationModule());
     SimpleModule sm = new SimpleModule();
     sm.addDeserializer(WorkflowConfigurationImpl.class, new YamlWorkflowConfigurationDeserializer());
-    sm.setDeserializerModifier(new BeanDeserializerModifier() {
-      private final CollectionType wcSetType = TypeFactory.defaultInstance().constructCollectionType(HashSet.class, WorkflowConfiguration.class);
-      @Override
-      public JsonDeserializer<?> modifyCollectionDeserializer(DeserializationConfig config, CollectionType type,
-          BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
-        if (wcSetType.equals(type)) {
-          return new YamlWorkflowConfigurationSetDeserializer();
-        }
-        return super.modifyCollectionDeserializer(config, type, beanDesc, deserializer);
-      }
-    });
+    sm.addSerializer(WorkflowConfigurationImpl.class, new YamlWorkflowConfigurationSerializer());
     om.registerModule(sm);
     mapper = om;
   }

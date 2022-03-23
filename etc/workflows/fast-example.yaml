@@ -17,32 +17,32 @@ operations:
   - id: defaults
     description: "Applying default configuration values"
     configurations:
-      straightToPublishing: true
+      - straightToPublishing: true
 
   - id: series
     fail-on-error: true
     exception-handler-workflow: partial-error
     description: "Applying access control entries from series"
     configurations:
-      apply-acl: true
+      - apply-acl: true
 
   - id: inspect
     fail-on-error: true
     exception-handler-workflow: "partial-error"
     description: "Inspecting audio and video streams"
     configurations:
-      overwrite: false
-      accept-no-media: false
+      - overwrite: false
+      - accept-no-media: false
 
   - id: encode
     fail-on-error: true
     exception-handler-workflow: "partial-error"
     description: "Encoding video"
     configurations:
-      source-flavor: "*/source"
-      target-flavor: "*/preview"
-      target-tags: "engage-download,engage-streaming,rss,atom"
-      encoding-profile: "fast.http"
+      - source-flavor: "*/source"
+      - target-flavor: "*/preview"
+      - target-tags: "engage-download,engage-streaming,rss,atom"
+      - encoding-profile: "fast.http"
 
   - id: image
     if: "${straightToPublishing}"
@@ -50,11 +50,11 @@ operations:
     exception-handler-workflow: "partial-error"
     description: "Creating Engage search result thumbnails"
     configurations:
-      source-flavor: "*/source"
-      target-flavor: "*/search+preview"
-      target-tags: "engage-download"
-      encoding-profile: "search-cover.http"
-      time: 1
+      - source-flavor: "*/source"
+      - target-flavor: "*/search+preview"
+      - target-tags: "engage-download"
+      - encoding-profile: "search-cover.http"
+      - time: 1
 
   - id: image
     if: "${straightToPublishing}"
@@ -62,11 +62,11 @@ operations:
     exception-handler-workflow: "partial-error"
     description: "Creating Engage player preview image"
     configurations:
-      source-flavor: "*/source"
-      target-flavor: "*/player+preview"
-      target-tags: "engage-download"
-      encoding-profile: "player-preview.http"
-      time: 1
+      - source-flavor: "*/source"
+      - target-flavor: "*/player+preview"
+      - target-tags: "engage-download"
+      - encoding-profile: "player-preview.http"
+      - time: 1
 
   - id: segment-video
     if: "${straightToPublishing}"
@@ -74,8 +74,8 @@ operations:
     exception-handler-workflow: "partial-error"
     description: "Detecting slide transitions in presentation track"
     configurations:
-      source-flavor: "presentation/source"
-      target-tags: "engage-download"
+      - source-flavor: "presentation/source"
+      - target-tags: "engage-download"
 
   - id: segmentpreviews
     if: "${straightToPublishing}"
@@ -83,20 +83,20 @@ operations:
     exception-handler-workflow: "partial-error"
     description: "Creating presentation segments preview image"
     configurations:
-      source-flavor: "presentation/source"
-      target-flavor: "presentation/segment+preview"
-      reference-tags: "engage-download"
-      target-tags: "engage-download"
-      encoding-profile: "player-slides.http"
+      - source-flavor: "presentation/source"
+      - target-flavor: "presentation/segment+preview"
+      - reference-tags: "engage-download"
+      - target-tags: "engage-download"
+      - encoding-profile: "player-slides.http"
 
   - id: publish-configure
     exception-handler-workflow: "partial-error"
     description: "Publish to preview publication channel"
     configurations:
-      download-source-flavors: "*/preview"
-      channel-id: "internal"
-      url-pattern: "${org_org_opencastproject_admin_ui_url!'http://localhost:8080'}/admin-ng/index.html#/events/events/${event_id}/tools/editor"
-      check-availability: false
+      - download-source-flavors: "*/preview"
+      - channel-id: "internal"
+      - url-pattern: "${org_org_opencastproject_admin_ui_url!'http://localhost:8080'}/admin-ng/index.html#/events/events/${event_id}/tools/editor"
+      - check-availability: false
 
   - id: publish-engage
     if: "${straightToPublishing}"
@@ -105,23 +105,23 @@ operations:
     exception-handler-workflow: "partial-error"
     description: "Publishing to Engage"
     configurations:
-      download-source-flavors: "dublincore/*,security/*"
-      download-source-tags: "engage-download"
-      check-availability: false
+      - download-source-flavors: "dublincore/*,security/*"
+      - download-source-tags: "engage-download"
+      - check-availability: false
 
   - id: snapshot
     fail-on-error: true
     exception-handler-workflow: "partial-error"
     description: "Archiving"
     configurations:
-      source-flavors: "*/source,dublincore/*,security/*"
+      - source-flavors: "*/source,dublincore/*,security/*"
 
   - id: cleanup
     fail-on-error: "false"
     description: "Cleaning up"
     configurations:
-      delete-external: true
-      preserve-flavors: "security/*"
+      - delete-external: true
+      - preserve-flavors: "security/*"
 
 state-mappings:
   - state: "running"
