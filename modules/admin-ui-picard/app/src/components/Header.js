@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
+import Link from "react-router-dom/Link";
 import i18n from "../i18n/i18n";
 import languages from "../i18n/languages";
 import opencastLogo from '../img/opencast-white.svg';
@@ -11,6 +12,9 @@ import {logger} from "../utils/logger";
 import {getOrgProperties, getUserInformation} from "../selectors/userInfoSelectors";
 import axios from "axios";
 import RegistrationModal from "./shared/RegistrationModal";
+import {setOffset} from "../actions/tableActions";
+import {loadServersIntoTable, loadServicesIntoTable} from "../thunks/tableThunks";
+import {fetchServices} from "../thunks/serviceThunks";
 
 // Todo: Find suitable place to define them and get these links out of config-file or whatever
 const studio = "https://opencast.org/";
@@ -51,7 +55,7 @@ function logout() {
 /**
  * Component that renders the header and the navigation in the upper right corner.
  */
-const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties }) => {
+const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetOffset, loadingServices, loadingServicesIntoTable }) => {
     const { t } = useTranslation();
     // State for opening (true) and closing (false) the dropdown menus for language, notification, help and user
     const [displayMenuLang, setMenuLang] = useState(false);
@@ -74,6 +78,17 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties }) => {
 
     const hideRegistrationModal = () => {
         setRegistrationModal(false);
+    }
+
+    const redirectToServices = () => {
+        // Reset the current page to first page
+        resetOffset();
+
+        // Fetching services from server
+        loadingServices();
+
+        // Load services into table
+        loadingServicesIntoTable();
     }
 
     useEffect(() => {
@@ -163,7 +178,8 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties }) => {
                             <span id="error-count" className="badge" >{healthStatus.numErr}</span>
                             {/* Click on the bell icon, a dropdown menu with all services in serviceList and their status opens */}
                             {displayMenuNotify && (
-                                <MenuNotify healthStatus={healthStatus}/>
+                                <MenuNotify healthStatus={healthStatus}
+                                            redirectToServices={redirectToServices}/>
                             )}
                         </div>
                     </div>
@@ -228,26 +244,29 @@ const MenuLang = () => {
     )
 };
 
-const MenuNotify = ({ healthStatus }) => (
-    <ul className="dropdown-ul">
-        {/* For each service in the serviceList (ActiveMQ and Background Services) one list item */}
-        {healthStatus.map((service, key) => (
-            <li key={key}>
-                {!!service.status && (
-                    <a>
-                        <span> {service.name} </span>
-                        {service.error ? (
-                            <span className="ng-multi-value ng-multi-value-red">{service.status}</span>
-                        ) : (
-                            <span className="ng-multi-value ng-multi-value-green">{service.status}</span>
-                        )}
-                    </a>
-                )}
-            </li>
-        ))}
+const MenuNotify = ({ healthStatus, redirectToServices }) => {
 
-    </ul>
-);
+    return (
+        <ul className="dropdown-ul">
+            {/* For each service in the serviceList (ActiveMQ and Background Services) one list item */}
+            {healthStatus.map((service, key) => (
+                <li key={key}>
+                    {!!service.status && (
+                        <Link to="/systems/services" onClick={() => redirectToServices()}>
+                            <span> {service.name} </span>
+                            {service.error ? (
+                                <span className="ng-multi-value ng-multi-value-red">{service.status}</span>
+                            ) : (
+                                <span className="ng-multi-value ng-multi-value-green">{service.status}</span>
+                            )}
+                        </Link>
+                    )}
+                </li>
+            ))}
+
+        </ul>
+    )
+};
 
 
 const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user, orgProperties }) => {
@@ -321,7 +340,10 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    loadingHealthStatus: () => dispatch(fetchHealthStatus())
+    loadingHealthStatus: () => dispatch(fetchHealthStatus()),
+    resetOffset: () => dispatch(setOffset(0)),
+    loadingServices: () => dispatch(fetchServices()),
+    loadingServicesIntoTable: () => dispatch(loadServicesIntoTable())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);
