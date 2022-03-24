@@ -1,4 +1,5 @@
 import {
+    LOAD_OC_VERSION_IN_PROGRESS, LOAD_OC_VERSION_SUCCESS,
     LOAD_USER_INFO_FAILURE,
     LOAD_USER_INFO_IN_PROGRESS,
     LOAD_USER_INFO_SUCCESS
@@ -15,7 +16,8 @@ const initialState = {
     org: {},
     roles: [],
     userRole: '',
-    user: {}
+    user: {},
+    ocVersion: {}
 }
 
 // reducer
@@ -49,6 +51,19 @@ const userInfo = (state=initialState, action) => {
                 roles: [],
                 userRole: '',
                 user: {}
+            }
+        }
+        case LOAD_OC_VERSION_IN_PROGRESS: {
+            return {
+                ...state,
+                isLoading: true
+            }
+        }
+        case LOAD_OC_VERSION_SUCCESS: {
+            const { ocVersion } = payload;
+            return {
+                ...state,
+                ocVersion: ocVersion
             }
         }
         default:

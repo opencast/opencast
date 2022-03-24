@@ -1,4 +1,10 @@
-import {loadUserInfoFailure, loadUserInfoInProgress, loadUserInfoSuccess} from "../actions/userInfoActions";
+import {
+    loadOcVersionFailure,
+    loadOcVersionInProgress, loadOcVersionSuccess,
+    loadUserInfoFailure,
+    loadUserInfoInProgress,
+    loadUserInfoSuccess
+} from "../actions/userInfoActions";
 import axios from "axios";
 import {logger} from "../utils/logger";
 
@@ -21,5 +27,20 @@ export const fetchUserInfo = () => async dispatch => {
     } catch (e) {
         logger.error(e);
         dispatch(loadUserInfoFailure());
+    }
+}
+
+export const fetchOcVersion = () => async dispatch => {
+    try {
+        dispatch(loadOcVersionInProgress());
+
+        let data = await axios.get("/sysinfo/bundles/version?prefix=opencast");
+
+        let ocVersion = await (data.data);
+
+        dispatch(loadOcVersionSuccess(ocVersion));
+    } catch (e) {
+       logger.error(e);
+       dispatch(loadOcVersionFailure());
     }
 }
