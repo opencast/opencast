@@ -24,6 +24,7 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import {showActions} from "../../actions/seriesActions";
 
 
 
@@ -35,7 +36,7 @@ const containerAction = React.createRef();
  */
 const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEvents, loadingEventsIntoTable,
                     series, loadingFilters, loadingStats, loadingSeriesMetadata, loadingSeriesThemes, resetTextFilter,
-                    resetOffset, user }) => {
+                    resetOffset, user, setShowActions }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -66,6 +67,9 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
 
     useEffect( () => {
         resetTextFilter();
+
+        // disable actions button
+        setShowActions(false);
 
         // Load series on mount
         loadSeries().then(r => logger.info(r));
@@ -220,7 +224,8 @@ const mapDispatchToProps = dispatch => ({
     loadingSeriesMetadata: () => dispatch(fetchSeriesMetadata()),
     loadingSeriesThemes: () => dispatch(fetchSeriesThemes()),
     resetTextFilter: () => dispatch(editTextFilter('')),
-    resetOffset: () => dispatch(setOffset(0))
+    resetOffset: () => dispatch(setOffset(0)),
+    setShowActions: isShowing => dispatch(showActions(isShowing))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Series));

@@ -8,7 +8,7 @@ export const LOAD_SERIES_SUCCESS = 'LOAD_SERIES_SUCCESS';
 export const LOAD_SERIES_FAILURE = 'LOAD_SERIES_FAILURE';
 
 // Constant of actions types affecting UI
-export const SHOW_ACTIONS = 'SHOW_ACTIONS';
+export const SHOW_ACTIONS_SERIES = 'SHOW_ACTIONS_SERIES';
 
 // Constants of action types affecting fetching of series metadata from server
 export const LOAD_SERIES_METADATA_IN_PROGRESS = 'LOAD_SERIES_METADATA_IN_PROGRESS';
@@ -39,7 +39,7 @@ export const loadSeriesFailure = () => ({
 // Actions affecting UI
 
 export const showActions = isShowing => ({
-    type: SHOW_ACTIONS,
+    type: SHOW_ACTIONS_SERIES,
     payload: { isShowing }
 });
 

@@ -28,6 +28,7 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import {showActions} from "../../actions/eventActions";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -38,7 +39,7 @@ const containerAction = React.createRef();
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
                         loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata, resetTextFilter,
-                    resetOffset, user }) => {
+                    resetOffset, user, setShowActions }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -73,6 +74,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
     useEffect(() => {
         resetTextFilter();
+
+        // disable actions button
+        setShowActions(false);
 
         // Load events on mount
         loadEvents().then(r => logger.info(r));
@@ -281,7 +285,8 @@ const mapDispatchToProps = dispatch => ({
     loadingStats: () => dispatch(fetchStats()),
     loadingEventMetadata: () => dispatch(fetchEventMetadata()),
     resetTextFilter: () => dispatch(editTextFilter('')),
-    resetOffset: () => dispatch(setOffset(0))
+    resetOffset: () => dispatch(setOffset(0)),
+    setShowActions: isShowing => dispatch(showActions(isShowing))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Events));

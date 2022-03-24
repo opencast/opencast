@@ -8,7 +8,7 @@ export const LOAD_EVENTS_SUCCESS = 'LOAD_EVENTS_SUCCESS';
 export const LOAD_EVENTS_FAILURE = 'LOAD_EVENTS_FAILURE';
 
 // Constants of actions types affecting UI
-export const SHOW_ACTIONS = 'SHOW_ACTIONS';
+export const SHOW_ACTIONS_EVENTS = 'SHOW_ACTIONS_EVENTS';
 
 // Constants of action types affecting fetching of event metadata from server
 export const LOAD_EVENT_METADATA_IN_PROGRESS = 'LOAD_EVENT_METADATA_IN_PROGRESS';
@@ -33,7 +33,7 @@ export const loadEventsFailure = () => ({
 // Actions affecting UI
 
 export const showActions = isShowing => ({
-    type: SHOW_ACTIONS,
+    type: SHOW_ACTIONS_EVENTS,
     payload: { isShowing }
 });
 
