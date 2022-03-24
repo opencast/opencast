@@ -118,6 +118,12 @@ angular.module('adminNg.services')
           me.state.status = PlayerAdapter.STATUS.SEEKING;
         });
 
+        targetElement.addEventListener('seeked', function () {
+          if (me.state.status == PlayerAdapter.STATUS.SEEKING) {
+            me.state.status = me.state.oldStatus;
+          }
+        });
+
         targetElement.addEventListener('error', function () {
           me.state.status = PlayerAdapter.STATUS.ERROR_NETWORK;
         });
