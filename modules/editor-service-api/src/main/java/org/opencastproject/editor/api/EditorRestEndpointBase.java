@@ -106,7 +106,7 @@ public abstract class EditorRestEndpointBase {
     try {
       details = readInputStream(request);
       logger.debug("Editor POST-Request received: {}", details);
-      EditingData editingInfo = EditingData.parse(details);
+      PostEditingData editingInfo = EditingData.parse(details);
       editorService.setEditData(mediaPackageId, editingInfo);
     } catch (EditorServiceException e) {
       return checkErrorState(mediaPackageId, e);

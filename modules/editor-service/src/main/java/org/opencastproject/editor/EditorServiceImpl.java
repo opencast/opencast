@@ -34,6 +34,7 @@ import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.EditorService;
 import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
+import org.opencastproject.editor.api.PostEditingData;
 import org.opencastproject.editor.api.SegmentData;
 import org.opencastproject.editor.api.TrackData;
 import org.opencastproject.editor.api.TrackSubData;
@@ -116,6 +117,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
@@ -435,6 +437,90 @@ public class EditorServiceImpl implements EditorService {
       throw new IOException(e);
     }
 
+  }
+
+  /**
+   * Adds subtitles {@link PostEditingData.Subtitle} to the media package and sends the updated media package
+   * to the archive. If a subtitle flavor already exists, the subtitle is overwritten
+   *
+   * @param mediaPackage
+   *          the media package to at the SMIL catalog
+   * @param subtitles
+   *          the subtitles to be added
+   * @throws IOException
+   */
+  private void addSubtitleTrack(MediaPackage mediaPackage, List<PostEditingData.Subtitle> subtitles)
+          throws IOException {
+    for (PostEditingData.Subtitle subtitle : subtitles) {
+      // Generate ID for new tracks
+      String subtitleId = UUID.randomUUID().toString();
+      String trackId = null;
+
+      // Check if subtitle already exists
+      for (Track t: mediaPackage.getTracks()) {
+        if (t.getFlavor().matches(subtitle.getFlavor())) {
+          logger.debug("Set Identifier for Subtitle-Track to: {}", t.getIdentifier());
+          subtitleId = t.getIdentifier();
+          trackId = t.getIdentifier();
+          break;
+        }
+      }
+
+      Track track = mediaPackage.getTrack(trackId);
+
+      // Memorize uri of the previous track file for deletion
+      URI oldTrackURI = null;
+      if (track != null) {
+        oldTrackURI = track.getURI();
+      }
+
+      // Put updated filename in working file repository and update the track.
+      InputStream is = IOUtils.toInputStream(subtitle.getSubtitle(), "UTF-8");
+      URI subtitleUri = workspace.put(
+              mediaPackage.getIdentifier().toString(),
+              subtitleId,
+              "subtitle.vtt",
+              //                  EditorService.TARGET_FILE_NAME,
+              is
+      );
+
+      // If not exists, create new Track
+      if (track == null) {
+        MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+        track = (Track) mpeBuilder.elementFromURI(
+                subtitleUri,
+                MediaPackageElement.Type.Track,
+                subtitle.getFlavor()
+        );
+        mediaPackage.add(track);
+        logger.info("Creating new track for flavor: " + track.getFlavor());
+      }
+
+      track.setURI(subtitleUri);
+      track.setIdentifier(subtitleId);
+      for (String tag : getSmilCatalogTags()) {
+        track.addTag(tag);
+      }
+      track.setChecksum(null);
+
+      if (oldTrackURI != null) {
+        // Delete the old files from the working file repository and workspace if they were in there
+        logger.info("Removing old track file {}", oldTrackURI);
+        try {
+          workspace.delete(oldTrackURI);
+        } catch (NotFoundException | IOException e) {
+          logger.info("Could not remove track from workspace. Could be it was never there.");
+        }
+      }
+
+      try {
+        assetManager.takeSnapshot(mediaPackage);
+      } catch (AssetManagerException e) {
+        logger.error("Error while adding the updated media package ({}) to the archive",
+                mediaPackage.getIdentifier(), e);
+        throw new IOException(e);
+      }
+    }
   }
 
   private Opt<Publication> getInternalPublication(MediaPackage mp) {
@@ -768,7 +854,8 @@ public class EditorServiceImpl implements EditorService {
   }
 
   @Override
-  public void setEditData(String mediaPackageId, EditingData editingData) throws EditorServiceException {
+  public void setEditData(String mediaPackageId, PostEditingData editingData) throws EditorServiceException,
+          IOException {
     final Event event = getEvent(mediaPackageId);
 
     if (WorkflowUtil.isActive(event.getWorkflowState())) {
@@ -806,6 +893,12 @@ public class EditorServiceImpl implements EditorService {
       addSmilToArchive(mediaPackage, smil);
     } catch (IOException e) {
       errorExit("Unable to add SMIL cutting catalog to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    try {
+      addSubtitleTrack(mediaPackage, editingData.getSubtitles());
+    } catch (IOException e) {
+      errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
     }
 
     if (editingData.getPostProcessingWorkflow() != null) {

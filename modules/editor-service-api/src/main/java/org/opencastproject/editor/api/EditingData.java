@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Provides access to the parsed editing information
  */
-public final class EditingData {
+public class EditingData {
   public static final String WORKFLOW_ACTIVE = "workflow_active";
   private final List<SegmentData> segments;
   private final List<WorkflowData> workflows;
@@ -61,10 +61,10 @@ public final class EditingData {
     this.waveformURIs = waveformURIs;
   }
 
-  public static EditingData parse(String json) {
+  public static PostEditingData parse(String json) {
     requireNonNull(json);
     Gson gson = new Gson();
-    EditingData editingData = gson.fromJson(json, EditingData.class);
+    PostEditingData editingData = gson.fromJson(json, PostEditingData.class);
     requireNonNull(editingData.getTracks());
     requireNonNull(editingData.getSegments());
 
