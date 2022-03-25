@@ -1,15 +1,15 @@
 import {createNotification, removeNotification} from "../actions/notificationActions";
 import {getLastAddedNotification} from "../selectors/notificationSelector";
+import {
+    ADMIN_NOTIFICATION_DURATION_ERROR,
+    ADMIN_NOTIFICATION_DURATION_SUCCESS,
+    ADMIN_NOTIFICATION_DURATION_WARNING
+} from "../configs/generalConfig";
 
-//todo: Put in config file and get values from there
-const ADMIN_NOTIFICATION_DURATION_ERROR = 5;
-const ADMIN_NOTIFICATION_DURATION_SUCCESS = 5;
-const ADMIN_NOTIFICATION_DURATION_WARNING = 5;
-const ADMIN_NOTIFICATION_DURATION_GLOBAL = 5;
+
 
 export const addNotification = (type, key, duration, parameter, context) => (dispatch, getState) => {
     if (!duration) {
-        // todo: exchange with values read from config (see old UI)
         // fall back to defaults
         // eslint-disable-next-line default-case
         switch (type) {

@@ -13,11 +13,9 @@ import {getOrgProperties, getUserInformation} from "../selectors/userInfoSelecto
 import axios from "axios";
 import RegistrationModal from "./shared/RegistrationModal";
 import {setOffset} from "../actions/tableActions";
-import {loadServersIntoTable, loadServicesIntoTable} from "../thunks/tableThunks";
+import { loadServicesIntoTable} from "../thunks/tableThunks";
 import {fetchServices} from "../thunks/serviceThunks";
-
-// Todo: Find suitable place to define them and get these links out of config-file or whatever
-const studio = "https://opencast.org/";
+import {studioURL} from "../configs/generalConfig";
 
 // Get code, flag and name of the current language
 const currentLanguage = getCurrentLanguageInformation();
@@ -164,7 +162,7 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetO
                 {/* Opencast Studio */}
                 {hasAccess("ROLE_STUDIO", user) && (
                     <div className="nav-dd" title="Studio">
-                        <a href={studio}>
+                        <a href={studioURL}>
                             <span className="fa fa-video-camera"/>
                         </a>
                     </div>
