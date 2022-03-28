@@ -43,6 +43,7 @@ import {
     LOAD_EVENT_METADATA_SUCCESS,
     LOAD_EVENT_METADATA_FAILURE,
     SET_EVENT_METADATA,
+    SET_EXTENDED_EVENT_METADATA,
     LOAD_EVENT_ASSETS_IN_PROGRESS,
     LOAD_EVENT_ASSETS_SUCCESS,
     LOAD_EVENT_ASSETS_FAILURE,
@@ -77,6 +78,7 @@ import {
 const initialState = {
     eventId: "",
     metadata: {},
+    extendedMetadata: [],
     fetchingMetadataInProgress: false,
     assets: {
         attachments: null,
@@ -212,17 +214,20 @@ const eventDetails = (state=initialState, action) => {
             };
         }
         case LOAD_EVENT_METADATA_SUCCESS: {
-            const { metadata } = payload;
+            const { metadata, extendedMetadata } = payload;
             return {
                 ...state,
                 fetchingMetadataInProgress: false,
-                metadata: metadata
+                metadata: metadata,
+                extendedMetadata: extendedMetadata
             };
         }
         case LOAD_EVENT_METADATA_FAILURE: {
             return {
                 ...state,
                 fetchingMetadataInProgress: false,
+                metadata: {},
+                extendedMetadata: []
             };
         }
         case SET_EVENT_METADATA: {
@@ -230,6 +235,14 @@ const eventDetails = (state=initialState, action) => {
             return {
                 ...state,
                 metadata: metadata
+            };
+        }
+        case SET_EXTENDED_EVENT_METADATA: {
+            const { metadata } = payload;
+
+            return {
+                ...state,
+                extendedMetadata: metadata
             };
         }
         case LOAD_EVENT_ASSETS_IN_PROGRESS: {

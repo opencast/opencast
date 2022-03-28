@@ -4,6 +4,7 @@ import ConfirmModal from "../../shared/ConfirmModal";
 import {deleteEvent} from "../../../thunks/eventThunks";
 import {connect} from "react-redux";
 import EventDetailsModal from "./modals/EventDetailsModal";
+import EmbeddingCodeModal from "./modals/EmbeddingCodeModal"
 import {getUserInformation} from "../../../selectors/userInfoSelectors";
 import {hasAccess} from "../../../utils/utils";
 
@@ -18,7 +19,8 @@ const EventActionCell = ({ row, deleteEvent, user })  => {
 
     const [displayDeleteConfirmation, setDeleteConfirmation] = useState(false);
     const [displayEventDetailsModal, setEventDetailsModal] = useState(false);
-    const [eventDetailsTabIndex, setEventDetailsTabIndex] = useState(0)
+    const [eventDetailsTabIndex, setEventDetailsTabIndex] = useState(0);
+    const [displayEmbeddingCodeModal, setEmbeddingCodeModal] = useState(false);
 
     const hideDeleteConfirmation = () => {
         setDeleteConfirmation(false);
@@ -28,7 +30,13 @@ const EventActionCell = ({ row, deleteEvent, user })  => {
         deleteEvent(id);
     };
 
-    
+    const hideEmbeddingCodeModal = () => {
+        setEmbeddingCodeModal(false);
+    };
+
+    const showEmbeddingCodeModal = () => {
+        setEmbeddingCodeModal(true);
+    };
 
     const showEventDetailsModal = () => {
         setEventDetailsModal(true);
@@ -144,9 +152,15 @@ const EventActionCell = ({ row, deleteEvent, user })  => {
             )}
            {/* Open dialog for embedded code*/}
             {hasAccess("ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW", user) && (
-                <a onClick={() => onClickEmbeddedCode()}
+                <a onClick={() => showEmbeddingCodeModal()}
                    title={t('EVENTS.EVENTS.TABLE.TOOLTIP.EMBEDDING_CODE')}
                    className="fa fa-link"/>
+
+            )}
+
+            {displayEmbeddingCodeModal && (
+            <EmbeddingCodeModal close={hideEmbeddingCodeModal}
+                                eventId={row.id}/>
             )}
         </>
     );
@@ -157,10 +171,6 @@ const onClickSeriesDetails = () => {
     console.log("Should open series-details.");
 }
 
-//todo: implement!
-const onClickEmbeddedCode = () => {
-    console.log("Should open dialog for embedded code.");
-}
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({

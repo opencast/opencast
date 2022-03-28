@@ -25,11 +25,12 @@ import EventDetailsAssetsAddAsset from "../ModalTabsAndPages/EventDetailsAssetsA
 import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
 import {
     getMetadata,
-    getSchedulingProperties,
+    getExtendedMetadata,
     isFetchingMetadata,
+    getSchedulingProperties,
     isFetchingScheduling
 } from "../../../../selectors/eventDetailsSelectors";
-import {fetchMetadata, fetchSchedulingInfo, updateMetadata} from "../../../../thunks/eventDetailsThunks";
+import {fetchMetadata, updateMetadata, updateExtendedMetadata, fetchSchedulingInfo} from "../../../../thunks/eventDetailsThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import EventDetailsSchedulingTab from "../ModalTabsAndPages/EventDetailsSchedulingTab";
@@ -42,8 +43,8 @@ const currentLanguage = getCurrentLanguageInformation();
  * This component manages the pages of the event details
  */
 const EventDetails = ({ tabIndex, eventId, close,
-                          metadata, isLoadingMetadata, hasSchedulingProperties, isLoadingScheduling,
-                          loadMetadata, updateMetadata, loadScheduling, removeNotificationWizardForm, user }) => {
+                          metadata, extendedMetadata, isLoadingMetadata, hasSchedulingProperties, isLoadingScheduling,
+                          loadMetadata, updateMetadata, updateExtendedMetadata, loadScheduling, removeNotificationWizardForm, user }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -65,10 +66,9 @@ const EventDetails = ({ tabIndex, eventId, close,
         },
         {
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA',
-            bodyHeaderTranslation: 'EVENTS.EVENTS.DETAILS.METADATA.CAPTION', //todo: here {{ catalog.title | translate }}
             accessRole: 'ROLE_UI_EVENTS_DETAILS_METADATA_VIEW',
             name: 'metadata-extended',
-            hidden: true
+            hidden: !(extendedMetadata.length > 0)
         },
         {
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.PUBLICATIONS',
@@ -91,7 +91,6 @@ const EventDetails = ({ tabIndex, eventId, close,
         },
         {
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS',
-            bodyHeaderTranslation: 'EVENTS.EVENTS.DETAILS.WORKFLOW_INSTANCES.TITLE', // todo: not quite right, has 2 top-level captions
             accessRole: 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW',
             name: 'workflows'
         },
@@ -192,9 +191,13 @@ const EventDetails = ({ tabIndex, eventId, close,
                             updateResource={updateMetadata}
                             editAccessRole='ROLE_UI_EVENTS_DETAILS_METADATA_EDIT'/>
                     )}
-                    {page === 1 && (
-                        <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                         t={t}/>
+                    {page === 1 && (!isLoadingMetadata) && (
+                        <DetailsExtendedMetadataTab
+                            resourceId={eventId}
+                            metadata={extendedMetadata}
+                            updateResource={updateExtendedMetadata}
+                            buttonLabel='SAVE'
+                            editAccessRole='ROLE_UI_EVENTS_DETAILS_METADATA_EDIT'/>
                     )}
                     {page === 2 && (
                         <EventDetailsPublicationTab eventId={eventId} />
@@ -270,7 +273,6 @@ const EventDetails = ({ tabIndex, eventId, close,
                         (workflowTabHierarchy === "entry" && (
                             <EventDetailsWorkflowTab
                                 eventId={eventId}
-                                header={tabs[page].bodyHeaderTranslation}
                                 t={t}
                                 close={close}
                                 setHierarchy={setWorkflowTabHierarchy}/>
@@ -357,6 +359,7 @@ const MockDataPage = ({ header, t }) => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     metadata: getMetadata(state),
+    extendedMetadata: getExtendedMetadata(state),
     isLoadingMetadata: isFetchingMetadata(state),
     hasSchedulingProperties: getSchedulingProperties(state),
     isLoadingScheduling: isFetchingScheduling(state),
@@ -368,6 +371,7 @@ const mapDispatchToProps = dispatch => ({
     loadMetadata: (id) => dispatch(fetchMetadata(id)),
     updateMetadata: (id, values) => dispatch(updateMetadata(id, values)),
     loadScheduling: (id) => dispatch(fetchSchedulingInfo(id)),
+    updateExtendedMetadata: (id, values, catalog) => dispatch(updateExtendedMetadata(id, values, catalog)),
     removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
 });
 

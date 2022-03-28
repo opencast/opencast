@@ -10,6 +10,7 @@ import {getCurrentLanguageInformation, hasAccess} from "../utils/utils";
 import {logger} from "../utils/logger";
 import {getUserInformation} from "../selectors/userInfoSelectors";
 import axios from "axios";
+import RegistrationModal from "./shared/RegistrationModal";
 
 
 // Todo: Find suitable place to define them and get these links out of config-file or whatever
@@ -62,9 +63,22 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
     const [displayMenuUser, setMenuUser] = useState(false);
     const [displayMenuNotify, setMenuNotify] = useState(false);
     const [displayMenuHelp, setMenuHelp] = useState(false);
+    const [displayRegistrationModal, setRegistrationModal] = useState(false);
 
     const loadHealthStatus = async () => {
         await loadingHealthStatus();
+    }
+
+    const hideMenuHelp = () => {
+        setMenuHelp(false);
+    }
+
+    const showRegistrationModal = () => {
+        setRegistrationModal(true);
+    }
+
+    const hideRegistrationModal = () => {
+        setRegistrationModal(false);
     }
 
     useEffect(() => {
@@ -101,36 +115,37 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
     }, []);
 
     return(
-        <header className="primary-header">
-            {/* Opencast logo in upper left corner */}
-            <div className="header-branding">
-                <a href="/" target="_self" className="logo">
-                    <img src={opencastLogo} alt="Opencast Logo"/>
-                </a>
-            </div>
-
-            {/* Navigation with icons and dropdown menus in upper right corner */}
-            <nav className="header-nav nav-dd-container" id="nav-dd-container">
-                {/* Select language */}
-                <div className="nav-dd lang-dd" id="lang-dd" ref={containerLang}>
-                    <div className="lang" title={t('LANGUAGE')}  onClick={() => setMenuLang(!displayMenuLang)}>
-                        <img src={currentLanguage.flag} alt={currentLanguage.code} />
-                    </div>
-                    {/* Click on the flag icon, a dropdown menu with all available languages opens */}
-                    { displayMenuLang && (
-                        <MenuLang />
-                    )}
+        <>
+            <header className="primary-header">
+                {/* Opencast logo in upper left corner */}
+                <div className="header-branding">
+                    <a href="/" target="_self" className="logo">
+                        <img src={opencastLogo} alt="Opencast Logo"/>
+                    </a>
                 </div>
 
-                {/* Media Module */}
-                {/* Show icon only if mediaModuleUrl is set*/}
-                {!!mediaModuleUrl && (
-                    <div className="nav-dd" title={t('MEDIAMODULE')}>
-                        <a href={mediaModuleUrl}>
-                            <span className="fa fa-play-circle"/>
-                        </a>
+                {/* Navigation with icons and dropdown menus in upper right corner */}
+                <nav className="header-nav nav-dd-container" id="nav-dd-container">
+                    {/* Select language */}
+                    <div className="nav-dd lang-dd" id="lang-dd" ref={containerLang}>
+                        <div className="lang" title={t('LANGUAGE')}  onClick={() => setMenuLang(!displayMenuLang)}>
+                            <img src={currentLanguage.flag} alt={currentLanguage.code} />
+                        </div>
+                        {/* Click on the flag icon, a dropdown menu with all available languages opens */}
+                        { displayMenuLang && (
+                            <MenuLang />
+                        )}
                     </div>
-                )}
+
+                    {/* Media Module */}
+                    {/* Show icon only if mediaModuleUrl is set*/}
+                    {!!mediaModuleUrl && (
+                        <div className="nav-dd" title={t('MEDIAMODULE')}>
+                            <a href={mediaModuleUrl}>
+                                <span className="fa fa-play-circle"/>
+                            </a>
+                        </div>
+                    )}
 
                 {/* Opencast Studio */}
                 {hasAccess("ROLE_STUDIO", user) && (
@@ -155,29 +170,38 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
                     </div>
                 )}
 
-                {/* Help */}
-                {/* Show only if documentationUrl or restdocsUrl is set */}
-                {(!!documentationUrl || !!restUrl) && (
-                    <div title="Help" className="nav-dd" id="help-dd" ref={containerHelp} >
-                        <div className="fa fa-question-circle" onClick={() => setMenuHelp(!displayMenuHelp)}/>
-                        {/* Click on the help icon, a dropdown menu with documentation, REST-docs and shortcuts (if available) opens */}
-                        {displayMenuHelp && (
-                            <MenuHelp user={user} />
-                        )}
-                    </div>
-                )}
+
+                    {/* Help */}
+                    {/* Show only if documentationUrl or restdocsUrl is set */}
+                    {(!!documentationUrl || !!restUrl) && (
+                        <div title="Help" className="nav-dd" id="help-dd" ref={containerHelp} >
+                            <div className="fa fa-question-circle" onClick={() => setMenuHelp(!displayMenuHelp)}/>
+                            {/* Click on the help icon, a dropdown menu with documentation, REST-docs and shortcuts (if available) opens */}
+                            {displayMenuHelp && (
+                                <MenuHelp hideMenuHelp={hideMenuHelp}
+                                          showRegistrationModal={showRegistrationModal}
+                                          user={user}/>
+                            )}
+                        </div>
+                    )}
 
                 {/* Username */}
-                <div className="nav-dd user-dd" id="user-dd" ref={containerUser}>
+                    <div className="nav-dd user-dd" id="user-dd" ref={containerUser}>
                     <div className="h-nav" onClick={() => setMenuUser(!displayMenuUser)}>{user.user.name || user.user.username}<span className="dropdown-icon"/></div>
-                    {/* Click on username, a dropdown menu with the option to logout opens */}
-                    {displayMenuUser && (
-                        <MenuUser />
+                {/* Click on username, a dropdown menu with the option to logout opens */}
+                {displayMenuUser && (
+                    <MenuUser />
                     )}
-                </div>
+                    </div>
+                </nav>
+            </header>
 
-            </nav>
-        </header>
+            {/* Adopters Registration Modal */}
+            {displayRegistrationModal && (
+                <RegistrationModal close={hideRegistrationModal}/>
+            )}
+        </>
+
     );
 };
 
@@ -221,34 +245,52 @@ const MenuNotify = ({ healthStatus }) => (
     </ul>
 );
 
-const MenuHelp = ({ user }) => {
+
+const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user }) => {
     const { t } = useTranslation();
-    return(
-        <ul className="dropdown-ul">
-            {/* Show only if documentationUrl is set */}
-            {!!documentationUrl && (
+
+    // show Adopter Registration Modal and hide drop down
+    const showAdoptersRegistrationModal = () => {
+        showRegistrationModal();
+        hideMenuHelp();
+    }
+
+    return (
+        <>
+            <ul className="dropdown-ul">
+                {/* Show only if documentationUrl is set */}
+                {!!documentationUrl && (
+                    <li>
+                        <a href={documentationUrl}>
+                            <span>{t('HELP.DOCUMENTATION')}</span>
+                        </a>
+                    </li>
+                )}
+                {/* Show only if restUrl is set */}
+                {(!!restUrl && hasAccess("ROLE_ADMIN", user)) && (
+                    <li>
+                        <a target="_self" href={restUrl}>
+                            <span>{t('HELP.REST_DOC')}</span>
+                        </a>
+                    </li>
+                )}
                 <li>
-                    <a href={documentationUrl}>
-                        <span>{t('HELP.DOCUMENTATION')}</span>
+                    <a onClick={() => showHotkeyCheatSheet}>
+                        <span>{t('HELP.HOTKEY_CHEAT_SHEET')}</span>
                     </a>
                 </li>
-            )}
-            {/* Show only if restUrl is set */}
-            {(!!restUrl && hasAccess("ROLE_ADMIN", user)) && (
-                <li>
-                    <a target="_self" href={restUrl}>
-                        <span>{t('HELP.REST_DOC')}</span>
-                    </a>
-                </li>
-            )}
-            <li>
-                <a onClick={() => showHotkeyCheatSheet}>
-                    <span>{t('HELP.HOTKEY_CHEAT_SHEET')}</span>
-                </a>
-            </li>
-            {/*todo: Adopter Registration Modal*/}
-        </ul>
+                {/* Adoter registration Modal */}
+                {hasAccess("ROLE_ADMIN", user) && (
+                    <li>
+                        <a onClick={() => showAdoptersRegistrationModal()}>
+                            <span>{t('HELP.ADOPTER_REGISTRATION')}</span>
+                        </a>
+                    </li>
+                )}
+            </ul>
+        </>
     )
+
 };
 
 const MenuUser = () => {

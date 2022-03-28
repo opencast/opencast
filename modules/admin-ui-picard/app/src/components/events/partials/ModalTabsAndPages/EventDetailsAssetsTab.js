@@ -17,15 +17,15 @@ import {
     isTransactionReadOnly
 } from "../../../../selectors/eventDetailsSelectors";
 import {getWorkflow} from "../../../../selectors/eventDetailsSelectors";
-/*todo: import {getUserInformation} from "../selectors/userInfoSelectors";
-import {hasAccess} from "../utils/utils";*/
+import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import {hasAccess} from "../../../../utils/utils";
 
 /**
  * This component manages the main assets tab of event details modal
  */
 const EventDetailsAssetsTab = ({ eventId, t, setHierarchy,
                                fetchAssets, fetchAttachments, fetchCatalogs, fetchMedia, fetchPublications,
-                               assets, transactionsReadOnly, uploadAssetOptions, isFetching /*todo: ,user*/}) => {
+                               assets, transactionsReadOnly, uploadAssetOptions, isFetching, user}) => {
 
     useEffect(() => {
         removeNotificationWizardForm();
@@ -69,7 +69,7 @@ const EventDetailsAssetsTab = ({ eventId, t, setHierarchy,
                                             <th> {t("EVENTS.EVENTS.DETAILS.ASSETS.TYPE") /* Type */ }</th>
                                             <th> {t("EVENTS.EVENTS.DETAILS.ASSETS.SIZE") /* Size */ }</th>
                                             <th className="medium">
-                                                {(!!uploadAssetOptions && !transactionsReadOnly /*todo: && hasAccess("ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT", user)*/) && (
+                                                {(!!uploadAssetOptions && !transactionsReadOnly && hasAccess("ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT", user)) && (
                                                     <a className="details-link"
                                                        onClick={() => openSubTab('add-asset', 'newassetupload', false, true)}
                                                     >
@@ -154,8 +154,8 @@ const mapStateToProps = state => ({
     isFetching: isFetchingAssets(state),
     transactionsReadOnly: isTransactionReadOnly(state),
     uploadAssetOptions: getUploadAssetOptions(state),
-    assetUploadWorkflowDefId: getWorkflow(state).id
-    /*todo: user: getUserInformation(state)*/
+    assetUploadWorkflowDefId: getWorkflow(state).id,
+    user: getUserInformation(state)
 });
 
 // Mapping actions to dispatch

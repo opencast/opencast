@@ -54,7 +54,6 @@
   <modules>
     <module>modules/admin-ui</module>
 <!--    <module>modules/admin-ui-frontend</module>-->
-    <module>modules/admin-ui-index</module>
     <module>modules/admin-ui-picard</module>
     <module>modules/analyze-mediapackage-workflowoperation</module>
     <module>modules/animate-api</module>
