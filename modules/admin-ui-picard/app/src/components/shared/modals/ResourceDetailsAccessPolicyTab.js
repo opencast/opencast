@@ -203,57 +203,57 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                     <div className="obj tbl-list">
                                                         <table className="main-tbl">
                                                             <thead>
-                                                            <tr>
-                                                                <th>
-                                                                    {t("EVENTS.EVENTS.DETAILS.ACCESS.TEMPLATES.TITLE") /* Templates */}
-                                                                </th>
-                                                            </tr>
+                                                                <tr>
+                                                                    <th>
+                                                                        {t("EVENTS.EVENTS.DETAILS.ACCESS.TEMPLATES.TITLE") /* Templates */}
+                                                                    </th>
+                                                                </tr>
                                                             </thead>
 
                                                             <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <div className="obj-container padded chosen-container chosen-container-single">
-                                                                        <p>
-                                                                            {descriptionText /* Description text for policies*/}
-                                                                        </p>
-                                                                        {!transactions.read_only ? (
+                                                                <tr>
+                                                                    <td>
+                                                                        <div className="obj-container padded chosen-container chosen-container-single">
+                                                                            <p>
+                                                                                {descriptionText /* Description text for policies*/}
+                                                                            </p>
+                                                                            {!transactions.read_only ? (
 
-                                                                            /* dropdown for selecting a policy template */
-                                                                            <Field className="chosen-single chosen-default"
-                                                                                   style={{width: '200px'}}
-                                                                                   name={"template"}
-                                                                                   as="select"
-                                                                                   onChange={event => handleTemplateChange(event.target.value, formik.setFieldValue)}
-                                                                            >
-                                                                                {(aclTemplates && aclTemplates.length > 0) ? (
-                                                                                    <>
+                                                                                /* dropdown for selecting a policy template */
+                                                                                <Field className="chosen-single chosen-default"
+                                                                                       style={{width: '200px'}}
+                                                                                       name={"template"}
+                                                                                       as="select"
+                                                                                       onChange={event => handleTemplateChange(event.target.value, formik.setFieldValue)}
+                                                                                >
+                                                                                    {(aclTemplates && aclTemplates.length > 0) ? (
+                                                                                        <>
+                                                                                            <option value="" defaultValue hidden>
+                                                                                                {t(buttonText)}
+                                                                                            </option>
+                                                                                            {
+                                                                                                aclTemplates.map((template, key) => (
+                                                                                                    <option value={template.id}
+                                                                                                            key={key}
+                                                                                                    >
+                                                                                                        {template.value}
+                                                                                                    </option>
+                                                                                                ))
+                                                                                            }
+                                                                                        </>
+                                                                                    ) : (
                                                                                         <option value="" defaultValue hidden>
-                                                                                            {t(buttonText)}
+                                                                                            {t('EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY')}
                                                                                         </option>
-                                                                                        {
-                                                                                            aclTemplates.map((template, key) => (
-                                                                                                <option value={template.id}
-                                                                                                        key={key}
-                                                                                                >
-                                                                                                    {template.value}
-                                                                                                </option>
-                                                                                            ))
-                                                                                        }
-                                                                                    </>
-                                                                                ) : (
-                                                                                    <option value="" defaultValue hidden>
-                                                                                        {t('EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY')}
-                                                                                    </option>
-                                                                                )}
-                                                                            </Field>
+                                                                                    )}
+                                                                                </Field>
 
-                                                                        ) : (
-                                                                            baseAclId
-                                                                        )}
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
+                                                                            ) : (
+                                                                                baseAclId
+                                                                            )}
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -270,158 +270,157 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
 
                                                             {/* column headers */}
                                                             <thead>
-                                                            <tr>
-                                                                <th>
-                                                                    {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ROLE") /* <!-- Role --> */}
-                                                                </th>
-                                                                <th className="fit">
-                                                                    {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.READ") /* <!-- Read --> */}
-                                                                </th>
-                                                                <th className="fit">
-                                                                    {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.WRITE") /* <!-- Write --> */}
-                                                                </th>
-                                                                { hasActions && (
-                                                                    <th className="fit">
-                                                                        {t("EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS") /* <!-- Additional Actions --> */}
+                                                                <tr>
+                                                                    <th>
+                                                                        {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ROLE") /* <!-- Role --> */}
                                                                     </th>
-                                                                )}
-                                                                {hasAccess(editAccessRole, user) && (
                                                                     <th className="fit">
-                                                                        {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ACTION") /* <!-- Action --> */}
+                                                                        {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.READ") /* <!-- Read --> */}
                                                                     </th>
-                                                                )}
-                                                            </tr>
+                                                                    <th className="fit">
+                                                                        {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.WRITE") /* <!-- Write --> */}
+                                                                    </th>
+                                                                    { hasActions && (
+                                                                        <th className="fit">
+                                                                            {t("EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS") /* <!-- Additional Actions --> */}
+                                                                        </th>
+                                                                    )}
+                                                                    {hasAccess(editAccessRole, user) && (
+                                                                        <th className="fit">
+                                                                            {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ACTION") /* <!-- Action --> */}
+                                                                        </th>
+                                                                    )}
+                                                                </tr>
                                                             </thead>
 
                                                             <tbody>
-                                                            {/* list of policies */}
-                                                            <FieldArray name="policies">
-                                                                { ({ replace, remove, push }) => (
-                                                                    <>
-                                                                        { (formik.values.policies.length > 0) &&
-                                                                        formik.values.policies.map((policy, index) => (
-                                                                            <tr key={index}>
+                                                                {/* list of policies */}
+                                                                <FieldArray name="policies">
+                                                                    { ({ replace, remove, push }) => (
+                                                                        <>
+                                                                            { (formik.values.policies.length > 0) &&
+                                                                            formik.values.policies.map((policy, index) => (
+                                                                                <tr key={index}>
 
-                                                                                {/* dropdown for policy.role */}
-                                                                                <td>
-                                                                                    { !transactions.read_only ? (
-                                                                                        <Field className="chosen-single chosen-default"
-                                                                                               style={{width: '360px'}}
-                                                                                               name={`policies.${index}.role`}
-                                                                                               as="select"
-                                                                                               disabled={!hasAccess(editAccessRole, user)}
-                                                                                               onChange={role => replace(index, {...policy, role:role.target.value})}
-                                                                                        >
-                                                                                            { (roles && roles.length > 0) && (
-                                                                                                <>
-                                                                                                    { !policy.role &&
-                                                                                                    <option value="" defaultValue hidden>
-                                                                                                        {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL')}
-                                                                                                    </option>
-                                                                                                    }
-                                                                                                    { !!policy.role &&
-                                                                                                    <option value={policy.role} defaultValue>
-                                                                                                        {policy.role}
-                                                                                                    </option>
-                                                                                                    }
-                                                                                                    { roles.filter(role => !formik.values.policies.find(policy => policy.role === role.name)).map((role, key) => (
-                                                                                                        <option value={role.name}
-                                                                                                                key={key}
-                                                                                                        >
-                                                                                                            {role.name}
-                                                                                                        </option>
-                                                                                                    ))}
-                                                                                                </>
-                                                                                            )}
-                                                                                            {(roles && roles.length > 0) || (
-                                                                                                <option value="" defaultValue hidden>
-                                                                                                    {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY')}
-                                                                                                </option>
-                                                                                            )}
-                                                                                        </Field>
-                                                                                    ) : (
-                                                                                        <p>{policy.role}</p>
-                                                                                    )}
-                                                                                </td>
-
-                                                                                {/* Checkboxes for policy.read and policy.write */}
-                                                                                <td className="fit text-center">
-                                                                                    <Field type="checkbox"
-                                                                                           name={`policies.${index}.read`}
-                                                                                           disabled={ transactions.read_only || !hasAccess(editAccessRole, user)}
-                                                                                           className={`${transactions.read_only ?
-                                                                                               "disabled" : "false"}`}
-                                                                                           onChange={ (read) => replace(index, {...policy, read: read.target.checked})}
-                                                                                    />
-                                                                                </td>
-                                                                                <td className="fit text-center">
-                                                                                    <Field type="checkbox"
-                                                                                           name={`policies.${index}.write`}
-                                                                                           disabled={ transactions.read_only || !hasAccess(editAccessRole, user)}
-                                                                                           className={`${transactions.read_only ?
-                                                                                               "disabled" : "false"}`}
-                                                                                           onChange={ (write) => replace(index, {...policy, write: write.target.checked})}
-                                                                                    />
-                                                                                </td>
-
-
-
-                                                                                {/* Multi value field for policy.actions (additional actions) */}
-                                                                                { hasActions && (
-                                                                                    <td className="fit editable">
-                                                                                        { !transactions.read_only && hasAccess(editAccessRole, user) && (
-                                                                                            <div>
-                                                                                                <Field
-                                                                                                    fieldInfo={
-                                                                                                        {
-                                                                                                            id: `policies.${index}.actions`,
-                                                                                                            type: 'mixed_text',
-                                                                                                            collection: aclActions
-                                                                                                        }
-                                                                                                    }
-                                                                                                    onlyCollectionValues
-                                                                                                    name={`policies.${index}.actions`}
-                                                                                                    component={RenderMultiField}
-                                                                                                />
-                                                                                            </div>
-                                                                                        )}
-                                                                                        {(transactions.read_only || !hasAccess(editAccessRole, user)) && (
-                                                                                            policy.actions.map((customAction, actionKey) => (
-                                                                                                <div key={actionKey}>
-                                                                                                    {customAction}
-                                                                                                </div>
-                                                                                            ))
-                                                                                        )}
-                                                                                    </td>
-                                                                                )}
-
-                                                                                {/* Remove policy */}
-                                                                                { hasAccess(editAccessRole, user) && (
+                                                                                    {/* dropdown for policy.role */}
                                                                                     <td>
-                                                                                        { !transactions.read_only && (
-                                                                                            <a onClick={() => remove(index)} className="remove" />
+                                                                                        { !transactions.read_only ? (
+                                                                                            <Field className="chosen-single chosen-default"
+                                                                                                   style={{width: '360px'}}
+                                                                                                   name={`policies.${index}.role`}
+                                                                                                   as="select"
+                                                                                                   disabled={!hasAccess(editAccessRole, user)}
+                                                                                                   onChange={role => replace(index, {...policy, role:role.target.value})}
+                                                                                            >
+                                                                                                { (roles && roles.length > 0) && (
+                                                                                                    <>
+                                                                                                        { !policy.role &&
+                                                                                                        <option value="" defaultValue hidden>
+                                                                                                            {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL')}
+                                                                                                        </option>
+                                                                                                        }
+                                                                                                        { !!policy.role &&
+                                                                                                        <option value={policy.role} defaultValue>
+                                                                                                            {policy.role}
+                                                                                                        </option>
+                                                                                                        }
+                                                                                                        { roles.filter(role => !formik.values.policies.find(policy => policy.role === role.name)).map((role, key) => (
+                                                                                                            <option value={role.name}
+                                                                                                                    key={key}
+                                                                                                            >
+                                                                                                                {role.name}
+                                                                                                            </option>
+                                                                                                        ))}
+                                                                                                    </>
+                                                                                                )}
+                                                                                                {(roles && roles.length > 0) || (
+                                                                                                    <option value="" defaultValue hidden>
+                                                                                                        {t('EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY')}
+                                                                                                    </option>
+                                                                                                )}
+                                                                                            </Field>
+                                                                                        ) : (
+                                                                                            <p>{policy.role}</p>
                                                                                         )}
                                                                                     </td>
-                                                                                )}
-                                                                            </tr>
-                                                                        ))
-                                                                        }
 
-                                                                        {/* create additional policy */}
-                                                                        { !transactions.read_only && hasAccess(editAccessRole, user) && (
-                                                                            <tr>
-                                                                                <td colSpan="5">
-                                                                                    <a onClick={() => push(createPolicy(""))}>
-                                                                                        + {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.NEW")}
-                                                                                    </a>
-                                                                                </td>
-                                                                            </tr>
-                                                                        )}
-                                                                    </>
-                                                                )}
-                                                            </FieldArray>
+                                                                                    {/* Checkboxes for policy.read and policy.write */}
+                                                                                    <td className="fit text-center">
+                                                                                        <Field type="checkbox"
+                                                                                               name={`policies.${index}.read`}
+                                                                                               disabled={ transactions.read_only || !hasAccess(editAccessRole, user)}
+                                                                                               className={`${transactions.read_only ?
+                                                                                                   "disabled" : "false"}`}
+                                                                                               onChange={ (read) => replace(index, {...policy, read: read.target.checked})}
+                                                                                        />
+                                                                                    </td>
+                                                                                    <td className="fit text-center">
+                                                                                        <Field type="checkbox"
+                                                                                               name={`policies.${index}.write`}
+                                                                                               disabled={ transactions.read_only || !hasAccess(editAccessRole, user)}
+                                                                                               className={`${transactions.read_only ?
+                                                                                                   "disabled" : "false"}`}
+                                                                                               onChange={ (write) => replace(index, {...policy, write: write.target.checked})}
+                                                                                        />
+                                                                                    </td>
+
+
+
+                                                                                    {/* Multi value field for policy.actions (additional actions) */}
+                                                                                    { hasActions && (
+                                                                                        <td className="fit editable">
+                                                                                            { !transactions.read_only && hasAccess(editAccessRole, user) && (
+                                                                                                <div>
+                                                                                                    <Field
+                                                                                                        fieldInfo={
+                                                                                                            {
+                                                                                                                id: `policies.${index}.actions`,
+                                                                                                                type: 'mixed_text',
+                                                                                                                collection: aclActions
+                                                                                                            }
+                                                                                                        }
+                                                                                                        onlyCollectionValues
+                                                                                                        name={`policies.${index}.actions`}
+                                                                                                        component={RenderMultiField}
+                                                                                                    />
+                                                                                                </div>
+                                                                                            )}
+                                                                                            {(transactions.read_only || !hasAccess(editAccessRole, user)) && (
+                                                                                                policy.actions.map((customAction, actionKey) => (
+                                                                                                    <div key={actionKey}>
+                                                                                                        {customAction}
+                                                                                                    </div>
+                                                                                                ))
+                                                                                            )}
+                                                                                        </td>
+                                                                                    )}
+
+                                                                                    {/* Remove policy */}
+                                                                                    { hasAccess(editAccessRole, user) && (
+                                                                                        <td>
+                                                                                            { !transactions.read_only && (
+                                                                                                <a onClick={() => remove(index)} className="remove" />
+                                                                                            )}
+                                                                                        </td>
+                                                                                    )}
+                                                                                </tr>
+                                                                            ))
+                                                                            }
+
+                                                                            {/* create additional policy */}
+                                                                            { !transactions.read_only && hasAccess(editAccessRole, user) && (
+                                                                                <tr>
+                                                                                    <td colSpan="5">
+                                                                                        <a onClick={() => push(createPolicy(""))}>
+                                                                                            + {t("EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.NEW")}
+                                                                                        </a>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            )}
+                                                                        </>
+                                                                    )}
+                                                                </FieldArray>
                                                             </tbody>
-
                                                         </table>
                                                     </div>
                                                 </div>
@@ -448,7 +447,6 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                                                     </div>
                                                 </footer>
                                             )}
-
                                         </div>
                                     )}
                                 </Formik>
@@ -457,8 +455,7 @@ const ResourceDetailsAccessPolicyTab = ({ resourceId, header, t, policies, fetch
                     )}
                 </div>
 
-                <div className="full-col">
-                </div>
+                <div className="full-col"/>
             </div>
         </div>
     );

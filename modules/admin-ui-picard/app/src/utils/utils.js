@@ -16,6 +16,10 @@ export const getTimezoneOffset = () => {
     return offset/60;
 };
 
+export const getTimezoneString = (offset) => {
+    return 'UTC' + (offset < 0 ? '-' : '+') + offset;
+}
+
 export const getCurrentLanguageInformation = () => {
     // Get code, flag, name and date locale of the current language
     let currentLang = languages.find(({ code }) => code === i18n.language);
@@ -51,7 +55,7 @@ export const makeTwoDigits = number => {
     if (number < 10) {
         return '0' + number;
     } else {
-        return number;
+        return '' + number;
     }
 };
 

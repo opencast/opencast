@@ -39,13 +39,26 @@ export const LOAD_EVENT_POLICIES_IN_PROGRESS = 'LOAD_EVENT_POLICIES_IN_PROGRESS'
 export const LOAD_EVENT_COMMENTS_SUCCESS = 'LOAD_EVENT_COMMENTS_SUCCESS';
 export const LOAD_EVENT_COMMENTS_FAILURE = 'LOAD_EVENT_COMMENTS_FAILURE';
 export const LOAD_EVENT_COMMENTS_IN_PROGRESS = 'LOAD_EVENT_COMMENTS_IN_PROGRESS';
-export const LOAD_EVENT_PUBLICATIONS_SUCCESS = 'LOAD_EVENT_PUBLICATIONS_SUCCESS';
-export const LOAD_EVENT_PUBLICATIONS_FAILURE = 'LOAD_EVENT_PUBLICATIONS_FAILURE';
-export const LOAD_EVENT_PUBLICATIONS_IN_PROGRESS = 'LOAD_EVENT_PUBLICATIONS_IN_PROGRESS';
 export const SAVE_COMMENT_DONE = 'SAVE_COMMENT_DONE';
 export const SAVE_COMMENT_IN_PROGRESS = 'SAVE_COMMENT_IN_PROGRESS';
 export const SAVE_COMMENT_REPLY_DONE = 'SAVE_COMMENT_REPLY_DONE';
 export const SAVE_COMMENT_REPLY_IN_PROGRESS = 'SAVE_COMMENT_REPLY_IN_PROGRESS';
+
+// Constants of actions types affecting the publications tab
+export const LOAD_EVENT_PUBLICATIONS_IN_PROGRESS = 'LOAD_EVENT_PUBLICATIONS_IN_PROGRESS';
+export const LOAD_EVENT_PUBLICATIONS_SUCCESS = 'LOAD_EVENT_PUBLICATIONS_SUCCESS';
+export const LOAD_EVENT_PUBLICATIONS_FAILURE = 'LOAD_EVENT_PUBLICATIONS_FAILURE';
+
+// Constants of actions types affecting the scheduling tab
+export const LOAD_EVENT_SCHEDULING_IN_PROGRESS = 'LOAD_EVENT_SCHEDULING_IN_PROGRESS';
+export const LOAD_EVENT_SCHEDULING_SUCCESS = 'LOAD_EVENT_SCHEDULING_SUCCESS';
+export const LOAD_EVENT_SCHEDULING_FAILURE = 'LOAD_EVENT_SCHEDULING_FAILURE';
+export const CHECK_CONFLICTS_IN_PROGRESS = 'CHECK_CONFLICTS_IN_PROGRESS';
+export const CHECK_CONFLICTS_SUCCESS = 'CHECK_CONFLICTS_SUCCESS';
+export const CHECK_CONFLICTS_FAILURE = 'CHECK_CONFLICTS_FAILURE';
+export const SAVE_EVENT_SCHEDULING_IN_PROGRESS = 'SAVE_EVENT_SCHEDULING_IN_PROGRESS';
+export const SAVE_EVENT_SCHEDULING_SUCCESS = 'SAVE_EVENT_SCHEDULING_SUCCESS';
+export const SAVE_EVENT_SCHEDULING_FAILURE = 'SAVE_EVENT_SCHEDULING_FAILURE';
 
 // Constants of actions types affecting the workflows tab
 export const LOAD_EVENT_WORKFLOWS_IN_PROGRESS = 'LOAD_EVENT_WORKFLOWS_IN_PROGRESS';
@@ -279,6 +292,52 @@ export const loadEventPublicationsSuccess = (publications) => ({
 
 export const loadEventPublicationsFailure = () => ({
     type: LOAD_EVENT_PUBLICATIONS_FAILURE
+});
+
+// actions for scheduling
+export const loadEventSchedulingInProgress = () => ({
+    type: LOAD_EVENT_SCHEDULING_IN_PROGRESS
+});
+
+export const loadEventSchedulingSuccess = ( source, captureAgents ) => ({
+    type: LOAD_EVENT_SCHEDULING_SUCCESS,
+    payload: {
+        source,
+        captureAgents
+    }
+});
+
+export const loadEventSchedulingFailure = () => ({
+    type: LOAD_EVENT_SCHEDULING_FAILURE
+});
+
+export const checkConflictsInProgress = () => ({
+    type: CHECK_CONFLICTS_IN_PROGRESS
+});
+
+export const checkConflictsSuccess = ( conflicts ) => ({
+    type: CHECK_CONFLICTS_SUCCESS,
+    payload: {
+        conflicts
+    }
+});
+
+export const checkConflictsFailure = () => ({
+    type: CHECK_CONFLICTS_FAILURE
+});
+export const saveEventSchedulingInProgress = () => ({
+    type: SAVE_EVENT_SCHEDULING_IN_PROGRESS
+});
+
+export const saveEventSchedulingSuccess = ( source ) => ({
+    type: SAVE_EVENT_SCHEDULING_SUCCESS,
+    payload: {
+        source
+    }
+});
+
+export const saveEventSchedulingFailure = () => ({
+    type: SAVE_EVENT_SCHEDULING_FAILURE
 });
 
 // actions for workflows
