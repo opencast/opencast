@@ -88,7 +88,7 @@ Building Opencast
 Automatically build all Opencast modules and assemble distributions for different server types:
 
     cd opencast-dir
-    mvn clean install
+    mvn clean install -T 1.0C -Pnone && cd assemblies && mvn install -T 1.0C && cd ..
 
 Deploy all-in-one distribution:
 

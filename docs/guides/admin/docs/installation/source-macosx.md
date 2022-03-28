@@ -117,7 +117,7 @@ Switch to the opencast folder. If you downloaded the tarball, this is the folder
 like `opencast-community-opencast-[…]`). If you chose to download via git, use `cd opencast`. You can proceed by
 building opencast (depending on the folder permissions, you might need to start the command with `sudo`):
 
-    mvn clean install -Pdev
+    mvn clean install -T 1.0C -Pnone && cd assemblies && mvn install -T 1.0C -Pdev && cd ..
 
 Please be patient, as building Opencast for the first time will take quite long.
 
