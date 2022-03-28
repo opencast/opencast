@@ -1303,12 +1303,12 @@
                "ADD": "添加角色"
             },
             "STRENGTH": {
-               "BAD": "Bad password",
-               "VERYWEAK": "Very weak password",
-               "WEAK": "Weak password",
-               "GOOD": "Good password",
-               "STRONG": "Strong password",
-               "VERYSTRONG": "Very strong password"
+               "BAD": "坏密码",
+               "VERYWEAK": "非常弱的密码",
+               "WEAK": "弱密码",
+               "GOOD": "好密码",
+               "STRONG": "强密码",
+               "VERYSTRONG": "非常强的密码"
             }
          }
       },
