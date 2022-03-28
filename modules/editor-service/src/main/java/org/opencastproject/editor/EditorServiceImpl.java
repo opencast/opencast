@@ -451,74 +451,68 @@ public class EditorServiceImpl implements EditorService {
    */
   private void addSubtitleTrack(MediaPackage mediaPackage, List<PostEditingData.Subtitle> subtitles)
           throws IOException {
-    for (PostEditingData.Subtitle subtitle : subtitles) {
-      // Generate ID for new tracks
-      String subtitleId = UUID.randomUUID().toString();
-      String trackId = null;
+    if (subtitles != null) {
+      for (PostEditingData.Subtitle subtitle : subtitles) {
+        // Generate ID for new tracks
+        String subtitleId = UUID.randomUUID().toString();
+        String trackId = null;
 
-      // Check if subtitle already exists
-      for (Track t: mediaPackage.getTracks()) {
-        if (t.getFlavor().matches(subtitle.getFlavor())) {
-          logger.debug("Set Identifier for Subtitle-Track to: {}", t.getIdentifier());
-          subtitleId = t.getIdentifier();
-          trackId = t.getIdentifier();
-          break;
+        // Check if subtitle already exists
+        for (Track t : mediaPackage.getTracks()) {
+          if (t.getFlavor().matches(subtitle.getFlavor())) {
+            logger.debug("Set Identifier for Subtitle-Track to: {}", t.getIdentifier());
+            subtitleId = t.getIdentifier();
+            trackId = t.getIdentifier();
+            break;
+          }
         }
-      }
 
-      Track track = mediaPackage.getTrack(trackId);
+        Track track = mediaPackage.getTrack(trackId);
 
-      // Memorize uri of the previous track file for deletion
-      URI oldTrackURI = null;
-      if (track != null) {
-        oldTrackURI = track.getURI();
-      }
+        // Memorize uri of the previous track file for deletion
+        URI oldTrackURI = null;
+        if (track != null) {
+          oldTrackURI = track.getURI();
+        }
 
-      // Put updated filename in working file repository and update the track.
-      InputStream is = IOUtils.toInputStream(subtitle.getSubtitle(), "UTF-8");
-      URI subtitleUri = workspace.put(
-              mediaPackage.getIdentifier().toString(),
-              subtitleId,
-              "subtitle.vtt",
-              //                  EditorService.TARGET_FILE_NAME,
-              is
-      );
+        // Put updated filename in working file repository and update the track.
+        InputStream is = IOUtils.toInputStream(subtitle.getSubtitle(), "UTF-8");
+        URI subtitleUri = workspace.put(mediaPackage.getIdentifier().toString(), subtitleId, "subtitle.vtt",
+                //                  EditorService.TARGET_FILE_NAME,
+                is);
 
-      // If not exists, create new Track
-      if (track == null) {
-        MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-        track = (Track) mpeBuilder.elementFromURI(
-                subtitleUri,
-                MediaPackageElement.Type.Track,
-                subtitle.getFlavor()
-        );
-        mediaPackage.add(track);
-        logger.info("Creating new track for flavor: " + track.getFlavor());
-      }
+        // If not exists, create new Track
+        if (track == null) {
+          MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+          track = (Track) mpeBuilder.elementFromURI(subtitleUri, MediaPackageElement.Type.Track, subtitle.getFlavor());
+          mediaPackage.add(track);
+          logger.info("Creating new track for flavor: " + track.getFlavor());
+        }
 
-      track.setURI(subtitleUri);
-      track.setIdentifier(subtitleId);
-      for (String tag : getSmilCatalogTags()) {
-        track.addTag(tag);
-      }
-      track.setChecksum(null);
+        track.setURI(subtitleUri);
+        track.setIdentifier(subtitleId);
+        for (String tag : getSmilCatalogTags()) {
+          track.addTag(tag);
+        }
+        track.setChecksum(null);
 
-      if (oldTrackURI != null) {
-        // Delete the old files from the working file repository and workspace if they were in there
-        logger.info("Removing old track file {}", oldTrackURI);
+        if (oldTrackURI != null) {
+          // Delete the old files from the working file repository and workspace if they were in there
+          logger.info("Removing old track file {}", oldTrackURI);
+          try {
+            workspace.delete(oldTrackURI);
+          } catch (NotFoundException | IOException e) {
+            logger.info("Could not remove track from workspace. Could be it was never there.");
+          }
+        }
+
         try {
-          workspace.delete(oldTrackURI);
-        } catch (NotFoundException | IOException e) {
-          logger.info("Could not remove track from workspace. Could be it was never there.");
+          assetManager.takeSnapshot(mediaPackage);
+        } catch (AssetManagerException e) {
+          logger.error("Error while adding the updated media package ({}) to the archive", mediaPackage.getIdentifier(),
+                  e);
+          throw new IOException(e);
         }
-      }
-
-      try {
-        assetManager.takeSnapshot(mediaPackage);
-      } catch (AssetManagerException e) {
-        logger.error("Error while adding the updated media package ({}) to the archive",
-                mediaPackage.getIdentifier(), e);
-        throw new IOException(e);
       }
     }
   }
