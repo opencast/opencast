@@ -77,8 +77,10 @@ import {addNotification} from "./notificationThunks";
 import {createPolicy, transformMetadataCollection} from "../utils/resourceUtils";
 import {NOTIFICATION_CONTEXT} from "../configs/modalConfig";
 import {
-    getBaseWorkflow, getCaptureAgents,
-    getMetadata, getSchedulingSource,
+    getBaseWorkflow,
+    getCaptureAgents,
+    getMetadata,
+    getSchedulingSource,
     getWorkflow,
     getWorkflowDefinitions,
     getWorkflows
@@ -87,6 +89,7 @@ import {fetchWorkflowDef} from "./workflowThunks";
 import {getWorkflowDef} from "../selectors/workflowSelectors";
 import {logger} from "../utils/logger";
 import {removeNotificationWizardForm} from "../actions/notificationActions";
+import {calculateDuration} from "../utils/dateUtils";
 
 // prepare http headers for posting to resources
 const getHttpHeaders = () => {
@@ -571,9 +574,7 @@ export const fetchSchedulingInfo = (eventId) => async (dispatch) => {
 
         const startDate = new Date(schedulingResponse.start);
         const endDate = new Date(schedulingResponse.end);
-        const duration = (endDate - startDate) / 1000;
-        const durationHours = (duration - (duration % 3600)) / 3600;
-        const durationMinutes = (duration % 3600) / 60;
+        const {durationHours, durationMinutes} = calculateDuration(startDate, endDate);
 
         let captureAgents = [];
         let device = {
@@ -757,7 +758,7 @@ export const saveSchedulingInfo = (eventId, values, startDate, endDate) => async
         .then( response => {
             dispatch(removeNotificationWizardForm());
             dispatch(saveEventSchedulingSuccess(source));
-            // todo: should I use this here?: dispatch(fetchSchedulingInfo(eventId));
+            dispatch(fetchSchedulingInfo(eventId));
 
         })
         .catch( response => {

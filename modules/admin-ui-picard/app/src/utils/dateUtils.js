@@ -27,3 +27,21 @@ export const relativeDateSpanToFilterValue = (fromRelativeDate, toRelativeDate, 
 
     return fromAbsoluteDate.toISOString() + '/' + toAbsoluteDate.toISOString();
 };
+
+// creates a date object from a date, hour and minute
+export const makeDate = (date, hour, minute) => {
+    const madeDate = new Date(date);
+    madeDate.setHours(hour);
+    madeDate.setMinutes(minute);
+
+    return madeDate;
+}
+
+// calculates the duration between a start and end date in hours and minutes
+export const calculateDuration = (startDate, endDate) => {
+    const duration = (endDate - startDate) / 1000;
+    const durationHours = (duration - (duration % 3600)) / 3600;
+    const durationMinutes = (duration % 3600) / 60;
+
+    return {durationHours, durationMinutes};
+}

@@ -17,9 +17,15 @@ import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import {
     getCurrentLanguageInformation,
     getTimezoneOffset,
+    getTimezoneString,
     hasAccess,
-    padLeadingZeros
+    initArray,
+    makeTwoDigits
 } from "../../../../utils/utils";
+import {
+    calculateDuration,
+    makeDate
+} from "../../../../utils/dateUtils";
 import {DatePicker} from "@material-ui/pickers";
 import {createTheme, ThemeProvider} from "@material-ui/core";
 import {Field, Formik} from "formik";
@@ -45,19 +51,15 @@ const EventDetailsSchedulingTab = ({ eventId, t,
     // Get info about the current language and its date locale
     const currentLanguage = getCurrentLanguageInformation();
 
-    const fillArray = (maxNumber) => {
-        return Array.from(Array(maxNumber).keys());
-    }
-
     // Make arrays of possible values for hours and minutes
-    const hours = fillArray(24);
-    const minutes = fillArray(60);
+    const hours = initArray(24);
+    const minutes = initArray(60);
 
     // Get timezone offset; Checks should be performed on UTC times
     const offset = getTimezoneOffset();
 
     // Set timezone
-    const tz = 'UTC' + (offset < 0 ? '-' : '+') + offset;
+    const tz = getTimezoneString(offset);
 
     // Style to bring date picker pop up to front
     const theme = createTheme({
@@ -81,23 +83,12 @@ const EventDetailsSchedulingTab = ({ eventId, t,
     const hasAccessRole = hasAccess("ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT", user);
     const accessAllowed = (agentId) => {return (!checkingConflicts)  && hasCurrentAgentAccess(agentId)};
 
-    // creates a date object
-    const makeDate = (date, hour, minute) => {
-        const madeDate = new Date(date);
-        madeDate.setHours(hour);
-        madeDate.setMinutes(minute);
-
-        return madeDate;
-    }
-
     // sets the duration in the formik
     const setDuration = (startDate, endDate, setFieldValue) => {
-        const duration = (endDate - startDate) / 1000;
-        const durationHours = (duration - (duration % 3600)) / 3600;
-        const durationMinutes = (duration % 3600) / 60;
+        const {durationHours, durationMinutes} = calculateDuration(startDate, endDate);
 
-        setFieldValue('scheduleDurationHours', padLeadingZeros(durationHours, 2));
-        setFieldValue('scheduleDurationMinutes', padLeadingZeros(durationMinutes, 2));
+        setFieldValue('scheduleDurationHours', makeTwoDigits(durationHours));
+        setFieldValue('scheduleDurationMinutes', makeTwoDigits(durationMinutes));
     }
 
     // checks if the time of the endDate is before the time of the startDate
@@ -214,8 +205,8 @@ const EventDetailsSchedulingTab = ({ eventId, t,
         endDate.setHours(endDate.getHours() + parseInt(duration.hours));
         endDate.setMinutes(endDate.getMinutes() + parseInt(duration.minutes));
 
-        setFieldValue('scheduleEndHour', padLeadingZeros(endDate.getHours(), 2));
-        setFieldValue('scheduleEndMinute', padLeadingZeros(endDate.getMinutes(), 2));
+        setFieldValue('scheduleEndHour', makeTwoDigits(endDate.getHours()));
+        setFieldValue('scheduleEndMinute', makeTwoDigits(endDate.getMinutes()));
 
         setFieldValue('scheduleEndDate', endDate.setHours(0,0,0));
 
@@ -308,13 +299,13 @@ const EventDetailsSchedulingTab = ({ eventId, t,
 
         return {
             scheduleStartDate: startDate.setHours(0,0,0),
-            scheduleStartHour: padLeadingZeros(source.start.hour, 2),
-            scheduleStartMinute: padLeadingZeros(source.start.minute, 2),
-            scheduleDurationHours: padLeadingZeros(source.duration.hour, 2),
-            scheduleDurationMinutes: padLeadingZeros(source.duration.minute, 2),
+            scheduleStartHour: makeTwoDigits(source.start.hour),
+            scheduleStartMinute: makeTwoDigits(source.start.minute),
+            scheduleDurationHours: makeTwoDigits(source.duration.hour),
+            scheduleDurationMinutes: makeTwoDigits(source.duration.minute),
             scheduleEndDate: endDate.setHours(0,0,0),
-            scheduleEndHour: padLeadingZeros(source.end.hour, 2),
-            scheduleEndMinute: padLeadingZeros(source.end.minute, 2),
+            scheduleEndHour: makeTwoDigits(source.end.hour),
+            scheduleEndMinute: makeTwoDigits(source.end.minute),
             captureAgent: source.device.name,
             inputs: Array.from(source.device.inputMethods)
         };
@@ -407,9 +398,9 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                     >
                                                                         <option value="" hidden/>
                                                                         {hours.map((h, key) => (
-                                                                            <option value={padLeadingZeros(h, 2)}
+                                                                            <option value={makeTwoDigits(h.index)}
                                                                                     key={key}>
-                                                                                {padLeadingZeros(h, 2)}
+                                                                                {h.value}
                                                                             </option>
                                                                         ))}
                                                                     </Field>
@@ -428,9 +419,9 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                     >
                                                                         <option value="" hidden/>
                                                                         {minutes.map((m, key) => (
-                                                                            <option value={padLeadingZeros(m, 2)}
+                                                                            <option value={makeTwoDigits(m.index)}
                                                                                     key={key}>
-                                                                                {padLeadingZeros(m, 2)}
+                                                                                {m.value}
                                                                             </option>
                                                                         ))}
                                                                     </Field>
@@ -439,8 +430,8 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                         )}
                                                         {!hasAccessRole && (
                                                             <td>
-                                                                {padLeadingZeros(source.start.hour, 2)}:
-                                                                {padLeadingZeros(source.start.minute, 2)}
+                                                                {makeTwoDigits(source.start.hour)}:
+                                                                {makeTwoDigits(source.start.minute)}
                                                             </td>
                                                         )}
                                                     </tr>
@@ -463,9 +454,9 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                     >
                                                                         <option value="" hidden/>
                                                                         {hours.map((h, key) => (
-                                                                            <option value={padLeadingZeros(h, 2)}
+                                                                            <option value={makeTwoDigits(h.index)}
                                                                                     key={key}>
-                                                                                {padLeadingZeros(h, 2)}
+                                                                                {h.value}
                                                                             </option>
                                                                         ))}
                                                                     </Field>
@@ -484,9 +475,9 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                     >
                                                                         <option value="" hidden/>
                                                                         {minutes.map((m, key) => (
-                                                                            <option value={padLeadingZeros(m, 2)}
+                                                                            <option value={makeTwoDigits(m.index)}
                                                                                     key={key}>
-                                                                                {padLeadingZeros(m, 2)}
+                                                                                {m.value}
                                                                             </option>
                                                                         ))}
                                                                     </Field>
@@ -495,8 +486,8 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                         )}
                                                         {!hasAccessRole && (
                                                             <td>
-                                                                {padLeadingZeros(source.duration.hour,2)}:
-                                                                {padLeadingZeros(source.duration.minute,2)}
+                                                                {makeTwoDigits(source.duration.hour)}:
+                                                                {makeTwoDigits(source.duration.minute)}
                                                             </td>
                                                         )}
                                                     </tr>
@@ -519,9 +510,9 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                     >
                                                                         <option value="" hidden/>
                                                                         {hours.map((h, key) => (
-                                                                            <option value={padLeadingZeros(h, 2)}
+                                                                            <option value={makeTwoDigits(h.index)}
                                                                                     key={key}>
-                                                                                {padLeadingZeros(h, 2)}
+                                                                                {h.value}
                                                                             </option>
                                                                         ))}
                                                                     </Field>
@@ -540,9 +531,9 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                                     >
                                                                         <option value="" hidden/>
                                                                         {minutes.map((m, key) => (
-                                                                            <option value={padLeadingZeros(m, 2)}
+                                                                            <option value={makeTwoDigits(m.index)}
                                                                                     key={key}>
-                                                                                {padLeadingZeros(m, 2)}
+                                                                                {m.value}
                                                                             </option>
                                                                         ))}
                                                                     </Field>
@@ -556,8 +547,8 @@ const EventDetailsSchedulingTab = ({ eventId, t,
                                                         )}
                                                         {!hasAccessRole && (
                                                             <td>
-                                                                {padLeadingZeros(source.end.hour,2)}:
-                                                                {padLeadingZeros(source.end.minute,2)}
+                                                                {makeTwoDigits(source.end.hour)}:
+                                                                {makeTwoDigits(source.end.minute)}
                                                                 {(formik.values.scheduleEndDate.toString() !== formik.values.scheduleStartDate.toString()) && (
                                                                     <span>{(new Date(formik.values.scheduleEndDate)).toLocaleDateString(currentLanguage.dateLocale.code)}</span>
                                                                 )}
