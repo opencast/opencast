@@ -9,10 +9,6 @@ import { getApplicationKeyMap } from 'react-hotkeys';
 const HotKeyCheatSheet = ({ close }) => {
     const { t } = useTranslation();
 
-    console.log("keys");
-    console.log(getApplicationKeyMap());
-
-
     const handleClose = () => {
         close();
     };
@@ -52,7 +48,7 @@ const HotKeyCheatSheet = ({ close }) => {
                                                                         : ' + '}
                                                                 </>
                                                             ))}
-                                                    </span>
+                                                        </span>
                                                     </p>
                                                 </td>
                                                 <td>{t(availableHotkeys[hotkeyGroup][hotkey].description)}</td>
