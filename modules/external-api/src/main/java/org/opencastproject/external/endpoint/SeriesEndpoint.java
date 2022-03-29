@@ -107,6 +107,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -420,7 +421,9 @@ public class SeriesEndpoint {
       withAcl = false;
     }
 
-    for (final Series s : indexService.getSeries(id, elasticsearchIndex)) {
+    Optional seriesOpt = indexService.getSeries(id, elasticsearchIndex);
+    if (seriesOpt.isPresent()) {
+      Series s = (Series) seriesOpt.get();
       JValue subjects;
       if (s.getSubject() == null) {
         subjects = arr();
@@ -500,8 +503,8 @@ public class SeriesEndpoint {
   }
 
   private Response getAllMetadata(String id, ApiVersion requestedVersion) throws SearchIndexException {
-    Opt<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
-    if (optSeries.isNone())
+    Optional<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
+    if (optSeries.isEmpty())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
     MetadataList metadataList = new MetadataList();
@@ -520,8 +523,8 @@ public class SeriesEndpoint {
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
-    Opt<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
-    if (optSeries.isNone())
+    Optional<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
+    if (optSeries.isEmpty())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
     // Try the main catalog first as we load it from the index.
@@ -706,8 +709,8 @@ public class SeriesEndpoint {
     Opt<DublinCoreMetadataCollection> optCollection = Opt.none();
     SeriesCatalogUIAdapter adapter = null;
 
-    Opt<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
-    if (optSeries.isNone())
+    Optional<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
+    if (optSeries.isEmpty())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
     MetadataList metadataList = new MetadataList();
@@ -792,8 +795,8 @@ public class SeriesEndpoint {
               .build();
     }
 
-    Opt<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
-    if (optSeries.isNone())
+    Optional<Series> optSeries = indexService.getSeries(id, elasticsearchIndex);
+    if (optSeries.isEmpty())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
 
     try {
@@ -813,7 +816,9 @@ public class SeriesEndpoint {
   public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     JSONParser parser = new JSONParser();
-    for (final Series series : indexService.getSeries(id, elasticsearchIndex)) {
+    Optional seriesOpt = indexService.getSeries(id, elasticsearchIndex);
+    if (seriesOpt.isPresent()) {
+      Series series = (Series) seriesOpt.get();
       // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.
       JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
 
@@ -834,7 +839,7 @@ public class SeriesEndpoint {
                   @RestResponse(description = "The series' properties are returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
-    if (indexService.getSeries(id, elasticsearchIndex).isSome()) {
+    if (indexService.getSeries(id, elasticsearchIndex).isPresent()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
       return ApiResponses.Json.ok(acceptHeader, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {

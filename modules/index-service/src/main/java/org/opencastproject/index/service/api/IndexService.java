@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -310,7 +311,7 @@ public interface IndexService {
    * @throws SearchIndexException
    *           Thrown if there is an error when using the search index.
    */
-  Opt<Series> getSeries(String seriesId, ElasticsearchIndex searchIndex) throws SearchIndexException;
+  Optional<Series> getSeries(String seriesId, ElasticsearchIndex searchIndex) throws SearchIndexException;
 
   /**
    * Create a new series.

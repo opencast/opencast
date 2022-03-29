@@ -139,6 +139,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -527,7 +528,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(indexService.getEvent("notExists", searchIndex)).andReturn(Opt.<Event> none()).anyTimes();
     EasyMock.expect(indexService.getEvent("notExists2", searchIndex)).andReturn(Opt.<Event> none()).anyTimes();
     EasyMock.expect(indexService.getEvent("updateFailure", searchIndex)).andReturn(Opt.some(event3)).anyTimes();
-    EasyMock.expect(indexService.getSeries("seriesId", searchIndex)).andReturn(Opt.some(series)).anyTimes();
+    EasyMock.expect(indexService.getSeries("seriesId", searchIndex)).andReturn(Optional.of(series)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(event)).andReturn(mp1).anyTimes();
     EasyMock.expect(indexService.getEventCatalogUIAdapters()).andReturn(eventCatalogAdapterList).anyTimes();
     EasyMock.expect(indexService.getExtendedEventCatalogUIAdapters()).andReturn(Collections.emptyList()).anyTimes();
