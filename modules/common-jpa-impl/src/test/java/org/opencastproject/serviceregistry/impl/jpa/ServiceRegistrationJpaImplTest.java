@@ -22,6 +22,7 @@ package org.opencastproject.serviceregistry.impl.jpa;
 
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.job.api.Job.Status.DISPATCHING;
+import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
@@ -29,12 +30,9 @@ import org.opencastproject.job.jpa.JpaJob;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
-import org.opencastproject.util.persistence.PersistenceUtil;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.Queries;
-
-import com.entwinemedia.fn.ProductBuilder;
+import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.util.persistence.PersistenceEnvs;
+import org.opencastproject.util.persistence.Queries;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.After;
@@ -46,13 +44,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.persistence.EntityManagerFactory;
-
 public class ServiceRegistrationJpaImplTest {
 
-  private static final ProductBuilder P = com.entwinemedia.fn.Products.E;
-
-  private EntityManagerFactory emf;
   private PersistenceEnv env;
 
   private JpaOrganization org;
@@ -60,8 +53,7 @@ public class ServiceRegistrationJpaImplTest {
 
   @Before
   public void setUp() throws Exception {
-    emf = PersistenceUtil.newTestEntityManagerFactory("org.opencastproject.common");
-    env = PersistenceEnvs.mk(emf);
+    env = PersistenceEnvs.testPersistenceEnv("org.opencastproject.common");
     setUpOrganizationAndUsers();
   }
 
@@ -104,8 +96,8 @@ public class ServiceRegistrationJpaImplTest {
 
     /* find the job created at 'now' should reveal exactly one job */
     List<Object> statistic = env.tx(
-        Queries.named.findAll("ServiceRegistration.statistics",
-        P.p2("minDateCreated", now), P.p2("maxDateCreated", now)));
+        Queries.named.findAll("ServiceRegistration.statistics", Object.class, tuple("minDateCreated", now),
+            tuple("maxDateCreated", now)));
 
     Object[] stats = (Object[]) statistic.get(0);
     assertEquals(1, statistic.size());
@@ -118,8 +110,8 @@ public class ServiceRegistrationJpaImplTest {
 
     /* There are no jobs in the specific time interval */
     statistic = env.tx(
-      Queries.named.findAll("ServiceRegistration.statistics",
-        P.p2("minDateCreated", DateUtils.addDays(now, -3)), P.p2("maxDateCreated", DateUtils.addDays(now, -2))));
+      Queries.named.findAll("ServiceRegistration.statistics", Object.class,
+          tuple("minDateCreated", DateUtils.addDays(now, -3)), tuple("maxDateCreated", DateUtils.addDays(now, -2))));
 
     assertEquals(0, statistic.size());
 

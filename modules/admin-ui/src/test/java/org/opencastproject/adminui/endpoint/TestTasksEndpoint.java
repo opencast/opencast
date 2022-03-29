@@ -57,9 +57,9 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
+import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.util.persistence.PersistenceEnvs;
+import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -156,8 +156,8 @@ public class TestTasksEndpoint extends TasksEndpoint {
   }
 
   AssetManager mkAssetManager(final Workspace workspace) throws Exception {
-    final EntityManagerFactory emf = mkEntityManagerFactory("org.opencastproject.assetmanager.impl");
-    final PersistenceEnv penv = PersistenceEnvs.mk(emf);
+    final EntityManagerFactory emf = PersistenceUtil.newTestEntityManagerFactory("org.opencastproject.assetmanager.impl");
+    final PersistenceEnv penv = PersistenceEnvs.persistenceEnvironment(emf);
     final Database db = new Database(emf, penv);
     HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
@@ -275,26 +275,4 @@ public class TestTasksEndpoint extends TasksEndpoint {
       }
     };
   }
-
-  static EntityManagerFactory mkEntityManagerFactory(String persistenceUnit) {
-    if ("mysql".equals(System.getProperty("useDatabase"))) {
-      return mkMySqlEntityManagerFactory(persistenceUnit);
-    } else {
-      return mkH2EntityManagerFactory(persistenceUnit);
-    }
-  }
-
-  static EntityManagerFactory mkH2EntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkTestEntityManagerFactory(persistenceUnit, true);
-  }
-
-  static EntityManagerFactory mkMySqlEntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkEntityManagerFactory(persistenceUnit, "MySQL", "com.mysql.jdbc.Driver",
-            "jdbc:mysql://localhost/test_scheduler", "matterhorn", "matterhorn",
-            org.opencastproject.util.data.Collections.map(tuple("eclipselink.ddl-generation", "drop-and-create-tables"),
-                    tuple("eclipselink.ddl-generation.output-mode", "database"),
-                    tuple("eclipselink.logging.level.sql", "FINE"), tuple("eclipselink.logging.parameters", "true")),
-            PersistenceUtil.mkTestPersistenceProvider());
-  }
-
 }

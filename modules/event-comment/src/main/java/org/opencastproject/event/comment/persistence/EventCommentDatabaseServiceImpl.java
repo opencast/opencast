@@ -20,7 +20,7 @@
  */
 package org.opencastproject.event.comment.persistence;
 
-import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
+import static org.opencastproject.util.persistence.Queries.persistOrUpdate;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -39,8 +39,8 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
+import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.util.persistence.PersistenceEnvs;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
@@ -115,7 +115,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   @Reference(target = "(osgi.unit.name=org.opencastproject.event.comment)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
-    this.env = PersistenceEnvs.mk(emf);
+    this.env = PersistenceEnvs.persistenceEnvironment(emf);
   }
 
   /**

@@ -25,12 +25,12 @@ import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
-import org.opencastproject.util.persistencefn.Queries;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.util.persistence.PersistenceEnvs;
+import org.opencastproject.util.persistence.PersistenceUtil;
+import org.opencastproject.util.persistence.Queries;
 
-import com.entwinemedia.fn.Fn;
 import com.mysema.query.jpa.impl.JPADeleteClause;
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.EntityPath;
@@ -44,9 +44,9 @@ public class AssetManagerDeleteTestBase extends AssetManagerTestBase implements 
 
   @Override
   public AssetManagerImpl makeAssetManager() throws Exception {
-    penv = PersistenceEnvs.mkTestEnvFromSystemProperties(PERSISTENCE_UNIT);
+    penv = PersistenceEnvs.testPersistenceEnv(PERSISTENCE_UNIT);
     // empty database
-    penv.tx(new Fn<EntityManager, Object>() {
+    penv.tx(new Function<EntityManager, Object>() {
       @Override public Object apply(EntityManager entityManager) {
         Queries.sql.update(entityManager, "delete from oc_assets_asset");
         Queries.sql.update(entityManager, "delete from oc_assets_properties");
@@ -56,7 +56,7 @@ public class AssetManagerDeleteTestBase extends AssetManagerTestBase implements 
       }
     });
 
-    final Database db = new Database(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
+    final Database db = new Database(PersistenceUtil.newTestEntityManagerFactory(PERSISTENCE_UNIT),
             penv);
     am = super.makeAssetManager();
     am.setDatabase(db);
@@ -64,7 +64,7 @@ public class AssetManagerDeleteTestBase extends AssetManagerTestBase implements 
   }
 
   long runCount(final JPAQuery q) {
-    return penv.tx(new Fn<EntityManager, Long>() {
+    return penv.tx(new Function<EntityManager, Long>() {
       @Override public Long apply(EntityManager em) {
         return q.clone(em, Database.TEMPLATES).count();
       }
@@ -98,30 +98,30 @@ public class AssetManagerDeleteTestBase extends AssetManagerTestBase implements 
     assertPropertiesTotal(properties);
   }
 
-  static Fn<EntityManager, JPADeleteClause> deleteFrom(final EntityPath<?> from) {
-    return new Fn<EntityManager, JPADeleteClause>() {
+  static Function<EntityManager, JPADeleteClause> deleteFrom(final EntityPath<?> from) {
+    return new Function<EntityManager, JPADeleteClause>() {
       @Override public JPADeleteClause apply(EntityManager em) {
         return new JPADeleteClause(em, from, Database.TEMPLATES);
       }
     };
   }
 
-  static final Fn<JPADeleteClause, Long> execute = new Fn<JPADeleteClause, Long>() {
+  static final Function<JPADeleteClause, Long> execute = new Function<JPADeleteClause, Long>() {
     @Override public Long apply(JPADeleteClause delete) {
       return delete.execute();
     }
   };
 
-  static Fn<JPADeleteClause, JPADeleteClause> where(final Predicate... p) {
-    return new Fn<JPADeleteClause, JPADeleteClause>() {
+  static Function<JPADeleteClause, JPADeleteClause> where(final Predicate... p) {
+    return new Function<JPADeleteClause, JPADeleteClause>() {
       @Override public JPADeleteClause apply(JPADeleteClause delete) {
         return delete.where(p);
       }
     };
   }
 
-  static Fn<EntityManager, Long> deleteFromWhere(final EntityPath<?> from, final Predicate... where) {
-    return new Fn<EntityManager, Long>() {
+  static Function<EntityManager, Long> deleteFromWhere(final EntityPath<?> from, final Predicate... where) {
+    return new Function<EntityManager, Long>() {
       @Override public Long apply(EntityManager em) {
         return deleteFrom(from).then(where(where)).then(execute).apply(em);
       }

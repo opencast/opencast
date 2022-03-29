@@ -29,12 +29,12 @@ import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.AssetDtos.Full;
 import org.opencastproject.assetmanager.impl.persistence.AssetDtos.Medium;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.Queries;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.util.persistence.PersistenceEnvs;
+import org.opencastproject.util.persistence.Queries;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fx;
 import com.entwinemedia.fn.data.Opt;
 import com.mysema.query.Tuple;
 import com.mysema.query.jpa.EclipseLinkTemplates;
@@ -75,7 +75,7 @@ public class Database implements EntityPaths {
   }
 
   public Database(EntityManagerFactory emf) {
-    penv = PersistenceEnvs.mk(emf);
+    penv = PersistenceEnvs.persistenceEnvironment(emf);
     entityManagerFactory = emf;
   }
 
@@ -84,9 +84,10 @@ public class Database implements EntityPaths {
    *
    * @param q the query function to run
    */
-  public <A> A run(final Fn<JPAQueryFactory, A> q) {
-    return penv.tx(new Fn<EntityManager, A>() {
-      @Override public A apply(final EntityManager em) {
+  public <A> A run(final Function<JPAQueryFactory, A> q) {
+    return penv.tx(new Function<EntityManager, A>() {
+      @Override
+      public A apply(EntityManager em) {
         return q.apply(new JPAQueryFactory(TEMPLATES, new Provider<EntityManager>() {
           @Override public EntityManager get() {
             return em;
@@ -108,7 +109,7 @@ public class Database implements EntityPaths {
    * Save a property to the database. This is either an insert or an update operation.
    */
   public boolean saveProperty(final Property property) {
-    return penv.tx(new Fn<EntityManager, Boolean>() {
+    return penv.tx(new Function<EntityManager, Boolean>() {
       @Override public Boolean apply(EntityManager em) {
         final PropertyId pId = property.getId();
         // check the existence of both the media package and the property in one query
@@ -142,9 +143,9 @@ public class Database implements EntityPaths {
    * Claim a new version for media package <code>mpId</code>.
    */
   public VersionImpl claimVersion(final String mpId) {
-    return penv.tx(new Fn<EntityManager, VersionImpl>() {
+    return penv.tx(new Function<EntityManager, VersionImpl>() {
       @Override public VersionImpl apply(final EntityManager em) {
-        final Opt<VersionClaimDto> lastOpt = VersionClaimDto.findLast(em, mpId);
+        final Option<VersionClaimDto> lastOpt = VersionClaimDto.findLast(em, mpId);
         if (lastOpt.isSome()) {
           final VersionImpl claim = VersionImpl.next(lastOpt.get().getLastClaimed());
           VersionClaimDto.update(em, mpId, claim.value());
@@ -177,7 +178,7 @@ public class Database implements EntityPaths {
             availability,
             storageId,
             owner);
-    return penv.tx(new Fn<EntityManager, SnapshotDto>() {
+    return penv.tx(new Function<EntityManager, SnapshotDto>() {
       @Override public SnapshotDto apply(EntityManager em) {
         // persist snapshot
         em.persist(snapshotDto);
@@ -206,8 +207,8 @@ public class Database implements EntityPaths {
   }
 
   public void setStorageLocation(final VersionImpl version, final String mpId, final String storageId) {
-    penv.tx(new Fx<EntityManager>() {
-      @Override public void apply(EntityManager em) {
+    penv.tx(new Function<EntityManager, Void>() {
+      @Override public Void apply(EntityManager em) {
         final QSnapshotDto q = QSnapshotDto.snapshotDto;
         final QAssetDto a = QAssetDto.assetDto;
         //Update the snapshot
@@ -222,35 +223,38 @@ public class Database implements EntityPaths {
                 .where(a.snapshot.id.eq(s.get().getSnapshotDto().getId()))
                 .set(a.storageId, storageId)
                 .execute();
+        return null;
       }
-    }.toFn());
+    });
   }
 
   public void setAssetStorageLocation(final VersionImpl version, final String mpId, final String mpeId,
           final String storageId) {
-    penv.tx(new Fx<EntityManager>() {
+    penv.tx(new Function<EntityManager, Void>() {
       @Override
-      public void apply(EntityManager em) {
+      public Void apply(EntityManager em) {
         final QAssetDto a = QAssetDto.assetDto;
         Opt<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
         // Update the asset store id
         new JPAUpdateClause(em, a, TEMPLATES)
                 .where(a.snapshot.id.eq(s.get().getSnapshotDto().getId()).and(a.mediaPackageElementId.eq(mpeId)))
                 .set(a.storageId, storageId).execute();
+        return null;
       }
-    }.toFn());
+    });
   }
 
   public void setAvailability(final VersionImpl version, final String mpId, final Availability availability) {
-    penv.tx(new Fx<EntityManager>() {
-      @Override public void apply(EntityManager em) {
+    penv.tx(new Function<EntityManager, Void>() {
+      @Override public Void apply(EntityManager em) {
         final QSnapshotDto q = QSnapshotDto.snapshotDto;
         new JPAUpdateClause(em, q, TEMPLATES)
             .where(q.version.eq(version.value()).and(q.mediaPackageId.eq(mpId)))
             .set(q.availability, availability.name())
             .execute();
+        return null;
       }
-    }.toFn());
+    });
   }
 
   /**
@@ -259,7 +263,7 @@ public class Database implements EntityPaths {
    * @return the asset or none, if no asset can be found
    */
   public Opt<AssetDtos.Medium> getAsset(final VersionImpl version, final String mpId, final String mpeId) {
-    return penv.tx(new Fn<EntityManager, Opt<AssetDtos.Medium>>() {
+    return penv.tx(new Function<EntityManager, Opt<AssetDtos.Medium>>() {
       @Override public Opt<AssetDtos.Medium> apply(EntityManager em) {
         final QAssetDto assetDto = QAssetDto.assetDto;
         final Tuple result = AssetDtos.baseJoin(em)
@@ -275,7 +279,7 @@ public class Database implements EntityPaths {
   }
 
   public Opt<SnapshotDtos.Medium> getSnapshot(final VersionImpl version, final String mpId) {
-    return penv.tx(new Fn<EntityManager, Opt<SnapshotDtos.Medium>>() {
+    return penv.tx(new Function<EntityManager, Opt<SnapshotDtos.Medium>>() {
       @Override public Opt<SnapshotDtos.Medium> apply(EntityManager em) {
         final QSnapshotDto snapshotDto = QSnapshotDto.snapshotDto;
         final Tuple result = SnapshotDtos.baseQuery(em)
@@ -290,7 +294,7 @@ public class Database implements EntityPaths {
   }
 
   public Opt<AssetDtos.Full> findAssetByChecksum(final String checksum) {
-    return penv.tx(new Fn<EntityManager, Opt<AssetDtos.Full>>() {
+    return penv.tx(new Function<EntityManager, Opt<AssetDtos.Full>>() {
       @Override public Opt<AssetDtos.Full> apply(EntityManager em) {
         final Tuple result = AssetDtos.baseJoin(em)
             .where(QAssetDto.assetDto.checksum.eq(checksum))
@@ -376,7 +380,7 @@ public class Database implements EntityPaths {
   }
 
   public Opt<AssetDtos.Full> findAssetByChecksumAndStore(final String checksum, final String storeId) {
-    return penv.tx(new Fn<EntityManager, Opt<AssetDtos.Full>>() {
+    return penv.tx(new Function<EntityManager, Opt<AssetDtos.Full>>() {
       @Override
       public Opt<AssetDtos.Full> apply(EntityManager em) {
         final Tuple result = AssetDtos.baseJoin(em)

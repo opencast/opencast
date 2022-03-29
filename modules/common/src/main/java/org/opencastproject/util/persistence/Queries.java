@@ -33,6 +33,8 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
@@ -143,6 +145,13 @@ public final class Queries {
     }
   };
 
+  /** Native SQL queries. Only support positional parameters. */
+  public static final QueriesBase<Object> sql = new QueriesBase<Object>() {
+    @Override public Query query(EntityManager em, String q, Object... params) {
+      return setParams(em.createNativeQuery(q), params);
+    }
+  };
+
   // -------------------------------------------------------------------------------------------------------------------
 
   public static abstract class TypedQueriesBase<P> extends QueriesBase<P> {
@@ -158,6 +167,10 @@ public final class Queries {
                                             String queryName,
                                             Class<A> type,
                                             Tuple<String, ?>... params);
+
+    public <A> Option<A> findSingle(final EntityManager em, final String q, final Class<A> type, final P... params) {
+      return findSingle(em, q, params);
+    }
 
     /** Find multiple entities. */
     public <A> List<A> findAll(EntityManager em,
@@ -218,6 +231,21 @@ public final class Queries {
           return count(em, q, params);
         }
       };
+    }
+
+    /**
+     * Run a SELECT query that should return a single result.
+     *
+     * @return some value if the query yields exactly one result, none otherwise
+     */
+    public <A> Option<A> findSingle(final EntityManager em, final String q, final P... params) {
+      try {
+        return Option.some((A) query(em, q, params).getSingleResult());
+      } catch (NoResultException e) {
+        return Option.none();
+      } catch (NonUniqueResultException e) {
+        return Option.none();
+      }
     }
 
     /** Find multiple entities. */

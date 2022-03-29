@@ -34,6 +34,7 @@ import org.opencastproject.assetmanager.impl.persistence.Conversions;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.assetmanager.impl.persistence.QPropertyDto;
 import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
+import org.opencastproject.util.data.Function;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.SetB;
@@ -95,7 +96,7 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
     // resolve AST
     final DeleteQueryContribution c = contributeDelete(owner);
     // run all queries in a single transaction
-    final DeletionResult deletion = am.getDatabase().run(new Fn<JPAQueryFactory, DeletionResult>() {
+    final DeletionResult deletion = am.getDatabase().run(new Function<JPAQueryFactory, DeletionResult>() {
       @Override public DeletionResult apply(final JPAQueryFactory jpa) {
         return runQueries(jpa, c);
       }

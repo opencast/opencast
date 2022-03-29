@@ -59,7 +59,7 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
+import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
@@ -89,7 +89,7 @@ import java.util.function.Function;
 /**
  * Base class for {@link org.opencastproject.assetmanager.api.AssetManager} tests.
  * <p>
- * See {@link org.opencastproject.util.persistencefn.PersistenceUtil
+ * See {@link org.opencastproject.util.persistence.PersistenceUtil
  * #mkTestEntityManagerFactoryFromSystemProperties(String)} for command line
  * configuration options.
  * <p>
@@ -133,8 +133,7 @@ public abstract class AssetManagerTestBase {
    * Create a new test asset manager.
    */
   protected AssetManagerImpl makeAssetManagerWithoutHandlers() throws Exception {
-    final Database db = new Database(
-            PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT));
+    final Database db = new Database(PersistenceUtil.newTestEntityManagerFactory(PERSISTENCE_UNIT));
 
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))

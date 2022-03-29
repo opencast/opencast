@@ -20,11 +20,10 @@
  */
 package org.opencastproject.assetmanager.impl.persistence;
 
-import org.opencastproject.util.persistencefn.Queries;
+import static org.opencastproject.util.data.Tuple.tuple;
 
-import com.entwinemedia.fn.ProductBuilder;
-import com.entwinemedia.fn.Products;
-import com.entwinemedia.fn.data.Opt;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.persistence.Queries;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -49,9 +48,7 @@ import javax.persistence.Table;
         query = "update VersionClaim a set a.lastClaimed = :lastClaimed where a.mediaPackageId = :mediaPackageId"
     )
 })
-public final class VersionClaimDto {
-  private static final ProductBuilder p = Products.E;
-
+public class VersionClaimDto {
   @Id
   @Column(name = "mediapackage_id", length = 128)
   private String mediaPackageId;
@@ -76,15 +73,16 @@ public final class VersionClaimDto {
   }
 
   /** Find the last claimed version for a media package. */
-  public static Opt<VersionClaimDto> findLast(EntityManager em, String mediaPackageId) {
-    return Queries.named.findSingle(em, "VersionClaim.last", p.p2("mediaPackageId", mediaPackageId));
+  public static Option<VersionClaimDto> findLast(EntityManager em, String mediaPackageId) {
+    return Queries.named.findSingle(em, "VersionClaim.last", VersionClaimDto.class,
+        tuple("mediaPackageId", mediaPackageId));
   }
 
   /** Update the last claimed version of a media package. */
   public static boolean update(EntityManager em, String mediaPackageId, long lastClaimed) {
     return Queries.named.update(
             em, "VersionClaim.update",
-            p.p2("mediaPackageId", mediaPackageId),
-            p.p2("lastClaimed", lastClaimed));
+            tuple("mediaPackageId", mediaPackageId),
+            tuple("lastClaimed", lastClaimed));
   }
 }

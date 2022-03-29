@@ -131,9 +131,9 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
+import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.util.persistence.PersistenceEnvs;
+import org.opencastproject.util.persistence.PersistenceUtil;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
@@ -314,7 +314,8 @@ public class SchedulerServiceImplTest {
 
 
     schedulerDatabase = new SchedulerServiceDatabaseImpl();
-    schedulerDatabase.setEntityManagerFactory(mkEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
+    EntityManagerFactory emf = PersistenceUtil.newTestEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT);
+    schedulerDatabase.setEntityManagerFactory(emf);
     schedulerDatabase.setSecurityService(securityService);
     schedulerDatabase.activate(null);
     schedSvc.setPersistence(schedulerDatabase);
@@ -1665,8 +1666,8 @@ public class SchedulerServiceImplTest {
   }
 
   AssetManager mkAssetManager() throws Exception {
-    final EntityManagerFactory emf = mkEntityManagerFactory("org.opencastproject.assetmanager.impl");
-    final PersistenceEnv penv = PersistenceEnvs.mk(emf);
+    final EntityManagerFactory emf = PersistenceUtil.newTestEntityManagerFactory("org.opencastproject.assetmanager.impl");
+    final PersistenceEnv penv = PersistenceEnvs.persistenceEnvironment(emf);
     final Database db = new Database(emf, penv);
     HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
@@ -1803,27 +1804,6 @@ public class SchedulerServiceImplTest {
         return "test_store";
       }
     };
-  }
-
-  static EntityManagerFactory mkEntityManagerFactory(String persistenceUnit) {
-    if ("mysql".equals(System.getProperty("useDatabase"))) {
-      return mkMySqlEntityManagerFactory(persistenceUnit);
-    } else {
-      return mkH2EntityManagerFactory(persistenceUnit);
-    }
-  }
-
-  static EntityManagerFactory mkH2EntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkTestEntityManagerFactory(persistenceUnit, true);
-  }
-
-  static EntityManagerFactory mkMySqlEntityManagerFactory(String persistenceUnit) {
-    return PersistenceUtil.mkEntityManagerFactory(persistenceUnit, "MySQL", "com.mysql.jdbc.Driver",
-            "jdbc:mysql://localhost/test_scheduler", "matterhorn", "matterhorn",
-            org.opencastproject.util.data.Collections.map(tuple("eclipselink.ddl-generation", "drop-and-create-tables"),
-                    tuple("eclipselink.ddl-generation.output-mode", "database"),
-                    tuple("eclipselink.logging.level.sql", "FINE"), tuple("eclipselink.logging.parameters", "true")),
-            PersistenceUtil.mkTestPersistenceProvider());
   }
 
   /**
