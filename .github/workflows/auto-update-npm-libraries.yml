@@ -37,7 +37,9 @@ jobs:
         run: |
           npm run eslint
 
+      #NB: The || true after the commit ensures that the pipeline doesn't fail
+      # (and send emails) if there are no updates available
       - name: push changes
         run: |
-          git commit -m 'Auto-update npm packages'
+          git commit -m 'Auto-update npm packages' || true
           git push
