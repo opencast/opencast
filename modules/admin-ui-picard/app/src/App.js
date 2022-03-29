@@ -16,10 +16,12 @@ import Acls from "./components/users/Acls";
 import {fetchUserInfo} from "./thunks/userInfoThunks";
 
 function App({loadingUserInfo}) {
+
     useEffect(() => {
        // Load information about current user on mount
        loadingUserInfo();
     });
+
   return (
           <HashRouter>
               <Switch>

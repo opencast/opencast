@@ -28,6 +28,8 @@ import Header from "../Header";
 import Footer from "../Footer";
 import {getUserInformation} from "../../selectors/userInfoSelectors";
 import {hasAccess} from "../../utils/utils";
+import {GlobalHotKeys} from "react-hotkeys";
+import {availableHotkeys} from "../../configs/hotkeysConfig";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -136,8 +138,13 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         setEditMetadataEventsModal(false);
     };
 
+    const hotKeyHandlers = {
+        NEW_EVENT: showNewEventModal
+    }
+
     return (
         <>
+            <GlobalHotKeys keyMap={availableHotkeys.general} handlers={hotKeyHandlers}/>
             <Header />
             <section className="action-nav-bar">
                 <div className="btn-group">

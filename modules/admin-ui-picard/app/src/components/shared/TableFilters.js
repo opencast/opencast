@@ -18,6 +18,8 @@ import {
 import TableFilterProfiles from "./TableFilterProfiles";
 
 import {getCurrentLanguageInformation} from "../../utils/utils";
+import {availableHotkeys} from "../../configs/hotkeysConfig";
+import {GlobalHotKeys} from "react-hotkeys";
 
 
 /**
@@ -118,138 +120,148 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
 
     };
 
+    const hotKeyHandlers = {
+        REMOVE_FILTERS: removeFilters
+    }
 
     return (
-        <div className="filters-container">
-            {/* Text filter - Search Query */}
-            <input type="text"
-                   className="search expand"
-                   placeholder={t('TABLE_FILTERS.PLACEHOLDER')}
-                   onChange={e => handleChange(e)}
-                   name="textFilter"
-                   value={textFilter}/>
+        <>
+            <GlobalHotKeys keyMap={availableHotkeys.general} handlers={hotKeyHandlers}/>
+            <div className="filters-container">
+                {/* Text filter - Search Query */}
+                <input type="text"
+                       className="search expand"
+                       placeholder={t('TABLE_FILTERS.PLACEHOLDER')}
+                       onChange={e => handleChange(e)}
+                       name="textFilter"
+                       value={textFilter}/>
 
-            {/* Selection of filters and management of filter profiles*/}
-            {/*show only if filters.filters contains filters*/}
-            {!!filterMap && (
-                <div className="table-filter">
-                    <div className="filters">
-                        <i title={t('TABLE_FILTERS.ADD')}
-                           className="fa fa-filter"
-                           onClick={() => setFilterSelector(!showFilterSelector)}/>
+                {/* Selection of filters and management of filter profiles*/}
+                {/*show only if filters.filters contains filters*/}
+                {!!filterMap && (
+                    <div className="table-filter">
+                        <div className="filters">
+                            <i title={t('TABLE_FILTERS.ADD')}
+                               className="fa fa-filter"
+                               onClick={() => setFilterSelector(!showFilterSelector)}/>
 
-                        {/*show if icon is clicked*/}
-                        {showFilterSelector && (
-                            <div>
-                                {/*Check if filters in filtersMap and show corresponding selection*/}
-                                {(!filterMap || false) ? (
-                                    // Show if no filters in filtersList
-                                    <select defaultValue={t('TABLE_FILTERS.FILTER_SELECTION.NO_OPTIONS')}
-                                            className="main-filter">
-                                        <option disabled>{t('TABLE_FILTERS.FILTER_SELECTION.NO_OPTIONS')}</option>
-                                    </select>
+                            {/*show if icon is clicked*/}
+                            {showFilterSelector && (
+                                <div>
+                                    {/*Check if filters in filtersMap and show corresponding selection*/}
+                                    {(!filterMap || false) ? (
+                                        // Show if no filters in filtersList
+                                        <select defaultValue={t('TABLE_FILTERS.FILTER_SELECTION.NO_OPTIONS')}
+                                                className="main-filter">
+                                            <option disabled>{t('TABLE_FILTERS.FILTER_SELECTION.NO_OPTIONS')}</option>
+                                        </select>
 
-                                ) : (
-                                    // Show all filtersMap as selectable options
-                                    <select disable_search_threshold="10"
-                                            onChange={e => handleChange(e)}
-                                            value={selectedFilter}
-                                            name="selectedFilter"
-                                            className="main-filter">
-                                        <option value="" disabled>{t('TABLE_FILTERS.FILTER_SELECTION.PLACEHOLDER')}</option>
-                                        {
-                                            filterMap.map((filter, key) => (
-                                                <option
-                                                    key={key}
-                                                    value={filter.name}>
-                                                    {t(filter.label).substr(0, 40)}
-                                                </option>
-                                            ))
-                                        }
-                                    </select>
-                                )}
-
-                            </div>
-                        )}
-
-                        {/*Show selection of secondary filter if a main filter is chosen*/}
-                        {!!selectedFilter && (
-                            <div>
-                                {/*Show the secondary filter depending on the type of main filter chosen (select or period)*/}
-                                <FilterSwitch filterMap={filterMap}
-                                              selectedFilter={selectedFilter}
-                                              secondFilter={secondFilter}
-                                              startDate={startDate}
-                                              endDate={endDate}
-                                              handleDate={handleDatepickerChange}
-                                              handleChange={handleChange}/>
-                            </div>
-                        )
-                        }
-
-                        {/* Show for each selected filter a blue label containing its name and option */}
-                        {
-                            filterMap.map((filter, key) => {
-                                if(!!filter.value) { return (
-                                    <span className="ng-multi-value" key={key}>
-                                        <span>
+                                    ) : (
+                                        // Show all filtersMap as selectable options
+                                        <select disable_search_threshold="10"
+                                                onChange={e => handleChange(e)}
+                                                value={selectedFilter}
+                                                name="selectedFilter"
+                                                className="main-filter">
+                                            <option value=""
+                                                    disabled>{t('TABLE_FILTERS.FILTER_SELECTION.PLACEHOLDER')}</option>
                                             {
-                                                // Use different representation of name and value depending on type of filter
-                                                filter.type === 'select' ?
-                                                    (
-                                                        <span>
-                                                            {t(filter.label).substr(0,40)}:
-                                                            {(filter.translatable) ? (
-                                                                t(filter.value).substr(0, 40)
-                                                            ) : (
-                                                                filter.value.substr(0, 40)
-                                                            )}
-                                                        </span>
-                                                    ) :
-                                                filter.type === 'period' ?
-                                                    (
-                                                        <span>
+                                                filterMap.map((filter, key) => (
+                                                    <option
+                                                        key={key}
+                                                        value={filter.name}>
+                                                        {t(filter.label).substr(0, 40)}
+                                                    </option>
+                                                ))
+                                            }
+                                        </select>
+                                    )}
+
+                                </div>
+                            )}
+
+                            {/*Show selection of secondary filter if a main filter is chosen*/}
+                            {!!selectedFilter && (
+                                <div>
+                                    {/*Show the secondary filter depending on the type of main filter chosen (select or period)*/}
+                                    <FilterSwitch filterMap={filterMap}
+                                                  selectedFilter={selectedFilter}
+                                                  secondFilter={secondFilter}
+                                                  startDate={startDate}
+                                                  endDate={endDate}
+                                                  handleDate={handleDatepickerChange}
+                                                  handleChange={handleChange}/>
+                                </div>
+                            )
+                            }
+
+                            {/* Show for each selected filter a blue label containing its name and option */}
+                            {
+                                filterMap.map((filter, key) => {
+                                    if (!!filter.value) {
+                                        return (
+                                            <span className="ng-multi-value" key={key}>
+                                                <span>
+                                                {
+                                                    // Use different representation of name and value depending on type of filter
+                                                    filter.type === 'select' ?
+                                                        (
                                                             <span>
-                                                                {/*todo: format date range*/}
-                                                                {t(filter.label).substr(0,40)}:
-                                                                {t('dateFormats.date.short', {date: new Date(filter.value)})}
+                                                                {t(filter.label).substr(0, 40)}:
+                                                                {(filter.translatable) ? (
+                                                                    t(filter.value).substr(0, 40)
+                                                                ) : (
+                                                                    filter.value.substr(0, 40)
+                                                                )}
                                                             </span>
-                                                        </span>
-                                                    ) : null
+                                                        ) :
+                                                        filter.type === 'period' ?
+                                                            (
+                                                                <span>
+                                                                    <span>
+                                                                        {/*todo: format date range*/}
+                                                                        {t(filter.label).substr(0, 40)}:
+                                                                        {t('dateFormats.date.short', {date: new Date(filter.value)})}
+                                                                    </span>
+                                                                </span>
+                                                            ) : null
                                                 }
-                                        </span>
-                                        {/* Remove icon in blue area around filter */}
-                                        <a title={t('TABLE_FILTERS.REMOVE')} onClick={() => removeFilter(filter)}>
-                                            <i className="fa fa-times"/>
-                                          </a>
-                                    </span>
-                                )
-                            }})
-                        }
+                                                </span>
+                                                {/* Remove icon in blue area around filter */}
+                                                <a title={t('TABLE_FILTERS.REMOVE')}
+                                                   onClick={() => removeFilter(filter)}>
+                                                    <i className="fa fa-times"/>
+                                                </a>
+                                            </span>
+                                        )
+                                    }
+                                })
+                            }
+                        </div>
+
+                        {/* Remove icon to clear all filters */}
+                        <i onClick={removeFilters}
+                           title={t('TABLE_FILTERS.CLEAR')}
+                           className="clear fa fa-times"/>
+                        {/* Settings icon to open filters profile dialog (save and editing filter profiles)*/}
+                        <i onClick={() => setFilterSettings(!showFilterSettings)}
+                           title={t('TABLE_FILTERS.PROFILES.FILTERS_HEADER')}
+                           className="settings fa fa-cog fa-times"/>
+
+                        {/* Filter profile dialog for saving and editing filter profiles */}
+                        <TableFilterProfiles showFilterSettings={showFilterSettings}
+                                             setFilterSettings={setFilterSettings}
+                                             resource={resource}
+                                             loadResource={loadResource}
+                                             loadResourceIntoTable={loadResourceIntoTable}/>
+
 
                     </div>
+                )}
 
-                    {/* Remove icon to clear all filters */}
-                    <i onClick={removeFilters}
-                       title={t('TABLE_FILTERS.CLEAR')}
-                       className="clear fa fa-times" />
-                    {/* Settings icon to open filters profile dialog (save and editing filter profiles)*/}
-                    <i onClick={() => setFilterSettings(!showFilterSettings)}
-                       title={t('TABLE_FILTERS.PROFILES.FILTERS_HEADER')}
-                       className="settings fa fa-cog fa-times" />
+            </div>
+        </>
 
-                    {/* Filter profile dialog for saving and editing filter profiles */}
-                    <TableFilterProfiles showFilterSettings={showFilterSettings}
-                                         setFilterSettings={setFilterSettings}
-                                         resource={resource}
-                                         loadResource={loadResource}
-                                         loadResourceIntoTable={loadResourceIntoTable} />
-
-
-                </div>
-            )}
-
-        </div>
     );
 
 
