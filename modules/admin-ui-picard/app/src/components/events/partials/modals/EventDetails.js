@@ -34,6 +34,7 @@ import {fetchMetadata, updateMetadata, updateExtendedMetadata, fetchSchedulingIn
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
 import EventDetailsSchedulingTab from "../ModalTabsAndPages/EventDetailsSchedulingTab";
+import DetailsExtendedMetadataTab from "../ModalTabsAndPages/DetailsExtendedMetadataTab";
 
 
 // Get info about the current language and its date locale
