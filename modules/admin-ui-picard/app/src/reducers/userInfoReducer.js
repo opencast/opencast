@@ -1,5 +1,7 @@
 import {
-    LOAD_OC_VERSION_IN_PROGRESS, LOAD_OC_VERSION_SUCCESS,
+    LOAD_OC_VERSION_FAILURE,
+    LOAD_OC_VERSION_IN_PROGRESS,
+    LOAD_OC_VERSION_SUCCESS,
     LOAD_USER_INFO_FAILURE,
     LOAD_USER_INFO_IN_PROGRESS,
     LOAD_USER_INFO_SUCCESS
@@ -63,7 +65,15 @@ const userInfo = (state=initialState, action) => {
             const { ocVersion } = payload;
             return {
                 ...state,
+                isLoading: false,
                 ocVersion: ocVersion
+            }
+        }
+        case LOAD_OC_VERSION_FAILURE: {
+            return {
+                ...state,
+                isLoading: false,
+                ocVersion: {}
             }
         }
         default:

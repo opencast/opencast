@@ -1,6 +1,7 @@
 import {
     loadOcVersionFailure,
-    loadOcVersionInProgress, loadOcVersionSuccess,
+    loadOcVersionInProgress,
+    loadOcVersionSuccess,
     loadUserInfoFailure,
     loadUserInfoInProgress,
     loadUserInfoSuccess
