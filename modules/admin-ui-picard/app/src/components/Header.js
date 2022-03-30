@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
+import Link from "react-router-dom/Link";
 import i18n from "../i18n/i18n";
 import languages from "../i18n/languages";
 import opencastLogo from '../img/opencast-white.svg';
@@ -8,19 +9,16 @@ import {fetchHealthStatus} from "../thunks/healthThunks";
 import {getHealthStatus} from "../selectors/healthSelectors";
 import {getCurrentLanguageInformation, hasAccess} from "../utils/utils";
 import {logger} from "../utils/logger";
-import {getUserInformation} from "../selectors/userInfoSelectors";
+import {getOrgProperties, getUserInformation} from "../selectors/userInfoSelectors";
 import axios from "axios";
 import RegistrationModal from "./shared/RegistrationModal";
+import {setOffset} from "../actions/tableActions";
+import { loadServicesIntoTable} from "../thunks/tableThunks";
+import {fetchServices} from "../thunks/serviceThunks";
+import {studioURL} from "../configs/generalConfig";
 import HotKeyCheatSheet from "./shared/HotKeyCheatSheet";
 import {GlobalHotKeys} from "react-hotkeys";
 import {availableHotkeys} from "../configs/hotkeysConfig";
-
-
-// Todo: Find suitable place to define them and get these links out of config-file or whatever
-const mediaModuleUrl = "http://localhost:8080/engage/ui/index.html";
-const studio = "https://opencast.org/";
-const documentationUrl = "https://opencast.org/";
-const restUrl = "https://opencast.org/";
 
 
 // Get code, flag and name of the current language
@@ -54,7 +52,7 @@ function logout() {
 /**
  * Component that renders the header and the navigation in the upper right corner.
  */
-const Header = ({ loadingHealthStatus, healthStatus, user }) => {
+const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetOffset, loadingServices, loadingServicesIntoTable }) => {
     const { t } = useTranslation();
     // State for opening (true) and closing (false) the dropdown menus for language, notification, help and user
     const [displayMenuLang, setMenuLang] = useState(false);
@@ -78,6 +76,17 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
 
     const hideRegistrationModal = () => {
         setRegistrationModal(false);
+    }
+
+    const redirectToServices = () => {
+        // Reset the current page to first page
+        resetOffset();
+
+        // Fetching services from server
+        loadingServices();
+
+        // Load services into table
+        loadingServicesIntoTable();
     }
 
     const showHotKeyCheatSheet = () => {
@@ -151,18 +160,22 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
 
                     {/* Media Module */}
                     {/* Show icon only if mediaModuleUrl is set*/}
-                    {!!mediaModuleUrl && (
-                        <div className="nav-dd" title={t('MEDIAMODULE')}>
-                            <a href={mediaModuleUrl}>
-                                <span className="fa fa-play-circle"/>
-                            </a>
-                        </div>
+                    {/* The seperated if clauses are intentional because on start up orgProperties are not filled yet,
+                    otherwise the app crashes */}
+                    {!!orgProperties && (
+                        !!orgProperties["org.opencastproject.admin.mediamodule.url"] && (
+                            <div className="nav-dd" title={t('MEDIAMODULE')}>
+                                <a href={orgProperties["org.opencastproject.admin.mediamodule.url"]}>
+                                    <span className="fa fa-play-circle"/>
+                                </a>
+                            </div>
+                        )
                     )}
 
                 {/* Opencast Studio */}
                 {hasAccess("ROLE_STUDIO", user) && (
                     <div className="nav-dd" title="Studio">
-                        <a href={studio}>
+                        <a href={studioURL}>
                             <span className="fa fa-video-camera"/>
                         </a>
                     </div>
@@ -176,7 +189,8 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
                             <span id="error-count" className="badge" >{healthStatus.numErr}</span>
                             {/* Click on the bell icon, a dropdown menu with all services in serviceList and their status opens */}
                             {displayMenuNotify && (
-                                <MenuNotify healthStatus={healthStatus}/>
+                                <MenuNotify healthStatus={healthStatus}
+                                            redirectToServices={redirectToServices}/>
                             )}
                         </div>
                     </div>
@@ -185,17 +199,22 @@ const Header = ({ loadingHealthStatus, healthStatus, user }) => {
 
                     {/* Help */}
                     {/* Show only if documentationUrl or restdocsUrl is set */}
-                    {(!!documentationUrl || !!restUrl) && (
-                        <div title="Help" className="nav-dd" id="help-dd" ref={containerHelp} >
-                            <div className="fa fa-question-circle" onClick={() => setMenuHelp(!displayMenuHelp)}/>
-                            {/* Click on the help icon, a dropdown menu with documentation, REST-docs and shortcuts (if available) opens */}
-                            {displayMenuHelp && (
-                                <MenuHelp hideMenuHelp={hideMenuHelp}
-                                          showRegistrationModal={showRegistrationModal}
-                                          showHotKeyCheatSheet={showHotKeyCheatSheet}
-                                          user={user}/>
-                            )}
-                        </div>
+                    {/* The seperated if clauses are intentional because on start up orgProperties are not filled yet,
+                    otherwise the app crashes */}
+                    {!!orgProperties && (
+                        (!!orgProperties["org.opencastproject.admin.help.documentation.url"] || !!orgProperties["org.opencastproject.admin.help.restdocs.url"]) && (
+                            <div title="Help" className="nav-dd" id="help-dd" ref={containerHelp} >
+                                <div className="fa fa-question-circle" onClick={() => setMenuHelp(!displayMenuHelp)}/>
+                                {/* Click on the help icon, a dropdown menu with documentation, REST-docs and shortcuts (if available) opens */}
+                                {displayMenuHelp && (
+                                    <MenuHelp hideMenuHelp={hideMenuHelp}
+                                              showRegistrationModal={showRegistrationModal}
+                                              showHotKeyCheatSheet={showHotKeyCheatSheet}
+                                              orgProperties={orgProperties}
+                                              user={user}/>
+                                )}
+                            </div>
+                        )
                     )}
 
                 {/* Username */}
@@ -242,29 +261,34 @@ const MenuLang = () => {
     )
 };
 
-const MenuNotify = ({ healthStatus }) => (
-    <ul className="dropdown-ul">
-        {/* For each service in the serviceList (ActiveMQ and Background Services) one list item */}
-        {healthStatus.map((service, key) => (
-            <li key={key}>
-                {!!service.status && (
-                    <a>
-                        <span> {service.name} </span>
-                        {service.error ? (
-                            <span className="ng-multi-value ng-multi-value-red">{service.status}</span>
-                        ) : (
-                            <span className="ng-multi-value ng-multi-value-green">{service.status}</span>
-                        )}
-                    </a>
-                )}
-            </li>
-        ))}
+const MenuNotify = ({ healthStatus, redirectToServices }) => {
 
-    </ul>
-);
+    return (
+        <ul className="dropdown-ul">
+            {/* For each service in the serviceList (ActiveMQ and Background Services) one list item */}
+            {healthStatus.map((service, key) => (
+                <li key={key}>
+                    {!!service.status && (
+                        <Link to="/systems/services" onClick={() => redirectToServices()}>
+                            <span> {service.name} </span>
+                            {service.error ? (
+                                <span className="ng-multi-value ng-multi-value-red">{service.status}</span>
+                            ) : (
+                                <span className="ng-multi-value ng-multi-value-green">{service.status}</span>
+                            )}
+                        </Link>
+                    )}
+                </li>
+            ))}
+
+        </ul>
+    )
+};
 
 
-const MenuHelp = ({ hideMenuHelp, showRegistrationModal, showHotKeyCheatSheet, user }) => {
+
+const MenuHelp = ({ hideMenuHelp, showRegistrationModal, showHotKeyCheatSheet, user, orgProperties }) => {
+
     const { t } = useTranslation();
 
     // show Adopter Registration Modal and hide drop down
@@ -283,17 +307,17 @@ const MenuHelp = ({ hideMenuHelp, showRegistrationModal, showHotKeyCheatSheet, u
         <>
             <ul className="dropdown-ul">
                 {/* Show only if documentationUrl is set */}
-                {!!documentationUrl && (
+                {!!orgProperties["org.opencastproject.admin.help.documentation.url"] && (
                     <li>
-                        <a href={documentationUrl}>
+                        <a href={orgProperties["org.opencastproject.admin.help.documentation.url"]}>
                             <span>{t('HELP.DOCUMENTATION')}</span>
                         </a>
                     </li>
                 )}
                 {/* Show only if restUrl is set */}
-                {(!!restUrl && hasAccess("ROLE_ADMIN", user)) && (
+                {(!!orgProperties["org.opencastproject.admin.help.restdocs.url"] && hasAccess("ROLE_ADMIN", user)) && (
                     <li>
-                        <a target="_self" href={restUrl}>
+                        <a target="_self" href={orgProperties["org.opencastproject.admin.help.restdocs.url"]}>
                             <span>{t('HELP.REST_DOC')}</span>
                         </a>
                     </li>
@@ -335,12 +359,16 @@ const MenuUser = () => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     healthStatus: getHealthStatus(state),
-    user: getUserInformation(state)
+    user: getUserInformation(state),
+    orgProperties: getOrgProperties(state)
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    loadingHealthStatus: () => dispatch(fetchHealthStatus())
+    loadingHealthStatus: () => dispatch(fetchHealthStatus()),
+    resetOffset: () => dispatch(setOffset(0)),
+    loadingServices: () => dispatch(fetchServices()),
+    loadingServicesIntoTable: () => dispatch(loadServicesIntoTable())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

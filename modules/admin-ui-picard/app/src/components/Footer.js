@@ -16,11 +16,11 @@ const Footer = ({ user }) => (
         <footer id="main-footer" >
             <div className="default-footer">
                 {/* Only render if a version is set */}
-                {!!version.version && (
+                {!!user.ocVersion && (
                     <div className="meta">
-                        Opencast {version.version}
+                        Opencast {user.ocVersion.version}
                         {hasAccess("ROLE_ADMIN", user) && (
-                            <span> - {version.buildNumber || 'undefined'}</span>
+                            <span> - {user.ocVersion.buildNumber || 'undefined'}</span>
                         )}
                     </div>
                 )}

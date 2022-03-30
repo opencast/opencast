@@ -4,7 +4,7 @@ import {
     LOAD_EVENTS_FAILURE,
     LOAD_EVENTS_IN_PROGRESS,
     LOAD_EVENTS_SUCCESS,
-    SHOW_ACTIONS
+    SHOW_ACTIONS_EVENTS
 } from '../actions/eventActions';
 import {eventsTableConfig} from "../configs/tableConfigs/eventsTableConfig";
 
@@ -60,7 +60,7 @@ const events = (state=initialState, action) => {
                 isLoading: false
             }
         }
-        case SHOW_ACTIONS: {
+        case SHOW_ACTIONS_EVENTS: {
             const { isShowing } = payload;
             return {
                 ...state,

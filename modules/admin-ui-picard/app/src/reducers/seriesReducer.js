@@ -6,7 +6,7 @@ import {
     LOAD_SERIES_METADATA_IN_PROGRESS,
     LOAD_SERIES_METADATA_SUCCESS,
     LOAD_SERIES_SUCCESS, LOAD_SERIES_THEMES_FAILURE, LOAD_SERIES_THEMES_IN_PROGRESS, LOAD_SERIES_THEMES_SUCCESS,
-    SHOW_ACTIONS
+    SHOW_ACTIONS_SERIES
 } from "../actions/seriesActions";
 
 /**
@@ -63,7 +63,7 @@ const series = (state=initialState, action) => {
                 isLoading: false
             }
         }
-        case SHOW_ACTIONS: {
+        case SHOW_ACTIONS_SERIES: {
             const { isShowing } = payload;
             return {
                 ...state,

@@ -13,19 +13,19 @@ import Servers from "./components/systems/Servers";
 import Services from "./components/systems/Services";
 import Groups from "./components/users/Groups";
 import Acls from "./components/users/Acls";
-import {fetchUserInfo} from "./thunks/userInfoThunks";
+import {fetchOcVersion, fetchUserInfo} from "./thunks/userInfoThunks";
 
-function App({loadingUserInfo}) {
-
+function App({ loadingUserInfo, loadingOcVersion }) {
     useEffect(() => {
        // Load information about current user on mount
        loadingUserInfo();
-    });
+       // Load information about current opencast version on mount
+       loadingOcVersion();
+    }, []);
 
   return (
           <HashRouter>
               <Switch>
-                  {/*Todo: When user is logged in then redirect to Events*/}
                   <Route exact path={"/"}>
                       <Events />
                   </Route>
@@ -68,7 +68,8 @@ function App({loadingUserInfo}) {
 }
 
 const mapDispatchToProps = dispatch => ({
-    loadingUserInfo: () => dispatch(fetchUserInfo())
+    loadingUserInfo: () => dispatch(fetchUserInfo()),
+    loadingOcVersion: () => dispatch(fetchOcVersion())
 });
 
 export default connect(null, mapDispatchToProps)(App);
