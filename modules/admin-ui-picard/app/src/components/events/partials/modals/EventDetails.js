@@ -22,6 +22,8 @@ import EventDetailsAssetCatalogDetails from "../ModalTabsAndPages/EventDetailsAs
 import EventDetailsAssetMediaDetails from "../ModalTabsAndPages/EventDetailsAssetMediaDetails";
 import EventDetailsAssetPublicationDetails from "../ModalTabsAndPages/EventDetailsAssetPublicationDetails";
 import EventDetailsAssetsAddAsset from "../ModalTabsAndPages/EventDetailsAssetsAddAsset";
+import EventDetailsSchedulingTab from "../ModalTabsAndPages/EventDetailsSchedulingTab";
+import DetailsExtendedMetadataTab from "../ModalTabsAndPages/DetailsExtendedMetadataTab";
 import DetailsMetadataTab from "../ModalTabsAndPages/DetailsMetadataTab";
 import {
     getMetadata,
@@ -33,7 +35,6 @@ import {
 import {fetchMetadata, updateMetadata, updateExtendedMetadata, fetchSchedulingInfo} from "../../../../thunks/eventDetailsThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
-import EventDetailsSchedulingTab from "../ModalTabsAndPages/EventDetailsSchedulingTab";
 
 
 // Get info about the current language and its date locale
