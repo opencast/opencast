@@ -16,6 +16,10 @@ import {setOffset} from "../actions/tableActions";
 import { loadServicesIntoTable} from "../thunks/tableThunks";
 import {fetchServices} from "../thunks/serviceThunks";
 import {studioURL} from "../configs/generalConfig";
+import HotKeyCheatSheet from "./shared/HotKeyCheatSheet";
+import {GlobalHotKeys} from "react-hotkeys";
+import {availableHotkeys} from "../configs/hotkeysConfig";
+
 
 // Get code, flag and name of the current language
 const currentLanguage = getCurrentLanguageInformation();
@@ -33,11 +37,6 @@ function changeLanguage(code) {
     i18n.changeLanguage(code);
     // Reload window for updating the flag of the language dropdown menu
     window.location.reload();
-}
-
-function showHotkeyCheatSheet() {
-    //todo: Implement method
-    console.log('Show Hot Keys');
 }
 
 function logout() {
@@ -61,6 +60,7 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetO
     const [displayMenuNotify, setMenuNotify] = useState(false);
     const [displayMenuHelp, setMenuHelp] = useState(false);
     const [displayRegistrationModal, setRegistrationModal] = useState(false);
+    const [displayHotKeyCheatSheet, setHotKeyCheatSheet] = useState(false);
 
     const loadHealthStatus = async () => {
         await loadingHealthStatus();
@@ -87,6 +87,18 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetO
 
         // Load services into table
         loadingServicesIntoTable();
+    }
+
+    const showHotKeyCheatSheet = () => {
+        setHotKeyCheatSheet(true);
+    }
+
+    const hideHotKeyCheatSheet = () => {
+        setHotKeyCheatSheet(false);
+    }
+
+    const hotKeyHandlers = {
+        HOTKEY_CHEATSHEET: showHotKeyCheatSheet
     }
 
     useEffect(() => {
@@ -124,6 +136,7 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetO
 
     return(
         <>
+            <GlobalHotKeys keyMap={availableHotkeys.general} handlers={hotKeyHandlers} />
             <header className="primary-header">
                 {/* Opencast logo in upper left corner */}
                 <div className="header-branding">
@@ -196,6 +209,7 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetO
                                 {displayMenuHelp && (
                                     <MenuHelp hideMenuHelp={hideMenuHelp}
                                               showRegistrationModal={showRegistrationModal}
+                                              showHotKeyCheatSheet={showHotKeyCheatSheet}
                                               orgProperties={orgProperties}
                                               user={user}/>
                                 )}
@@ -217,6 +231,11 @@ const Header = ({ loadingHealthStatus, healthStatus, user, orgProperties, resetO
             {/* Adopters Registration Modal */}
             {displayRegistrationModal && (
                 <RegistrationModal close={hideRegistrationModal}/>
+            )}
+
+            {/* Hotkey Cheat Sheet */}
+            {displayHotKeyCheatSheet && (
+                <HotKeyCheatSheet close={hideHotKeyCheatSheet}/>
             )}
         </>
 
@@ -267,12 +286,20 @@ const MenuNotify = ({ healthStatus, redirectToServices }) => {
 };
 
 
-const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user, orgProperties }) => {
+
+const MenuHelp = ({ hideMenuHelp, showRegistrationModal, showHotKeyCheatSheet, user, orgProperties }) => {
+
     const { t } = useTranslation();
 
     // show Adopter Registration Modal and hide drop down
     const showAdoptersRegistrationModal = () => {
         showRegistrationModal();
+        hideMenuHelp();
+    }
+
+    // show Hotkeys Cheat Sheet and hide drop down
+    const showHotKeys = () => {
+        showHotKeyCheatSheet();
         hideMenuHelp();
     }
 
@@ -296,7 +323,7 @@ const MenuHelp = ({ hideMenuHelp, showRegistrationModal, user, orgProperties }) 
                     </li>
                 )}
                 <li>
-                    <a onClick={() => showHotkeyCheatSheet}>
+                    <a onClick={() => showHotKeys()}>
                         <span>{t('HELP.HOTKEY_CHEAT_SHEET')}</span>
                     </a>
                 </li>

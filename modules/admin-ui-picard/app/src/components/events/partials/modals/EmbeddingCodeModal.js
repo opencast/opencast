@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
-import axios from "axios";
 import {getSourceURL} from "../../../../utils/embeddedCodeUtils";
 
 

@@ -1,6 +1,7 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-import {Link} from "react-router-dom";
+import {useHistory} from "react-router-dom";
+import Link from "react-router-dom/Link";
 import {connect} from "react-redux";
 import {
     loadAclsIntoTable,
@@ -28,6 +29,8 @@ import {fetchServers} from "../../thunks/serverThunks";
 import {fetchServices} from "../../thunks/serviceThunks";
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
+import {GlobalHotKeys} from "react-hotkeys";
+import {availableHotkeys} from "../../configs/hotkeysConfig";
 
 /**
  * This component renders the main navigation that opens when the burger button is clicked
@@ -38,6 +41,7 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
                      loadingUsersIntoTable, loadingGroups, loadingGroupsIntoTable, loadingAcls, loadingAclsIntoTable,
                      loadingThemes, loadingThemesIntoTable, resetOffset, user }) => {
     const { t } = useTranslation();
+    let history = useHistory();
 
     const loadEvents = () => {
         // Reset the current page to first page
@@ -152,8 +156,22 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
         loadingThemesIntoTable();
     }
 
+    const hotkeyLoadEvents = () => {
+        history.push('/events/events');
+    }
+
+    const hotkeyLoadSeries = () => {
+        history.push('/events/series');
+    }
+
+    const hotKeyHandlers = {
+        EVENT_VIEW: hotkeyLoadEvents,
+        SERIES_VIEW: hotkeyLoadSeries,
+        MAIN_MENU: toggleMenu
+    }
     return (
         <>
+            <GlobalHotKeys keyMap={availableHotkeys.general} handlers={hotKeyHandlers}/>
             <div className="menu-top" onClick={() => toggleMenu()}>
                 {isOpen && (
                     <nav id="roll-up-menu">

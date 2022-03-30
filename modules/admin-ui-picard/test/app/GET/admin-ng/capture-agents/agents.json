@@ -4,6 +4,26 @@
   "offset": 0,
   "results": [
     {
+      "Name": "F300.1",
+      "Status": "AGENTS.STATUS.IDLE",
+      "Update": "2021-05-26T15:37:02Z",
+      "inputs": [
+        {
+          "id": "video",
+          "value": "CAPTURE_AGENT.DEVICE.CAMERA"
+        },
+        {
+          "id": "desktop",
+          "value": "CAPTURE_AGENT.DEVICE.PRESENTATION"
+        },
+        {
+          "id": "audio",
+          "value": "CAPTURE_AGENT.DEVICE.MICROPHONE"
+        }
+      ],
+      "roomId": 620
+    },
+    {
       "Name": "agent1",
       "Status": "AGENTS.STATUS.IDLE",
       "Update": "2014-05-26T15:37:02Z",
@@ -40,7 +60,7 @@
           "value": "CAPTURE_AGENT.DEVICE.PRESENTATION"
         },
         {
-          "id": "video",
+          "id": "audio",
           "value": "CAPTURE_AGENT.DEVICE.MICROPHONE"
         }
 

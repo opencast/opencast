@@ -27,6 +27,15 @@ export const isFetchingComments = state => state.eventDetails.fetchingCommentsIn
 export const isSavingComment = state => state.eventDetails.savingCommentInProgress;
 export const isSavingCommentReply = state => state.eventDetails.savingCommentReplyInProgress;
 
+/* selectors for scheduling */
+export const getSchedulingProperties = state => state.eventDetails.scheduling.hasProperties;
+export const isFetchingScheduling = state => state.eventDetails.fetchingSchedulingInProgress;
+export const isSavingScheduling = state => state.eventDetails.savingSchedulingInProgress;
+export const getSchedulingSource = state => state.eventDetails.schedulingSource;
+export const getCaptureAgents = state => state.eventDetails.captureAgents;
+export const getSchedulingConflicts = state => state.eventDetails.schedulingConflicts;
+export const isCheckingConflicts = state => state.eventDetails.checkingConflicts;
+
 /* selectors for workflows */
 export const getWorkflows = state => state.eventDetails.workflows;
 export const isFetchingWorkflows = state => state.eventDetails.fetchingWorkflowsInProgress;
