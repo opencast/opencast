@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "coffeescript": "^2.6.1",
-    "sass": "^1.49.9"
+    "sass": "^1.49.10"
   },
   "optionalDependencies": {
     "fsevents": "^2.3.2"
