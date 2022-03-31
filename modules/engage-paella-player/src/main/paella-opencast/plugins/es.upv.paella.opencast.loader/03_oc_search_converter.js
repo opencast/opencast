@@ -274,6 +274,10 @@ class OpencastToPaellaConverter {
           if (videoCanvas) {
             currentStream.canvas = [videoCanvas];
           }
+        } else {
+          // Explicitly set the type, else Paella will assume this track to be 'video' type (Causing an exception
+          // if it is actually not)
+          currentStream.type = 'noType';
         }
       }
     });
@@ -379,20 +383,11 @@ class OpencastToPaellaConverter {
     return paellaStreams;
   }
 
-  getCaptions(episode) {
-    var captions = [];
-
-    var attachments = episode.mediapackage.attachments.attachment;
-    var catalogs = episode.mediapackage.metadata.catalog;
-    if (!(attachments instanceof Array)) { attachments = attachments ? [attachments] : []; }
-    if (!(catalogs instanceof Array)) { catalogs = catalogs ? [catalogs] : []; }
-
-
-    // Read the attachments
-    attachments.forEach((currentAttachment) => {
+  readCaptions(potentialNewCaptions, captions) {
+    potentialNewCaptions.forEach((potentialCaption) => {
       try {
         let captions_regex = /^captions\/([^+]+)(\+(.+))?/g;
-        let captions_match = captions_regex.exec(currentAttachment.type);
+        let captions_match = captions_regex.exec(potentialCaption.type);
 
         if (captions_match) {
           let captions_format = captions_match[1];
@@ -401,11 +396,11 @@ class OpencastToPaellaConverter {
           // TODO: read the lang from the dfxp file
           //if (captions_format == "dfxp") {}
 
-          if (!captions_lang && currentAttachment.tags && currentAttachment.tags.tag) {
-            if (!(currentAttachment.tags.tag instanceof Array)) {
-              currentAttachment.tags.tag = [currentAttachment.tags.tag];
+          if (!captions_lang && potentialCaption.tags && potentialCaption.tags.tag) {
+            if (!(potentialCaption.tags.tag instanceof Array)) {
+              potentialCaption.tags.tag = [potentialCaption.tags.tag];
             }
-            currentAttachment.tags.tag.forEach((tag)=>{
+            potentialCaption.tags.tag.forEach((tag)=>{
               if (tag.startsWith('lang:')){
                 let split = tag.split(':');
                 captions_lang = split[1];
@@ -417,16 +412,33 @@ class OpencastToPaellaConverter {
           //paella.utils.dictionary.translate("CAPTIONS_" + captions_lang);
 
           captions.push({
-            id: currentAttachment.id,
+            id: potentialCaption.id,
             lang: captions_lang,
             text: captions_label,
-            url: currentAttachment.url,
+            url: potentialCaption.url,
             format: captions_format
           });
         }
       }
       catch (err) {/**/}
     });
+  }
+
+  getCaptions(episode) {
+    var captions = [];
+
+    var attachments = episode.mediapackage.attachments.attachment;
+    var catalogs = episode.mediapackage.metadata.catalog;
+    var tracks = episode.mediapackage.media.track;
+    if (!(attachments instanceof Array)) { attachments = attachments ? [attachments] : []; }
+    if (!(catalogs instanceof Array)) { catalogs = catalogs ? [catalogs] : []; }
+    if (!(tracks instanceof Array)) { tracks = tracks ? [tracks] : []; }
+
+    // Read the attachments
+    this.readCaptions(attachments, captions);
+
+    // Read the tracks
+    this.readCaptions(tracks, captions);
 
     // Read the catalogs
     catalogs.forEach((currentCatalog) => {
