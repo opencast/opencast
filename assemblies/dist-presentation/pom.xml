@@ -9,7 +9,6 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <disableJobDispatching>true</disableJobDispatching>
   </properties>
   <artifactId>opencast-dist-presentation</artifactId>
   <packaging>karaf-assembly</packaging>

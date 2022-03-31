@@ -40,12 +40,12 @@
     </delete>
   </target>
 
-  <target if="disableJobDispatching" name="job dispatching">
-    <echo>Disabling job dispatching</echo>
+  <target if="enableJobDispatching" name="job dispatching">
+    <echo>Enabling job dispatching</echo>
     <replaceregexp
-      file="target/classes/etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg"
-      match="^#dispatch.interval=2$"
-      replace="dispatch.interval=0"
+      file="target/classes/etc/org.opencastproject.serviceregistry.impl.JobDispatcher.cfg"
+      match="^# dispatch.enabled=false$"
+      replace="dispatch.enabled=true"
       byline="true" />
   </target>
 </project>
