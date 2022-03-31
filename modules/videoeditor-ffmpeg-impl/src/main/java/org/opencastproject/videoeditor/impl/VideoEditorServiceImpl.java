@@ -21,6 +21,8 @@
 
 package org.opencastproject.videoeditor.impl;
 
+import static org.opencastproject.videoeditor.impl.VideoEditorProperties.SUBTITLE_GRACE_PERIOD;
+
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -212,24 +214,10 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       throw new ProcessFailedException("Deserialization of source track " + sourceTrackUri + " failed", e);
     }
 
-    // get output file extension
-    String outputFileExtension = properties.getProperty(VideoEditorProperties.DEFAULT_EXTENSION, ".mp4");
-    outputFileExtension = properties.getProperty(VideoEditorProperties.OUTPUT_FILE_EXTENSION, outputFileExtension);
-
-    if (!outputFileExtension.startsWith(".")) {
-      outputFileExtension = '.' + outputFileExtension;
-    }
-
     // create working directory
     File tempDirectory = new File(new File(workspace.rootDirectory()), "editor");
     tempDirectory = new File(tempDirectory, Long.toString(job.getId()));
-    String filename = String.format("%s-%s%s", sourceTrackFlavor,
-        FilenameUtils.removeExtension(sourceFile.getName()), outputFileExtension);
-    File outputPath = new File(tempDirectory, filename);
 
-    if (!outputPath.getParentFile().exists()) {
-      outputPath.getParentFile().mkdirs();
-    }
     URI newTrackURI;
     inputfile.add(sourceFile.getAbsolutePath()); // default source - add to source table as 0
     int srcIndex = inputfile.indexOf(sourceFile.getAbsolutePath()); // index = 0
@@ -274,7 +262,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
 
                   // Sort out ref elements
                   if (media.getMediaType() == SmilMediaElement.MediaType.REF) {
-                    refElements.add(new VideoClip(index, begin / 1000.0, end / 1000.0));
+                    refElements.add(new VideoClip(index, begin, end));
                   } else {
                     videoclips.add(new VideoClip(index, begin / 1000.0, end / 1000.0));
                   }
@@ -292,9 +280,35 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         }
       }
 
+      // Don't mix video/audio and subtitles
       if (videoclips.size() > 0 && refElements.size() > 0) {
-        throw new ProcessFailedException("Can not process media elemnts together with ref elements. "
+        throw new ProcessFailedException("Can not process media elements together with ref elements. "
                 + "There likely is an error in the SMIL file");
+      }
+
+      // get output file extension
+      String outputFileExtension = null;
+      if (videoclips.size() > 0) {
+        outputFileExtension = properties.getProperty(VideoEditorProperties.DEFAULT_EXTENSION, ".mp4");
+      }
+      if (refElements.size() > 0) {
+        String extension = FilenameUtils.getExtension(sourceTrackUri);
+        if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
+          outputFileExtension = properties.getProperty(VideoEditorProperties.WEBVTT_EXTENSION, ".vtt");
+        }
+      }
+      outputFileExtension = properties.getProperty(VideoEditorProperties.OUTPUT_FILE_EXTENSION, outputFileExtension);
+
+      if (!outputFileExtension.startsWith(".")) {
+        outputFileExtension = '.' + outputFileExtension;
+      }
+
+      String filename = String.format("%s-%s%s", sourceTrackFlavor,
+              FilenameUtils.removeExtension(sourceFile.getName()), outputFileExtension);
+      File outputPath = new File(tempDirectory, filename);
+
+      if (!outputPath.getParentFile().exists()) {
+        outputPath.getParentFile().mkdirs();
       }
 
       // If we are cutting video/audio, use ffmpeg
@@ -317,12 +331,11 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
 
       // If we are cutting ref elements, check if they are subtitle files
       // Or give up
-      // TODO: It might be better if subtitle tracks were assigned the mediatype "textrack" in the first place
-      // TODO: Encapsulate in function
+      // TODO: It might be better if subtitle tracks were assigned the mediatype "texttrack" in the first place
       if (refElements.size() > 0) {
         List<VideoClip> cleanclips = sortSegments(refElements);    // remove very short cuts that will look bad
         String extension = FilenameUtils.getExtension(sourceTrackUri);
-        if ("vtt".equals(extension)) {
+        if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
           // Parse
           WebVTTParser parser = new WebVTTParser();
           FileInputStream fin = new FileInputStream(sourceFile);
@@ -332,7 +345,10 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
           Subtitle cutSubtitle = new WebVTTSubtitle();
           for (VideoClip time: cleanclips) {
             for (SubtitleCue cue : subtitle.getCues()) {
-              if (time.getStart() < cue.getStartTime() && time.getEnd() > cue.getEndTime()) {
+              if ((time.getStart() - SUBTITLE_GRACE_PERIOD) <= cue.getStartTime()
+                      && (time.getEnd() + SUBTITLE_GRACE_PERIOD) >= cue.getEndTime()) {
+                cue.setStartTime((long) (cue.getStartTime() - time.getStart()));
+                cue.setEndTime((long) (cue.getEndTime() - time.getStart()));
                 cutSubtitle.addCue(cue);
               }
             }
@@ -340,10 +356,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
           subtitle = cutSubtitle;
 
           // Write
-          // TODO: Figure out a good flavor to use and way to set it
-          filename = String.format("%s-%s%s", sourceTrackFlavor,
-                  FilenameUtils.removeExtension(sourceFile.getName()), "vtt");
-          outputPath = new File(tempDirectory, filename);
           WebVTTWriter writer = new WebVTTWriter();
           writer.write(subtitle, new FileOutputStream(outputPath));
         } else {
@@ -373,7 +385,16 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       Track editedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
       logger.info("Finished editing track {}", editedTrack);
       editedTrack.setIdentifier(newTrackId);
-      editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(), SINK_FLAVOR_SUBTYPE));
+      if (videoclips.size() > 0) {
+        editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(), SINK_FLAVOR_SUBTYPE));
+      }
+      if (refElements.size() > 0) {
+        String extension = FilenameUtils.getExtension(sourceTrackUri);
+        if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
+          editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(),
+                  sourceTrackFlavor.getSubtype() + "+" + SINK_FLAVOR_SUBTYPE));
+        }
+      }
 
       return editedTrack;
 
