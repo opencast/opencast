@@ -95,6 +95,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -179,6 +181,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the retrieval of service statistics: Do not consider jobs older than max_job_age (in days) */
   protected static final String OPT_SERVICE_STATISTICS_MAX_JOB_AGE = "org.opencastproject.statistics.services.max_job_age";
 
+  /** Configuration key for the encoding preferred worker nodes */
+  protected static final String OPT_ENCODINGWORKERS = "org.opencastproject.encoding.workers";
+
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 
@@ -225,6 +230,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** The base URL for job URLs */
   protected String jobHost;
+
+  /** Comma-seperate list with URLs of encoding specialised workers*/
+  protected static List<String> encodingWorkers = new ArrayList<String>();
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
@@ -761,6 +769,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                 DEFAULT_JOB_STATISTICS);
         collectJobstats = DEFAULT_JOB_STATISTICS;
       }
+    }
+
+    // get the encoding worker nodes defined in the configuration file and parse the comma-separated list
+    String encodingWorkersString = (String) properties.get(OPT_ENCODINGWORKERS);
+    if (StringUtils.isNotBlank(encodingWorkersString)) {
+      encodingWorkers = Arrays.asList(encodingWorkersString.split("\\s*,\\s*"));
     }
 
     String maxJobAgeString = StringUtils.trimToNull((String) properties.get(OPT_SERVICE_STATISTICS_MAX_JOB_AGE));
@@ -2746,8 +2760,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       filteredList.add(service);
     }
 
-    // Sort the list by capacity
-    Collections.sort(filteredList, new LoadComparator(systemLoad));
+    // Sort the list by capacity and distinguish between composer jobs and other jobs
+    if ("org.opencastproject.composer".equals(jobType)) {
+        Collections.sort(filteredList, new LoadComparatorEncoding(systemLoad));
+    }
+    else {
+      Collections.sort(filteredList, new LoadComparator(systemLoad));
+    }
 
     return filteredList;
   }
@@ -2890,7 +2909,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Comparator that will sort service registrations depending on their capacity, wich is defined by the number of jobs
-   * the service's host is already running. The lower that number, the bigger the capacity.
+   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger the capacity.
    */
   private static final class LoadComparator implements Comparator<ServiceRegistration> {
 
@@ -2923,6 +2942,72 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     }
 
+  }
+
+  /**
+   * Comparator that will sort service registrations depending on their capacity, which is defined by the number of jobs
+   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger the capacity.
+   * This Comparator will preferre encoding workers, if none are defined in the configuration file it will act like the LoadComparator.
+   */
+  private static final class LoadComparatorEncoding implements Comparator<ServiceRegistration> {
+
+    private SystemLoad loadByHost = null;
+
+    /**
+     * Creates a new comparator which is using the given map of host names and loads.
+     *
+     * @param loadByHost
+     */
+    LoadComparatorEncoding(SystemLoad loadByHost) {
+      this.loadByHost = loadByHost;
+    }
+
+    @Override
+    public int compare(ServiceRegistration serviceA, ServiceRegistration serviceB) {
+      String hostA = serviceA.getHost();
+      String hostB = serviceB.getHost();
+      NodeLoad nodeA = loadByHost.get(hostA);
+      NodeLoad nodeB = loadByHost.get(hostB);
+
+
+
+      if (encodingWorkers != null) {
+
+        if (isEncodingWorker(hostA, encodingWorkers) && !isEncodingWorker(hostB, encodingWorkers)) {
+          if (nodeA.getLoadFactor() <= 0.4) {
+            return -1;
+          }
+          return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor() * 4);
+        }
+        if (isEncodingWorker(hostB, encodingWorkers) && !isEncodingWorker(hostA, encodingWorkers)) {
+          if (nodeB.getLoadFactor() <= 0.4) {
+            return 1;
+          }
+          return Float.compare(nodeA.getLoadFactor() * 4, nodeB.getLoadFactor());
+        }
+
+      }
+
+      //If the load factors are about the same, sort based on maximum load
+      if (Math.abs(nodeA.getLoadFactor() - nodeB.getLoadFactor()) <= 0.01) {
+        //NOTE: The sort order below is *reversed* from what you'd expect
+        //When we're comparing the load factors we want the node with the lowest factor to be first
+        //When we're comparing the maximum load value, we want the node with the highest max to be first
+        return Float.compare(nodeB.getMaxLoad(), nodeA.getMaxLoad());
+      }
+      return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
+
+    }
+
+    private boolean isEncodingWorker(String host, List<String> encodingWorkersList) {
+      Iterator<String> workerIterator = encodingWorkersList.iterator();
+      while (workerIterator.hasNext()) {
+        if (workerIterator.next().equals(host)) {
+          return true;
+        }
+      }
+      return false;
+    }
   }
 
   /**
