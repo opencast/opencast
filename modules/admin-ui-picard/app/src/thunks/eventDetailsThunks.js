@@ -73,6 +73,9 @@ import {
     saveEventSchedulingFailure,
     saveEventSchedulingSuccess,
     saveEventSchedulingInProgress,
+    loadEventStatisticsInProgress,
+    loadEventStatisticsSuccess,
+    loadEventStatisticsFailure,
 } from '../actions/eventDetailsActions';
 import {addNotification} from "./notificationThunks";
 import {
@@ -1049,6 +1052,23 @@ export const fetchEventPublications = eventId => async dispatch => {
 
     } catch (e) {
         dispatch(loadEventPublicationsFailure());
+        logger.error(e);
+    }
+}
+
+
+// thunks for statistics
+
+export const fetchStatistics = eventId => async dispatch => {
+    try {
+        dispatch(loadEventStatisticsInProgress());
+
+        const statistics = ['', ''];
+
+        dispatch(loadEventStatisticsSuccess(statistics, true));
+
+    } catch (e) {
+        dispatch(loadEventStatisticsFailure());
         logger.error(e);
     }
 }

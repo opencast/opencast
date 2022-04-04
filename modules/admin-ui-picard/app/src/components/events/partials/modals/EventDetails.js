@@ -30,11 +30,18 @@ import {
     getExtendedMetadata,
     isFetchingMetadata,
     getSchedulingProperties,
-    isFetchingScheduling
+    isFetchingScheduling, hasStatistics, isFetchingStatistics
 } from "../../../../selectors/eventDetailsSelectors";
-import {fetchMetadata, updateMetadata, updateExtendedMetadata, fetchSchedulingInfo} from "../../../../thunks/eventDetailsThunks";
+import {
+    fetchMetadata,
+    updateMetadata,
+    updateExtendedMetadata,
+    fetchSchedulingInfo,
+    fetchStatistics
+} from "../../../../thunks/eventDetailsThunks";
 import {removeNotificationWizardForm} from "../../../../actions/notificationActions";
 import {getUserInformation} from "../../../../selectors/userInfoSelectors";
+import EventDetailsStatisticsTab from "../ModalTabsAndPages/EventDetailsStatisticsTab";
 
 
 // Get info about the current language and its date locale
@@ -44,14 +51,15 @@ const currentLanguage = getCurrentLanguageInformation();
  * This component manages the pages of the event details
  */
 const EventDetails = ({ tabIndex, eventId, close,
-                          metadata, extendedMetadata, isLoadingMetadata, hasSchedulingProperties, isLoadingScheduling,
-                          loadMetadata, updateMetadata, updateExtendedMetadata, loadScheduling, removeNotificationWizardForm, user }) => {
+                          metadata, extendedMetadata, isLoadingMetadata, hasSchedulingProperties, isLoadingScheduling, hasStatistics, isLoadingStatistics,
+                          loadMetadata, updateMetadata, updateExtendedMetadata, loadScheduling, loadStatistics, removeNotificationWizardForm, user }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
         removeNotificationWizardForm();
         loadMetadata(eventId).then(r => {});
         loadScheduling(eventId).then(r => {});
+        loadStatistics(eventId).then(r => {});
     }, []);
 
     const [page, setPage] = useState(tabIndex);
@@ -109,10 +117,10 @@ const EventDetails = ({ tabIndex, eventId, close,
         },
         {
             tabNameTranslation: 'EVENTS.EVENTS.DETAILS.TABS.STATISTICS',
-            bodyHeaderTranslation: 'EVENTS.EVENTS.DETAILS.METADATA.CAPTION',
+            bodyHeaderTranslation: 'EVENTS.EVENTS.DETAILS.STATISTICS.CAPTION',
             accessRole: 'ROLE_UI_EVENTS_DETAILS_STATISTICS_VIEW',
             name: 'statistics',
-            hidden: true
+            hidden: !hasStatistics
         }
     ];
 
@@ -321,9 +329,11 @@ const EventDetails = ({ tabIndex, eventId, close,
                             header={tabs[page].bodyHeaderTranslation}
                             t={t}/>
                     )}
-                    {page === 8 && (
-                        <MockDataPage header={tabs[page].bodyHeaderTranslation}
-                                         t={t}/>
+                    {page === 8 && (!isLoadingStatistics) && (
+                        <EventDetailsStatisticsTab
+                            eventId={eventId}
+                            header={tabs[page].bodyHeaderTranslation}
+                            t={t}/>
                     )}
                 </div>
         </>
@@ -364,6 +374,8 @@ const mapStateToProps = state => ({
     isLoadingMetadata: isFetchingMetadata(state),
     hasSchedulingProperties: getSchedulingProperties(state),
     isLoadingScheduling: isFetchingScheduling(state),
+    hasStatistics: hasStatistics(state),
+    isLoadingStatistics: isFetchingStatistics(state),
     user: getUserInformation(state)
 });
 
@@ -373,6 +385,7 @@ const mapDispatchToProps = dispatch => ({
     updateMetadata: (id, values) => dispatch(updateMetadata(id, values)),
     loadScheduling: (id) => dispatch(fetchSchedulingInfo(id)),
     updateExtendedMetadata: (id, values, catalog) => dispatch(updateExtendedMetadata(id, values, catalog)),
+    loadStatistics: (id) => dispatch(fetchStatistics(id)),
     removeNotificationWizardForm: () => dispatch(removeNotificationWizardForm())
 });
 
