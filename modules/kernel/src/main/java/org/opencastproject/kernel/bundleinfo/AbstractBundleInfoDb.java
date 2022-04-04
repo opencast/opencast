@@ -21,22 +21,22 @@
 
 package org.opencastproject.kernel.bundleinfo;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.persistence.Queries.persist;
+import static org.opencastproject.db.Queries.namedQuery;
 
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.db.DBSession;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 
 public abstract class AbstractBundleInfoDb implements BundleInfoDb {
-  protected abstract PersistenceEnv getPersistenceEnv();
+  protected abstract DBSession getDBSession();
 
   @Override
   public void store(final BundleInfo info) {
-    tx(persist(BundleInfoJpa.create(info)));
+    tx(namedQuery.persist(BundleInfoJpa.create(info)));
   }
 
   @Override
@@ -56,22 +56,23 @@ public abstract class AbstractBundleInfoDb implements BundleInfoDb {
 
   @Override
   public List<BundleInfo> getBundles() {
-    return mlist(tx(BundleInfoJpa.findAll)).map(BundleInfoJpa.toBundleInfo).value();
+    return tx(BundleInfoJpa.findAll).stream()
+        .map(BundleInfoJpa::toBundleInfo)
+        .collect(Collectors.toList());
   }
 
   @Override
   public List<BundleInfo> getBundles(String... prefixes) throws BundleInfoDbException {
-    return mlist(tx(BundleInfoJpa.findAll(prefixes))).map(BundleInfoJpa.toBundleInfo).value();
+    return tx(BundleInfoJpa.findAll(prefixes)).stream()
+        .map(BundleInfoJpa::toBundleInfo)
+        .collect(Collectors.toList());
   }
 
-  private <A> A tx(Function<EntityManager, A> f) {
-    return getPersistenceEnv().<A> tx().rethrow(exTransformer).apply(f);
-  }
-
-  private static final Function<Exception, BundleInfoDbException> exTransformer = new Function<Exception, BundleInfoDbException>() {
-    @Override
-    public BundleInfoDbException apply(Exception e) {
-      return new BundleInfoDbException(e);
+  private <A> A tx(Function<EntityManager, A> fn) {
+    try {
+      return getDBSession().execTx(fn);
+    } catch (Exception e) {
+      throw new BundleInfoDbException(e);
     }
-  };
+  }
 }

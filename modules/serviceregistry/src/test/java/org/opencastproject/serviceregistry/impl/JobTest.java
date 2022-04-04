@@ -23,12 +23,11 @@ package org.opencastproject.serviceregistry.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.db.DBTestEnv.newDBSession;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.util.data.Arrays.mkString;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.functions.Booleans.eq;
-import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
+import org.opencastproject.db.DBSession;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.FailureReason;
@@ -51,8 +50,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.persistence.PersistenceEnv;
 
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
@@ -65,6 +62,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -86,11 +84,12 @@ public class JobTest {
   private ServiceRegistrationJpaImpl regType2Localhost = null;
   @SuppressWarnings("unused")
   private ServiceRegistrationJpaImpl regType2Remotehost = null;
-  private PersistenceEnv penv;
+  private DBSession db;
 
   @Before
   public void setUp() throws Exception {
-    final EntityManagerFactory emf = newTestEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT);
+    final EntityManagerFactory emf = newEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT);
+    db = newDBSession(emf);
 
     serviceRegistry = new ServiceRegistryJpaImpl();
     serviceRegistry.setEntityManagerFactory(emf);
@@ -120,8 +119,6 @@ public class JobTest {
     regType1Remotehost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_1, REMOTEHOST, PATH);
     regType2Localhost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_2, LOCALHOST, PATH);
     regType2Remotehost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_2, REMOTEHOST, PATH);
-
-    penv = persistenceEnvironment(emf);
   }
 
   @After
@@ -401,34 +398,28 @@ public class JobTest {
     localRunning1.setStatus(Status.RUNNING);
     localRunning1 = serviceRegistry.updateJob(localRunning1);
     //
-    final Monadics.ListMonadic<String> jpql = resultToString(new Function.X<EntityManager, List<Object[]>>() {
+    final List<String> jpql = resultToString(new Function.X<EntityManager, List<Object[]>>() {
       @Override
       public List<Object[]> xapply(EntityManager em) throws Exception {
         return serviceRegistry.getCountPerHostService(em);
       }
     });
-    assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,2,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,2,2"))); // <-- 2 jobs, one of them is the
+    assertTrue(jpql.contains("http://remotehost:8080,testing1,2,1"));
+    assertTrue(jpql.contains("http://localhost:8080,testing2,2,2")); // <-- 2 jobs, one of them is the
     // dispatchable job
-    assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,3,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,3,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing1,3,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing1,2,2")));
-    assertEquals(6, jpql.value().size());
+    assertTrue(jpql.contains("http://remotehost:8080,testing1,3,1"));
+    assertTrue(jpql.contains("http://localhost:8080,testing2,3,1"));
+    assertTrue(jpql.contains("http://localhost:8080,testing1,3,1"));
+    assertTrue(jpql.contains("http://localhost:8080,testing1,2,2"));
+    assertEquals(6, jpql.size());
   }
 
-  private Monadics.ListMonadic<String> resultToString(final Function<EntityManager, List<Object[]>> q) {
-    return penv.tx(new Function.X<EntityManager, Monadics.ListMonadic<String>>() {
-      @Override
-      protected Monadics.ListMonadic<String> xapply(EntityManager em) throws Exception {
-        // (host, service_type, status, count)
-        return mlist(q.apply(em)).map(new Function<Object[], String>() {
-          @Override
-          public String apply(Object[] a) {
-            return mkString(a, ",");
-          }
-        });
-      }
+  private List<String> resultToString(final Function<EntityManager, List<Object[]>> q) {
+    return db.execTx(em -> {
+      return q.apply(em).stream()
+          // (host, service_type, status, count)
+          .map(a -> mkString(a, ","))
+          .collect(Collectors.toList());
     });
   }
 

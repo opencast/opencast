@@ -21,8 +21,8 @@
 
 package org.opencastproject.kernel.security.persistence;
 
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.kernel.security.persistence.OrganizationDatabaseImpl.PERSISTENCE_UNIT;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -65,7 +65,7 @@ public class OrganizationPersistenceTest {
     EasyMock.replay(securityService);
 
     organizationDatabase = new OrganizationDatabaseImpl();
-    organizationDatabase.setEntityManagerFactory(newTestEntityManagerFactory(PERSISTENCE_UNIT));
+    organizationDatabase.setEntityManagerFactory(newEntityManagerFactory(PERSISTENCE_UNIT));
     organizationDatabase.setSecurityService(securityService);
     organizationDatabase.activate(null);
   }

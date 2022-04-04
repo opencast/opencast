@@ -23,6 +23,7 @@ package org.opencastproject.serviceregistry.impl;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -40,7 +41,6 @@ import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.persistence.PersistenceUtil;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -71,8 +71,7 @@ public class ServiceRegistrationTest {
   @Before
   public void setUp() throws Exception {
     serviceRegistry = new ServiceRegistryJpaImpl();
-    serviceRegistry.setEntityManagerFactory(PersistenceUtil
-            .newTestEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT));
+    serviceRegistry.setEntityManagerFactory(newEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT));
     serviceRegistry.activate(null);
 
     Organization organization = new DefaultOrganization();

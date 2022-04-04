@@ -27,7 +27,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -80,7 +80,7 @@ public class SeriesServicePersistenceTest {
     EasyMock.replay(securityService);
 
     seriesDatabase = new SeriesServiceDatabaseImpl();
-    seriesDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SeriesServiceDatabaseImpl.PERSISTENCE_UNIT));
+    seriesDatabase.setEntityManagerFactory(newEntityManagerFactory(SeriesServiceDatabaseImpl.PERSISTENCE_UNIT));
     DublinCoreCatalogService dcService = new DublinCoreCatalogService();
     seriesDatabase.setDublinCoreService(dcService);
     seriesDatabase.setSecurityService(securityService);

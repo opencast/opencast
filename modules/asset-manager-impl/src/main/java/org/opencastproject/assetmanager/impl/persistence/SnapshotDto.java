@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -214,55 +215,53 @@ public class SnapshotDto {
   /**
    * Check if any snapshot with the given media package exists.
    *
-   * @param em
-   *          An entity manager to sue
    * @param mediaPackageId
    *          The media package identifier to check for
    * @return If a snapshot exists for the given media package
    */
-  public static boolean exists(EntityManager em, final String mediaPackageId) {
-    return exists(em, mediaPackageId, null);
+  public static Function<EntityManager, Boolean> existsQuery(final String mediaPackageId) {
+    return existsQuery(mediaPackageId, null);
   }
 
   /**
    * Check if any snapshot with the given media package exists.
    *
-   * @param em
-   *          An entity manager to use
    * @param mediaPackageId
    *          The media package identifier to check for
    * @param organization
    *          An organization to limit the check for
    * @return If a snapshot exists for the given media package
    */
-  public static boolean exists(EntityManager em, final String mediaPackageId, final String organization) {
-    TypedQuery<Long> query;
-    if (organization == null) {
-      query = em.createNamedQuery("Snapshot.countByMediaPackage", Long.class)
-              .setParameter("mediaPackageId", mediaPackageId);
-    } else {
-      query = em.createNamedQuery("Snapshot.countByMediaPackageAndOrg", Long.class)
-              .setParameter("mediaPackageId", mediaPackageId)
-              .setParameter("organizationId", organization);
-    }
-    logger.debug("Executing query {}", query);
-    return query.getSingleResult() > 0;
+  public static Function<EntityManager, Boolean> existsQuery(final String mediaPackageId, final String organization) {
+    return em -> {
+      TypedQuery<Long> query;
+      if (organization == null) {
+        query = em.createNamedQuery("Snapshot.countByMediaPackage", Long.class)
+            .setParameter("mediaPackageId", mediaPackageId);
+      } else {
+        query = em.createNamedQuery("Snapshot.countByMediaPackageAndOrg", Long.class)
+            .setParameter("mediaPackageId", mediaPackageId)
+            .setParameter("organizationId", organization);
+      }
+      logger.debug("Executing query {}", query);
+      return query.getSingleResult() > 0;
+    };
   }
 
   /**
    * Count events with snapshots in the asset manager
    *
-   * @param em
-   *          An entity manager to use
    * @param organization
    *          An organization to count in
    * @return Number of events
    */
-  public static long countEvents(EntityManager em, final String organization) {
-    TypedQuery<Long> query;
-    query = em.createNamedQuery("Snapshot.countEvents", Long.class)
-        .setParameter("organizationId", organization);
-    logger.debug("Executing query {}", query);
-    return query.getSingleResult();
+  public static Function<EntityManager, Long> countEventsQuery(final String organization) {
+    return em -> {
+      TypedQuery<Long> query;
+      query = em.createNamedQuery("Snapshot.countEvents", Long.class)
+          .setParameter("organizationId", organization);
+      logger.debug("Executing query {}", query);
+      return query.getSingleResult();
+    };
   }
 }

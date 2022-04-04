@@ -23,6 +23,7 @@ package org.opencastproject.serviceregistry.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -46,7 +47,6 @@ import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.JobProduc
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
-import org.opencastproject.util.persistence.PersistenceUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -188,7 +188,7 @@ public class ServiceRegistryJpaImplTest {
   }
 
   public static void setUpEntityManagerFactory() {
-    emf = PersistenceUtil.newTestEntityManagerFactory("org.opencastproject.common");
+    emf = newEntityManagerFactory("org.opencastproject.common");
   }
 
   public static void setUpServiceRegistryJpaImpl()

@@ -22,7 +22,7 @@
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
@@ -38,6 +38,7 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.impl.AclDb;
 import org.opencastproject.authorization.xacml.manager.impl.AclServiceImpl;
 import org.opencastproject.authorization.xacml.manager.impl.persistence.JpaAclDb;
+import org.opencastproject.db.DBSessionFactoryImpl;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.impl.SearchResultImpl;
@@ -86,7 +87,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   public static final AssetManager assetManager;
   public static final Workspace workspace;
   public static final ElasticsearchIndex index;
-  public static final EntityManagerFactory authorizationEMF = newTestEntityManagerFactory(
+  public static final EntityManagerFactory authorizationEMF = newEntityManagerFactory(
           "org.opencastproject.authorization.xacml.manager");
 
   static {
@@ -155,6 +156,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   private static AclDb newAclPersistence() {
     JpaAclDb db = new JpaAclDb();
     db.setEntityManagerFactory(authorizationEMF);
+    db.setDBSessionFactory(new DBSessionFactoryImpl());
+    db.activate();
     return db;
   }
 

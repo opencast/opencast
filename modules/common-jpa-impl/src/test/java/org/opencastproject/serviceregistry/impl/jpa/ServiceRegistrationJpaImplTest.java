@@ -21,20 +21,20 @@
 package org.opencastproject.serviceregistry.impl.jpa;
 
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.db.DBTestEnv.newDBSession;
+import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.job.api.Job.Status.DISPATCHING;
-import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.db.DBSession;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.job.jpa.JpaJob;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
-import org.opencastproject.util.persistence.PersistenceEnv;
-import org.opencastproject.util.persistence.PersistenceEnvs;
-import org.opencastproject.util.persistence.Queries;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,14 +46,14 @@ import java.util.List;
 
 public class ServiceRegistrationJpaImplTest {
 
-  private PersistenceEnv env;
+  private DBSession db;
 
   private JpaOrganization org;
   private JpaUser user;
 
   @Before
   public void setUp() throws Exception {
-    env = PersistenceEnvs.testPersistenceEnv("org.opencastproject.common");
+    db = newDBSession("org.opencastproject.common");
     setUpOrganizationAndUsers();
   }
 
@@ -62,13 +62,13 @@ public class ServiceRegistrationJpaImplTest {
             "TEST_ORG_ANON", new HashMap<String, String>());
     user = new JpaUser("producer1", "pw-producer1", org, "test", true, new HashSet<JpaRole>());
 
-    org = env.tx(Queries.persistOrUpdate(org));
-    user = env.tx(Queries.persistOrUpdate(user));
+    org = db.execTx(namedQuery.persistOrUpdate(org));
+    user = db.execTx(namedQuery.persistOrUpdate(user));
   }
 
   @After
   public void cleanUp() {
-    env.close();
+    db.close();
   }
 
   private JpaJob createJob(Date dateCreated, ServiceRegistrationJpaImpl serviceRegistry) {
@@ -88,16 +88,21 @@ public class ServiceRegistrationJpaImplTest {
 
     Date now = new Date();
 
-    host = env.tx(Queries.persistOrUpdate(host));
-    serviceReg = env.tx(Queries.persistOrUpdate(serviceReg));
+    host = db.execTx(namedQuery.persistOrUpdate(host));
+    serviceReg = db.execTx(namedQuery.persistOrUpdate(serviceReg));
 
-    JpaJob job = env.tx(Queries.persistOrUpdate(createJob(now, serviceReg)));
-    JpaJob jobYesterday = env.tx(Queries.persistOrUpdate(createJob(DateUtils.addDays(now, -1), serviceReg)));
+    JpaJob job = db.execTx(namedQuery.persistOrUpdate(createJob(now, serviceReg)));
+    JpaJob jobYesterday = db.execTx(namedQuery.persistOrUpdate(createJob(DateUtils.addDays(now, -1), serviceReg)));
 
     /* find the job created at 'now' should reveal exactly one job */
-    List<Object> statistic = env.tx(
-        Queries.named.findAll("ServiceRegistration.statistics", Object.class, tuple("minDateCreated", now),
-            tuple("maxDateCreated", now)));
+    List<Object> statistic = db.execTx(
+        namedQuery.findAll(
+            "ServiceRegistration.statistics",
+            Object.class,
+            Pair.of("minDateCreated", now),
+            Pair.of("maxDateCreated", now)
+        )
+    );
 
     Object[] stats = (Object[]) statistic.get(0);
     assertEquals(1, statistic.size());
@@ -109,12 +114,16 @@ public class ServiceRegistrationJpaImplTest {
     assertEquals(1000L, ((Number) stats[4]).longValue());
 
     /* There are no jobs in the specific time interval */
-    statistic = env.tx(
-      Queries.named.findAll("ServiceRegistration.statistics", Object.class,
-          tuple("minDateCreated", DateUtils.addDays(now, -3)), tuple("maxDateCreated", DateUtils.addDays(now, -2))));
+    statistic = db.execTx(
+        namedQuery.findAll(
+            "ServiceRegistration.statistics",
+            Object.class,
+            Pair.of("minDateCreated", DateUtils.addDays(now, -3)),
+            Pair.of("maxDateCreated", DateUtils.addDays(now, -2))
+        )
+    );
 
     assertEquals(0, statistic.size());
-
   }
 
   @Test
@@ -125,5 +134,4 @@ public class ServiceRegistrationJpaImplTest {
     String jobString = "Job {id:3, operation:do, status:DISPATCHING}";
     assertEquals(jpaJob.toString(), jobString);
   }
-
 }

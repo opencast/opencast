@@ -21,7 +21,7 @@
 
 package org.opencastproject.annotation.impl;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.annotation.api.Annotation;
 import org.opencastproject.annotation.api.AnnotationList;
@@ -59,7 +59,7 @@ public class AnnotationServiceJpaImplTest {
 
     // Set up the annotation service
     annotationService = new AnnotationServiceJpaImpl();
-    annotationService.setEntityManagerFactory(newTestEntityManagerFactory(AnnotationServiceJpaImpl.PERSISTENCE_UNIT));
+    annotationService.setEntityManagerFactory(newEntityManagerFactory(AnnotationServiceJpaImpl.PERSISTENCE_UNIT));
     annotationService.setSecurityService(securityService);
   }
 

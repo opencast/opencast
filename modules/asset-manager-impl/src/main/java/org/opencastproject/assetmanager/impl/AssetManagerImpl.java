@@ -64,6 +64,7 @@ import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
@@ -184,6 +185,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private HttpAssetProvider httpAssetProvider;
   private String systemUserName;
   private Database db;
+  private DBSessionFactory dbSessionFactory;
+  private EntityManagerFactory emf;
   private AclServiceFactory aclServiceFactory;
   private ElasticsearchIndex index;
   private Map<String, List<EventCatalogUIAdapter>> extendedEventCatalogUIAdapters = new HashMap<>();
@@ -207,6 +210,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Activate
   public synchronized void activate(ComponentContext cc) {
     logger.info("Activating AssetManager.");
+    db = new Database(dbSessionFactory.createSession(emf));
     systemUserName = SecurityUtil.getSystemUserName(cc);
 
     includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
@@ -220,7 +224,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Reference(target = "(osgi.unit.name=org.opencastproject.assetmanager.impl)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
-    this.db = new Database(emf);
+    this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   @Reference

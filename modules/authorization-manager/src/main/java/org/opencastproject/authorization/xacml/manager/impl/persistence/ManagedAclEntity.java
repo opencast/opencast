@@ -21,20 +21,18 @@
 
 package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
+import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.security.api.AccessControlParser.parseAclSilent;
 import static org.opencastproject.security.api.AccessControlParser.toJsonSilent;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.persistence.PersistenceUtil.findAll;
-import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
-import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
 
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistence.PersistenceUtil;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -62,7 +60,7 @@ import javax.persistence.UniqueConstraint;
         @NamedQuery(name = "ManagedAcl.deleteByIdAndOrg",
                     query = "DELETE FROM ManagedAcl e WHERE e.id = :id AND e.organizationId = :organization") })
 /** JPA link of {@link ManagedAcl}. */
-public final class ManagedAclEntity implements ManagedAcl {
+public class ManagedAclEntity implements ManagedAcl {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "pk")
@@ -114,34 +112,36 @@ public final class ManagedAclEntity implements ManagedAcl {
   }
 
   /** Find a managed ACL by id. */
-  public static Function<EntityManager, Option<ManagedAclEntity>> findByIdAndOrg(final String orgId, final Long id) {
-    return new Function<EntityManager, Option<ManagedAclEntity>>() {
-      @Override public Option<ManagedAclEntity> apply(EntityManager em) {
-        return runSingleResultQuery(em, "ManagedAcl.findByIdAndOrg", tuple("id", id), tuple("organization", orgId));
-      }
-    };
+  public static Function<EntityManager, Optional<ManagedAclEntity>> findByIdAndOrgQuery(final String orgId,
+      final Long id) {
+    return namedQuery.findOpt(
+        "ManagedAcl.findByIdAndOrg",
+        ManagedAclEntity.class,
+        Pair.of("id", id),
+        Pair.of("organization", orgId)
+    );
   }
 
   /** Find a managed ACL by id. */
-  public static Function<EntityManager, Option<ManagedAclEntity>> findById(final Long id) {
-    return PersistenceUtil.findById(ManagedAclEntity.class, id);
+  public static Function<EntityManager, Optional<ManagedAclEntity>> findByIdQuery(final Long id) {
+    return namedQuery.findByIdOpt(ManagedAclEntity.class, id);
   }
 
   /** Find all ACLs of an organization. */
-  public static Function<EntityManager, List<ManagedAclEntity>> findByOrg(final String orgId) {
-    return new Function<EntityManager, List<ManagedAclEntity>>() {
-      @Override public List<ManagedAclEntity> apply(EntityManager em) {
-        return findAll(em, "ManagedAcl.findAllByOrg", tuple("organization", orgId));
-      }
-    };
+  public static Function<EntityManager, List<ManagedAclEntity>> findByOrgQuery(final String orgId) {
+    return namedQuery.findAll(
+        "ManagedAcl.findAllByOrg",
+        ManagedAclEntity.class,
+        Pair.of("organization", orgId)
+    );
   }
 
   /** Delete an ACL by id. */
-  public static Function<EntityManager, Boolean> deleteByIdAndOrg(final String orgId, final Long id) {
-    return new Function<EntityManager, Boolean>() {
-      @Override public Boolean apply(EntityManager em) {
-        return runUpdate(em, "ManagedAcl.deleteByIdAndOrg", tuple("id", id), tuple("organization", orgId));
-      }
-    };
+  public static Function<EntityManager, Integer> deleteByIdAndOrgQuery(final String orgId, final Long id) {
+    return namedQuery.delete(
+        "ManagedAcl.deleteByIdAndOrg",
+        Pair.of("id", id),
+        Pair.of("organization", orgId)
+    );
   }
 }

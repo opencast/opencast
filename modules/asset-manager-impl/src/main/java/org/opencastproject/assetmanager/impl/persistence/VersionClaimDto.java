@@ -20,10 +20,12 @@
  */
 package org.opencastproject.assetmanager.impl.persistence;
 
-import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.db.Queries.namedQuery;
 
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistence.Queries;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -73,16 +75,20 @@ public class VersionClaimDto {
   }
 
   /** Find the last claimed version for a media package. */
-  public static Option<VersionClaimDto> findLast(EntityManager em, String mediaPackageId) {
-    return Queries.named.findSingle(em, "VersionClaim.last", VersionClaimDto.class,
-        tuple("mediaPackageId", mediaPackageId));
+  public static Function<EntityManager, Optional<VersionClaimDto>> findLastQuery(String mediaPackageId) {
+    return namedQuery.findOpt(
+        "VersionClaim.last",
+        VersionClaimDto.class,
+        Pair.of("mediaPackageId", mediaPackageId)
+    );
   }
 
   /** Update the last claimed version of a media package. */
-  public static boolean update(EntityManager em, String mediaPackageId, long lastClaimed) {
-    return Queries.named.update(
-            em, "VersionClaim.update",
-            tuple("mediaPackageId", mediaPackageId),
-            tuple("lastClaimed", lastClaimed));
+  public static Function<EntityManager, Integer> updateQuery(String mediaPackageId, long lastClaimed) {
+    return namedQuery.update(
+        "VersionClaim.update",
+        Pair.of("mediaPackageId", mediaPackageId),
+        Pair.of("lastClaimed", lastClaimed)
+    );
   }
 }

@@ -21,10 +21,11 @@
 
 package org.opencastproject.assetmanager.aws.persistence;
 
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
+
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.util.PathSupport;
-import org.opencastproject.util.persistence.PersistenceUtil;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.DataSources;
@@ -70,8 +71,7 @@ public class AwsAssetDatabaseImplTest {
     EasyMock.replay(bc, cc);
 
     database = new AwsAssetDatabaseImpl();
-    database.setEntityManagerFactory(
-        PersistenceUtil.newTestEntityManagerFactory(AwsAssetDatabaseImpl.PERSISTENCE_UNIT));
+    database.setEntityManagerFactory(newEntityManagerFactory(AwsAssetDatabaseImpl.PERSISTENCE_UNIT));
     database.activate(cc);
   }
 

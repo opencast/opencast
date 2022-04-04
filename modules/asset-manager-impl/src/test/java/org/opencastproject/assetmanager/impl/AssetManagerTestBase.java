@@ -39,6 +39,7 @@ import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.util.TestUser;
+import org.opencastproject.db.DBTestEnv;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -59,7 +60,6 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
@@ -88,11 +88,6 @@ import java.util.function.Function;
 
 /**
  * Base class for {@link org.opencastproject.assetmanager.api.AssetManager} tests.
- * <p>
- * See {@link org.opencastproject.util.persistence.PersistenceUtil
- * #mkTestEntityManagerFactoryFromSystemProperties(String)} for command line
- * configuration options.
- * <p>
  */
 // CHECKSTYLE:OFF
 public abstract class AssetManagerTestBase {
@@ -133,7 +128,7 @@ public abstract class AssetManagerTestBase {
    * Create a new test asset manager.
    */
   protected AssetManagerImpl makeAssetManagerWithoutHandlers() throws Exception {
-    final Database db = new Database(PersistenceUtil.newTestEntityManagerFactory(PERSISTENCE_UNIT));
+    final Database db = new Database(DBTestEnv.newDBSession(PERSISTENCE_UNIT));
 
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))

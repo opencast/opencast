@@ -24,6 +24,7 @@ package org.opencastproject.authorization.xacml.manager.impl.persistence;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.security.api.AccessControlUtil.acl;
 import static org.opencastproject.security.api.AccessControlUtil.entries;
 import static org.opencastproject.security.api.AccessControlUtil.entry;
@@ -31,14 +32,17 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
+import org.opencastproject.db.DBSessionFactoryImpl;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistence.PersistenceUtil;
 
 import org.junit.Test;
+
+import java.util.Optional;
+
+import javax.persistence.EntityManagerFactory;
 
 /** Tests for {@link JpaAclDb}. */
 public final class JpaAclDbTest {
@@ -46,20 +50,22 @@ public final class JpaAclDbTest {
   private JpaAclDb db;
   @Test
   public void testProvider() {
+    EntityManagerFactory emf = newEntityManagerFactory("org.opencastproject.authorization.xacml.manager");
 
     db = new JpaAclDb();
-    db.setEntityManagerFactory(PersistenceUtil.newTestEntityManagerFactory(
-            "org.opencastproject.authorization.xacml.manager"));
+    db.setEntityManagerFactory(emf);
+    db.setDBSessionFactory(new DBSessionFactoryImpl());
+    db.activate();
 
     // add ACL to org1
     final AccessControlList publicAcl = acl(entry("anonymous", "read", true));
-    final Option<ManagedAcl> acl = db.createAcl(org1, publicAcl, "public");
-    assertTrue(acl.isSome());
-    assertTrue(db.getAcl(org1, acl.get().getId()).isSome());
+    final Optional<ManagedAcl> acl = db.createAcl(org1, publicAcl, "public");
+    assertTrue(acl.isPresent());
+    assertTrue(db.getAcl(org1, acl.get().getId()).isPresent());
     // ACL should not be visible for org2
-    assertTrue(db.getAcl(org2, acl.get().getId()).isNone());
+    assertTrue(db.getAcl(org2, acl.get().getId()).isEmpty());
     // create duplicate which should be denied
-    assertTrue(db.createAcl(org1, publicAcl, "public").isNone());
+    assertTrue(db.createAcl(org1, publicAcl, "public").isEmpty());
     //
     // add another ACL to org1
     db.createAcl(org1, acl(entries("instructor", tuple("read", true), tuple("write", true))), "instructor");

@@ -68,7 +68,6 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.easymock.Capture;
@@ -207,7 +206,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     AclService aclService = EasyMock.createNiceMock(AclService.class);
     EasyMock.expect(aclService.getAcls()).andReturn(managedAcls).anyTimes();
-    EasyMock.expect(aclService.getAcl(EasyMock.anyLong())).andReturn(Option.some(managedAcl1)).anyTimes();
+    EasyMock.expect(aclService.getAcl(EasyMock.anyLong())).andReturn(Optional.of(managedAcl1)).anyTimes();
     EasyMock.replay(aclService);
 
     AclServiceFactory aclServiceFactory = EasyMock.createNiceMock(AclServiceFactory.class);

@@ -19,28 +19,16 @@
  *
  */
 
+package org.opencastproject.db;
 
-package org.opencastproject.util.persistence;
+public final class SqlState {
+  // SQL State Class 40 - Transaction rollback
+  public static final String TRANSACTION_ROLLBACK_NO_SUBCLASS = "40000";
+  public static final String TRANSACTION_ROLLBACK_SERIALIZATION_FAILURE = "40001";
+  public static final String TRANSACTION_ROLLBACK_INTEGRITY_CONSTRAINT_VIOLATION = "40002";
+  public static final String TRANSACTION_ROLLBACK_STATEMENT_COMPLETION_UNKNOWN = "40003";
+  public static final String TRANSACTION_ROLLBACK_DEADLOCK_DETECTED = "40P01";
 
-import org.opencastproject.util.data.Function;
-
-import javax.persistence.EntityManager;
-
-/** Persistence environment to perform a transaction. */
-public abstract class PersistenceEnv {
-  /** Run code inside a transaction. */
-  public abstract <A> A tx(Function<EntityManager, A> transactional);
-
-  /** {@link #tx(org.opencastproject.util.data.Function)} as a function. */
-  public <A> Function<Function<EntityManager, A>, A> tx() {
-    return new Function<Function<EntityManager, A>, A>() {
-      @Override
-      public A apply(Function<EntityManager, A> transactional) {
-        return tx(transactional);
-      }
-    };
+  private SqlState() {
   }
-
-  /** Close the environment and free all associated resources. */
-  public abstract void close();
 }

@@ -20,8 +20,10 @@
  */
 package org.opencastproject.event.comment.persistence;
 
-import static org.opencastproject.util.persistence.Queries.persistOrUpdate;
+import static org.opencastproject.db.Queries.namedQuery;
 
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Comment;
@@ -39,8 +41,6 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.persistence.PersistenceEnv;
-import org.opencastproject.util.persistence.PersistenceEnvs;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
@@ -86,8 +86,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   /** Factory used to create {@link EntityManager}s for transactions */
   private EntityManagerFactory emf;
 
-  /** Persistence environment */
-  private PersistenceEnv env;
+  private DBSessionFactory dbSessionFactory;
+  private DBSession db;
 
   /** The security service used to retrieve organizations. */
   private OrganizationDirectoryService organizationDirectoryService;
@@ -109,13 +109,18 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for event comments");
     this.cc = cc;
+    db = dbSessionFactory.createSession(emf);
   }
 
   /** OSGi DI */
   @Reference(target = "(osgi.unit.name=org.opencastproject.event.comment)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
-    this.env = PersistenceEnvs.persistenceEnvironment(emf);
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
   }
 
   /**
@@ -277,7 +282,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   @Override
   public EventComment updateComment(EventComment comment) throws EventCommentDatabaseException {
     final EventCommentDto commentDto = EventCommentDto.from(comment);
-    final EventComment updatedComment = env.tx(persistOrUpdate(commentDto)).toComment(userDirectoryService);
+    final EventComment updatedComment = db.execTx(namedQuery.persistOrUpdate(commentDto))
+        .toComment(userDirectoryService);
     updateIndices(updatedComment.getEventId());
     return updatedComment;
   }

@@ -28,7 +28,7 @@ import javax.ws.rs.Path;
 @Path("/")
 @Ignore
 public class TestBundleInfoRestEndpoint extends BundleInfoRestEndpoint {
-  private final BundleInfoDb db = BundleInfoRestEndpointTest.db;
+  private final BundleInfoDb db = BundleInfoRestEndpointTest.bundleInfo;
 
   @Override protected BundleInfoDb getDb() {
     return db;

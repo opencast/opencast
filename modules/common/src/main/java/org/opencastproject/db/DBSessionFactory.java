@@ -19,20 +19,10 @@
  *
  */
 
-package org.opencastproject.util.persistence;
+package org.opencastproject.db;
 
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
+import javax.persistence.EntityManagerFactory;
 
-import javax.persistence.EntityManager;
-
-/**
- * Persistence environment that handles errors with an either instead of throwing exceptions.
- *
- * @see PersistenceEnv
- */
-public interface PersistenceEnv2<F> {
-  /** Run code inside a transaction. */
-  <A> Either<F, A> tx(Function<EntityManager, A> transactional);
-
+public interface DBSessionFactory {
+  DBSession createSession(EntityManagerFactory emf);
 }

@@ -19,13 +19,14 @@
  *
  */
 
-package org.opencastproject.util.persistence;
+package org.opencastproject.db;
 
-import org.opencastproject.util.data.Function;
+import static org.opencastproject.db.Queries.namedQuery;
 
 import org.junit.Ignore;
 
 import java.util.List;
+import java.util.function.Function;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -74,5 +75,6 @@ public class TestDto {
     this.value = value;
   }
 
-  public static final Function<EntityManager, List<TestDto>> findAll = Queries.named.findAll("Test.findAll");
+  public static final Function<EntityManager, List<TestDto>> findAll = namedQuery.findAll("Test.findAll",
+      TestDto.class);
 }

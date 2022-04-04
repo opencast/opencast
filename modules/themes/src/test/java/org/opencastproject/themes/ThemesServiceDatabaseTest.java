@@ -21,7 +21,7 @@
 
 package org.opencastproject.themes;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -79,7 +79,7 @@ public class ThemesServiceDatabaseTest {
     EasyMock.replay(index);
 
     themesDatabase = new ThemesServiceDatabaseImpl();
-    themesDatabase.setEntityManagerFactory(newTestEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
+    themesDatabase.setEntityManagerFactory(newEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
     themesDatabase.setSecurityService(securityService);
     themesDatabase.setUserDirectoryService(userDirectoryService);
     themesDatabase.setIndex(index);

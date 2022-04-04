@@ -25,8 +25,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
@@ -103,7 +103,7 @@ public class SeriesServiceImplTest {
     EasyMock.replay(securityService);
 
     seriesDatabase = new SeriesServiceDatabaseImpl();
-    seriesDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SeriesServiceDatabaseImpl.PERSISTENCE_UNIT));
+    seriesDatabase.setEntityManagerFactory(newEntityManagerFactory(SeriesServiceDatabaseImpl.PERSISTENCE_UNIT));
     dcService = new DublinCoreCatalogService();
     seriesDatabase.setDublinCoreService(dcService);
     seriesDatabase.activate(null);

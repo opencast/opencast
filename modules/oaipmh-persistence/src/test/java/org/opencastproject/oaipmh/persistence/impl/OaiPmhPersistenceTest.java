@@ -20,10 +20,10 @@
  */
 package org.opencastproject.oaipmh.persistence.impl;
 
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.oaipmh.persistence.QueryBuilder.query;
 import static org.opencastproject.oaipmh.persistence.QueryBuilder.queryRepo;
 import static org.opencastproject.util.UrlSupport.uri;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -86,7 +86,7 @@ public class OaiPmhPersistenceTest {
     EasyMock.replay(workspace);
 
     oaiPmhDatabase = new OaiPmhDatabaseImpl();
-    oaiPmhDatabase.setEntityManagerFactory(newTestEntityManagerFactory(OaiPmhDatabaseImpl.PERSISTENCE_UNIT_NAME));
+    oaiPmhDatabase.setEntityManagerFactory(newEntityManagerFactory(OaiPmhDatabaseImpl.PERSISTENCE_UNIT_NAME));
     oaiPmhDatabase.setSecurityService(securityService);
     oaiPmhDatabase.setWorkspace(workspace);
     oaiPmhDatabase.activate(null);

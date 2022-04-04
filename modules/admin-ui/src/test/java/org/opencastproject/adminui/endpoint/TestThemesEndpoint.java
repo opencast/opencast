@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
@@ -110,7 +110,7 @@ public class TestThemesEndpoint extends ThemesEndpoint {
 
     themesServiceDatabaseImpl = new ThemesServiceDatabaseImpl();
     themesServiceDatabaseImpl
-            .setEntityManagerFactory(newTestEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
+            .setEntityManagerFactory(newEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
     themesServiceDatabaseImpl.setUserDirectoryService(userDirectoryService);
     themesServiceDatabaseImpl.setSecurityService(securityService);
     themesServiceDatabaseImpl.setIndex(elasticsearchIndex);

@@ -21,7 +21,7 @@
 
 package org.opencastproject.scheduler.impl.persistence;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
@@ -60,7 +60,7 @@ public class SchedulerServiceDatabaseImplTest {
 
     schedulerDatabase = new SchedulerServiceDatabaseImpl();
     schedulerDatabase
-        .setEntityManagerFactory(newTestEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
+        .setEntityManagerFactory(newEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
     schedulerDatabase.setSecurityService(securityService);
     schedulerDatabase.activate(null);
   }

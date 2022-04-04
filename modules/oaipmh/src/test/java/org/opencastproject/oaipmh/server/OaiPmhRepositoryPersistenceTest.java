@@ -27,6 +27,7 @@ import static org.easymock.EasyMock.getCurrentArguments;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.metadata.dublincore.EncodingSchemeUtils.encodeDate;
 import static org.opencastproject.security.util.SecurityUtil.createSystemUser;
 import static org.opencastproject.util.data.Collections.nil;
@@ -52,7 +53,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -267,8 +267,7 @@ public class OaiPmhRepositoryPersistenceTest {
       }).anyTimes();
       EasyMock.replay(workspace);
       // oai-pmh database
-      final EntityManagerFactory emf = PersistenceUtil
-              .newTestEntityManagerFactory(OaiPmhDatabaseImpl.PERSISTENCE_UNIT_NAME);
+      final EntityManagerFactory emf = newEntityManagerFactory(OaiPmhDatabaseImpl.PERSISTENCE_UNIT_NAME);
       final AbstractOaiPmhDatabase db = new AbstractOaiPmhDatabase() {
         @Override
         public EntityManagerFactory getEmf() {
