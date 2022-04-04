@@ -361,8 +361,9 @@ public class IngestServiceImplTest {
 
     mediaPackage = service.createMediaPackage();
     mediaPackage = service.addTrack(urlTrack, MediaPackageElements.PRESENTATION_SOURCE, mediaPackage);
-    mediaPackage = service.addCatalog(urlCatalog1, MediaPackageElements.EPISODE, mediaPackage);
-    mediaPackage = service.addAttachment(urlAttachment, MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR, mediaPackage);
+    mediaPackage = service.addCatalog(urlCatalog1, MediaPackageElements.EPISODE, null, mediaPackage);
+    mediaPackage = service.addAttachment(urlAttachment, MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR, null,
+        mediaPackage);
     WorkflowInstance instance = service.ingest(mediaPackage);
     Assert.assertEquals(1, mediaPackage.getTracks().length);
     Assert.assertEquals(1, mediaPackage.getCatalogs().length);

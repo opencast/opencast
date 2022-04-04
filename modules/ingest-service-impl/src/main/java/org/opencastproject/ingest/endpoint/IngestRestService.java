@@ -302,7 +302,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addTrackURL", description = "Add a media track to a given media package using an URL", restParameters = {
           @RestParameter(description = "The location of the media", isRequired = true, name = "url", type = RestParameter.Type.STRING),
           @RestParameter(description = "The kind of media", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The Tags of the  media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the  media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
@@ -335,7 +335,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     description = "Add a media track to a given media package using an input stream",
     restParameters = {
       @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-      @RestParameter(description = "The Tags of the  media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
+      @RestParameter(description = "The tags of the media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
       @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
     bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
     responses = {
@@ -398,19 +398,24 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addCatalogURL", description = "Add a metadata catalog to a given media package using an URL", restParameters = {
           @RestParameter(description = "The location of the catalog", isRequired = true, name = "url", type = RestParameter.Type.STRING),
           @RestParameter(description = "The kind of catalog", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the catalog", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackageCatalog(@FormParam("url") String url, @FormParam("flavor") String flavor,
-          @FormParam("mediaPackage") String mpx) {
-    logger.trace("add catalog with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
+      @FormParam("tags") String tags, @FormParam("mediaPackage") String mpx) {
+    logger.trace("add catalog with url: {} flavor: {} tags: {} mediaPackage: {}", url, flavor, tags, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
+      String[] tagsArray = null;
+      if (tags != null) {
+        tagsArray = tags.split(",");
+      }
       MediaPackage resultingMediaPackage = ingestService.addCatalog(new URI(url),
-              MediaPackageElementFlavor.parseFlavor(flavor), mp);
+              MediaPackageElementFlavor.parseFlavor(flavor), tagsArray, mp);
       return Response.ok(resultingMediaPackage).build();
     } catch (Exception e) {
       logger.warn("Unable to add catalog", e);
@@ -424,6 +429,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Path("addCatalog")
   @RestQuery(name = "addCatalogInputStream", description = "Add a metadata catalog to a given media package using an input stream", restParameters = {
           @RestParameter(description = "The kind of media catalog", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(description = "The metadata catalog file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
@@ -439,18 +445,23 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addAttachmentURL", description = "Add an attachment to a given media package using an URL", restParameters = {
           @RestParameter(description = "The location of the attachment", isRequired = true, name = "url", type = RestParameter.Type.STRING),
           @RestParameter(description = "The kind of attachment", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackageAttachment(@FormParam("url") String url, @FormParam("flavor") String flavor,
-          @FormParam("mediaPackage") String mpx) {
+      @FormParam("tags") String tags, @FormParam("mediaPackage") String mpx) {
     logger.trace("add attachment with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
-      mp = ingestService.addAttachment(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), mp);
+      String[] tagsArray = null;
+      if (tags != null) {
+        tagsArray = tags.split(",");
+      }
+      mp = ingestService.addAttachment(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), tagsArray, mp);
       return Response.ok(mp).build();
     } catch (Exception e) {
       logger.warn("Unable to add attachment", e);
@@ -464,6 +475,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Path("addAttachment")
   @RestQuery(name = "addAttachmentInputStream", description = "Add an attachment to a given media package using an input stream", restParameters = {
           @RestParameter(description = "The kind of attachment", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(description = "The attachment file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
@@ -784,7 +796,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             } else if ("episodeDCCatalogUri".equals(fieldName)) {
               try {
                 URI dcUrl = new URI(value);
-                ingestService.addCatalog(dcUrl, MediaPackageElements.EPISODE, mp);
+                ingestService.addCatalog(dcUrl, MediaPackageElements.EPISODE, null, mp);
                 updateMediaPackageID(mp, dcUrl);
                 episodeDCCatalogNumber += 1;
               } catch (java.net.URISyntaxException e) {
@@ -809,7 +821,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             } else if ("seriesDCCatalogUri".equals(fieldName)) {
               try {
                 URI dcUrl = new URI(value);
-                ingestService.addCatalog(dcUrl, MediaPackageElements.SERIES, mp);
+                ingestService.addCatalog(dcUrl, MediaPackageElements.SERIES, null, mp);
               } catch (java.net.URISyntaxException e) {
                 return badRequest(String.format("Invalid URI %s for episodeDCCatalogUri", value), e);
               } catch (Exception e) {
