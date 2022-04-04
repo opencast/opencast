@@ -1582,6 +1582,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         if (uri.toString().matches(downloadSource)) {
           //NB: We're creating a new client here with *different* auth than the system auth creds
           externalHttpClient = getAuthedHttpClient();
+          get.setHeader("X-Requested-Auth", "Digest");
           response = externalHttpClient.execute(get);
         } else if (clusterUrls.contains(uri.getScheme() + "://" + uri.getHost())) {
           // Only using the system-level httpclient and digest credentials against our own servers
@@ -1794,7 +1795,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     provider.setCredentials(
       new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
       new UsernamePasswordCredentials(downloadUser, downloadPassword));
-    return cb.build();
+    return cb.setDefaultCredentialsProvider(provider).build();
   }
 
   private MediaPackage createSmil(MediaPackage mediaPackage) throws IOException, IngestException {
