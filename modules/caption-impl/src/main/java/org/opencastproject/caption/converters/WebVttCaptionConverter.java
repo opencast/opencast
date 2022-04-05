@@ -43,7 +43,7 @@ import java.util.List;
     service = { CaptionConverter.class },
     property = {
         "service.description=WebVTT caption converter",
-        "caption.format=webvtt"
+        "caption.format=vtt"
     }
 )
 public class WebVttCaptionConverter implements CaptionConverter {
