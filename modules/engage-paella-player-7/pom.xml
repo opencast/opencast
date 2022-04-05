@@ -32,7 +32,9 @@
                 </goals>
                 <configuration>
                   <executable>npm</executable>
-                  <arguments>ci</arguments>
+                  <arguments>
+                    <argument>ci</argument>
+                  </arguments>
                 </configuration>
               </execution>
 
@@ -44,20 +46,24 @@
                 </goals>
                 <configuration>
                   <executable>npm</executable>
-                  <arguments>run check</arguments>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>check</argument>
+                  </arguments>
                 </configuration>
               </execution>
 
               <execution>
+                <phase>validate</phase>
                 <id>frontend build</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <phase>compile</phase>
                 <configuration>
-                  <executable>node_modules/gulp/bin/gulp.js</executable>
+                  <executable>npm</executable>
                   <arguments>
-                    <argument>paella-opencast:build</argument>
+                    <argument>run</argument>
+                    <argument>build</argument>
                   </arguments>
                 </configuration>
               </execution>
@@ -113,8 +119,8 @@
               </execution>
 
               <execution>
-                <phase>process-resources</phase>
-                <id>npm run build</id>
+                <phase>validate</phase>
+                <id>frontend build</id>
                 <goals>
                   <goal>npm</goal>
                 </goals>
