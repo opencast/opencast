@@ -32,6 +32,7 @@ import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,7 +106,11 @@ public final class YamlWorkflowParser {
    *           if creating the workflow definition fails
    */
   public static WorkflowDefinition parseWorkflowDefinition(String in) throws WorkflowParsingException {
-    return parseWorkflowDefinition(IOUtils.toInputStream(in, "UTF8"));
+    try {
+      return parseWorkflowDefinition(IOUtils.toInputStream(in, "UTF8"));
+    } catch (IOException e) {
+      throw new WorkflowParsingException(e);
+    }
   }
 
   /**
@@ -139,7 +144,11 @@ public final class YamlWorkflowParser {
    *           if creating the workflow instance fails
    */
   public static WorkflowInstanceImpl parseWorkflowInstance(String in) throws WorkflowParsingException {
-    return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
+    try {
+      return parseWorkflowInstance(IOUtils.toInputStream(in, "UTF8"));
+    } catch (IOException e) {
+      throw new WorkflowParsingException(e);
+    }
   }
 
   /**
