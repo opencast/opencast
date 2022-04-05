@@ -390,7 +390,6 @@ class OpencastToPaellaConverter {
         let captions_match = captions_regex.exec(potentialCaption.type);
 
         if (captions_match) {
-          let captions_format = captions_match[1];
           let captions_lang = captions_match[3];
 
           // TODO: read the lang from the dfxp file
@@ -410,6 +409,10 @@ class OpencastToPaellaConverter {
 
           let captions_label = captions_lang || 'unknown language';
           //paella.utils.dictionary.translate("CAPTIONS_" + captions_lang);
+
+          let captions_format = potentialCaption.url.
+            substring(potentialCaption.url.lastIndexOf('.') + 1, potentialCaption.url.length)
+            || potentialCaption.url;
 
           captions.push({
             id: potentialCaption.id,
