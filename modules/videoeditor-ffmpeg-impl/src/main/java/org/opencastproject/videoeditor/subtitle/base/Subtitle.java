@@ -23,22 +23,32 @@ package org.opencastproject.videoeditor.subtitle.base;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Subtitle {
-  private List<SubtitleCue> cues;
+public abstract class Subtitle<T extends SubtitleCue> {
+  private List<String> headerLines;
+  private List<T> cues;
 
   public Subtitle() {
-    this.cues = new ArrayList<SubtitleCue>();
+    this.headerLines = new ArrayList<String>();
+    this.cues = new ArrayList<T>();
   }
 
-  public void addCue(SubtitleCue cue) {
+  public void addHeaderLine(String headerLine) {
+    this.headerLines.add(headerLine);
+  }
+  public List<String> getHeaderLines() {
+    return headerLines;
+  }
+  public void setHeaderLines(List<String> headerLines) {
+    this.headerLines = headerLines;
+  }
+
+  public void addCue(T cue) {
     this.cues.add(cue);
   }
-
-  public List<SubtitleCue> getCues() {
+  public List<T> getCues() {
     return this.cues;
   }
-
-  public void setCues(List<SubtitleCue> cues) {
+  public void setCues(List<T> cues) {
     this.cues = cues;
   }
 }

@@ -20,15 +20,23 @@
  */
 package org.opencastproject.videoeditor.subtitle.webvtt;
 
-import org.opencastproject.videoeditor.subtitle.base.SubtitleCue;
+import java.util.ArrayList;
+import java.util.List;
 
-public class WebVTTSubtitleCue extends SubtitleCue {
-  private String cueSettingsList;
+public class WebVTTSubtitleRegion {
+  private List<String> lines;
 
-  public String getCueSettingsList() {
-    return cueSettingsList;
+  public WebVTTSubtitleRegion() {
+    this.lines = new ArrayList<>();
   }
-  public void setCueSettingsList(String cueSettingsList) {
-    this.cueSettingsList = cueSettingsList;
+
+  public List<String> getLines() {
+    return this.lines;
+  }
+  public void setLines(List<String> lines) {
+    this.lines = lines;
+  }
+  public void addLine(String line) {
+    this.lines.add(line);
   }
 }

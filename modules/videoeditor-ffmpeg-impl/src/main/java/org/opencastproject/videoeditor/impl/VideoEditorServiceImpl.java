@@ -51,10 +51,9 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
 import org.opencastproject.videoeditor.ffmpeg.FFmpegEdit;
-import org.opencastproject.videoeditor.subtitle.base.Subtitle;
-import org.opencastproject.videoeditor.subtitle.base.SubtitleCue;
 import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTParser;
 import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTSubtitle;
+import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTSubtitleCue;
 import org.opencastproject.videoeditor.subtitle.webvtt.WebVTTWriter;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -339,21 +338,21 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
           // Parse
           WebVTTParser parser = new WebVTTParser();
           FileInputStream fin = new FileInputStream(sourceFile);
-          Subtitle subtitle = parser.parse(fin);
+          WebVTTSubtitle subtitle = parser.parse(fin);
 
           // Edit
-          Subtitle cutSubtitle = new WebVTTSubtitle();
+          List<WebVTTSubtitleCue> cutCues = new ArrayList<>();
           for (VideoClip time: cleanclips) {
-            for (SubtitleCue cue : subtitle.getCues()) {
+            for (WebVTTSubtitleCue cue : subtitle.getCues()) {
               if ((time.getStart() - SUBTITLE_GRACE_PERIOD) <= cue.getStartTime()
                       && (time.getEnd() + SUBTITLE_GRACE_PERIOD) >= cue.getEndTime()) {
                 cue.setStartTime((long) (cue.getStartTime() - time.getStart()));
                 cue.setEndTime((long) (cue.getEndTime() - time.getStart()));
-                cutSubtitle.addCue(cue);
+                cutCues.add(cue);
               }
             }
           }
-          subtitle = cutSubtitle;
+          subtitle.setCues(cutCues);
 
           // Write
           WebVTTWriter writer = new WebVTTWriter();

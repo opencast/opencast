@@ -22,5 +22,41 @@ package org.opencastproject.videoeditor.subtitle.webvtt;
 
 import org.opencastproject.videoeditor.subtitle.base.Subtitle;
 
-public class WebVTTSubtitle extends Subtitle {
+import java.util.ArrayList;
+import java.util.List;
+
+public class WebVTTSubtitle extends Subtitle<WebVTTSubtitleCue> {
+  private List<WebVTTSubtitleCue> cues;
+  private List<WebVTTSubtitleRegion> regions;
+  private List<WebVTTSubtitleStyle> style;
+
+  public WebVTTSubtitle() {
+    this.cues = new ArrayList<>();
+    this.regions = new ArrayList<>();
+    this.style = new ArrayList<>();
+  }
+
+  public void addCue(WebVTTSubtitleCue cue) {
+    this.cues.add(cue);
+  }
+  public List<WebVTTSubtitleCue> getCues() {
+    return this.cues;
+  }
+  public void setCues(List<WebVTTSubtitleCue> cues) {
+    this.cues = cues;
+  }
+
+  public void addRegion(WebVTTSubtitleRegion region) {
+    this.regions.add(region);
+  }
+  public List<WebVTTSubtitleRegion> getRegions() {
+    return regions;
+  }
+
+  public void addStyle(WebVTTSubtitleStyle style) {
+    this.style.add(style);
+  }
+  public List<WebVTTSubtitleStyle> getStyle() {
+    return style;
+  }
 }

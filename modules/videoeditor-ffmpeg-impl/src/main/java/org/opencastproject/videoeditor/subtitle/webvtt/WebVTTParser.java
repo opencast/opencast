@@ -20,7 +20,6 @@
  */
 package org.opencastproject.videoeditor.subtitle.webvtt;
 
-import org.opencastproject.videoeditor.subtitle.base.Subtitle;
 import org.opencastproject.videoeditor.subtitle.base.SubtitleParsingException;
 
 import java.io.BufferedReader;
@@ -32,6 +31,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Parses WebVTT from a file into a datastructure to allow for easy modification.
+ * Throws exceptions if the read WebVTT is invalid.
+ *
+ * TODO: Comments are currently ignored and discarded. Find a good way to keep comments
+ *  without compromising easy editing.
+ */
 public class WebVTTParser {
 
   private static final String WEBVTT_METADATA_HEADER_STRING = "\\S*[:=]\\S*";
@@ -57,11 +63,11 @@ public class WebVTTParser {
     this.charset = charset;
   }
 
-  public Subtitle parse(InputStream is) throws IOException, SubtitleParsingException {
+  public WebVTTSubtitle parse(InputStream is) throws IOException, SubtitleParsingException {
     return parse(is, true);
   }
 
-  public Subtitle parse(InputStream is, boolean strict) throws IOException, SubtitleParsingException {
+  public WebVTTSubtitle parse(InputStream is, boolean strict) throws IOException, SubtitleParsingException {
     // Create subtitle object
     WebVTTSubtitle subtitle = new WebVTTSubtitle();
 
@@ -75,11 +81,17 @@ public class WebVTTParser {
       throw new SubtitleParsingException("WEBVTT Header line is null");
     }
 
-    if (!"WEBVTT".equals(line)) {
-      throw new SubtitleParsingException("Expected WEBVTT. Got " + line);
+    if (!line.startsWith("WEBVTT")) {
+      throw new SubtitleParsingException("Header line did not start with WEBVTT. Got " + line);
     }
 
-    // TODO: Avoid parsing errors by region definition blocks and style blocks
+    subtitle.addHeaderLine(line);
+
+    // While this is not mentioned in the W3C specs, it seems to be common practice to have additional lines after
+    // the header containing metadata information on the file.
+    while ((line = webvttReader.readLine()) != null && !line.isEmpty()) {
+      subtitle.addHeaderLine(line);
+    }
 
     // Process the cues
     while ((line = webvttReader.readLine()) != null) {
@@ -87,6 +99,33 @@ public class WebVTTParser {
 
       // Skip additional newlines
       if (line.isEmpty()) {
+        continue;
+      }
+
+      if (line.startsWith("REGION")) {
+        WebVTTSubtitleRegion region = new WebVTTSubtitleRegion();
+        region.addLine(line);
+        while ((line = webvttReader.readLine()) != null && !line.isEmpty()) {
+          region.addLine(line);
+        }
+        subtitle.addRegion(region);
+        continue;
+      }
+
+      if (line.startsWith("STYLE")) {
+        WebVTTSubtitleStyle style = new WebVTTSubtitleStyle();
+        style.addLine(line);
+        while ((line = webvttReader.readLine()) != null && !line.isEmpty()) {
+          style.addLine(line);
+        }
+        subtitle.addStyle(style);
+        continue;
+      }
+
+      if (line.startsWith("NOTE")) {
+        while ((line = webvttReader.readLine()) != null && !line.isEmpty()) {
+          // do nothing
+        }
         continue;
       }
 
@@ -100,21 +139,28 @@ public class WebVTTParser {
       // Parse the cue timestamps
       matcher = WEBVTT_TIMESTAMP.matcher(line);
 
-      // parse start timestamp
+      // Parse start timestamp
       if (!matcher.find()) {
         throw new SubtitleParsingException("Expected cue start time: " + line);
       } else {
         cue.setStartTime(parseTimestamp(matcher.group()));
       }
 
-      // parse end timestamp
+      // Parse end timestamp
       if (!matcher.find()) {
         throw new SubtitleParsingException("Expected cue end time: " + line);
       } else {
         cue.setEndTime(parseTimestamp(matcher.group()));
       }
 
-      // parse text
+      // Parse cue settings list
+      String cueSettings = line.substring(matcher.end()).trim();
+      if (!cueSettings.isEmpty()) {
+        cue.setCueSettingsList(cueSettings);
+      }
+
+
+      // Parse text
       while (((line = webvttReader.readLine()) != null) && (!line.isEmpty())) {
         cue.addLine(line);
       }

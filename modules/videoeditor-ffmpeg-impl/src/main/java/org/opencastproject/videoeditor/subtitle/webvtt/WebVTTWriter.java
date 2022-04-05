@@ -20,14 +20,14 @@
  */
 package org.opencastproject.videoeditor.subtitle.webvtt;
 
-import org.opencastproject.videoeditor.subtitle.base.Subtitle;
-import org.opencastproject.videoeditor.subtitle.base.SubtitleCue;
+import static java.util.Optional.ofNullable;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class WebVTTWriter {
   private Charset charset; // Charset used to encode file
@@ -40,13 +40,42 @@ public class WebVTTWriter {
     this.charset = charset;
   }
 
-  public void write(Subtitle subtitleObject, OutputStream os) throws IOException {
+  public void write(WebVTTSubtitle subtitleObject, OutputStream os) throws IOException {
     try {
       // Write header
-      os.write(new String("WEBVTT\n\n").getBytes(this.charset));
+      List<String> headerLines = subtitleObject.getHeaderLines();
+      for (int i = 0; i < headerLines.size() ; i++) {
+        // Ensure valid header
+        if (i == 0 && !headerLines.get(i).startsWith("WEBVTT")) {
+          os.write(("WEBVTT " +  headerLines.get(i) + "\n").getBytes(this.charset));
+          continue;
+        }
+        os.write((headerLines.get(i) + "\n").getBytes(this.charset));
+      }
+      // Ensure valid header
+      if (headerLines.size() == 0) {
+        os.write(("WEBVTT" + "\n").getBytes(this.charset));
+      }
+      os.write("\n".getBytes(this.charset));
+
+      // Write region blocks
+      for (WebVTTSubtitleRegion region : subtitleObject.getRegions()) {
+        for (String regionLine : region.getLines()) {
+          os.write((regionLine + "\n").getBytes(this.charset));
+        }
+        os.write("\n".getBytes(this.charset));
+      }
+
+      // Write style blocks
+      for (WebVTTSubtitleStyle style : subtitleObject.getStyle()) {
+        for (String styleLine : style.getLines()) {
+          os.write((styleLine + "\n").getBytes(this.charset));
+        }
+        os.write("\n".getBytes(this.charset));
+      }
 
       // Write cues
-      for (SubtitleCue cue : subtitleObject.getCues()) {
+      for (WebVTTSubtitleCue cue : subtitleObject.getCues()) {
         if (cue.getId() != null) {
           // Write id
           String number = String.format("%s\n", cue.getId());
@@ -54,9 +83,10 @@ public class WebVTTWriter {
         }
 
         // Write start and end time
-        String startToEnd = String.format("%s --> %s \n",
+        String startToEnd = String.format("%s --> %s %s\n",
                 this.formatTimeCode(cue.getStartTime()),
-                this.formatTimeCode(cue.getEndTime()));
+                this.formatTimeCode(cue.getEndTime()),
+                ofNullable(cue.getCueSettingsList()).orElse(""));
         os.write(startToEnd.getBytes(this.charset));
 
         // Write text
