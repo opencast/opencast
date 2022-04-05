@@ -118,6 +118,14 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
       return;
     }
 
+    // make sure host is not in maintenance due to previous termination handling
+    try {
+      String host = getServiceRegistry().getRegistryHostname();
+      getServiceRegistry().setMaintenanceStatus(host, false);
+    } catch (ServiceRegistryException | NotFoundException e) {
+      logger.error("Cannot take this host out of maintenance", e);
+    }
+
     if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone()) {
       credentials = new DefaultAWSCredentialsProviderChain();
     } else {
