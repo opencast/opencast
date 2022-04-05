@@ -37,11 +37,11 @@
                 </configuration>
               </execution>
               <execution>
-                <id>esline</id>
+                <id>eslint</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <phase>validate</phase>
+                <phase>test</phase>
                 <configuration>
                   <executable>npm</executable>
                   <arguments>
