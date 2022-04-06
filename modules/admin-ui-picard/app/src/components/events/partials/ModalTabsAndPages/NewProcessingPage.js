@@ -28,6 +28,10 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
 
     }
 
+    const onClick = () => {
+      formik.setFieldValue("configuration", {});
+    }
+
     return (
         <>
             <div className="modal-content">
@@ -43,6 +47,7 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
                                     <Field tabIndex="99"
                                            as="select"
                                            name="processingWorkflow"
+                                           onClick={() => onClick()}
                                            placeholder={t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
                                            style={{width: '100%'}}>
                                         <option value="" />
@@ -60,7 +65,9 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
                                     <div id="new-event-workflow-configuration"
                                          className="checkbox-container obj-container">
                                         {formik.values.processingWorkflow ? (
-                                            <RenderWorkflowConfig displayDescription={true} workflowId={formik.values.processingWorkflow} />
+                                            <RenderWorkflowConfig displayDescription={true}
+                                                                  workflowId={formik.values.processingWorkflow}
+                                                                  formik={formik} />
                                         ) : null}
                                     </div>
                                 </div>
@@ -95,7 +102,7 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    workflowDef: getWorkflowDef(state)
+    workflowDef: getWorkflowDef(state),
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -22,6 +22,7 @@ export const initialFormValuesNewEvents = {
     location: '',
     deviceInputs: [],
     processingWorkflow: '',
+    configuration: {},
     policies: [{
         role: 'ROLE_USER_ADMIN',
         read: true,
