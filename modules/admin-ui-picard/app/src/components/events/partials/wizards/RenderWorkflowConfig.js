@@ -24,25 +24,24 @@ const RenderWorkflowConfig = (props) => {
     const setDefaultValues = () => {
       let defaultConfiguration = {};
 
-      configPanel.fieldset?.map(field => (
-        defaultConfiguration = {
-          ...defaultConfiguration,
-          [field.name]: field.value
-        }
-      ));
+      if (configPanel[0].fieldset) {
+        configPanel[0].fieldset.forEach(field => {
+          defaultConfiguration[field.name] = field.value;
+          console.log("in for each");
+          console.log(defaultConfiguration);
+        });
+      }
+
+      console.log("Default Configuration");
+      console.log(defaultConfiguration);
 
       return defaultConfiguration;
     }
 
     let ref = React.useRef();
-    let workflowPanelRef = React.useRef();
 
      if (ref.current?.childNodes !== undefined) {
          let array = [...ref.current?.childNodes];
-     }
-
-     const onSubmit = values => {
-       formik.setFieldValue("configuration", values);
      }
 
     const descriptionBoxStyle = {
@@ -71,30 +70,25 @@ const RenderWorkflowConfig = (props) => {
       )}
 
       {configPanel.length > 0 && (
-        <Formik initialValues={setDefaultValues()}
-                onSubmit={values => onSubmit(values)} innerRef={workflowPanelRef}>
-          {subformik => (
-            <form>
-              <div id="workflow-configuration">
-                {configPanel.map((configOption, key) => (
-                  <fieldset key={key}>
-                    {!!configOption.legend && (
-                      <legend>{configOption.legend}</legend>
-                    )}
-                    {!!configOption.description && (
-                      <p>{configOption.description}</p>
-                    )}
-                    <ul>
-                      {configOption.fieldset?.map((field, keys) => (
-                        renderInputByType(field, keys, subformik)
-                      ))}
-                    </ul>
-                  </fieldset>
-                ))}
-              </div>
-            </form>
-          )}
-        </Formik>
+        <form>
+          <div id="workflow-configuration">
+            {configPanel.map((configOption, key) => (
+              <fieldset key={key}>
+                {!!configOption.legend && (
+                  <legend>{configOption.legend}</legend>
+                )}
+                {!!configOption.description && (
+                  <p>{configOption.description}</p>
+                )}
+                <ul>
+                  {configOption.fieldset?.map((field, keys) => (
+                    renderInputByType(field, keys, formik)
+                  ))}
+                </ul>
+              </fieldset>
+            ))}
+          </div>
+        </form>
       )}
     </>
 
@@ -120,10 +114,10 @@ const RenderCheckbox = ({ field, key, formik }) => {
   const uuid = uuidv4();
 
   useEffect(() => {
-    formik.values.configuration[field.name] = field.checked;
+    //formik.values.configuration[field.name] = field.checked;
 
     console.log("in useEffect");
-    console.log(formik.values.configuration[field.name]);
+    //console.log(formik.values.configuration[field.name]);
 
   }, []);
 

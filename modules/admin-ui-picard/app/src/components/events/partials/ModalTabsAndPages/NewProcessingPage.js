@@ -10,7 +10,7 @@ import RenderWorkflowConfig from "../wizards/RenderWorkflowConfig";
 /**
  * This component renders the processing page for new events in the new event wizard.
  */
-const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef, workflowDef }) => {
+const NewProcessingPage = ({ previousPage, nextPage, formik, workflowPanelRef, loadingWorkflowDef, workflowDef }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -28,8 +28,35 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
 
     }
 
-    const onClick = () => {
-      formik.setFieldValue("configuration", {});
+    const resetConfig = e => {
+      let workflowId = e.target.value;
+      let defaultConfiguration = {};
+      let configPanel = workflowDef.find(workflow => workflow.id === workflowId).configuration_panel;
+
+      if (configPanel.length > 0) {
+        configPanel.forEach(configOption => {
+          if (configOption.fieldset) {
+            defaultConfiguration = fillDefaultConfig(configOption.fieldset, defaultConfiguration);
+          }
+        });
+      }
+
+      formik.setFieldValue("configuration", defaultConfiguration);
+      formik.setFieldValue("processingWorkflow", workflowId);
+    }
+
+    const fillDefaultConfig = (fieldset, defaultConfiguration) => {
+      fieldset.forEach(field => {
+          defaultConfiguration[field.name] = field.value;
+          console.log("in for each");
+          console.log(defaultConfiguration);
+          if (field.fieldset) {
+            defaultConfiguration = fillDefaultConfig(field.fieldset, defaultConfiguration);
+          }
+      });
+
+      return defaultConfiguration;
+
     }
 
     return (
@@ -47,7 +74,7 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
                                     <Field tabIndex="99"
                                            as="select"
                                            name="processingWorkflow"
-                                           onClick={() => onClick()}
+                                           onChange={e => resetConfig(e)}
                                            placeholder={t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
                                            style={{width: '100%'}}>
                                         <option value="" />
@@ -67,6 +94,7 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, loadingWorkflowDef,
                                         {formik.values.processingWorkflow ? (
                                             <RenderWorkflowConfig displayDescription={true}
                                                                   workflowId={formik.values.processingWorkflow}
+                                                                  workflowPanelRef={workflowPanelRef}
                                                                   formik={formik} />
                                         ) : null}
                                     </div>
