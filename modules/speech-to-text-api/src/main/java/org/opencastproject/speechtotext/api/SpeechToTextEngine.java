@@ -22,7 +22,6 @@
 package org.opencastproject.speechtotext.api;
 
 import java.io.File;
-import java.net.URI;
 
 /** Interface for speech-to-text implementations. */
 public interface SpeechToTextEngine {
@@ -38,12 +37,12 @@ public interface SpeechToTextEngine {
    * Generates the subtitles file.
    *
    * @param mediaFile The media package containing the audio track.
-   * @param preparedOutputFile The prepared output file where the subtitles data should be saved.
+   * @param preparedOutputFile The prepared output file where the subtitle's data should be saved.
    * @param language The language of the audio track.
    * @return The generated subtitles file.
    * @throws SpeechToTextEngineException Thrown when an error occurs at the process.
    */
-  File generateSubtitlesFile(URI mediaFile, File preparedOutputFile, String language)
+  File generateSubtitlesFile(File mediaFile, File preparedOutputFile, String language)
           throws SpeechToTextEngineException;
 
 }
