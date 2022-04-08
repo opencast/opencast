@@ -1,0 +1,12 @@
+Paella player 7
+---------------
+
+Paella player 7 as alternative player. To activate the player set for each tenant
+the property `prop.player` in the file `.../etc/org.opencastproject.organization-<tenant>.cfg`.
+
+```properties
+prop.player=/paella7/ui/watch.html?id=#{id}
+```
+
+Paella now supports custom themes. To customize the theme modify the
+`.../etc/ui-config/<tenant>/paella7/custom_theme.css` file.

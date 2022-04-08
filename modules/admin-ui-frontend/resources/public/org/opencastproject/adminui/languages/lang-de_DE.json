@@ -1303,12 +1303,12 @@
                "ADD": "Rolle hinzufügen"
             },
             "STRENGTH": {
-               "BAD": "Bad password",
-               "VERYWEAK": "Very weak password",
-               "WEAK": "Weak password",
-               "GOOD": "Good password",
-               "STRONG": "Strong password",
-               "VERYSTRONG": "Very strong password"
+               "BAD": "Schlechtes Passwort",
+               "VERYWEAK": "Sehr schwaches Passwort",
+               "WEAK": "Schwaches Passwort",
+               "GOOD": "Gutes Passwort",
+               "STRONG": "Starkes Passwort",
+               "VERYSTRONG": "Sehr starkes Passwort"
             }
          }
       },

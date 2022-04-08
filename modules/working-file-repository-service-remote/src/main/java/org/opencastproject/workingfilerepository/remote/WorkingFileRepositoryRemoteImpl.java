@@ -238,6 +238,21 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
     throw new RuntimeException("Error removing older files from collection");
   }
 
+  @Override
+  public boolean cleanupOldFilesFromMediaPackage(long days) throws IOException {
+    String url = UrlSupport.concat(new String[] { MEDIAPACKAGE_PATH_PREFIX, Long.toString(days) });
+    HttpDelete del = new HttpDelete(url);
+    HttpResponse response = getResponse(del, SC_NO_CONTENT);
+    try {
+      if (response != null) {
+        return SC_NO_CONTENT == response.getStatusLine().getStatusCode();
+      }
+    } finally {
+      closeConnection(response);
+    }
+    throw new RuntimeException("Error removing older files from collection");
+  }
+
   protected JSONObject getStorageReport() {
     String url = UrlSupport.concat(new String[] { "storage" });
     HttpGet get = new HttpGet(url);

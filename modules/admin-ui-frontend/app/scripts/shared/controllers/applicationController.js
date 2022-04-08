@@ -131,6 +131,11 @@ angular.module('adminNg.controllers')
       }
     });
 
+    const checkPermission = (rolesWithPermission) => {
+      let roles = AuthService.getRoles();
+      return rolesWithPermission.some(i => roles.includes(i));
+    };
+
     HotkeysService.activateUniversalHotkey('general.event_view', function (event) {
       event.preventDefault();
       $location.path('/events/events').replace();
@@ -142,13 +147,21 @@ angular.module('adminNg.controllers')
     });
 
     HotkeysService.activateUniversalHotkey('general.new_event', function (event) {
-      event.preventDefault();
-      ResourceModal.show('new-event-modal');
+      let rolesWithPermission = ['ROLE_UI_EVENTS_CREATE', 'ROLE_ADMIN'];
+      // only useres with above roles can trigger the modal
+      if (checkPermission(rolesWithPermission)) {
+        event.preventDefault();
+        ResourceModal.show('new-event-modal');
+      }
     });
 
     HotkeysService.activateUniversalHotkey('general.new_series', function (event) {
-      event.preventDefault();
-      ResourceModal.show('new-series-modal');
+      let rolesWithPermission = ['ROLE_UI_SERIES_CREATE', 'ROLE_ADMIN'];
+      // only useres with above roles can trigger the modal
+      if (checkPermission(rolesWithPermission)) {
+        event.preventDefault();
+        ResourceModal.show('new-series-modal');
+      }
     });
   }
 ]);

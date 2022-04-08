@@ -26,7 +26,7 @@ paella.addPlugin(function() {
     getName() { return 'es.upv.paella.opencast.episodesFromSeries'; }
 
     getIndex() { return 10; }
-    getDefaultToolTip() { return paella.utils.dictionary.translate('Related Videos'); }
+    getDefaultToolTip() { return paella.dictionary.translate('Related Videos'); }
 
 
     getAlignment() { return 'right'; }
@@ -60,12 +60,11 @@ paella.addPlugin(function() {
       episodesFromSeriesTitle.className = 'episodesFromSeriesTitle';
       if (serieId) {
         episodesFromSeriesTitle.innerHTML = '<span class=\'episodesFromSeriesTitle_Bold\'>'
-          + paella.utils.dictionary.translate('Videos in this series:') + '</span> '
-          + paella.AntiXSS.htmlEscape(serieTitle);
+          + paella.dictionary.translate('Videos in this series:') + '</span> ' + paella.AntiXSS.htmlEscape(serieTitle);
       }
       else {
         episodesFromSeriesTitle.innerHTML = '<span class=\'episodesFromSeriesTitle_Bold\'>'
-          + paella.utils.dictionary.translate('Available videos:') + '</span>';
+          + paella.dictionary.translate('Available videos:') + '</span>';
       }
 
       var episodesFromSeriesListing = document.createElement('div');
@@ -80,68 +79,67 @@ paella.addPlugin(function() {
       var params = {limit:5, page:0, sid:serieId};
       var mySearch = new SearchEpisode(paella.player.config, params);
       mySearch.doSearch(params, document.getElementById('episodesFromSeriesListing'));
-
     }
   };
 });
 
 
+
 /************************************************************************************/
 
-class AsyncLoaderPublishCallback extends paella.utils.AsyncLoaderCallback {
-  constructor(config, recording) {
-    super();
+var SearchEpisode = Class.create({
+  config:null,
+  proxyUrl:'',
+  recordingEntryID:'',
+  useJsonp:false,
+  divLoading:null,
+  divResults:null,
 
-    this.config = config;
-    this.recording = recording;
-  }
+  AsyncLoaderPublishCallback: Class.create(paella.AsyncLoaderCallback,{
+    config:null,
+    recording:null,
 
-  load(onSuccess, onError) {
-    var thisClass = this;
+    initialize:function(config, recording) {
+      this.parent('AsyncLoaderPublishCallback');
+      this.config = config;
+      this.recording = recording;
+    },
 
-    paella.data.read('publish',{id:this.recording.id},function(data,status) {
-      if (status == true) {
-        if ((data == true) || (data == 'True')) {
-          thisClass.recording.entry_published_class = 'published';
-        }
-        else if ((data == false) || (data == 'False')) {
-          thisClass.recording.entry_published_class = 'unpublished';
-        }
-        else if (data == 'undefined'){
-          thisClass.recording.entry_published_class = 'pendent';
+    load:function(onSuccess,onError) {
+      var thisClass = this;
+
+      paella.data.read('publish',{id:this.recording.id},function(data,status) {
+        if (status == true) {
+          if ((data == true) || (data == 'True')) {
+            thisClass.recording.entry_published_class = 'published';
+          }
+          else if ((data == false) || (data == 'False')) {
+            thisClass.recording.entry_published_class = 'unpublished';
+          }
+          else if (data == 'undefined'){
+            thisClass.recording.entry_published_class = 'pendent';
+          }
+          else {
+            thisClass.recording.entry_published_class = 'no_publish_info';
+          }
+          onSuccess();
         }
         else {
           thisClass.recording.entry_published_class = 'no_publish_info';
+          onSuccess();
         }
-        onSuccess();
-      }
-      else {
-        thisClass.recording.entry_published_class = 'no_publish_info';
-        onSuccess();
-      }
-    });
-  }
-}
+      });
+    }
+  }),
 
-class SearchEpisode {
-
-  constructor() {
-    this.config = null;
-    this.proxyUrl = '';
-    this.recordingEntryID = '';
-    this.useJsonp = false;
-    this.divLoading = null;
-    this.divResults = null;
-  }
-
-  createDOMElement(type, id, className) {
+  createDOMElement:function(type, id, className) {
     var elem = document.createElement(type);
     elem.id = id;
     elem.className = className;
     return elem;
-  }
+  },
 
-  doSearch(params, domElement) {
+  doSearch:function(params, domElement) {
     var thisClass = this;
     this.recordingEntryID =	 domElement.id + '_entry_';
 
@@ -149,7 +147,7 @@ class SearchEpisode {
     domElement.innerText = '';
     // loading div
     this.divLoading = this.createDOMElement('div', thisClass.recordingEntryID + '_loading', 'recordings_loading');
-    this.divLoading.innerText = paella.utils.dictionary.translate('Searching...');
+    this.divLoading.innerText = paella.dictionary.translate('Searching...');
     domElement.appendChild(this.divLoading);
 
     // header div
@@ -164,17 +162,17 @@ class SearchEpisode {
 
     // loading results
     thisClass.setLoading(true);
-    paella.utils.ajax.get({url:'/search/episode.json', params:params},
+    paella.ajax.get({url:'/search/episode.json', params:params},
       function(data, contentType, returnCode, dataRaw) {
         thisClass.processSearchResults(data, params, domElement, divNavigation);
       },
       function(data, contentType, returnCode) {
       }
     );
-  }
+  },
 
 
-  processSearchResults(response, params, divList, divNavigation) {
+  processSearchResults:function(response, params, divList, divNavigation) {
     var thisClass = this;
     if (typeof(response) == 'string') {
       response = JSON.parse(response);
@@ -185,7 +183,7 @@ class SearchEpisode {
       (response['search-results'].total !== undefined);
 
     if (resultsAvailable === false) {
-      paella.log.debug('Seach failed, respons:  ' + response);
+      paella.debug.log('Seach failed, respons:  ' + response);
       return;
     }
 
@@ -218,12 +216,12 @@ class SearchEpisode {
       // *******************************
       // *******************************
       // TODO
-      var asyncLoader = new paella.utils.AsyncLoader();
+      var asyncLoader = new paella.AsyncLoader();
       var results = response['search-results'].result;
       if (!(results instanceof Array)) { results = [results]; }
       //There are annotations of the desired type, deleting...
       for (var i = 0; i < results.length; ++i ){
-        asyncLoader.addCallback(new AsyncLoaderPublishCallback(thisClass.config, results[i]));
+        asyncLoader.addCallback(new thisClass.AsyncLoaderPublishCallback(thisClass.config, results[i]));
       }
 
       asyncLoader.load(function() {
@@ -260,17 +258,17 @@ class SearchEpisode {
               params.sid = this.param_sid;
               thisClass.doSearch(params, divList);
             });
-            divPrevLink.innerText = paella.utils.dictionary.translate('Previous');
+            divPrevLink.innerText = paella.dictionary.translate('Previous');
             divPrev.appendChild(divPrevLink);
           } else {
-            divPrev.innerText = paella.utils.dictionary.translate('Previous');
+            divPrev.innerText = paella.dictionary.translate('Previous');
           }
           divNavigation.appendChild(divPrev);
 
           var divPage = document.createElement('div');
           divPage.id = thisClass.recordingEntryID + '_header_navigation_page';
           divPage.className = 'recordings_header_navigation_page';
-          divPage.innerText = paella.utils.dictionary.translate('Page:');
+          divPage.innerText = paella.dictionary.translate('Page:');
           divNavigation.appendChild(divPage);
 
           // take care for the page buttons
@@ -334,10 +332,10 @@ class SearchEpisode {
               params.sid = this.param_sid;
               thisClass.doSearch(params, divList);
             });
-            divNextLink.innerText = paella.utils.dictionary.translate('Next');
+            divNextLink.innerText = paella.dictionary.translate('Next');
             divNext.appendChild(divNextLink);
           } else {
-            divNext.innerText = paella.utils.dictionary.translate('Next');
+            divNext.innerText = paella.dictionary.translate('Next');
           }
           divNavigation.appendChild(divNext);
 
@@ -354,22 +352,22 @@ class SearchEpisode {
     }
     // finished loading
     thisClass.setLoading(false);
-  }
+  },
 
 
-  setLoading(loading) {
+  setLoading:function(loading) {
     if (loading == true) {
       this.divLoading.style.display = 'block';
     } else {
       this.divLoading.style.display = 'none';
     }
-  }
+  },
 
-  setResults(results) {
+  setResults:function(results) {
     this.divResults.innerText = results;
-  }
+  },
 
-  getUrlOfAttachmentWithType(recording, type) {
+  getUrlOfAttachmentWithType:function(recording, type) {
     for (var i = 0; i < recording.mediapackage.attachments.attachment.length; ++i ){
       var attachment = recording.mediapackage.attachments.attachment[i];
       if (attachment.type === type) {
@@ -378,9 +376,9 @@ class SearchEpisode {
     }
 
     return '';
-  }
+  },
 
-  createRecordingEntry(index, recording) {
+  createRecordingEntry:function(index, recording) {
     var rootID = this.recordingEntryID + index;
 
 
@@ -442,7 +440,7 @@ class SearchEpisode {
     var author = ' ';
     var author_search = '';
     if(recording.dcCreator) {
-      author = paella.utils.dictionary.translate('by:') + recording.dcCreator;
+      author = 'by ' + recording.dcCreator;
       author_search = recording.dcCreator;
     }
     var divResultAuthorText = document.createElement('div');
@@ -502,4 +500,4 @@ class SearchEpisode {
 
     return divEntry;
   }
-}
+});

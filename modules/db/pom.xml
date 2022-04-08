@@ -59,7 +59,7 @@
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
-      <version>3.0.3</version>
+      <version>3.0.4</version>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
@@ -70,12 +70,12 @@
       <!-- runtime dependency for postgresql -->
       <groupId>org.checkerframework</groupId>
       <artifactId>checker-qual</artifactId>
-      <version>3.21.3</version>
+      <version>3.21.4</version>
     </dependency>
     <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
-      <version>5.10.0</version>
+      <version>5.11.0</version>
     </dependency>
   </dependencies>
   <build>

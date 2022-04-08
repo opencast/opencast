@@ -21,6 +21,7 @@
 
 package org.opencastproject.workingfilerepository.impl;
 
+import org.opencastproject.cleanup.RecursiveDirectoryCleaner;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -55,10 +56,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -945,6 +948,13 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
 
     return true;
+  }
+
+  @Override
+  public boolean cleanupOldFilesFromMediaPackage(long days) throws IOException {
+    return RecursiveDirectoryCleaner.cleanDirectory(
+            Paths.get(rootDirectory, MEDIAPACKAGE_PATH_PREFIX),
+            Duration.ofDays(days));
   }
 
   /**

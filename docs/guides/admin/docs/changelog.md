@@ -4,6 +4,41 @@ Changelog
 Opencast 11
 ----------
 
+### Opencast 11.5
+
+*Released on March 23rd, 2022*
+
+- [[#3544](https://github.com/opencast/opencast/pull/3544)] -
+  Fix bug: Editor sometimes doesn't skip deactivated sections on Safari Browser
+- [[#3547](https://github.com/opencast/opencast/pull/3547)] -
+  Redowngrade Paella to 6.4.4
+- [[#3546](https://github.com/opencast/opencast/pull/3546)] -
+  Update Editor to 2022-03-22
+- [[#3545](https://github.com/opencast/opencast/pull/3545)] -
+  Update 11.x translations, restore zh_TW translations
+- [[#3541](https://github.com/opencast/opencast/pull/3541)] -
+  Downgrade commons-io
+- [[#3540](https://github.com/opencast/opencast/pull/3540)] -
+  Fix NPE when signing publication URLs
+- [[#3534](https://github.com/opencast/opencast/pull/3534)] -
+  Fix Admin UI builds due to missing SASS
+- [[#3532](https://github.com/opencast/opencast/pull/3532)] -
+  Fix wrong name of admin UI configuration file
+- [[#3520](https://github.com/opencast/opencast/pull/3520)] -
+  Docs: Force same sample rate for audio files in PartialImport WOH encoding
+- [[#3474](https://github.com/opencast/opencast/pull/3474)] -
+  Fix OC 11.4 release notes layout issues
+- [[#3466](https://github.com/opencast/opencast/pull/3466)] -
+  Check if encoding profile exist for imageToVideo Operation
+- [[#3460](https://github.com/opencast/opencast/pull/3460)] -
+  fix admin-ui endpoint crash, when a series without title exists
+- [[#3459](https://github.com/opencast/opencast/pull/3459)] -
+  Add release notes and changelog for OC 11.4
+- [[#3343](https://github.com/opencast/opencast/pull/3343)] -
+  Password strength indicator
+- [[#3197](https://github.com/opencast/opencast/pull/3197)] -
+  Elasticsearch Retry Config
+
 ### Opencast 11.4
 
 *Released on February 16th, 2022*
@@ -733,6 +768,24 @@ Opencast 11
 
 Opencast 10
 ----------
+
+### Opencast 10.11
+
+*Released on Mar 22nd, 2022*
+
+- [[#3533](https://github.com/opencast/opencast/pull/3533)] -
+  Add activemq upgrade note to 10.x upgrade guide
+- [[#3531](https://github.com/opencast/opencast/pull/3531)] -
+  Revert "Update paella player to paella 6.5.5 (#3142)" since HLS videos do not load on slow connections
+- [[#3517](https://github.com/opencast/opencast/pull/3517)] -
+  Admin-ui-frontend migrate node-sass to sass
+- [[#3512](https://github.com/opencast/opencast/pull/3512)] -
+  Improve Tooltips in Documentation
+- [[#3490](https://github.com/opencast/opencast/pull/3490)] -
+  Document that you cannot run Opencast in a sub-path
+- [[#3467](https://github.com/opencast/opencast/pull/3467)] -
+  Opencast 10.10 release notes and changelog
+
 
 ### Opencast 10.10
 

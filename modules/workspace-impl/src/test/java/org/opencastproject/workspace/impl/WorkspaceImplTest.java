@@ -57,6 +57,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -283,7 +284,7 @@ public class WorkspaceImplTest {
     workspace.cleanup(-1);
     Assert.assertEquals(0L, workspace.getUsedSpace().get().longValue());
 
-    File file = new File(PathSupport.concat(new String[] { workspaceRoot, "test", "c1", "bar.mov" }));
+    File file = Paths.get(workspaceRoot, "test", "c1", "bar.mov").toFile();
     FileUtils.write(file, "asdf", StandardCharsets.UTF_8);
     file.deleteOnExit();
 
@@ -300,8 +301,10 @@ public class WorkspaceImplTest {
 
     Prelude.sleep(1100L);
 
+    Assert.assertTrue(Paths.get(workspaceRoot, "test", "c1").toFile().exists());
     workspace.cleanup(1);
     Assert.assertEquals(0L, workspace.getUsedSpace().get().longValue());
+    Assert.assertFalse(Paths.get(workspaceRoot, "test").toFile().exists());
   }
 
 }
