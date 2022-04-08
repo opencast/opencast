@@ -261,7 +261,7 @@
               "type": "checkbox",
               "name": "reviewCutting",
               "label": "Review / Cutting",
-              "checked": "false"
+              "value": false
             }
           ]
         }, {
@@ -271,13 +271,13 @@
               "type": "checkbox",
               "name": "mediaModule",
               "label": "Opencast Media Module",
-              "checked": "true"
+              "value": true
             },
             {
               "type": "checkbox",
               "name": "defaultRepo",
               "label": "Default OAI-PMH Repository",
-              "checked": "true"
+              "value": true
             }
           ]
         }, {
@@ -287,7 +287,7 @@
               "type": "checkbox",
               "name": "liveStream",
               "label": "Add live event to Opencast Media Module",
-              "checked": "false"
+              "value": false
             }
           ]
         }],
@@ -1477,31 +1477,31 @@
               "type": "checkbox",
               "name": "flagQuality360p",
               "label": "360p resolution",
-              "checked": "false"
+              "value": false
             },
             {
               "type": "checkbox",
               "name": "flagQuality480p",
               "label": "480p resolution",
-              "checked": "false"
+              "value": false
             },
             {
               "type": "checkbox",
               "name": "flagQuality720p",
               "label": "720p resolution (HDready)",
-              "checked": "true"
+              "value": true
             },
             {
               "type": "checkbox",
               "name": "flagQuality1080p",
               "label": "1080p resolution (FullHD)",
-              "checked": "false"
+              "value": false
             },
             {
               "type": "checkbox",
               "name": "flagQuality2160p",
               "label": "2160p resolution (UltraHD)",
-              "checked": "false"
+              "value": false
             }
           ]
         },
@@ -1512,13 +1512,13 @@
                 "type": "checkbox",
                 "name": "flagForCutting",
                 "label": "Cutting",
-                "checked": "false"
+                "value": false
               },
               {
                 "type": "checkbox",
                 "name": "flagForReview",
                 "label": "Review",
-                "checked": "false"
+                "value": false
               }
             ]
           },
@@ -1530,34 +1530,34 @@
                 "name": "holdOrPublishToggle",
                 "label": "Hold",
                 "value": "hold",
-                "checked": "false"
+                "checked": true
               },
               {
                 "type": "radio",
                 "name": "holdOrPublishToggle",
                 "label": "Publish right away to",
-                "checked": "true",
+                "checked": false,
                 "value": "publish",
                 "fieldset": [
                   {
                     "type": "checkbox",
                     "name": "publishToSearch",
                     "label": "Opencast Index",
-                    "checked": "true",
+                    "checked": true,
                     "fieldset": [
                       {
                         "type": "radio",
                         "name": "searchPublishTyp",
                         "label": "Opencast Media Module",
-                        "value": "true",
-                        "checked": "true"
+                        "value": true,
+                        "checked": true
                       },
                       {
                         "type": "radio",
                         "name": "searchPublishTyp",
                         "label": "AWS",
-                        "value": "true",
-                        "checked": "false"
+                        "value": true,
+                        "checked": false
                       }
                     ]
                   },
@@ -1565,19 +1565,19 @@
                     "type": "checkbox",
                     "name": "publishToApi",
                     "label": "External Applications",
-                    "checked": "true"
+                    "value": true
                   },
                   {
                     "type": "checkbox",
                     "name": "publishToOAIPMH",
                     "label": "OAI-PMH Default Repository",
-                    "checked": "true"
+                    "value": true
                   },
                   {
                     "type": "checkbox",
                     "name": "publishToYouTube",
                     "label": "YouTube",
-                    "checked": "false"
+                    "value": false
                   }
                 ]
               }
@@ -1590,7 +1590,7 @@
                 "type": "checkbox",
                 "name": "publishLive",
                 "label": "Add live event to Opencast Media Module",
-                "checked": "false"
+                "checked": false
               }
             ]
           }],
@@ -1854,7 +1854,7 @@
               "type": "checkbox",
               "name": "multiQualityVideos",
               "label": "Multi Quality Videos for Adaptive Streaming",
-              "checked": "false"
+              "value": false
             }
           ]
         }, {
@@ -1865,21 +1865,21 @@
               "type": "checkbox",
               "name": "ocIndex",
               "label": "Opencast Index",
-              "checked": "true",
+              "value": true,
               "fieldset": [
                 {
                   "type": "radio",
                   "name": "toggleOcMediaOrAWS",
                   "label": "Opencast Media Module",
                   "value": "mediaModule",
-                  "checked": "true"
+                  "checked": true
                 },
                 {
                   "type": "radio",
                   "name": "toggleOcMediaOrAWS",
                   "label": "AWS",
                   "value": "aws",
-                  "checked": "false"
+                  "checked": false
                 }
               ]
             },
@@ -1887,19 +1887,19 @@
               "type": "checkbox",
               "name": "externalApp",
               "label": "External Applications",
-              "checked": "true"
+              "value": true
             },
             {
               "type": "checkbox",
               "name": "defaultRepo",
               "label": "Default OAI-PMH Repository",
-              "checked": "true"
+              "value": true
             },
             {
               "type": "checkbox",
               "name": "youTube",
               "label": "YouTube",
-              "checked": "true"
+              "value": true
             }
           ]
         }],
@@ -3326,13 +3326,13 @@
               "type": "checkbox",
               "name": "ocMediaModule",
               "label": "Opencast Media Module",
-              "checked": "true"
+              "checked": true
             },
             {
               "type": "checkbox",
               "name": "defaultRepo",
               "label": "Default OAI-PMH Repository",
-              "checked": "true"
+              "checked": true
             }
           ]
         }],
@@ -3442,37 +3442,37 @@
               "type": "checkbox",
               "name": "ocMediaModule",
               "label": "Opencast Media Module",
-              "checked": "true"
+              "value": true
             },
             {
               "type": "checkbox",
               "name": "aws",
               "label": "AWS",
-              "checked": "true"
+              "value": true
             },
             {
               "type": "checkbox",
               "name": "externalApp",
               "label": "External Applications",
-              "checked": "true"
+              "value": true
             },
             {
               "type": "checkbox",
               "name": "preview",
               "label": "Preview and Editing Media",
-              "checked": "true"
+              "value": true
             },
             {
               "type": "checkbox",
               "name": "defaultRepo",
               "label": "Default OAI-PMH Repository",
-              "checked": "true"
+              "value": true
             },
             {
               "type": "checkbox",
               "name": "youTube",
               "label": "YouTube",
-              "checked": "true"
+              "value": true
             }
           ]
         }],

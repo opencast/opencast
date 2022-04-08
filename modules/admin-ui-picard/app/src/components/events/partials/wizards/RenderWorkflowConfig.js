@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
-import {Formik, Field} from "formik";
+import {Field} from "formik";
 import {
   getWorkflowDefById,
   makeGetWorkflowDefById
@@ -21,28 +21,11 @@ const RenderWorkflowConfig = (props) => {
     const displayDescription = props.displayDescription;
     let formik = props.formik;
 
-    const setDefaultValues = () => {
-      let defaultConfiguration = {};
-
-      if (configPanel[0].fieldset) {
-        configPanel[0].fieldset.forEach(field => {
-          defaultConfiguration[field.name] = field.value;
-          console.log("in for each");
-          console.log(defaultConfiguration);
-        });
-      }
-
-      console.log("Default Configuration");
-      console.log(defaultConfiguration);
-
-      return defaultConfiguration;
-    }
-
     let ref = React.useRef();
 
-     if (ref.current?.childNodes !== undefined) {
-         let array = [...ref.current?.childNodes];
-     }
+    if (ref.current?.childNodes !== undefined) {
+      let array = [...ref.current?.childNodes];
+    }
 
     const descriptionBoxStyle = {
         margin: '15px 0 0 0',
@@ -95,6 +78,7 @@ const RenderWorkflowConfig = (props) => {
   );
 }
 
+// render input depending on field type
 const renderInputByType = (field, key, formik) => {
   switch (field.type) {
     case 'checkbox':
@@ -111,15 +95,8 @@ const renderInputByType = (field, key, formik) => {
 }
 
 const RenderCheckbox = ({ field, key, formik }) => {
+  // id used for Field and label
   const uuid = uuidv4();
-
-  useEffect(() => {
-    //formik.values.configuration[field.name] = field.checked;
-
-    console.log("in useEffect");
-    //console.log(formik.values.configuration[field.name]);
-
-  }, []);
 
   return (
     <li key={key}>
@@ -129,6 +106,8 @@ const RenderCheckbox = ({ field, key, formik }) => {
              defaultValue={field.checked}
              type={field.type}/>
       <label htmlFor={uuid}>{field.label}</label>
+      {/* if input has an additional fieldset or further configuration inputs
+      than render again by input type*/}
       {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
         <ul className="workflow-configuration-subpanel">
           {field.fieldset?.map((f, keys) => (
@@ -141,7 +120,9 @@ const RenderCheckbox = ({ field, key, formik }) => {
 }
 
 const RenderRadio = ({ field, key, formik }) => {
+  // id used for Field and label
   const uuid = uuidv4();
+
   return (
     <li key={key}>
       <Field id={uuid}
@@ -150,6 +131,8 @@ const RenderRadio = ({ field, key, formik }) => {
              value={field.value}
              type={field.type}/>
       <label htmlFor={uuid}>{field.label}</label>
+      {/* if input has an additional fieldset or further configuration inputs
+      than render again by input type*/}
       {(!!field.fieldset && formik.values.configuration[field.name] === field.value) && (
         <ul className="workflow-configuration-subpanel">
           {field.fieldset?.map((f, keys) => (
@@ -162,8 +145,10 @@ const RenderRadio = ({ field, key, formik }) => {
 }
 
 const RenderNumber = ({ field, key, formik }) => {
+  // id used for Field and label
   const uuid = uuidv4();
 
+  // todo: find way to validate that value of number is actually between max and min
   const validate = value => {
     let error;
     if (parseInt(value) > field.max || parseInt(value) < field.min) {
@@ -182,6 +167,8 @@ const RenderNumber = ({ field, key, formik }) => {
              min={field.min}
              max={field.max}/>
       <label htmlFor={uuid}>{field.label}</label>
+      {/* if input has an additional fieldset or further configuration inputs
+      than render again by input type*/}
       {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
         <ul className="workflow-configuration-subpanel">
           {field.fieldset?.map((f, keys) => (
@@ -194,7 +181,9 @@ const RenderNumber = ({ field, key, formik }) => {
 }
 
 const RenderText = ({ field, key, formik }) => {
+  // id used for Field and label
   const uuid = uuidv4();
+
   return (
     <li key={key}>
       <Field id={uuid}
@@ -202,6 +191,8 @@ const RenderText = ({ field, key, formik }) => {
              name={'configuration.' + field.name}
              type={field.type}/>
       <label htmlFor={uuid}>{field.label}</label>
+      {/* if input has an additional fieldset or further configuration inputs
+      than render again by input type*/}
       {(!!field.fieldset && !!formik.values.configuration[field.name]) && (
         <ul className="workflow-configuration-subpanel">
           {field.fieldset?.map((f, keys) => (

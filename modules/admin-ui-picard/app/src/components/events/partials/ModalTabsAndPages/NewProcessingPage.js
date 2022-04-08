@@ -28,12 +28,15 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, workflowPanelRef, l
 
     }
 
-    const resetConfig = e => {
+    const setDefaultValues = e => {
       let workflowId = e.target.value;
       let defaultConfiguration = {};
+      // find configuration panel information about chosen workflow
       let configPanel = workflowDef.find(workflow => workflow.id === workflowId).configuration_panel;
 
+      // only set default values if there is an configuration panel
       if (configPanel.length > 0) {
+        // iterate through all config options and set their defaults
         configPanel.forEach(configOption => {
           if (configOption.fieldset) {
             defaultConfiguration = fillDefaultConfig(configOption.fieldset, defaultConfiguration);
@@ -41,15 +44,27 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, workflowPanelRef, l
         });
       }
 
+      // set default configuration in formik
       formik.setFieldValue("configuration", defaultConfiguration);
+      // set chosen workflow in formik
       formik.setFieldValue("processingWorkflow", workflowId);
     }
 
+    // fills default configuration with values
     const fillDefaultConfig = (fieldset, defaultConfiguration) => {
+      // iteration through each input field
       fieldset.forEach(field => {
-          defaultConfiguration[field.name] = field.value;
-          console.log("in for each");
-          console.log(defaultConfiguration);
+          // set value in default configuration
+          if (field.type !== "radio") {
+            defaultConfiguration[field.name] = field.value;
+          } else {
+            // set only the checked input of radio button as default value
+            if (field.type === "radio" && field.checked) {
+              defaultConfiguration[field.name] = field.value;
+            }
+          }
+
+          // if an input has further configuration than go through fillDefaultConfig again
           if (field.fieldset) {
             defaultConfiguration = fillDefaultConfig(field.fieldset, defaultConfiguration);
           }
@@ -74,7 +89,7 @@ const NewProcessingPage = ({ previousPage, nextPage, formik, workflowPanelRef, l
                                     <Field tabIndex="99"
                                            as="select"
                                            name="processingWorkflow"
-                                           onChange={e => resetConfig(e)}
+                                           onChange={e => setDefaultValues(e)}
                                            placeholder={t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
                                            style={{width: '100%'}}>
                                         <option value="" />
